@@ -1,0 +1,24 @@
+<div class="dropdown" id="profile-dropdown">
+    <button class="btn btn-light" type="button"
+    hx-target="#generic_modal_body" hx-include="#switch_user"
+    hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
+    hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click">
+        <span style="font-size:12px">Logged in as {{user.profile}} </b> 
+        <img src="/media/{{user.profile.avatar}}" width="40" height="40" class="rounded-circle">
+    </button>
+    <input type="text" style="display:None" id="switch_user" name="template_name" value="switch_user"/>
+    {% comment %} <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+        <li>
+            <a class="dropdown-item"
+                hx-target="#generic_modal_body" hx-include="#switch_user"
+                hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
+                hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click">
+                Switch User
+            </a>
+        </li>
+    </ul> {% endcomment %}
+</div>
+
+<span hx-swap-oob="true" id="csrf_token_div">
+    <input type="text" style="display:None" id="csrf_token" name="csrf_token" value="{{csrf_token}}"/>
+</span>

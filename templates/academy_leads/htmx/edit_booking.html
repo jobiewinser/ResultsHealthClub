@@ -1,0 +1,38 @@
+<span>
+    <div class="row">
+        <div class="col">
+            <div class="m-3">
+                <label class="form-label custom-badge-label" for="time_occurred">Time of Communication</label>
+                <input type="time" id="time_occurred" name="time_occurred" class="form-control">
+            </div>
+
+            <div class="m-3 row" style="text-align:left; margin-left:0px !important; min-width:300px;">
+                <div class="col" style="text-align:right">
+                    <span id="booking-type-span-one">Phone</span>
+                </div>
+
+                <div class="col-md-auto p-0">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="booking-type">
+                    </div>
+                </div>
+
+                <div class="col" style="text-align:left; padding-left:5px">
+                    In Person
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="m-3">
+                <button class="btn btn-primary" onclick="$('#generic_modal').modal('hide'); snackbarShow('Successfully added Booking', 'success')">
+                    Submit Booking
+                </button>
+            </div>
+        </div>
+    </div>
+</span>
+<span hx-swap-oob="true" id="generic_modal_title">
+    Add Booking
+</span>

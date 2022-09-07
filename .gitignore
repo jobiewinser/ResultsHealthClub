@@ -127,3 +127,15 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+.vscode
+static/**
+
+migrations
+
+media/**
+asgi.py
+nano.save
+settings.py1
+.requirements.txt.swp
+__init__.py

@@ -1,0 +1,26 @@
+{%load static%}
+<span>
+    <div class="row">
+        <div class="col center" >
+            <input name="first_name" class="form-control add_user_input" placeholder="First Name"/>
+            <br>
+            <input name="last_name" class="form-control add_user_input" placeholder="Last Name"/>
+            <br>
+            <label class="form-label" for="customFile">Profile Picture:</label>
+            <input name="profile_picture" type="file" class="form-control add_user_input" id="customFile" />
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col center" >
+            <button class="btn btn-light" type="button"
+                hx-encoding="multipart/form-data"
+                hx-post="{% url 'add-user' %}" hx-include=".add_user_input" hx-target="#profile-dropdown">
+                Add Profile
+            </button>
+        </div>
+    </div>
+</span>
+<span hx-swap-oob="true" id="generic_modal_title">
+    Add User
+</span>

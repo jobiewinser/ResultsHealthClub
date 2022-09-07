@@ -1,0 +1,478 @@
+{% extends 'core/base.html' %}
+{%load static%}
+{%block scripts%}
+    {{block.super}}
+    <script>
+        $(document).ready(function() {
+        });
+    </script>
+{%endblock scripts%}
+
+{%block styles%}
+    {{block.super}}
+    <style>
+    </style>
+{%endblock styles%}
+{%block content%}
+    <input type="text" style="display:None" id="log_communication" name="template_name" value="log_communication"/>
+    <input type="text" style="display:None" id="communication_history" name="template_name" value="communication_history"/>
+    <input type="text" style="display:None" id="edit_booking" name="template_name" value="edit_booking"/>
+    <input type="text" style="display:None" id="pause_whatsapp" name="template_name" value="pause_whatsapp"/>
+    
+    <div class="">
+        <div class="row">
+            <div class="col-md-auto">
+                <select class="form-select">
+                    <option>Results Health Club - Abingdon</option>
+                </select>
+            </div>
+            <div class="col-md-auto">
+                <button class="btn btn-success" onclick="snackbarShow('Coming Soon', 'danger')"><i class="fa fa-whatsapp" aria-hidden="true"></i> Whatsapp Templates</button>
+            </div>
+            <div class="col">                
+            </div>
+        </div>
+        <div class="row m-3">
+            <div class="col">
+                <table id="results_table" class="table"> 
+                    <thead> 
+                        <tr>
+                            <th>
+                                Name
+                            </th>
+                            <th>
+                                Lead Date
+                            </th>
+                            <th>
+                                Ad Campaign
+                            </th>
+                            <th>
+                                Whatsapp
+                            </th>
+                            <th>
+                                Other Communication
+                            </th>
+                            <th>
+                                Last Communication & History
+                            </th>
+                            <th>
+                                Date/Time Booked
+                            </th>
+                            <th>
+                                Arrived
+                            </th>
+                            <th>
+                                Sold
+                            </th>
+                            <th>
+                                Next Automatic Whatsapp
+                            </th>
+                            <th>
+                                Extra
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody> 
+                        <tr id="row_1">
+                            <td>
+                                Jobie Winser
+                            </td>
+                            <td class="nowrap">
+                                25-08-2022 <br>
+                                <i>(7 days ago)</i>
+                            </td>
+                            <td>
+                                Live Well Male
+                            </td>
+                            <td class="nowrap">
+                                <a style="text-decoration: none;" target="_blank" href="whatsapp://send?phone=447827777940&text=Hi Jobie, I'm using Eleanor's number as a demo"><i class="fa fa-whatsapp" aria-hidden="true"></i> 07872000364</a>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-primary"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover" 
+                                    data-bs-placement="top"
+                                    data-bs-content="Log a phone call communication attempt"
+                                    hx-target="#generic_modal_body" 
+                                    hx-include="#log_communication"
+                                    hx-get="{% url 'get-modal-content' param1='Phone' %}" 
+                                    hx-push-url="false"
+                                    hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa fa-phone" aria-hidden="true"></i></button>
+                                <button class="btn btn-sm btn-warning"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover" 
+                                    data-bs-placement="top"
+                                    data-bs-content="Log an email communication attempt"
+                                    hx-target="#generic_modal_body" 
+                                    hx-include="#log_communication"
+                                    hx-get="{% url 'get-modal-content' param1='Email' %}" 
+                                    hx-push-url="false"
+                                    hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa fa-envelope" aria-hidden="true"></i></button>
+                                <button class="btn btn-sm btn-secondary"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover" 
+                                    data-bs-placement="top"
+                                    data-bs-content="Log a text message communication attempt"
+                                    hx-target="#generic_modal_body" 
+                                    hx-include="#log_communication"
+                                    hx-get="{% url 'get-modal-content' param1='Text' %}" 
+                                    hx-push-url="false"
+                                    hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa fa-message-sms" aria-hidden="true"></i></button>
+                            </td>
+                            <td class="nowrap">
+                                <button class="btn btn-sm btn-primary"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover" 
+                                    data-bs-placement="top"
+                                    data-bs-content="See communication history for this lead."
+                                    hx-target="#generic_modal_body" 
+                                    hx-include="#communication_history"
+                                    hx-get="{% url 'get-modal-content' %}" 
+                                    hx-push-url="false"
+                                    hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click">
+                                        <i class="fa-regular fa-clock-rotate-left" ></i> History
+                                </button>
+                                15-09-2022 - Phone
+                            </td>
+                            <td class="nowrap">
+                                <div class="row">
+                                    <div class="col-md-auto p-0 pe-2">
+                                        <button class="btn btn-sm btn-warning"
+                                            data-bs-toggle="popover" 
+                                            data-bs-trigger="hover" 
+                                            data-bs-placement="top"
+                                            data-bs-content="Add a booking"
+                                            hx-target="#generic_modal_body" 
+                                            hx-include="#edit_booking"
+                                            hx-get="{% url 'get-modal-content' %}" 
+                                            hx-push-url="false"
+                                            hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+                                    </div>
+                                    <div class="col p-0">
+                                        12-06-22 3:15 PM - Phone
+                                        <br>
+                                        <span class="badge bg-warning">In 2 days (Tuesday)</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <input type="checkbox" indeterminate="True" onclick="snackbarShow('Successfully marked as arrived', 'success')"/>
+                            </td>
+                            <td>
+                                <input type="checkbox" indeterminate="True" onclick="snackbarShow('Successfully marked as sold', 'success')"/>
+                            </td>
+                            <td>
+                                
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-success" onclick="snackbarShow('Successfully marked lead as done', 'success')"
+                                    hx-post="{% url 'mark-done' %}" hx-target="#row_1">Done</button>
+                            </td>
+                        </tr>
+                        <tr id="row_2">
+                            <td>
+                                Jack Grant
+                            </td>
+                            <td class="nowrap">
+                                22-08-2022 <br>
+                                <i>(10 days ago)</i>
+                            </td>
+                            <td>
+                                Live Well Female
+                            </td>
+                            <td class="nowrap">
+                                <a style="text-decoration: none;" target="_blank" href="whatsapp://send?phone=447827777940&text=Hi Jack, I'm using Eleanor's number as a demo"><i class="fa fa-whatsapp" aria-hidden="true"></i> 07827777940</a>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-primary"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover" 
+                                    data-bs-placement="top"
+                                    data-bs-content="Log a phone call communication attempt"
+                                    hx-target="#generic_modal_body" 
+                                    hx-include="#log_communication"
+                                    hx-get="{% url 'get-modal-content' param1='Phone' %}" 
+                                    hx-push-url="false"
+                                    hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa fa-phone" aria-hidden="true"></i></button>
+                                <button class="btn btn-sm btn-warning"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover" 
+                                    data-bs-placement="top"
+                                    data-bs-content="Log an email communication attempt"
+                                    hx-target="#generic_modal_body" 
+                                    hx-include="#log_communication"
+                                    hx-get="{% url 'get-modal-content' param1='Email' %}" 
+                                    hx-push-url="false"
+                                    hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa fa-envelope" aria-hidden="true"></i></button>
+                                <button class="btn btn-sm btn-secondary"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover" 
+                                    data-bs-placement="top"
+                                    data-bs-content="Log a text message communication attempt"
+                                    hx-target="#generic_modal_body" 
+                                    hx-include="#log_communication"
+                                    hx-get="{% url 'get-modal-content' param1='Text' %}" 
+                                    hx-push-url="false"
+                                    hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa fa-message-sms" aria-hidden="true"></i></button>
+                            </td>
+                            <td class="nowrap">
+                                <button class="btn btn-sm btn-primary"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover" 
+                                    data-bs-placement="top"
+                                    data-bs-content="See communication history for this lead."
+                                    hx-target="#generic_modal_body" 
+                                    hx-include="#communication_history"
+                                    hx-get="{% url 'get-modal-content' %}" 
+                                    hx-push-url="false"
+                                    hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click">
+                                        <i class="fa-regular fa-clock-rotate-left" ></i> History
+                                </button>
+                                15-09-2022 - Whatsapp
+                            </td>
+                            <td class="nowrap">
+                                <div class="row">
+                                    <div class="col-md-auto p-0 pe-2">
+                                        <button class="btn btn-sm btn-warning"
+                                            data-bs-toggle="popover" 
+                                            data-bs-trigger="hover" 
+                                            data-bs-placement="top"
+                                            data-bs-content="Add a booking"
+                                            hx-target="#generic_modal_body" 
+                                            hx-include="#edit_booking"
+                                            hx-get="{% url 'get-modal-content' %}" 
+                                            hx-push-url="false"
+                                            hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+                                    </div>
+                                    <div class="col p-0">
+                                        14-07-22 3:15 PM - In Person
+                                        <br>
+                                        <span class="badge bg-danger">Tomorrow (Monday)</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <input type="checkbox" indeterminate="True" onclick="snackbarShow('Successfully marked as arrived', 'success')"/>
+                            </td>
+                            <td>
+                                <input type="checkbox" indeterminate="True" onclick="snackbarShow('Successfully marked as sold', 'success')"/>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-secondary"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover" 
+                                    data-bs-placement="top"
+                                    data-bs-content="Pause this message for a while"
+                                    hx-target="#generic_modal_body" 
+                                    hx-include="#pause_whatsapp"
+                                    hx-get="{% url 'get-modal-content' %}" 
+                                    hx-push-url="false"
+                                    hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa fa-pause" aria-hidden="true"></i></button>
+                                15-09-2022
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-success" onclick="snackbarShow('Successfully marked lead as done', 'success')"
+                                    hx-post="{% url 'mark-done' %}" hx-target="#row_2">Done</button>
+                            </td>
+                        </tr>
+                        <tr id="row_3">
+                            <td>
+                                Scout Winser
+                            </td>
+                            <td class="nowrap">
+                                26-08-2022 <br>
+                                <i>(6 days ago)</i>
+                            </td>
+                            <td>
+                                Live Well Male
+                            </td>
+                            <td class="nowrap">
+                                <a style="text-decoration: none;" target="_blank" href="whatsapp://send?phone=447827777940&text=Hi Scout, I'm using Eleanor's number as a demo"><i class="fa fa-whatsapp" aria-hidden="true"></i> 09876543214</a>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-primary"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover" 
+                                    data-bs-placement="top"
+                                    data-bs-content="Log a phone call communication attempt"
+                                    hx-target="#generic_modal_body" 
+                                    hx-include="#log_communication"
+                                    hx-get="{% url 'get-modal-content' param1='Phone' %}" 
+                                    hx-push-url="false"
+                                    hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa fa-phone" aria-hidden="true"></i></button>
+                                <button class="btn btn-sm btn-warning"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover" 
+                                    data-bs-placement="top"
+                                    data-bs-content="Log an email communication attempt"
+                                    hx-target="#generic_modal_body" 
+                                    hx-include="#log_communication"
+                                    hx-get="{% url 'get-modal-content' param1='Email' %}" 
+                                    hx-push-url="false"
+                                    hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa fa-envelope" aria-hidden="true"></i></button>
+                                <button class="btn btn-sm btn-secondary"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover" 
+                                    data-bs-placement="top"
+                                    data-bs-content="Log a text message communication attempt"
+                                    hx-target="#generic_modal_body" 
+                                    hx-include="#log_communication"
+                                    hx-get="{% url 'get-modal-content' param1='Text' %}" 
+                                    hx-push-url="false"
+                                    hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa fa-message-sms" aria-hidden="true"></i></button>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-primary"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover" 
+                                    data-bs-placement="top"
+                                    data-bs-content="See communication history for this lead."
+                                    hx-target="#generic_modal_body" 
+                                    hx-include="#communication_history"
+                                    hx-get="{% url 'get-modal-content' %}" 
+                                    hx-push-url="false"
+                                    hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click">
+                                        <i class="fa-regular fa-clock-rotate-left" ></i> History
+                                </button>
+                                15-09-2022 - In Person
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-primary"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover" 
+                                    data-bs-placement="top"
+                                    data-bs-content="Add a booking"
+                                    hx-target="#generic_modal_body" 
+                                    hx-include="#edit_booking"
+                                    hx-get="{% url 'get-modal-content' %}" 
+                                    hx-push-url="false"
+                                    hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa fa-plus" aria-hidden="true"></i></button>                                
+                            </td>
+                            <td>
+                                <input type="checkbox" indeterminate="True" onclick="snackbarShow('Successfully marked as arrived', 'success')"/>
+                            </td>
+                            <td>
+                                <input type="checkbox" indeterminate="True" onclick="snackbarShow('Successfully marked as sold', 'success')"/>
+                            </td>
+                            <td>                            
+                                <button class="btn btn-sm btn-secondary"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover" 
+                                    data-bs-placement="top"
+                                    data-bs-content="Pause this message for a while"
+                                    hx-target="#generic_modal_body" 
+                                    hx-include="#pause_whatsapp"
+                                    hx-get="{% url 'get-modal-content' %}" 
+                                    hx-push-url="false"
+                                    hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa fa-pause" aria-hidden="true"></i></button>
+                                15-09-2022
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-success" onclick="snackbarShow('Successfully marked lead as done', 'success')"
+                                    hx-post="{% url 'mark-done' %}" hx-target="#row_3">Done</button>
+                            </td>
+                        </tr>
+                        <tr id="row_4">
+                            <td>
+                                Mark Benden
+                            </td>
+                            <td class="nowrap">
+                                31-08-2022 <br>
+                                <i>(1 day ago)</i>
+                            </td>
+                            <td>
+                                Live Well Female
+                            </td>
+                            <td class="nowrap">
+                                <a style="text-decoration: none;" target="_blank" href="whatsapp://send?phone=447827777940&text=Hi Mark, I'm using Eleanor's number as a demo"><i class="fa fa-whatsapp" aria-hidden="true"></i> 09876543214</a>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-primary"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover" 
+                                    data-bs-placement="top"
+                                    data-bs-content="Log a phone call communication attempt"
+                                    hx-target="#generic_modal_body" 
+                                    hx-include="#log_communication"
+                                    hx-get="{% url 'get-modal-content' param1='Phone' %}" 
+                                    hx-push-url="false"
+                                    hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa fa-phone" aria-hidden="true"></i></button>
+                                <button class="btn btn-sm btn-warning"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover" 
+                                    data-bs-placement="top"
+                                    data-bs-content="Log an email communication attempt"
+                                    hx-target="#generic_modal_body" 
+                                    hx-include="#log_communication"
+                                    hx-get="{% url 'get-modal-content' param1='Email' %}" 
+                                    hx-push-url="false"
+                                    hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa fa-envelope" aria-hidden="true"></i></button>
+                                <button class="btn btn-sm btn-secondary"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover" 
+                                    data-bs-placement="top"
+                                    data-bs-content="Log a text message communication attempt"
+                                    hx-target="#generic_modal_body" 
+                                    hx-include="#log_communication"
+                                    hx-get="{% url 'get-modal-content' param1='Text' %}" 
+                                    hx-push-url="false"
+                                    hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa fa-message-sms" aria-hidden="true"></i></button>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-primary"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover" 
+                                    data-bs-placement="top"
+                                    data-bs-content="See communication history for this lead."
+                                    hx-target="#generic_modal_body" 
+                                    hx-include="#communication_history"
+                                    hx-get="{% url 'get-modal-content' %}" 
+                                    hx-push-url="false"
+                                    hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click">
+                                        <i class="fa-regular fa-clock-rotate-left" ></i> History
+                                </button>
+                                07-09-2022 - Whatsapp
+                            </td>
+                            <td>                                
+                                <button class="btn btn-sm btn-primary"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover" 
+                                    data-bs-placement="top"
+                                    data-bs-content="Add a booking"
+                                    hx-target="#generic_modal_body" 
+                                    hx-include="#edit_booking"
+                                    hx-get="{% url 'get-modal-content' %}" 
+                                    hx-push-url="false"
+                                    hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa fa-plus" aria-hidden="true"></i></button>
+                            </td>
+                            <td>
+                                <input type="checkbox" indeterminate="True" onclick="snackbarShow('Successfully marked as arrived', 'success')"/>
+                            </td>
+                            <td>
+                                <input type="checkbox" indeterminate="True" onclick="snackbarShow('Successfully marked as sold', 'success')"/>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-secondary"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover" 
+                                    data-bs-placement="top"
+                                    data-bs-content="Pause this message for a while"
+                                    hx-target="#generic_modal_body" 
+                                    hx-include="#pause_whatsapp"
+                                    hx-get="{% url 'get-modal-content' %}" 
+                                    hx-push-url="false"
+                                    hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa fa-pause" aria-hidden="true"></i></button>
+                                07-09-2022
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-success" onclick="snackbarShow('Successfully marked lead as done', 'success')"
+                                    hx-post="{% url 'mark-done' %}" hx-target="#row_4">Done</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+{%endblock content%}

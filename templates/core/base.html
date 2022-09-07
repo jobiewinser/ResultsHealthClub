@@ -1,0 +1,173 @@
+{%load static%}
+<!DOCTYPE html>
+<html>
+    <head>
+        {%block cdn%}
+            
+            <link rel="stylesheet" type="text/css"  href="{% static 'css/base.css' %}">
+            <link rel="stylesheet" type="text/css"  href="{% static 'css/main.css' %}">
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">  
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script> 
+            <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>            
+            <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+            <script src="https://kit.fontawesome.com/dff56c38e1.js" crossorigin="anonymous"></script>   
+            <script src="{% static 'js/htmx.min.js' %}"></script>        
+            <link href="{% static 'css/snackbar.css' %}" rel="stylesheet" />
+            <script src="{% static 'js/snackbar.js' %}"></script> 
+            {% comment %} 
+            AutoFill v2.3.7
+            Buttons v2.0.1
+            Column visibility v2.0.1
+            HTML5 export v2.0.1
+            JSZip v2.5.0
+            pdfmake v0.1.36
+            Print view v2.0.1
+            ColReorder v1.5.5
+            DateTime v1.1.1
+            FixedColumns v4.0.1
+            FixedHeader v3.2.0
+            KeyTable v2.6.4
+            Responsive v2.2.9
+            RowGroup v1.1.4
+            RowReorder v1.2.8
+            Scroller v2.0.5
+            SearchBuilder v1.3.0
+            SearchPanes v1.4.0
+            Select v1.3.3 {% endcomment %}
+           <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-1.11.3/af-2.3.7/b-2.0.1/b-colvis-2.0.1/b-html5-2.0.1/b-print-2.0.1/cr-1.5.5/date-1.1.1/fc-4.0.1/fh-3.2.0/kt-2.6.4/r-2.2.9/rg-1.1.4/rr-1.2.8/sc-2.0.5/sb-1.3.0/sp-1.4.0/sl-1.3.3/datatables.min.css"/>
+           <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.11.3/af-2.3.7/b-2.0.1/b-colvis-2.0.1/b-html5-2.0.1/b-print-2.0.1/cr-1.5.5/date-1.1.1/fc-4.0.1/fh-3.2.0/kt-2.6.4/r-2.2.9/rg-1.1.4/rr-1.2.8/sc-2.0.5/sb-1.3.0/sp-1.4.0/sl-1.3.3/datatables.min.js"></script>
+        {%endblock cdn%}
+
+        {%block scripts%}
+            <script>
+                $(document).ready(function() {
+                    $('#results_table').DataTable({
+                    });
+                    $("[data-bs-toggle=popover]").popover();
+
+                    document.body.addEventListener('htmx:afterOnLoad', function(evt) {                
+                        if (evt.detail.target.id == 'generic_modal_body'){
+                            $('#generic_modal').modal('show');
+                        }
+                        else if (evt.detail.pathInfo.path.includes("switch-user")){
+                            $('#generic_modal').modal('hide');
+                            snackbarShow('Successfully switched user', 'success')
+                        }
+                        else if (evt.detail.pathInfo.path.includes("add-user")){
+                            $('#generic_modal').modal('hide');
+                            snackbarShow('Successfully added user', 'success')
+                        }
+                        else if (evt.detail.pathInfo.path.includes("mark-done")){
+                            snackbarShow('Successfully marked lead as done', 'success')
+                        }
+                        
+                        $('[data-bs-toggle=popover]').popover();
+                    });
+                    document.body.addEventListener('htmx:configRequest', function(evt) {    
+                        evt.detail.headers['x-csrftoken'] = $('#csrf_token').val();
+                    });
+                });
+            </script>
+        {%endblock scripts%}
+
+        {%block styles%}
+        <style>
+            .row {
+                width:100%;
+                margin:0px;
+            }
+            .no-bullet {
+                list-style-type: none; 
+            }
+            .modal {
+            text-align: center;
+            padding: 0!important;
+            }
+            .modal:before {
+            content: '';
+            display: inline-block;
+            height: 100%;
+            vertical-align: middle;
+            margin-right: -4px;
+            }
+            .modal-dialog {
+            display: inline-block;
+            text-align: left;
+            vertical-align: middle;
+            }
+            .nowrap {
+                white-space: nowrap;
+            }
+            .badge > * {
+                vertical-align:middle;
+            }
+            .user-select {
+                text-align:center;
+                cursor: pointer;
+            }
+            .current-user-highlight {
+                background-color: rgba(25, 135, 84, 0.3) !important;
+                border: rgba(25, 135, 84, 0.8) !important;
+            }
+            .content {
+                margin-top:10px;
+            }
+            #booking-type:checked ~ #booking-type-span-one {
+                color:green
+            }
+            .badge {
+                text-shadow: none;
+                font-size: .9em;
+                font-weight: 400;
+            }
+              
+        </style>
+        {%endblock styles%}
+        
+    </head>
+
+    <body>
+
+        {%block navbar%}
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                <div class="container-fluid">
+                        <a href="#" class="navbar-brand p-0"><img src="{% static 'img/logo_white.png' %}" height="40px"></a>
+                        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                                <li class="nav-item">
+                                <a class="nav-link active" href="#">Academy Leads</a>
+                                </li>
+                                <li class="nav-item">
+                                <a class="nav-link" href="#">Other Features</a>
+                                </li>
+                            </ul>
+                            {%include 'academy_leads/htmx/profile_dropdown.html'%}
+                        </div>
+                </div>
+            </nav>
+        {%endblock navbar%}
+        
+        <div class="content">
+            {%block content%}
+            {%endblock content%}
+        </div>
+
+        <div class="modal fade" id="generic_modal" role="dialog" style="overflow:hidden;display: none;">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="generic_modal_title"></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true"></span>
+                        </button>
+                    </div> 
+                    <div class="modal-body" id="generic_modal_body">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </body>
+    <div id="snackbar"></div>
+</html>
+

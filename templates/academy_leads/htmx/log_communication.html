@@ -1,0 +1,37 @@
+<span>
+    <div class="row">
+        <div class="col">
+            <div class="m-3">
+                <label class="form-label custom-badge-label" for="time_occurred">Time of Communication</label>
+                <input type="time" id="time_occurred" name="time_occurred" class="form-control">
+            </div>
+            {%if communication_type == 'Phone'%}
+            <div class="m-3">
+                <label class="form-label custom-badge-label" for="customer_answered">Customer answered?</label>
+                <input type="checkbox" id="customer_answered" name="customer_answered" class="form-check-input">
+            </div>
+            {%endif%}
+            <div class="m-3">
+                <label class="form-label custom-badge-label" for="time_occurred">Notes</label>
+                <textarea rows=5 type="time" style="min-width:500px" id="time_occurred" name="time_occurred" class="form-control"></textarea>
+            </div>
+            <div class="m-3">
+                <button class="btn btn-primary" onclick="$('#generic_modal').modal('hide'); snackbarShow('Successfully logged communication - {{communication_type}}', 'success')">
+                    {%if communication_type == 'Phone'%}
+                    <i class="fa fa-phone" aria-hidden="true"></i>
+                    {%elif communication_type == 'Email'%}
+                    <i class="fa fa-envelope" aria-hidden="true"></i>
+                    {%elif communication_type == 'Text'%}
+                    <i class="fa fa-message-sms" aria-hidden="true"></i>
+                    {%endif%} 
+                    Submit Log
+                </button>
+            </div>
+        </div>
+    </div>
+</span>
+
+
+<span hx-swap-oob="true" id="generic_modal_title">
+    Log Communication - {{communication_type}}
+</span>

@@ -1,0 +1,23 @@
+<span>
+    <div class="row">
+        <div class="col">
+            <div class="m-3">
+                <div class="form-group">
+                  <small class="form-text text-muted">Pause for</small>
+                  <input type="number" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="1">
+                  <small class="form-text text-muted">Day(s)</small>
+                </div>
+            </div>
+            <div class="m-3">
+                <button class="btn btn-primary" onclick="$('#generic_modal').modal('hide'); snackbarShow('Successfully paused Whatsapp messages', 'success')">
+                    Pause Messages
+                </button>
+            </div>
+        </div>
+    </div>
+</span>
+
+
+<span hx-swap-oob="true" id="generic_modal_title">
+    Pause Whatsapp Automatic Messages
+</span>
