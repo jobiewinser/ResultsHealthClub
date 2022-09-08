@@ -14,6 +14,6 @@ def mark_done(request, **kwargs):
         if request.user.is_staff:
             return HttpResponse("", "text", 200)
     except Exception as e:
-        logger.debug("switch_user Error "+str(e))
+        logger.debug("mark_done Error "+str(e))
         return HttpResponse(e, status=500)
 

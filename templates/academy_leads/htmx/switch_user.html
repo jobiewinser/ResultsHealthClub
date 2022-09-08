@@ -6,7 +6,7 @@
         <div class="col-md-auto user-select p-3 mb-3 {%if staff_user == request.user%}current-user-highlight{%endif%}"
             hx-post="{% url 'switch-user' %}" hx-include="#user-select-{{staff_user.pk}}" hx-target="#profile-dropdown">
             <input type="text" style="display:None" id="user-select-{{staff_user.pk}}" name="user_pk" value="{{staff_user.pk}}"/>
-            <img src="/media/{{staff_user.profile.avatar}}" width="80" height="80" class="rounded-circle">            
+            <img src="/media/{{staff_user.profile.avatar}}" width="80" height="80" class="rounded-circle" style="object-fit: cover;">            
             <br>            
             <br>            
             <h6 class="nowrap">{{staff_user.profile}}</h6>
@@ -14,7 +14,7 @@
         {%endif%}
         {%endfor%}
     </div>
-    <Br>
+    <br>
     <div class="row">
         <div class="col center">
             <button class="btn btn-light" type="button"

@@ -1,0 +1,62 @@
+{% extends 'core/base.html' %}
+{%load static%}
+{%block scripts%}
+{{block.super}}
+<script>
+    $(document).ready(function() {
+        $('#results_table').DataTable({
+        });
+        $("[data-bs-toggle=popover]").popover();
+
+        document.body.addEventListener('htmx:afterOnLoad', function(evt) {                
+            if (evt.detail.target.id == 'generic_modal_body'){
+                $('#generic_modal').modal('show');
+            }
+            else if (evt.detail.pathInfo.path.includes("switch-user")){
+                $('#generic_modal').modal('hide');
+                snackbarShow('Successfully switched user', 'success')
+            }
+            else if (evt.detail.pathInfo.path.includes("add-user")){
+                $('#generic_modal').modal('hide');
+                snackbarShow('Successfully added user', 'success')
+            }
+            
+            $('[data-bs-toggle=popover]').popover();
+        });
+        document.body.addEventListener('htmx:configRequest', function(evt) {    
+            evt.detail.headers['x-csrftoken'] = $('#csrf_token').val();
+        });
+    });
+</script>
+{%endblock scripts%}
+
+{%block styles%}
+    {{block.super}}
+    <style>
+    </style>
+{%endblock styles%}
+{%block content%}    
+    <div class="">
+        <div class="row">
+            <div class="col-md-auto">
+                <select class="form-select">
+                    {%for gym in gym_choices%}
+                    <option>Results Health Club - {{gym.1}}</option>
+                    {%endfor%}
+                </select>
+            </div>
+            {%block extra_top_buttons %}
+            {%endblock%}
+            <div class="col">                
+            </div>
+        </div>
+        <div class="row m-3">
+            <div class="col">
+                {%block table%}
+                
+                {%endblock table%}
+            </div>
+        </div>
+    </div>
+    
+{%endblock content%}

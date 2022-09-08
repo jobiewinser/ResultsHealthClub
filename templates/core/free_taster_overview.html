@@ -1,0 +1,89 @@
+{% extends 'core/overviews.html' %}
+{%load static%}
+{%load core_tags%}
+
+{%block scripts%}
+{{block.super}}
+<script>
+    $(document).ready(function() {
+    });
+</script>
+{%endblock scripts%}
+
+{%block extra_top_buttons %}
+<div class="col-md-auto">
+    <button class="btn btn-success"
+        data-bs-toggle="popover" 
+        data-bs-trigger="hover" 
+        data-bs-placement="top"
+        data-bs-content="Generate a unique free taster link."
+        hx-target="#generic_modal_body" 
+        hx-include="#create_free_taster_link"
+        hx-get="{% url 'get-modal-content' %}" 
+        hx-push-url="false"
+        hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click">
+            <i class="fa-solid fa-link" aria-hidden="true"></i> Generate Free Taster Link
+    </button>
+    <input type="text" style="display:None" id="create_free_taster_link" name="template_name" value="create_free_taster_link"/>
+</div>
+{%endblock%}
+
+{%block table%}
+<table id="results_table" class="table"> 
+    <thead> 
+        <tr>
+            <th>
+                Customer Name
+            </th>
+            <th>
+                Staff
+            </th>
+            <th>
+                Link Clicked
+            </th>
+            <th>
+                Link
+            </th>
+            <th>
+                Extra
+            </th>
+        </tr>
+    </thead>
+    <tbody> 
+        {%for link in free_taster_links%}
+        <tr id="row_{{link.pk}}">
+            <td>
+                {{link.customer_name}}
+                <input type="text" style="display:None" id="link_pk_{{link.pk}}" name="link_pk" value="{{link.pk}}"/>
+            </td>
+            <td>
+                {{link.staff_user.profile}}
+                {%if link.staff_user == request.user%}
+                <span style="color:grey">(You)</span>
+                {%endif%}
+            </td>
+            <td>
+                {%if link.freetasterlinkclick_set.all%}
+                <span class="badge bg-success" 
+                    data-bs-toggle="popover" 
+                    data-bs-trigger="hover" 
+                    data-bs-placement="top"
+                    data-bs-html="true"
+                    data-bs-content="<ol>{%for click in link.freetasterlinkclick_set.all%}<li>{{click.created}}</li>{%endfor%}</ol>">
+                    {{link.freetasterlinkclick_set.first.created}}
+                </span>
+                {%endif%}
+            </td>
+            <td>
+                <button class="btn btn-primary" onclick="copyTextToClipboard('{% get_env_var 'SITE_URL' %}/free-taster-redirect/{{link.guid}}')"><i class="fa-solid fa-copy"></i> Copy</button>
+                {% get_env_var 'SITE_URL' %}/free-taster-redirect/{{link.guid}}                 
+            </td>
+            <td>
+                <button class="btn btn-sm btn-danger" hx-include="#link_pk_{{link.pk}}"
+                    hx-post="{% url 'delete-free-taster-link' %}" hx-target="#row_{{link.pk}}">Delete</button>             
+            </td>
+        </tr>
+        {%endfor%}
+    </tbody>
+</table>
+{%endblock table%}

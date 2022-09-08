@@ -1,5 +1,6 @@
 import os
-from core.models import Profile
+import uuid
+from core.models import FreeTasterLink, Profile
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import render
@@ -19,7 +20,7 @@ def switch_user(request, **kwargs):
                 user_pk = user_pk[0]
             logger.debug(f"TEST {str(user_pk)}")
             login(request, User.objects.get(pk=user_pk, is_superuser=False))
-            return render(request, f"academy_leads/htmx/profile_dropdown.html", {})   
+            return render(request, f"core/htmx/profile_dropdown.html", {})   
     except Exception as e:
         logger.debug("switch_user Error "+str(e))
         return HttpResponse(e, status=500)
@@ -53,9 +54,40 @@ def add_user(request, **kwargs):
                                         is_staff=True)
             Profile.objects.create(user = user, avatar = request.FILES['profile_picture'])
             login(request, user)
-            return render(request, f"academy_leads/htmx/profile_dropdown.html", {})  
+            return render(request, f"core/htmx/profile_dropdown.html", {})  
     except Exception as e:
         logger.debug("get_modal_content Error "+str(e))
         return HttpResponse(e, status=500)
+
+
+@login_required
+def generate_free_taster_link(request, **kwargs):
+    try:
+        if request.user.is_staff:
+            customer_name = request.POST.get('customer_name', '')
+            if customer_name:
+                guid = str(uuid.uuid4())[:8]
+                while FreeTasterLink.objects.filter(guid=guid):
+                    guid = str(uuid.uuid4())[:8]
+                generated_link = FreeTasterLink.objects.create(customer_name=customer_name, staff_user=request.user, guid=guid)
+                return render(request, f"core/htmx/generated_link_display.html", {'generated_link':generated_link})  
+    except Exception as e:
+        logger.debug("get_modal_content Error "+str(e))
+        return HttpResponse(e, status=500)
+
+
+@login_required
+def delete_free_taster_link(request, **kwargs):
+    logger.debug(str(request.user))
+    try:
+        if request.user.is_staff:
+            link_pk = request.POST.get('link_pk','')
+            if link_pk:
+                FreeTasterLink.objects.get(pk=link_pk).delete()
+            return HttpResponse("", "text", 200)
+    except Exception as e:
+        logger.debug("delete_free_taster_link Error "+str(e))
+        return HttpResponse(e, status=500)
+
 
         
