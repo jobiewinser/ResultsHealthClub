@@ -20,6 +20,14 @@
                             <span style="">
                                 {{booking.datetime}}
                             </span>
+                            <br>
+                            <span style="">
+                                <ul>
+                                {%for note in booking.note_set.all%}
+                                <li>{{note.text}}</li>
+                                {%endfor%}
+                                </ul>
+                            </span>
                         </td>
                     </tr>
                     {%endfor%}

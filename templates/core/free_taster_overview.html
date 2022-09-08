@@ -29,6 +29,7 @@
 {%endblock%}
 
 {%block table%}
+<br>
 <table id="results_table" class="table"> 
     <thead> 
         <tr>
@@ -58,9 +59,6 @@
             </td>
             <td>
                 {{link.staff_user.profile}}
-                {%if link.staff_user == request.user%}
-                <span style="color:grey">(You)</span>
-                {%endif%}
             </td>
             <td>
                 {%if link.freetasterlinkclick_set.all%}
@@ -75,8 +73,8 @@
                 {%endif%}
             </td>
             <td>
-                <button class="btn btn-primary" onclick="copyTextToClipboard('{% get_env_var 'SITE_URL' %}/free-taster-redirect/{{link.guid}}')"><i class="fa-solid fa-copy"></i> Copy</button>
-                {% get_env_var 'SITE_URL' %}/free-taster-redirect/{{link.guid}}                 
+                <button class="btn btn-primary" onclick="copyTextToClipboard('{% get_env_var 'SITE_URL' %}/free-taster/{{link.guid}}')"><i class="fa-solid fa-copy"></i> Copy</button>
+                {% get_env_var 'SITE_URL' %}/free-taster/{{link.guid}}                 
             </td>
             <td>
                 <button class="btn btn-sm btn-danger" hx-include="#link_pk_{{link.pk}}"

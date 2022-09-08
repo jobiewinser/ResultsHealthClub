@@ -28,6 +28,19 @@
         
     </td>
     <td>
+        <button class="btn btn-sm btn-secondary"
+            data-bs-toggle="popover" 
+            data-bs-trigger="hover" 
+            data-bs-placement="top"
+            data-bs-content="See communication history for this lead."
+            hx-target="#generic_modal_body" 
+            hx-include="#communication_history"
+            hx-get="{% url 'academy-lead-get-modal-content' param1=lead.pk %}" 
+            hx-push-url="false"
+            hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click">
+                <i class="fa-regular fa-clock-rotate-left" ></i> History 
+                <span class="badge rounded-pill bg-light" style="color:black; width:20px; font-size:8px;">{{lead.communication_set.all.count}}</span>
+        </button>
         <button class="btn btn-sm btn-primary"
             data-bs-toggle="popover" 
             data-bs-trigger="hover" 
@@ -59,22 +72,6 @@
             hx-push-url="false"
             hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa fa-message-sms" aria-hidden="true"></i></button>
     </td>
-    <td>
-        <button class="btn btn-sm btn-secondary"
-            data-bs-toggle="popover" 
-            data-bs-trigger="hover" 
-            data-bs-placement="top"
-            data-bs-content="See communication history for this lead."
-            hx-target="#generic_modal_body" 
-            hx-include="#communication_history"
-            hx-get="{% url 'academy-lead-get-modal-content' param1=lead.pk %}" 
-            hx-push-url="false"
-            hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click">
-                <i class="fa-regular fa-clock-rotate-left" ></i> History
-        </button>
-        <span class="nowrap">{{lead.communication_set.all.0.datetime}}</span> - <span class="nowrap">{{lead.communication_set.all.0.get_type_display}}</span>
-        {% comment %} 07-09-2022 - Whatsapp {% endcomment %}
-    </td>
     <td>       
         <button class="btn btn-sm btn-secondary"
             data-bs-toggle="popover" 
@@ -87,6 +84,7 @@
             hx-push-url="false"
             hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click">
                 <i class="fa-regular fa-clock-rotate-left" ></i> History
+                <span class="badge rounded-pill bg-light" style="color:black; width:20px; font-size:8px;">{{lead.booking_set.all.count}}</span>
         </button>                         
         <button class="btn btn-sm btn-primary"
             data-bs-toggle="popover" 
@@ -123,7 +121,12 @@
         Coming Soon
     </td>
     <td>
-        <button class="btn btn-sm btn-success" hx-include="#lead_pk_{{lead.pk}}"
-            hx-post="{% url 'mark-done' %}" hx-target="#row_{{lead.pk}}">Done</button>
+        {%if request.GET.complete%}
+            <button class="btn btn-sm btn-danger" hx-include="#lead_pk_{{lead.pk}}"
+                hx-post="{% url 'mark-done' %}" hx-target="#row_{{lead.pk}}">Unarchive</button>
+        {%else%}
+            <button class="btn btn-sm btn-success" hx-include="#lead_pk_{{lead.pk}}"
+                hx-post="{% url 'mark-done' %}" hx-target="#row_{{lead.pk}}">Archive</button>
+        {%endif%}
     </td>
 </tr>

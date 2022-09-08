@@ -4,7 +4,15 @@
 {{block.super}}
 <script>
     $(document).ready(function() {
-        document.body.addEventListener('htmx:afterOnLoad', function(evt) {  
+        
+
+        document.body.addEventListener('htmx:beforeRequest', function(evt) {  
+            if (evt.detail.target.id == 'results_table'){
+                $("#results_table").dataTable().fnDestroy();
+            }
+        });
+
+        document.body.addEventListener('htmx:afterSwap', function(evt) {  
             if (evt.detail.xhr.status == 200){
                 if (evt.detail.pathInfo.path.includes("mark-done")){
                     snackbarShow('Successfully marked lead as done', 'success')
@@ -25,9 +33,9 @@
                     console.log(evt)
                     snackbarShow('Successfully sold to customer', 'success')
                 }
-            } else {
-                snackbarShow(evt.detail.xhr.responseText, 'danger')
             }
+            
+            $('[data-bs-toggle=popover]').popover();
         });
     });
 </script>
@@ -53,6 +61,20 @@
     <input type="text" style="display:None" id="create_academy_lead" name="template_name" value="create_academy_lead"/>
 </div>
 {%include 'academy_leads/htmx/academy_leads_table_status_toggle_div.html'%}
+<div class="col-md-auto">
+    {% comment %} <button class="btn btn-primary" 
+        data-bs-toggle="popover" 
+        data-bs-trigger="hover" 
+        data-bs-placement="top"
+        data-bs-content="Manually create an academy lead."
+        hx-target="#generic_modal_body" 
+        hx-include="#create_academy_lead"
+        hx-get="{% url 'academy-lead-get-modal-content' %}" 
+        hx-push-url="false"
+        hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click">
+            <i class="fa fa-plus" aria-hidden="true"></i> Manually Add Academy Lead
+    </button> {% endcomment %}
+</div>
 
 {%endblock%}
 
@@ -62,5 +84,6 @@
 <input type="text" style="display:None" id="booking_history" name="template_name" value="booking_history"/>
 <input type="text" style="display:None" id="add_booking" name="template_name" value="add_booking"/>
 <input type="text" style="display:None" id="pause_whatsapp" name="template_name" value="pause_whatsapp"/>
+<br>
 {% include 'academy_leads/htmx/academy_leads_table.html' %}
 {%endblock table%}

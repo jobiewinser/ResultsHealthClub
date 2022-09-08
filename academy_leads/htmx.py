@@ -155,7 +155,7 @@ def mark_arrived(request, **kwargs):
     try:
         if request.user.is_staff:
             lead = AcademyLead.objects.get(pk=request.POST.get('lead_pk'))
-            lead.arrived = (not lead.arrived)
+            lead.arrived = not lead.arrived
             lead.save()
             return render(request, "academy_leads/htmx/academy_lead_row.html", {'lead':lead}) 
     except Exception as e:

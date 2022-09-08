@@ -7,9 +7,14 @@
         $('#results_table').DataTable({
         });
         $("[data-bs-toggle=popover]").popover();
-
-        document.body.addEventListener('htmx:afterOnLoad', function(evt) {                
-            if (evt.detail.target.id == 'generic_modal_body'){
+        document.body.addEventListener('htmx:configRequest', function(evt) {    
+            evt.detail.headers['x-csrftoken'] = $('#csrf_token').val();
+        });
+        document.body.addEventListener('htmx:afterSwap', function(evt) {  
+            if (evt.detail.target.id == 'results_table'){
+                $('#results_table').DataTable({});  
+            }
+            else if (evt.detail.target.id == 'generic_modal_body'){
                 $('#generic_modal').modal('show');
             }
             else if (evt.detail.pathInfo.path.includes("switch-user")){
@@ -20,11 +25,13 @@
                 $('#generic_modal').modal('hide');
                 snackbarShow('Successfully added user', 'success')
             }
+
+            if (evt.detail.xhr.status == 200){
+            } else {
+                snackbarShow(evt.detail.xhr.responseText, 'danger')
+            }
             
             $('[data-bs-toggle=popover]').popover();
-        });
-        document.body.addEventListener('htmx:configRequest', function(evt) {    
-            evt.detail.headers['x-csrftoken'] = $('#csrf_token').val();
         });
     });
 </script>
@@ -39,7 +46,7 @@
     <div class="">
         <div class="row">
             <div class="col-md-auto">
-                <select class="form-select">
+                <select class="form-select" onchange="snackbarShow('Coming Soon', 'danger')">
                     {%for gym in gym_choices%}
                     <option>Results Health Club - {{gym.1}}</option>
                     {%endfor%}
@@ -50,7 +57,7 @@
             <div class="col">                
             </div>
         </div>
-        <div class="row m-3">
+        <div class="row">
             <div class="col">
                 {%block table%}
                 

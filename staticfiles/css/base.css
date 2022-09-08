@@ -182,3 +182,7 @@ body {
 .danger-tr > * {
     background-color: rgba(220, 53, 69, 0.1) !important;
 }
+
+.sorting {
+    cursor: pointer
+}
