@@ -20,6 +20,7 @@ urlpatterns = [
     path('switch-user/', corehtmx.switch_user, name='switch-user' ),
     path('get-modal-content/', corehtmx.get_modal_content, name='get-modal-content' ),
     path('get-modal-content/<str:param1>/', corehtmx.get_modal_content, name='get-modal-content' ),
+    path('get-modal-content/<str:param1>/<str:param2>/', corehtmx.get_modal_content, name='get-modal-content' ),
     path('add-user/', corehtmx.add_user, name='add-user' ),
     path('free-taster/', coreviews.FreeTasterOverviewView.as_view(), name='free-taster' ),
     path('free-taster-redirect/<str:guid>/', coreviews.free_taster_redirect, name='free-taster-redirect' ),

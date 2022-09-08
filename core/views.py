@@ -22,4 +22,4 @@ def free_taster_redirect(request, **kwargs):
         FreeTasterLinkClick.objects.create(link=free_taster_link)
     except:
         pass
-    return HttpResponseRedirect("https://resultshealthclubs.co.uk/")
+    return HttpResponseRedirect("https://resultshealthclubs.co.uk/book-free-taster-sessions-abingdon/")

@@ -32,10 +32,7 @@ def get_modal_content(request, **kwargs):
             template_name = request.GET.get('template_name', '')
             context = {}
             if template_name == 'switch_user':
-                # context['staff_users'] = User.objects.filter(is_staff=True, is_superuser=False).order_by('first_name')
                 context['staff_users'] = User.objects.filter(is_staff=True).order_by('first_name')
-            if template_name == 'log_communication':
-                context['communication_type'] = kwargs.get('param1')
             return render(request, f"academy_leads/htmx/{template_name}.html", context)   
     except Exception as e:
         logger.debug("get_modal_content Error "+str(e))

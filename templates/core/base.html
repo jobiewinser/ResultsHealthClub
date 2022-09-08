@@ -66,6 +66,11 @@
               
                 document.body.removeChild(textArea);
               }
+
+              function inlinePreventDefault(e) {
+                  e.preventDefault();
+              }
+              
               function copyTextToClipboard(text) {
                 if (!navigator.clipboard) {
                   fallbackCopyTextToClipboard(text);

@@ -19,4 +19,14 @@ import academy_leads.htmx as academyleadshtmx
 urlpatterns = [
     path('', academyleadsviews.AcademyLeadsOverviewView.as_view(), name='academy-leads-overview'),
     path('mark-done/', academyleadshtmx.mark_done, name='mark-done' ),
+    path('create-academy-lead/', academyleadshtmx.create_academy_lead, name='create-academy-lead' ),
+    path('log-communication/', academyleadshtmx.log_communication, name='log-communication' ),
+    path('add-booking/', academyleadshtmx.add_booking, name='add-booking' ),
+    path('mark-arrived/', academyleadshtmx.mark_arrived, name='mark-arrived' ),
+    path('mark-sold/', academyleadshtmx.mark_sold, name='mark-sold' ),
+    
+    path('academy-lead-get-modal-content/', academyleadshtmx.get_modal_content, name='academy-lead-get-modal-content' ),
+    path('academy-lead-get-modal-content/<str:param1>/', academyleadshtmx.get_modal_content, name='academy-lead-get-modal-content' ),
+    path('academy-lead-get-modal-content/<str:param1>/<str:param2>/', academyleadshtmx.get_modal_content, name='academy-lead-get-modal-content' ),
+    
 ]

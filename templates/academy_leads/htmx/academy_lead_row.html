@@ -1,0 +1,129 @@
+{%load static%}
+<tr id="row_{{lead.pk}}" class="{% if lead.complete and not lead.sold%}danger-tr{% elif lead.sold %}complete-tr{%endif%}">
+    <td>
+        <input type="text" style="display:None" id="lead_pk_{{lead.pk}}" name="lead_pk" value="{{lead.pk}}"/>
+        {% comment %} Mark Benden {% endcomment %}
+        {{lead.first_name}} {{lead.last_name}}
+    </td>
+    <td>
+        {%if lead.complete and not lead.sold%}
+            <span class="badge bg-danger">Archived</span>
+        {% elif lead.complete %}
+        <span class="badge bg-success">Complete</span>
+        {%else%}
+            <span class="badge bg-success-trans">Active</span>
+        {%endif%}
+    </td>
+    <td class="nowrap">
+        {% comment %} 31-08-2022 <br>
+        <i>(1 day ago)</i> {% endcomment %}
+        {{lead.created}}
+    </td>
+    <td>
+        {% comment %} Live Well Female {% endcomment %}
+        {{lead.ad_campaign.name}}
+    </td>
+    <td class="nowrap">
+        <a style="text-decoration: none;" target="_blank" href="whatsapp://send?phone={{lead.phone}}&text=Hi {{lead.first_name}}, I'm {{request.user.first_name}}"><i class="fa fa-whatsapp" aria-hidden="true"></i> {{lead.phone}}</a>
+        
+    </td>
+    <td>
+        <button class="btn btn-sm btn-primary"
+            data-bs-toggle="popover" 
+            data-bs-trigger="hover" 
+            data-bs-placement="top"
+            data-bs-content="Log a phone call communication attempt"
+            hx-target="#generic_modal_body" 
+            hx-include="#log_communication"
+            hx-get="{% url 'academy-lead-get-modal-content' param1=lead.pk param2='a' %}" 
+            hx-push-url="false"
+            hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa fa-phone" aria-hidden="true"></i></button>
+        <button class="btn btn-sm btn-warning"
+            data-bs-toggle="popover" 
+            data-bs-trigger="hover" 
+            data-bs-placement="top"
+            data-bs-content="Log an email communication attempt"
+            hx-target="#generic_modal_body" 
+            hx-include="#log_communication"
+            hx-get="{% url 'academy-lead-get-modal-content' param1=lead.pk param2='c' %}" 
+            hx-push-url="false"
+            hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa fa-envelope" aria-hidden="true"></i></button>
+        <button class="btn btn-sm btn-secondary"
+            data-bs-toggle="popover" 
+            data-bs-trigger="hover" 
+            data-bs-placement="top"
+            data-bs-content="Log a text message communication attempt"
+            hx-target="#generic_modal_body" 
+            hx-include="#log_communication"
+            hx-get="{% url 'academy-lead-get-modal-content' param1=lead.pk param2='d' %}" 
+            hx-push-url="false"
+            hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa fa-message-sms" aria-hidden="true"></i></button>
+    </td>
+    <td>
+        <button class="btn btn-sm btn-secondary"
+            data-bs-toggle="popover" 
+            data-bs-trigger="hover" 
+            data-bs-placement="top"
+            data-bs-content="See communication history for this lead."
+            hx-target="#generic_modal_body" 
+            hx-include="#communication_history"
+            hx-get="{% url 'academy-lead-get-modal-content' param1=lead.pk %}" 
+            hx-push-url="false"
+            hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click">
+                <i class="fa-regular fa-clock-rotate-left" ></i> History
+        </button>
+        <span class="nowrap">{{lead.communication_set.all.0.datetime}}</span> - <span class="nowrap">{{lead.communication_set.all.0.get_type_display}}</span>
+        {% comment %} 07-09-2022 - Whatsapp {% endcomment %}
+    </td>
+    <td>       
+        <button class="btn btn-sm btn-secondary"
+            data-bs-toggle="popover" 
+            data-bs-trigger="hover" 
+            data-bs-placement="top"
+            data-bs-content="See communication history for this lead."
+            hx-target="#generic_modal_body" 
+            hx-include="#booking_history"
+            hx-get="{% url 'academy-lead-get-modal-content' param1=lead.pk %}" 
+            hx-push-url="false"
+            hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click">
+                <i class="fa-regular fa-clock-rotate-left" ></i> History
+        </button>                         
+        <button class="btn btn-sm btn-primary"
+            data-bs-toggle="popover" 
+            data-bs-trigger="hover" 
+            data-bs-placement="top"
+            data-bs-content="Add a booking"
+            hx-target="#generic_modal_body" 
+            hx-include="#add_booking"
+            hx-get="{% url 'academy-lead-get-modal-content' param1=lead.pk %}" 
+            hx-push-url="false"
+            hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa fa-plus" aria-hidden="true"></i></button>
+        <span class="nowrap">{{lead.booking_set.all.0.datetime}}</span> - <span class="nowrap">{{lead.booking_set.all.0.get_type_display}}</span>
+    </td>
+    <td id="arrived_div_{{lead.pk}}">
+        {% comment %} <input type="checkbox" indeterminate="True" onclick="snackbarShow('Successfully marked as arrived', 'success')"/> {% endcomment %}
+        {%include 'academy_leads/htmx/arrived_checkbox.html'%}
+    </td>
+    <td id="sold_div_{{lead.pk}}">
+        {% comment %} <input type="checkbox" indeterminate="True" onclick="snackbarShow('Successfully marked as sold', 'success')"/> {% endcomment %}
+        {%include 'academy_leads/htmx/sold_checkbox.html'%}
+    </td>
+    <td>
+        {% comment %} <button class="btn btn-sm btn-secondary"
+            data-bs-toggle="popover" 
+            data-bs-trigger="hover" 
+            data-bs-placement="top"
+            data-bs-content="Pause this message for a while"
+            hx-target="#generic_modal_body" 
+            hx-include="#pause_whatsapp"
+            hx-get="{% url 'academy-lead-get-modal-content' %}" 
+            hx-push-url="false"
+            hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa fa-pause" aria-hidden="true"></i></button>
+        07-09-2022 {% endcomment %}
+        Coming Soon
+    </td>
+    <td>
+        <button class="btn btn-sm btn-success" hx-include="#lead_pk_{{lead.pk}}"
+            hx-post="{% url 'mark-done' %}" hx-target="#row_{{lead.pk}}">Done</button>
+    </td>
+</tr>

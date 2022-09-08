@@ -166,3 +166,19 @@ body {
     font-size: .9em;
     font-weight: 400;
 }
+
+.bg-success-trans {
+    background-color: rgba(25, 135, 84, 0.6) !important;
+}
+
+.complete-tr > * {
+    background-color: rgba(25, 135, 84, 0.1) !important;
+}
+
+.warning-tr > * {
+    background-color: rgba(255, 193, 7, 0.1) !important;
+}
+
+.danger-tr > * {
+    background-color: rgba(220, 53, 69, 0.1) !important;
+}

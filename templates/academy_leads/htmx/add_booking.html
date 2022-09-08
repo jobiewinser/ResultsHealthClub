@@ -1,0 +1,59 @@
+<span>
+    <div class="row">
+        <div class="col">
+            <div class="m-3">
+                <label class="form-label custom-badge-label" for="booking_date">Date of Booking</label>
+                <input type="date" id="booking_date" name="booking_date" class="form-control booking_input"
+                _="on htmx:validation:validate
+                if my.value != 'foo'
+                    call me.setCustomValidity('Please enter the value foo')
+                else
+                    call me.setCustomValidity('')"
+                >
+            </div>
+            <div class="m-3">
+                <label class="form-label custom-badge-label" for="booking_time">Time of Booking</label>
+                <input type="time" id="booking_time" name="booking_time" class="form-control booking_input">
+            </div>
+
+            <div class="m-3 row" style="text-align:left; margin-left:0px !important; min-width:300px;">
+                <div class="col" style="text-align:right">
+                    <span id="booking-type-span-one">Phone</span>
+                </div>
+
+                <div class="col-md-auto p-0">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input booking_input" name="booking_type" checked type="checkbox" id="booking-type">
+                    </div>
+                </div>
+
+                <div class="col" style="text-align:left; padding-left:5px">
+                    In Person
+                </div>
+            </div>
+            <div class="m-3">
+                <label class="form-label custom-badge-label" for="time_occurred">Notes</label>
+                <textarea rows=5 type="time" style="min-width:500px" id="time_occurred" 
+                name="note" class="form-control log_communication_input"></textarea>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="m-3">
+                <button class="btn btn-primary"
+                hx-target="#row_{{lead.pk}}" 
+                hx-include=".booking_input"
+                hx-post="{% url 'add-booking' %}" 
+                hx-push-url="false"
+                hx-swap="outerHTML" hx-indicator="#htmx-indicator" hx-trigger="click">
+                    Submit Booking
+                </button>
+            </div>
+        </div>
+    </div>
+</span>
+<span hx-swap-oob="true" id="generic_modal_title">
+    Add Booking - {{lead.first_name}} {{lead.last_name}}
+    <input class="booking_input" type="text" style="display:None" id="modal_lead_pk" name="lead_pk" value="{{lead.pk}}"/>
+</span>

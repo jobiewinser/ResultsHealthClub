@@ -1,0 +1,9 @@
+<input type="checkbox" id="sold_{{lead.pk}}"
+    {%if lead.sold%}checked{%endif%}
+    hx-target="#row_{{lead.pk}}"
+    hx-include="#lead_pk_{{lead.pk}}"
+    hx-post="{% url 'mark-sold' %}" 
+    hx-push-url="false"
+    hx-swap="outerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"    
+    onclick="inlinePreventDefault(event);"
+/>

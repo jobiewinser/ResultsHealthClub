@@ -1,0 +1,19 @@
+
+
+{%if request.GET.complete%}
+<div hx-swap-oob="true" class="col-md-auto" id="swap_status_button">
+    <button class="btn btn-success"
+        hx-target="#results_table" 
+        hx-get="{% url 'academy-leads-overview' %}" 
+        hx-push-url="false"
+        hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa fa-whatsapp" aria-hidden="true"></i> Show Active</button>
+</div>
+{%else%}
+<div hx-swap-oob="true" class="col-md-auto" id="swap_status_button">
+    <button class="btn btn-warning"
+        hx-target="#results_table" 
+        hx-get="{% url 'academy-leads-overview' %}?complete=True" 
+        hx-push-url="false"
+        hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa fa-whatsapp" aria-hidden="true"></i> Show Archived & Complete</button>
+</div>
+{%endif%}

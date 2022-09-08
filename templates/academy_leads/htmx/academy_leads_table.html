@@ -1,0 +1,49 @@
+
+{%load static%}
+<table id="results_table" class="table"> 
+    <thead> 
+        <tr>
+            <th>
+                Name
+            </th>
+            <th>
+                Status
+            </th>
+            <th>
+                Lead Date
+            </th>
+            <th>
+                Ad Campaign
+            </th>
+            <th>
+                Whatsapp
+            </th>
+            <th>
+                Other Communication
+            </th>
+            <th>
+                Last Communication & History
+            </th>
+            <th>
+                Date/Time Booked
+            </th>
+            <th>
+                Arrived
+            </th>
+            <th>
+                Sold
+            </th>
+            <th>
+                Next Automatic Whatsapp
+            </th>
+            <th>
+                Extra
+            </th>
+        </tr>
+    </thead>
+    <tbody> 
+        {%for lead in leads%}
+        {%include 'academy_leads/htmx/academy_lead_row.html'%}
+        {%endfor%}
+    </tbody>
+</table>
