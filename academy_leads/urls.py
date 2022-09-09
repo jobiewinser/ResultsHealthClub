@@ -24,6 +24,7 @@ urlpatterns = [
     path('add-booking/', academyleadshtmx.add_booking, name='add-booking' ),
     path('mark-arrived/', academyleadshtmx.mark_arrived, name='mark-arrived' ),
     path('mark-sold/', academyleadshtmx.mark_sold, name='mark-sold' ),
+    path('test-whatsapp-message/', academyleadshtmx.test_whatsapp_message, name='test-whatsapp-message' ),
     
     path('academy-lead-get-modal-content/', academyleadshtmx.get_modal_content, name='academy-lead-get-modal-content' ),
     path('academy-lead-get-modal-content/<str:param1>/', academyleadshtmx.get_modal_content, name='academy-lead-get-modal-content' ),

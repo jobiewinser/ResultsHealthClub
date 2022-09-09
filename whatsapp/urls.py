@@ -13,19 +13,8 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.conf.urls import include, url
-from django.contrib import admin
 from django.urls import path
-
+import whatsapp.views as whatsappviews
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include('academy_leads.urls')),
-    path('', include('core.urls')),
-    path('', include('whatsapp.urls')),
-    path('accounts/', include('django.contrib.auth.urls')),
+    path('whatsapp-webhooks/', whatsappviews.Webhooks.as_view(), name='whatsapp-webhooks' ),
 ]
-from django.conf import settings
-from django.conf.urls.static import static
-
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

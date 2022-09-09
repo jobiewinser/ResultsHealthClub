@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+
+from whatsapp.api import Whatsapp
 # Create your models here.
 
 
@@ -34,7 +36,12 @@ class AcademyLead(models.Model):
     complete = models.BooleanField(default=False)
     def next_whatsapp_communication(self):
         last_whatsapp_communication = self.communication_set.filter(type='b')
+    def send_whatsapp_message(self, message):
+        whatsapp = Whatsapp()
+        response = whatsapp.send_message(self.phone, f"{message}")
+        print(response)
 
+        
 class Communication(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     datetime = models.DateTimeField(null=False, blank=False)

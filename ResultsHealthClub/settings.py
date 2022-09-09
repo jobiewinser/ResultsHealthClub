@@ -92,6 +92,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'core',
     'academy_leads',
+    'whatsapp',
     'import_export',
     'rest_framework',
 ]

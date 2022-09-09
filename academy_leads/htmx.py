@@ -178,3 +178,15 @@ def mark_sold(request, **kwargs):
     except Exception as e:
         logger.debug("mark_done Error "+str(e))
         return HttpResponse(e, status=500)
+        
+@login_required
+def test_whatsapp_message(request, **kwargs):
+    logger.debug(str(request.user))
+    try:
+        if request.user.is_staff:
+            lead = AcademyLead.objects.get(pk=request.POST.get('lead_pk'))
+            lead.send_whatsapp_message('testing api')
+            return render(request, "academy_leads/htmx/academy_lead_row.html", {'lead':lead}) 
+    except Exception as e:
+        logger.debug("mark_done Error "+str(e))
+        return HttpResponse(e, status=500)

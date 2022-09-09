@@ -1,4 +1,4 @@
-{%load static%}
+{%load static core_tags%}
 <tr id="row_{{lead.pk}}" class="{% if lead.complete and not lead.sold%}danger-tr{% elif lead.sold %}complete-tr{%endif%}">
     <td>
         <input type="text" style="display:None" id="lead_pk_{{lead.pk}}" name="lead_pk" value="{{lead.pk}}"/>
@@ -17,7 +17,7 @@
     <td class="nowrap">
         {% comment %} 31-08-2022 <br>
         <i>(1 day ago)</i> {% endcomment %}
-        {{lead.created}}
+        {{lead.created.date}}
     </td>
     <td>
         {% comment %} Live Well Female {% endcomment %}
@@ -28,7 +28,7 @@
         
     </td>
     <td>
-        <button class="btn btn-sm btn-secondary"
+        <button class="btn btn-xs btn-secondary"
             data-bs-toggle="popover" 
             data-bs-trigger="hover" 
             data-bs-placement="top"
@@ -38,10 +38,12 @@
             hx-get="{% url 'academy-lead-get-modal-content' param1=lead.pk %}" 
             hx-push-url="false"
             hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click">
-                <i class="fa-regular fa-clock-rotate-left" ></i> History 
-                <span class="badge rounded-pill bg-light" style="color:black; width:20px; font-size:8px;">{{lead.communication_set.all.count}}</span>
+                <i class="fa-regular fa-clock-rotate-left" ></i> 
+                <span class="badge bg-info" style="font-size:10px">
+                    {{lead.communication_set.all.count}}                
+                </span>
         </button>
-        <button class="btn btn-sm btn-primary"
+        <button class="btn btn-xs btn-primary"
             data-bs-toggle="popover" 
             data-bs-trigger="hover" 
             data-bs-placement="top"
@@ -51,7 +53,7 @@
             hx-get="{% url 'academy-lead-get-modal-content' param1=lead.pk param2='a' %}" 
             hx-push-url="false"
             hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa fa-phone" aria-hidden="true"></i></button>
-        <button class="btn btn-sm btn-warning"
+        <button class="btn btn-xs btn-warning"
             data-bs-toggle="popover" 
             data-bs-trigger="hover" 
             data-bs-placement="top"
@@ -61,7 +63,7 @@
             hx-get="{% url 'academy-lead-get-modal-content' param1=lead.pk param2='c' %}" 
             hx-push-url="false"
             hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa fa-envelope" aria-hidden="true"></i></button>
-        <button class="btn btn-sm btn-secondary"
+        <button class="btn btn-xs btn-secondary"
             data-bs-toggle="popover" 
             data-bs-trigger="hover" 
             data-bs-placement="top"
@@ -73,7 +75,7 @@
             hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa fa-message-sms" aria-hidden="true"></i></button>
     </td>
     <td>       
-        <button class="btn btn-sm btn-secondary"
+        <button class="btn btn-xs btn-secondary"
             data-bs-toggle="popover" 
             data-bs-trigger="hover" 
             data-bs-placement="top"
@@ -83,10 +85,12 @@
             hx-get="{% url 'academy-lead-get-modal-content' param1=lead.pk %}" 
             hx-push-url="false"
             hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click">
-                <i class="fa-regular fa-clock-rotate-left" ></i> History
-                <span class="badge rounded-pill bg-light" style="color:black; width:20px; font-size:8px;">{{lead.booking_set.all.count}}</span>
+                <i class="fa-regular fa-clock-rotate-left" ></i>
+                <span class="badge bg-info m-0" style="font-size:10px">
+                    {{lead.booking_set.all.count}}
+                </span>
         </button>                         
-        <button class="btn btn-sm btn-primary"
+        <button class="btn btn-xs btn-primary"
             data-bs-toggle="popover" 
             data-bs-trigger="hover" 
             data-bs-placement="top"
@@ -96,7 +100,21 @@
             hx-get="{% url 'academy-lead-get-modal-content' param1=lead.pk %}" 
             hx-push-url="false"
             hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa fa-plus" aria-hidden="true"></i></button>
-        <span class="nowrap">{{lead.booking_set.all.0.datetime}}</span> - <span class="nowrap">{{lead.booking_set.all.0.get_type_display}}</span>
+            <span class="nowrap badge bg-info">{{lead.booking_set.all.0.datetime.date}}</span>
+            <span class="nowrap badge bg-primary">{{lead.booking_set.all.0.datetime.time}}</span>
+            {%if lead.booking_set.all.0 == 'a'%}
+                <span class="nowrap badge bg-success"
+                data-bs-toggle="popover" 
+                data-bs-trigger="hover" 
+                data-bs-placement="top"
+                data-bs-content="In Person"><i class="fa-solid fa-person"></i></span>
+            {%else%}
+                <span class="nowrap badge bg-warning"
+                data-bs-toggle="popover" 
+                data-bs-trigger="hover" 
+                data-bs-placement="top"
+                data-bs-content="Phone"><i class="fa-solid fa-phone"></i></span>
+            {%endif%}
     </td>
     <td id="arrived_div_{{lead.pk}}">
         {% comment %} <input type="checkbox" indeterminate="True" onclick="snackbarShow('Successfully marked as arrived', 'success')"/> {% endcomment %}
@@ -107,7 +125,7 @@
         {%include 'academy_leads/htmx/sold_checkbox.html'%}
     </td>
     <td>
-        {% comment %} <button class="btn btn-sm btn-secondary"
+        {% comment %} <button class="btn btn-xs btn-secondary"
             data-bs-toggle="popover" 
             data-bs-trigger="hover" 
             data-bs-placement="top"
@@ -122,11 +140,14 @@
     </td>
     <td>
         {%if request.GET.complete%}
-            <button class="btn btn-sm btn-danger" hx-include="#lead_pk_{{lead.pk}}"
+            <button class="btn btn-xs btn-danger" hx-include="#lead_pk_{{lead.pk}}"
                 hx-post="{% url 'mark-done' %}" hx-target="#row_{{lead.pk}}">Unarchive</button>
         {%else%}
-            <button class="btn btn-sm btn-success" hx-include="#lead_pk_{{lead.pk}}"
+            <button class="btn btn-xs btn-success" hx-include="#lead_pk_{{lead.pk}}"
                 hx-post="{% url 'mark-done' %}" hx-target="#row_{{lead.pk}}">Archive</button>
         {%endif%}
+        <button class="btn btn-xs btn-success" hx-include="#lead_pk_{{lead.pk}}"
+            hx-post="{% url 'test-whatsapp-message' %}" hx-target="#row_{{lead.pk}}">Test WhatsApp</button>
+        
     </td>
 </tr>

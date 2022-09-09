@@ -21,5 +21,18 @@ def prefill_time_input_with_now(nothing):
     except:
         return ""
 
+@register.filter
+def nice_date_tag(date):
+    try:
+        date = date + datetime.timedelta(hours=1)
+        date = (date.date() - date(1970, 1, 1)).total_seconds()
+        # just for preview/phrase editing
+        date = datetime.datetime.strptime(str(date), '%d-%m-%Y')
+    except Exception as e:
+        pass
+    try:
+        return str(date.strftime("%-d %B %Y"))
+    except Exception as e:
+        return str(date)
 
     
