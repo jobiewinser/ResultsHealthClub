@@ -30,7 +30,7 @@
             } else {
                 snackbarShow(evt.detail.xhr.responseText, 'danger')
             }
-            
+            $('.popover').remove()
             $('[data-bs-toggle=popover]').popover();
         });
     });

@@ -1,0 +1,11 @@
+<button class="btn btn-space btn-{%if lead.sold%}success{%else%}light{%endif%} btn-sm nowrap" id="sold_{{lead.pk}}"
+data-bs-toggle="popover" 
+data-bs-trigger="hover" 
+data-bs-placement="top"
+data-bs-content="{%if lead.sold%}Mark this lead as not sold{%else%}Mark this lead as sold{%endif%}"
+hx-target="#row_{{lead.pk}}"
+hx-include="#lead_pk_{{lead.pk}}"
+hx-post="{% url 'mark-sold' %}" 
+hx-push-url="false"
+hx-swap="outerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"     
+>{%if lead.sold%}<i class="fa-solid fa-check"></i>{%else%}<i class="fa-solid fa-x"></i>{%endif%} Sold</button>

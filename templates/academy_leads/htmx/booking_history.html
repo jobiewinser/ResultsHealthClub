@@ -1,5 +1,42 @@
 <span>
     <div class="row">
+        <div class="col center">
+            
+            <div class="btn-group btn-space">
+                <button class="btn btn-light btn-sm" type="button"
+                    data-bs-toggle="popover" 
+                    data-bs-trigger="hover" 
+                    data-bs-placement="top"
+                    data-bs-content="See communication history for this lead."
+                    hx-target="#generic_modal_body" 
+                    hx-include="#communication_history"
+                    hx-get="{% url 'academy-lead-get-modal-content' param1=lead.pk %}" 
+                    hx-push-url="false"
+                    hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click">
+                        Communication History
+                        <span class="badge bg-info" style="font-size:10px">
+                            {{lead.communication_set.all.count}}                
+                        </span>
+                </button>
+                <button class="btn btn-sm btn-success"
+                    data-bs-toggle="popover" 
+                    data-bs-trigger="hover" 
+                    data-bs-placement="top"
+                    data-bs-content="See communication history for this lead."
+                    hx-target="#generic_modal_body" 
+                    hx-include="#booking_history"
+                    hx-get="{% url 'academy-lead-get-modal-content' param1=lead.pk %}" 
+                    hx-push-url="false"
+                    hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click">
+                        Booking History
+                        <span class="badge bg-info" style="font-size:10px">
+                            {{lead.booking_set.all.count}}                
+                        </span>
+                </button>   
+            </div> 
+        </div>
+    </div>
+    <div class="row">
         <div class="col">
             <table class="table table-light table-sm table-striped col-md-auto notes_table">
                 <thead>
