@@ -1,15 +1,20 @@
 @font-face {
     font-family: 'Roboto-Regular';
-    src: local('Roboto-Regular'), url('/static/fonts/Roboto-Regular.ttf') format("truetype");
+    src: local('Roboto-Regular'), url('/static/fonts/Roboto/Roboto-Regular.ttf') format("truetype");
 }
 
 @font-face {
     font-family: 'Roboto-Bold';
-    src: local('Roboto-Bold'), url('/static/fonts/Roboto-Bold.ttf') format("truetype");
+    src: local('Roboto-Bold'), url('/static/fonts/Roboto/Roboto-Bold.ttf') format("truetype");
 }
 
-* {
-    font-family: Roboto-Regular;
+@font-face {
+    font-family: 'Inter';
+    src: local('Inter'), url('/static/fonts/Inter/Inter-Regular.ttf') format("truetype");
+}
+
+.content > * {
+    font-family: Inter;
     font-size: 16px
 }
 
@@ -186,10 +191,42 @@ body {
 .sorting {
     cursor: pointer
 }
-
-.btn-group-xs > .btn, .btn-xs {
-    padding: .25rem .4rem;
-    font-size: .875rem;
-    line-height: .5;
-    border-radius: .2rem;
+/* start dark joined buttons */
+.btn-secondary, .note-btn-group .btn-default {
+    color: #545454;
+    background-color: #fff;
+    border-color: #ccc;
 }
+
+.btn-group>.btn.btn-dark:first-child, .input-group-append>.btn.btn-dark:first-child, .input-group-btn>.btn.btn-dark:first-child, .input-group-prepend>.btn.btn-dark:first-child {
+    border-left-color: transparent;
+}
+.btn-group>.btn.btn-dark, .input-group-append>.btn.btn-dark, .input-group-btn>.btn.btn-dark, .input-group-prepend>.btn.btn-dark {
+    border-left-color: #4a4a4a;
+    border-right-color: #4a4a4a;
+}
+.btn-group-vertical>.btn, .btn-group>.btn {
+    position: relative;
+    -webkit-box-flex: 1;
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+}
+[type=button]:not(:disabled), [type=reset]:not(:disabled), [type=submit]:not(:disabled), button:not(:disabled) {
+    cursor: pointer;
+}
+.btn-dark {
+    color: #fff;
+    background-color: #545454;
+    border-color: #545454;
+}
+/* end dark joined buttons */
+/* start light joined buttons */
+.btn-group>.btn-group:not(:first-child), .btn-group>.btn:not(:first-child) {
+    margin-left: -1px;
+}
+.btn-secondary, .note-btn-group .btn-default {
+    color: #545454;
+    background-color: #fff;
+    border-color: #ccc;
+}
+/* end dark joined buttons */
