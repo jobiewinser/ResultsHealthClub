@@ -4,7 +4,7 @@
         <input type="text" style="display:None" id="lead_pk_{{lead.pk}}" name="lead_pk" value="{{lead.pk}}"/>
         <span class="primary_td_layer">{{lead.first_name}} {{lead.last_name}}</span>
         <br>
-        <span class="secondary_td_layer"><a style="text-decoration: none;" class="nowrap" target="_blank" href="whatsapp://send?phone={{lead.phone}}&text=Hi {{lead.first_name}}, I'm {{request.user.first_name}}"><i class="fa fa-whatsapp" aria-hidden="true"></i> {{lead.phone}}</a></span>        
+        <span class="secondary_td_layer"><a style="text-decoration: none;" class="nowrap" target="_blank" href="whatsapp://send?phone={{lead.country_code}}{{lead.phone}}&text=Hi {{lead.first_name}}, I'm {{request.user.first_name}}"><i class="fa fa-whatsapp" aria-hidden="true"></i> +{{lead.country_code}} {{lead.phone}}</a></span>        
     </td>
     <td class="nowrap">
         {%if lead.complete and not lead.sold%}
@@ -116,6 +116,10 @@
                     hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa-regular fa-clock-rotate-left" ></i></button>
             </div>
         </span>
+        {% if request.user.is_superuser%}            
+            <button class="btn btn-sm btn-success" hx-include="#lead_pk_{{lead.pk}}"
+            hx-post="{% url 'test-whatsapp-message' %}" hx-target="#row_{{lead.pk}}">Test WhatsApp</button>
+        {%endif%}
         <br>
         <span class="secondary_td_layer">     
             <div class="btn-group btn-space mt-1">     

@@ -253,3 +253,9 @@ body {
 .btn-sm {
     font-size: 13px;
 }
+
+.notes_table {
+    overflow-y: scroll;
+    display: block;
+    height: 300px;
+}

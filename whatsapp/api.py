@@ -31,15 +31,13 @@ class Whatsapp:
         headers = self._get_headers()
         body = { 
             "messaging_product": "whatsapp", 
-            "recipient_type": "individual", 
             "to": f"{recipient_number}", 
             "type": "text",
             "text": json.dumps({
                 "body": f"{message}",
                 "preview_url": preview_url,
                 })
-        }        
-        print(body)
-        response = requests.post(url=url, data=body, headers=headers)
+        }
+        response = requests.post(url=url, json=body, headers=headers)
         response_body = response.json()
         return response_body

@@ -40,10 +40,12 @@ def create_academy_lead(request, **kwargs):
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
         phone = request.POST.get('phone')
+        country_code = request.POST.get('countryCode')
         AcademyLead.objects.create(
             first_name=first_name,
             last_name=last_name,
             phone=phone,
+            country_code=country_code,
             ad_campaign=AdCampaign.objects.get_or_create(name='Manually Created')[0]
         )
         context = {
@@ -185,7 +187,7 @@ def test_whatsapp_message(request, **kwargs):
     try:
         if request.user.is_staff:
             lead = AcademyLead.objects.get(pk=request.POST.get('lead_pk'))
-            lead.send_whatsapp_message('testing api')
+            lead.send_whatsapp_message('testing api', request.user)
             return render(request, "academy_leads/htmx/academy_lead_row.html", {'lead':lead}) 
     except Exception as e:
         logger.debug("mark_done Error "+str(e))
