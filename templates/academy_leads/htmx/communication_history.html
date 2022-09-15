@@ -49,8 +49,28 @@
                 <tbody class="noteBody">
                     {%for communication in lead.communication_set.all%}
                     <tr>
-                        <td colspan="2">
-                            <i class="fa fa-phone" style="color:green" aria-hidden="true"></i> 
+                        <td colspan="2"
+                        data-bs-html="true" 
+                        data-bs-toggle="popover" 
+                        data-bs-trigger="hover" 
+                        data-bs-placement="right"
+                        data-bs-content="
+                        {%if communication.error_json%}
+                        <b>Error</b> {{communication.error_json.error.error_data.details}}
+                        {%endif%}
+                        
+                        {%if communication.whatsappmessage.whatsappmessagestatus_set.all%}
+                        Statuses:
+                        <ul>
+                            {%for status in communication.whatsappmessage.whatsappmessagestatus_set.all%}
+                            <li><b>{{status.status}}</b> {{status.datetime}} </li>
+                            {%endfor%}
+                        </ul>
+                        {%endif%}
+                        ">
+                            <i  class="fa fa-{%if communication.type == 'a'%}phone{%elif communication.type == 'b'%}whatsapp{%elif communication.type == 'c'%}envelope{%elif communication.type == 'd'%}message-sms{%endif%}" 
+                                style="color:{%if communication.successful == True%}green{%elif communication.successful == False%}red{%else%}grey{%endif%}" 
+                                aria-hidden="true"></i> 
                             <span style="color:#a9a9a9;"> 
                                 {{communication.staff_user.profile}} <i class="fa-solid fa-arrow-right"> </i>
                             </span>

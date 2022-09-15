@@ -13,6 +13,8 @@ from django.shortcuts import get_object_or_404
 from django.http.response import HttpResponseRedirect
 from django.template import loader
 logger = logging.getLogger(__name__)
+
+# https://developers.activecampaign.com/reference
 class ActiveCampaign:
     
     active_campaign_api_key = os.getenv("ACTIVE_CAMPAIGN_API_KEY")
@@ -20,23 +22,27 @@ class ActiveCampaign:
 
     def _get_headers(self):
         headers = {
-            'Authorization': 'Bearer ' + self.active_campaign_api_key,
-                   'Content-Type': 'application/json'
+            'Api-Token': self.active_campaign_api_key
                    }
         return headers
-    #POST
-    # def send_message(self, recipient_number, message, preview_url = False):        
-    #     url = f"{self.whatsapp_url}{self.whatsapp_business_phone_number_id}/messages"
-    #     headers = self._get_headers()
-    #     body = { 
-    #         "messaging_product": "whatsapp", 
-    #         "to": f"{recipient_number}", 
-    #         "type": "text",
-    #         "text": json.dumps({
-    #             "body": f"{message}",
-    #             "preview_url": preview_url,
-    #             })
-    #     }
-    #     response = requests.post(url=url, json=body, headers=headers)
-    #     response_body = response.json()
-    #     return response_body
+    # Get
+    def get_campaigns(self):        
+        url = f"{self.active_campaign_url}api/3/campaigns"
+        headers = self._get_headers()
+        response = requests.get(url=url, headers=headers)
+        return response.json()
+    # Get
+    def get_all_messages(self):        
+        url = f"{self.active_campaign_url}api/3/messages?limit=100"
+        headers = self._get_headers()
+        i = 0
+        count = 0
+        messages = []
+        response_json = requests.get(url=url, headers=headers).json()
+        while count < int(response_json.get('meta', {}).get('total', 0)):
+            count += len(response_json.get('messages',[]))
+            messages += response_json.get('messages',[])
+            i+=1
+            response_json = requests.get(url=f"{url}&offset={i}", headers=headers).json()
+
+        return messages

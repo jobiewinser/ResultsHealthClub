@@ -1,0 +1,21 @@
+<div class="row m-3" id="template_area">
+    <input type="text" class="template_editor_input" style="display:None" name="template_pk" value="{{template.pk}}"/>
+
+    <div class="col-md-auto">
+        <select id="variable_choice" name="variable_choice" class="form-select">
+            <option value="{first_name}" selected>First Name</option>
+            <option value="{last_name}" selected>Last Name</option>
+        </select>
+        <br>
+        <button onclick="$('#template_text').val($('#template_text').val()+$('#variable_choice').val());" class="btn btn-primary btn-sm">Insert Variable</button>
+    </div>
+    <div class="col-md-auto">
+        <textarea style="width:600px; height:600px;" id="template_text" name="template_text" class="template_editor_input form-control">{{template.text}}</textarea>
+    </div>
+    <div class="col-md-auto">
+        <button hx-post="{% url 'template-save' %}" hx-swap="outerHTML" hx-include=".template_editor_input" hx-target="#template_area" class="btn btn-primary btn-sm">Save</button>
+    </div>
+    <div class="col-md-auto">
+        <textarea style="width:600px; height:600px;" class="form-control">{{template.rendered_demo}}</textarea>
+    </div>
+</div>

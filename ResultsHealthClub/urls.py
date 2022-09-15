@@ -22,6 +22,7 @@ urlpatterns = [
     path('', include('academy_leads.urls')),
     path('', include('core.urls')),
     path('', include('whatsapp.urls')),
+    path('', include('active_campaign.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
 ]
 from django.conf import settings
@@ -29,3 +30,5 @@ from django.conf.urls.static import static
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

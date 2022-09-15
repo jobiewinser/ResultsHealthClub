@@ -1,0 +1,41 @@
+{% extends 'core/base.html' %}
+{%load static%}
+{%block scripts%}
+{{block.super}}
+<script>
+    $(document).ready(function() {
+        $("[data-bs-toggle=popover]").popover();
+        document.body.addEventListener('htmx:configRequest', function(evt) {    
+            evt.detail.headers['x-csrftoken'] = $('#csrf_token').val();
+        });
+        document.body.addEventListener('htmx:afterSwap', function(evt) {  
+            $('.popover').remove()
+            $('[data-bs-toggle=popover]').popover();
+        });
+    });
+</script>
+{%endblock scripts%}
+
+{%block extra_top_buttons %}
+
+{%endblock%}
+
+{%block content%} 
+<ul class="nav nav-pills">
+    <div class="row m-3">
+        <div class="col-md-auto">
+            <select id="template_choice" name="template_pk" class="form-select">
+                <option value="" disabled selected>Select a Whatsapp Template</option>
+                {%for template in templates%}
+                <option value="{{template.pk}}">{{template.name}}</option>
+                {%endfor%}
+            </select>
+        </div>
+        <div class="col">
+            <button hx-get="{% url 'template-editor' %}" hx-swap="outerHTML" hx-include="#template_choice" hx-target="#template_area" class="btn btn-primary btn-sm">Edit</button>
+        </div>
+    </div>
+    <div class="row m-3" id="template_area">
+    </div>
+</ul>
+{%endblock content%}

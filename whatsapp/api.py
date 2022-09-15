@@ -13,21 +13,28 @@ from django.shortcuts import get_object_or_404
 from django.http.response import HttpResponseRedirect
 from django.template import loader
 logger = logging.getLogger(__name__)
+# https://developers.facebook.com/docs/whatsapp/cloud-api/reference
+# https://business.facebook.com/settings/people/100085397745468?business_id=851701125750291
 class Whatsapp:
     
-    whatsapp_token = os.getenv("WHATSAPP_TOKEN")
+    whatsapp_access_token = os.getenv("WHATSAPP_ACCESS_TOKEN")
     whatsapp_url = os.getenv("WHATSAPP_URL")
-    whatsapp_business_phone_number_id = os.getenv("WHATSAPP_PRIMARY_BUSINESS_PHONE_NUMBER_ID")
+    whatsapp_app_id = os.getenv("WHATSAPP_APP_ID")
+    whatsapp_user_id = os.getenv("WHATSAPP_USER_ID")
+    
+    whatsapp_business_id = os.getenv("WHATSAPP_BUSINESS_ID")
+    whatsapp_business_account_id = os.getenv("WHATSAPP_BUSINESS_ACCOUNT_ID")
+    whatsapp_primary_business_phone_number_id = os.getenv("WHATSAPP_PRIMARY_BUSINESS_PHONE_NUMBER_ID")
 
     def _get_headers(self):
         headers = {
-            'Authorization': 'Bearer ' + self.whatsapp_token,
+            'Authorization': 'Bearer ' + self.whatsapp_access_token,
                    'Content-Type': 'application/json'
                    }
         return headers
     #POST
     def send_message(self, recipient_number, message, preview_url = False):        
-        url = f"{self.whatsapp_url}{self.whatsapp_business_phone_number_id}/messages"
+        url = f"{self.whatsapp_url}{self.whatsapp_primary_business_phone_number_id}/messages"
         headers = self._get_headers()
         body = { 
             "messaging_product": "whatsapp", 
@@ -41,3 +48,11 @@ class Whatsapp:
         response = requests.post(url=url, json=body, headers=headers)
         response_body = response.json()
         return response_body
+    #POST
+    def get_phone_numbers(self):        
+        url = f"{self.whatsapp_url}{self.whatsapp_business_account_id}/phone_numbers?access_token={self.whatsapp_access_token}"
+        # headers = self._get_headers()
+        response = requests.get(url=url)
+        response_body = response.json()
+        return response_body
+        

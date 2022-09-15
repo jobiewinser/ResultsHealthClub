@@ -7,7 +7,8 @@ from django.contrib.auth import login
 from django.middleware.csrf import get_token
 from django.contrib.auth.decorators import login_required
 
-from academy_leads.models import AcademyLead, AdCampaign, Booking, Communication, Note, communication_choices_dict
+from academy_leads.models import AcademyLead, Booking, Communication, Note, WhatsappTemplate, communication_choices_dict
+from active_campaign.models import Campaign
 from core.models import GYM_CHOICES
 logger = logging.getLogger(__name__)
 
@@ -46,7 +47,7 @@ def create_academy_lead(request, **kwargs):
             last_name=last_name,
             phone=phone,
             country_code=country_code,
-            ad_campaign=AdCampaign.objects.get_or_create(name='Manually Created')[0]
+            campaign=Campaign.objects.get_or_create(name='Manually Created')[0]
         )
         context = {
             'gym_choices': GYM_CHOICES,
@@ -181,14 +182,39 @@ def mark_sold(request, **kwargs):
         logger.debug("mark_done Error "+str(e))
         return HttpResponse(e, status=500)
         
+# @login_required
+# def test_whatsapp_message(request, **kwargs):
+#     logger.debug(str(request.user))
+#     try:
+#         if request.user.is_staff:
+#             lead = AcademyLead.objects.get(pk=request.POST.get('lead_pk'))
+#             lead.send_whatsapp_message('testing api', request.user)
+#             return render(request, "academy_leads/htmx/academy_lead_row.html", {'lead':lead}) 
+#     except Exception as e:
+#         logger.debug("mark_done Error "+str(e))
+#         return HttpResponse(e, status=500)
 @login_required
-def test_whatsapp_message(request, **kwargs):
+def template_editor(request, **kwargs):
     logger.debug(str(request.user))
     try:
         if request.user.is_staff:
-            lead = AcademyLead.objects.get(pk=request.POST.get('lead_pk'))
-            lead.send_whatsapp_message('testing api', request.user)
-            return render(request, "academy_leads/htmx/academy_lead_row.html", {'lead':lead}) 
+            template = WhatsappTemplate.objects.get(pk=request.GET.get('template_pk'))
+            return render(request, "academy_leads/htmx/template_editor.html", {'template':template}) 
     except Exception as e:
         logger.debug("mark_done Error "+str(e))
         return HttpResponse(e, status=500)
+
+@login_required
+def template_save(request, **kwargs):
+    logger.debug(str(request.user))
+    try:
+        if request.user.is_staff:
+            template = WhatsappTemplate.objects.get(pk=request.POST.get('template_pk'))
+            template.text = request.POST.get('template_text')
+            template.save()
+            return render(request, "academy_leads/htmx/template_editor.html", {'template':template}) 
+    except Exception as e:
+        logger.debug("mark_done Error "+str(e))
+        return HttpResponse(e, status=500)
+
+        

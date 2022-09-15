@@ -153,8 +153,12 @@
                                 <a class="nav-link{%if request.path == '/'%} active{%endif%}" href="/">Academy Leads</a>
                                 </li>
                                 <li class="nav-item">
-                                <a class="nav-link{%if request.path == '/free-taster/'%} active{%endif%}" href="/free-taster/">Free Taster Links</a>
+                                <a class="nav-link{%if request.path == '/free-taster/'%} active{%endif%}" href="{% url 'free-taster' %}">Free Taster Links</a>
                                 </li>
+                                <li class="nav-item">
+                                <a class="nav-link{%if request.path == '/whatsapp-templates/'%} active{%endif%}" href="{% url 'whatsapp-templates' %}">Whatsapp Templates</a>
+                                </li>
+                                
                             </ul>
                             {%include 'core/htmx/profile_dropdown.html'%}
                         </div>

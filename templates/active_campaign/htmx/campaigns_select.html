@@ -1,0 +1,6 @@
+<select class="form-select select2" onchange="snackbarShow('Coming Soon', 'danger')">
+    <option>Campaign: Show All</option>
+    {%for campaign in campaigns%}
+        <option value="{{campaign.id}}">Campaign: {{campaign.name}} ({{campaign.academylead_set.all.count}} leads)</option>
+    {%endfor%}
+</select>

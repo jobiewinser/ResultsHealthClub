@@ -22,7 +22,7 @@
     </td>
     <td>
         {% comment %} Live Well Female {% endcomment %}
-        {{lead.ad_campaign.name}}
+        {{lead.campaign.name}}
     </td>
     <td>                 
         <span class="primary_td_layer">
@@ -116,10 +116,10 @@
                     hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa-regular fa-clock-rotate-left" ></i></button>
             </div>
         </span>
-        {% if request.user.is_superuser%}            
+        {% comment %} {% if request.user.is_superuser%}            
             <button class="btn btn-sm btn-success" hx-include="#lead_pk_{{lead.pk}}"
             hx-post="{% url 'test-whatsapp-message' %}" hx-target="#row_{{lead.pk}}">Test WhatsApp</button>
-        {%endif%}
+        {%endif%} {% endcomment %}
         <br>
         <span class="secondary_td_layer">     
             <div class="btn-group btn-space mt-1">     

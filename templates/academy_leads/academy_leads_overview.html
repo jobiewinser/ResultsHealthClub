@@ -12,7 +12,7 @@
             }
         });
 
-        document.body.addEventListener('htmx:afterSwap', function(evt) {  
+        document.body.addEventListener('htmx:afterSwap', function(evt) {   
             if (evt.detail.xhr.status == 200){
                 if (evt.detail.pathInfo.path.includes("mark-done")){
                     snackbarShow('Successfully marked lead as done', 'success')
@@ -46,9 +46,6 @@
 
 {%block extra_top_buttons %}
 <div class="col-md-auto">
-    <button class="btn btn-success" onclick="snackbarShow('Coming Soon', 'danger')"><i class="fa fa-whatsapp" aria-hidden="true"></i> Whatsapp Templates</button>
-</div>
-<div class="col-md-auto">
     <button class="btn btn-primary" 
         data-bs-toggle="popover" 
         data-bs-trigger="hover" 
@@ -64,19 +61,12 @@
     <input type="text" style="display:None" id="create_academy_lead" name="template_name" value="create_academy_lead"/>
 </div>
 {%include 'academy_leads/htmx/academy_leads_table_status_toggle_div.html'%}
-<div class="col-md-auto">
-    {% comment %} <button class="btn btn-primary" 
-        data-bs-toggle="popover" 
-        data-bs-trigger="hover" 
-        data-bs-placement="top"
-        data-bs-content="Manually create an academy lead."
-        hx-target="#generic_modal_body" 
-        hx-include="#create_academy_lead"
-        hx-get="{% url 'academy-lead-get-modal-content' %}" 
-        hx-push-url="false"
-        hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click">
-            <i class="fa fa-plus" aria-hidden="true"></i> Manually Add Academy Lead
-    </button> {% endcomment %}
+<div class="col-md-auto" hx-get="{% url 'get-campaigns' %}" hx-trigger="load" hx-swap="innerHTML">
+    <span id="campaign_list_span">   
+        <select class="form-select select2" onchange="snackbarShow('Coming Soon', 'danger')">
+            <option>Loading</option>
+        </select>    
+    </span>
 </div>
 
 {%endblock%}

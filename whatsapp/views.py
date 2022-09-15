@@ -58,11 +58,15 @@ class Webhooks(View):
                 for status_dict in value.get('statuses', []):
                     whats_app_messages = WhatsAppMessage.objects.filter(wamid=status_dict.get('id'))
                     if whats_app_messages:
-                        WhatsAppMessageStatus.objects.get_or_create(
+                        whatsapp_message_status = WhatsAppMessageStatus.objects.get_or_create(
                             whats_app_message=whats_app_messages[0],
                             datetime = datetime.fromtimestamp(int(status_dict.get('timestamp'))),
                             status = status_dict.get('status'),
-                        )
+                        )[0]
+                        if status_dict.get('status') == 'read':
+                            communication = whatsapp_message_status.whats_app_message.communication
+                            communication.successful = True
+                            communication.save()
                         
         response = HttpResponse("")
         response.status_code = 200     

@@ -61,22 +61,29 @@ LOGGING = {
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("SECRET_KEY")
 
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, "staticfiles"),
-)
+
 if os.getenv('ENVIRONMENT') == 'development':
     ALLOWED_HOSTS = ['*']
     DEBUG = True
     CSRF_COOKIE_SECURE = False
     SESSION_COOKIE_SECURE = False
+    STATIC_URL = '/static/'
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+    STATICFILES_DIRS = (
+        os.path.join(BASE_DIR, "staticfiles"),
+    )
+
 else:
-    ALLOWED_HOSTS = [os.getenv('ALLOWED_HOSTS')]
+    ALLOWED_HOSTS = [os.getenv('ALLOWED_HOSTS'), '*']
     DEBUG = False
     CSRF_COOKIE_SECURE = True
     SESSION_COOKIE_SECURE = True
     SECURE_HSTS_SECONDS = 3600
+    STATIC_URL = '/static/'
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+    STATICFILES_DIRS = (
+        os.path.join(BASE_DIR, "staticfiles"),
+    )
 
 
 
@@ -92,6 +99,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'core',
     'academy_leads',
+    'active_campaign',
     'whatsapp',
     'import_export',
     'rest_framework',
