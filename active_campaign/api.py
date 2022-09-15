@@ -19,15 +19,44 @@ class ActiveCampaign:
     
     active_campaign_api_key = os.getenv("ACTIVE_CAMPAIGN_API_KEY")
     active_campaign_url = os.getenv("ACTIVE_CAMPAIGN_URL")
+    site_url = os.getenv("SITE_URL")
 
     def _get_headers(self):
         headers = {
             'Api-Token': self.active_campaign_api_key
                    }
         return headers
+    #POST
+    def create_webhook(self, name, guid, list_id):        
+        url = f"{self.active_campaign_url}api/3/webhooks"
+        headers = self._get_headers()
+        body = {
+            "webhook": {
+                "name": f"{name} (Academy Lead System)",
+                "url": f"{self.site_url}/active-campaign-webhooks/{guid}/",
+                "listid": list_id,                
+                "events": [
+                    "subscribe",                    
+                    "update"
+                ],
+                "sources": [
+                    "public",
+                    "admin",
+                    "api",
+                    "system"
+                ]
+            }
+        }
+        response = requests.post(url=url, json=body, headers=headers)
+        return response
     # Get
-    def get_campaigns(self):        
-        url = f"{self.active_campaign_url}api/3/campaigns"
+    # def get_campaigns(self):        
+    #     url = f"{self.active_campaign_url}api/3/campaigns"
+    #     headers = self._get_headers()
+    #     response = requests.get(url=url, headers=headers)
+    #     return response.json()
+    def get_lists(self):        
+        url = f"{self.active_campaign_url}api/3/lists?limit=100"
         headers = self._get_headers()
         response = requests.get(url=url, headers=headers)
         return response.json()
@@ -44,5 +73,6 @@ class ActiveCampaign:
             messages += response_json.get('messages',[])
             i+=1
             response_json = requests.get(url=f"{url}&offset={i}", headers=headers).json()
-
         return messages
+
+    

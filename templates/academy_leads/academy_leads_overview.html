@@ -61,7 +61,7 @@
     <input type="text" style="display:None" id="create_academy_lead" name="template_name" value="create_academy_lead"/>
 </div>
 {%include 'academy_leads/htmx/academy_leads_table_status_toggle_div.html'%}
-<div class="col-md-auto" hx-get="{% url 'get-campaigns' %}" hx-trigger="load" hx-swap="innerHTML">
+<div class="col-md-auto" hx-get="{% url 'get-active-campaign-lists' %}" hx-trigger="load" hx-swap="innerHTML">
     <span id="campaign_list_span">   
         <select class="form-select select2" onchange="snackbarShow('Coming Soon', 'danger')">
             <option>Loading</option>

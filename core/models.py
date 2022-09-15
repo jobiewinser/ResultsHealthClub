@@ -1,4 +1,3 @@
-import uuid
 from django.db import models
 from django.db.models.deletion import SET_NULL
 from django.contrib.auth.models import User
@@ -18,6 +17,8 @@ class Profile(models.Model):
     gym = models.CharField(choices=GYM_CHOICES, max_length=2, null=True, blank=True)
 
     def __str__(self):
+        return f"{self.user.first_name} {self.user.last_name}"
+    def name(self):
         return f"{self.user.first_name} {self.user.last_name}"
 
 class FreeTasterLink(models.Model):

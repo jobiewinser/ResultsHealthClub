@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from whatsapp.api import Whatsapp
 from whatsapp.models import WhatsAppMessage
 
+from django.conf import settings
 from django.dispatch import receiver
 # Create your models here.
 
@@ -35,18 +36,28 @@ class AcademyLead(models.Model):
     last_name = models.TextField(null=True, blank=True)
     phone = models.TextField(null=True, blank=True)
     country_code = models.TextField(null=True, blank=True)
-    campaign = models.ForeignKey("active_campaign.Campaign", on_delete=models.CASCADE, null=True, blank=True)
+    active_campaign_list = models.ForeignKey("active_campaign.ActiveCampaignList", on_delete=models.CASCADE, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     arrived = models.BooleanField(default=False)
     sold = models.BooleanField(default=False)
     complete = models.BooleanField(default=False)
-
+    active_campaign_contact_id = models.TextField(null=True, blank=True)
+    active_campaign_form_id = models.TextField(null=True, blank=True)
+    @property
+    def name(self):
+        if self.last_name:
+            return f"{self.first_name} {self.last_name}"
+        return self.first_name
+    @property
     def next_whatsapp_communication(self):
         last_whatsapp_communication = self.communication_set.filter(type='b')
     def send_whatsapp_message(self, template, user=None):
         whatsapp = Whatsapp()
-        response = whatsapp.send_message(f"{self.country_code}{self.phone}", f"{template.rendered(self)}")
-        print("send_whatsapp_message response", response)
+        message = f"{template.rendered(self)}" 
+        recipient_number = f"{self.country_code}{self.phone}"
+        if settings.WHATSAPP_PHONE_OVERRIDE:
+            recipient_number = settings.WHATSAPP_PHONE_OVERRIDE     
+        response = whatsapp.send_message(recipient_number, message)
         reponse_messages = response.get('messages',[])
         if reponse_messages:
             for response_message in reponse_messages:
@@ -57,13 +68,12 @@ class AcademyLead(models.Model):
                     automatic = True,
                     staff_user = user
                 )[0]
-                print("response_message MESSAGE", str(response_message))
                 WhatsAppMessage.objects.get_or_create(
                     wamid=response_message.get('id'),
                     message=message,
                     communication=communication,
                     phone_from=os.getenv("WHATSAPP_PRIMARY_BUSINESS_PHONE_NUMBER"),
-                    phone_to=f"{self.country_code}{self.phone}"
+                    phone_to=recipient_number
                     )
         else:
             communication = Communication.objects.get_or_create(    
@@ -78,7 +88,7 @@ class AcademyLead(models.Model):
 
 @receiver(models.signals.post_save, sender=AcademyLead)
 def execute_after_save(sender, instance, created, *args, **kwargs):
-    if created:
+    if created and not instance.complete:
         instance.send_whatsapp_message(WhatsappTemplate.objects.get(pk=1), user=None)
         
 class Communication(models.Model):
@@ -131,10 +141,10 @@ class WhatsappTemplate(models.Model):
         self.save()
 
     def rendered_demo(self):
-        return self.text.replace('{first_name}', 'Jobie').replace('{last_name}', 'Winser')
+        return self.text.replace('{first_name}', 'Jobie')
 
     def rendered(self, lead):
-        return self.text.replace('{first_name}', lead.first_name).replace('{last_name}', lead.last_name)
+        return self.text.replace('{first_name}', str(lead.first_name))
 try:
     template, created = WhatsappTemplate.objects.get_or_create(pk=1)
     template.name = "Immediate Lead Followup"

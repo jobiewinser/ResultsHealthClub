@@ -75,7 +75,7 @@
                                 {{communication.staff_user.profile}} <i class="fa-solid fa-arrow-right"> </i>
                             </span>
                             <span style="color:#033dfc;">
-                                {{communication.lead.first_name}} {{communication.lead.last_name}}
+                                {{communication.lead.name}}
                             </span> 
                             <br>
                             <span style="">
@@ -156,6 +156,6 @@
     </div>
 </span>
 <span hx-swap-oob="true" id="generic_modal_title">
-    Communication History - {{lead.first_name}} {{lead.last_name}}
+    Communication History - {{lead.name}}
     <input type="text" style="display:None" id="modal_lead_pk" name="lead_pk" value="{{lead.pk}}"/>
 </span>

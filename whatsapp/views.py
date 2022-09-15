@@ -13,12 +13,14 @@ from django.utils.decorators import method_decorator
 @method_decorator(csrf_exempt, name="dispatch")
 class Webhooks(View):
     def get(self, request, *args, **kwargs):
+        logger.debug(str(request.GET))
         challenge = request.GET.get('hub.challenge',{})
         response = HttpResponse(challenge)
         response.status_code = 200
         return response
 
     def post(self, request, *args, **kwargs):
+        logger.debug(str(request.POST))
         body = json.loads(request.body)
         for entry in body.get('entry'):
             for change in entry.get('changes'):
@@ -31,7 +33,6 @@ class Webhooks(View):
                     datetime_from_request = datetime.fromtimestamp(int(message.get('timestamp')))
                     try:
                         lead = AcademyLead.objects.get(phone__icontains=from_number[-10:])
-                        print("lead", str(lead))
                         communication = Communication.objects.get_or_create(    
                             datetime = datetime_from_request,
                             lead = lead,
@@ -41,7 +42,6 @@ class Webhooks(View):
                             staff_user = None
                         )[0]
                     except Exception as e:
-                        print("Exception", str(e))
                         lead = None
                         communication = None
                     existing_messages = WhatsAppMessage.objects.filter( wamid=wamid )

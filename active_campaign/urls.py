@@ -1,6 +1,6 @@
 """jobiewebsite URL Configuration
 
-The `urlpatterns` list routes URLs to views. For more information please see:
+The `urlpatterns` list routes URLs to views. For more inlistation please see:
     https://docs.djangoproject.com/en/3.2/topics/http/urls/
 Examples:
 Function views
@@ -16,7 +16,7 @@ Including another URLconf
 from django.urls import path
 import active_campaign.views as activecampaignviews
 urlpatterns = [
-    path('active-campaign-webhooks/', activecampaignviews.Webhooks.as_view(), name='active-campaign-webhooks' ),
-    path('get-campaigns/', activecampaignviews.get_campaigns, name='get-campaigns'),
+    path('active-campaign-webhooks/<str:guid>/', activecampaignviews.Webhooks.as_view(), name='active-campaign-webhooks' ),
+    path('get-active-campaign-lists/', activecampaignviews.get_active_campaign_lists, name='get-active-campaign-lists'),
     
 ]

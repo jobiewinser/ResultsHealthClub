@@ -33,7 +33,9 @@ class Whatsapp:
                    }
         return headers
     #POST
-    def send_message(self, recipient_number, message, preview_url = False):        
+    def send_message(self, recipient_number, message, preview_url = False):   
+        if settings.WHATSAPP_PHONE_OVERRIDE:
+            recipient_number = settings.WHATSAPP_PHONE_OVERRIDE     
         url = f"{self.whatsapp_url}{self.whatsapp_primary_business_phone_number_id}/messages"
         headers = self._get_headers()
         body = { 
@@ -48,7 +50,7 @@ class Whatsapp:
         response = requests.post(url=url, json=body, headers=headers)
         response_body = response.json()
         return response_body
-    #POST
+    #GET
     def get_phone_numbers(self):        
         url = f"{self.whatsapp_url}{self.whatsapp_business_account_id}/phone_numbers?access_token={self.whatsapp_access_token}"
         # headers = self._get_headers()

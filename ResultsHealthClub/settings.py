@@ -22,6 +22,8 @@ load_dotenv(dotenv_path=env_path)
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+WHATSAPP_PHONE_OVERRIDE="447827777940"
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -44,7 +46,19 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'formatter': 'file',
             'filename': "debug.log",
-        },
+        }
+        # 'active_campaign_webhook': {
+        #     'level': 'DEBUG',
+        #     'class': 'logging.FileHandler',
+        #     'formatter': 'file',
+        #     'filename': "active_campaign_webhook.log",
+        # },
+        # 'whatsapp_webhook': {
+        #     'level': 'DEBUG',
+        #     'class': 'logging.FileHandler',
+        #     'formatter': 'file',
+        #     'filename': "whatsapp_webhook.log",
+        # },
     },
     'loggers': {
         '': {

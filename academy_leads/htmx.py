@@ -8,7 +8,7 @@ from django.middleware.csrf import get_token
 from django.contrib.auth.decorators import login_required
 
 from academy_leads.models import AcademyLead, Booking, Communication, Note, WhatsappTemplate, communication_choices_dict
-from active_campaign.models import Campaign
+from active_campaign.models import ActiveCampaignList
 from core.models import GYM_CHOICES
 logger = logging.getLogger(__name__)
 
@@ -39,15 +39,15 @@ def create_academy_lead(request, **kwargs):
     logger.debug(str(request.user))
     try:
         first_name = request.POST.get('first_name')
-        last_name = request.POST.get('last_name')
+        # last_name = request.POST.get('last_name')
         phone = request.POST.get('phone')
         country_code = request.POST.get('countryCode')
         AcademyLead.objects.create(
             first_name=first_name,
-            last_name=last_name,
+            # last_name=last_name,
             phone=phone,
             country_code=country_code,
-            campaign=Campaign.objects.get_or_create(name='Manually Created')[0]
+            active_campaign_list=ActiveCampaignList.objects.get_or_create(name='Manually Created')[0]
         )
         context = {
             'gym_choices': GYM_CHOICES,
@@ -172,10 +172,7 @@ def mark_sold(request, **kwargs):
     try:
         if request.user.is_staff:
             lead = AcademyLead.objects.get(pk=request.POST.get('lead_pk'))
-            print(not lead.sold)
-            print(lead.sold)
             lead.sold = not lead.sold
-            print(lead.sold)
             lead.save()
             return render(request, "academy_leads/htmx/academy_lead_row.html", {'lead':lead}) 
     except Exception as e:
