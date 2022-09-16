@@ -12,6 +12,8 @@ class FreeTasterOverviewView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(FreeTasterOverviewView, self).get_context_data(**kwargs)
+        if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+            self.template_name = 'core/htmx/free_taster_table_htmx.html'
         context['gym_choices'] = GYM_CHOICES
         context['free_taster_links'] = FreeTasterLink.objects.all()
         return context

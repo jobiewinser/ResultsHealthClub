@@ -3,14 +3,7 @@
 {%block scripts%}
 {{block.super}}
 <script>
-    $(document).ready(function() {
-        
-
-        document.body.addEventListener('htmx:beforeRequest', function(evt) {  
-            if (evt.detail.target.id == 'results_table'){
-                $("#results_table").dataTable().fnDestroy();
-            }
-        });
+    $(document).ready(function() {  
 
         document.body.addEventListener('htmx:afterSwap', function(evt) {   
             if (evt.detail.xhr.status == 200){
@@ -41,10 +34,28 @@
             $('[data-bs-toggle=popover]').popover();
         });
     });
+    function initDataTable() {
+        let dt = $('#results_table').DataTable(            
+        {  
+            order: [[ 2, 'asc' ]],
+            iDisplayLength: 10
+        }
+        );
+    }
 </script>
 {%endblock scripts%}
 
-{%block extra_top_buttons %}
+{%block extra_top_left_buttons %}
+<div class="col-md-auto" hx-get="{% url 'get-active-campaign-lists' %}" hx-trigger="load" hx-swap="innerHTML">
+    <span id="campaign_list_span">   
+        <select class="form-select select2" onchange="snackbarShow('Coming Soon', 'danger')">
+            <option>Loading</option>
+        </select>    
+    </span>
+</div>
+{%endblock%}
+
+{%block extra_top_right_buttons %}
 <div class="col-md-auto">
     <button class="btn btn-primary" 
         data-bs-toggle="popover" 
@@ -61,14 +72,6 @@
     <input type="text" style="display:None" id="create_academy_lead" name="template_name" value="create_academy_lead"/>
 </div>
 {%include 'academy_leads/htmx/academy_leads_table_status_toggle_div.html'%}
-<div class="col-md-auto" hx-get="{% url 'get-active-campaign-lists' %}" hx-trigger="load" hx-swap="innerHTML">
-    <span id="campaign_list_span">   
-        <select class="form-select select2" onchange="snackbarShow('Coming Soon', 'danger')">
-            <option>Loading</option>
-        </select>    
-    </span>
-</div>
-
 {%endblock%}
 
 {%block table%}

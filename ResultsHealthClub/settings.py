@@ -111,10 +111,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'core',
     'academy_leads',
     'active_campaign',
     'whatsapp',
+    'core',
     'import_export',
     'rest_framework',
 ]

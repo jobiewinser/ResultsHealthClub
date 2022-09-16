@@ -6,7 +6,7 @@
         hx-target="#results_table" 
         hx-get="{% url 'academy-leads-overview' %}" 
         hx-push-url="false"
-        hx-swap="outerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa-regular fa-wave-pulse"></i> Show Active</button>
+        hx-swap="outerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa-regular fa-wave-pulse"></i> Show Active</button>        
 </div>
 {%else%}
 <div hx-swap-oob="true" class="col-md-auto" id="swap_status_button">

@@ -1,4 +1,4 @@
-import datetime
+from datetime import timedelta, datetime
 import os
 from django.db import models
 from django.contrib.auth.models import User
@@ -49,8 +49,22 @@ class AcademyLead(models.Model):
             return f"{self.first_name} {self.last_name}"
         return self.first_name
     @property
-    def next_whatsapp_communication(self):
-        last_whatsapp_communication = self.communication_set.filter(type='b')
+    def last_whatsapp_communication(self):
+        whatsapp_communications = self.communication_set.filter(type='b')
+        if whatsapp_communications:
+            return whatsapp_communications.first()
+        return None
+    
+    @property
+    def time_until_next_whatsapp(self):
+        last_whatsapp_communication = self.last_whatsapp_communication
+        print(last_whatsapp_communication)
+        if last_whatsapp_communication:
+            return last_whatsapp_communication.datetime.replace(hour=9).replace(minute=30).replace(second=0) + timedelta(days=1)
+        return "Never"
+    
+
+
     def send_whatsapp_message(self, template, user=None):
         whatsapp = Whatsapp()
         message = f"{template.rendered(self)}" 
@@ -62,7 +76,7 @@ class AcademyLead(models.Model):
         if reponse_messages:
             for response_message in reponse_messages:
                 communication = Communication.objects.get_or_create(    
-                    datetime = datetime.datetime.now(),
+                    datetime = datetime.now(),
                     lead = self,
                     type = 'b',
                     automatic = True,
@@ -73,11 +87,12 @@ class AcademyLead(models.Model):
                     message=message,
                     communication=communication,
                     phone_from=os.getenv("WHATSAPP_PRIMARY_BUSINESS_PHONE_NUMBER"),
-                    phone_to=recipient_number
+                    phone_to=recipient_number,
+                    template=template
                     )
         else:
             communication = Communication.objects.get_or_create(    
-                datetime = datetime.datetime.now(),
+                datetime = datetime.now(),
                 lead = self,
                 type = 'b',
                 automatic = True,
@@ -137,6 +152,8 @@ class WhatsappTemplate(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     objects = WhatsappTemplateManager()
+    class Meta:
+        ordering = ['pk']
     def delete(self):
         self.save()
 

@@ -1,0 +1,58 @@
+{%load core_tags%}
+{%load static tz core_tags%}
+<table id="results_table" class="table"> 
+    <thead> 
+        <tr>
+            <th>
+                Customer Name
+            </th>
+            <th>
+                Staff
+            </th>
+            <th>
+                Link Clicked
+            </th>
+            <th>
+                Link
+            </th>
+            <th>
+                Extra
+            </th>
+        </tr>
+    </thead>
+    <tbody> 
+        {%for link in free_taster_links%}
+        <tr id="row_{{link.pk}}">
+            <td>
+                {{link.customer_name}}
+                <input type="text" style="display:None" id="link_pk_{{link.pk}}" name="link_pk" value="{{link.pk}}"/>
+            </td>
+            <td>
+                {{link.staff_user.profile}}
+            </td>
+            <td>
+                {%if link.freetasterlinkclick_set.all%}
+                
+                <span class="badge bg-success" 
+                    data-bs-toggle="popover" 
+                    data-bs-trigger="hover" 
+                    data-bs-placement="top"
+                    data-bs-html="true"
+                    data-bs-content="<ol>{%for click in link.freetasterlinkclick_set.all%}{%with click.created|timezone:'Europe/London' as created%}<li>{{created}}</li>{%endwith%}{%endfor%}</ol>">
+                    {%with link.freetasterlinkclick_set.first.created|timezone:'Europe/London' as created%}{{created}}{%endwith%}
+                </span>
+                  
+                {%endif%}
+            </td>
+            <td>
+                <button class="btn btn-primary" onclick="copyTextToClipboard('{% get_env_var 'SITE_URL' %}/free-taster/{{link.guid}}')"><i class="fa-solid fa-copy"></i> Copy</button>
+                {% get_env_var 'SITE_URL' %}/free-taster/{{link.guid}}                 
+            </td>
+            <td>
+                <button class="btn btn-sm btn-danger" hx-include="#link_pk_{{link.pk}}"
+                    hx-post="{% url 'delete-free-taster-link' %}" hx-target="#row_{{link.pk}}">Delete</button>             
+            </td>
+        </tr>
+        {%endfor%}
+    </tbody>
+</table>

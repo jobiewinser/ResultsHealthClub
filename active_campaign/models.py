@@ -20,6 +20,8 @@ class ActiveCampaignList(models.Model):
                 self.webhook_created = True
                 self.webhook_id = response.json().get('webhook').get('id')
                 self.save()
+    def get_active_leads_qs(self):
+        return self.academylead_set.filter(complete=False)
 
 @receiver(models.signals.post_save, sender=ActiveCampaignList)
 def execute_after_save(sender, instance, created, *args, **kwargs):
@@ -30,3 +32,4 @@ def execute_after_save(sender, instance, created, *args, **kwargs):
 
 class CampaignWebhook(models.Model):
     json_data = models.JSONField(default=dict)
+    guid = models.TextField(null=True, blank=True)

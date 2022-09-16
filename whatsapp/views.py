@@ -64,9 +64,12 @@ class Webhooks(View):
                             status = status_dict.get('status'),
                         )[0]
                         if status_dict.get('status') == 'read':
-                            communication = whatsapp_message_status.whats_app_message.communication
-                            communication.successful = True
-                            communication.save()
+                            try:
+                                communication = whatsapp_message_status.whats_app_message.communication
+                                communication.successful = True
+                                communication.save()
+                            except:
+                                pass
                         
         response = HttpResponse("")
         response.status_code = 200     

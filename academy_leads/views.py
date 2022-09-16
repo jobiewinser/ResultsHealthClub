@@ -5,6 +5,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from academy_leads.models import AcademyLead, WhatsappTemplate
 from active_campaign.api import ActiveCampaign
+from active_campaign.models import ActiveCampaignList
 
 from core.models import GYM_CHOICES
 from whatsapp.api import Whatsapp
@@ -19,8 +20,13 @@ class AcademyLeadsOverviewView(TemplateView):
             self.template_name = 'academy_leads/htmx/academy_leads_table_htmx.html'
         context['gym_choices'] = GYM_CHOICES
         complete_filter = (self.request.GET.get('complete')=='True')
-        context['leads'] = AcademyLead.objects.filter(complete=complete_filter)
-        whatsapp = Whatsapp()
+        leads = AcademyLead.objects.filter(complete=complete_filter)
+        active_campaign_list_pk = self.request.GET.get('active_campaign_list_pk', None)
+        if active_campaign_list_pk:
+            leads = leads.filter(active_campaign_list=ActiveCampaignList.objects.get(pk=active_campaign_list_pk))
+        context['leads'] = leads
+
+        # whatsapp = Whatsapp()
         return context
         
 @method_decorator(login_required, name='dispatch')

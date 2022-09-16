@@ -259,3 +259,9 @@ body {
     display: block;
     height: 300px;
 }
+
+
+
+tr.odd td {
+    background-color: unset
+}

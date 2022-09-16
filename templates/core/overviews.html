@@ -4,15 +4,19 @@
 {{block.super}}
 <script>
     $(document).ready(function() {
-        $('#results_table').DataTable({
-        });
+        initDataTable();
         $("[data-bs-toggle=popover]").popover();
         document.body.addEventListener('htmx:configRequest', function(evt) {    
             evt.detail.headers['x-csrftoken'] = $('#csrf_token').val();
+        }); 
+        document.body.addEventListener('htmx:beforeRequest', function(evt) {  
+            if (evt.detail.target.id == 'results_table'){
+                $("#results_table").dataTable().fnDestroy();
+            }
         });
         document.body.addEventListener('htmx:afterSwap', function(evt) {  
             if (evt.detail.target.id == 'results_table'){
-                $('#results_table').DataTable({});  
+                initDataTable(); 
             }
             else if (evt.detail.target.id == 'generic_modal_body'){
                 $('#generic_modal').modal('show');
@@ -45,17 +49,19 @@
 {%block content%}    
     <div class="">
         <div class="row">
-            <div class="col-md-auto">
+            {% comment %} <div class="col-md-auto">
                 <select class="form-select" onchange="snackbarShow('Coming Soon', 'danger')">
                     {%for gym in gym_choices%}
                     <option>Results Health Club - {{gym.1}}</option>
                     {%endfor%}
                 </select>
-            </div>
-            {%block extra_top_buttons %}
+            </div> {% endcomment %}
+            {%block extra_top_left_buttons %}
             {%endblock%}
             <div class="col">                
             </div>
+            {%block extra_top_right_buttons %}
+            {%endblock%}
         </div>
         <div class="row">
             <div class="col">

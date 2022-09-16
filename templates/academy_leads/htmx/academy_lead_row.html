@@ -1,10 +1,10 @@
-{%load static core_tags%}
+{%load static core_tags tz%}
 <tr id="row_{{lead.pk}}" class="{% if lead.complete and not lead.sold%}danger-tr{% elif lead.sold %}complete-tr{%endif%}">
     <td class="double_layer_td">
         <input type="text" style="display:None" id="lead_pk_{{lead.pk}}" name="lead_pk" value="{{lead.pk}}"/>
         <span class="primary_td_layer">{{lead.name}}</span>
         <br>
-        <span class="secondary_td_layer"><a style="text-decoration: none;" class="nowrap" target="_blank" href="whatsapp://send?phone={{lead.country_code}}{{lead.phone}}&text=Hi {{lead.first_name}}, I'm {{request.user.first_name}}"><i class="fa fa-whatsapp" aria-hidden="true"></i> +{{lead.country_code}} {{lead.phone}}</a></span>        
+        <span class="secondary_td_layer"><a style="text-decoration: none; color: #25d366" class="nowrap" target="_blank" href="whatsapp://send?phone={{lead.country_code}}{{lead.phone}}&text=Hi {{lead.first_name}}, I'm {{request.user.first_name}}"><i class="fa fa-whatsapp" aria-hidden="true"></i> +{{lead.country_code}} {{lead.phone}}</a></span>        
     </td>
     <td class="nowrap">
         {%if lead.complete and not lead.sold%}
@@ -16,9 +16,12 @@
         {%endif%}
     </td>
     <td class="double_layer_td">
-        <span class="primary_td_layer">{{lead.created.date}}</span>
+        {%with lead.created|timezone:'Europe/London' as created%}
+        <span hidden>{{created|timestamp}}</span>
+        <span class="primary_td_layer">{{created.date}}</span>
         <br>
-        <span class="secondary_td_layer">{{lead.created.time}}</span>   
+        <span class="secondary_td_layer">{{created.time}}</span> 
+        {%endwith%}  
     </td>
     <td>
         {% comment %} Live Well Female {% endcomment %}
@@ -44,22 +47,18 @@
         <br>
         <span class="secondary_td_layer">
             {{lead.booking_set.all.0.datetime.time}}
-        </span>  
-        
+        </span>         
     </td>
     <td>
-        {% comment %} <button class="btn btn-xs btn-secondary"
-            data-bs-toggle="popover" 
-            data-bs-trigger="hover" 
-            data-bs-placement="top"
-            data-bs-content="Pause this message for a while"
-            hx-target="#generic_modal_body" 
-            hx-include="#pause_whatsapp"
-            hx-get="{% url 'academy-lead-get-modal-content' %}" 
-            hx-push-url="false"
-            hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa fa-pause" aria-hidden="true"></i></button>
-        07-09-2022 {% endcomment %}
-        Coming Soon
+        {% with lead.time_until_next_whatsapp as time_until_next_whatsapp %}  
+        <span class="primary_td_layer">
+            {{time_until_next_whatsapp.date}} 
+        </span>
+        <br>
+        <span class="secondary_td_layer">
+            {{time_until_next_whatsapp.time}}
+        </span>  
+        {%endwith%}
     </td>
     <td class="double_layer_td">       
         <span class="primary_td_layer">           
@@ -113,7 +112,7 @@
                     hx-include="#communication_history"
                     hx-get="{% url 'academy-lead-get-modal-content' param1=lead.pk %}" 
                     hx-push-url="false"
-                    hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa-regular fa-clock-rotate-left" ></i></button>
+                    hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa-regular fa-clock-rotate-left" ></i> <span style="color:Silver">{{lead.communication_set.all.count}}</span></button>
             </div>
         </span>
         {% comment %} {% if request.user.is_superuser%}            

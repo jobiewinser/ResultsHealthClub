@@ -2,7 +2,11 @@
 <div class="row mt-3" id="generated_link" style="width:600px !important; height:50px !important;">
     {%if generated_link%}
     <div class="col-md-auto">
-        <button class="btn btn-primary" onclick="copyTextToClipboard('{% get_env_var 'SITE_URL' %}/free-taster/{{generated_link.guid}}')"><i class="fa-solid fa-copy"></i> Copy</button>
+        <button class="btn btn-primary"        
+        onclick="copyTextToClipboard('{% get_env_var 'SITE_URL' %}/free-taster/{{generated_link.guid}}')"
+        hx-get="{% url 'free-taster' %}" 
+        hx-swap="outerHTML" hx-target="#results_table"
+        ><i class="fa-solid fa-copy"></i> Copy</button>
     </div>
     <div class="col">
         <input value="{% get_env_var 'SITE_URL' %}/free-taster/{{generated_link.guid}}" class="form-control" />
