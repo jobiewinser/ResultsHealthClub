@@ -15,7 +15,7 @@ class ActiveCampaignList(models.Model):
     webhook_id = models.TextField(null=True, blank=True)
 
     def create_webhook(self):
-        if self.name and self.guid and not settings.DEBUG:
+        if self.name and self.guid and not settings.DEBUG and not 'manually' in self.name.lower():
             response = ActiveCampaign().create_webhook(str(self.name), str(self.guid), str(self.active_campaign_id))
             if response.status_code in [200, 201]:
                 self.webhook_created = True
