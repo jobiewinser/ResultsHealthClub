@@ -150,13 +150,13 @@
                         <div class="collapse navbar-collapse" id="navbarSupportedContent">
                             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                                 <li class="nav-item">
-                                <a class="nav-link{%if request.path == '/'%} active{%endif%}" href="/">Academy Leads</a>
+                                <a class="nav-link{%if request.path == '/'%} active{%endif%}" href="{% url 'academy-leads-overview' %}">Academy Leads</a>
                                 </li>
                                 <li class="nav-item">
                                 <a class="nav-link{%if request.path == '/free-taster/'%} active{%endif%}" href="{% url 'free-taster' %}">Free Taster Links</a>
                                 </li>                                
                             </ul>
-                            <ul class="navbar-nav me-3 m-0" style="text-align:right"">
+                            <ul class="navbar-nav me-3 m-0" style="text-align:right">
                                 <li class="nav-item">
                                 <a class="nav-link{%if 'configuration' in request.path %} active{%endif%}" href="{% url 'configuration' %}"><i class="fa-light fa-gear"></i> Configuration</a>
                                 </li>                               
@@ -165,6 +165,9 @@
                         </div>
                 </div>
             </nav>
+            <div id="htmx-indicator" class="progress">
+              <div id="pb" class="progress-bar" style="width:0%"></div>
+            </div>
         {%endblock navbar%}
         
         <div class="content">

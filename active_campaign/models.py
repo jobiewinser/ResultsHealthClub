@@ -16,7 +16,7 @@ class ActiveCampaignList(models.Model):
     site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
         
     def create_webhook(self):
-        if self.name and self.guid and not settings.DEBUG and not 'manually' in self.name.lower():
+        if self.name and self.guid and not self.webhook_id and not settings.DEBUG and not 'manually' in self.name.lower():
             response = ActiveCampaign().create_webhook(str(self.name), str(self.guid), str(self.active_campaign_id))
             if response.status_code in [200, 201]:
                 self.webhook_created = True

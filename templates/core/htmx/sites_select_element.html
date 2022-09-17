@@ -1,0 +1,7 @@
+<select class="form-select results_table_filters" name="site_pk" id="site_choice" onchange="$('#change_site').click();">
+    <option value="">Show All</option>
+    {%for site in site_list%}
+    <option {%if site.pk == request.GET.site_pk %}selected{%endif%} value="{{site.pk}}">{{site.name}}</option>
+    {%endfor%}
+</select>
+<button hidden hx-get="{% url 'academy-leads-overview' %}{%if request.GET.complete %}?complete=True{%endif%}" hx-push-url="true" hx-swap="outerHTML" hx-include=".results_table_filters" hx-target="#results_table" id="change_site" class="btn btn-primary btn-sm"></button>

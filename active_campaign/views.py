@@ -2,6 +2,7 @@ import logging
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from academy_leads.models import AcademyLead
+from core.views import get_site_pk_from_request
 from active_campaign.api import ActiveCampaign
 from active_campaign.models import CampaignWebhook, ActiveCampaignList
 from core.models import Site
@@ -94,24 +95,27 @@ def get_and_generate_active_campaign_list_objects():
         active_campaign_list.save()
     return ActiveCampaignList.objects.all()
     
+def get_active_campaign_list_qs(request):
+    first_model_query = (AcademyLead.objects
+        .filter(active_campaign_list=OuterRef('pk'), complete=False)
+        .values('active_campaign_list')
+        .annotate(cnt=Count('pk'))
+        .values('cnt')
+    )    
+    active_campaign_list_qs = ActiveCampaignList.objects.annotate(
+        first_model_count=Subquery(first_model_query)
+    )     
+    site_pk = get_site_pk_from_request(request)
+    if site_pk and not site_pk == 'all':
+        active_campaign_list_qs = active_campaign_list_qs.filter(site__pk=site_pk)
+    return active_campaign_list_qs.order_by('first_model_count')
+
 @login_required
-def get_active_campaign_lists(request):
+def get_active_campaign_lists(request, **kwargs):
     # try:
         get_and_generate_active_campaign_list_objects()
-        first_model_query = (AcademyLead.objects
-            .filter(active_campaign_list=OuterRef('pk'), complete=False)
-            .values('active_campaign_list')
-            .annotate(cnt=Count('pk'))
-            .values('cnt')
-        )
-        
-        active_campaign_list_qs = ActiveCampaignList.objects.annotate(
-            first_model_count=Subquery(first_model_query)
-        ) 
-        
         return render(request, f"active_campaign/htmx/active_campaign_lists_select.html", 
-        {'active_campaign_lists':active_campaign_list_qs.order_by('first_model_count')})
-
+        {'active_campaign_lists':get_active_campaign_list_qs(request)})
 @login_required
 def set_active_campaign_lists_site(request, **kwargs):
     # try:

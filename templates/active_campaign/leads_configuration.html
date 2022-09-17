@@ -10,7 +10,13 @@
         let dt = $('#results_table').DataTable(          
             {  
                 order: [[ 1, 'asc' ]],
-                iDisplayLength: 10
+                iDisplayLength: 10,
+                
+                'columns': 
+                [
+                    { 'searchable': true },
+                    { 'searchable': false },
+                ]
             }
         );
     }

@@ -25,7 +25,11 @@
                     $('#generic_modal').modal('hide');
                     console.log(evt)
                     snackbarShow('Successfully sold to customer', 'success')
+                } else if (evt.detail.pathInfo.path.includes("academy-leads-overview")){
+                    $('#refresh_campaign_list_span').click(); 
+                    snackbarShow('Successfully refreshed table', 'success')
                 }
+                
             }
             if ($('#noteTable')){
                 
@@ -47,21 +51,16 @@
 
 {%block extra_top_left_buttons %}
 <div class="col-md-auto">
-    <span id="site_list_span">   
-        <select class="form-select">
-            {%for site in site_list%}
-            <option value="{{site.pk}}">{{site.name}}</option>
-            {%endfor%}
-        </select>    
-    </span>
+    {%include 'core/htmx/sites_select_element.html'%}
 </div>
-<div class="col-md-auto" hx-get="{% url 'get-active-campaign-lists' %}" hx-trigger="load" hx-swap="innerHTML">
+<div class="col-md-auto" hx-get="{% url 'get-active-campaign-lists'%}" hx-include="#site_pk" hx-trigger="load" hx-target="#campaign_list_span" hx-swap="outerHTML">
     <span id="campaign_list_span">   
         <select class="form-select">
             <option>Loading</option>
         </select>    
     </span>
 </div>
+<button hidden hx-get="{% url 'get-active-campaign-lists'%}" hx-include="#site_pk" id="refresh_campaign_list_span" hx-target="#campaign_list_span" hx-trigger="click" hx-swap="outerHTML"></button>
 {%endblock%}
 
 {%block extra_top_right_buttons %}
@@ -72,7 +71,7 @@
         data-bs-placement="top"
         data-bs-content="Manually create an academy lead."
         hx-target="#generic_modal_body" 
-        hx-include="#create_academy_lead"
+        hx-include="#create_academy_lead,#site_pk"
         hx-get="{% url 'academy-lead-get-modal-content' %}" 
         hx-push-url="false"
         hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click">
@@ -84,6 +83,10 @@
 {%endblock%}
 
 {%block table%}
+
+<span hx-swap-oob="true" id="site_pk_span">   
+    <input type="text" style="display:None" id="site_pk" name="site_pk" value="{{request.GET.site_pk}}"/>
+</span>
 <input type="text" style="display:None" id="log_communication" name="template_name" value="log_communication"/>
 <input type="text" style="display:None" id="communication_history" name="template_name" value="communication_history"/>
 <input type="text" style="display:None" id="booking_history" name="template_name" value="booking_history"/>

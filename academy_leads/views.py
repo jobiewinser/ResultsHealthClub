@@ -6,27 +6,37 @@ from django.contrib.auth.decorators import login_required
 from academy_leads.models import AcademyLead, WhatsappTemplate
 from active_campaign.api import ActiveCampaign
 from active_campaign.models import ActiveCampaignList
-from active_campaign.views import get_and_generate_active_campaign_list_objects
-from core.models import Site
+from active_campaign.views import get_active_campaign_list_qs, get_and_generate_active_campaign_list_objects
+from core.models import Profile, Site
+from core.views import get_site_pk_from_request
 
 from whatsapp.api import Whatsapp
 logger = logging.getLogger(__name__)
+
+    
+
+
+
 @method_decorator(login_required, name='dispatch')
 class AcademyLeadsOverviewView(TemplateView):
     template_name='academy_leads/academy_leads_overview.html'
 
     def get_context_data(self, **kwargs):
-        context = super(AcademyLeadsOverviewView, self).get_context_data(**kwargs)#
+        self.request.GET._mutable = True       
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
-            self.template_name = 'academy_leads/htmx/academy_leads_table_htmx.html'
-        context['site_choices'] = Site.objects.all()
+            self.template_name = 'academy_leads/htmx/academy_leads_table_htmx.html'   
+        context = super(AcademyLeadsOverviewView, self).get_context_data(**kwargs)      
+            
         complete_filter = (self.request.GET.get('complete')=='True')
         leads = AcademyLead.objects.filter(complete=complete_filter)
+        context['site_list'] = Site.objects.all()
         active_campaign_list_pk = self.request.GET.get('active_campaign_list_pk', None)
         if active_campaign_list_pk:
             leads = leads.filter(active_campaign_list=ActiveCampaignList.objects.get(pk=active_campaign_list_pk))
-        context['leads'] = leads
-
+        site_pk = get_site_pk_from_request(self.request)
+        if site_pk:
+            context['leads'] = leads.filter(active_campaign_list__site__pk=site_pk)
+            self.request.GET['site_pk'] = int(site_pk)
         # whatsapp = Whatsapp()
         return context
         
@@ -48,7 +58,3 @@ class LeadConfigurationView(TemplateView):
         context['active_campaign_lists'] = get_and_generate_active_campaign_list_objects()
         context['sites'] = Site.objects.all()
         return context
-    
-
-
-    

@@ -1,6 +1,6 @@
 import os
 import uuid
-from core.models import FreeTasterLink, Profile
+from core.models import FreeTasterLink, Profile, Site
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import render
@@ -30,7 +30,7 @@ def get_modal_content(request, **kwargs):
     try:
         if request.user.is_staff:
             template_name = request.GET.get('template_name', '')
-            context = {}
+            context = {'site_list':Site.objects.all()}
             if template_name == 'switch_user':
                 context['staff_users'] = User.objects.filter(is_staff=True).order_by('first_name')
             return render(request, f"academy_leads/htmx/{template_name}.html", context)   
@@ -44,12 +44,15 @@ def add_user(request, **kwargs):
         if request.user.is_staff:
             first_name = request.POST['first_name']
             last_name = request.POST['last_name']
+            site_pk = request.POST['site_pk']
             user = User.objects.create(username=f"{first_name}{last_name}", 
                                         first_name=first_name,
                                         last_name=last_name,
                                         password=os.getenv("DEFAULT_USER_PASSWORD"), 
                                         is_staff=True)
-            Profile.objects.create(user = user, avatar = request.FILES['profile_picture'])
+            Profile.objects.create(user = user, 
+                                    avatar = request.FILES['profile_picture'], 
+                                    site=Site.objects.get(pk=site_pk))
             login(request, user)
             return render(request, f"core/htmx/profile_dropdown.html", {})  
     except Exception as e:

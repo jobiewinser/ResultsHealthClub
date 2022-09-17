@@ -2,12 +2,15 @@
 <span>
     <div class="row">
         <div class="col center" >
-            <input name="first_name" class="form-control add_user_input" placeholder="First Name"/>
-            <br>
-            <input name="last_name" class="form-control add_user_input" placeholder="Last Name"/>
-            <br>
+            <select class="form-select add_user_input my-3" name="site_pk">
+                {%for site in site_list%}
+                <option value="{{site.pk}}">{{site.name}}</option>
+                {%endfor%}
+            </select>   
+            <input name="first_name" class="form-control add_user_input my-3" placeholder="First Name"/>
+            <input name="last_name" class="form-control add_user_input my-3" placeholder="Last Name"/>
             <label class="form-label" for="customFile">Profile Picture:</label>
-            <input name="profile_picture" type="file" class="form-control add_user_input" id="customFile" />
+            <input name="profile_picture" type="file" class="form-control add_user_input my-3" id="customFile" />
         </div>
     </div>
     <br>

@@ -17,7 +17,7 @@ def get_modal_content(request, **kwargs):
     try:
         if request.user.is_staff:
             template_name = request.GET.get('template_name', '')
-            context = {}
+            context = {'site_list':Site.objects.all()}
             param1 = kwargs.get('param1', '')
             if param1:
                 context['lead'] = AcademyLead.objects.get(pk=param1)
