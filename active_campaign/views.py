@@ -83,7 +83,7 @@ class Webhooks(View):
     
 logger = logging.getLogger(__name__)
 
-def generate_active_campaign_list_objects():
+def get_and_generate_active_campaign_list_objects():
     for active_campaign_list_dict in ActiveCampaign().get_lists().get('lists',[]):
         active_campaign_list, created = ActiveCampaignList.objects.get_or_create(
             active_campaign_id = active_campaign_list_dict.pop('id'),
@@ -91,11 +91,12 @@ def generate_active_campaign_list_objects():
         )
         active_campaign_list.json_data = active_campaign_list_dict
         active_campaign_list.save()
+    return ActiveCampaignList.objects.all()
 
 @login_required
 def get_active_campaign_lists(request):
     # try:
-        generate_active_campaign_list_objects()
+        get_and_generate_active_campaign_list_objects()
         first_model_query = (AcademyLead.objects
             .filter(active_campaign_list=OuterRef('pk'), complete=False)
             .values('active_campaign_list')

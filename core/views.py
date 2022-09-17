@@ -17,6 +17,14 @@ class FreeTasterOverviewView(TemplateView):
         context['gym_choices'] = GYM_CHOICES
         context['free_taster_links'] = FreeTasterLink.objects.all()
         return context
+        
+@method_decorator(login_required, name='dispatch')
+class ConfigurationView(TemplateView):
+    template_name='core/configuration.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ConfigurationView, self).get_context_data(**kwargs)        
+        return context
 
 def free_taster_redirect(request, **kwargs):
     try:

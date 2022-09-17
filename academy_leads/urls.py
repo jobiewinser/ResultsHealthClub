@@ -18,7 +18,9 @@ import academy_leads.views as academyleadsviews
 import academy_leads.htmx as academyleadshtmx
 urlpatterns = [
     path('', academyleadsviews.AcademyLeadsOverviewView.as_view(), name='academy-leads-overview'),
-    path('whatsapp-templates/', academyleadsviews.WhatsappTemplatesView.as_view(), name='whatsapp-templates'),
+    path('configuration/whatsapp-templates/', academyleadsviews.WhatsappTemplatesView.as_view(), name='whatsapp-templates'),
+    path('configuration/lead-configuration/', academyleadsviews.LeadConfigurationView.as_view(), name='lead-configuration'),
+    
     path('mark-done/', academyleadshtmx.mark_done, name='mark-done' ),
     path('create-academy-lead/', academyleadshtmx.create_academy_lead, name='create-academy-lead' ),
     path('log-communication/', academyleadshtmx.log_communication, name='log-communication' ),

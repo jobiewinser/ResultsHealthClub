@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from academy_leads.models import AcademyLead, WhatsappTemplate
 from active_campaign.api import ActiveCampaign
 from active_campaign.models import ActiveCampaignList
+from active_campaign.views import get_and_generate_active_campaign_list_objects
 
 from core.models import GYM_CHOICES
 from whatsapp.api import Whatsapp
@@ -37,6 +38,16 @@ class WhatsappTemplatesView(TemplateView):
         context = super(WhatsappTemplatesView, self).get_context_data(**kwargs)
         context['templates'] = WhatsappTemplate.objects.all()
         return context
+        
+@method_decorator(login_required, name='dispatch')
+class LeadConfigurationView(TemplateView):
+    template_name='academy_leads/whatsapp_templates.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(LeadConfigurationView, self).get_context_data(**kwargs)
+        context['active_campaign_lists'] = get_and_generate_active_campaign_list_objects()
+        return context
     
+
 
     
