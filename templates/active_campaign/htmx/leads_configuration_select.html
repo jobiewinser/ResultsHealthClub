@@ -1,14 +1,14 @@
-<span id="gym_select_span_{{active_campaign_list.pk}}"> 
-    <span style="display:none"> {{active_campaign_list.gym.name}}</span>
-    <select id="gym_choice_{{active_campaign_list.pk}}" class="form-select" name="gym_choice"onchange="$('#submit_gym_choice_{{active_campaign_list.pk}}').click()">
+<span id="site_select_span_{{active_campaign_list.pk}}"> 
+    <span style="display:none"> {{active_campaign_list.site.name}}</span>
+    <select id="site_choice_{{active_campaign_list.pk}}" class="form-select" name="site_choice"onchange="$('#submit_site_choice_{{active_campaign_list.pk}}').click()">
     <option value="">None</option>
-    {%for gym in gyms%}
-    <option value="{{gym.pk}}" {%if active_campaign_list.gym == gym%}selected{%endif%}>{{gym.name}}</option>
+    {%for site in sites%}
+    <option value="{{site.pk}}" {%if active_campaign_list.site == site%}selected{%endif%}>{{site.name}}</option>
     {%endfor%}
     </select>
     <button hidden 
-    hx-post="{% url 'set-active-campaign-list-gym' list_pk=active_campaign_list.pk %}" 
-    hx-swap="outerHTML" hx-target="#gym_select_span_{{active_campaign_list.pk}}"
-    hx-include="#gym_choice_{{active_campaign_list.pk}}" 
-    id="submit_gym_choice_{{active_campaign_list.pk}}"></button>
+    hx-post="{% url 'set-active-campaign-list-site' list_pk=active_campaign_list.pk %}" 
+    hx-swap="outerHTML" hx-target="#site_select_span_{{active_campaign_list.pk}}"
+    hx-include="#site_choice_{{active_campaign_list.pk}}" 
+    id="submit_site_choice_{{active_campaign_list.pk}}"></button>
 </span>

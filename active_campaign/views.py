@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from academy_leads.models import AcademyLead
 from active_campaign.api import ActiveCampaign
 from active_campaign.models import CampaignWebhook, ActiveCampaignList
-from core.models import Gym
+from core.models import Site
 logger = logging.getLogger(__name__)
 from django.views import View 
 from django.utils.decorators import method_decorator
@@ -113,12 +113,12 @@ def get_active_campaign_lists(request):
         {'active_campaign_lists':active_campaign_list_qs.order_by('first_model_count')})
 
 @login_required
-def set_active_campaign_lists_gym(request, **kwargs):
+def set_active_campaign_lists_site(request, **kwargs):
     # try:
-    print(request.POST.get('gym_choice'))
+    print(request.POST.get('site_choice'))
     active_campaign_list = ActiveCampaignList.objects.get(pk=kwargs.get('list_pk'))
-    active_campaign_list.gym = Gym.objects.get(pk=request.POST.get('gym_choice'))
+    active_campaign_list.site = Site.objects.get(pk=request.POST.get('site_choice'))
     active_campaign_list.save()
-    return render(request, 'active_campaign/htmx/leads_configuration_select.html', {'active_campaign_list':active_campaign_list, 'gyms':Gym.objects.all()})
+    return render(request, 'active_campaign/htmx/leads_configuration_select.html', {'active_campaign_list':active_campaign_list, 'sites':Site.objects.all()})
     # except Exception as e:        
-    #     logger.error(f"set_active_campaign_lists_gym {str(e)}")
+    #     logger.error(f"set_active_campaign_lists_site {str(e)}")

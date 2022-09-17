@@ -7,7 +7,7 @@ from academy_leads.models import AcademyLead, WhatsappTemplate
 from active_campaign.api import ActiveCampaign
 from active_campaign.models import ActiveCampaignList
 from active_campaign.views import get_and_generate_active_campaign_list_objects
-from core.models import Gym
+from core.models import Site
 
 from whatsapp.api import Whatsapp
 logger = logging.getLogger(__name__)
@@ -19,7 +19,7 @@ class AcademyLeadsOverviewView(TemplateView):
         context = super(AcademyLeadsOverviewView, self).get_context_data(**kwargs)#
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'academy_leads/htmx/academy_leads_table_htmx.html'
-        context['gym_choices'] = Gym.objects.all()
+        context['site_choices'] = Site.objects.all()
         complete_filter = (self.request.GET.get('complete')=='True')
         leads = AcademyLead.objects.filter(complete=complete_filter)
         active_campaign_list_pk = self.request.GET.get('active_campaign_list_pk', None)
@@ -46,7 +46,7 @@ class LeadConfigurationView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(LeadConfigurationView, self).get_context_data(**kwargs)
         context['active_campaign_lists'] = get_and_generate_active_campaign_list_objects()
-        context['gyms'] = Gym.objects.all()
+        context['sites'] = Site.objects.all()
         return context
     
 

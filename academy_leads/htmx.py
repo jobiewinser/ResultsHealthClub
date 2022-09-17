@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 
 from academy_leads.models import AcademyLead, Booking, Communication, Note, WhatsappTemplate, communication_choices_dict
 from active_campaign.models import ActiveCampaignList
-from core.models import Gym
+from core.models import Site
 logger = logging.getLogger(__name__)
 
 @login_required
@@ -50,7 +50,7 @@ def create_academy_lead(request, **kwargs):
             active_campaign_list=ActiveCampaignList.objects.get_or_create(name='Manually Created')[0]
         )
         context = {
-            'gym_choices': Gym.objects.all(),
+            'site_choices': Site.objects.all(),
             'leads': AcademyLead.objects.filter(complete=False),
         }
         

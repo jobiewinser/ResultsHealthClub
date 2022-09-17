@@ -13,7 +13,7 @@ class ActiveCampaignList(models.Model):
     guid = models.TextField(null=True, blank=True)
     webhook_created = models.BooleanField(default=False)
     webhook_id = models.TextField(null=True, blank=True)
-    gym = models.ForeignKey('core.Gym', on_delete=models.SET_NULL, null=True, blank=True)
+    site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
         
     def create_webhook(self):
         if not settings.DEBUG and self.name and self.guid:

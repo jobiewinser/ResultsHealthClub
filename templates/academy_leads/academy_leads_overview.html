@@ -46,9 +46,18 @@
 {%endblock scripts%}
 
 {%block extra_top_left_buttons %}
+<div class="col-md-auto">
+    <span id="site_list_span">   
+        <select class="form-select">
+            {%for site in site_list%}
+            <option value="{{site.pk}}">{{site.name}}</option>
+            {%endfor%}
+        </select>    
+    </span>
+</div>
 <div class="col-md-auto" hx-get="{% url 'get-active-campaign-lists' %}" hx-trigger="load" hx-swap="innerHTML">
     <span id="campaign_list_span">   
-        <select class="form-select select2" onchange="snackbarShow('Coming Soon', 'danger')">
+        <select class="form-select">
             <option>Loading</option>
         </select>    
     </span>
