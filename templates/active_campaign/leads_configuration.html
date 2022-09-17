@@ -1,0 +1,53 @@
+{% extends 'core/overviews.html' %}
+    {%load core_tags%}
+{%load static tz core_tags%}
+{%block scripts%}
+{{block.super}}
+<script>
+    $(document).ready(function() {
+    });
+    function initDataTable() {
+        let dt = $('#results_table').DataTable(
+        );
+    }
+</script>
+{%endblock scripts%}
+
+{%block extra_top_left_buttons %}
+<div class="col-md-auto">
+    <a class="btn btn-success"
+    href="{% url 'configuration' %}"><i class="fa-light fa-gear"></i> Back to Configuration</a>
+</div>
+{%endblock%}
+
+{%block table%}
+<br>
+<table id="results_table" class="table"> 
+    <thead> 
+        <tr>
+            <th>
+                Name
+            </th>
+            <th>
+                Gym
+            </th>
+        </tr>
+    </thead>
+    <tbody> 
+        {%for active_campaign_list in active_campaign_lists%}
+        <tr id="row_{{active_campaign_list.pk}}">
+            <td>
+                {{active_campaign_list.name}}
+            </td>
+            <td> 
+                {%include 'active_campaign/htmx/leads_configuration_select.html'%}
+               <button hidden 
+               hx-post="{% url 'set-active-campaign-list-gym' list_pk=active_campaign_list.pk %}" 
+               hx-swap="outerHTML" hx-include="#gym_choice_{{active_campaign_list.pk}}" 
+               id="submit_gym_choice_{{active_campaign_list.pk}}"></button>
+            </td>
+        </tr>
+        {%endfor%}
+    </tbody>
+</table>
+{%endblock table%}

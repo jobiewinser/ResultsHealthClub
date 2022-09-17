@@ -18,5 +18,6 @@ import active_campaign.views as activecampaignviews
 urlpatterns = [
     path('active-campaign-webhooks/<str:guid>/', activecampaignviews.Webhooks.as_view(), name='active-campaign-webhooks' ),
     path('get-active-campaign-lists/', activecampaignviews.get_active_campaign_lists, name='get-active-campaign-lists'),
+    path('set-active-campaign-list-gym/<int:list_pk>/', activecampaignviews.set_active_campaign_lists_gym, name='set-active-campaign-list-gym'),
     
 ]
