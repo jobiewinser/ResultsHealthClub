@@ -2,6 +2,7 @@ import uuid
 from django.db import models
 from active_campaign.api import ActiveCampaign
 from django.dispatch import receiver
+from django.conf import settings
 class ActiveCampaignList(models.Model):
     active_campaign_id = models.TextField(null=True, blank=True)
     name = models.TextField(null=True, blank=True)   
@@ -14,7 +15,7 @@ class ActiveCampaignList(models.Model):
     webhook_id = models.TextField(null=True, blank=True)
 
     def create_webhook(self):
-        if self.name and self.guid:
+        if self.name and self.guid and not settings.DEBUG:
             response = ActiveCampaign().create_webhook(str(self.name), str(self.guid), str(self.active_campaign_id))
             if response.status_code in [200, 201]:
                 self.webhook_created = True

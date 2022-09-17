@@ -91,7 +91,6 @@ def generate_active_campaign_list_objects():
         )
         active_campaign_list.json_data = active_campaign_list_dict
         active_campaign_list.save()
-
 @login_required
 def get_active_campaign_lists(request):
     # try:
