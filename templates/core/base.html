@@ -154,11 +154,12 @@
                                 </li>
                                 <li class="nav-item">
                                 <a class="nav-link{%if request.path == '/free-taster/'%} active{%endif%}" href="{% url 'free-taster' %}">Free Taster Links</a>
-                                </li>
+                                </li>                                
+                            </ul>
+                            <ul class="navbar-nav me-3 m-0" style="text-align:right"">
                                 <li class="nav-item">
-                                <a class="nav-link{%if request.path == '/whatsapp-templates/'%} active{%endif%}" href="{% url 'whatsapp-templates' %}">Whatsapp Templates</a>
-                                </li>
-                                
+                                <a class="nav-link{%if 'configuration' in request.path %} active{%endif%}" href="{% url 'configuration' %}"><i class="fa-light fa-gear"></i> Configuration</a>
+                                </li>                               
                             </ul>
                             {%include 'core/htmx/profile_dropdown.html'%}
                         </div>

@@ -3,7 +3,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 import logging
 from django.http import HttpResponseRedirect
-from core.models import GYM_CHOICES, FreeTasterLink, FreeTasterLinkClick  
+from core.models import FreeTasterLink, FreeTasterLinkClick, Site  
 logger = logging.getLogger(__name__)
 
 @method_decorator(login_required, name='dispatch')
@@ -14,8 +14,16 @@ class FreeTasterOverviewView(TemplateView):
         context = super(FreeTasterOverviewView, self).get_context_data(**kwargs)
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'core/htmx/free_taster_table_htmx.html'
-        context['gym_choices'] = GYM_CHOICES
+        context['site_choices'] = Site.objects.all()
         context['free_taster_links'] = FreeTasterLink.objects.all()
+        return context
+        
+@method_decorator(login_required, name='dispatch')
+class ConfigurationView(TemplateView):
+    template_name='core/configuration.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ConfigurationView, self).get_context_data(**kwargs)        
         return context
 
 def free_taster_redirect(request, **kwargs):

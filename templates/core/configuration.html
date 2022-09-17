@@ -1,0 +1,41 @@
+{% extends 'core/base.html' %}
+{%load static%}
+{%block scripts%}
+{{block.super}}
+<script>
+    $(document).ready(function() {
+        $("[data-bs-toggle=popover]").popover();
+        document.body.addEventListener('htmx:configRequest', function(evt) {    
+            evt.detail.headers['x-csrftoken'] = $('#csrf_token').val();
+        });
+        document.body.addEventListener('htmx:afterSwap', function(evt) {  
+            $('.popover').remove()
+            $('[data-bs-toggle=popover]').popover();
+        });
+    });
+</script>
+{%endblock scripts%}
+
+{%block content%} 
+    <div class="row">
+        {% comment %} <div class="col-md-auto">
+            <select class="form-select" onchange="snackbarShow('Coming Soon', 'danger')">
+                {%for site in site_choices%}
+                <option>Results Health Club - {{site.1}}</option>
+                {%endfor%}
+            </select>
+        </div> {% endcomment %}
+        {%block extra_top_left_buttons %}
+        {%endblock%}
+        <div class="col">                
+        </div>
+        {%block extra_top_right_buttons %}
+        {%endblock%}
+    </div>
+    <div class="row">
+        <div class="col">
+            <a class="btn btn-success" href="{% url 'whatsapp-templates' %}">Whatsapp Templates</a>
+            <a class="btn btn-success" href="{% url 'lead-configuration' %}">Lead Configuration</a>
+        </div>
+    </div> 
+{%endblock content%}
