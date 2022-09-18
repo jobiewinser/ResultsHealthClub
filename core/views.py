@@ -11,11 +11,19 @@ class FreeTasterOverviewView(TemplateView):
     template_name='core/free_taster_overview.html'
 
     def get_context_data(self, **kwargs):
+        self.request.GET._mutable = True       
         context = super(FreeTasterOverviewView, self).get_context_data(**kwargs)
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'core/htmx/free_taster_table_htmx.html'
-        context['site_choices'] = Site.objects.all()
-        context['free_taster_links'] = FreeTasterLink.objects.all()
+        context['site_list'] = Site.objects.all()
+        free_taster_links = FreeTasterLink.objects.all()
+
+        site_pk = get_site_pk_from_request(self.request)
+        if site_pk:
+            free_taster_links = free_taster_links.filter(site__pk=site_pk)
+            self.request.GET['site_pk'] = site_pk                    
+        context['free_taster_links'] = free_taster_links
+
         return context
         
 @method_decorator(login_required, name='dispatch')

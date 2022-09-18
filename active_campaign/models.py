@@ -3,6 +3,8 @@ from django.db import models
 from active_campaign.api import ActiveCampaign
 from django.dispatch import receiver
 from django.conf import settings
+
+from core.models import Site
 class ActiveCampaignList(models.Model):
     active_campaign_id = models.TextField(null=True, blank=True)
     name = models.TextField(null=True, blank=True)   
@@ -14,6 +16,7 @@ class ActiveCampaignList(models.Model):
     webhook_created = models.BooleanField(default=False)
     webhook_id = models.TextField(null=True, blank=True)
     site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
+    manual = models.BooleanField(default=False)
         
     def create_webhook(self):
         if self.name and self.guid and not self.webhook_id and not settings.DEBUG and not 'manually' in self.name.lower():
@@ -24,7 +27,6 @@ class ActiveCampaignList(models.Model):
                 self.save()
     def get_active_leads_qs(self):
         return self.academylead_set.filter(complete=False)
-
 @receiver(models.signals.post_save, sender=ActiveCampaignList)
 def execute_after_save(sender, instance, created, *args, **kwargs):
     if created:
@@ -35,3 +37,5 @@ def execute_after_save(sender, instance, created, *args, **kwargs):
 class CampaignWebhook(models.Model):
     json_data = models.JSONField(default=dict)
     guid = models.TextField(null=True, blank=True)
+
+

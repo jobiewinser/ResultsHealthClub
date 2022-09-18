@@ -1,8 +1,14 @@
-{%load static%}
+{%load static core_tags%}
 <span>
     <div class="row">
-        <div class="col center">            
-            <input name="customer_name" id="customer_name_input" class="form-control add_user_input" placeholder="Customer Full Name"/>
+        <div class="col center">     
+            <select class="form-select free_taster_input" name="site_pk">
+                {%for site in site_list%}
+                <option {%if site.pk == request.GET.site_pk|str_to_int %}selected{%endif%} value="{{site.pk}}">{{site.name}}</option>
+                {%endfor%}
+            </select>
+            <br>       
+            <input name="customer_name" id="customer_name_input" class="form-control free_taster_input" placeholder="Customer Full Name"/>
         </div>
     </div>
     <br>
@@ -10,7 +16,7 @@
         <div class="col center">
             <button class="btn btn-success"
                 hx-target="#generated_link" 
-                hx-include="#customer_name_input"
+                hx-include=".free_taster_input"
                 hx-post="{% url 'generate-free-taster-link' %}" 
                 hx-push-url="false"
                 hx-swap="outerHTML" hx-indicator="#htmx-indicator" hx-trigger="click">
