@@ -3,7 +3,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 import logging
 from django.http import HttpResponseRedirect
-from core.models import FreeTasterLink, FreeTasterLinkClick, Site  
+from core.models import FreeTasterLink, FreeTasterLinkClick, Profile, Site  
 logger = logging.getLogger(__name__)
 
 @method_decorator(login_required, name='dispatch')
@@ -33,3 +33,12 @@ def free_taster_redirect(request, **kwargs):
     except:
         pass
     return HttpResponseRedirect("https://resultshealthclubs.co.uk/book-free-taster-sessions-abingdon/")
+
+def get_site_pk_from_request(request):    
+    site_pk = request.GET.get('site_pk', None)
+    if site_pk:
+        return site_pk
+    profiles = Profile.objects.filter(user=request.user)
+    if profiles:
+        if profiles.first().site:
+            return request.user.profile.site.pk
