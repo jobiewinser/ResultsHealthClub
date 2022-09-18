@@ -16,6 +16,7 @@
                     $('#generic_modal').modal('hide');
                     snackbarShow('Successfully logged a communication', 'success')
                 } else if (evt.detail.pathInfo.path.includes("create-academy-lead")){
+                    $('#refresh_results_table').click(); 
                     $('#generic_modal').modal('hide');
                     snackbarShow('Successfully manually created an academy lead', 'success')
                 } else if (evt.detail.pathInfo.path.includes("mark-arrived")){
@@ -23,13 +24,11 @@
                     snackbarShow('Successfully marked that the customer arrived as booking', 'success')
                 } else if (evt.detail.pathInfo.path.includes("mark-sold")){
                     $('#generic_modal').modal('hide');
-                    console.log(evt)
                     snackbarShow('Successfully sold to customer', 'success')
                 } else if (evt.detail.pathInfo.path.includes("academy-leads-overview")){
                     $('#refresh_campaign_list_span').click(); 
                     snackbarShow('Successfully refreshed table', 'success')
-                }
-                
+                }                
             }
             if ($('#noteTable')){
                 
@@ -39,7 +38,7 @@
         });
     });
     function initDataTable() {
-        let dt = $('#results_table').DataTable(            
+        dt = $('#results_table').DataTable(            
         {  
             order: [[ 2, 'asc' ]],
             iDisplayLength: 10
@@ -50,17 +49,17 @@
 {%endblock scripts%}
 
 {%block extra_top_left_buttons %}
-<div class="col-md-auto">
-    {%include 'core/htmx/sites_select_element.html'%}
-</div>
-<div class="col-md-auto" hx-get="{% url 'get-active-campaign-lists'%}" hx-include="#site_pk" hx-trigger="load" hx-target="#campaign_list_span" hx-swap="outerHTML">
+<button hidden hx-get="{% url 'academy-leads-overview' %}" hx-push-url="true" hx-swap="outerHTML" hx-include=".non_site_dependant_results_table_filters" hx-target="#results_table" id="change_site" class="btn btn-primary btn-sm"></button>
+{{block.super}}
+<div class="col-md-auto" hx-get="{% url 'get-active-campaign-lists'%}" hx-include=".results_table_filters" hx-trigger="load" hx-target="#campaign_list_span" hx-swap="outerHTML">
     <span id="campaign_list_span">   
         <select class="form-select">
             <option>Loading</option>
         </select>    
     </span>
 </div>
-<button hidden hx-get="{% url 'get-active-campaign-lists'%}" hx-include="#site_pk" id="refresh_campaign_list_span" hx-target="#campaign_list_span" hx-trigger="click" hx-swap="outerHTML"></button>
+<button hidden hx-get="{% url 'get-active-campaign-lists'%}" hx-include=".results_table_filters" id="refresh_campaign_list_span" hx-target="#campaign_list_span" hx-trigger="click" hx-swap="outerHTML"></button>
+<button hidden hx-get="{% url 'academy-leads-overview'%}" hx-include=".results_table_filters" id="refresh_results_table" hx-target="#results_table" hx-trigger="click" hx-swap="outerHTML"></button>
 {%endblock%}
 
 {%block extra_top_right_buttons %}

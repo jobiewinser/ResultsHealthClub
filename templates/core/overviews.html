@@ -3,6 +3,7 @@
 {%block scripts%}
 {{block.super}}
 <script>
+    let dt = null;
     $(document).ready(function() {
         initDataTable();
         $("[data-bs-toggle=popover]").popover();
@@ -10,12 +11,13 @@
             evt.detail.headers['x-csrftoken'] = $('#csrf_token').val();
         }); 
         document.body.addEventListener('htmx:beforeRequest', function(evt) {  
-            if (evt.detail.target.id == 'results_table'){
+            if (evt.detail.target.id == 'results_table' || evt.detail.pathInfo.path.includes("academy-leads-overview")){
                 $("#results_table").dataTable().fnDestroy();
             }
         });
         document.body.addEventListener('htmx:afterSwap', function(evt) {  
             if (evt.detail.target.id == 'results_table'){
+                console.log(evt.detail)
                 initDataTable(); 
             }
             else if (evt.detail.target.id == 'generic_modal_body'){
@@ -50,6 +52,9 @@
     <div class="">
         <div class="row">
             {%block extra_top_left_buttons %}
+            <div class="col-md-auto">
+                {%include 'core/htmx/sites_select_element.html'%}
+            </div>
             {%endblock%}
             <div class="col">                
             </div>

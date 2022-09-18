@@ -15,6 +15,16 @@ logger = logging.getLogger(__name__)
 
     
 
+try:
+    for site in Site.objects.all():
+        if not ActiveCampaignList.objects.filter(site=site, manual=True):
+            ActiveCampaignList.objects.create(
+                name=f"Manually Created ({site.name})",
+                site=site,
+                manual=True,
+            )
+except:
+    pass
 
 
 @method_decorator(login_required, name='dispatch')
@@ -27,16 +37,18 @@ class AcademyLeadsOverviewView(TemplateView):
             self.template_name = 'academy_leads/htmx/academy_leads_table_htmx.html'   
         context = super(AcademyLeadsOverviewView, self).get_context_data(**kwargs)      
             
-        complete_filter = (self.request.GET.get('complete')=='True')
+        complete_filter = (self.request.GET.get('complete', '').lower() =='true')
         leads = AcademyLead.objects.filter(complete=complete_filter)
         context['site_list'] = Site.objects.all()
         active_campaign_list_pk = self.request.GET.get('active_campaign_list_pk', None)
         if active_campaign_list_pk:
             leads = leads.filter(active_campaign_list=ActiveCampaignList.objects.get(pk=active_campaign_list_pk))
+            self.request.GET['active_campaign_list_pk'] = active_campaign_list_pk
         site_pk = get_site_pk_from_request(self.request)
-        if site_pk:
-            context['leads'] = leads.filter(active_campaign_list__site__pk=site_pk)
-            self.request.GET['site_pk'] = int(site_pk)
+        if site_pk and not site_pk == 'all':
+            leads = leads.filter(active_campaign_list__site__pk=site_pk)
+            self.request.GET['site_pk'] = site_pk
+        context['leads'] = leads
         # whatsapp = Whatsapp()
         return context
         

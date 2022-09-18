@@ -1,7 +1,14 @@
-{%load static%}
+{%load static core_tags%}
 <span>
     <div class="row">
-        <div class="col center">            
+        <div class="col center">          
+            <select class="form-select academy_leads_inputs" name="site_pk">
+                {%for site in site_list%}
+                <option {%if site.pk == request.GET.site_pk|str_to_int %}selected{%endif%} value="{{site.pk}}">{{site.name}}</option>
+                {%endfor%}
+            </select>
+            <br>
+            
             <input name="first_name" id="academy_first_name" class="form-control academy_leads_inputs" placeholder="Customer First Name"/>
             <br>          
             {% comment %} <input name="last_name" id="academy_last_name" class="form-control academy_leads_inputs" placeholder="Customer Last Name"/>
@@ -240,7 +247,6 @@
     <div class="row">
         <div class="col center">
             <button class="btn btn-success"
-                hx-target="#results_table" 
                 hx-include=".academy_leads_inputs"
                 hx-post="{% url 'create-academy-lead' %}" 
                 hx-push-url="false"

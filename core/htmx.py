@@ -8,6 +8,8 @@ import logging
 from django.contrib.auth import login
 from django.middleware.csrf import get_token
 from django.contrib.auth.decorators import login_required
+
+from core.views import get_site_pk_from_request
 logger = logging.getLogger(__name__)
 
 @login_required
@@ -28,6 +30,10 @@ def switch_user(request, **kwargs):
 @login_required
 def get_modal_content(request, **kwargs):
     try:
+        request.GET._mutable = True
+        site_pk = get_site_pk_from_request(request)
+        if site_pk:
+            request.GET['site_pk'] = site_pk
         if request.user.is_staff:
             template_name = request.GET.get('template_name', '')
             context = {'site_list':Site.objects.all()}
@@ -65,11 +71,12 @@ def generate_free_taster_link(request, **kwargs):
     try:
         if request.user.is_staff:
             customer_name = request.POST.get('customer_name', '')
+            site_pk = request.POST.get('site_pk','')
             if customer_name:
                 guid = str(uuid.uuid4())[:8]
                 while FreeTasterLink.objects.filter(guid=guid):
                     guid = str(uuid.uuid4())[:8]
-                generated_link = FreeTasterLink.objects.create(customer_name=customer_name, staff_user=request.user, guid=guid)
+                generated_link = FreeTasterLink.objects.create(customer_name=customer_name, staff_user=request.user, guid=guid, site=Site.objects.get(pk=site_pk))
                 return render(request, f"core/htmx/generated_link_display.html", {'generated_link':generated_link})  
     except Exception as e:
         logger.debug("get_modal_content Error "+str(e))

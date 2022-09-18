@@ -43,3 +43,14 @@ def timestamp(date):
         return time.mktime(date.timetuple())        
     except Exception as e:
         return 0000000000.0
+
+@register.filter
+def get_type(value):
+    return type(value)
+
+@register.filter
+def str_to_int(value):
+    try:
+        return int(value)
+    except:
+        return value

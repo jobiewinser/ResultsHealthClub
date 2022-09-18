@@ -8,13 +8,19 @@ from django.middleware.csrf import get_token
 from django.contrib.auth.decorators import login_required
 
 from academy_leads.models import AcademyLead, Booking, Communication, Note, WhatsappTemplate, communication_choices_dict
+from academy_leads.views import AcademyLeadsOverviewView
 from active_campaign.models import ActiveCampaignList
 from core.models import Site
+from core.views import get_site_pk_from_request
 logger = logging.getLogger(__name__)
 
 @login_required
 def get_modal_content(request, **kwargs):
     try:
+        request.GET._mutable = True
+        site_pk = get_site_pk_from_request(request)
+        if site_pk:
+            request.GET['site_pk'] = site_pk
         if request.user.is_staff:
             template_name = request.GET.get('template_name', '')
             context = {'site_list':Site.objects.all()}
@@ -42,19 +48,16 @@ def create_academy_lead(request, **kwargs):
         # last_name = request.POST.get('last_name')
         phone = request.POST.get('phone')
         country_code = request.POST.get('countryCode')
+        site = Site.objects.get(pk=request.POST.get('site_pk'))
+        manually_created_list = ActiveCampaignList.objects.get(site=site, manual=True)
         AcademyLead.objects.create(
             first_name=first_name,
             # last_name=last_name,
             phone=phone,
             country_code=country_code,
-            active_campaign_list=ActiveCampaignList.objects.get_or_create(name='Manually Created')[0]
+            active_campaign_list=manually_created_list
         )
-        context = {
-            'site_choices': Site.objects.all(),
-            'leads': AcademyLead.objects.filter(complete=False),
-        }
-        
-        return render(request, "academy_leads/htmx/academy_leads_table_htmx.html", context)   
+        return HttpResponse("<span></span>", status=200)
     except Exception as e:
         logger.debug("create_academy_lead Error "+str(e))
         return HttpResponse(e, status=500)
@@ -96,7 +99,7 @@ def log_communication(request, **kwargs):
         
         return render(request, "academy_leads/htmx/academy_lead_row.html", context)   
     except Exception as e:
-        logger.debug("create_academy_lead Error "+str(e))
+        logger.debug("log_communication Error "+str(e))
         return HttpResponse(e, status=500)
 
 @login_required
@@ -134,7 +137,7 @@ def add_booking(request, **kwargs):
         
         return render(request, "academy_leads/htmx/academy_lead_row.html", context)   
     except Exception as e:
-        logger.debug("create_academy_lead Error "+str(e))
+        logger.debug("add_booking Error "+str(e))
         return HttpResponse(e, status=500)
 
 
