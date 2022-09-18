@@ -1,3 +1,10 @@
+{%load core_tags%}
 <span id="campaign_list_span">    
-{%include 'active_campaign/htmx/active_campaign_lists_select_element.html'%}
+    <select class="form-select select2 results_table_filters" onchange="$('#filter_active_campaign_list').click()" id="active_campaign_list_pk" name="active_campaign_list_pk">
+        <option value="">Campaign: Show all for this site</option>
+        {%for active_campaign_list in active_campaign_lists%}
+            <option {%if request.GET.active_campaign_list_pk|str_to_int == active_campaign_list.pk%}selected{%endif%} value="{{active_campaign_list.pk}}">Campaign: {{active_campaign_list.name}} ({{active_campaign_list.get_active_leads_qs.count}} active leads)</option>
+        {%endfor%}
+    </select>
+    <button hidden hx-get="{% url 'academy-leads-overview' %}" hx-swap="outerHTML" hx-push-url="true" hx-include=".results_table_filters" hx-target="#results_table" id="filter_active_campaign_list" class="btn btn-primary btn-sm"></button>
 </span>
