@@ -3,7 +3,7 @@
     <div class="row">
         <div class="col center" >
             <select class="form-select add_user_input my-3" name="site_pk">
-                <option value="">Show All Sites</option>
+                {% comment %} <option value="">Show All Sites</option> {% endcomment %}
                 {%for site in site_list%}
                 <option value="{{site.pk}}">{{site.name}}</option>
                 {%endfor%}
