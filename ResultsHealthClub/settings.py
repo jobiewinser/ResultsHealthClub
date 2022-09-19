@@ -114,6 +114,7 @@ INSTALLED_APPS = [
     'academy_leads',
     'active_campaign',
     'whatsapp',
+    'analytics',
     'core',
     'import_export',
     'rest_framework',

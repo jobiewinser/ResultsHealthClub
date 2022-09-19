@@ -18,24 +18,21 @@
 
 {%block content%} 
     <div class="row">
-        {% comment %} <div class="col-md-auto">
-            <select class="form-select" onchange="snackbarShow('Coming Soon', 'danger')">
-                {%for site in site_list%}
-                <option>Results Health Club - {{site.1}}</option>
-                {%endfor%}
-            </select>
-        </div> {% endcomment %}
         {%block extra_top_left_buttons %}
+        {%include 'core/htmx/site_selection.html'%}
         {%endblock%}
         <div class="col">                
         </div>
         {%block extra_top_right_buttons %}
         {%endblock%}
     </div>
+    <br>
     <div class="row">
         <div class="col">
-            <a class="btn btn-success" href="{% url 'whatsapp-templates' %}">Whatsapp Templates</a>
-            <a class="btn btn-success" href="{% url 'lead-configuration' %}">Lead Configuration</a>
+            <div class="col" hx-get="{% url 'get-sales'%}" hx-include="#site_choice" 
+            hx-trigger="load" hx-swap="innerHTML">
+                <img  class="htmx-indicator" src="https://htmx.org/img/bars.svg"/>
+            </div>
         </div>
     </div> 
 {%endblock content%}
