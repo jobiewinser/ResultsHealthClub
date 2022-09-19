@@ -23,6 +23,9 @@ urlpatterns = [
     path('get-modal-content/<str:param1>/<str:param2>/', corehtmx.get_modal_content, name='get-modal-content' ),
     path('modify-user/', corehtmx.ModifyUser.as_view(), name='modify-user' ),
 
+
+
+    path('analytics/', coreviews.AnalyticsOverviewView.as_view(), name='analytics' ),
     path('free-taster/', coreviews.FreeTasterOverviewView.as_view(), name='free-taster' ),
     path('free-taster/<str:guid>/', coreviews.free_taster_redirect, name='free-taster' ),
     path('generate-free-taster-link/', corehtmx.generate_free_taster_link, name='generate-free-taster-link' ),
