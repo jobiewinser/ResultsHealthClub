@@ -90,7 +90,7 @@ class ModifyUser(View):
                         profile.site=Site.objects.get(pk=site_pk)
                     profile.save()   
 
-                return render(request, f"core/htmx/profile_dropdown.html", {'staff_users': User.objects.filter(is_staff=True).order_by('first_name')})   
+                return render(request, f"academy_leads/htmx/switch_user.html", {'staff_users': User.objects.filter(is_staff=True).order_by('first_name')})   
         except Exception as e:
             logger.debug("ModifyUser Post Error "+str(e))
             return HttpResponse(e, status=500)
