@@ -1,3 +1,4 @@
+import json
 import os
 import uuid
 from core.models import FreeTasterLink, Profile, Site
@@ -8,8 +9,11 @@ import logging
 from django.contrib.auth import login
 from django.middleware.csrf import get_token
 from django.contrib.auth.decorators import login_required
-
+from django.utils.decorators import method_decorator
+from django.views import View 
 from core.views import get_site_pk_from_request
+from django.http import QueryDict
+
 logger = logging.getLogger(__name__)
 
 @login_required
@@ -39,31 +43,57 @@ def get_modal_content(request, **kwargs):
             context = {'site_list':Site.objects.all()}
             if template_name == 'switch_user':
                 context['staff_users'] = User.objects.filter(is_staff=True).order_by('first_name')
+            elif template_name == 'edit_user':
+                user_pk = request.GET.get('user_pk', None)
+                if user_pk:
+                    context["edit_user"] = User.objects.get(pk=user_pk)
             return render(request, f"academy_leads/htmx/{template_name}.html", context)   
     except Exception as e:
         logger.debug("get_modal_content Error "+str(e))
         return HttpResponse(e, status=500)
 
-@login_required
-def add_user(request, **kwargs):
-    try:
-        if request.user.is_staff:
-            first_name = request.POST['first_name']
-            last_name = request.POST['last_name']
-            site_pk = request.POST['site_pk']
-            user = User.objects.create(username=f"{first_name}{last_name}", 
-                                        first_name=first_name,
-                                        last_name=last_name,
-                                        password=os.getenv("DEFAULT_USER_PASSWORD"), 
-                                        is_staff=True)
-            Profile.objects.create(user = user, 
-                                    avatar = request.FILES['profile_picture'], 
-                                    site=Site.objects.get(pk=site_pk))
-            login(request, user)
-            return render(request, f"core/htmx/profile_dropdown.html", {})  
-    except Exception as e:
-        logger.debug("get_modal_content Error "+str(e))
-        return HttpResponse(e, status=500)
+
+@method_decorator(login_required, name="dispatch")
+class ModifyUser(View):
+    def post(self, request, **kwargs):
+        try:
+            if request.user.is_staff:
+                action = request.POST.get('action', '')
+                if action == 'add':
+                    first_name = request.POST.get('first_name', '')
+                    last_name = request.POST.get('last_name', '')
+                    site_pk = request.POST.get('site_pk', '')
+                    user = User.objects.create(username=f"{first_name}{last_name}", 
+                                                first_name=first_name,
+                                                last_name=last_name,
+                                                password=os.getenv("DEFAULT_USER_PASSWORD"), 
+                                                is_staff=True)
+                    Profile.objects.create(user = user, 
+                                            avatar = request.FILES['profile_picture'], 
+                                            site=Site.objects.get(pk=site_pk))
+                elif action == 'edit':
+                    first_name = request.POST.get('first_name', '')
+                    last_name = request.POST.get('last_name', '')
+                    site_pk = request.POST.get('site_pk', '')
+                    user = User.objects.get(pk=request.POST['user_pk'])
+                    # user.username=f"{first_name}{last_name}" 
+                    user.first_name=first_name
+                    user.last_name=last_name
+                    user.is_staff=True
+                    user.save()
+
+                    profile = Profile.objects.get_or_create(user = user)[0]
+                    profile_picture = request.FILES.get('profile_picture', None)
+                    if profile_picture:
+                        profile.avatar = profile_picture
+                    if site_pk:
+                        profile.site=Site.objects.get(pk=site_pk)
+                    profile.save()   
+
+                return render(request, f"academy_leads/htmx/switch_user.html", {'staff_users': User.objects.filter(is_staff=True).order_by('first_name')})   
+        except Exception as e:
+            logger.debug("ModifyUser Post Error "+str(e))
+            return HttpResponse(e, status=500)
 
 
 @login_required
@@ -79,7 +109,7 @@ def generate_free_taster_link(request, **kwargs):
                 generated_link = FreeTasterLink.objects.create(customer_name=customer_name, staff_user=request.user, guid=guid, site=Site.objects.get(pk=site_pk))
                 return render(request, f"core/htmx/generated_link_display.html", {'generated_link':generated_link})  
     except Exception as e:
-        logger.debug("get_modal_content Error "+str(e))
+        logger.debug("generate_free_taster_link Error "+str(e))
         return HttpResponse(e, status=500)
 
 

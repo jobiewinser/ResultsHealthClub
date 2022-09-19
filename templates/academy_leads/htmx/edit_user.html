@@ -1,0 +1,37 @@
+{%load static%}
+<span>
+    <div class="row">
+        <div class="col center" >
+            <select class="form-select edit_user_input my-3" name="site_pk">
+                <option value="">Show All Sites</option>
+                {%for site in site_list%}
+                <option {%if edit_user.profile.site == site%}selected{%endif%} value="{{site.pk}}">{{site.name}}</option>
+                {%endfor%}
+            </select>   
+            <input name="first_name" value="{{edit_user.first_name}}" class="form-control edit_user_input my-3" placeholder="First Name"/>
+            <input name="last_name" value="{{edit_user.last_name}}" class="form-control edit_user_input my-3" placeholder="Last Name"/>
+            <label class="form-label" for="customFile">Profile Picture (leave empty to keep current):</label>
+            <input name="profile_picture" placeholder="test" type="file" class="form-control edit_user_input my-3" id="customFile" />
+            <input type="text" style="display:None" id="user_pk" class="edit_user_input" name="user_pk" value="{{edit_user.pk}}"/>
+            <input type="text" style="display:None" id="user_modify_action" class="edit_user_input" name="action" value="edit"/>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col center" >
+            <button class="btn btn-light" type="button"
+            hx-encoding="multipart/form-data"
+                hx-post="{% url 'modify-user' %}" hx-include=".edit_user_input"
+                hx-swap="innerHTML"
+                hx-target="#generic_modal_body">
+                Save Profile
+            </button>
+        </div>
+    </div>
+</span>
+<span hx-swap-oob="true" id="generic_modal_title">
+    <a href="#"
+    hx-target="#generic_modal_body" hx-include="#switch_user"
+    hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
+    hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa-solid fa-arrow-left"></i> Back</a> - Edit User - {{edit_user}}
+</span>
