@@ -1,0 +1,10 @@
+
+{%load core_tags%}
+<div class="col-md-auto">
+    <select class="form-select results_table_filters non_site_dependant_results_table_filters" name="site_pk" id="site_choice" onchange="$('#change_site').click();">
+        <option value="all">Show All Sites</option>
+        {%for site in site_list%}
+        <option {%if site.pk == request.GET.site_pk|str_to_int %}selected{%endif%} value="{{site.pk}}">{{site.name}}</option>
+        {%endfor%}
+    </select>
+</div>

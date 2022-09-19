@@ -99,7 +99,7 @@ else:
         os.path.join(BASE_DIR, "staticfiles"),
     )
 
-
+enable_whatsapp_messaging = os.getenv('ENABLE_WHATSAPP_MESSAGING')
 
 # Application definition
 
@@ -114,6 +114,7 @@ INSTALLED_APPS = [
     'academy_leads',
     'active_campaign',
     'whatsapp',
+    'analytics',
     'core',
     'import_export',
     'rest_framework',

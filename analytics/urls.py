@@ -13,23 +13,9 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.conf.urls import include, url
-from django.contrib import admin
 from django.urls import path
-
+import analytics.views as analyticviews
+import analytics.htmx as analyticshtmx
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include('academy_leads.urls')),
-    path('', include('core.urls')),
-    path('', include('whatsapp.urls')),
-    path('', include('active_campaign.urls')),
-    path('', include('analytics.urls')),
-    path('accounts/', include('django.contrib.auth.urls')),
+    path('get-leads-to-sales/', analyticshtmx.get_leads_to_sales, name='get-leads-to-sales' ),
 ]
-from django.conf import settings
-from django.conf.urls.static import static
-
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-if settings.DEBUG:
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

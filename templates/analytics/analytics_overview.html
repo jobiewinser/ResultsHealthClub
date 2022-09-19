@@ -1,0 +1,46 @@
+{% extends 'core/base.html' %}
+{%load static%}
+{%block scripts%}
+{{block.super}}
+<script>
+    $(document).ready(function() {
+        $("[data-bs-toggle=popover]").popover();
+        document.body.addEventListener('htmx:configRequest', function(evt) {    
+            evt.detail.headers['x-csrftoken'] = $('#csrf_token').val();
+        });
+        document.body.addEventListener('htmx:afterSwap', function(evt) {  
+            $('.popover').remove()
+            $('[data-bs-toggle=popover]').popover();
+            if (evt.detail.pathInfo.path.includes("get-leads-to-sale")){
+                initDataTable('leads_to_sale_table');
+            }
+        });
+    });
+    
+    function initDataTable(table_id) {
+        $('#'+table_id).DataTable(
+        );
+    }
+</script>
+{%endblock scripts%}
+
+{%block content%} 
+    <div class="row">
+        {%block extra_top_left_buttons %}
+        {%include 'core/htmx/site_selection.html'%}
+        {%endblock%}
+        <div class="col">                
+        </div>
+        {%block extra_top_right_buttons %}
+        {%endblock%}
+    </div>
+    <br>
+    <div class="row">
+        <div class="col">
+            <div class="col" hx-get="{% url 'get-leads-to-sales'%}" hx-include="#site_choice" 
+            hx-trigger="load" hx-swap="innerHTML">
+                <img  class="htmx-indicator" src="https://htmx.org/img/bars.svg"/>
+            </div>
+        </div>
+    </div> 
+{%endblock content%}

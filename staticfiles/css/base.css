@@ -265,3 +265,23 @@ body {
 tr.odd td {
     background-color: unset
 }
+
+.htmx-indicator{
+    opacity:0;
+    transition: opacity 500ms ease-in;
+}
+.htmx-request .htmx-indicator{
+    opacity:1
+}
+.htmx-request.htmx-indicator{
+    opacity:1
+}
+
+.month_header{
+    border-right:  1px solid grey !important;
+    border-left:   1px solid  grey !important;
+}
+
+.table{
+    width:100% !important;
+}

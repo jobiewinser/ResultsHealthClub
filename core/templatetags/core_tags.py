@@ -2,8 +2,12 @@ import os
 from django import template
 from datetime import datetime
 import time
+import calendar
 register = template.Library()
 
+@register.filter
+def month_name(month_number):
+    return calendar.month_name[month_number]
 @register.simple_tag
 def get_env_var(key):
     return os.environ.get(key)

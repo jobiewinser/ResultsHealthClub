@@ -66,40 +66,41 @@ class AcademyLead(models.Model):
 
 
     def send_whatsapp_message(self, template, user=None):
-        whatsapp = Whatsapp()
-        message = f"{template.rendered(self)}" 
-        recipient_number = f"{self.country_code}{self.phone}"
-        if settings.WHATSAPP_PHONE_OVERRIDE:
-            recipient_number = settings.WHATSAPP_PHONE_OVERRIDE     
-        response = whatsapp.send_message(recipient_number, message)
-        reponse_messages = response.get('messages',[])
-        if reponse_messages:
-            for response_message in reponse_messages:
+        if settings.enable_whatsapp_messaging:
+            whatsapp = Whatsapp()
+            message = f"{template.rendered(self)}" 
+            recipient_number = f"{self.country_code}{self.phone}"
+            if settings.WHATSAPP_PHONE_OVERRIDE:
+                recipient_number = settings.WHATSAPP_PHONE_OVERRIDE     
+            response = whatsapp.send_message(recipient_number, message)
+            reponse_messages = response.get('messages',[])
+            if reponse_messages:
+                for response_message in reponse_messages:
+                    communication = Communication.objects.get_or_create(    
+                        datetime = datetime.now(),
+                        lead = self,
+                        type = 'b',
+                        automatic = True,
+                        staff_user = user
+                    )[0]
+                    WhatsAppMessage.objects.get_or_create(
+                        wamid=response_message.get('id'),
+                        message=message,
+                        communication=communication,
+                        phone_from=os.getenv("WHATSAPP_PRIMARY_BUSINESS_PHONE_NUMBER"),
+                        phone_to=recipient_number,
+                        template=template
+                        )
+            else:
                 communication = Communication.objects.get_or_create(    
                     datetime = datetime.now(),
                     lead = self,
                     type = 'b',
                     automatic = True,
-                    staff_user = user
+                    staff_user = user,
+                    successful = False,
+                    error_json = response
                 )[0]
-                WhatsAppMessage.objects.get_or_create(
-                    wamid=response_message.get('id'),
-                    message=message,
-                    communication=communication,
-                    phone_from=os.getenv("WHATSAPP_PRIMARY_BUSINESS_PHONE_NUMBER"),
-                    phone_to=recipient_number,
-                    template=template
-                    )
-        else:
-            communication = Communication.objects.get_or_create(    
-                datetime = datetime.now(),
-                lead = self,
-                type = 'b',
-                automatic = True,
-                staff_user = user,
-                successful = False,
-                error_json = response
-            )[0]
 
 @receiver(models.signals.post_save, sender=AcademyLead)
 def execute_after_save(sender, instance, created, *args, **kwargs):
