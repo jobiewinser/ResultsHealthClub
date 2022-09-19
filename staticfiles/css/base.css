@@ -276,3 +276,12 @@ tr.odd td {
 .htmx-request.htmx-indicator{
     opacity:1
 }
+
+.month_header{
+    border-right:  1px solid grey !important;
+    border-left:   1px solid  grey !important;
+}
+
+.table{
+    width:100% !important;
+}

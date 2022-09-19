@@ -1,0 +1,40 @@
+{%load core_tags%}
+<table id="leads_to_sale_table" class="table analytics_table">
+    <thead> 
+        <tr>
+            {%for month in dataset.months%}
+            <th colspan="3" class="month_header">
+                {{month|month_name}} 2022
+            </th>
+            {%endfor%}
+        </tr>
+        <tr>
+            {%for month in dataset.months%}
+            <th>
+                Leads
+            </th>
+            <th>
+                Sales
+            </th>
+            <th>
+                %
+            </th>
+            {%endfor%}
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            {%for data_entry in dataset.data%}
+            <td>
+                {{data_entry.leads}}
+            </td>
+            <td>
+                {{data_entry.sales}}
+            </td>
+            <td>
+                {{data_entry.percentage}}
+            </td>
+            {%endfor%}
+        </tr>
+    </tbody>
+</table>
