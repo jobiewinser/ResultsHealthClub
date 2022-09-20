@@ -43,6 +43,7 @@ class AcademyLead(models.Model):
     complete = models.BooleanField(default=False)
     active_campaign_contact_id = models.TextField(null=True, blank=True)
     active_campaign_form_id = models.TextField(null=True, blank=True)
+    possible_duplicate = models.BooleanField(default=False)
     @property
     def name(self):
         if self.last_name:
