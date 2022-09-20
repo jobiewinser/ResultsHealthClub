@@ -99,7 +99,7 @@ else:
         os.path.join(BASE_DIR, "staticfiles"),
     )
 
-enable_whatsapp_messaging = (os.getenv('ENABLE_WHATSAPP_MESSAGING') == 'True')
+ENABLE_WHATSAPP_MESSAGING = os.getenv('ENABLE_WHATSAPP_MESSAGING') == 'True'
 
 # Application definition
 

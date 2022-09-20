@@ -67,7 +67,7 @@ class AcademyLead(models.Model):
 
 
     def send_whatsapp_message(self, user=None):
-        if settings.enable_whatsapp_messaging:
+        if settings.ENABLE_WHATSAPP_MESSAGING:
             template = WhatsappTemplate.objects.filter(send_order = 1, site=self.active_campaign_list.site)
             whatsapp = Whatsapp()
             message = f"{template.rendered(self)}" 
