@@ -3,13 +3,8 @@
 {%block scripts%}
 {{block.super}}
 <script>
-    let dt = null;
     $(document).ready(function() {
         initDataTable();
-        $("[data-bs-toggle=popover]").popover();
-        document.body.addEventListener('htmx:configRequest', function(evt) {    
-            evt.detail.headers['x-csrftoken'] = $('#csrf_token').val();
-        }); 
         document.body.addEventListener('htmx:beforeRequest', function(evt) {  
             if (evt.detail.target.id == 'results_table' || evt.detail.pathInfo.path.includes("academy-leads-overview")){
                 $("#results_table").dataTable().fnDestroy();
@@ -17,27 +12,12 @@
         });
         document.body.addEventListener('htmx:afterSwap', function(evt) {  
             if (evt.detail.target.id == 'results_table'){
-                console.log(evt.detail)
                 initDataTable(); 
-            }
-            else if (evt.detail.target.id == 'generic_modal_body'){
-                $('#generic_modal').modal('show');
-            }
-            else if (evt.detail.pathInfo.path.includes("switch-user")){
-                $('#generic_modal').modal('hide');
-                snackbarShow('Successfully switched user', 'success')
             }
             else if (evt.detail.pathInfo.path.includes("modify-user")){
                 $('#generic_modal').modal('hide');
                 snackbarShow('Successfully modifed/added user', 'success')
             }
-
-            if (evt.detail.xhr.status == 200){
-            } else {
-                snackbarShow(evt.detail.xhr.responseText, 'danger')
-            }
-            $('.popover').remove()
-            $('[data-bs-toggle=popover]').popover();
         });
     });
 </script>

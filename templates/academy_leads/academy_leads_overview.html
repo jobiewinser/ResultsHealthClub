@@ -49,17 +49,17 @@
 {%endblock scripts%}
 
 {%block extra_top_left_buttons %}
-<button hidden hx-get="{% url 'academy-leads-overview' %}" hx-push-url="true" hx-swap="outerHTML" hx-include=".non_site_dependant_results_table_filters" hx-target="#results_table" id="change_site" class="btn btn-primary btn-sm"></button>
+<button hidden hx-get="{% url 'academy-leads-overview' %}" hx-push-url="true" hx-swap="outerHTML" hx-include=".non_site_dependant_results_table_filters" hx-indicator=".top-htmx-indicator" hx-target="#results_table" id="change_site" class="btn btn-primary btn-sm"></button>
 {{block.super}}
-<div class="col-md-auto" hx-get="{% url 'get-active-campaign-lists'%}" hx-include=".results_table_filters" hx-trigger="load" hx-target="#campaign_list_span" hx-swap="outerHTML">
+<div class="col-md-auto" hx-get="{% url 'get-active-campaign-lists'%}" hx-include=".results_table_filters" hx-trigger="load" hx-indicator=".top-htmx-indicator" hx-target="#campaign_list_span" hx-swap="outerHTML">
     <span id="campaign_list_span">   
         <select class="form-select">
             <option>Loading</option>
         </select>    
     </span>
 </div>
-<button hidden hx-get="{% url 'get-active-campaign-lists'%}" hx-include=".results_table_filters" id="refresh_campaign_list_span" hx-target="#campaign_list_span" hx-trigger="click" hx-swap="outerHTML"></button>
-<button hidden hx-get="{% url 'academy-leads-overview'%}" hx-include=".results_table_filters" id="refresh_results_table" hx-target="#results_table" hx-trigger="click" hx-swap="outerHTML"></button>
+<button hidden hx-get="{% url 'get-active-campaign-lists'%}" hx-include=".results_table_filters" id="refresh_campaign_list_span" hx-indicator=".top-htmx-indicator" hx-target="#campaign_list_span" hx-trigger="click" hx-swap="outerHTML"></button>
+<button hidden hx-get="{% url 'academy-leads-overview'%}" hx-include=".results_table_filters" id="refresh_results_table" hx-indicator=".top-htmx-indicator" hx-target="#results_table" hx-trigger="click" hx-swap="outerHTML"></button>
 {%endblock%}
 
 {%block extra_top_right_buttons %}
@@ -69,11 +69,11 @@
         data-bs-trigger="hover" 
         data-bs-placement="top"
         data-bs-content="Manually create an academy lead."
-        hx-target="#generic_modal_body" 
+        hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
         hx-include="#create_academy_lead,#site_pk"
         hx-get="{% url 'academy-lead-get-modal-content' %}" 
         hx-push-url="false"
-        hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click">
+        hx-swap="innerHTML" hx-trigger="click">
             <i class="fa fa-plus" aria-hidden="true"></i> Manually Add Academy Lead
     </button>
     <input type="text" style="display:None" id="create_academy_lead" name="template_name" value="create_academy_lead"/>

@@ -128,6 +128,6 @@ def set_active_campaign_lists_site(request, **kwargs):
     else:
         active_campaign_list.site = None
     active_campaign_list.save()
-    return render(request, 'active_campaign/htmx/leads_configuration_select.html', {'active_campaign_list':active_campaign_list, 'sites':Site.objects.all()})
+    return render(request, 'active_campaign/htmx/leads_configuration_select.html', {'active_campaign_list':active_campaign_list, 'site_list':Site.objects.all()})
     # except Exception as e:        
     #     logger.error(f"set_active_campaign_lists_site {str(e)}")

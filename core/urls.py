@@ -25,7 +25,7 @@ urlpatterns = [
 
 
 
-    path('analytics/', coreviews.AnalyticsOverviewView.as_view(), name='analytics' ),
+    
     path('free-taster/', coreviews.FreeTasterOverviewView.as_view(), name='free-taster' ),
     path('free-taster/<str:guid>/', coreviews.free_taster_redirect, name='free-taster' ),
     path('generate-free-taster-link/', corehtmx.generate_free_taster_link, name='generate-free-taster-link' ),

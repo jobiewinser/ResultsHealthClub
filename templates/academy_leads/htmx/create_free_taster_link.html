@@ -15,11 +15,11 @@
     <div class="row">
         <div class="col center">
             <button class="btn btn-success"
-                hx-target="#generated_link" 
+                hx-indicator=".top-htmx-indicator" hx-target="#generated_link" 
                 hx-include=".free_taster_input"
                 hx-post="{% url 'generate-free-taster-link' %}" 
                 hx-push-url="false"
-                hx-swap="outerHTML" hx-indicator="#htmx-indicator" hx-trigger="click">
+                hx-swap="outerHTML" hx-trigger="click">
                     <i class="fa-solid fa-link" aria-hidden="true"></i> Generate Free Taster Link
             </button>
         </div>

@@ -4,12 +4,14 @@ from django.contrib.auth.models import User
 
 class Site(models.Model):
     name = models.TextField(blank=True, null=True)
+    whatsapp_business_phone_number_id = models.TextField(blank=True, null=True)
  
 # Extending User Model Using a One-To-One Link
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     avatar = models.ImageField(default='default.jpg', upload_to='profile_images')
     site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
+    whatsapp_phone_number_id = models.TextField(blank=True, null=True)
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name}"
     def name(self):

@@ -50,14 +50,4 @@ def get_site_pk_from_request(request):
     if profiles:
         if profiles.first().site:
             return request.user.profile.site.pk
-
-        
-@method_decorator(login_required, name='dispatch')
-class AnalyticsOverviewView(TemplateView):
-    template_name='analytics/analytics_overview.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(AnalyticsOverviewView, self).get_context_data(**kwargs)        
-        return context
-
     

@@ -1,0 +1,27 @@
+<div id="content">
+    <div class="row">
+        <button hidden hx-get="{% url 'whatsapp-templates' %}" hx-push-url="true" hx-swap="outerHTML" hx-include=".non_site_dependant_results_table_filters" hx-indicator=".top-htmx-indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
+        {%block extra_top_left_buttons %}
+        {%include 'core/htmx/site_selection.html'%}
+        {%endblock%}
+        {%block extra_top_right_buttons %}
+        <div class="col-md-auto">
+            <select id="template_choice" onchange="$('#edit_template').click()" name="template_pk" class="form-select">
+                <option value="" disabled selected>Select a Whatsapp Template {{site_pk}}</option>
+                {%for template in templates%}
+                <option value="{{template.pk}}">{{template.site.name}} {{template.get_send_order_display}} Template</option>
+                {%endfor%}
+            </select>
+            <button hidden hx-get="{% url 'template-editor' %}" hx-swap="outerHTML" hx-include="#template_choice" hx-indicator=".top-htmx-indicator" hx-target="#template_area" id="edit_template" class="btn btn-primary btn-sm">Edit</button>
+        </div>
+    </div>
+    {%endblock%}
+    <div class="row">
+        <div class="col">
+            <ul class="nav nav-pills">
+                <div class="row m-3" id="template_area">
+                </div>
+            </ul>
+        </div>
+    </div>
+</div>

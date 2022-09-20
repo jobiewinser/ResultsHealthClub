@@ -13,7 +13,7 @@
         <textarea style="width:600px; height:600px;" id="template_text" name="template_text" class="template_editor_input form-control" oninput="$('.template_save_button.btn-success').removeClass('btn-success').addClass('btn-primary')">{{template.text}}</textarea>
     </div>
     <div class="col-md-auto">
-        <button hx-post="{% url 'template-save' %}" hx-swap="outerHTML" hx-include=".template_editor_input" hx-target="#template_area" class="btn btn-success btn-sm template_save_button">Save</button>
+        <button hx-post="{% url 'template-save' %}" hx-swap="outerHTML" hx-include=".template_editor_input" hx-indicator=".top-htmx-indicator" hx-target="#template_area" class="btn btn-success btn-sm template_save_button">Save</button>
     </div>
     <div class="col-md-auto">
         <textarea style="width:600px; height:600px;" class="form-control">{{template.rendered_demo}}</textarea>

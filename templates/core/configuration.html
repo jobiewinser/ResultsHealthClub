@@ -4,14 +4,6 @@
 {{block.super}}
 <script>
     $(document).ready(function() {
-        $("[data-bs-toggle=popover]").popover();
-        document.body.addEventListener('htmx:configRequest', function(evt) {    
-            evt.detail.headers['x-csrftoken'] = $('#csrf_token').val();
-        });
-        document.body.addEventListener('htmx:afterSwap', function(evt) {  
-            $('.popover').remove()
-            $('[data-bs-toggle=popover]').popover();
-        });
     });
 </script>
 {%endblock scripts%}
