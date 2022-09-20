@@ -121,8 +121,13 @@ def set_active_campaign_lists_site(request, **kwargs):
     # try:
     print(request.POST.get('site_choice'))
     active_campaign_list = ActiveCampaignList.objects.get(pk=kwargs.get('list_pk'))
-    active_campaign_list.site = Site.objects.get(pk=request.POST.get('site_choice'))
+    site_pk = request.POST.get('site_choice',None)
+    if site_pk:
+        site = Site.objects.get(pk=site_pk)
+        active_campaign_list.site = site
+    else:
+        active_campaign_list.site = None
     active_campaign_list.save()
-    return render(request, 'active_campaign/htmx/leads_configuration_select.html', {'active_campaign_list':active_campaign_list, 'sites':Site.objects.all()})
+    return render(request, 'active_campaign/htmx/leads_configuration_select.html', {'active_campaign_list':active_campaign_list, 'site_list':Site.objects.all()})
     # except Exception as e:        
     #     logger.error(f"set_active_campaign_lists_site {str(e)}")

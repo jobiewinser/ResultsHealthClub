@@ -65,14 +65,15 @@ class AcademyLead(models.Model):
     
 
 
-    def send_whatsapp_message(self, template, user=None):
+    def send_whatsapp_message(self, user=None):
         if settings.enable_whatsapp_messaging:
+            template = WhatsappTemplate.objects.filter(send_order = 1, site=self.active_campaign_list.site)
             whatsapp = Whatsapp()
             message = f"{template.rendered(self)}" 
             recipient_number = f"{self.country_code}{self.phone}"
             if settings.WHATSAPP_PHONE_OVERRIDE:
                 recipient_number = settings.WHATSAPP_PHONE_OVERRIDE     
-            response = whatsapp.send_message(recipient_number, message)
+            response = whatsapp.send_message(recipient_number, message, self.active_campaign_list.site.whatsapp_business_phone_number_id)
             reponse_messages = response.get('messages',[])
             if reponse_messages:
                 for response_message in reponse_messages:
@@ -105,7 +106,7 @@ class AcademyLead(models.Model):
 @receiver(models.signals.post_save, sender=AcademyLead)
 def execute_after_save(sender, instance, created, *args, **kwargs):
     if created and not instance.complete:
-        instance.send_whatsapp_message(WhatsappTemplate.objects.get(pk=1), user=None)
+        instance.send_whatsapp_message(user=None)
         
 class Communication(models.Model):
     created = models.DateTimeField(auto_now_add=True)
@@ -145,12 +146,20 @@ class WhatsappTemplateManager(models.Manager):
     def get_queryset(self):
         return CustomWhatsappTemplateQuerySet(self.model, using=self._db)
 
+
+WHATSAPP_ORDER_CHOICES = (
+                    (1, 'First'),
+                    (2, 'Second'),
+                    (3, 'Third')
+                )
 class WhatsappTemplate(models.Model):
-    name = models.TextField(null=False, blank=False)
+    # name = models.TextField(null=False, blank=False)
+    send_order = models.IntegerField(choices=WHATSAPP_ORDER_CHOICES, null=False, blank=False, default=1)
     text = models.TextField(null=False, blank=False)
     edited_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     edited = models.DateTimeField(null=True, blank=True) 
     created = models.DateTimeField(auto_now_add=True)
+    site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
 
     objects = WhatsappTemplateManager()
     class Meta:

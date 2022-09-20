@@ -24,7 +24,7 @@ class Whatsapp:
     
     whatsapp_business_id = os.getenv("WHATSAPP_BUSINESS_ID")
     whatsapp_business_account_id = os.getenv("WHATSAPP_BUSINESS_ACCOUNT_ID")
-    whatsapp_primary_business_phone_number_id = os.getenv("WHATSAPP_PRIMARY_BUSINESS_PHONE_NUMBER_ID")
+    # whatsapp_primary_business_phone_number_id = os.getenv("WHATSAPP_PRIMARY_BUSINESS_PHONE_NUMBER_ID")
 
     def _get_headers(self):
         headers = {
@@ -33,10 +33,10 @@ class Whatsapp:
                    }
         return headers
     #POST
-    def send_message(self, recipient_number, message, preview_url = False):   
+    def send_message(self, recipient_number, message, whatsapp_business_phone_number_id, preview_url = False):   
         if settings.WHATSAPP_PHONE_OVERRIDE:
             recipient_number = settings.WHATSAPP_PHONE_OVERRIDE     
-        url = f"{self.whatsapp_url}{self.whatsapp_primary_business_phone_number_id}/messages"
+        url = f"{self.whatsapp_url}{whatsapp_business_phone_number_id}/messages"
         headers = self._get_headers()
         body = { 
             "messaging_product": "whatsapp", 

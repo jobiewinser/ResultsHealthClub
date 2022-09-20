@@ -68,56 +68,56 @@
                     data-bs-trigger="hover" 
                     data-bs-placement="top"
                     data-bs-content="Log a text message communication attempt"
-                    hx-target="#generic_modal_body" 
+                    hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
                     hx-include="#log_communication"
                     hx-get="{% url 'academy-lead-get-modal-content' param1=lead.pk param2='d' %}" 
                     hx-push-url="false"
-                    hx-swap="innerHTML" hx-indicator="#htmx-indicator"><i class="fa-sharp fa-regular fa-message-sms"></i></button>
+                    hx-swap="innerHTML"><i class="fa-sharp fa-regular fa-message-sms"></i></button>
                 <button class="btn btn-secondary btn-sm" type="button"
                     data-bs-toggle="popover" 
                     data-bs-trigger="hover" 
                     data-bs-placement="top"
                     data-bs-content="Log an email communication attempt"
-                    hx-target="#generic_modal_body" 
+                    hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
                     hx-include="#log_communication"
                     hx-get="{% url 'academy-lead-get-modal-content' param1=lead.pk param2='c' %}" 
                     hx-push-url="false"
-                    hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa fa-envelope" aria-hidden="true"></i></button>
+                    hx-swap="innerHTML" hx-trigger="click"><i class="fa fa-envelope" aria-hidden="true"></i></button>
                 <button class="btn btn-secondary btn-sm" type="button"
                     data-bs-toggle="popover" 
                     data-bs-trigger="hover" 
                     data-bs-placement="top"
                     data-bs-content="Log a phone call communication attempt"
-                    hx-target="#generic_modal_body" 
+                    hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
                     hx-include="#log_communication"
                     hx-get="{% url 'academy-lead-get-modal-content' param1=lead.pk param2='a' %}" 
                     hx-push-url="false"
-                    hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa fa-phone" aria-hidden="true"></i></button>
+                    hx-swap="innerHTML" hx-trigger="click"><i class="fa fa-phone" aria-hidden="true"></i></button>
                 <button class="btn btn-secondary btn-sm" type="button"
                     data-bs-toggle="popover" 
                     data-bs-trigger="hover" 
                     data-bs-placement="top"
                     data-bs-content="Add a booking"
-                    hx-target="#generic_modal_body" 
+                    hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
                     hx-include="#add_booking"
                     hx-get="{% url 'academy-lead-get-modal-content' param1=lead.pk %}" 
                     hx-push-url="false"
-                    hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa fa-plus" aria-hidden="true"></i></button>
+                    hx-swap="innerHTML" hx-trigger="click"><i class="fa fa-plus" aria-hidden="true"></i></button>
                 <button class="btn btn-secondary btn-sm" type="button"
                     data-bs-toggle="popover" 
                     data-bs-trigger="hover" 
                     data-bs-placement="top"
                     data-bs-content="See communication history for this lead."
-                    hx-target="#generic_modal_body" 
+                    hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
                     hx-include="#communication_history"
                     hx-get="{% url 'academy-lead-get-modal-content' param1=lead.pk %}" 
                     hx-push-url="false"
-                    hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa-regular fa-clock-rotate-left" ></i> <span style="color:Silver">{{lead.communication_set.all.count}}</span></button>
+                    hx-swap="innerHTML" hx-trigger="click"><i class="fa-regular fa-clock-rotate-left" ></i> <span style="color:Silver">{{lead.communication_set.all.count}}</span></button>
             </div>
         </span>
         {% comment %} {% if request.user.is_superuser%}            
             <button class="btn btn-sm btn-success" hx-include="#lead_pk_{{lead.pk}}"
-            hx-post="{% url 'test-whatsapp-message' %}" hx-target="#row_{{lead.pk}}">Test WhatsApp</button>
+            hx-post="{% url 'test-whatsapp-message' %}" hx-indicator=".top-htmx-indicator" hx-target="#row_{{lead.pk}}">Test WhatsApp</button>
         {%endif%} {% endcomment %}
         <br>
         <span class="secondary_td_layer">     
@@ -130,14 +130,14 @@
                     data-bs-trigger="hover" 
                     data-bs-placement="top"
                     data-bs-content="Unarchive this lead"
-                        hx-post="{% url 'mark-done' %}" hx-target="#row_{{lead.pk}}"><i class="fa-regular fa-box-archive"></i></button>
+                        hx-post="{% url 'mark-done' %}" hx-indicator=".top-htmx-indicator" hx-target="#row_{{lead.pk}}"><i class="fa-regular fa-box-archive"></i></button>
                 {%else%}
                     <button class="btn btn-success btn-sm nowrap" hx-include="#lead_pk_{{lead.pk}}"
                     data-bs-toggle="popover" 
                     data-bs-trigger="hover" 
                     data-bs-placement="top"
                     data-bs-content="Archive this lead"
-                        hx-post="{% url 'mark-done' %}" hx-target="#row_{{lead.pk}}"><i class="fa-regular fa-box-archive"></i></button>
+                        hx-post="{% url 'mark-done' %}" hx-indicator=".top-htmx-indicator" hx-target="#row_{{lead.pk}}"><i class="fa-regular fa-box-archive"></i></button>
                 {%endif%} 
             </div>
         </span>

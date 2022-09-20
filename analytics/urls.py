@@ -17,5 +17,6 @@ from django.urls import path
 import analytics.views as analyticviews
 import analytics.htmx as analyticshtmx
 urlpatterns = [
+    path('analytics/', analyticviews.AnalyticsOverviewView.as_view(), name='analytics' ),
     path('get-leads-to-sales/', analyticshtmx.get_leads_to_sales, name='get-leads-to-sales' ),
 ]

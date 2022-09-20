@@ -28,11 +28,11 @@
             </div>
             <div class="m-3">
                 <button class="btn btn-primary" 
-                hx-target="#row_{{lead.pk}}" 
+                hx-indicator=".top-htmx-indicator" hx-target="#row_{{lead.pk}}" 
                 hx-include=".log_communication_input"
                 hx-post="{% url 'log-communication' %}" 
                 hx-push-url="false"
-                hx-swap="outerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"                
+                hx-swap="outerHTML" hx-trigger="click"                
                 >
                     {%if communication_type == 'a'%}
                     <i class="fa fa-phone" aria-hidden="true"></i>

@@ -83,6 +83,33 @@
                 });
               }
             </script>
+            
+            <script>
+                let dt = null;
+                $(document).ready(function() {
+                    $("[data-bs-toggle=popover]").popover();
+                    document.body.addEventListener('htmx:afterSwap', function(evt) {  
+                        if (evt.detail.target.id == 'generic_modal_body'){
+                            $('#generic_modal').modal('show');
+                        }
+                        if (evt.detail.pathInfo.path.includes("switch-user")){
+                            $('#generic_modal').modal('hide');
+                            snackbarShow('Successfully switched user', 'success')
+                        }
+
+                        if (evt.detail.xhr.status == 200){
+                        } else {
+                            snackbarShow(evt.detail.xhr.responseText, 'danger')
+                        }
+                        $('.popover').remove()
+                        $('[data-bs-toggle=popover]').popover();
+                    });
+                    
+                    document.body.addEventListener('htmx:configRequest', function(evt) {    
+                        evt.detail.headers['x-csrftoken'] = $('#csrf_token').val();
+                    });
+                });
+            </script>
         {%endblock scripts%}
 
         {%block styles%}
@@ -158,6 +185,13 @@
                                 <li class="nav-item">
                                 <a class="nav-link{%if request.path == '/analytics/'%} active{%endif%}" href="{% url 'analytics' %}">Analytics (Coming Soon)</a>
                                 </li>                                
+                            </ul>
+                            <ul class="navbar-nav me-auto">
+                                <li class="nav-item">                                    
+                                    <a class="nav-link" href="#"><img  class="htmx-indicator top-htmx-indicator" src="https://htmx.org/img/bars.svg"/></a>
+                                </li>                          
+                                
+  
                             </ul>
                             <ul class="navbar-nav me-3 m-0" style="text-align:right">
                                 <li class="nav-item">

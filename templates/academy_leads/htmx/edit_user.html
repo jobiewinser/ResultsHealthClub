@@ -41,7 +41,7 @@
             hx-encoding="multipart/form-data"
                 hx-post="{% url 'modify-user' %}" hx-include=".edit_user_input"
                 hx-swap="innerHTML"
-                hx-target="#generic_modal_body">
+                hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body">
                 Save Profile
             </button>
         </div>
@@ -49,7 +49,7 @@
 </span>
 <span hx-swap-oob="true" id="generic_modal_title">
     <a href="#"
-    hx-target="#generic_modal_body" hx-include="#switch_user"
+    hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" hx-include="#switch_user"
     hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
-    hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa-solid fa-arrow-left"></i> Back</a> - Edit User - {{edit_user}}
+    hx-swap="innerHTML" hx-trigger="click"><i class="fa-solid fa-arrow-left"></i> Back</a> - Edit User - {{edit_user}}
 </span>

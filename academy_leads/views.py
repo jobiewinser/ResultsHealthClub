@@ -17,13 +17,16 @@ logger = logging.getLogger(__name__)
 
 try:
     for site in Site.objects.all():
+        WhatsappTemplate.objects.get_or_create(site=site, send_order=1)
+        WhatsappTemplate.objects.get_or_create(site=site, send_order=2)
+        WhatsappTemplate.objects.get_or_create(site=site, send_order=3)
         if not ActiveCampaignList.objects.filter(site=site, manual=True):
             ActiveCampaignList.objects.create(
                 name=f"Manually Created ({site.name})",
                 site=site,
                 manual=True,
             )
-except:
+except Exception as e:
     pass
 
 
@@ -57,8 +60,18 @@ class WhatsappTemplatesView(TemplateView):
     template_name='academy_leads/whatsapp_templates.html'
 
     def get_context_data(self, **kwargs):
+        self.request.GET._mutable = True     
         context = super(WhatsappTemplatesView, self).get_context_data(**kwargs)
-        context['templates'] = WhatsappTemplate.objects.all()
+        if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+            self.template_name = 'academy_leads/htmx/whatsapp_templates_content.html'   
+        site_pk = self.request.GET.get('site_pk')
+        if site_pk:
+            context['templates'] = WhatsappTemplate.objects.filter(site=Site.objects.get(pk=site_pk))
+        else:
+            context['templates'] = WhatsappTemplate.objects.filter(site=self.request.user.profile.site)
+            self.request.GET['site_pk'] = self.request.user.profile.site.pk
+        context['site_list'] = Site.objects.all()
+        context['hide_show_all'] = True
         return context
         
 @method_decorator(login_required, name='dispatch')
@@ -68,5 +81,5 @@ class LeadConfigurationView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(LeadConfigurationView, self).get_context_data(**kwargs)
         context['active_campaign_lists'] = get_and_generate_active_campaign_list_objects()
-        context['sites'] = Site.objects.all()
+        context['site_list'] = Site.objects.all()
         return context

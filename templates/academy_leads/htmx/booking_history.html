@@ -8,11 +8,11 @@
                     data-bs-trigger="hover" 
                     data-bs-placement="top"
                     data-bs-content="See communication history for this lead."
-                    hx-target="#generic_modal_body" 
+                    hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
                     hx-include="#communication_history"
                     hx-get="{% url 'academy-lead-get-modal-content' param1=lead.pk %}" 
                     hx-push-url="false"
-                    hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click">
+                    hx-swap="innerHTML" hx-trigger="click">
                         Communication History
                         <span class="badge bg-info" style="font-size:10px">
                             {{lead.communication_set.all.count}}                
@@ -23,11 +23,11 @@
                     data-bs-trigger="hover" 
                     data-bs-placement="top"
                     data-bs-content="See communication history for this lead."
-                    hx-target="#generic_modal_body" 
+                    hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
                     hx-include="#booking_history"
                     hx-get="{% url 'academy-lead-get-modal-content' param1=lead.pk %}" 
                     hx-push-url="false"
-                    hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click">
+                    hx-swap="innerHTML" hx-trigger="click">
                         Booking History
                         <span class="badge bg-info" style="font-size:10px">
                             {{lead.booking_set.all.count}}                

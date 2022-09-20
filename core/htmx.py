@@ -42,7 +42,7 @@ def get_modal_content(request, **kwargs):
             template_name = request.GET.get('template_name', '')
             context = {'site_list':Site.objects.all()}
             if template_name == 'switch_user':
-                context['staff_users'] = User.objects.filter(is_staff=True).order_by('first_name')
+                context['staff_users'] = User.objects.filter(is_staff=True, is_superuser=False).order_by('first_name')
             elif template_name == 'edit_user':
                 user_pk = request.GET.get('user_pk', None)
                 if user_pk:

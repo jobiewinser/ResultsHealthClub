@@ -37,7 +37,7 @@
         <div class="col center" >
             <button class="btn btn-light" type="button"
                 hx-encoding="multipart/form-data"
-                hx-post="{% url 'modify-user' %}" hx-include=".add_user_input"
+                hx-post="{% url 'modify-user' %}" hx-include=".add_user_input" hx-indicator=".top-htmx-indicator" hx-target="#profile-dropdown"
                 hx-swap="innerHTML"
                 hx-target="#generic_modal_body">
                 Add Profile
@@ -47,7 +47,7 @@
 </span>
 <span hx-swap-oob="true" id="generic_modal_title">
     <a href="#"
-    hx-target="#generic_modal_body" hx-include="#switch_user"
+    hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" hx-include="#switch_user"
     hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
-    hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click"><i class="fa-solid fa-arrow-left"></i> Back</a> - Add User
+    hx-swap="innerHTML" hx-trigger="click"><i class="fa-solid fa-arrow-left"></i> Back</a> - Add User
 </span>

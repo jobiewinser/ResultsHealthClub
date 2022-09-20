@@ -14,7 +14,7 @@
 {%endblock scripts%}
 
 {%block extra_top_left_buttons %}
-<button hidden hx-get="{% url 'free-taster' %}" hx-push-url="true" hx-swap="outerHTML" hx-include=".non_site_dependant_results_table_filters" hx-target="#results_table" id="change_site" class="btn btn-primary btn-sm"></button>
+<button hidden hx-get="{% url 'free-taster' %}" hx-push-url="true" hx-swap="outerHTML" hx-include=".non_site_dependant_results_table_filters" hx-indicator=".top-htmx-indicator" hx-target="#results_table" id="change_site" class="btn btn-primary btn-sm"></button>
 {{block.super}}
 {%endblock%}
 
@@ -25,11 +25,11 @@
         data-bs-trigger="hover" 
         data-bs-placement="top"
         data-bs-content="Generate a unique free taster link."
-        hx-target="#generic_modal_body" 
+        hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
         hx-include="#create_free_taster_link"
         hx-get="{% url 'get-modal-content' %}" 
         hx-push-url="false"
-        hx-swap="innerHTML" hx-indicator="#htmx-indicator" hx-trigger="click">
+        hx-swap="innerHTML" hx-trigger="click">
             <i class="fa-solid fa-link" aria-hidden="true"></i> Generate Free Taster Link
     </button>
     <input type="text" style="display:None" id="create_free_taster_link" name="template_name" value="create_free_taster_link"/>
