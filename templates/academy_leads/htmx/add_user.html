@@ -2,17 +2,34 @@
 <span>
     <div class="row">
         <div class="col center" >
-            <select class="form-select add_user_input my-3" name="site_pk">
-                <option value="">Show All Sites</option>
-                {%for site in site_list%}
-                <option value="{{site.pk}}">{{site.name}}</option>
-                {%endfor%}
-            </select>   
-            <input name="first_name" class="form-control add_user_input my-3" placeholder="First Name"/>
-            <input name="last_name" class="form-control add_user_input my-3" placeholder="Last Name"/>
-            <label class="form-label" for="customFile">Profile Picture:</label>
-            <input name="profile_picture" type="file" class="form-control add_user_input my-3" id="customFile" />
-            <input type="text" style="display:None" id="user_modify_action" class="edit_user_input" name="action" value="add"/>
+            
+            <div class="form-group">
+                <label class="form-label" for="site_pk">Site: </label>
+                <select class="form-select add_user_input" name="site_pk" id="site_pk">
+                    {%for site in site_list%}
+                    <option value="{{site.pk}}">{{site.name}}</option>
+                    {%endfor%}
+                </select>   
+            </div>
+                    
+            <br>
+            <div class="form-group">
+                <label class="form-label" for="first_name">First Name: </label>
+                <input name="first_name" class="form-control add_user_input" placeholder="First Name" id="first_name"/>
+            </div>
+                    
+            <br>
+            <div class="form-group">
+                <label class="form-label" for="last_name">Last Name: </label>
+                <input name="last_name" class="form-control add_user_input" placeholder="Last Name" id="last_name"/>
+            </div>
+                    
+            <br>
+            <div class="form-group">
+                <label class="form-label" for="customFile">Profile Picture:</label>
+                <input name="profile_picture" placeholder="test" type="file" class="form-control add_user_input" id="customFile" />
+            </div>
+            <input type="text" style="display:None" id="user_modify_action" class="add_user_input" name="action" value="add"/>
         </div>
     </div>
     <br>
@@ -20,7 +37,9 @@
         <div class="col center" >
             <button class="btn btn-light" type="button"
                 hx-encoding="multipart/form-data"
-                hx-post="{% url 'modify-user' %}" hx-include=".add_user_input" hx-indicator=".top-htmx-indicator" hx-target="#profile-dropdown">
+                hx-post="{% url 'modify-user' %}" hx-include=".add_user_input" hx-indicator=".top-htmx-indicator" hx-target="#profile-dropdown"
+                hx-swap="innerHTML"
+                hx-target="#generic_modal_body">
                 Add Profile
             </button>
         </div>
