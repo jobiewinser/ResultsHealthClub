@@ -23,9 +23,11 @@
         <span class="secondary_td_layer">{{created.time}}</span> 
         {%endwith%}  
     </td>
-    <td>
-        {% comment %} Live Well Female {% endcomment %}
-        {{lead.active_campaign_list.name}}
+    <td class="double_layer_td">
+        {% comment %} Live Well Female {% endcomment %}        
+        <span class="primary_td_layer">{{lead.active_campaign_list.name}}</span>
+        <br>
+        <span class="secondary_td_layer">{{lead.active_campaign_list.site}}</span>
     </td>
     <td>                 
         <span class="primary_td_layer">
