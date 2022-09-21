@@ -63,4 +63,8 @@ def get_leads_to_sales(request):
     # context['data_points'] = [1, 2, 3, 4]
     # context['labels'] = [1, 2, 3, 4]
     # context['data_points1'] = [10, 20, 30, 40]
+    if request.GET.get('graph_type', 'off') == 'on':
+        context['graph_type'] = 'bar'
+    else:
+        context['graph_type'] = 'line'
     return render(request, 'analytics/htmx/leads_to_sale_data.html', context)

@@ -50,7 +50,7 @@
 <script>
 const ctx = document.getElementById('myChart');
 const myChart = new Chart(ctx, {
-    type: 'line',
+    type: '{%if graph_type%}{{graph_type}}{%else%}bar{%endif%}',
     data: {
         labels: [{%for month, year in month_year_set%}'{{month|short_month_name}} {{year|last_x_chars:2}}'{% if not forloop.last %},{%endif%}{%endfor%}],
         datasets: [{
