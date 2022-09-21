@@ -68,8 +68,12 @@ class WhatsappTemplatesView(TemplateView):
         if site_pk:
             context['templates'] = WhatsappTemplate.objects.filter(site=Site.objects.get(pk=site_pk))
         else:
-            context['templates'] = WhatsappTemplate.objects.filter(site=self.request.user.profile.site)
-            self.request.GET['site_pk'] = self.request.user.profile.site.pk
+            if self.request.user.profile.site:
+                context['templates'] = WhatsappTemplate.objects.filter(site=self.request.user.profile.site)
+                self.request.GET['site_pk'] = self.request.user.profile.site.pk
+            else:
+                context['templates'] = WhatsappTemplate.objects.filter(site=Site.objects.all().first())
+                self.request.GET['site_pk'] = Site.objects.all().first().pk
         context['site_list'] = Site.objects.all()
         context['hide_show_all'] = True
         return context

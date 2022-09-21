@@ -43,6 +43,7 @@ class AcademyLead(models.Model):
     complete = models.BooleanField(default=False)
     active_campaign_contact_id = models.TextField(null=True, blank=True)
     active_campaign_form_id = models.TextField(null=True, blank=True)
+    possible_duplicate = models.BooleanField(default=False)
     @property
     def name(self):
         if self.last_name:
@@ -66,8 +67,8 @@ class AcademyLead(models.Model):
 
 
     def send_whatsapp_message(self, user=None):
-        if settings.enable_whatsapp_messaging:
-            template = WhatsappTemplate.objects.filter(send_order = 1, site=self.active_campaign_list.site)
+        if settings.ENABLE_WHATSAPP_MESSAGING:
+            template = WhatsappTemplate.objects.get(send_order = 1, site=self.active_campaign_list.site)
             whatsapp = Whatsapp()
             message = f"{template.rendered(self)}" 
             recipient_number = f"{self.country_code}{self.phone}"

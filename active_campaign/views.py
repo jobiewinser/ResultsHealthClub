@@ -43,19 +43,21 @@ class Webhooks(View):
                     else:
                         phone_number = "None"
                         country_code = "None"
-
-                    if not AcademyLead.objects.filter(
+                    possible_duplicate  = False
+                    if AcademyLead.objects.filter(
                             active_campaign_list=active_campaign_list,
                             active_campaign_contact_id=data.get('contact[id]')
-                        ):
-                        AcademyLead.objects.create(
-                            active_campaign_contact_id=data.get('contact[id]'),
-                            first_name=data.get('contact[first_name]', "None"),
-                            phone=phone_number,
-                            country_code=country_code,
-                            active_campaign_list=active_campaign_list,
-                            active_campaign_form_id=data.get('form[id]', None)
-                        )
+                        ): 
+                        possible_duplicate  = True
+                    AcademyLead.objects.create(
+                        active_campaign_contact_id=data.get('contact[id]'),
+                        first_name=data.get('contact[first_name]', "None"),
+                        phone=phone_number,
+                        country_code=country_code,
+                        active_campaign_list=active_campaign_list,
+                        active_campaign_form_id=data.get('form[id]', None),
+                        possible_duplicate = possible_duplicate
+                    )
             response = HttpResponse("")
             response.status_code = 200             
             return response

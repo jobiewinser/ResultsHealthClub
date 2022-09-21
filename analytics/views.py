@@ -21,6 +21,9 @@ class AnalyticsOverviewView(TemplateView):
             self.template_name = 'analytics/htmx/analytics_overview_content.html'
         site_pk = self.request.GET.get('site_pk')
         if not site_pk:
-            self.request.GET['site_pk'] = self.request.user.profile.site.pk       
+            if self.request.user.profile.site:
+                self.request.GET['site_pk'] = self.request.user.profile.site.pk       
+            else:
+                self.request.GET['site_pk'] = Site.objects.all().first().pk  
         context['site_list'] = Site.objects.all()   
         return context
