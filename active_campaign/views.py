@@ -121,9 +121,9 @@ def get_active_campaign_lists(request, **kwargs):
 @login_required
 def set_active_campaign_lists_site(request, **kwargs):
     # try:
-    print(request.POST.get('site_choice'))
+    print(request.POST.get('site_pk'))
     active_campaign_list = ActiveCampaignList.objects.get(pk=kwargs.get('list_pk'))
-    site_pk = request.POST.get('site_choice',None)
+    site_pk = request.POST.get('site_pk',None)
     if site_pk:
         site = Site.objects.get(pk=site_pk)
         active_campaign_list.site = site

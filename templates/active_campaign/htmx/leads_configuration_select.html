@@ -1,6 +1,6 @@
 <span id="site_select_span_{{active_campaign_list.pk}}"> 
     <span style="display:none"> {{active_campaign_list.site.name}}</span>
-    <select id="site_choice_{{active_campaign_list.pk}}" class="form-select" name="site_choice"onchange="$('#submit_site_choice_{{active_campaign_list.pk}}').click()">
+    <select id="site_pk_{{active_campaign_list.pk}}" class="form-select" name="site_pk"onchange="$('#submit_site_pk_{{active_campaign_list.pk}}').click()">
     <option value="">None</option>
     {%for site in site_list%}
     <option value="{{site.pk}}" {%if active_campaign_list.site == site%}selected{%endif%}>{{site.name}}</option>
@@ -9,6 +9,6 @@
     <button hidden 
     hx-post="{% url 'set-active-campaign-list-site' list_pk=active_campaign_list.pk %}" 
     hx-swap="outerHTML" hx-indicator=".top-htmx-indicator" hx-target="#site_select_span_{{active_campaign_list.pk}}"
-    hx-include="#site_choice_{{active_campaign_list.pk}}" 
-    id="submit_site_choice_{{active_campaign_list.pk}}"></button>
+    hx-include="#site_pk_{{active_campaign_list.pk}}" 
+    id="submit_site_pk_{{active_campaign_list.pk}}"></button>
 </span>

@@ -1,13 +1,24 @@
 import os
 from django import template
-from datetime import datetime
+from datetime import datetime, timedelta
 import time
 import calendar
+
+from dateutil import relativedelta
 register = template.Library()
 
 @register.filter
 def month_name(month_number):
     return calendar.month_name[month_number]
+@register.filter
+def short_month_name(month_number):
+    return calendar.month_name[month_number][:3]
+@register.filter
+def first_x_chars(var,x):
+    return str(var)[:x]
+@register.filter
+def last_x_chars(var,x):
+    return str(var)[x:]
 @register.simple_tag
 def get_env_var(key):
     return os.environ.get(key)
@@ -58,3 +69,30 @@ def str_to_int(value):
         return int(value)
     except:
         return value
+
+@register.filter
+def add_year(date, x):  
+    try:
+        return date + relativedelta.relativedelta(years=x)
+    except Exception as e:
+        return "Error"
+@register.filter
+def add_month(date, x):  
+    try:
+        return date + relativedelta.relativedelta(months=x)
+    except Exception as e:
+        return "Error"
+
+@register.filter
+def date_to_date_input_prefill(date):
+    try:
+        return date.strftime('%Y-%m-%d')
+    except:
+        return date
+        
+@register.filter
+def today_date_input_tag(anything):
+    return datetime.now().strftime('%Y-%m-%d')
+@register.filter
+def today_date_tag(anything):
+    return datetime.now()
