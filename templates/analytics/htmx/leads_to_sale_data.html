@@ -1,0 +1,85 @@
+{%load core_tags%}
+<span>
+<canvas height="100" width="100%" id="myChart" ></canvas>
+</span>
+            
+<span hx-swap-oob="true" id="lead_to_sales_table_wrapper">
+    <div class="table-wrapper m-3" id="lead_to_sales_table_wrapper">  
+        <table id="leads_to_sale_table" class="fl-table">
+            <thead> 
+                <tr class="over_header">
+                    {%for month, year in month_year_set%}
+                    <th colspan="3" class="month_header">
+                        {{month|short_month_name}} {{year|last_x_chars:2}}
+                    </th>
+                    {%endfor%}
+                </tr>
+                <tr>
+                    {%for month, year in month_year_set%}
+                    <th>
+                        Leads
+                    </th>
+                    <th>
+                        Sales
+                    </th>
+                    <th>
+                        %
+                    </th>
+                    {%endfor%}
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    {%for data_entry in data_set%}
+                    <td>
+                        {{data_entry.leads}}
+                    </td>
+                    <td>
+                        {{data_entry.sales}}
+                    </td>
+                    <td>
+                        {{data_entry.percentage|floatformat:0}}
+                    </td>
+                    {%endfor%}
+                </tr>
+            </tbody>
+        </table>
+                
+    </div>
+</span>
+<script>
+const ctx = document.getElementById('myChart');
+const myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: [{%for month, year in month_year_set%}'{{month|short_month_name}} {{year|last_x_chars:2}}'{% if not forloop.last %},{%endif%}{%endfor%}],
+        datasets: [{
+            label: 'Leads',
+            data: [{%for data_entry in data_set%}{{data_entry.leads}}{% if not forloop.last %},{%endif%}{%endfor%}],
+            backgroundColor: 'rgba(180, 180, 180, 0.35)',
+            borderColor: 'rgba(180, 180, 180, 0.7)',
+            fill: true,
+            borderWidth: 1
+        }, {
+            label: 'Sales',
+            data: [{%for data_entry in data_set%}{{data_entry.sales}}{% if not forloop.last %},{%endif%}{%endfor%}],
+            backgroundColor: 'rgba(0, 255, 32, 0.35)',
+            borderColor: 'rgba(0, 255, 32, 0.7)',
+            fill: true,
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                  beginAtZero: true,
+                  callback: function(value) {if (value % 1 === 0) {return value;}}
+                }
+            }
+        },
+        responive: false
+    }
+});
+</script>

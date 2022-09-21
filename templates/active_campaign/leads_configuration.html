@@ -54,8 +54,8 @@
                 {%include 'active_campaign/htmx/leads_configuration_select.html'%}
                <button hidden 
                hx-post="{% url 'set-active-campaign-list-site' list_pk=active_campaign_list.pk %}" 
-               hx-swap="outerHTML" hx-include="#site_choice_{{active_campaign_list.pk}}" 
-               id="submit_site_choice_{{active_campaign_list.pk}}"></button>
+               hx-swap="outerHTML" hx-include="#site_pk_{{active_campaign_list.pk}}" 
+               id="submit_site_pk_{{active_campaign_list.pk}}"></button>
             </td>
         </tr>
         {%endfor%}

@@ -12,9 +12,11 @@
     </div> 
     <div class="row my-3">
         <div class="col">
-            <div class="col" hx-get="{% url 'get-leads-to-sales'%}" hx-include="#site_choice" 
-            hx-trigger="load" hx-swap="innerHTML">
-                <img  class="htmx-indicator" src="https://htmx.org/img/bars.svg"/>
+            <div class="card p-2">
+                <h5>Leads & sales</h5> <small> (Need to add gradient on percentage and time scale based table i.e 3 months shows individual weeks instead) </small>
+                <div class="col">
+                    {%include 'analytics/htmx/leads_to_sale.html'%}
+                </div>
             </div>
         </div>
     </div> 

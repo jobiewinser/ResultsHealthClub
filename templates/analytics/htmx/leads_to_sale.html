@@ -1,40 +1,35 @@
 {%load core_tags%}
-<table id="leads_to_sale_table" class="table analytics_table">
-    <thead> 
-        <tr>
-            {%for month, year in date_tuples%}
-            <th colspan="3" class="month_header">
-                {{month|month_name}} {{year}}
-            </th>
-            {%endfor%}
-        </tr>
-        <tr>
-            {%for month, year in date_tuples%}
-            <th>
-                Leads
-            </th>
-            <th>
-                Sales
-            </th>
-            <th>
-                %
-            </th>
-            {%endfor%}
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            {%for data_entry in dataset%}
-            <td>
-                {{data_entry.leads}}
-            </td>
-            <td>
-                {{data_entry.sold}}
-            </td>
-            <td>
-                {{data_entry.percentage}}
-            </td>
-            {%endfor%}
-        </tr>
-    </tbody>
-</table>
+
+
+<div class="row">
+    <div class="col-3">
+        <div class="" id="lead_to_sales_chart_wrapper">
+        </div>
+    </div>
+    <div class="col">
+        <div class="row">
+            <button hidden id="refresh_lead_to_sales" hx-trigger="load, click delay:0.5s"
+                hx-get="{%url 'get-leads-to-sales' %}"
+                hx-include="#start_date, #end_date, #site_pk"
+                hx-target="#lead_to_sales_chart_wrapper"
+                hx-swap="innerHTML">refresh</button>
+            <div class="col">
+            </div>
+            <div class="col-md-auto right">
+                <input id="start_date" value="{{''|today_date_tag|add_year:-1|add_month:1|date_to_date_input_prefill}}" class="form-control form-control-sm" type="date" name="start_date"
+                onchange="$('#refresh_lead_to_sales').click()"/>
+            </div>
+            <div class="col-md-auto">
+                To
+            </div>
+            <div class="col-md-auto left">
+                <input id="end_date" value="{{''|today_date_input_tag}}" class="form-control form-control-sm" type="date" name="end_date"
+                onchange="$('#refresh_lead_to_sales').click()"/>
+            </div>
+            <div class="col">
+            </div>
+        </div>
+        <span id="lead_to_sales_table_wrapper">            
+        </span>
+    </div>
+</div>
