@@ -49,9 +49,9 @@ class AcademyLeadsOverviewView(TemplateView):
             leads = leads.filter(active_campaign_list__site__pk=site_pk)
             self.request.GET['site_pk'] = site_pk 
             
+        context['complete_count'] = leads.filter(complete=True).count()
         complete_filter = (self.request.GET.get('complete', '').lower() =='true')
         leads = leads.filter(complete=complete_filter)   
-        context['complete_count'] = leads.filter(complete=None).count()
             
         booking_needed_filter = (self.request.GET.get('booking_needed', '').lower() =='true')
         if booking_needed_filter:
