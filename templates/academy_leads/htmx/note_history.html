@@ -18,7 +18,7 @@
                             {{lead.communication_set.all.count}}                
                         </span>
                 </button>
-                <button class="btn btn-sm btn-success"
+                <button class="btn btn-sm btn-secondary"
                     data-bs-toggle="popover" 
                     data-bs-trigger="hover" 
                     data-bs-placement="top"
@@ -33,7 +33,7 @@
                             {{lead.booking_set.all.count}}                
                         </span>
                 </button>   
-                <button class="btn btn-sm btn-secondary"
+                <button class="btn btn-sm btn-success"
                     data-bs-toggle="popover" 
                     data-bs-trigger="hover" 
                     data-bs-placement="top"
@@ -57,43 +57,36 @@
             <table class="table">
                 <thead>
                   <tr>
-                    <th ><strong>Booking</strong></th>
+                    <th ><strong>History</strong></th>
                     <th style="width:400px">
                     </th>
                   </tr>
                 </thead>
-                <tbody class="noteBody">
-                    {%for booking in lead.booking_set.all%}
-                    <tr>
-                        <td colspan="2"
-                        data-bs-html="true" 
+                <tbody class="">
+                    {%for note in lead.note_set.all%}
+                    <tr
                         data-bs-toggle="popover" 
                         data-bs-trigger="hover" 
                         data-bs-placement="right"
+                        data-bs-html="true"
                         data-bs-content="
-                        <p>{%if booking.type == 'a'%}This appointment is in person{%elif booking.type == 'b'%}This appointment is over the phone{%endif%}</p>
-                        {%if booking.note_set.all%}
-                        <br>
-                        <b>Notes:</b>
-                        <ul>
-                            {%for note in booking.note_set.all%}
-                            <li>{{note.text}} - <i>{{note.staff_user}}, {{note.datetime}}</i></li>
-                            {%endfor%}
-                        </ul>
-                        {%endif%}
-                        " class="double_layer_td">                         
+                        {%if note.communication%}
+                        <p>Attached to the <b>{{note.communication.get_type_display}}</b> communication{%if note.communication.staff_user%} made by <b>{{note.communication.staff_user.first_name}} {{note.communication.staff_user.last_name}}</b>{%endif%} at <b>{{note.communication.datetime}}</b></p>
+                        {%endif%}  
+                        {%if note.booking%}
+                        <p>Attached to the <b>{{note.booking.get_type_display}}</b> booking{%if note.booking.staff_user%} made by <b>{{note.booking.staff_user.first_name}} {{note.booking.staff_user.last_name}}</b>{%endif%} booked for <b>{{note.booking.datetime}}</b></p>
+                        {%endif%}                        
+                        ">
+                        <td colspan="2" class="double_layer_td">                         
                             <div class="row">   
-                                <div class="col p-0">                            
-                                    <span class="primary_td_layer"><i class="fa-solid fa-{%if booking.type == 'a'%}person{%elif booking.type == 'b'%}phone{%endif%}"></i> - {{booking.datetime}}</span>
+                                <div class="col p-0">   
+                                    <span class="primary_td_layer">{{note.text}}</span>
                                     <br>
-                                    <span class="secondary_td_layer">{{booking.staff_user.first_name}} {{booking.staff_user.last_name}}</span>  
+                                    <span class="secondary_td_layer">{{note.staff_user.first_name}} {{note.staff_user.last_name}} - {{note.datetime}}</span>   
                                 </div>
-                                <div class="col-md-auto  p-0">
-                                    {%if booking.note_set.all%}
-                                        <i class="fa-duotone fa-note"></i>
-                                    {%endif%}
+                                <div class="col-md-auto p-0">
                                 </div>
-                            </div>  
+                            </div>
                         </td>
                     </tr>
                     {%endfor%}

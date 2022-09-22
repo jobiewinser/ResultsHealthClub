@@ -40,7 +40,7 @@
     function initDataTable() {
         dt = $('#results_table').DataTable(            
         {  
-            order: [[ 2, 'asc' ]],
+            order: [[ 4, 'asc' ],[ 2, 'asc' ]],
             iDisplayLength: 10
         }
         );
@@ -64,7 +64,7 @@
 
 {%block extra_top_right_buttons %}
 <div class="col-md-auto">
-    <button class="btn btn-primary" 
+    <button class="btn btn-primary btn-sm" 
         data-bs-toggle="popover" 
         data-bs-trigger="hover" 
         data-bs-placement="top"
@@ -79,6 +79,7 @@
     <input type="text" style="display:None" id="create_academy_lead" name="template_name" value="create_academy_lead"/>
 </div>
 {%include 'academy_leads/htmx/academy_leads_table_status_toggle_div.html'%}
+{%include 'academy_leads/htmx/academy_leads_table_booking_needed_toggle_div.html'%}
 {%endblock%}
 
 {%block table%}
@@ -89,6 +90,8 @@
 <input type="text" style="display:None" id="log_communication" name="template_name" value="log_communication"/>
 <input type="text" style="display:None" id="communication_history" name="template_name" value="communication_history"/>
 <input type="text" style="display:None" id="booking_history" name="template_name" value="booking_history"/>
+<input type="text" style="display:None" id="note_history" name="template_name" value="note_history"/>
+
 <input type="text" style="display:None" id="add_booking" name="template_name" value="add_booking"/>
 <input type="text" style="display:None" id="pause_whatsapp" name="template_name" value="pause_whatsapp"/>
 <br>

@@ -23,6 +23,8 @@ urlpatterns = [
     path('configuration/lead-configuration/', academyleadsviews.LeadConfigurationView.as_view(), name='lead-configuration'),
     
     path('mark-done/', academyleadshtmx.mark_done, name='mark-done' ),
+    path('delete-lead/', academyleadshtmx.delete_lead, name='delete-lead' ),
+    
     path('create-academy-lead/', academyleadshtmx.create_academy_lead, name='create-academy-lead' ),
     path('log-communication/', academyleadshtmx.log_communication, name='log-communication' ),
     path('add-booking/', academyleadshtmx.add_booking, name='add-booking' ),

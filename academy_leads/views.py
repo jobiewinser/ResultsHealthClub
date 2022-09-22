@@ -38,11 +38,8 @@ class AcademyLeadsOverviewView(TemplateView):
         self.request.GET._mutable = True       
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'academy_leads/htmx/academy_leads_table_htmx.html'   
-        context = super(AcademyLeadsOverviewView, self).get_context_data(**kwargs)      
-            
-        complete_filter = (self.request.GET.get('complete', '').lower() =='true')
-        leads = AcademyLead.objects.filter(complete=complete_filter)
-        context['site_list'] = Site.objects.all()
+        context = super(AcademyLeadsOverviewView, self).get_context_data(**kwargs)  
+        leads = AcademyLead.objects.all()
         active_campaign_list_pk = self.request.GET.get('active_campaign_list_pk', None)
         if active_campaign_list_pk:
             leads = leads.filter(active_campaign_list=ActiveCampaignList.objects.get(pk=active_campaign_list_pk))
@@ -50,7 +47,21 @@ class AcademyLeadsOverviewView(TemplateView):
         site_pk = get_site_pk_from_request(self.request)
         if site_pk and not site_pk == 'all':
             leads = leads.filter(active_campaign_list__site__pk=site_pk)
-            self.request.GET['site_pk'] = site_pk
+            self.request.GET['site_pk'] = site_pk 
+            
+        complete_filter = (self.request.GET.get('complete', '').lower() =='true')
+        leads = leads.filter(complete=complete_filter)   
+        context['complete_count'] = leads.filter(complete=None).count()
+            
+        booking_needed_filter = (self.request.GET.get('booking_needed', '').lower() =='true')
+        if booking_needed_filter:
+            leads = leads.filter(booking=None)
+        context['booking_needed_count'] = leads.filter(booking=None).count()
+
+
+
+
+        context['site_list'] = Site.objects.all()
         context['leads'] = leads
         # whatsapp = Whatsapp()
         return context
