@@ -64,11 +64,15 @@ class AcademyLead(models.Model):
             return last_whatsapp_communication.datetime.replace(hour=9).replace(minute=30).replace(second=0) + timedelta(days=1)
         return "Never"
     
+    @property
+    def successful_communication(self):
+        return self.communication_set.filter(successful=True)
+    
 
 
-    def send_whatsapp_message(self, user=None):
+    def send_whatsapp_message(self, whatsapp_template_send_order, user=None):
         if settings.ENABLE_WHATSAPP_MESSAGING:
-            template = WhatsappTemplate.objects.get(send_order = 1, site=self.active_campaign_list.site)
+            template = WhatsappTemplate.objects.get(send_order = whatsapp_template_send_order, site=self.active_campaign_list.site)
             whatsapp = Whatsapp()
             message = f"{template.rendered(self)}" 
             recipient_number = f"{self.country_code}{self.phone}"
@@ -107,7 +111,7 @@ class AcademyLead(models.Model):
 @receiver(models.signals.post_save, sender=AcademyLead)
 def execute_after_save(sender, instance, created, *args, **kwargs):
     if created and not instance.complete:
-        instance.send_whatsapp_message(user=None)
+        instance.send_whatsapp_message(1, user=None)
         
 class Communication(models.Model):
     created = models.DateTimeField(auto_now_add=True)

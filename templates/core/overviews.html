@@ -17,7 +17,11 @@
             else if (evt.detail.pathInfo.path.includes("modify-user")){
                 $('#generic_modal').modal('hide');
                 snackbarShow('Successfully modifed/added user', 'success')
-            }
+            }            
+            {% comment %} if (evt.detail.target.classList.contains('academy_lead_row')) {
+                $('#refresh_results_table').click(); 
+            } {% endcomment %}
+            
         });
     });
 </script>
