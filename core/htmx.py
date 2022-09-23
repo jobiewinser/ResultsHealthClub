@@ -25,7 +25,7 @@ def switch_user(request, **kwargs):
             if type(user_pk) == list:
                 user_pk = user_pk[0]
             logger.debug(f"TEST {str(user_pk)}")
-            login(request, User.objects.get(pk=user_pk, is_superuser=False))
+            login(request, User.objects.get(pk=user_pk))
             return render(request, f"core/htmx/profile_dropdown.html", {})   
     except Exception as e:
         logger.debug("switch_user Error "+str(e))
@@ -42,7 +42,7 @@ def get_modal_content(request, **kwargs):
             template_name = request.GET.get('template_name', '')
             context = {'site_list':Site.objects.all()}
             if template_name == 'switch_user':
-                context['staff_users'] = User.objects.filter(is_staff=True, is_superuser=False).order_by('first_name')
+                context['staff_users'] = User.objects.filter(is_staff=True).order_by('first_name')
             elif template_name == 'edit_user':
                 user_pk = request.GET.get('user_pk', None)
                 if user_pk:
