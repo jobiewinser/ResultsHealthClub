@@ -132,7 +132,7 @@ class Booking(models.Model):
     type = models.CharField(choices=BOOKING_CHOICES, max_length=2, null=False, blank=False)
     staff_user = models.ForeignKey(User, on_delete=models.CASCADE)
     class Meta:
-        ordering = ['-created']
+        ordering = ['-datetime']
 
 class Note(models.Model):
     text = models.TextField(null=False, blank=False)
@@ -142,6 +142,8 @@ class Note(models.Model):
     staff_user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     #This referes to the date it was created unless it's attached to a communication/booking, then it's set to the related datetime
     datetime = models.DateTimeField(null=True, blank=True) 
+    class Meta:
+        ordering = ['-datetime']
 
 
 class CustomWhatsappTemplateQuerySet(models.QuerySet):

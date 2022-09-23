@@ -153,6 +153,18 @@ def mark_done(request, **kwargs):
     except Exception as e:
         logger.debug("mark_done Error "+str(e))
         return HttpResponse(e, status=500)
+@login_required
+def delete_lead(request, **kwargs):
+    logger.debug(str(request.user))
+    try:
+        if request.user.is_staff:
+            lead = AcademyLead.objects.get(pk=request.POST.get('lead_pk'))
+            lead.delete()
+
+            return HttpResponse("", "text", 200)
+    except Exception as e:
+        logger.debug("mark_done Error "+str(e))
+        return HttpResponse(e, status=500)
 
 @login_required
 def mark_arrived(request, **kwargs):

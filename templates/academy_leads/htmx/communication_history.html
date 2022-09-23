@@ -22,7 +22,7 @@
                     data-bs-toggle="popover" 
                     data-bs-trigger="hover" 
                     data-bs-placement="top"
-                    data-bs-content="See communication history for this lead."
+                    data-bs-content="See booking history for this lead."
                     hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
                     hx-include="#booking_history"
                     hx-get="{% url 'academy-lead-get-modal-content' param1=lead.pk %}" 
@@ -32,14 +32,29 @@
                         <span class="badge bg-info" style="font-size:10px">
                             {{lead.booking_set.all.count}}                
                         </span>
-                </button>   
+                </button>     
+                <button class="btn btn-sm btn-secondary"
+                    data-bs-toggle="popover" 
+                    data-bs-trigger="hover" 
+                    data-bs-placement="top"
+                    data-bs-content="See note history for this lead."
+                    hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
+                    hx-include="#note_history"
+                    hx-get="{% url 'academy-lead-get-modal-content' param1=lead.pk %}" 
+                    hx-push-url="false"
+                    hx-swap="innerHTML" hx-trigger="click">
+                        Note History
+                        <span class="badge bg-info" style="font-size:10px">
+                            {{lead.note_set.all.count}}                
+                        </span>
+                </button> 
             </div> 
         </div>
     </div>
     <br>
     <div class="row">
         <div class="col">
-            <table class="table table-light table-sm table-striped col-md-auto notes_table" id="">
+            <table class="table" id="">
                 <thead>
                   <tr>
                     <th ><strong>History</strong></th>
@@ -55,47 +70,34 @@
                         data-bs-trigger="hover" 
                         data-bs-placement="right"
                         data-bs-content="
-                        {%if communication.error_json%}
-                        <b>Error</b> {{communication.error_json.error.error_data.details}}
-                        {%endif%}
-                        
-                        {%if communication.whatsappmessage.whatsappmessagestatus_set.all%}
-                        Statuses:
+                        <b>{%if communication.successful == True%}Successful{%elif communication.successful == False%}Unsuccessful{%endif%}</b> communication
+                        {%if communication.note_set.all%}
+                        <br>
+                        <b>Notes:</b>
                         <ul>
-                            {%for status in communication.whatsappmessage.whatsappmessagestatus_set.all%}
-                            <li><b>{{status.status}}</b> {{status.datetime}} </li>
+                            {%for note in communication.note_set.all%}
+                            <li>{{note.text}} - <i>{{note.staff_user}}, {{note.datetime}}</i></li>
                             {%endfor%}
                         </ul>
                         {%endif%}
-                        ">
-                            <i  class="fa fa-{%if communication.type == 'a'%}phone{%elif communication.type == 'b'%}whatsapp{%elif communication.type == 'c'%}envelope{%elif communication.type == 'd'%}message-sms{%endif%}" 
-                                style="color:{%if communication.successful == True%}green{%elif communication.successful == False%}red{%else%}grey{%endif%}" 
-                                aria-hidden="true"></i> 
-                            <span style="color:#a9a9a9;"> 
-                                {{communication.staff_user.profile}} <i class="fa-solid fa-arrow-right"> </i>
-                            </span>
-                            <span style="color:#033dfc;">
-                                {{communication.lead.name}}
-                            </span> 
-                            <br>
-                            <span style="">
-                                {{communication.datetime}}
-                            </span>
-                            {%if communication.type == 'a'%}
-                            {%if communication.successful %}
-                                <small style="color:green">Customer picked up phone</small>
-                            {%else%}                                    
-                                <small style="color:red">Customer didn't pick up phone</small>
-                            {%endif%}
-                            {%endif%}
-                            <br>
-                            <span style="">
-                                <ul>
-                                {%for note in communication.note_set.all%}
-                                <li>{{note.text}}</li>
-                                {%endfor%}
-                                </ul>
-                            </span>
+                        " class="double_layer_td">                                
+                            <div class="row">   
+                                <div class="col p-0">                     
+                                    <span class="primary_td_layer">
+                                        <i  class="fa fa-{%if communication.type == 'a'%}phone{%elif communication.type == 'b'%}whatsapp{%elif communication.type == 'c'%}envelope{%elif communication.type == 'd'%}message-sms{%endif%}" 
+                                            style="color:{%if communication.successful == True%}green{%elif communication.successful == False%}red{%else%}grey{%endif%}" 
+                                            aria-hidden="true"></i>  
+                                            - 
+                                            {{communication.datetime}}</span>
+                                    <br>
+                                    <span class="secondary_td_layer">{{communication.staff_user.first_name}} {{communication.staff_user.last_name}}</span>    
+                                </div>
+                                <div class="col-md-auto  p-0">
+                                    {%if communication.note_set.all%}
+                                        <i class="fa-duotone fa-note"></i>
+                                    {%endif%}
+                                </div>
+                            </div>
                         </td>
                     </tr>
                     {%endfor%}

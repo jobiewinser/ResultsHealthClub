@@ -7,19 +7,28 @@ from academy_leads.models import AcademyLead
 from core.models import Site
 from dateutil import relativedelta
 
+def get_leads_created_in_month_and_year_all_sites(date):
+    return AcademyLead.objects.filter(created__month=date.month, created__year=date.year)
+
 @login_required
 def get_leads_to_sales(request):
     context = {}
     data_set = []
     month_year_set = []
 
-    site_pk = request.GET.get('site_pk')
-    site = Site.objects.get(pk=site_pk)
+    site_pk = request.GET.get('site_pk', 'all')
+    if not site_pk == 'all':
+        site = Site.objects.get(pk=site_pk)
+    else:
+        site = None
     start_date = datetime.strptime(request.GET.get('start_date'), '%Y-%m-%d')
     end_date = datetime.strptime(request.GET.get('end_date'), '%Y-%m-%d')   
     index_date = start_date
     while index_date < end_date + relativedelta.relativedelta(months=1):
-        qs = site.get_leads_created_in_month_and_year(index_date)
+        if site:
+            qs = site.get_leads_created_in_month_and_year(index_date)
+        else:
+            qs = get_leads_created_in_month_and_year_all_sites(index_date)
         leads = qs.count()
         sales = qs.filter(sold=True).count()
         if leads:
@@ -54,4 +63,8 @@ def get_leads_to_sales(request):
     # context['data_points'] = [1, 2, 3, 4]
     # context['labels'] = [1, 2, 3, 4]
     # context['data_points1'] = [10, 20, 30, 40]
+    if request.GET.get('graph_type', 'off') == 'on':
+        context['graph_type'] = 'bar'
+    else:
+        context['graph_type'] = 'line'
     return render(request, 'analytics/htmx/leads_to_sale_data.html', context)
