@@ -16,6 +16,8 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.urls import path
+import core.views as coreviews
+handler500 = coreviews.handler500
 
 urlpatterns = [
     path('admin/', admin.site.urls),

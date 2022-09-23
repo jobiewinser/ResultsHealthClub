@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    {% load static %}
+        <style>
+            .center {
+                margin: 0;
+                position: absolute;
+                top: 40%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                font-family: Helvetica, Geneva, Verdana, sans-serif;
+            }
+        </style>
+
+    </head>
+    <body>
+        <div class="center" style="text-align: center;">
+            <div> 
+                
+                    <img class="center-horizontal" style="width:auto; height:300px;" src="{% static 'img/logo_white.png' %}" alt="Results Logo">
+            </div>
+            <div style="padding-top: 25px;">                
+                    <h1 class="center-horizontal" style="font-size: 46px; margin: 35px;">500 - Internal server error</h1>
+                    <p class="center-horizontal" style="font-size: 18px; margin: 15px;">Jobie has been notified!</span></p>
+                    <a style="padding: 10px; width: 100px; margin-top: 60px" id="id_btn_home" href="/" class="btn btn-primary" role="button">Back to Leads</a>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,3 +1,6 @@
+import os
+import sys
+import traceback
 from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
@@ -51,3 +54,49 @@ def get_site_pk_from_request(request):
         if profiles.first().site:
             return request.user.profile.site.pk
     
+
+from django.core.mail import send_mail
+from django.shortcuts import render
+def handler500(request):
+    known_errors = []
+    try:
+        type_, value, tb = sys.exc_info()
+        
+        if str(value) not in known_errors:
+            if request.user.id:
+                id = str(request.user.id)
+            else:
+                id = "None"
+
+            if request.user.username:
+                name = str(request.user.username)
+            else:
+                name = "None"
+
+            if request.META['PATH_INFO']:
+                path = os.getenv('SITE_URL')+str(request.META['PATH_INFO'])
+            else:
+                path = "None"
+
+            body = "None"
+            try:
+                if request.body:
+                    body = str(request.body)
+            except:
+                pass
+
+            if request.headers:
+                headers = str(request.headers)
+            else:
+                headers = "None"
+                
+            error_description = f"<p>user id: {str(id)} <br> user name: {str(name)} <br> url: {str(path)}  <br> Error type: {str(value)}  <br> Request Body: {str(body)}  <br> Request Headers: {str(headers)} <br><br><br> Traceback: {str(traceback.format_exception(type, value, tb))}</p>"
+            send_mail(
+                subject='Results Prod - 500 error ',
+                message=error_description,
+                from_email='jobiewinser@live.co.uk',
+                recipient_list=['jobiewinser@live.co.uk'])
+
+    except Exception as e:
+            logger.error(   "couldn't send error email", str(e))
+    return render(request, '500.html', status=500)
