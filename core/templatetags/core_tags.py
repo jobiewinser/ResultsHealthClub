@@ -23,6 +23,25 @@ def last_x_chars(var,x):
 def get_env_var(key):
     return os.environ.get(key)
     
+@register.filter
+def percentage_to_colour(percentage, opacity=1):
+    if percentage > 84:
+        return f'rgba(96, 248, 61, {str(opacity)})'
+    elif percentage > 60:
+        return f'rgba(156, 250, 64, {str(opacity)})'
+    elif percentage > 36:
+        return f'rgba(255, 253, 70, {str(opacity)})'
+    elif percentage > 12:
+        return f'rgba(239, 131, 44, {str(opacity)})'
+    else:
+        return f'rgba(231, 36, 29, {str(opacity)})'
+
+    #e7241d for v <= 12%
+#ef832c for v > 12% and v <= 36%
+#fffd46 for v > 36% and v <= 60%
+#9cfa40 for v > 60% and v <= 84%
+#60f83d for v > 84%
+    
 @register.simple_tag
 def prefill_date_input_with_now(nothing):
     try:

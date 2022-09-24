@@ -29,4 +29,23 @@
             </div>
         </div>
     </div> 
+    <div class="row my-3">
+        <div class="col">
+            <div class="card p-2">
+                <div class="row">
+                    <div class="col-md-auto">
+                        <h5 data-bs-toggle="popover" 
+                        data-bs-trigger="hover" 
+                        data-bs-placement="top"
+                        data-bs-html="true"
+                        data-bs-content="This shows the analytics for Leads and Bookings for the chosen site (top left), between the times chosen (right).<br><br><small> (Jobie Note: Need to add gradient on percentage and time scale based table i.e 3 months shows individual weeks instead) </small>">Leads & sales <i class="fa-solid fa-circle-info"></i></h5> 
+                    </div>
+                </div>
+
+                <div class="col">
+                    {%include 'analytics/htmx/leads_to_booking.html'%}
+                </div>
+            </div>
+        </div>
+    </div> 
 </div> 

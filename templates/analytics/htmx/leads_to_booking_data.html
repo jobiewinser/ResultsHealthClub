@@ -1,11 +1,11 @@
 {%load core_tags%}
 <span>
-<canvas height="100" width="100%" id="leads_to_sales_chart" ></canvas>
+<canvas height="100" width="100%" id="leads_to_bookings_chart" ></canvas>
 </span>
             
-<span hx-swap-oob="true" id="lead_to_sales_table_wrapper">
-    <div class="table-wrapper m-3" id="lead_to_sales_table_wrapper">  
-        <table id="leads_to_sale_table" class="fl-table">
+<span hx-swap-oob="true" id="lead_to_bookings_table_wrapper">
+    <div class="table-wrapper m-3" id="lead_to_bookings_table_wrapper">  
+        <table id="leads_to_booking_table" class="fl-table">
             <thead> 
                 <tr class="over_header">
                     {%for label in time_label_set%}
@@ -20,7 +20,7 @@
                         Leads
                     </th>
                     <th>
-                        Sales
+                        Bookings
                     </th>
                     <th>
                         %
@@ -35,7 +35,7 @@
                         {{data_entry.leads}}
                     </td>
                     <td>
-                        {{data_entry.sales}}
+                        {{data_entry.bookings}}
                     </td>
                     <td style="background-color:{{data_entry.percentage|percentage_to_colour:0.5}}">
                         {{data_entry.percentage|floatformat:0}}
@@ -48,11 +48,11 @@
     </div>
 </span>
 <script>
-const leads_to_sales_chart_var = document.getElementById('leads_to_sales_chart');
-const leads_to_sales_chart = new Chart(leads_to_sales_chart_var, {
+const leads_to_booking_chart_var = document.getElementById('leads_to_bookings_chart');
+const leads_to_bookings_chart = new Chart(leads_to_booking_chart_var, {
     type: '{%if graph_type%}{{graph_type}}{%else%}bar{%endif%}',
     data: {
-        labels: [{%for label in time_label_set%}'{{label    }}'{% if not forloop.last %},{%endif%}{%endfor%}],
+        labels: [{%for label in time_label_set%}'{{label}}'{% if not forloop.last %},{%endif%}{%endfor%}],
         datasets: [{
             label: 'Leads',
             data: [{%for data_entry in data_set%}{{data_entry.leads}}{% if not forloop.last %},{%endif%}{%endfor%}],
@@ -61,8 +61,8 @@ const leads_to_sales_chart = new Chart(leads_to_sales_chart_var, {
             fill: true,
             borderWidth: 1
         }, {
-            label: 'Sales',
-            data: [{%for data_entry in data_set%}{{data_entry.sales}}{% if not forloop.last %},{%endif%}{%endfor%}],
+            label: 'Bookings',
+            data: [{%for data_entry in data_set%}{{data_entry.bookings}}{% if not forloop.last %},{%endif%}{%endfor%}],
             backgroundColor: '{{data_entry.percentage|percentage_to_colour:0.35}}',
             borderColor: '{{data_entry.percentage|percentage_to_colour:0.7}}',
             fill: true,

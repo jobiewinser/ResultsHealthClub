@@ -10,20 +10,20 @@
         <div class="row">
             <button hidden id="refresh_lead_to_sales" hx-trigger="load, click delay:0.5s"
                 hx-get="{%url 'get-leads-to-sales' %}"
-                hx-include="#start_date, #end_date, #site_pk, #graph_type_leads_to_sale"
+                hx-include="#leads_to_sales_start_date, #leads_to_sales_end_date, #site_pk, #graph_type_leads_to_sale"
                 hx-target="#lead_to_sales_chart_wrapper"
                 hx-indicator="#htmx-indicator-leads-and-sales"
                 hx-swap="innerHTML"
                 onclick="$('#htmx-indicator-leads-and-sales').addClass('htmx-request')">refresh</button>
             <div class="col-md-auto right">
-                <input id="start_date" value="{{''|today_date_tag|add_year:-1|add_month:1|date_to_date_input_prefill}}" class="form-control form-control-sm" type="date" name="start_date"
+                <input id="leads_to_sales_start_date" value="{{''|today_date_tag|add_year:-1|add_month:1|date_to_date_input_prefill}}" class="form-control form-control-sm" type="date" name="start_date"
                 onchange="$('#refresh_lead_to_sales').click()"/>
             </div>
             <div class="col-md-auto">
                 <small>To</small>
             </div>
             <div class="col-md-auto left">
-                <input id="end_date" value="{{''|today_date_input_tag}}" class="form-control form-control-sm" type="date" name="end_date"
+                <input id="leads_to_sales_end_date" value="{{''|today_date_input_tag}}" class="form-control form-control-sm" type="date" name="end_date"
                 onchange="$('#refresh_lead_to_sales').click()"/>
             </div>
             
