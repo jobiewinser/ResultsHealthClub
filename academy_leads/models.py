@@ -93,7 +93,7 @@ class AcademyLead(models.Model):
                         wamid=response_message.get('id'),
                         message=message,
                         communication=communication,
-                        phone_from=os.getenv("WHATSAPP_PRIMARY_BUSINESS_PHONE_NUMBER"),
+                        phone_from=self.active_campaign_list.site.whatsapp_business_phone_number,
                         phone_to=recipient_number,
                         template=template
                         )

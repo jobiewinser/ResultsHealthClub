@@ -7,6 +7,7 @@ from academy_leads.models import AcademyLead
 class Site(models.Model):
     name = models.TextField(blank=True, null=True)
     whatsapp_business_phone_number_id = models.TextField(blank=True, null=True)
+    whatsapp_business_phone_number = models.TextField(blank=True, null=True)
 
     def get_leads_created_in_month_and_year(self, date):
         return AcademyLead.objects.filter(active_campaign_list__site=self, created__month=date.month, created__year=date.year)

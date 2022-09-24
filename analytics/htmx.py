@@ -10,64 +10,68 @@ from dateutil import relativedelta
 from core.templatetags.core_tags import short_month_name
 
 def get_sales_to_leads_between_dates_with_timeframe_differences(start_date, end_date, timeframe, timeframe_label_string='month', site=None):
-    index_date = start_date
-    time_label_set = []
-    data_set = []
-    while index_date < end_date + timeframe:
-        qs = AcademyLead.objects.filter(created__gte=index_date, created__lt=index_date + timeframe)
-        if site:
-            qs = qs.filter(active_campaign_list__site=site)
-        leads = qs.count()
-        sales = qs.filter(sold=True).count()
-        if leads:
-            percentage = sales/leads*100
-        else:
-            percentage = 0
-        data_set.append({
-            'leads':leads,
-            'sales':sales,
-            'percentage':percentage,
-        })
-        if timeframe_label_string == 'months':
-            time_label_set.append(f"{short_month_name(index_date.month)} {str(index_date.year)[2:]} - {short_month_name((index_date + timeframe).month)} {str((index_date + timeframe).year)[2:]}")
-        elif timeframe_label_string == 'month':
-            time_label_set.append(f"{short_month_name(index_date.month)} {str(index_date.year)[2:]}")
-        elif timeframe_label_string == 'week':
-            time_label_set.append(f"{index_date} - {index_date + timeframe}")
-        elif timeframe_label_string == 'day':
-            time_label_set.append(f"{index_date}")
-        index_date = index_date + timeframe
-    return data_set, time_label_set
+    if timeframe < relativedelta.relativedelta(years=3):
+        index_date = start_date
+        time_label_set = []
+        data_set = []
+        while index_date < end_date + timeframe:
+            qs = AcademyLead.objects.filter(created__gte=index_date, created__lt=index_date + timeframe)
+            if site:
+                qs = qs.filter(active_campaign_list__site=site)
+            leads = qs.count()
+            sales = qs.filter(sold=True).count()
+            if leads:
+                percentage = sales/leads*100
+            else:
+                percentage = 0
+            data_set.append({
+                'leads':leads,
+                'sales':sales,
+                'percentage':percentage,
+            })
+            if timeframe_label_string == 'months':
+                time_label_set.append(f"{short_month_name(index_date.month)} {str(index_date.year)[2:]} - {short_month_name((index_date + timeframe).month)} {str((index_date + timeframe).year)[2:]}")
+            elif timeframe_label_string == 'month':
+                time_label_set.append(f"{short_month_name(index_date.month)} {str(index_date.year)[2:]}")
+            elif timeframe_label_string == 'week':
+                time_label_set.append(f"{index_date} - {index_date + timeframe}")
+            elif timeframe_label_string == 'day':
+                time_label_set.append(f"{index_date}")
+            index_date = index_date + timeframe
+        return data_set, time_label_set    
+    return [],[]
     
 def get_bookings_to_leads_between_dates_with_timeframe_differences(start_date, end_date, timeframe, timeframe_label_string='month', site=None):
-    index_date = start_date
-    time_label_set = []
-    data_set = []
-    while index_date < end_date + timeframe:
-        qs = AcademyLead.objects.filter(created__gte=index_date, created__lt=index_date + timeframe)
-        if site:
-            qs = qs.filter(active_campaign_list__site=site)
-        leads = qs.count()
-        booked_leads_count = qs.exclude(booking=None).count()
-        if leads:
-            percentage = booked_leads_count/leads*100
-        else:
-            percentage = 0
-        data_set.append({
-            'leads':leads,
-            'bookings':booked_leads_count,
-            'percentage':percentage,
-        })
-        if timeframe_label_string == 'months':
-            time_label_set.append(f"{short_month_name(index_date.month)} {str(index_date.year)[2:]} - {short_month_name((index_date + timeframe).month)} {str((index_date + timeframe).year)[2:]}")
-        elif timeframe_label_string == 'month':
-            time_label_set.append(f"{short_month_name(index_date.month)} {str(index_date.year)[2:]}")
-        elif timeframe_label_string == 'week':
-            time_label_set.append(f"{index_date} - {index_date + timeframe}")
-        elif timeframe_label_string == 'day':
-            time_label_set.append(f"{index_date}")
-        index_date = index_date + timeframe
-    return data_set, time_label_set
+    if timeframe < relativedelta.relativedelta(years=3):
+        index_date = start_date
+        time_label_set = []
+        data_set = []
+        while index_date < end_date + timeframe:
+            qs = AcademyLead.objects.filter(created__gte=index_date, created__lt=index_date + timeframe)
+            if site:
+                qs = qs.filter(active_campaign_list__site=site)
+            leads = qs.count()
+            booked_leads_count = qs.exclude(booking=None).count()
+            if leads:
+                percentage = booked_leads_count/leads*100
+            else:
+                percentage = 0
+            data_set.append({
+                'leads':leads,
+                'bookings':booked_leads_count,
+                'percentage':percentage,
+            })
+            if timeframe_label_string == 'months':
+                time_label_set.append(f"{short_month_name(index_date.month)} {str(index_date.year)[2:]} - {short_month_name((index_date + timeframe).month)} {str((index_date + timeframe).year)[2:]}")
+            elif timeframe_label_string == 'month':
+                time_label_set.append(f"{short_month_name(index_date.month)} {str(index_date.year)[2:]}")
+            elif timeframe_label_string == 'week':
+                time_label_set.append(f"{index_date} - {index_date + timeframe}")
+            elif timeframe_label_string == 'day':
+                time_label_set.append(f"{index_date}")
+            index_date = index_date + timeframe
+        return data_set, time_label_set    
+    return [],[]
 @login_required
 def get_leads_to_sales(request):
     context = {}
