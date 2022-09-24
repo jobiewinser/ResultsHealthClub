@@ -419,3 +419,7 @@ html ,.content,body {
 .bg-light {
     color:black
 }
+
+.btn-space-with-history {
+    min-width:80px
+}

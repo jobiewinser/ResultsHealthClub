@@ -187,6 +187,7 @@ def mark_sold(request, **kwargs):
         if request.user.is_staff:
             lead = AcademyLead.objects.get(pk=request.POST.get('lead_pk'))
             lead.sold = not lead.sold
+            lead.complete = not lead.complete
             lead.save()
             return render(request, "academy_leads/htmx/academy_lead_row.html", {'lead':lead}) 
     except Exception as e:
