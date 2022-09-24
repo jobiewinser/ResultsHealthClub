@@ -29,36 +29,37 @@ class Webhooks(View):
             if data.get('type') in ['subscribe','update']:
                 if guid:
                     active_campaign_list = ActiveCampaignList.objects.get(guid=guid)
-                    phone_number_whole = str(data.get('contact[phone]', "")).replace('+','').replace(' ','')
-                    if phone_number_whole:
-                        if phone_number_whole[0] == "0":
-                            phone_number = phone_number_whole[1:]
-                            country_code = "44"
-                        elif phone_number_whole[:2] == "44":
-                            phone_number = phone_number_whole[2:]
-                            country_code = "44"
+                    if active_campaign_list.site:
+                        phone_number_whole = str(data.get('contact[phone]', "")).replace('+','').replace(' ','')
+                        if phone_number_whole:
+                            if phone_number_whole[0] == "0":
+                                phone_number = phone_number_whole[1:]
+                                country_code = "44"
+                            elif phone_number_whole[:2] == "44":
+                                phone_number = phone_number_whole[2:]
+                                country_code = "44"
+                            else:
+                                phone_number = phone_number_whole
+                                country_code = "44"
                         else:
-                            phone_number = phone_number_whole
-                            country_code = "44"
-                    else:
-                        phone_number = "None"
-                        country_code = "None"
-                    possible_duplicate  = False
-                    if AcademyLead.objects.filter(
-                            active_campaign_list=active_campaign_list,
-                            active_campaign_contact_id=data.get('contact[id]')
-                        ): 
-                        possible_duplicate  = True
-                    if not possible_duplicate:
-                        AcademyLead.objects.create(
-                            active_campaign_contact_id=data.get('contact[id]'),
-                            first_name=data.get('contact[first_name]', "None"),
-                            phone=phone_number,
-                            country_code=country_code,
-                            active_campaign_list=active_campaign_list,
-                            active_campaign_form_id=data.get('form[id]', None),
-                            possible_duplicate = possible_duplicate
-                        )
+                            phone_number = "None"
+                            country_code = "None"
+                        possible_duplicate  = False
+                        if AcademyLead.objects.filter(
+                                active_campaign_list=active_campaign_list,
+                                active_campaign_contact_id=data.get('contact[id]')
+                            ): 
+                            possible_duplicate  = True
+                        if not possible_duplicate:
+                            AcademyLead.objects.create(
+                                active_campaign_contact_id=data.get('contact[id]'),
+                                first_name=data.get('contact[first_name]', "None"),
+                                phone=phone_number,
+                                country_code=country_code,
+                                active_campaign_list=active_campaign_list,
+                                active_campaign_form_id=data.get('form[id]', None),
+                                possible_duplicate = possible_duplicate
+                            )
             response = HttpResponse("")
             response.status_code = 200             
             return response

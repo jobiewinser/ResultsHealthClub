@@ -7,18 +7,10 @@
     $(document).ready(function() {
         document.body.addEventListener('htmx:afterSwap', function(evt) {  
             if (evt.detail.pathInfo.path.includes("get-leads-to-sale")){
-                {% comment %} initDataTable('leads_to_sale_table'); {% endcomment %}
+                
             }
         });
     });
-    
-    function initDataTable(table_id) {
-        $('#'+table_id).DataTable({
-            "bPaginate": false,
-            "bLengthChange": false,
-            "bFilter": false,
-        });
-    }
 </script>
 {%endblock scripts%}
 

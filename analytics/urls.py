@@ -19,4 +19,6 @@ import analytics.htmx as analyticshtmx
 urlpatterns = [
     path('analytics/', analyticviews.AnalyticsOverviewView.as_view(), name='analytics' ),
     path('get-leads-to-sales/', analyticshtmx.get_leads_to_sales, name='get-leads-to-sales' ),
+    path('get-leads-to-bookings/', analyticshtmx.get_leads_to_bookings, name='get-leads-to-bookings' ),
+    
 ]

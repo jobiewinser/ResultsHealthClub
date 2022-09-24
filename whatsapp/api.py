@@ -20,11 +20,9 @@ class Whatsapp:
     whatsapp_access_token = os.getenv("WHATSAPP_ACCESS_TOKEN")
     whatsapp_url = os.getenv("WHATSAPP_URL")
     whatsapp_app_id = os.getenv("WHATSAPP_APP_ID")
-    whatsapp_user_id = os.getenv("WHATSAPP_USER_ID")
     
     whatsapp_business_id = os.getenv("WHATSAPP_BUSINESS_ID")
     whatsapp_business_account_id = os.getenv("WHATSAPP_BUSINESS_ACCOUNT_ID")
-    # whatsapp_primary_business_phone_number_id = os.getenv("WHATSAPP_PRIMARY_BUSINESS_PHONE_NUMBER_ID")
 
     def _get_headers(self):
         headers = {
