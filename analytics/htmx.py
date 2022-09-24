@@ -10,7 +10,7 @@ from dateutil import relativedelta
 from core.templatetags.core_tags import short_month_name
 
 def get_sales_to_leads_between_dates_with_timeframe_differences(start_date, end_date, timeframe, timeframe_label_string='month', site=None):
-    if timeframe < relativedelta.relativedelta(years=3):
+    if start_date + relativedelta.relativedelta(years=3) > end_date:
         index_date = start_date
         time_label_set = []
         data_set = []
@@ -42,7 +42,7 @@ def get_sales_to_leads_between_dates_with_timeframe_differences(start_date, end_
     return [],[]
     
 def get_bookings_to_leads_between_dates_with_timeframe_differences(start_date, end_date, timeframe, timeframe_label_string='month', site=None):
-    if timeframe < relativedelta.relativedelta(years=3):
+    if start_date + relativedelta.relativedelta(years=3) > end_date:
         index_date = start_date
         time_label_set = []
         data_set = []
