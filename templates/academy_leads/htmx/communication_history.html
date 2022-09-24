@@ -80,6 +80,15 @@
                             {%endfor%}
                         </ul>
                         {%endif%}
+                        {%if communication.whatsappmessage.whatsappmessagestatus_set.all%}
+                        <br>
+                        <b>Message Status:</b>
+                        <ul>
+                            {%for status in communication.whatsappmessage.whatsappmessagestatus_set.all%}
+                            <li><b>{{status.status}}</b> {{status.datetime}} </li>
+                            {%endfor%}
+                        </ul>
+                        {%endif%}
                         " class="double_layer_td">                                
                             <div class="row">   
                                 <div class="col p-0">                     
