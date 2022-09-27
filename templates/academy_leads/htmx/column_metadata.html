@@ -1,0 +1,4 @@
+<span id="column_metadata_{{ counter }}">
+    <span class="secondary_td_layer m-0">{{queryset.count}} Leads</span> <span style="color:rgb(96, 248, 61y)" class="secondary_td_layer">£12,345.12</span>
+    <button hidden hx-get="{% url 'get-leads-column-meta-data' call_count=counter%}" hx-include=".results_table_filters" id="refresh_column_metadata_{{ counter }}" hx-indicator=".top-htmx-indicator" hx-target="#column_metadata_{{ counter }}" hx-trigger="click" hx-swap="outerHTML"></button>
+</span>

@@ -62,6 +62,28 @@ def create_academy_lead(request, **kwargs):
     except Exception as e:
         logger.debug("create_academy_lead Error "+str(e))
         return HttpResponse(e, status=500)
+@login_required
+def get_leads_column_meta_data(request, **kwargs):
+    logger.debug(str(request.user))
+    try:
+        leads = AcademyLead.objects.filter(complete=False, booking=None)
+        active_campaign_list_pk = request.GET.get('active_campaign_list_pk', None)
+        if active_campaign_list_pk:
+            leads = leads.filter(active_campaign_list=ActiveCampaignList.objects.get(pk=active_campaign_list_pk))
+            # request.GET['active_campaign_list_pk'] = active_campaign_list_pk
+        site_pk = get_site_pk_from_request(request)
+        if site_pk and not site_pk == 'all':
+            leads = leads.filter(active_campaign_list__site__pk=site_pk)
+            # request.GET['site_pk'] = site_pk 
+
+
+        call_count = int(kwargs.get('call_count'))
+
+        leads = leads.annotate(calls=Count('communication', filter=Q(communication__type='a'))).filter(calls=call_count)
+        return render(request, 'academy_leads/htmx/column_metadata.html', {'queryset':leads, 'counter':call_count})
+    except Exception as e:
+        logger.debug("get_leads_column_meta_data Error "+str(e))
+        return HttpResponse(e, status=500)
 
 @login_required
 def log_communication(request, **kwargs):

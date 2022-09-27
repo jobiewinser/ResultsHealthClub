@@ -122,6 +122,8 @@ def get_active_campaign_lists(request, **kwargs):
         get_and_generate_active_campaign_list_objects()
         return render(request, f"active_campaign/htmx/active_campaign_lists_select.html", 
         {'active_campaign_lists':get_active_campaign_list_qs(request)})
+    return render(request, f"active_campaign/htmx/active_campaign_lists_select.html", 
+    {'active_campaign_lists':get_active_campaign_list_qs(request)})
 @login_required
 def set_active_campaign_lists_site(request, **kwargs):
     # try:

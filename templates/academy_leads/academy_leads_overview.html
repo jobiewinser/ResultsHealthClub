@@ -31,6 +31,9 @@
                 } else if (evt.detail.pathInfo.path.includes("academy-booking-overview")){
                     $('#refresh_campaign_list_span').click(); 
                     snackbarShow('Successfully refreshed table', 'success')
+                } else if (evt.detail.pathInfo.path.includes("new-call")){
+                    $('#refresh_campaign_list_span').click(); 
+                    snackbarShow('Successfully refreshed table', 'success')
                 }                
             }
             if ($('#noteTable')){
@@ -101,7 +104,9 @@
                     <div class="column column-done" data-call-count="{{ forloop.counter0 }}" ondrop="drop(event)" ondragover="allowDrop(event)">
                         <div class="m-2">
                         <h2 class="m-0">{{queryset_title}}</h2>
-                        <span class="secondary_td_layer m-0">{{queryset.count}} Leads</span> <span style="color:rgb(96, 248, 61y)" class="secondary_td_layer">£12,345.12</span>
+                        {%with forloop.counter0 as counter%}
+                        {%include 'academy_leads/htmx/column_metadata.html'%}
+                        {%endwith%}
                         </div>
                         {%for lead in queryset%}
                         {%include 'academy_leads/htmx/lead_article.html'%}

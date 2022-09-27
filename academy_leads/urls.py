@@ -28,6 +28,7 @@ urlpatterns = [
     path('new-call/<int:lead_pk>/<int:call_count>/', academyleadshtmx.new_call, name='new-call' ),
     path('delete-lead/', academyleadshtmx.delete_lead, name='delete-lead' ),
     
+    path('get-leads-column-meta-data/<str:call_count>/', academyleadshtmx.get_leads_column_meta_data, name='get-leads-column-meta-data' ),
     path('create-academy-lead/', academyleadshtmx.create_academy_lead, name='create-academy-lead' ),
     path('log-communication/', academyleadshtmx.log_communication, name='log-communication' ),
     path('add-booking/', academyleadshtmx.add_booking, name='add-booking' ),
