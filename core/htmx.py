@@ -26,7 +26,7 @@ def switch_user(request, **kwargs):
                 user_pk = user_pk[0]
             logger.debug(f"TEST {str(user_pk)}")
             login(request, User.objects.get(pk=user_pk))
-            return render(request, f"core/htmx/profile_dropdown.html", {})   
+            return render(request, f"core/htmx/profile-nav-section.html", {})   
     except Exception as e:
         logger.debug("switch_user Error "+str(e))
         return HttpResponse(e, status=500)
@@ -42,7 +42,7 @@ def get_modal_content(request, **kwargs):
             template_name = request.GET.get('template_name', '')
             context = {'site_list':Site.objects.all()}
             if template_name == 'switch_user':
-                context['staff_users'] = User.objects.filter(is_staff=True).order_by('first_name')
+                context['users'] = User.objects.filter(is_staff=True).order_by('first_name')
             elif template_name == 'edit_user':
                 user_pk = request.GET.get('user_pk', None)
                 if user_pk:
@@ -90,7 +90,7 @@ class ModifyUser(View):
                         profile.site=Site.objects.get(pk=site_pk)
                     profile.save()   
 
-                return render(request, f"academy_leads/htmx/switch_user.html", {'staff_users': User.objects.filter(is_staff=True).order_by('first_name')})   
+                return render(request, "core/htmx/profile-nav-section.html", {'user':User.objects.get(pk=user.pk)})   
         except Exception as e:
             logger.debug("ModifyUser Post Error "+str(e))
             return HttpResponse(e, status=500)

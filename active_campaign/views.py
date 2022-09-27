@@ -12,6 +12,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.db.models import OuterRef, Subquery, Count
+from django.conf import settings
 @method_decorator(csrf_exempt, name="dispatch")
 class Webhooks(View):
     def get(self, request, *args, **kwargs):
@@ -117,9 +118,12 @@ def get_active_campaign_list_qs(request):
 @login_required
 def get_active_campaign_lists(request, **kwargs):
     # try:
+    if not settings.DEBUG:
         get_and_generate_active_campaign_list_objects()
         return render(request, f"active_campaign/htmx/active_campaign_lists_select.html", 
         {'active_campaign_lists':get_active_campaign_list_qs(request)})
+    return render(request, f"active_campaign/htmx/active_campaign_lists_select.html", 
+    {'active_campaign_lists':get_active_campaign_list_qs(request)})
 @login_required
 def set_active_campaign_lists_site(request, **kwargs):
     # try:

@@ -1,0 +1,23 @@
+<input type="text" style="display:None" id="edit_user" name="template_name" value="edit_user"/>
+<input type="text" style="display:None" id="switch_user" name="template_name" value="switch_user"/>
+<input type="text" style="display:None" id="user-select-{{user.pk}}" name="user_pk" value="{{user.pk}}"/>
+<a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+    <img src="/media/{{user.profile.avatar}}" alt="" width="32" height="32" class="rounded-circle me-2">
+    <strong>{{user.profile}}</strong>
+</a>
+<ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
+    <li><a class="dropdown-item" href="#"hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" hx-include="#switch_user"
+        hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
+        hx-swap="innerHTML" hx-trigger="click">Switch Profile</a>
+    </li>
+    <li><a class="dropdown-item" href="#"
+        hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" hx-include="#edit_user,#user-select-{{user.pk}}"
+        hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
+        hx-swap="innerHTML" hx-trigger="click">Edit Profile</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="/accounts/logout/">Sign out fdsa</a></li>
+</ul>
+
+<span id="csrf_token_div">
+    <input type="text" style="display:None" id="csrf_token" name="csrf_token" value="{{csrf_token}}"/>
+</span>

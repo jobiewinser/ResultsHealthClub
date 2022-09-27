@@ -2,20 +2,20 @@
 <span>
     <div class="row">
         <div class="col center">          
-            <select class="form-select academy_leads_inputs" name="site_pk">
+            <select class="form-select academy_bookings_inputs" name="site_pk">
                 {%for site in site_list%}
                 <option {%if site.pk == request.GET.site_pk|str_to_int %}selected{%endif%} value="{{site.pk}}">{{site.name}}</option>
                 {%endfor%}
             </select>
             <br>
             
-            <input name="first_name" id="academy_first_name" class="form-control academy_leads_inputs" placeholder="Customer First Name"/>
+            <input name="first_name" id="academy_first_name" class="form-control academy_bookings_inputs" placeholder="Customer First Name"/>
             <br>          
-            {% comment %} <input name="last_name" id="academy_last_name" class="form-control academy_leads_inputs" placeholder="Customer Last Name"/>
+            {% comment %} <input name="last_name" id="academy_last_name" class="form-control academy_bookings_inputs" placeholder="Customer Last Name"/>
             <br>    {% endcomment %}
             <div class="row">
                 <div class="col-md-auto">
-                    <select name="countryCode" class="form-select academy_leads_inputs" id="academy_phone_extension">
+                    <select name="countryCode" class="form-select academy_bookings_inputs" id="academy_phone_extension">
                         <option data-countryCode="GB" value="44" Selected>UK (+44)</option>
                         <option data-countryCode="US" value="1">USA (+1)</option>
                         <optgroup label="Other countries">
@@ -237,7 +237,7 @@
                     </select>   
                 </div>
                 <div class="col">
-                    <input name="phone" id="academy_phone" class="form-control academy_leads_inputs" placeholder="Customer Phone Number"/>
+                    <input name="phone" id="academy_phone" class="form-control academy_bookings_inputs" placeholder="Customer Phone Number"/>
                 </div>
             </div> 
             <br>
@@ -247,7 +247,7 @@
     <div class="row">
         <div class="col center">
             <button class="btn btn-success"
-                hx-include=".academy_leads_inputs"
+                hx-include=".academy_bookings_inputs"
                 hx-post="{% url 'create-academy-lead' %}" 
                 hx-push-url="false"
                 hx-swap="outerHTML" hx-trigger="click">

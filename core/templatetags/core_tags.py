@@ -7,6 +7,11 @@ import calendar
 from dateutil import relativedelta
 register = template.Library()
 
+import math
+
+def roundup(x, round_target):
+    return int(int(math.ceil(x / round_target)) * round_target)
+
 @register.filter
 def month_name(month_number):
     return calendar.month_name[month_number]
@@ -24,20 +29,29 @@ def get_env_var(key):
     return os.environ.get(key)
     
 @register.filter
-def percentage_to_colour(percentage, opacity=1):
-    percentage = int(percentage or 0)
-    opacity = str(opacity)
-    if percentage > 84:
-        return f'rgba(96, 248, 61, {opacity})'
-    elif percentage > 60:
-        return f'rgba(156, 250, 64, {opacity})'
-    elif percentage > 36:
-        return f'rgba(255, 253, 70, {opacity})'
-    elif percentage > 12:
-        return f'rgba(239, 131, 44, {opacity})'
-    else:
-        return f'rgba(231, 36, 29, {opacity})'
+def roundup_tag(number, round_target):
+    try:
+        return roundup(float(number), float(round_target))
+    except:
+        return ""
 
+@register.filter
+def percentage_to_colour(percentage, opacity=1):
+    try:
+        percentage = int(percentage or 0)
+        opacity = str(opacity)
+        if percentage > 84:
+            return f'rgba(96, 248, 61, {opacity})'
+        elif percentage > 60:
+            return f'rgba(156, 250, 64, {opacity})'
+        elif percentage > 36:
+            return f'rgba(255, 253, 70, {opacity})'
+        elif percentage > 12:
+            return f'rgba(239, 131, 44, {opacity})'
+        else:
+            return f'rgba(231, 36, 29, {opacity})'
+    except:
+        return f'rgba(231, 36, 29, {opacity})'
     #e7241d for v <= 12%
 #ef832c for v > 12% and v <= 36%
 #fffd46 for v > 36% and v <= 60%
@@ -90,6 +104,29 @@ def str_to_int(value):
         return int(value)
     except:
         return value
+
+@register.filter
+def division_percentage(num, divider):  
+    try:
+        return (int(num) / int(divider)) * 100
+    except Exception as e:
+        return 0
+@register.filter
+def division_percentage_max_100(num, divider):  
+    try:
+        total = (int(num) / int(divider)) * 100
+        if total < 100:
+            return total
+        return 100
+    except Exception as e:
+        return 0
+        
+@register.filter
+def division(num, divider):  
+    try:
+        return int(num) / int(divider)
+    except Exception as e:
+        return 0
 
 @register.filter
 def add_year(date, x):  

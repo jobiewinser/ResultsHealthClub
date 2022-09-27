@@ -1,0 +1,57 @@
+.board {
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+}
+
+.draggable-card {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 250px;
+    height: 120px;
+    cursor: grab;
+    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.card:active {
+    cursor: grabbing;
+}
+
+.card.dragging {
+    opacity: .5;
+    transform: scale(.8);
+}
+
+.column {
+    margin: 10px;
+    padding: 10px;
+    background: unset;
+    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    width:250px
+}
+
+.column.column-ip {
+    margin: 0 20px;
+}
+
+.column.drop article {
+    pointer-events: none;
+}
+
+h3 {
+    font-size: 21px;
+    font-family: Helvetica;
+    margin: 0;
+}
+
+.card:last-child {
+    margin-bottom: 0;
+}
+
+h2 {
+    /* margin: -10px -10px; */
+    font-family: Helvetica;
+    font-size: 21px;
+}

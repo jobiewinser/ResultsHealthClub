@@ -6,7 +6,7 @@
     $(document).ready(function() {
         initDataTable();
         document.body.addEventListener('htmx:beforeRequest', function(evt) {  
-            if (evt.detail.target.id == 'results_table' || evt.detail.pathInfo.path.includes("academy-leads-overview")){
+            if (evt.detail.target.id == 'results_table' || evt.detail.pathInfo.path.includes("academy-booking-overview")){
                 $("#results_table").dataTable().fnDestroy();
             }
         });
@@ -18,7 +18,7 @@
                 $('#generic_modal').modal('hide');
                 snackbarShow('Successfully modifed/added user', 'success')
             }            
-            {% comment %} if (evt.detail.target.classList.contains('academy_lead_row')) {
+            {% comment %} if (evt.detail.target.classList.contains('academy_booking_row')) {
                 $('#refresh_results_table').click(); 
             } {% endcomment %}
             

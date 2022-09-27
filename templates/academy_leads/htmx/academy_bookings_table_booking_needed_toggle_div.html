@@ -4,7 +4,7 @@
 <div hx-swap-oob="true" class="col-md-auto" id="swap_booking_needed_button">
     <button class="btn btn-success btn-sm nowrap"
         hx-indicator=".top-htmx-indicator" hx-target="#results_table" 
-        hx-get="{% url 'academy-leads-overview' %}" 
+        hx-get="{% url 'academy-booking-overview' %}" 
         hx-push-url="true"
         {% comment %} hx-swap="outerHTML" hx-include=".results_table_filters:not(#current_booking_needed),#change_booking_needed" hx-trigger="click"><i class="fa fa-book-open-cover" aria-hidden="true"></i> Show Booked & Non-Booked</button>       {% endcomment %}
         hx-swap="outerHTML" hx-include=".results_table_filters:not(#current_booking_needed),#change_booking_needed" hx-trigger="click"><i class="fa fa-book-open-cover" aria-hidden="true"></i> Show Non-Booked <span class="badge bg-light bg-light-border">{{booking_needed_count}}</span></button>      
@@ -15,7 +15,7 @@
 <div hx-swap-oob="true" class="col-md-auto" id="swap_booking_needed_button">
     <button class="btn btn-light bg-light-border btn-sm nowrap"
         hx-indicator=".top-htmx-indicator" hx-target="#results_table" 
-        hx-get="{% url 'academy-leads-overview' %}" 
+        hx-get="{% url 'academy-booking-overview' %}" 
         hx-push-url="true"
         hx-swap="outerHTML" hx-include=".results_table_filters:not(#current_booking_needed),#change_booking_needed" hx-trigger="click"><i class="fa fa-book-open-cover" aria-hidden="true"></i> Show Non-Booked <span class="badge bg-primary">{{booking_needed_count}}</span></button>
         <input type="text" style="display:None" id="current_booking_needed" class="results_table_filters non_site_dependant_results_table_filters" name="booking_needed" value="false"/>
