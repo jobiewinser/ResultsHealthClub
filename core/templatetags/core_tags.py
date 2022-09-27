@@ -127,6 +127,13 @@ def division(num, divider):
         return int(num) / int(divider)
     except Exception as e:
         return 0
+        
+@register.filter
+def multiplication(num1, num2):  
+    try:
+        return int(num1) * int(num2)
+    except Exception as e:
+        return 0
 
 @register.filter
 def add_year(date, x):  

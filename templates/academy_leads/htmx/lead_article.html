@@ -8,17 +8,12 @@
                 <span class="primary_td_layer">{{lead.name}}</span>
             </div>
             <div class="col-md-auto p-0">
-                <span style="color:rgb(96, 248, 61y)" class="secondary_td_layer">£123</span>
+                <span style="color:rgb(96, 248, 61y)" class="secondary_td_layer">£190</span>
             </div>
         </div>
 
         <span class="secondary_td_layer">{{lead.active_campaign_list.name}}</span><br>
-        <span class="secondary_td_layer"><a 
-            data-bs-toggle="popover" 
-            data-bs-trigger="hover" 
-            data-bs-placement="top"
-            data-bs-content="Click to open this number in whatsapp"
-            style="text-decoration: none; color: #25d366" class="nowrap" target="_blank" href="whatsapp://send?phone={{lead.country_code}}{{lead.phone}}"><i class="fa fa-whatsapp" aria-hidden="true"></i> +{{lead.country_code}} {{lead.phone}}</a></span>
+        <span class="secondary_td_layer"><i class="fa fa-whatsapp" aria-hidden="true"></i> +{{lead.country_code}} {{lead.phone}}</span>
     </article>
     {%endwith%}
 </span>
