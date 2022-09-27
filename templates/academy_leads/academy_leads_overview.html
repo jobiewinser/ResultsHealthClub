@@ -11,8 +11,9 @@
         document.body.addEventListener('htmx:afterSwap', function(evt) {   
             if (evt.detail.xhr.status == 200){
                 if (evt.detail.pathInfo.path.includes("create-academy-lead")){
-                    $('#refresh_results_table').click(); 
+                    {% comment %} $('#refresh_results_table').click();  {% endcomment %}
                     $('#generic_modal').modal('hide');
+                    $('#refresh_column_metadata').click()
                     snackbarShow('Successfully manually created an academy lead', 'success')
                 } else if (evt.detail.pathInfo.path.includes("new-call")){
                     $('#refresh_column_metadata').click()

@@ -110,50 +110,50 @@
         <div class="d-flex" id="wrapper">
             <!-- Sidebar-->
             {%block navbar%}
-            <div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark side_nav" style="width:250px">
-                <a href="{%url 'default'%}" class="d-flex align-items-center pb-3 mb-3 link-light text-decoration-none border-bottom">
-                    <img src="{% static 'img/logo_white.png' %}" height="120px" style="object-fit: cover;">
-                </a>
-                <ul class="nav nav-pills flex-column mb-auto">
-                  <li class="mb-1">
-                    <button class="btn btn-toggle align-items-center rounded collapsed {%if 'academy-leads' in request.path or request.path == '/'%} active{%endif%}" data-bs-toggle="collapse" data-bs-target="#home-collapse" {%if 'academy-leads' in request.path or request.path == '/'%} aria-expanded="true"{%endif%}>
-                      Academy Leads
-                    </button>
-                    <div class="collapse {%if 'academy-leads' in request.path or request.path == '/'%} active show{%endif%}" id="home-collapse">
-                      <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                        <li><a href="{%url 'academy-leads-overview'%}" class="link-light rounded {%if 'academy-leads/leads-and-calls' in request.path or request.path == '/'%} active{%endif%}">Leads & Calls</a></li>
-                        <li><a href="{%url 'academy-booking-overview'%}" class="link-light rounded {%if 'academy-leads/booking-and-calender' in request.path%} active{%endif%}">Booking & Calender</a></li>
-                      </ul>
-                    </div>
-                  </li>
-                  <li class="mb-1">
-                    <button class="btn btn-toggle align-items-center rounded {%if 'free-tasters' in request.path%} active{%endif%}" data-bs-toggle="collapse" data-bs-target="#dashboard-collapse" {%if 'free-tasters' in request.path%} aria-expanded="true"{%endif%}>
-                      Free Tasters
-                    </button>
-                    <div class="collapse {%if 'free-tasters' in request.path%} active show{%endif%}" id="dashboard-collapse" style="">
-                      <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                        <li><a href="{%url 'free-taster'%}" class="link-light rounded {%if 'free-tasters/overview' in request.path%} active{%endif%}">Overview</a></li>
-                      </ul>
-                    </div>
-                  </li>
-                  <hr>
-                  <li class="mb-1">
-                    <button class="btn btn-toggle align-items-center rounded collapsed {%if 'configuration' in request.path%} active{%endif%}" data-bs-toggle="collapse" data-bs-target="#account-collapse" {%if 'configuration' in request.path%} aria-expanded="true"{%endif%}>
-                      Configuration
-                    </button>
-                    <div class="collapse {%if 'configuration' in request.path%} active show{%endif%}" id="account-collapse">
-                      <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                        <li><a href="{% url 'whatsapp-templates' %}" class="link-light rounded {%if 'configuration/whatsapp-templates' in request.path%} active{%endif%}">Whatsapp Templates</a></li>
-                        <li><a href="{% url 'lead-configuration' %}" class="link-light rounded {%if 'configuration/lead-configuration' in request.path%} active{%endif%}">Lead Configuration</a></li>
-                      </ul>
-                    </div>
-                  </li>
-                </ul>
+            <div class="d-flex flex-column bg-dark flex-shrink-0 p-3 text-white side_nav" style="">
+              <a href="{%url 'default'%}" class="d-flex align-items-center pb-3 mb-3 link-light text-decoration-none border-bottom">
+                  <img src="{% static 'img/logo_white.png' %}" height="120px" style="object-fit: cover;">
+              </a>
+              <ul class="nav nav-pills flex-column mb-auto">
+                <li class="mb-1">
+                  <button class="btn btn-toggle align-items-center rounded collapsed {%if 'academy-leads' in request.path or request.path == '/'%} active{%endif%}" data-bs-toggle="collapse" data-bs-target="#home-collapse" {%if 'academy-leads' in request.path or request.path == '/'%} aria-expanded="true"{%endif%}>
+                    Academy Leads
+                  </button>
+                  <div class="collapse {%if 'academy-leads' in request.path or request.path == '/'%} active show{%endif%}" id="home-collapse">
+                    <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                      <li><a href="{%url 'academy-leads-overview'%}" class="link-light rounded {%if 'academy-leads/leads-and-calls' in request.path or request.path == '/'%} active{%endif%}">Leads & Calls</a></li>
+                      <li><a href="{%url 'academy-booking-overview'%}" class="link-light rounded {%if 'academy-leads/booking-and-calender' in request.path%} active{%endif%}">Booking & Calender</a></li>
+                    </ul>
+                  </div>
+                </li>
+                <li class="mb-1">
+                  <button class="btn btn-toggle align-items-center rounded {%if 'free-tasters' in request.path%} active{%endif%}" data-bs-toggle="collapse" data-bs-target="#dashboard-collapse" {%if 'free-tasters' in request.path%} aria-expanded="true"{%endif%}>
+                    Free Tasters
+                  </button>
+                  <div class="collapse {%if 'free-tasters' in request.path%} active show{%endif%}" id="dashboard-collapse" style="">
+                    <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                      <li><a href="{%url 'free-taster'%}" class="link-light rounded {%if 'free-tasters/overview' in request.path%} active{%endif%}">Overview</a></li>
+                    </ul>
+                  </div>
+                </li>
                 <hr>
-                <div class="dropdown" id="profile-nav-section">
-                    {%include 'core/htmx/profile-nav-section.html'%}
-                </div>
+                <li class="mb-1">
+                  <button class="btn btn-toggle align-items-center rounded collapsed {%if 'configuration' in request.path%} active{%endif%}" data-bs-toggle="collapse" data-bs-target="#account-collapse" {%if 'configuration' in request.path%} aria-expanded="true"{%endif%}>
+                    Configuration
+                  </button>
+                  <div class="collapse {%if 'configuration' in request.path%} active show{%endif%}" id="account-collapse">
+                    <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                      <li><a href="{% url 'whatsapp-templates' %}" class="link-light rounded {%if 'configuration/whatsapp-templates' in request.path%} active{%endif%}">Whatsapp Templates</a></li>
+                      <li><a href="{% url 'lead-configuration' %}" class="link-light rounded {%if 'configuration/lead-configuration' in request.path%} active{%endif%}">Lead Configuration</a></li>
+                    </ul>
+                  </div>
+                </li>
+              </ul>
+              <hr>
+              <div class="dropdown" id="profile-nav-section">
+                  {%include 'core/htmx/profile-nav-section.html'%}
               </div>
+            </div>
             {%endblock navbar%}
             <!-- Page content wrapper-->
             <div id="page-content-wrapper" class="col">

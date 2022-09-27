@@ -250,7 +250,8 @@
                 hx-include=".academy_bookings_inputs"
                 hx-post="{% url 'create-academy-lead' %}" 
                 hx-push-url="false"
-                hx-swap="outerHTML" hx-trigger="click">
+                hx-target=".manually_add_lead_div"
+                hx-swap="afterend" hx-trigger="click">
                     <i class="fa-solid fa-link" aria-hidden="true"></i> Generate Academy Lead
             </button>
         </div>

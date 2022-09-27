@@ -51,14 +51,14 @@ def create_academy_lead(request, **kwargs):
         country_code = request.POST.get('countryCode')
         site = Site.objects.get(pk=request.POST.get('site_pk'))
         manually_created_list = ActiveCampaignList.objects.get(site=site, manual=True)
-        AcademyLead.objects.create(
+        lead = AcademyLead.objects.create(
             first_name=first_name,
             # last_name=last_name,
             phone=phone,
             country_code=country_code,
             active_campaign_list=manually_created_list
         )
-        return HttpResponse("<span></span>", status=200)
+        return render(request, 'academy_leads/htmx/lead_article.html', {'lead':lead,'max_call_count':1,'call_count':0})
     except Exception as e:
         logger.debug("create_academy_lead Error "+str(e))
         return HttpResponse(e, status=500)
