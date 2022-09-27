@@ -51,7 +51,10 @@
         <div class="row">
             {%block extra_top_left_buttons %}
             {%include 'core/htmx/site_selection.html'%}
-            <button hidden hx-get="{% url 'academy-leads-overview' %}" hx-push-url="true" hx-swap="outerHTML" hx-include=".results_table_filters" hx-indicator=".top-htmx-indicator" hx-target="#results_table" id="change_site" class="btn btn-primary btn-sm"></button>
+            <button hidden hx-get="{{request.path}}" hx-push-url="true" hx-swap="outerHTML" hx-include=".results_table_filters" hx-indicator=".top-htmx-indicator" hx-target="#leads_board" id="change_site" class="btn btn-primary btn-sm"></button>
+            <button hidden
+                hx-get="{{request.path}}" 
+                hx-swap="outerHTML" hx-push-url="true" hx-include=".results_table_filters" hx-indicator=".top-htmx-indicator" hx-target="#leads_board" id="filter_active_campaign_list" class="btn btn-primary btn-sm"></button>
             <div class="col-md-auto" hx-get="{% url 'get-active-campaign-lists'%}" hx-include=".results_table_filters" hx-trigger="load" hx-indicator=".top-htmx-indicator" hx-target="#campaign_list_span" hx-swap="outerHTML">
                 <span id="campaign_list_span">   
                     <select class="form-select">
@@ -62,9 +65,6 @@
             <button hidden hx-get="{% url 'get-active-campaign-lists'%}" hx-include=".results_table_filters" id="refresh_campaign_list_span" hx-indicator=".top-htmx-indicator" hx-target="#campaign_list_span" hx-trigger="click" hx-swap="outerHTML"></button>
             <button hidden hx-get="{% url 'academy-leads-overview'%}" hx-include=".results_table_filters" id="refresh_results_table" hx-indicator=".top-htmx-indicator" hx-target="#results_table" hx-trigger="click" hx-swap="outerHTML"></button>
             {%endblock%}
-            <div class="col">                
-            </div>
-            {%block extra_top_right_buttons %}
             <div class="col-md-auto">
                 <button class="btn btn-primary btn-sm" 
                     data-bs-toggle="popover" 
@@ -80,17 +80,15 @@
                 </button>
                 <input type="text" style="display:None" id="create_academy_lead" name="template_name" value="create_academy_lead"/>
             </div>
+            <div class="col">                
+            </div>
+            {%block extra_top_right_buttons %}
             {%endblock%}
         </div>
         <div class="row">
             <div class="col-md-auto">
-                
-                <main id="leads_board" class="board">
-                    <button hidden hx-get="{% url 'get-leads-column-meta-data'%}" hx-include=".results_table_filters" id="refresh_column_metadata" hx-indicator=".column-htmx-indicator" hx-target="#column_metadata_0" hx-trigger="click" hx-swap="outerHTML"></button>
-                    <button hidden hx-get="{% url "new-leads-column" %}" hx-include="#max_call_count" id="add_column" hx-indicator=".column-htmx-indicator" hx-target="#leads_board" hx-trigger="click" hx-swap="beforeend"></button>
-                    {%include 'academy_leads/htmx/lead_columns.html' %}
-                </div>
-            </main>
+                {%include 'academy_leads/htmx/leads_board.html' %}
+            </div>
 
             <div class="col">
             </div>

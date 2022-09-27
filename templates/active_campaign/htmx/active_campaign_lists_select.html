@@ -4,9 +4,10 @@
         <option value="">Show all campaigns for this site</option>
         {%for active_campaign_list in active_campaign_lists%}
         {%if active_campaign_list.get_active_leads_qs.count%}
-            <option {%if request.GET.active_campaign_list_pk|str_to_int == active_campaign_list.pk%}selected{%endif%} value="{{active_campaign_list.pk}}">{{active_campaign_list.name}} ({{active_campaign_list.get_active_leads_qs.count}} active)</option>
+            <option {%if request.GET.active_campaign_list_pk|str_to_int == active_campaign_list.pk%}selected{%endif%} value="{{active_campaign_list.pk}}">{{active_campaign_list.name}}
+                 {% comment %} ({{active_campaign_list.get_active_leads_qs.count}} active) {% endcomment %}
+                </option>
         {%endif%}
         {%endfor%}
     </select>
-    <button hidden hx-get="{% url 'academy-booking-overview' %}" hx-swap="outerHTML" hx-push-url="true" hx-include=".results_table_filters" hx-indicator=".top-htmx-indicator" hx-target="#results_table" id="filter_active_campaign_list" class="btn btn-primary btn-sm"></button>
 </span>

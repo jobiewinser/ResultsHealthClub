@@ -49,15 +49,18 @@
 
 {%block extra_top_left_buttons %}
 <button hidden hx-get="{% url 'academy-booking-overview' %}" hx-push-url="true" hx-swap="outerHTML" hx-include=".non_site_dependant_results_table_filters" hx-indicator=".top-htmx-indicator" hx-target="#results_table" id="change_site" class="btn btn-primary btn-sm"></button>
+<button hidden
+hx-get="{{request.path}}" 
+hx-swap="outerHTML" hx-push-url="true" hx-include=".results_table_filters" hx-indicator=".top-htmx-indicator" hx-target="#results_table" id="filter_active_campaign_list" class="btn btn-primary btn-sm"></button>
 {{block.super}}
-<div class="col-md-auto" hx-get="{% url 'get-active-campaign-lists'%}" hx-include=".results_table_filters" hx-trigger="load" hx-indicator=".top-htmx-indicator" hx-target="#campaign_list_span" hx-swap="outerHTML">
-    <span id="campaign_list_span">   
+<div class="col-md-auto" id="campaign_list_div">
+    <span id="campaign_list_span" hx-get="{% url 'get-active-campaign-lists'%}" hx-include=".results_table_filters" hx-trigger="load" hx-indicator=".top-htmx-indicator" hx-target="#campaign_list_span" hx-swap="outerHTML">   
         <select class="form-select">
             <option>Loading</option>
         </select>    
     </span>
 </div>
-<button hidden hx-get="{% url 'get-active-campaign-lists'%}" hx-include=".results_table_filters" id="refresh_campaign_list_span" hx-indicator=".top-htmx-indicator" hx-target="#campaign_list_span" hx-trigger="click" hx-swap="outerHTML"></button>
+<button hidden hx-get="{% url 'get-active-campaign-lists'%}" hx-include=".results_table_filters" id="refresh_campaign_list_span" hx-indicator=".top-htmx-indicator" hx-target="#campaign_list_div" hx-trigger="click" hx-swap="innerHTML"></button>
 <button hidden hx-get="{% url 'academy-booking-overview'%}" hx-include=".results_table_filters" id="refresh_results_table" hx-indicator=".top-htmx-indicator" hx-target="#results_table" hx-trigger="click" hx-swap="outerHTML"></button>
 {%endblock%}
 

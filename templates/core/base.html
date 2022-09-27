@@ -1,4 +1,4 @@
-{%load static%}
+{%load static core_tags%}
 <!DOCTYPE html>
 <html>
     <head>
@@ -76,9 +76,12 @@
                         }
                         if (evt.detail.pathInfo.path.includes("switch-user")){
                             $('#generic_modal').modal('hide');
-                            snackbarShow('Successfully switched user', 'success')
+                            snackbarShow('Successfully switched profile', 'success')
+                        } else if (evt.detail.pathInfo.path.includes("modify-user")){
+                            $('#generic_modal').modal('hide');
+                            snackbarShow('Successfully modified a profile', 'success')
                         }
-
+                        
                         if (evt.detail.xhr.status == 200){
                         } else {
                             snackbarShow(evt.detail.xhr.responseText, 'danger')
@@ -108,17 +111,17 @@
             <!-- Sidebar-->
             {%block navbar%}
             <div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark side_nav" style="width:250px">
-                <a href="/" class="d-flex align-items-center pb-3 mb-3 link-light text-decoration-none border-bottom">
+                <a href="{%url 'default'%}" class="d-flex align-items-center pb-3 mb-3 link-light text-decoration-none border-bottom">
                     <img src="{% static 'img/logo_white.png' %}" height="120px" style="object-fit: cover;">
                 </a>
                 <ul class="nav nav-pills flex-column mb-auto">
                   <li class="mb-1">
-                    <button class="btn btn-toggle align-items-center rounded collapsed {%if 'academy-leads' in request.path%} active{%endif%}" data-bs-toggle="collapse" data-bs-target="#home-collapse" {%if 'academy-leads' in request.path%} aria-expanded="true"{%endif%}>
+                    <button class="btn btn-toggle align-items-center rounded collapsed {%if 'academy-leads' in request.path or request.path == '/'%} active{%endif%}" data-bs-toggle="collapse" data-bs-target="#home-collapse" {%if 'academy-leads' in request.path or request.path == '/'%} aria-expanded="true"{%endif%}>
                       Academy Leads
                     </button>
-                    <div class="collapse {%if 'academy-leads' in request.path%} active show{%endif%}" id="home-collapse">
+                    <div class="collapse {%if 'academy-leads' in request.path or request.path == '/'%} active show{%endif%}" id="home-collapse">
                       <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                        <li><a href="{%url 'academy-leads-overview'%}" class="link-light rounded {%if 'academy-leads/leads-and-calls' in request.path%} active{%endif%}">Leads & Calls</a></li>
+                        <li><a href="{%url 'academy-leads-overview'%}" class="link-light rounded {%if 'academy-leads/leads-and-calls' in request.path or request.path == '/'%} active{%endif%}">Leads & Calls</a></li>
                         <li><a href="{%url 'academy-booking-overview'%}" class="link-light rounded {%if 'academy-leads/booking-and-calender' in request.path%} active{%endif%}">Booking & Calender</a></li>
                       </ul>
                     </div>
@@ -153,7 +156,7 @@
               </div>
             {%endblock navbar%}
             <!-- Page content wrapper-->
-            <div id="page-content-wrapper">
+            <div id="page-content-wrapper" class="col">
                 <!-- Page content-->
                 <div class="container-fluid">
                     <div class="content">

@@ -90,7 +90,7 @@ class ModifyUser(View):
                         profile.site=Site.objects.get(pk=site_pk)
                     profile.save()   
 
-                return render(request, "core/htmx/profile-nav-section.html", {'user':request.user})   
+                return render(request, "core/htmx/profile-nav-section.html", {'user':User.objects.get(pk=user.pk)})   
         except Exception as e:
             logger.debug("ModifyUser Post Error "+str(e))
             return HttpResponse(e, status=500)

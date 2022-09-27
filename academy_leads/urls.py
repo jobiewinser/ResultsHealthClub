@@ -17,8 +17,8 @@ from django.urls import path
 import academy_leads.views as academyleadsviews
 import academy_leads.htmx as academyleadshtmx
 urlpatterns = [
-    path('', academyleadsviews.AcademyBookingsOverviewView.as_view(), name='academy-booking-overview'),
     path('academy-leads/booking-and-calender/', academyleadsviews.AcademyBookingsOverviewView.as_view(), name='academy-booking-overview'),
+    path('', academyleadsviews.AcademyLeadsOverviewView.as_view(), name='default'),
     path('academy-leads/leads-and-calls/', academyleadsviews.AcademyLeadsOverviewView.as_view(), name='academy-leads-overview'),    
     path('configuration/whatsapp-templates/', academyleadsviews.WhatsappTemplatesView.as_view(), name='whatsapp-templates'),
     path('configuration/lead-configuration/', academyleadsviews.LeadConfigurationView.as_view(), name='lead-configuration'),

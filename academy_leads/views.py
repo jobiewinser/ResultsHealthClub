@@ -37,9 +37,10 @@ class AcademyLeadsOverviewView(TemplateView):
 
     def get_context_data(self, **kwargs):
         self.request.GET._mutable = True       
-        if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
-            self.template_name = 'academy_leads/htmx/academy_bookings_table_htmx.html'   
         context = super(AcademyLeadsOverviewView, self).get_context_data(**kwargs)  
+        if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+            self.template_name = 'academy_leads/htmx/leads_board.html'   
+            context['active_campaign_lists'] = get_active_campaign_list_qs(self.request)
         leads = AcademyLead.objects.filter(complete=False, booking=None)
         active_campaign_list_pk = self.request.GET.get('active_campaign_list_pk', None)
         if active_campaign_list_pk:
@@ -80,10 +81,11 @@ class AcademyBookingsOverviewView(TemplateView):
     template_name='academy_leads/academy_bookings_overview.html'
 
     def get_context_data(self, **kwargs):
-        self.request.GET._mutable = True       
+        self.request.GET._mutable = True     
+        context = super(AcademyBookingsOverviewView, self).get_context_data(**kwargs)    
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'academy_leads/htmx/academy_bookings_table_htmx.html'   
-        context = super(AcademyBookingsOverviewView, self).get_context_data(**kwargs)  
+            context['active_campaign_lists'] = get_active_campaign_list_qs(self.request)
         leads = AcademyLead.objects.filter(booking=None)
         active_campaign_list_pk = self.request.GET.get('active_campaign_list_pk', None)
         if active_campaign_list_pk:
@@ -97,7 +99,6 @@ class AcademyBookingsOverviewView(TemplateView):
         context['complete_count'] = leads.filter(complete=True).count()
         complete_filter = (self.request.GET.get('complete', '').lower() =='true')
         leads = leads.filter(complete=complete_filter)   
-            
         # booking_needed_filter = (self.request.GET.get('booking_needed', '').lower() =='true')
         # if booking_needed_filter:
         #     leads = leads.filter(booking=None)
