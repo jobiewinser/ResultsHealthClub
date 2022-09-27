@@ -17,12 +17,15 @@ from django.urls import path
 import academy_leads.views as academyleadsviews
 import academy_leads.htmx as academyleadshtmx
 urlpatterns = [
-    path('', academyleadsviews.AcademyLeadsOverviewView.as_view(), name='academy-leads-overview-temp'),
+    path('', academyleadsviews.AcademyBookingsOverviewView.as_view(), name='academy-booking-overview'),
+    path('academy-booking-overview/', academyleadsviews.AcademyBookingsOverviewView.as_view(), name='academy-booking-overview'),
     path('academy-leads-overview/', academyleadsviews.AcademyLeadsOverviewView.as_view(), name='academy-leads-overview'),
     path('configuration/whatsapp-templates/', academyleadsviews.WhatsappTemplatesView.as_view(), name='whatsapp-templates'),
     path('configuration/lead-configuration/', academyleadsviews.LeadConfigurationView.as_view(), name='lead-configuration'),
     
     path('mark-done/', academyleadshtmx.mark_done, name='mark-done' ),
+    path('new-call/', academyleadshtmx.new_call, name='new-call' ),
+    path('new-call/<int:lead_pk>/<int:call_count>/', academyleadshtmx.new_call, name='new-call' ),
     path('delete-lead/', academyleadshtmx.delete_lead, name='delete-lead' ),
     
     path('create-academy-lead/', academyleadshtmx.create_academy_lead, name='create-academy-lead' ),

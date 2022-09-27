@@ -8,5 +8,5 @@
         {%endif%}
         {%endfor%}
     </select>
-    <button hidden hx-get="{% url 'academy-leads-overview' %}" hx-swap="outerHTML" hx-push-url="true" hx-include=".results_table_filters" hx-indicator=".top-htmx-indicator" hx-target="#results_table" id="filter_active_campaign_list" class="btn btn-primary btn-sm"></button>
+    <button hidden hx-get="{% url 'academy-booking-overview' %}" hx-swap="outerHTML" hx-push-url="true" hx-include=".results_table_filters" hx-indicator=".top-htmx-indicator" hx-target="#results_table" id="filter_active_campaign_list" class="btn btn-primary btn-sm"></button>
 </span>

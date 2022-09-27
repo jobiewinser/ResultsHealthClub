@@ -1,7 +1,10 @@
-{% extends 'core/overviews.html' %}
-{%load static%}
+{% extends 'core/base.html' %}
+{%load static core_tags%}
 {%block scripts%}
 {{block.super}}
+ 
+<link href="{% static 'css/drag_drop.css' %}" rel="stylesheet" />
+<script src="{% static 'js/drag_drop.js' %}"></script> 
 <script>
     $(document).ready(function() {  
 
@@ -25,7 +28,7 @@
                 } else if (evt.detail.pathInfo.path.includes("mark-sold")){
                     $('#generic_modal').modal('hide');
                     snackbarShow('Successfully sold to customer', 'success')
-                } else if (evt.detail.pathInfo.path.includes("academy-leads-overview")){
+                } else if (evt.detail.pathInfo.path.includes("academy-booking-overview")){
                     $('#refresh_campaign_list_span').click(); 
                     snackbarShow('Successfully refreshed table', 'success')
                 }                
@@ -44,57 +47,75 @@
         }
         );
     }
+    
+    function handleDraggedItem(dragged_elem_id, drag_target){
+        dragged_elem = $('#'+dragged_elem_id)
+        htmx.ajax('POST', '{% url "new-call" %}'+dragged_elem.data('id')+'/'+$(drag_target).data("call-count")+'/', {target:'#'+dragged_elem_id, swap:'outerHTML'})
+    }
 </script>
 {%endblock scripts%}
 
-{%block extra_top_left_buttons %}
-<button hidden hx-get="{% url 'academy-leads-overview' %}" hx-push-url="true" hx-swap="outerHTML" hx-include=".non_site_dependant_results_table_filters" hx-indicator=".top-htmx-indicator" hx-target="#results_table" id="change_site" class="btn btn-primary btn-sm"></button>
-{{block.super}}
-<div class="col-md-auto" hx-get="{% url 'get-active-campaign-lists'%}" hx-include=".results_table_filters" hx-trigger="load" hx-indicator=".top-htmx-indicator" hx-target="#campaign_list_span" hx-swap="outerHTML">
-    <span id="campaign_list_span">   
-        <select class="form-select">
-            <option>Loading</option>
-        </select>    
-    </span>
-</div>
-<button hidden hx-get="{% url 'get-active-campaign-lists'%}" hx-include=".results_table_filters" id="refresh_campaign_list_span" hx-indicator=".top-htmx-indicator" hx-target="#campaign_list_span" hx-trigger="click" hx-swap="outerHTML"></button>
-<button hidden hx-get="{% url 'academy-leads-overview'%}" hx-include=".results_table_filters" id="refresh_results_table" hx-indicator=".top-htmx-indicator" hx-target="#results_table" hx-trigger="click" hx-swap="outerHTML"></button>
-{%endblock%}
+{%block content%}    
+    <div class="">
+        <div class="row">
+            {%block extra_top_left_buttons %}
+            {%include 'core/htmx/site_selection.html'%}
+            <button hidden hx-get="{% url 'academy-booking-overview' %}" hx-push-url="true" hx-swap="outerHTML" hx-include=".non_site_dependant_results_table_filters" hx-indicator=".top-htmx-indicator" hx-target="#results_table" id="change_site" class="btn btn-primary btn-sm"></button>
+            <div class="col-md-auto" hx-get="{% url 'get-active-campaign-lists'%}" hx-include=".results_table_filters" hx-trigger="load" hx-indicator=".top-htmx-indicator" hx-target="#campaign_list_span" hx-swap="outerHTML">
+                <span id="campaign_list_span">   
+                    <select class="form-select">
+                        <option>Loading</option>
+                    </select>    
+                </span>
+            </div>
+            <button hidden hx-get="{% url 'get-active-campaign-lists'%}" hx-include=".results_table_filters" id="refresh_campaign_list_span" hx-indicator=".top-htmx-indicator" hx-target="#campaign_list_span" hx-trigger="click" hx-swap="outerHTML"></button>
+            <button hidden hx-get="{% url 'academy-booking-overview'%}" hx-include=".results_table_filters" id="refresh_results_table" hx-indicator=".top-htmx-indicator" hx-target="#results_table" hx-trigger="click" hx-swap="outerHTML"></button>
+            {%endblock%}
+            <div class="col">                
+            </div>
+            {%block extra_top_right_buttons %}
+            <div class="col-md-auto">
+                <button class="btn btn-primary btn-sm" 
+                    data-bs-toggle="popover" 
+                    data-bs-trigger="hover" 
+                    data-bs-placement="top"
+                    data-bs-content="Manually create an academy lead."
+                    hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
+                    hx-include="#create_academy_lead,#site_pk"
+                    hx-get="{% url 'academy-lead-get-modal-content' %}" 
+                    hx-push-url="false"
+                    hx-swap="innerHTML" hx-trigger="click">
+                        <i class="fa fa-plus" aria-hidden="true"></i> Manually Add Academy Lead
+                </button>
+                <input type="text" style="display:None" id="create_academy_lead" name="template_name" value="create_academy_lead"/>
+            </div>
+            {%endblock%}
+        </div>
+        <div class="row">
+            <div class="col-md-auto">
+                
+                <main class="board">
+                    {%for queryset_title, queryset, call_count in querysets%}
+                    {%with call_count|division_percentage:max_call_count as call_percentage%}
+                    {%with call_percentage|percentage_to_colour as colour%}
+                    <div class="column column-done" data-call-count="{{ forloop.counter0 }}" ondrop="drop(event)" ondragover="allowDrop(event)">
+                        <div class="m-2">
+                        <h2 class="m-0">{{queryset_title}}</h2>
+                        <span class="secondary_td_layer m-0">{{queryset.count}} Leads</span> <span style="color:rgb(96, 248, 61y)" class="secondary_td_layer">£12,345.12</span>
+                        </div>
+                        {%for lead in queryset%}
+                        {%include 'academy_leads/htmx/lead_article.html'%}
+                        {%endfor%}
+                    </div>
+                    {%endwith%}
+                    {%endwith%}
+                    {%endfor%}
+                </div>
+            </main>
 
-{%block extra_top_right_buttons %}
-<div class="col-md-auto">
-    <button class="btn btn-primary btn-sm" 
-        data-bs-toggle="popover" 
-        data-bs-trigger="hover" 
-        data-bs-placement="top"
-        data-bs-content="Manually create an academy lead."
-        hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
-        hx-include="#create_academy_lead,#site_pk"
-        hx-get="{% url 'academy-lead-get-modal-content' %}" 
-        hx-push-url="false"
-        hx-swap="innerHTML" hx-trigger="click">
-            <i class="fa fa-plus" aria-hidden="true"></i> Manually Add Academy Lead
-    </button>
-    <input type="text" style="display:None" id="create_academy_lead" name="template_name" value="create_academy_lead"/>
-</div>
-{%include 'academy_leads/htmx/academy_leads_table_status_toggle_div.html'%}
-{%include 'academy_leads/htmx/academy_leads_table_booking_needed_toggle_div.html'%}
-{%endblock%}
-
-{%block table%}
-
-<span hx-swap-oob="true" id="site_pk_span">   
-    <input type="text" style="display:None" id="site_pk" name="site_pk" value="{{request.GET.site_pk}}"/>
-</span>
-<input type="text" style="display:None" id="log_communication" name="template_name" value="log_communication"/>
-<input type="text" style="display:None" id="communication_history" name="template_name" value="communication_history"/>
-<input type="text" style="display:None" id="booking_history" name="template_name" value="booking_history"/>
-<input type="text" style="display:None" id="note_history" name="template_name" value="note_history"/>
-
-<input type="text" style="display:None" id="add_booking" name="template_name" value="add_booking"/>
-<input type="text" style="display:None" id="pause_whatsapp" name="template_name" value="pause_whatsapp"/>
-<br>
-<div class="card p-2">
-    {% include 'academy_leads/htmx/academy_leads_table.html' %}
-</div>
-{%endblock table%}
+            <div class="col">
+            </div>
+        </div>
+    </div>
+    
+{%endblock content%}

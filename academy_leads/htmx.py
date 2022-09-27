@@ -8,10 +8,12 @@ from django.middleware.csrf import get_token
 from django.contrib.auth.decorators import login_required
 
 from academy_leads.models import AcademyLead, Booking, Communication, Note, WhatsappTemplate, communication_choices_dict
-from academy_leads.views import AcademyLeadsOverviewView
+from academy_leads.views import AcademyBookingsOverviewView
 from active_campaign.models import ActiveCampaignList
 from core.models import Site
 from core.views import get_site_pk_from_request
+from django.db.models import Q, Count
+
 logger = logging.getLogger(__name__)
 
 @login_required
@@ -96,7 +98,7 @@ def log_communication(request, **kwargs):
             'lead': lead,
         }
         
-        return render(request, "academy_leads/htmx/academy_lead_row.html", context)   
+        return render(request, "academy_leads/htmx/academy_booking_row.html", context)   
     except Exception as e:
         logger.debug("log_communication Error "+str(e))
         return HttpResponse(e, status=500)
@@ -134,7 +136,7 @@ def add_booking(request, **kwargs):
             'lead': lead,
         }
         
-        return render(request, "academy_leads/htmx/academy_lead_row.html", context)   
+        return render(request, "academy_leads/htmx/academy_booking_row.html", context)   
     except Exception as e:
         logger.debug("add_booking Error "+str(e))
         return HttpResponse(e, status=500)
@@ -153,6 +155,43 @@ def mark_done(request, **kwargs):
     except Exception as e:
         logger.debug("mark_done Error "+str(e))
         return HttpResponse(e, status=500)
+
+
+@login_required
+def new_call(request, **kwargs):
+    logger.debug(str(request.user))
+    try:
+        if request.user.is_staff:
+            log_datetime = datetime.now()
+            call_count = int(kwargs.get('call_count'))
+            lead = AcademyLead.objects.filter(pk=kwargs.get('lead_pk')).annotate(calls=Count('communication', filter=Q(communication__type='a'))).first()
+            if lead.calls < call_count:
+                while lead.calls < call_count:
+                    communication = Communication.objects.create(
+                        datetime=log_datetime,
+                        lead = lead,
+                        type = 'a',
+                        successful = False,
+                        staff_user=request.user
+                    )
+                    lead = AcademyLead.objects.filter(pk=kwargs.get('lead_pk')).annotate(calls=Count('communication', filter=Q(communication__type='a'))).first()
+            elif lead.calls > call_count:
+                while lead.calls > call_count:
+                    Communication.objects.filter(
+                        lead = lead,
+                        type = 'a'
+                    ).order_by('-datetime').first().delete()
+                    lead = AcademyLead.objects.filter(pk=kwargs.get('lead_pk')).annotate(calls=Count('communication', filter=Q(communication__type='a'))).first()
+           
+            lead.save()
+
+            return render(request, 'academy_leads/htmx/lead_article_content.html', {'lead':lead})
+    except Exception as e:
+        logger.debug("new_call Error "+str(e))
+        return HttpResponse(e, status=500)
+
+
+
 @login_required
 def delete_lead(request, **kwargs):
     logger.debug(str(request.user))
@@ -174,7 +213,7 @@ def mark_arrived(request, **kwargs):
             lead = AcademyLead.objects.get(pk=request.POST.get('lead_pk'))
             lead.arrived = not lead.arrived
             lead.save()
-            return render(request, "academy_leads/htmx/academy_lead_row.html", {'lead':lead}) 
+            return render(request, "academy_leads/htmx/academy_booking_row.html", {'lead':lead}) 
     except Exception as e:
         logger.debug("mark_done Error "+str(e))
         return HttpResponse(e, status=500)
@@ -189,7 +228,7 @@ def mark_sold(request, **kwargs):
             lead.sold = not lead.sold
             lead.complete = not lead.complete
             lead.save()
-            return render(request, "academy_leads/htmx/academy_lead_row.html", {'lead':lead}) 
+            return render(request, "academy_leads/htmx/academy_booking_row.html", {'lead':lead}) 
     except Exception as e:
         logger.debug("mark_done Error "+str(e))
         return HttpResponse(e, status=500)
@@ -201,7 +240,7 @@ def mark_sold(request, **kwargs):
 #         if request.user.is_staff:
 #             lead = AcademyLead.objects.get(pk=request.POST.get('lead_pk'))
 #             lead.send_whatsapp_message('testing api', request.user)
-#             return render(request, "academy_leads/htmx/academy_lead_row.html", {'lead':lead}) 
+#             return render(request, "academy_leads/htmx/academy_booking_row.html", {'lead':lead}) 
 #     except Exception as e:
 #         logger.debug("mark_done Error "+str(e))
 #         return HttpResponse(e, status=500)
