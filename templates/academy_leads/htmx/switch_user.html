@@ -1,10 +1,10 @@
 {%load static%}
 <span>
     <div class="row">
-        {%for staff_user in staff_users%}
+        {%for staff_user in users%}
         {%if staff_user.profile%}
         <div class="col-md-auto user-select p-3 mb-3 {%if staff_user == request.user%}current-user-highlight{%endif%}"
-            hx-post="{% url 'switch-user' %}" hx-include="#user-select-{{staff_user.pk}}" hx-indicator=".top-htmx-indicator" hx-target="#profile-dropdown">
+            hx-post="{% url 'switch-user' %}" hx-include="#user-select-{{staff_user.pk}}" hx-indicator=".top-htmx-indicator" hx-target="#profile-nav-section">
             <input type="text" style="display:None" id="user-select-{{staff_user.pk}}" name="user_pk" value="{{staff_user.pk}}"/>
             <img src="/media/{{staff_user.profile.avatar}}" width="80" height="80" class="rounded-circle" style="object-fit: cover;">            
             <br>            
@@ -15,7 +15,6 @@
             hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" hx-include="#edit_user,#user-select-{{staff_user.pk}}"
             hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
             hx-swap="innerHTML" hx-trigger="click"><i class="fa-light fa-gear"></i> Edit</a>
-            <input type="text" style="display:None" id="edit_user" name="template_name" value="edit_user"/>
         </div>
         {%endif%}
         {%endfor%}

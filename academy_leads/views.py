@@ -62,6 +62,9 @@ class AcademyLeadsOverviewView(TemplateView):
                 context['querysets'].append(
                     (f"Call {index}", leads.filter(calls=index), index)
                 )
+            context['querysets'].append(
+                (f"Call {index+1}", leads.none(), index+1)
+            )
         else:
             context['querysets'].append(
                 (f"Call 1", leads.none(), 1)

@@ -31,7 +31,7 @@ def get_modal_content(request, **kwargs):
                 context['lead'] = AcademyLead.objects.get(pk=param1)
             
             if template_name == 'switch_user':
-                context['staff_users'] = User.objects.filter(is_staff=True).order_by('first_name')
+                context['users'] = User.objects.filter(is_staff=True).order_by('first_name')
             if template_name == 'log_communication':
                 context['communication_type'] = kwargs.get('param2')
                 context['communication_type_display'] = communication_choices_dict[kwargs.get('param2')]
@@ -75,12 +75,23 @@ def get_leads_column_meta_data(request, **kwargs):
         if site_pk and not site_pk == 'all':
             leads = leads.filter(active_campaign_list__site__pk=site_pk)
             # request.GET['site_pk'] = site_pk 
-
-
-        call_count = int(kwargs.get('call_count'))
-
-        leads = leads.annotate(calls=Count('communication', filter=Q(communication__type='a'))).filter(calls=call_count)
-        return render(request, 'academy_leads/htmx/column_metadata.html', {'queryset':leads, 'counter':call_count})
+            
+        leads = leads.annotate(calls=Count('communication', filter=Q(communication__type='a')))
+        querysets = [
+            ('Fresh', leads.filter(calls=0), 0)
+        ]
+        index = 0
+        if leads.filter(calls__gt=index):
+            while leads.filter(calls__gt=index):
+                index = index + 1
+                querysets.append(
+                    (f"Call {index}", leads.filter(calls=index), index)
+                )
+        else:
+            querysets.append(
+                (f"Call 1", leads.none(), 1)
+            )
+        return render(request, 'academy_leads/htmx/column_metadata_htmx.html', {'querysets':querysets})
     except Exception as e:
         logger.debug("get_leads_column_meta_data Error "+str(e))
         return HttpResponse(e, status=500)
@@ -180,6 +191,20 @@ def mark_done(request, **kwargs):
 
 
 @login_required
+def new_leads_column(request, **kwargs):
+    logger.debug(str(request.user))
+    try:
+        if request.user.is_staff:
+            max_call_count = int(request.GET.get('max_call_count', 1))+2
+            querysets = [
+                (f"Call {max_call_count}", AcademyLead.objects.none(), max_call_count)
+            ]
+            return render(request, 'academy_leads/htmx/lead_columns.html', {'querysets':querysets, 'max_call_count':max_call_count-1})
+    except Exception as e:
+        logger.debug("new_call Error "+str(e))
+        return HttpResponse(e, status=500)
+
+@login_required
 def new_call(request, **kwargs):
     logger.debug(str(request.user))
     try:
@@ -207,7 +232,7 @@ def new_call(request, **kwargs):
            
             lead.save()
 
-            return render(request, 'academy_leads/htmx/lead_article_content.html', {'lead':lead})
+            return render(request, 'academy_leads/htmx/lead_article.html', {'lead':lead,'max_call_count':kwargs.get('max_call_count', 1), 'call_count':call_count})
     except Exception as e:
         logger.debug("new_call Error "+str(e))
         return HttpResponse(e, status=500)

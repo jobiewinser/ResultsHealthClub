@@ -18,17 +18,21 @@ import academy_leads.views as academyleadsviews
 import academy_leads.htmx as academyleadshtmx
 urlpatterns = [
     path('', academyleadsviews.AcademyBookingsOverviewView.as_view(), name='academy-booking-overview'),
-    path('academy-booking-overview/', academyleadsviews.AcademyBookingsOverviewView.as_view(), name='academy-booking-overview'),
-    path('academy-leads-overview/', academyleadsviews.AcademyLeadsOverviewView.as_view(), name='academy-leads-overview'),
+    path('academy-leads/booking-and-calender/', academyleadsviews.AcademyBookingsOverviewView.as_view(), name='academy-booking-overview'),
+    path('academy-leads/leads-and-calls/', academyleadsviews.AcademyLeadsOverviewView.as_view(), name='academy-leads-overview'),    
     path('configuration/whatsapp-templates/', academyleadsviews.WhatsappTemplatesView.as_view(), name='whatsapp-templates'),
     path('configuration/lead-configuration/', academyleadsviews.LeadConfigurationView.as_view(), name='lead-configuration'),
     
+
+    
     path('mark-done/', academyleadshtmx.mark_done, name='mark-done' ),
+    
+    path('new-leads-column/', academyleadshtmx.new_leads_column, name='new-leads-column' ),
     path('new-call/', academyleadshtmx.new_call, name='new-call' ),
-    path('new-call/<int:lead_pk>/<int:call_count>/', academyleadshtmx.new_call, name='new-call' ),
+    path('new-call/<int:lead_pk>/<int:call_count>/<int:max_call_count>/', academyleadshtmx.new_call, name='new-call' ),
     path('delete-lead/', academyleadshtmx.delete_lead, name='delete-lead' ),
     
-    path('get-leads-column-meta-data/<str:call_count>/', academyleadshtmx.get_leads_column_meta_data, name='get-leads-column-meta-data' ),
+    path('get-leads-column-meta-data/', academyleadshtmx.get_leads_column_meta_data, name='get-leads-column-meta-data' ),
     path('create-academy-lead/', academyleadshtmx.create_academy_lead, name='create-academy-lead' ),
     path('log-communication/', academyleadshtmx.log_communication, name='log-communication' ),
     path('add-booking/', academyleadshtmx.add_booking, name='add-booking' ),

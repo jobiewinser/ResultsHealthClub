@@ -10,35 +10,16 @@
 
         document.body.addEventListener('htmx:afterSwap', function(evt) {   
             if (evt.detail.xhr.status == 200){
-                if (evt.detail.pathInfo.path.includes("mark-done")){
-                    snackbarShow('Successfully marked lead as done', 'success')
-                } else if (evt.detail.pathInfo.path.includes("add-booking")){
-                    $('#generic_modal').modal('hide');
-                    snackbarShow('Successfully added a booking', 'success')
-                } else if (evt.detail.pathInfo.path.includes("log-communication")){
-                    $('#generic_modal').modal('hide');
-                    snackbarShow('Successfully logged a communication', 'success')
-                } else if (evt.detail.pathInfo.path.includes("create-academy-lead")){
+                if (evt.detail.pathInfo.path.includes("create-academy-lead")){
                     $('#refresh_results_table').click(); 
                     $('#generic_modal').modal('hide');
                     snackbarShow('Successfully manually created an academy lead', 'success')
-                } else if (evt.detail.pathInfo.path.includes("mark-arrived")){
-                    $('#generic_modal').modal('hide');
-                    snackbarShow('Successfully marked that the customer arrived as booking', 'success')
-                } else if (evt.detail.pathInfo.path.includes("mark-sold")){
-                    $('#generic_modal').modal('hide');
-                    snackbarShow('Successfully sold to customer', 'success')
-                } else if (evt.detail.pathInfo.path.includes("academy-booking-overview")){
-                    $('#refresh_campaign_list_span').click(); 
-                    snackbarShow('Successfully refreshed table', 'success')
                 } else if (evt.detail.pathInfo.path.includes("new-call")){
-                    $('#refresh_campaign_list_span').click(); 
-                    snackbarShow('Successfully refreshed table', 'success')
+                    $('#refresh_column_metadata').click()
+                    snackbarShow('Successfully added call', 'success')
                 }                
             }
-            if ($('#noteTable')){
-                
-            }
+            
             $('[data-bs-toggle=popover]').popover();
         });
     });
@@ -53,7 +34,14 @@
     
     function handleDraggedItem(dragged_elem_id, drag_target){
         dragged_elem = $('#'+dragged_elem_id)
-        htmx.ajax('POST', '{% url "new-call" %}'+dragged_elem.data('id')+'/'+$(drag_target).data("call-count")+'/', {target:'#'+dragged_elem_id, swap:'outerHTML'})
+        htmx.ajax('POST', '{% url "new-call" %}'+dragged_elem.data('id')+'/'+$(drag_target).data("call-count")+'/'+$('#max_call_count').val()+'/', {target:'#'+dragged_elem_id, 
+                                                                                                                    swap:'outerHTML'})
+        let call_count = parseInt($(drag_target).data("call-count"));
+        let max_call_count = parseInt($('#max_call_count').val());
+        console.log(call_count, max_call_count)
+        if (call_count > max_call_count) {
+            $('#add_column').click();
+        }
     }
 </script>
 {%endblock scripts%}
@@ -63,7 +51,7 @@
         <div class="row">
             {%block extra_top_left_buttons %}
             {%include 'core/htmx/site_selection.html'%}
-            <button hidden hx-get="{% url 'academy-booking-overview' %}" hx-push-url="true" hx-swap="outerHTML" hx-include=".non_site_dependant_results_table_filters" hx-indicator=".top-htmx-indicator" hx-target="#results_table" id="change_site" class="btn btn-primary btn-sm"></button>
+            <button hidden hx-get="{% url 'academy-leads-overview' %}" hx-push-url="true" hx-swap="outerHTML" hx-include=".results_table_filters" hx-indicator=".top-htmx-indicator" hx-target="#results_table" id="change_site" class="btn btn-primary btn-sm"></button>
             <div class="col-md-auto" hx-get="{% url 'get-active-campaign-lists'%}" hx-include=".results_table_filters" hx-trigger="load" hx-indicator=".top-htmx-indicator" hx-target="#campaign_list_span" hx-swap="outerHTML">
                 <span id="campaign_list_span">   
                     <select class="form-select">
@@ -72,7 +60,7 @@
                 </span>
             </div>
             <button hidden hx-get="{% url 'get-active-campaign-lists'%}" hx-include=".results_table_filters" id="refresh_campaign_list_span" hx-indicator=".top-htmx-indicator" hx-target="#campaign_list_span" hx-trigger="click" hx-swap="outerHTML"></button>
-            <button hidden hx-get="{% url 'academy-booking-overview'%}" hx-include=".results_table_filters" id="refresh_results_table" hx-indicator=".top-htmx-indicator" hx-target="#results_table" hx-trigger="click" hx-swap="outerHTML"></button>
+            <button hidden hx-get="{% url 'academy-leads-overview'%}" hx-include=".results_table_filters" id="refresh_results_table" hx-indicator=".top-htmx-indicator" hx-target="#results_table" hx-trigger="click" hx-swap="outerHTML"></button>
             {%endblock%}
             <div class="col">                
             </div>
@@ -97,24 +85,10 @@
         <div class="row">
             <div class="col-md-auto">
                 
-                <main class="board">
-                    {%for queryset_title, queryset, call_count in querysets%}
-                    {%with call_count|division_percentage:max_call_count as call_percentage%}
-                    {%with call_percentage|percentage_to_colour as colour%}
-                    <div class="column column-done" data-call-count="{{ forloop.counter0 }}" ondrop="drop(event)" ondragover="allowDrop(event)">
-                        <div class="m-2">
-                        <h2 class="m-0">{{queryset_title}}</h2>
-                        {%with forloop.counter0 as counter%}
-                        {%include 'academy_leads/htmx/column_metadata.html'%}
-                        {%endwith%}
-                        </div>
-                        {%for lead in queryset%}
-                        {%include 'academy_leads/htmx/lead_article.html'%}
-                        {%endfor%}
-                    </div>
-                    {%endwith%}
-                    {%endwith%}
-                    {%endfor%}
+                <main id="leads_board" class="board">
+                    <button hidden hx-get="{% url 'get-leads-column-meta-data'%}" hx-include=".results_table_filters" id="refresh_column_metadata" hx-indicator=".column-htmx-indicator" hx-target="#column_metadata_0" hx-trigger="click" hx-swap="outerHTML"></button>
+                    <button hidden hx-get="{% url "new-leads-column" %}" hx-include="#max_call_count" id="add_column" hx-indicator=".column-htmx-indicator" hx-target="#leads_board" hx-trigger="click" hx-swap="beforeend"></button>
+                    {%include 'academy_leads/htmx/lead_columns.html' %}
                 </div>
             </main>
 
