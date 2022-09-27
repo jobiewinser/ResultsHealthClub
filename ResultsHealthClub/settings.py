@@ -22,7 +22,7 @@ load_dotenv(dotenv_path=env_path)
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-WHATSAPP_PHONE_OVERRIDE="447827777940"
+WHATSAPP_PHONE_OVERRIDE=False
 
 LOGGING = {
     'version': 1,

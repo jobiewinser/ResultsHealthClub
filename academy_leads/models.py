@@ -179,17 +179,17 @@ class WhatsappTemplate(models.Model):
 
     def rendered(self, lead):
         return self.text.replace('{first_name}', str(lead.first_name))
-try:
-    template, created = WhatsappTemplate.objects.get_or_create(pk=1)
-    template.name = "Immediate Lead Followup"
-    template.save()
+# try:
+#     template, created = WhatsappTemplate.objects.get_or_create(pk=1)
+#     template.name = "Immediate Lead Followup"
+#     template.save()
 
-    template, created = WhatsappTemplate.objects.get_or_create(pk=2)
-    template.name = "Second Lead Followup"
-    template.save()
+#     template, created = WhatsappTemplate.objects.get_or_create(pk=2)
+#     template.name = "Second Lead Followup"
+#     template.save()
 
-    template, created = WhatsappTemplate.objects.get_or_create(pk=3)
-    template.name = "Third Lead Followup"
-    template.save()
-except:
-    pass
+#     template, created = WhatsappTemplate.objects.get_or_create(pk=3)
+#     template.name = "Third Lead Followup"
+#     template.save()
+# except:
+#     pass
