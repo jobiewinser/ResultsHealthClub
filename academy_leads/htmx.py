@@ -169,7 +169,7 @@ def add_booking(request, **kwargs):
             'lead': lead,
         }
         
-        return render(request, "academy_leads/htmx/academy_booking_row.html", context)   
+        return HttpResponse("<span></span>", status=200) 
     except Exception as e:
         logger.debug("add_booking Error "+str(e))
         return HttpResponse(e, status=500)

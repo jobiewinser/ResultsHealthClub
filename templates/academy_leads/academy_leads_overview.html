@@ -18,7 +18,10 @@
                 } else if (evt.detail.pathInfo.path.includes("new-call")){
                     $('#refresh_column_metadata').click()
                     snackbarShow('Successfully added call', 'success')
-                }                
+                } else if (evt.detail.pathInfo.path.includes("add-booking")){
+                    $('#generic_modal').modal('hide');
+                    snackbarShow('Successfully added a booking', 'success')
+                }               
             }
             
             $('[data-bs-toggle=popover]').popover();

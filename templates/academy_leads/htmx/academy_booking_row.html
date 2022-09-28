@@ -128,7 +128,7 @@
                     hx-push-url="false"
                     hx-swap="innerHTML" hx-trigger="click"><i class="fa-regular fa-clock-rotate-left" ></i> <span style="color:Silver">{{lead.successful_communication.count}}</span></button>
             </div>           {% endcomment %}
-            <div class="btn-group btn-space mb-1">
+            {% comment %} <div class="btn-group btn-space mb-1">
                 <button class="btn btn-secondary btn-sm" type="button"
                     data-bs-toggle="popover" 
                     data-bs-trigger="hover" 
@@ -139,7 +139,7 @@
                     hx-get="{% url 'academy-lead-get-modal-content' param1=lead.pk %}" 
                     hx-push-url="false"
                     hx-swap="innerHTML" hx-trigger="click"><i class="fa fa-book-open-cover" aria-hidden="true"></i></button>
-            </div>
+            </div> {% endcomment %}
 
             
             <div class="btn-group btn-space btn-space-with-history mb-1">
