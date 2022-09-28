@@ -481,3 +481,17 @@ html ,.content,body {
 #leads_board {
     justify-content:unset
 }
+
+
+#add_booking_area {
+    visibility: hidden;
+    position: absolute;
+    right:2%;
+    top:50%;
+    width:200px;
+    height:100px;
+    background-color:rgba(25, 135, 84, 0.6);
+}
+#add_booking_area.shown {
+    visibility: visible;    
+}

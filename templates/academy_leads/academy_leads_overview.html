@@ -65,6 +65,7 @@
             </div>
             <button hidden hx-get="{% url 'get-active-campaign-lists'%}" hx-include=".results_table_filters" id="refresh_campaign_list_span" hx-indicator=".top-htmx-indicator" hx-target="#campaign_list_span" hx-trigger="click" hx-swap="outerHTML"></button>
             <button hidden hx-get="{% url 'academy-leads-overview'%}" hx-include=".results_table_filters" id="refresh_results_table" hx-indicator=".top-htmx-indicator" hx-target="#results_table" hx-trigger="click" hx-swap="outerHTML"></button>
+            <input type="text" style="display:None" id="add_booking" name="template_name" value="add_booking"/>
             {%endblock%}
             <div class="col-md-auto">
                 <button class="btn btn-primary btn-sm" 
@@ -94,6 +95,9 @@
             <div class="col">
             </div>
         </div>
+    </div>
+    <div id="add_booking_area" class="" ondrop="drop_booking(event)" ondragover="allowDrop(event)">
+        Add Booking
     </div>
     
 {%endblock content%}
