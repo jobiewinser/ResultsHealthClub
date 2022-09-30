@@ -9,6 +9,13 @@ from django.http import HttpResponseRedirect
 from core.models import FreeTasterLink, FreeTasterLinkClick, Profile, Site  
 logger = logging.getLogger(__name__)
 
+
+
+class HomeView(TemplateView):
+    template_name='core/home.html'
+
+
+
 @method_decorator(login_required, name='dispatch')
 class FreeTasterOverviewView(TemplateView):
     template_name='core/free_taster_overview.html'

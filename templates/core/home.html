@@ -1,0 +1,72 @@
+{% extends 'core/base.html' %}
+{%load static tz core_tags%}
+
+{%block scripts%}
+{{block.super}}
+<script>
+    $(document).ready(function() {
+    });
+</script>
+{%endblock scripts%}
+{%block content%}
+{% comment %} <div class="card m-3 border">
+<img src="{% static 'img/demo1.png' %}" width="100%" alt="demo1 picture">
+</div> {% endcomment %}
+<div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+    <h1 class="display-4">Pricing</h1>
+    <p class="lead">Coming Soon. I am currently trialing the system with a client.</p>
+</div>
+    <div class="card-deck p-3 text-center row">
+      <div class="card col m-2 p-0 box-shadow">
+        <div class="card-header">
+          <h4 class="my-0 font-weight-normal">1 Site</h4>
+        </div>
+        <div class="card-body">
+          <h1 class="card-title pricing-card-title">£x <small class="text-muted">/ mo</small></h1>
+          <ul class="list-unstyled mt-3 mb-4">
+            <li>Full lead system for 1 site </li>
+            <li>Whatsapp and Facebook integration</li>
+            <li>Up to 10 users</li>
+            <li>Full analytics system</li>
+            <li>Flexible Webhook campaign lead system</li>
+            <li>Vote-based feature requests</li>
+          </ul>
+          <button type="button" class="btn btn-lg btn-block btn-primary">More Information</button>
+        </div>
+      </div>
+      <div class="card col-md m-2 p-0 box-shadow">
+        <div class="card-header">
+          <h4 class="my-0 font-weight-normal">Up to 5 sites</h4>
+        </div>
+        <div class="card-body">
+          <h1 class="card-title pricing-card-title">£x <small class="text-muted">/ mo per site</small></h1>
+          <ul class="list-unstyled mt-3 mb-4">
+            <li>Full lead system for 1 site </li>
+            <li>Whatsapp and Facebook integration</li>
+            <li>Up to 20 users per site</li>
+            <li>Full analytics system</li>
+            <li>Flexible Webhook campaign lead system</li>
+            <li>Vote-based feature requests</li>
+          </ul>
+          <button type="button" class="btn btn-lg btn-block btn-primary">More Information</button>
+        </div>
+      </div>
+      <div class="card col-md m-2 p-0 box-shadow">
+        <div class="card-header">
+          <h4 class="my-0 font-weight-normal">5+ sites</h4>
+        </div>
+        <div class="card-body">
+          <h1 class="card-title pricing-card-title">Get a quote </h1>
+          <ul class="list-unstyled mt-3 mb-4">
+            <li>Full lead system for 1 site </li>
+            <li>Whatsapp and Facebook integration</li>
+            <li>Unlimited users</li>
+            <li>Full analytics system</li>
+            <li>Flexible Webhook campaign lead system</li>
+            <li>Vote-based feature requests</li>
+          </ul>
+          <button type="button" class="btn btn-lg btn-block btn-primary">Contact Us</button>
+        </div>
+      </div>
+    </div>
+{%endblock content%}

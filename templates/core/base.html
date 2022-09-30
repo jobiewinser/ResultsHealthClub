@@ -1,5 +1,6 @@
 {%load static core_tags%}
 <!DOCTYPE html>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <html>
     <head>
         {%block cdn%}
@@ -13,8 +14,6 @@
             <script src="{% static 'js/palette.js' %}"></script>        
             <link href="{% static 'css/snackbar.css' %}" rel="stylesheet" />
             <script src="{% static 'js/snackbar.js' %}"></script> 
-            <link href="{% static 'css/datatables.css' %}" rel="stylesheet" />
-            <script src="{% static 'js/datatables.js' %}"></script> 
             
             <link rel="stylesheet" type="text/css"  href="{% static 'css/side_bar.css' %}">
             <link rel="stylesheet" type="text/css"  href="{% static 'css/base.css' %}">
@@ -73,23 +72,14 @@
                     document.body.addEventListener('htmx:afterSwap', function(evt) {  
                         if (evt.detail.target.id == 'generic_modal_body'){
                             $('#generic_modal').modal('show');
-                        }
-                        if (evt.detail.pathInfo.path.includes("switch-user")){
-                            $('#generic_modal').modal('hide');
-                            snackbarShow('Successfully switched profile', 'success')
-                        } else if (evt.detail.pathInfo.path.includes("modify-user")){
-                            $('#generic_modal').modal('hide');
-                            snackbarShow('Successfully modified a profile', 'success')
-                        }
-                        
+                        }                        
                         if (evt.detail.xhr.status == 200){
                         } else {
                             snackbarShow(evt.detail.xhr.responseText, 'danger')
                         }
                         $('.popover').remove()
                         $('[data-bs-toggle=popover]').popover();
-                    });
-                    
+                    });                    
                     document.body.addEventListener('htmx:configRequest', function(evt) {    
                         evt.detail.headers['x-csrftoken'] = $('#csrf_token').val();
                     });
@@ -106,64 +96,32 @@
     </head>
 
     <body>
-
-        <div class="d-flex" id="wrapper">
-            <!-- Sidebar-->
+        <!-- Sidebar-->
+        <div class="row">
+            <div class="col-md-auto p-0 side_nav bg-dark">
             {%block navbar%}
-            <div class="d-flex flex-column bg-dark flex-shrink-0 p-3 text-white side_nav" style="">
-              <a href="{%url 'default'%}" class="d-flex align-items-center pb-3 mb-3 link-light text-decoration-none border-bottom">
-                  <img src="{% static 'img/logo_white.png' %}" height="120px" style="object-fit: cover;">
-              </a>
-              <ul class="nav nav-pills flex-column mb-auto">
-                <li class="mb-1">
-                  <button class="btn btn-toggle align-items-center rounded collapsed {%if 'academy-leads' in request.path or request.path == '/'%} active{%endif%}" data-bs-toggle="collapse" data-bs-target="#home-collapse" {%if 'academy-leads' in request.path or request.path == '/'%} aria-expanded="true"{%endif%}>
-                    Academy Leads
-                  </button>
-                  <div class="collapse {%if 'academy-leads' in request.path or request.path == '/'%} active show{%endif%}" id="home-collapse">
-                    <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                      <li><a href="{%url 'academy-leads-overview'%}" class="link-light rounded {%if 'academy-leads/leads-and-calls' in request.path or request.path == '/'%} active{%endif%}">Leads & Calls</a></li>
-                      <li><a href="{%url 'academy-booking-overview'%}" class="link-light rounded {%if 'academy-leads/booking-and-calender' in request.path%} active{%endif%}">Booking & Calender</a></li>
-                    </ul>
-                  </div>
-                </li>
-                <li class="mb-1">
-                  <button class="btn btn-toggle align-items-center rounded {%if 'free-tasters' in request.path%} active{%endif%}" data-bs-toggle="collapse" data-bs-target="#dashboard-collapse" {%if 'free-tasters' in request.path%} aria-expanded="true"{%endif%}>
-                    Free Tasters
-                  </button>
-                  <div class="collapse {%if 'free-tasters' in request.path%} active show{%endif%}" id="dashboard-collapse" style="">
-                    <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                      <li><a href="{%url 'free-taster'%}" class="link-light rounded {%if 'free-tasters/overview' in request.path%} active{%endif%}">Overview</a></li>
-                    </ul>
-                  </div>
-                </li>
-                <hr>
-                <li class="mb-1">
-                  <button class="btn btn-toggle align-items-center rounded collapsed {%if 'configuration' in request.path%} active{%endif%}" data-bs-toggle="collapse" data-bs-target="#account-collapse" {%if 'configuration' in request.path%} aria-expanded="true"{%endif%}>
-                    Configuration
-                  </button>
-                  <div class="collapse {%if 'configuration' in request.path%} active show{%endif%}" id="account-collapse">
-                    <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                      <li><a href="{% url 'whatsapp-templates' %}" class="link-light rounded {%if 'configuration/whatsapp-templates' in request.path%} active{%endif%}">Whatsapp Templates</a></li>
-                      <li><a href="{% url 'lead-configuration' %}" class="link-light rounded {%if 'configuration/lead-configuration' in request.path%} active{%endif%}">Lead Configuration</a></li>
-                    </ul>
-                  </div>
-                </li>
-              </ul>
-              <hr>
-              <div class="dropdown" id="profile-nav-section">
-                  {%include 'core/htmx/profile-nav-section.html'%}
-              </div>
-            </div>
+                <img id="" src="{% static 'img/logo_white.png' %}" style="object-fit: cover; height:20vh" alt="winser systems logo">
+                <ul class="nav nav-pills">
+                    <li class="mb-1">
+                        <button class="btn btn-toggle align-items-center rounded collapsed {%if request.path == '/'%} active{%endif%}" data-bs-toggle="collapse" data-bs-target="#home-collapse" {%if request.path == '/'%} aria-expanded="true"{%endif%}>
+                        Products
+                        </button>
+                        <div class="collapse {%if request.path == '/'%} active show{%endif%}" id="home-collapse">
+                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                            <li><a href="#" class="link-light rounded ">Campaign Leads System</a></li>
+                        </ul>
+                        </div>
+                    </li>                
+                </ul>
+                {% comment %} <div class="dropdown" id="profile-nav-section">
+                    {%include 'core/htmx/profile-nav-section.html'%}
+                </div> {% endcomment %}
             {%endblock navbar%}
+            </div>
             <!-- Page content wrapper-->
-            <div id="page-content-wrapper" class="col">
-                <!-- Page content-->
-                <div class="container-fluid">
-                    <div class="content">
-                        {%block content%}
-                        {%endblock content%}
-                    </div>
-                </div>
+            <div class="col p-0">
+                {%block content%}
+                {%endblock content%}
             </div>
         </div>
 
