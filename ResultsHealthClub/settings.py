@@ -239,10 +239,10 @@ REST_FRAMEWORK = {
 }
 
 CORS_ALLOWED_ORIGINS = [
-    'http://results.jobiewinser.co.uk',
+    'http://winser.uk',
     # '82.37.38.164'
 ]
-CSRF_TRUSTED_ORIGINS = ['http://results.jobiewinser.co.uk']
+CSRF_TRUSTED_ORIGINS = ['http://winser.uk']
 
 CORS_REPLACE_HTTPS_REFERER = True
 
