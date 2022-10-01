@@ -111,7 +111,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'academy_leads',
+    'campaign_leads',
     'active_campaign',
     'whatsapp',
     'analytics',
@@ -130,7 +130,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'core.backends.CustomerBackend',
+]
 ROOT_URLCONF = 'WinserSystems.urls'
 
 TEMPLATES_DIR = os.path.join(BASE_DIR,'templates')

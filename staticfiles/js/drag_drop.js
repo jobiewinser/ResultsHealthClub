@@ -45,7 +45,7 @@ const drop_booking = event => {
     console.log("drop_booking", event.currentTarget)
     document.querySelector('#add_booking_area').classList.remove('shown');
     
-    htmx.ajax('GET', '/academy-lead-get-modal-content/'+dragged_elem.data('id')+'/?template_name=add_booking', {target:'#generic_modal_body'})
+    htmx.ajax('GET', '/campaign-lead-get-modal-content/'+dragged_elem.data('id')+'/?template_name=add_booking', {target:'#generic_modal_body'})
 };
 
 function handleDraggedItem(elem){

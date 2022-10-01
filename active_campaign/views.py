@@ -1,7 +1,7 @@
 import logging
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from academy_leads.models import AcademyLead
+from campaign_leads.models import Campaignlead
 from core.views import get_site_pk_from_request
 from active_campaign.api import ActiveCampaign
 from active_campaign.models import CampaignWebhook, ActiveCampaignList
@@ -46,13 +46,13 @@ class Webhooks(View):
                             phone_number = "None"
                             country_code = "None"
                         possible_duplicate  = False
-                        if AcademyLead.objects.filter(
+                        if Campaignlead.objects.filter(
                                 active_campaign_list=active_campaign_list,
                                 active_campaign_contact_id=data.get('contact[id]')
                             ): 
                             possible_duplicate  = True
                         if not possible_duplicate:
-                            AcademyLead.objects.create(
+                            Campaignlead.objects.create(
                                 active_campaign_contact_id=data.get('contact[id]'),
                                 first_name=data.get('contact[first_name]', "None"),
                                 phone=phone_number,
@@ -101,7 +101,7 @@ def get_and_generate_active_campaign_list_objects():
     return ActiveCampaignList.objects.all()
     
 def get_active_campaign_list_qs(request):
-    first_model_query = (AcademyLead.objects
+    first_model_query = (Campaignlead.objects
         .filter(active_campaign_list=OuterRef('pk'), complete=False)
         .values('active_campaign_list')
         .annotate(cnt=Count('pk'))

@@ -111,7 +111,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'academy_leads',
+    'campaign_leads',
     'active_campaign',
     'whatsapp',
     'analytics',

@@ -1,0 +1,14 @@
+{% extends 'campaign_leads/campaign_leads_base.html' %}
+{%load static%}
+{%block scripts%}
+{{block.super}}
+<script>
+    $(document).ready(function() {
+        $("[data-bs-toggle=popover]").popover();
+    });
+</script>
+{%endblock scripts%}
+
+{%block content%} 
+{%include 'campaign_leads/htmx/whatsapp_templates_content.html'%}
+{%endblock content%}

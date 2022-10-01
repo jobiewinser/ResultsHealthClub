@@ -17,6 +17,7 @@ class ActiveCampaignList(models.Model):
     webhook_id = models.TextField(null=True, blank=True)
     site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
     manual = models.BooleanField(default=False)
+    company = models.ManyToManyField("core.Company")
         
     def create_webhook(self):
         if self.name and self.guid and not self.webhook_id and not settings.DEBUG and not 'manually' in self.name.lower():
@@ -26,7 +27,7 @@ class ActiveCampaignList(models.Model):
                 self.webhook_id = response.json().get('webhook').get('id')
                 self.save()
     def get_active_leads_qs(self):
-        return self.academylead_set.filter(complete=False)
+        return self.campaignlead_set.filter(complete=False)
 @receiver(models.signals.post_save, sender=ActiveCampaignList)
 def execute_after_save(sender, instance, created, *args, **kwargs):
     if created:
@@ -37,5 +38,6 @@ def execute_after_save(sender, instance, created, *args, **kwargs):
 class CampaignWebhook(models.Model):
     json_data = models.JSONField(default=dict)
     guid = models.TextField(null=True, blank=True)
+    company = models.ManyToManyField("core.Company")
 
 

@@ -21,7 +21,7 @@ handler500 = coreviews.handler500
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('academy_leads.urls')),
+    path('campaign-leads/', include('campaign_leads.urls')),
     path('', include('core.urls')),
     path('', include('whatsapp.urls')),
     path('', include('active_campaign.urls')),

@@ -32,7 +32,7 @@ class ActiveCampaign:
         headers = self._get_headers()
         body = {
             "webhook": {
-                "name": f"{name} (Academy Lead System)",
+                "name": f"{name} (Campaign Lead System)",
                 "url": f"{self.site_url}/active-campaign-webhooks/{guid}/",
                 "listid": list_id,                
                 "events": [

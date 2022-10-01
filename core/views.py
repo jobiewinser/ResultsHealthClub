@@ -5,18 +5,23 @@ from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 import logging
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
+from django.contrib.auth.models import User
 from core.models import FreeTasterLink, FreeTasterLinkClick, Profile, Site  
+from django.contrib.auth import authenticate
+from django.contrib.auth import login
 logger = logging.getLogger(__name__)
-
-
-
 class HomeView(TemplateView):
     template_name='core/home.html'
 class CampaignLeadsProductPageView(TemplateView):
     template_name='core/campaign_leads_product_page.html'
 
-
+def custom_login_post(request):    
+    user = authenticate(username=request.POST.get('username', ''), email=request.POST.get('email', ''), password=request.POST.get('password', ''))
+    if user:
+        login(request, user)
+        return HttpResponse(status=200)
+    return HttpResponse(status=404)
 
 @method_decorator(login_required, name='dispatch')
 class FreeTasterOverviewView(TemplateView):

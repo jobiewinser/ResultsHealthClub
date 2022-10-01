@@ -1,0 +1,10 @@
+{%load core_tags%}
+{%for queryset_title, queryset, call_count in querysets%}
+    {%if forloop.counter0 == 0%}
+    {%include 'campaign_leads/htmx/column_metadata.html'%}
+    {%else%}
+    {%with True as hx_swap_oob%}
+        {%include 'campaign_leads/htmx/column_metadata.html'%}
+    {%endwith%}
+    {%endif%}
+{%endfor%}

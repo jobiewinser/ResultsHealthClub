@@ -14,9 +14,10 @@ class WhatsAppMessage(models.Model):
     message = models.TextField(null=True, blank=True)   
     phone_to = models.TextField(null=True, blank=True) 
     phone_from = models.TextField(null=True, blank=True)
-    communication = models.OneToOneField("academy_leads.Communication", on_delete=models.SET_NULL, null=True, blank=True) 
+    communication = models.OneToOneField("campaign_leads.Communication", on_delete=models.SET_NULL, null=True, blank=True) 
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    template = models.ForeignKey("academy_leads.WhatsappTemplate", on_delete=models.SET_NULL, null=True, blank=True)
+    template = models.ForeignKey("campaign_leads.WhatsappTemplate", on_delete=models.SET_NULL, null=True, blank=True)
+    company = models.ManyToManyField("core.Company")
     class Meta:
         ordering = ['-datetime']
     

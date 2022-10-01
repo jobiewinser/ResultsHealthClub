@@ -1,0 +1,34 @@
+
+{%load static%}
+<table id="results_table" class="table"> 
+    <thead> 
+        <tr>
+            <th>
+                Name
+            </th>
+            <th>
+                Status
+            </th>
+            {% comment %} <th>
+                Lead Date
+            </th> {% endcomment %}
+            <th>
+                Ad Campaign
+            </th>
+            <th>
+                Booked
+            </th>
+            {% comment %} <th>
+                Next Auto Whatsapp
+            </th> {% endcomment %}
+            <th>
+                Actions
+            </th>
+        </tr>
+    </thead>
+    <tbody> 
+        {%for lead in leads%}
+        {%include 'campaign_leads/htmx/campaign_booking_row.html'%}
+        {%endfor%}
+    </tbody>
+</table>

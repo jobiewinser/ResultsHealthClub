@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 
-from academy_leads.models import AcademyLead
+from campaign_leads.models import Campaignlead
 from core.models import Site
 from dateutil import relativedelta
 
@@ -15,7 +15,7 @@ def get_sales_to_leads_between_dates_with_timeframe_differences(start_date, end_
         time_label_set = []
         data_set = []
         while index_date < end_date + timeframe:
-            qs = AcademyLead.objects.filter(created__gte=index_date, created__lt=index_date + timeframe)
+            qs = Campaignlead.objects.filter(created__gte=index_date, created__lt=index_date + timeframe)
             if site:
                 qs = qs.filter(active_campaign_list__site=site)
             leads = qs.count()
@@ -47,7 +47,7 @@ def get_bookings_to_leads_between_dates_with_timeframe_differences(start_date, e
         time_label_set = []
         data_set = []
         while index_date < end_date + timeframe:
-            qs = AcademyLead.objects.filter(created__gte=index_date, created__lt=index_date + timeframe)
+            qs = Campaignlead.objects.filter(created__gte=index_date, created__lt=index_date + timeframe)
             if site:
                 qs = qs.filter(active_campaign_list__site=site)
             leads = qs.count()

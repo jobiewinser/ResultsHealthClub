@@ -3,7 +3,7 @@ import logging
 from django.http import HttpResponse
 import json
 from django.views.decorators.csrf import csrf_exempt
-from academy_leads.models import AcademyLead, Communication
+from campaign_leads.models import Campaignlead, Communication
 
 from whatsapp.models import WhatsAppMessage, WhatsAppMessageStatus
 logger = logging.getLogger(__name__)
@@ -32,7 +32,7 @@ class Webhooks(View):
                     from_number = message.get('from')
                     datetime_from_request = datetime.fromtimestamp(int(message.get('timestamp')))
                     try:
-                        lead = AcademyLead.objects.get(phone__icontains=from_number[-10:])
+                        lead = Campaignlead.objects.get(phone__icontains=from_number[-10:])
                         communication = Communication.objects.get_or_create(    
                             datetime = datetime_from_request,
                             lead = lead,

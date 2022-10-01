@@ -47,7 +47,7 @@ def get_modal_content(request, **kwargs):
                 user_pk = request.GET.get('user_pk', None)
                 if user_pk:
                     context["edit_user"] = User.objects.get(pk=user_pk)
-            return render(request, f"academy_leads/htmx/{template_name}.html", context)   
+            return render(request, f"campaign_leads/htmx/{template_name}.html", context)   
     except Exception as e:
         logger.debug("get_modal_content Error "+str(e))
         return HttpResponse(e, status=500)
