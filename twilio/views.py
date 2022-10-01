@@ -50,7 +50,7 @@ class MessageWebhooks(View):
             try:
                 message.__setattr__(key, request.POST.dict().get(key, [''])[0])
             except Exception as e:
-                error = ErrorModel.objects.create({'error':str(e)})
+                error = ErrorModel.objects.create(json_data={'error':str(e)})
                 message.errors.add(error)
         message.save()
         response = HttpResponse("")
