@@ -33,11 +33,7 @@ class MessageWebhooks(View):
             request_type='a',
             twilio_webhook_type='a',
         )          
-           
-        From_raw = request.POST.dict().get('From')[0]
-        Type_and_From = From_raw.split(':')
-        Type = Type_and_From[0]
-        From = Type_and_From[1]
+        
         message = TwilioMessage.objects.create(
             inbound = 'a',
             type = 'a',
@@ -46,7 +42,7 @@ class MessageWebhooks(View):
             From = From,
         )
 
-        for key in [
+        for key in ['From',
             'raw_webhook','Body','ProfileName',
             'From','To','SmsSid','MessageSid',
             'SmsMessageSid','AccountSid','ApiVersion',
