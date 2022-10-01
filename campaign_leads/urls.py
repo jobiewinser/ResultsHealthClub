@@ -22,7 +22,7 @@ urlpatterns = [
 
 
     path('booking-and-calender/', campaignleadsviews.CampaignBookingsOverviewView.as_view(), name='campaign-booking-overview'),
-    path('leads-and-calls/', campaignleadsviews.CampaignleadsOverviewView.as_view(), name='campaign-booking-overview'),    
+    path('leads-and-calls/', campaignleadsviews.CampaignleadsOverviewView.as_view(), name='campaign-leads-overview'),    
 
 
 
