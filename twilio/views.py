@@ -11,9 +11,9 @@ from core.models import ErrorModel
 @method_decorator(csrf_exempt, name="dispatch")
 class MessageWebhooks(View):
     def get(self, request, *args, **kwargs):
-        logger.debug(f"MessageWebhooks get {str(request.body)}")     
+        logger.debug(f"MessageWebhooks get {str(request.body.dict())}")     
         webhook = TwilioRawWebhook.objects.create(
-            json_data=json.loads(request.body),
+            json_data=json.loads(request.body.dict()),
             request_type='b',
             twilio_webhook_type='a',
         )
@@ -27,9 +27,9 @@ class MessageWebhooks(View):
         return response
 
     def post(self, request, *args, **kwargs):
-        logger.debug(f"MessageWebhooks post {str(request.body)}")       
+        logger.debug(f"MessageWebhooks post {str(request.body.dict())}")       
         webhook = TwilioRawWebhook.objects.create(
-            json_data=json.loads(request.body),
+            json_data=json.loads(request.body.dict()),
             request_type='a',
             twilio_webhook_type='a',
         )          
@@ -66,13 +66,13 @@ class MessageWebhooks(View):
 @method_decorator(csrf_exempt, name="dispatch")
 class StatusWebhooks(View):
     def get(self, request, *args, **kwargs):
-        logger.debug(f"StatusWebhooks get {str(request.body)}")            
+        logger.debug(f"StatusWebhooks get {str(request.body.dict())}")            
         response = HttpResponse("")
         response.status_code = 200
         return response
 
     def post(self, request, *args, **kwargs):
-        logger.debug(f"StatusWebhooks post {str(request.body)}")                      
+        logger.debug(f"StatusWebhooks post {str(request.body.dict())}")                      
         response = HttpResponse("")
         response.status_code = 200             
         return response
