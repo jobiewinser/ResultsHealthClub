@@ -299,7 +299,7 @@ tr.odd td {
     transition: opacity 50ms ease-in !important;
 }
 
-html ,.content,body {
+.flex-column {
     background-color: #f4f4f4;
 }
 .row {
@@ -521,20 +521,7 @@ html ,.content,body {
     font-size:unset
 }
 
-.crop-squarelogo {
-    /* max-width: 1200px; /* img src width (if known) */
-    height: 12vh;
-    object-fit: cover;
-    width:24vh;
-    overflow: hidden; 
+.side_nav_logo{
+    width:100%
 }
-
-.crop-squarelogo-small {
-    /* max-width: 1200px; /* img src width (if known) */
-    height: 6vh;
-    object-fit: cover;
-    overflow: hidden; 
-    width:12vh;
-}
-
   

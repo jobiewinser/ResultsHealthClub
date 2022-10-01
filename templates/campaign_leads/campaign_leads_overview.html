@@ -68,9 +68,10 @@
 </script>
 {%endblock scripts%}
 
-{%block content%}    
-    <div class="">
-        <div class="row">
+{%block overide_content%}       
+<div class="col d-flex flex-column h-sm-100 p-0" style="overflow-x:hidden"> 
+    <main class="row overflow-auto">
+        <div class="row p-0 mt-2">
             {%block extra_top_left_buttons %}
             {%include 'core/htmx/site_selection.html'%}
             <button hidden hx-get="{{request.path}}" hx-push-url="true" hx-swap="outerHTML" hx-include=".results_table_filters" hx-indicator=".top-htmx-indicator" hx-target="#leads_board" id="change_site" class="btn btn-primary btn-sm"></button>
@@ -108,7 +109,7 @@
             {%block extra_top_right_buttons %}
             {%endblock%}
         </div>
-        <div class="row">
+        <div class="row p-0">
             <div class="col-md-auto">
                 {%include 'campaign_leads/htmx/leads_board.html' %}
             </div>
@@ -116,9 +117,9 @@
             <div class="col">
             </div>
         </div>
-    </div>
+    </main>
     <div id="add_booking_area" class="" ondrop="drop_booking(event)" ondragover="allowDrop(event)">
         Add Booking
     </div>
-    
-{%endblock content%}
+</div>
+{%endblock overide_content%}

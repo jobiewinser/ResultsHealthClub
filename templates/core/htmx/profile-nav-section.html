@@ -3,7 +3,7 @@
 <input type="text" style="display:None" id="edit_user" name="template_name" value="edit_user"/>
 {% comment %} <input type="text" style="display:None" id="switch_user" name="template_name" value="switch_user"/> {% endcomment %}
 <input type="text" style="display:None" id="user-select-{{user.pk}}" name="user_pk" value="{{user.pk}}"/>
-<a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+<a href="#" class="align-items-center text-white text-decoration-none" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
     <img src="{%if user.profile.avatar%}/media/{{user.profile.avatar}}{%else%}{% static 'img/blank-profile-picture.png' %}{%endif%}" alt="" width="32" height="32" class="rounded-circle me-2">
     <span class="hide_small"><strong>{{user.profile}}</strong></span>
 </a>
