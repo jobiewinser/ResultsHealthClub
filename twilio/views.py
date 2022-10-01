@@ -13,7 +13,7 @@ class MessageWebhooks(View):
     def get(self, request, *args, **kwargs):
         logger.debug(f"MessageWebhooks get {str(request.GET.dict())}")     
         webhook = TwilioRawWebhook.objects.create(
-            json_data=json.loads(request.GET.dict()),
+            json_data=request.GET.dict(),
             request_type='b',
             twilio_webhook_type='a',
         )
@@ -29,7 +29,7 @@ class MessageWebhooks(View):
     def post(self, request, *args, **kwargs):
         logger.debug(f"MessageWebhooks post {str(request.POST.dict())}")       
         webhook = TwilioRawWebhook.objects.create(
-            json_data=json.loads(request.POST.dict()),
+            json_data=request.POST.dict(),
             request_type='a',
             twilio_webhook_type='a',
         )          
