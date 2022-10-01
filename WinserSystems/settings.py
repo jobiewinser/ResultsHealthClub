@@ -76,6 +76,11 @@ LOGGING = {
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'core.backends.CustomerBackend',
+]
+
 if os.getenv('ENVIRONMENT') == 'development':
     ALLOWED_HOSTS = ['*']
     DEBUG = True

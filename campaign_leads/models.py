@@ -137,7 +137,7 @@ class Booking(models.Model):
 class Note(models.Model):
     text = models.TextField(null=False, blank=False)
     lead = models.ForeignKey(Campaignlead, on_delete=models.CASCADE, null=True, blank=True)
-    communication = models.ForeignKey(Communication, on_delete=models.CASCADE, null=True, blank=True)
+    communication = models.ForeignKey('campaign_leads.Communication', on_delete=models.CASCADE, null=True, blank=True)
     booking = models.ForeignKey(Booking, on_delete=models.CASCADE, null=True, blank=True)
     staff_user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     #This referes to the date it was created unless it's attached to a communication/booking, then it's set to the related datetime
