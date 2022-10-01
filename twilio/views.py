@@ -38,8 +38,6 @@ class MessageWebhooks(View):
             inbound = 'a',
             type = 'a',
             raw_webhook = webhook,
-            Type = Type,
-            From = From,
         )
 
         for key in ['From',
