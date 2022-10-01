@@ -28,8 +28,8 @@ class TwilioMessage(models.Model):
                     )
     raw_webhook = models.ForeignKey("twilio.TwilioRawWebhook", null=True, blank=True, on_delete=models.SET_NULL)
     inbound = models.CharField(choices=INBOUND_OUTBOUND_CHOICES, default='a', max_length=1)
-    Type = models.CharField(choices=TYPE_CHOICES, default='whatsapp', max_length=15)
     errors = models.ManyToManyField("core.ErrorModel", null=True, blank=True)
+    Type = models.CharField(choices=TYPE_CHOICES, default='whatsapp', max_length=15)
 
     Body = models.TextField(null=True, blank=True)
     ProfileName = models.TextField(null=True, blank=True)

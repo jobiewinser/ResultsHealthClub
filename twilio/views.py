@@ -36,7 +36,7 @@ class MessageWebhooks(View):
         
         message = TwilioMessage.objects.create(
             inbound = 'a',
-            type = 'a',
+            Type = 'a',
             raw_webhook = webhook,
         )
 
