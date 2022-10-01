@@ -1,8 +1,8 @@
 <div class="dropdown" id="profile-dropdown">
-    <button class="btn btn-light" type="button"
+    {% comment %} <button class="btn btn-light" type="button"
     hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" hx-include="#switch_user"
     hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
-    hx-swap="innerHTML" hx-trigger="click">
+    hx-swap="innerHTML" hx-trigger="click"> {% endcomment %}
         <span style="font-size:12px">Logged in as {{user.profile}} </b> 
         <img src="/media/{{user.profile.avatar}}" width="40" height="40" class="rounded-circle">
     </button>

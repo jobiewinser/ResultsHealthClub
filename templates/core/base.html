@@ -98,26 +98,52 @@
     <body>
         <!-- Sidebar-->
         <div class="row">
-            <div class="col-md-auto p-0 side_nav bg-dark">
-            {%block navbar%}
-                <img id="" src="{% static 'img/logo_white.png' %}" style="object-fit: cover; height:20vh" alt="winser systems logo">
-                <ul class="nav nav-pills">
-                    <li class="mb-1">
-                        <button class="btn btn-toggle align-items-center rounded collapsed {%if request.path == '/'%} active{%endif%}" data-bs-toggle="collapse" data-bs-target="#home-collapse" {%if request.path == '/'%} aria-expanded="true"{%endif%}>
-                        Products
-                        </button>
-                        <div class="collapse {%if request.path == '/'%} active show{%endif%}" id="home-collapse">
-                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                            <li><a href="#" class="link-light rounded ">Campaign Leads System</a></li>
-                        </ul>
-                        </div>
-                    </li>                
-                </ul>
-                {% comment %} <div class="dropdown" id="profile-nav-section">
-                    {%include 'core/htmx/profile-nav-section.html'%}
-                </div> {% endcomment %}
-            {%endblock navbar%}
-            </div>
+            <nav class="col-md-auto p-0 side_nav bg-dark hide_small">
+                {%block navbar%}
+                    <a class="navbar-brand" href="{%url 'home'%}"><img class="crop-squarelogo" src="{% static 'img/logo_white.png' %}" alt="winser systems logo"></a>
+                    
+                    <hr class="text-white m-1 side_nav_hr">
+                    <ul class="nav nav-pills">
+                        <li class="mb-1">
+                            <button class="side_nav_button btn btn-toggle align-items-center rounded collapsed {%if 'products' in request.path%} active{%endif%}"
+                                data-bs-toggle="collapse" data-bs-target="#home-collapse" 
+                                {%if 'products' in request.path%} aria-expanded="true"{%endif%}>
+                            Products
+                            </button>
+                            <div class="collapse {%if 'products' in request.path%} active show{%endif%}" id="home-collapse">
+                                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                                    <li><a href="{% url 'campaign-leads-product-page'%}" class="link-light rounded {%if 'campaign-leads-product-page' in request.path%}active{%endif%}">Campaign Leads System</a></li>
+                                </ul>
+                            </div>
+                        </li>              
+                    </ul>     
+                    <ul class="nav nav-pills ">
+                        <li class="m-1">
+                            <div class="dropdown  m-2" id="profile-nav-section">
+                                {%include 'core/htmx/profile-nav-section.html'%}
+                            </div> 
+                        </li>                   
+                    </ul>   
+                {%endblock navbar%}
+            </nav>
+            <nav class="col p-0 side_nav bg-dark show_small">
+                <div class="row">
+                    <div class="col-md-auto p-0">
+                        <a class="show_small" href="{%url 'home'%}"><img class="crop-squarelogo-small" src="{% static 'img/logo_white.png' %}" alt="winser systems logo"></a>  
+                    </div>
+                    <div class="col p-0">
+                    </div>
+                    <div class="col-md-auto p-0">
+                        <ul class="nav nav-pills ">
+                            <li class="m-1">
+                                <div class="dropdown  m-2" id="profile-nav-section">
+                                    {%include 'core/htmx/profile-nav-section.html'%}
+                                </div> 
+                            </li>                   
+                        </ul>   
+                    </div>
+                </div>
+            </nav>
             <!-- Page content wrapper-->
             <div class="col p-0">
                 {%block content%}

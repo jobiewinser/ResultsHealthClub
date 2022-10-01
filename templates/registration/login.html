@@ -6,14 +6,6 @@
 {%block content%}
 
     <div class="login-dark">
-      <form method="post" style="text-align:center">
-        {%csrf_token%}
-        <img src="{% static 'img/logo_black.png' %}" height="80px" style="object-fit: cover;">
-          <div class="illustration"><i class="icon ion-ios-locked-outline"></i></div>
-          <div class="form-control"><input class="form-control" type="text" id="id_username" name="username" placeholder="Username"></div>
-          <div class="form-control"><input class="form-control" type="password" id="id_password" name="password" placeholder="Password"></div>
-          <div class="m-2"><button class="btn btn-primary btn-block" type="submit">Log In</button></div>
-          {% comment %} <a href="#" class="forgot">Forgot your email or password?</a> {% endcomment %}
-        </form>
-  </div>
+      {%include 'academy_leads/htmx/login_snippet.html'%}
+    </div>
 {%endblock content%}

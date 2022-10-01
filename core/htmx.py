@@ -16,20 +16,20 @@ from django.http import QueryDict
 
 logger = logging.getLogger(__name__)
 
-@login_required
-def switch_user(request, **kwargs):
-    logger.debug(str(request.user))
-    try:
-        if request.user.is_staff:
-            user_pk = request.POST.get('user_pk')
-            if type(user_pk) == list:
-                user_pk = user_pk[0]
-            logger.debug(f"TEST {str(user_pk)}")
-            login(request, User.objects.get(pk=user_pk))
-            return render(request, f"core/htmx/profile-nav-section.html", {})   
-    except Exception as e:
-        logger.debug("switch_user Error "+str(e))
-        return HttpResponse(e, status=500)
+# @login_required
+# def switch_user(request, **kwargs):
+#     logger.debug(str(request.user))
+#     try:
+#         if request.user.is_staff:
+#             user_pk = request.POST.get('user_pk')
+#             if type(user_pk) == list:
+#                 user_pk = user_pk[0]
+#             logger.debug(f"TEST {str(user_pk)}")
+#             login(request, User.objects.get(pk=user_pk))
+#             return render(request, f"core/htmx/profile-nav-section.html", {})   
+#     except Exception as e:
+#         logger.debug("switch_user Error "+str(e))
+#         return HttpResponse(e, status=500)
 
 @login_required
 def get_modal_content(request, **kwargs):
@@ -41,9 +41,9 @@ def get_modal_content(request, **kwargs):
         if request.user.is_staff:
             template_name = request.GET.get('template_name', '')
             context = {'site_list':Site.objects.all()}
-            if template_name == 'switch_user':
-                context['users'] = User.objects.filter(is_staff=True).order_by('first_name')
-            elif template_name == 'edit_user':
+            # if template_name == 'switch_user':
+            #     context['users'] = User.objects.filter(is_staff=True).order_by('first_name')
+            if template_name == 'edit_user':
                 user_pk = request.GET.get('user_pk', None)
                 if user_pk:
                     context["edit_user"] = User.objects.get(pk=user_pk)

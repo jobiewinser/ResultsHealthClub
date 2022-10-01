@@ -13,6 +13,8 @@ logger = logging.getLogger(__name__)
 
 class HomeView(TemplateView):
     template_name='core/home.html'
+class CampaignLeadsProductPageView(TemplateView):
+    template_name='core/campaign_leads_product_page.html'
 
 
 

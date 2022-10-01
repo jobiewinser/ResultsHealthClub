@@ -1,0 +1,11 @@
+{%load static%}
+<form method="post" action="/accounts/login/" style="text-align:center">
+    {%csrf_token%}
+    <img class="crop-squarelogo" src="{% static 'img/logo_black.png' %}" style="object-fit: cover; width:20vh" alt="winser systems logo">
+    <hr class="m-1">
+    
+    <div class="m-2">Username <input class="form-control" type="text" id="id_username" name="username" placeholder="Username"></div>
+    <div class="m-2">Password <input class="form-control" type="password" id="id_password" name="password" placeholder="Password"></div>
+    <div class="m-4"><button class="btn btn-primary btn-block" type="submit">Log In</button></div>
+    {% comment %} <a href="#" class="forgot">Forgot your email or password?</a> {% endcomment %}
+</form>

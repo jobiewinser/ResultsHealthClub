@@ -487,14 +487,54 @@ html ,.content,body {
     width: auto;
 }
 
-
+#profile-nav-section {    
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+.show_small {
+    display:none;
+}
 @media (max-width: 500px) {
-    .side_nav>img {
+    .hide_small {
+        display:none;
+    }
+    .show_small {
+        display:flex;
+    }
+    .navbar-brand,.side_nav_hr,.hide_small {
         display:none;
     }
     .side_nav{
-        width:100vw;
+        width:500px;
         height:unset;
         min-height:unset;
+        flex: unset;
+    }
+
+    #profile-nav-section {  
+        position: unset;
     }
 }
+
+.side_nav_button {
+    font-size:unset
+}
+
+.crop-squarelogo {
+    /* max-width: 1200px; /* img src width (if known) */
+    height: 12vh;
+    object-fit: cover;
+    width:24vh;
+    overflow: hidden; 
+}
+
+.crop-squarelogo-small {
+    /* max-width: 1200px; /* img src width (if known) */
+    height: 6vh;
+    object-fit: cover;
+    overflow: hidden; 
+    width:12vh;
+}
+
+  

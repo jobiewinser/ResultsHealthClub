@@ -30,8 +30,8 @@ def get_modal_content(request, **kwargs):
             if param1:
                 context['lead'] = AcademyLead.objects.get(pk=param1)
             
-            if template_name == 'switch_user':
-                context['users'] = User.objects.filter(is_staff=True).order_by('first_name')
+            # if template_name == 'switch_user':
+            #     context['users'] = User.objects.filter(is_staff=True).order_by('first_name')
             if template_name == 'log_communication':
                 context['communication_type'] = kwargs.get('param2')
                 context['communication_type_display'] = communication_choices_dict[kwargs.get('param2')]

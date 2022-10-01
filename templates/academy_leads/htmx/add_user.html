@@ -4,7 +4,7 @@
         <div class="col center" >
             
             <div class="form-group">
-                <label class="form-label" for="site_pk">Site: </label>
+                <label class="form-label" for="site_pk">Default Site: </label>
                 <select class="form-select add_user_input" name="site_pk" id="site_pk">
                     {%for site in site_list%}
                     <option value="{{site.pk}}">{{site.name}}</option>
@@ -46,8 +46,9 @@
     </div>
 </span>
 <span hx-swap-oob="true" id="generic_modal_title">
-    <a href="#"
+    {% comment %} <a href="#"
     hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" hx-include="#switch_user"
     hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
-    hx-swap="innerHTML" hx-trigger="click"><i class="fa-solid fa-arrow-left"></i> Back</a> - Add User
+    hx-swap="innerHTML" hx-trigger="click"><i class="fa-solid fa-arrow-left"></i> Back</a> -  {% endcomment %}
+    Add User
 </span>

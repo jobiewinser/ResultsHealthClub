@@ -4,7 +4,7 @@
         <div class="col center" >
             
             <div class="form-group">
-                <label class="form-label" for="site_pk">Site: </label>
+                <label class="form-label" for="site_pk">Default Site: </label>
                 <select class="form-select edit_user_input" name="site_pk" id="site_pk">
                     {%if not edit_user.profile.site%}<option value="">Show All Sites</option>{%endif%}
                     {%for site in site_list%}
@@ -47,9 +47,10 @@
         </div>
     </div>
 </span>
-<span hx-swap-oob="true" id="generic_modal_title">
-    <a href="#"
+<span hx-swap-oob="true" id="generic_modal_title">    
+    {% comment %} <a href="#"
     hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" hx-include="#switch_user"
     hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
-    hx-swap="innerHTML" hx-trigger="click"><i class="fa-solid fa-arrow-left"></i> Back</a> - Edit User - {{edit_user}}
+    hx-swap="innerHTML" hx-trigger="click"><i class="fa-solid fa-arrow-left"></i> Back</a> -  {% endcomment %}
+    Edit User - {{edit_user.first_name}} {{edit_user.last_name}}
 </span>
