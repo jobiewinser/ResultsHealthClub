@@ -48,7 +48,7 @@ class MessageWebhooks(View):
             'ReferralNumMedia','SmsStatus'
         ]:
             try:
-                message.__setattr__(key, request.POST.dict().get(key, [''])[0])
+                message.__setattr__(key, request.POST.dict().get(key, ''))
             except Exception as e:
                 error = ErrorModel.objects.create(json_data={'error':str(e)})
                 message.errors.add(error)
