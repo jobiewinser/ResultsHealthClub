@@ -37,7 +37,7 @@ class Campaignlead(models.Model):
     phone = models.TextField(null=True, blank=True)
     country_code = models.TextField(null=True, blank=True)
     active_campaign_list = models.ForeignKey("active_campaign.ActiveCampaignList", on_delete=models.CASCADE, null=True, blank=True)
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     arrived = models.BooleanField(default=False)
     sold = models.BooleanField(default=False)
     complete = models.BooleanField(default=False)
@@ -114,7 +114,7 @@ def execute_after_save(sender, instance, created, *args, **kwargs):
         instance.send_whatsapp_message(1, user=None)
         
 class Communication(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     datetime = models.DateTimeField(null=False, blank=False)
     lead = models.ForeignKey(Campaignlead, on_delete=models.CASCADE, null=True, blank=True)
     type = models.CharField(choices=COMMUNICATION_CHOICES, max_length=2, null=False, blank=False)
@@ -126,7 +126,7 @@ class Communication(models.Model):
         ordering = ['-datetime']
 
 class Booking(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     datetime = models.DateTimeField(null=False, blank=False)
     lead = models.ForeignKey(Campaignlead, on_delete=models.CASCADE)
     type = models.CharField(choices=BOOKING_CHOICES, max_length=2, null=False, blank=False)
@@ -165,7 +165,7 @@ class WhatsappTemplate(models.Model):
     text = models.TextField(null=False, blank=False)
     edited_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     edited = models.DateTimeField(null=True, blank=True) 
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
 
     objects = WhatsappTemplateManager()
