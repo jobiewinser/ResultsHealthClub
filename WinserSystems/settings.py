@@ -24,6 +24,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 WHATSAPP_PHONE_OVERRIDE=False
 
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -97,6 +98,8 @@ else:
         os.path.join(BASE_DIR, "staticfiles"),
     )
 
+if DEBUG:
+    WHATSAPP_PHONE_OVERRIDE='447827777940'
 ENABLE_WHATSAPP_MESSAGING = os.getenv('ENABLE_WHATSAPP_MESSAGING') == 'True'
 
 # Application definition

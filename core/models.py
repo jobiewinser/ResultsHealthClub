@@ -8,6 +8,7 @@ class Site(models.Model):
     name = models.TextField(blank=True, null=True)
     whatsapp_business_phone_number_id = models.TextField(blank=True, null=True)
     whatsapp_business_phone_number = models.TextField(blank=True, null=True)
+    whatsapp_access_token = models.TextField(blank=True, null=True)
     company = models.ManyToManyField("core.Company")
 
     def get_leads_created_in_month_and_year(self, date):
@@ -26,6 +27,8 @@ class Company(models.Model):
     @property
     def get_campaign_leads_enabled(self):
         return self.campaign_leads_enabled
+    def __str__(self):
+        return f"{self.company_name}"
  
 # Extending User Model Using a One-To-One Link
 class Profile(models.Model):

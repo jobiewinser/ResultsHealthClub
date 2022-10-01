@@ -27,6 +27,7 @@ urlpatterns = [
     path('', include('active_campaign.urls')),
     path('', include('analytics.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
+    path('twilio/', include('twilio.urls')),
 ]
 from django.conf import settings
 from django.conf.urls.static import static

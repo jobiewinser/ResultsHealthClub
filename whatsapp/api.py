@@ -17,38 +17,39 @@ logger = logging.getLogger(__name__)
 # https://business.facebook.com/settings/people/100085397745468?business_id=851701125750291
 class Whatsapp:
     
-    whatsapp_access_token = os.getenv("WHATSAPP_ACCESS_TOKEN")
+    # whatsapp_access_token = os.getenv("WHATSAPP_ACCESS_TOKEN")
     whatsapp_url = os.getenv("WHATSAPP_URL")
     whatsapp_app_id = os.getenv("WHATSAPP_APP_ID")
     
     whatsapp_business_id = os.getenv("WHATSAPP_BUSINESS_ID")
     whatsapp_business_account_id = os.getenv("WHATSAPP_BUSINESS_ACCOUNT_ID")
 
-    def _get_headers(self):
+    def _get_headers(self, whatsapp_access_token):
         headers = {
-            'Authorization': 'Bearer ' + self.whatsapp_access_token,
+            'Authorization': 'Bearer ' + whatsapp_access_token,
                    'Content-Type': 'application/json'
                    }
         return headers
     #POST
-    def send_message(self, recipient_number, message, whatsapp_business_phone_number_id, preview_url = False):   
-        if settings.WHATSAPP_PHONE_OVERRIDE:
-            recipient_number = settings.WHATSAPP_PHONE_OVERRIDE     
-        url = f"{self.whatsapp_url}{whatsapp_business_phone_number_id}/messages"
-        headers = self._get_headers()
-        body = { 
-            "messaging_product": "whatsapp", 
-            "to": f"{recipient_number}", 
-            "type": "text",
-            "text": json.dumps({
-                "body": f"{message}",
-                "preview_url": preview_url,
-                })
-        }
-        response = requests.post(url=url, json=body, headers=headers)
-        response_body = response.json()
-        print(response_body)
-        return response_body
+    def send_message(self, recipient_number, message, whatsapp_business_phone_number_id, whatsapp_access_token, preview_url = False):   
+        if message:
+            if settings.WHATSAPP_PHONE_OVERRIDE:
+                recipient_number = settings.WHATSAPP_PHONE_OVERRIDE     
+            url = f"{self.whatsapp_url}{whatsapp_business_phone_number_id}/messages"
+            headers = self._get_headers(whatsapp_access_token)
+            body = { 
+                "messaging_product": "whatsapp", 
+                "to": f"{recipient_number}", 
+                "type": "text",
+                "text": json.dumps({
+                    "body": f"{message}",
+                    "preview_url": preview_url,
+                    })
+            }
+            response = requests.post(url=url, json=body, headers=headers)
+            response_body = response.json()
+            print(response_body)
+            return response_body
     #GET
     def get_phone_numbers(self):        
         url = f"{self.whatsapp_url}{self.whatsapp_business_account_id}/phone_numbers?access_token={self.whatsapp_access_token}"

@@ -78,7 +78,7 @@ class Campaignlead(models.Model):
             recipient_number = f"{self.country_code}{self.phone}"
             if settings.WHATSAPP_PHONE_OVERRIDE:
                 recipient_number = settings.WHATSAPP_PHONE_OVERRIDE     
-            response = whatsapp.send_message(recipient_number, message, self.active_campaign_list.site.whatsapp_business_phone_number_id)
+            response = whatsapp.send_message(recipient_number, message, self.active_campaign_list.site.whatsapp_business_phone_number_id, self.active_campaign_list.site.whatsapp_access_token)
             reponse_messages = response.get('messages',[])
             if reponse_messages:
                 for response_message in reponse_messages:
