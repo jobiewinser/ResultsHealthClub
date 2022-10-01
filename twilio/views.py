@@ -8,13 +8,13 @@ from django.utils.decorators import method_decorator
 @method_decorator(csrf_exempt, name="dispatch")
 class MessageWebhooks(View):
     def get(self, request, *args, **kwargs):
-        logger.debug(str(request.GET))                 
+        logger.debug(f"MessageWebhooks get {str(request.GET)}")                 
         response = HttpResponse("")
         response.status_code = 200
         return response
 
     def post(self, request, *args, **kwargs):
-        logger.debug(str(request.POST))                        
+        logger.debug(f"MessageWebhooks post {str(request.POST)}")                      
         response = HttpResponse("")
         response.status_code = 200             
         return response
@@ -22,13 +22,13 @@ class MessageWebhooks(View):
 @method_decorator(csrf_exempt, name="dispatch")
 class StatusWebhooks(View):
     def get(self, request, *args, **kwargs):
-        logger.debug(str(request.GET))                 
+        logger.debug(f"StatusWebhooks get {str(request.GET)}")            
         response = HttpResponse("")
         response.status_code = 200
         return response
 
     def post(self, request, *args, **kwargs):
-        logger.debug(str(request.POST))                        
+        logger.debug(f"StatusWebhooks post {str(request.POST)}")                      
         response = HttpResponse("")
         response.status_code = 200             
         return response
