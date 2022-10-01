@@ -74,13 +74,6 @@ LOGGING = {
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("SECRET_KEY")
-
-
-AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-    'core.backends.CustomerBackend',
-]
-
 if os.getenv('ENVIRONMENT') == 'development':
     ALLOWED_HOSTS = ['*']
     DEBUG = True
