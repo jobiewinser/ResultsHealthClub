@@ -11,9 +11,9 @@ from core.models import ErrorModel
 @method_decorator(csrf_exempt, name="dispatch")
 class MessageWebhooks(View):
     def get(self, request, *args, **kwargs):
-        logger.debug(f"MessageWebhooks get {str(request.values)}")     
+        logger.debug(f"MessageWebhooks get {str(request.GET.dict())}")     
         webhook = TwilioRawWebhook.objects.create(
-            json_data=json.loads(request.values),
+            json_data=json.loads(request.GET.dict()),
             request_type='b',
             twilio_webhook_type='a',
         )
@@ -27,14 +27,14 @@ class MessageWebhooks(View):
         return response
 
     def post(self, request, *args, **kwargs):
-        logger.debug(f"MessageWebhooks post {str(request.values)}")       
+        logger.debug(f"MessageWebhooks post {str(request.POST.dict())}")       
         webhook = TwilioRawWebhook.objects.create(
-            json_data=json.loads(request.values),
+            json_data=json.loads(request.POST.dict()),
             request_type='a',
             twilio_webhook_type='a',
         )          
            
-        From_raw = request.values.get('From')[0]
+        From_raw = request.POST.dict().get('From')[0]
         Type_and_From = From_raw.split(':')
         Type = Type_and_From[0]
         From = Type_and_From[1]
@@ -54,7 +54,7 @@ class MessageWebhooks(View):
             'ReferralNumMedia','SmsStatus'
         ]:
             try:
-                message.__setattr__(key, request.values.get(key, [''])[0])
+                message.__setattr__(key, request.POST.dict().get(key, [''])[0])
             except Exception as e:
                 error = ErrorModel.objects.create({'error':str(e)})
                 message.errors.add(error)
@@ -66,13 +66,13 @@ class MessageWebhooks(View):
 @method_decorator(csrf_exempt, name="dispatch")
 class StatusWebhooks(View):
     def get(self, request, *args, **kwargs):
-        logger.debug(f"StatusWebhooks get {str(request.values)}")            
+        logger.debug(f"StatusWebhooks get {str(request.GET.dict())}")            
         response = HttpResponse("")
         response.status_code = 200
         return response
 
     def post(self, request, *args, **kwargs):
-        logger.debug(f"StatusWebhooks post {str(request.values)}")                      
+        logger.debug(f"StatusWebhooks post {str(request.POST.dict())}")                      
         response = HttpResponse("")
         response.status_code = 200             
         return response
