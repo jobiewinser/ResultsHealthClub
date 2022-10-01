@@ -1,11 +1,11 @@
-{% extends 'campaign_leads/campaign_leads_base.html' %}
+{% comment %} {% extends 'campaign_leads/campaign_leads_base.html' %}
 {%load static%}
 
 {%block navbar%}
 {%endblock navbar%}
-{%block content%}
+{%block content%} {% endcomment %}
 
     <div class="login-dark">
       {%include 'campaign_leads/htmx/login_snippet.html'%}
     </div>
-{%endblock content%}
+{% comment %} {%endblock content%} {% endcomment %}
