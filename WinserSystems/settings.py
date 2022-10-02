@@ -120,6 +120,7 @@ INSTALLED_APPS = [
     'core',
     'import_export',
     'rest_framework',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -270,3 +271,10 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+ASGI_APPLICATION = "WinserSystems.routing.application" #routing.py will be created later
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': "channels.layers.InMemoryChannelLayer"
+        }
+}

@@ -6,12 +6,12 @@
     $(document).ready(function() {
         initDataTable();
         document.body.addEventListener('htmx:beforeRequest', function(evt) {  
-            if (evt.detail.target.id == 'results_table' || evt.detail.pathInfo.path.includes("academy-booking-overview")){
-                $("#results_table").dataTable().fnDestroy();
+            if (evt.detail.target.id == 'overview_table' || evt.detail.pathInfo.path.includes("academy-booking-overview")){
+                $("#overview_table").dataTable().fnDestroy();
             }
         });
         document.body.addEventListener('htmx:afterSwap', function(evt) {  
-            if (evt.detail.target.id == 'results_table'){
+            if (evt.detail.target.id == 'overview_table'){
                 initDataTable(); 
             }
             else if (evt.detail.pathInfo.path.includes("modify-user")){
@@ -19,7 +19,7 @@
                 snackbarShow('Successfully modifed/added user', 'success')
             }            
             {% comment %} if (evt.detail.target.classList.contains('academy_booking_row')) {
-                $('#refresh_results_table').click(); 
+                $('#refresh_overview_table').click(); 
             } {% endcomment %}
             
         });

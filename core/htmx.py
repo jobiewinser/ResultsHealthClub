@@ -99,7 +99,7 @@ class ModifyUser(View):
 @login_required
 def generate_free_taster_link(request, **kwargs):
     try:
-        if request.user.is_staff:
+        if request.user.is_authenticated:
             customer_name = request.POST.get('customer_name', '')
             site_pk = request.POST.get('site_pk','')
             if customer_name:

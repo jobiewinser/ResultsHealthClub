@@ -12,7 +12,8 @@
             <h6 class="nowrap">{{staff_user.first_name}} {{staff_user.last_name}}</h6>
             <br>            
             <a href="#" class="nowrap" ton class="btn btn-light" type="button"
-            hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" hx-include="#edit_user,#user-select-{{staff_user.pk}}"
+            hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" hx-include="#user-select-{{staff_user.pk}}"
+            hx-vals='{"template_name": "edit_user"}'
             hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
             hx-swap="innerHTML" hx-trigger="click"><i class="fa-light fa-gear"></i> Edit</a>
         </div>
@@ -23,7 +24,8 @@
     <div class="row">
         <div class="col center">
             <button class="btn btn-light" type="button"
-                hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" hx-include="#add_user"
+                hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
+                hx-vals='{"template_name": "add_user"}'
                 hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
                 hx-swap="innerHTML" hx-trigger="click">
                 Add Profile

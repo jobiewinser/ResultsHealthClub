@@ -31,20 +31,21 @@ class Webhooks(View):
                 if guid:
                     active_campaign_list = ActiveCampaignList.objects.get(guid=guid)
                     if active_campaign_list.site:
-                        phone_number_whole = str(data.get('contact[phone]', "")).replace('+','').replace(' ','')
-                        if phone_number_whole:
-                            if phone_number_whole[0] == "0":
-                                phone_number = phone_number_whole[1:]
-                                country_code = "44"
-                            elif phone_number_whole[:2] == "44":
-                                phone_number = phone_number_whole[2:]
-                                country_code = "44"
-                            else:
-                                phone_number = phone_number_whole
-                                country_code = "44"
-                        else:
-                            phone_number = "None"
-                            country_code = "None"
+                        phone_number_whole = str(data.get('contact[phone]', "")).replace(' ','')
+                        # phone_number_whole = str(data.get('contact[phone]', "")).replace('+','').replace(' ','')
+                        # if phone_number_whole:
+                        #     if phone_number_whole[0] == "0":
+                        #         phone_number = phone_number_whole[1:]
+                        #         country_code = "44"
+                        #     elif phone_number_whole[:2] == "44":
+                        #         phone_number = phone_number_whole[2:]
+                        #         country_code = "44"
+                        #     else:
+                        #         phone_number = phone_number_whole
+                        #         country_code = "44"
+                        # else:
+                        #     phone_number = "None"
+                        #     country_code = "None"
                         possible_duplicate  = False
                         if Campaignlead.objects.filter(
                                 active_campaign_list=active_campaign_list,
@@ -55,8 +56,7 @@ class Webhooks(View):
                             Campaignlead.objects.create(
                                 active_campaign_contact_id=data.get('contact[id]'),
                                 first_name=data.get('contact[first_name]', "None"),
-                                phone=phone_number,
-                                country_code=country_code,
+                                whatsapp_number=f"whatsapp:+{phone_number_whole}",
                                 active_campaign_list=active_campaign_list,
                                 active_campaign_form_id=data.get('form[id]', None),
                                 possible_duplicate = possible_duplicate
@@ -89,16 +89,6 @@ class Webhooks(View):
 #     return render(request, f"active_campaign/htmx/campaigns_select.html", {'campaigns':Campaign.objects.all()})
     
 logger = logging.getLogger(__name__)
-
-def get_and_generate_active_campaign_list_objects():
-    for active_campaign_list_dict in ActiveCampaign().get_lists().get('lists',[]):
-        active_campaign_list, created = ActiveCampaignList.objects.get_or_create(
-            active_campaign_id = active_campaign_list_dict.pop('id'),
-            name = active_campaign_list_dict.pop('name')
-        )
-        active_campaign_list.json_data = active_campaign_list_dict
-        active_campaign_list.save()
-    return ActiveCampaignList.objects.all()
     
 def get_active_campaign_list_qs(request):
     first_model_query = (Campaignlead.objects
@@ -119,7 +109,8 @@ def get_active_campaign_list_qs(request):
 def get_active_campaign_lists(request, **kwargs):
     # try:
     if not settings.DEBUG:
-        get_and_generate_active_campaign_list_objects()
+        if request.user.profile.company:
+            request.user.profile.company.first().get_and_generate_active_campaign_list_objects()
         return render(request, f"active_campaign/htmx/active_campaign_lists_select.html", 
         {'active_campaign_lists':get_active_campaign_list_qs(request)})
     return render(request, f"active_campaign/htmx/active_campaign_lists_select.html", 

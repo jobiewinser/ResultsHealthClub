@@ -12,6 +12,10 @@ body {
     font-size: 1.5vh
 }
 
+.nav-link {
+    color:white
+}
+
 @font-face {
     font-family: 'Roboto-Regular';
     src: local('Roboto-Regular'), url('/static/fonts/Roboto/Roboto-Regular.ttf') format("truetype");

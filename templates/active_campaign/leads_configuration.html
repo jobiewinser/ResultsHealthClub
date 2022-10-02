@@ -1,4 +1,4 @@
-{% extends 'core/overviews.html' %}
+{% extends 'core/base.html' %}
     {%load core_tags%}
 {%load static tz core_tags%}
 {%block scripts%}
@@ -7,7 +7,7 @@
     $(document).ready(function() {
     });
     function initDataTable() {
-        dt = $('#results_table').DataTable(          
+        dt = $('#overview_table').DataTable(          
             {  
                 order: [[ 1, 'asc' ]],
                 iDisplayLength: 10,
@@ -33,7 +33,7 @@
 
 {%block table%}
 <br>
-<table id="results_table" class="table"> 
+<table id="overview_table" class="table"> 
     <thead> 
         <tr>
             <th>

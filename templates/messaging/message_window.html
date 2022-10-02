@@ -1,0 +1,48 @@
+{%load static%}
+
+
+<div class="card chat_bottom_window p-0" id="chat_card_{{lead.pk}}">
+    <div class="card-header chat_bottom_header center" >
+        <div class="row">
+            <div class="col p-0" data-bs-toggle="collapse" data-bs-target="#messageWindowCollapse_{{lead.pk}}" aria-expanded="true" aria-controls="messageWindowCollapse_{{lead.pk}}">
+                {{lead.name}}
+            </div>
+            <div class="col-auto p-0">
+                <i class="fa-sharp fa-solid fa-circle-xmark" onclick="$('#chat_card_{{lead.pk}}').remove()"></i>
+            </div>
+        </div>
+    </div>
+    <div class="card-body chat_card_body collapse show p-0" id="messageWindowCollapse_{{lead.pk}}">
+        {%for message in lead.twiliomessage_set.all%}
+            {%if message.inbound%}
+                <div class="row">
+                    <div class="col-auto p-0 ps-1 m-1">
+                        <img src="{% static 'img/blank-profile-picture.png' %}" alt="" width="22" height="22" class="rounded-circle">
+                    </div>
+                    <div class="col p-0 ps-1 m-1 card">
+                        {{message.Body}}
+                    </div>
+                </div>
+            {%else%}
+                <div class="row">
+                    <div class="col p-0 ps-1 m-1 card">
+                        {{message.Body}}
+                    </div>
+                    <div class="col-auto p-0 ps-1 m-1">
+                        <img src="{% static 'img/blank-profile-picture.png' %}" alt="" width="22" height="22" class="rounded-circle">
+                    </div>
+                </div>
+            {%endif%}
+        {%endfor%}
+        <div style="position: absolute; right:0; bottom: 0; width:100%" class="row"> 
+            <div class="col"> 
+                <input class="form-control" type="text">
+        
+                </input>
+            </div>
+            <div class="col-auto"> 
+                <button class="badge bg-primary"><i class="fa-solid fa-paper-plane-top"></i></button>
+            </div>
+        </div>
+    </div>
+</div>

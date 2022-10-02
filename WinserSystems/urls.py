@@ -23,6 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('campaign-leads/', include('campaign_leads.urls')),
     path('', include('core.urls')),
+    path('', include('messaging.urls')),
     path('', include('whatsapp.urls')),
     path('', include('active_campaign.urls')),
     path('', include('analytics.urls')),

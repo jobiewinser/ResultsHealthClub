@@ -1,6 +1,6 @@
 <div id="content">
     <div class="row">
-        <button hidden hx-get="{% url 'whatsapp-templates' %}" hx-push-url="true" hx-swap="outerHTML" hx-include=".non_site_dependant_results_table_filters" hx-indicator=".top-htmx-indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
+        <button hidden hx-get="{% url 'whatsapp-templates' %}" hx-push-url="true" hx-swap="outerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator=".top-htmx-indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
         {%block extra_top_left_buttons %}
         {%include 'core/htmx/site_selection.html'%}
         {%endblock%}

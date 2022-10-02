@@ -1,6 +1,6 @@
 {%load core_tags%}
 <span id="campaign_list_span">    
-    <select class="form-select select2 results_table_filters" onchange="$('#filter_active_campaign_list').click()" id="active_campaign_list_pk" name="active_campaign_list_pk">
+    <select class="form-select select2 overview_table_filters" onchange="$('#filter_active_campaign_list').click()" id="active_campaign_list_pk" name="active_campaign_list_pk">
         <option value="">Show all campaigns for this site</option>
         {%for active_campaign_list in active_campaign_lists%}
         {%if active_campaign_list.get_active_leads_qs.count%}

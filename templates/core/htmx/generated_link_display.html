@@ -4,8 +4,8 @@
     <div class="col-md-auto">
         <button class="btn btn-primary"        
         onclick="copyTextToClipboard('{% get_env_var 'SITE_URL' %}/free-taster/{{generated_link.guid}}')"
-        hx-get="{% url 'free-taster' %}" 
-        hx-swap="outerHTML" hx-indicator=".top-htmx-indicator" hx-target="#results_table"
+        hx-get="{% url 'free-taster-overview' %}" 
+        hx-swap="outerHTML" hx-indicator=".top-htmx-indicator" hx-target="#overview_table"
         ><i class="fa-solid fa-copy"></i> Copy</button>
     </div>
     <div class="col">

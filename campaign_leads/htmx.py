@@ -54,8 +54,8 @@ def create_campaign_lead(request, **kwargs):
         lead = Campaignlead.objects.create(
             first_name=first_name,
             # last_name=last_name,
-            phone=phone,
-            country_code=country_code,
+            whatsapp_number=f"whatsapp:+{country_code}{phone}",
+            # country_code=country_code,
             active_campaign_list=manually_created_list
         )
         return render(request, 'campaign_leads/htmx/lead_article.html', {'lead':lead,'max_call_count':1,'call_count':0})

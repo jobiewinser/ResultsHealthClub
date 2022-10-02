@@ -4,7 +4,7 @@
 {% comment %} <input type="text" style="display:None" id="switch_user" name="template_name" value="switch_user"/> {% endcomment %}
 <input type="text" style="display:None" id="user-select-{{user.pk}}" name="user_pk" value="{{user.pk}}"/>
 <a href="#" class="align-items-center text-white text-decoration-none" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-    <img src="{%if user.profile.avatar%}/media/{{user.profile.avatar}}{%else%}{% static 'img/blank-profile-picture.png' %}{%endif%}" alt="" width="32" height="32" class="rounded-circle me-2">
+    <img src="{%if user.profile.avatar%}/media/{{user.profile.avatar}}{%else%}{% static 'img/blank-profile-picture.png' %}{%endif%}" alt="" width="55" height="55" class="rounded-circle me-2">
     <span class="hide_small"><strong>{{user.profile}}</strong></span>
 </a>
 <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
@@ -13,7 +13,8 @@
         hx-swap="innerHTML" hx-trigger="click">Switch Profile</a>
     </li> {% endcomment %}
     <li><a class="dropdown-item" href="#"
-        hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" hx-include="#edit_user,#user-select-{{user.pk}}"
+        hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" hx-include="#user-select-{{user.pk}}"
+        hx-vals='{"template_name": "edit_user"}'
         hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
         hx-swap="innerHTML" hx-trigger="click">Edit Profile</a></li>
     <li><hr class="dropdown-divider"></li>

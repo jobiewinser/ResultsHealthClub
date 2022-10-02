@@ -13,7 +13,7 @@
             data-bs-trigger="hover" 
             data-bs-placement="top"
             data-bs-content="Click to open this number in whatsapp"
-            style="text-decoration: none; color: #25d366" class="nowrap" target="_blank" href="whatsapp://send?phone={{lead.country_code}}{{lead.phone}}"><i class="fa fa-whatsapp" aria-hidden="true"></i> +{{lead.country_code}} {{lead.phone}}</a></span>        
+            style="text-decoration: none; color: #25d366" class="nowrap" target="_blank" href="#"><i class="fa fa-whatsapp" aria-hidden="true"></i> {{lead.whatsapp_number}}</a></span>        
     </td>
     <td class="nowrap">
         {%if lead.complete and not lead.sold%}
@@ -148,14 +148,14 @@
                     data-bs-trigger="hover" 
                     data-bs-placement="top"
                     data-bs-content="Open Whatsapp for this lead"
-                    target="_blank" href="whatsapp://send?phone={{lead.country_code}}{{lead.phone}}"><i class="fa fa-whatsapp" aria-hidden="true"></i></a>
+                    target="_blank" href="#"><i class="fa fa-whatsapp" aria-hidden="true"></i></a>
                 <button class="btn btn-secondary btn-sm" type="button"
                     data-bs-toggle="popover" 
                     data-bs-trigger="hover" 
                     data-bs-placement="top"
                     data-bs-content="See communication history for this lead."
                     hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
-                    hx-include="#communication_history"
+                    hx-vals='{"template_name": "communication_history"}'
                     hx-get="{% url 'campaign-lead-get-modal-content' param1=lead.pk %}" 
                     hx-push-url="false"
                     hx-swap="innerHTML" hx-trigger="click"><i class="fa-regular fa-clock-rotate-left" ></i> <span style="color:Silver">{{lead.successful_communication.count}}</span></button>
@@ -169,7 +169,7 @@
                     data-bs-placement="top"
                     data-bs-content="Log a phone call communication attempt"
                     hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
-                    hx-include="#log_communication"
+                    hx-vals='{"template_name": "log_communication"}'
                     hx-get="{% url 'campaign-lead-get-modal-content' param1=lead.pk param2='a' %}" 
                     hx-push-url="false"
                     hx-swap="innerHTML" hx-trigger="click"><i class="fa fa-phone" aria-hidden="true"></i></button>
@@ -179,7 +179,7 @@
                     data-bs-placement="top"
                     data-bs-content="See communication history for this lead."
                     hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
-                    hx-include="#communication_history"
+                    hx-vals='{"template_name": "communication_history"}'
                     hx-get="{% url 'campaign-lead-get-modal-content' param1=lead.pk %}" 
                     hx-push-url="false"
                     hx-swap="innerHTML" hx-trigger="click"><i class="fa-regular fa-clock-rotate-left" ></i> <span style="color:Silver">{{lead.successful_communication.count}}</span></button>

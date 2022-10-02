@@ -55,11 +55,13 @@ class ActiveCampaign:
     #     headers = self._get_headers()
     #     response = requests.get(url=url, headers=headers)
     #     return response.json()
-    def get_lists(self):        
-        url = f"{self.active_campaign_url}api/3/lists?limit=100"
-        headers = self._get_headers()
-        response = requests.get(url=url, headers=headers)
-        return response.json()
+    def get_lists(self, activate_campaign_url):       
+        if activate_campaign_url: 
+            url = f"{activate_campaign_url}api/3/lists?limit=100"
+            headers = self._get_headers()
+            response = requests.get(url=url, headers=headers)
+            return response.json()
+        return {}
     # Get
     def get_all_messages(self):        
         url = f"{self.active_campaign_url}api/3/messages?limit=100"

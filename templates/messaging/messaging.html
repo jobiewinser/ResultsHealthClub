@@ -1,0 +1,92 @@
+{%load static%}
+{% comment %} <script>
+        $(document).ready(function() {  
+            const user_username = JSON.parse(document.getElementById('user_username').textContent);
+            document.querySelector('#submit').onclick = function (e) {
+                const messageInputDom = document.querySelector('#input');
+                const message = messageInputDom.value;
+                chatSocket.send(JSON.stringify({
+                    'message': message,
+                    'username': user_username,
+                }));
+                messageInputDom.value = '';
+            };
+            
+            const boxName = JSON.parse(document.getElementById('box-name').textContent);
+            const chatSocket = new WebSocket(
+                'ws://' +
+                window.location.host +
+                '/ws/chat/' +
+                boxName +
+                '/'
+            );
+            
+            chatSocket.onmessage = function (e) {
+                const data = JSON.parse(e.data);
+                document.querySelector('#chat-text').value += (data.message + ' sent by ' + data.username   + '\n') // add message to text box
+            }
+        })
+        
+</script> {% endcomment %}
+<link href="{% static 'css/chat.css' %}" rel="stylesheet" />
+    <span id="next_chat_window"></span>
+    {%if site%}
+    <div class="card chat_bottom_window p-0">
+        <div class="card-header chat_bottom_header collapsed center " data-bs-toggle="collapse" data-bs-target="#messageCollapse" aria-expanded="false" aria-controls="messageCollapse">
+            <b>Chats for {{site.name}}</b>
+        </div>
+        <div class="card-body collapse p-0 all_chat_card_body" id="messageCollapse">
+                {%for message in site.get_fresh_messages%}
+                {%if message.lead%}
+                <div class="row chat_row {%if message.inbound%}active_chat_row{%else%}inactive_chat_row{%endif%}"
+                hx-get="{%url 'leads-message-window' lead_pk=message.lead.pk%}"
+                hx-indicator=".top-htmx-indicator" 
+                hx-target="#next_chat_window"
+                hx-push-url="false"
+                hx-swap="outerHTML" hx-trigger="click"   
+                >
+                    <div class="col-auto p-0">
+                        <img src="{% static 'img/blank-profile-picture.png' %}" alt="" width="44" height="44" class="rounded-circle">
+                    </div>
+                    <div class="col p-0 ps-1">
+                        <div class="row chat_lead_name_row">
+                            <div class="col p-0">
+                                {{message.lead.name}}
+                            </div>
+                        </div>
+                        <div class="row chat_message_row">
+                            <div class="col p-0">
+                                {%if message.inbound%}{{message.lead.name}}{%else%}You{%endif%}: {{message.Body}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {%endif%}
+                {%endfor%}
+        </div>
+    </div>
+    {%else%}
+    <div class="card card-body chat_bottom_window">
+        <div class="card-header chat_bottom_header" >
+            Select a site to chat
+        </div>
+    </div>
+    {%endif%}
+    {% comment %} <div class="container">
+        <div class="row d-flex justify-content-center">
+            <div class="col-3">
+                <form>
+                    <div class="form-group">
+                        <label for="exampleFormControlTextarea1" class="h4 pt-5">Chatbox</label>
+                        <textarea class="form-control" id="chat-text" readonly rows="10"></textarea><br>
+                    </div>
+                    <div class="form-group">
+                        <input class="form-control" placeholder="Enter text here" id="input" type="text"></br>
+                    </div>
+                    <input class="btn btn-primary btn-lg btn-block" id="submit" type="button" value="Send">
+                </form>
+            </div>
+        </div>
+    </div> {% endcomment %}
+    {% comment %} Get data for username and chatbox name{% endcomment %}
+    {% comment %} {{ request.user.username|json_script:"user_username" }} {% endcomment %}

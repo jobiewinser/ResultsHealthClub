@@ -3,22 +3,22 @@
 {%if request.GET.booking_needed == 'true' or request.GET.booking_needed == True%}
 <div hx-swap-oob="true" class="col-md-auto" id="swap_booking_needed_button">
     <button class="btn btn-success btn-sm nowrap"
-        hx-indicator=".top-htmx-indicator" hx-target="#results_table" 
+        hx-indicator=".top-htmx-indicator" hx-target="#overview_table" 
         hx-get="{% url 'campaign-booking-overview' %}" 
         hx-push-url="true"
-        {% comment %} hx-swap="outerHTML" hx-include=".results_table_filters:not(#current_booking_needed),#change_booking_needed" hx-trigger="click"><i class="fa fa-book-open-cover" aria-hidden="true"></i> Show Booked & Non-Booked</button>       {% endcomment %}
-        hx-swap="outerHTML" hx-include=".results_table_filters:not(#current_booking_needed),#change_booking_needed" hx-trigger="click"><i class="fa fa-book-open-cover" aria-hidden="true"></i> Show Non-Booked <span class="badge bg-light bg-light-border">{{booking_needed_count}}</span></button>      
-        <input type="text" style="display:None" id="current_booking_needed" class="results_table_filters non_site_dependant_results_table_filters" name="booking_needed" value="true"/>  
+        {% comment %} hx-swap="outerHTML" hx-include=".overview_table_filters:not(#current_booking_needed),#change_booking_needed" hx-trigger="click"><i class="fa fa-book-open-cover" aria-hidden="true"></i> Show Booked & Non-Booked</button>       {% endcomment %}
+        hx-swap="outerHTML" hx-include=".overview_table_filters:not(#current_booking_needed),#change_booking_needed" hx-trigger="click"><i class="fa fa-book-open-cover" aria-hidden="true"></i> Show Non-Booked <span class="badge bg-light bg-light-border">{{booking_needed_count}}</span></button>      
+        <input type="text" style="display:None" id="current_booking_needed" class="overview_table_filters non_site_dependant_overview_table_filters" name="booking_needed" value="true"/>  
         <input type="text" style="display:None" id="change_booking_needed" name="booking_needed" value="false"/>
 </div>
 {%else%}
 <div hx-swap-oob="true" class="col-md-auto" id="swap_booking_needed_button">
     <button class="btn btn-light bg-light-border btn-sm nowrap"
-        hx-indicator=".top-htmx-indicator" hx-target="#results_table" 
+        hx-indicator=".top-htmx-indicator" hx-target="#overview_table" 
         hx-get="{% url 'campaign-booking-overview' %}" 
         hx-push-url="true"
-        hx-swap="outerHTML" hx-include=".results_table_filters:not(#current_booking_needed),#change_booking_needed" hx-trigger="click"><i class="fa fa-book-open-cover" aria-hidden="true"></i> Show Non-Booked <span class="badge bg-primary">{{booking_needed_count}}</span></button>
-        <input type="text" style="display:None" id="current_booking_needed" class="results_table_filters non_site_dependant_results_table_filters" name="booking_needed" value="false"/>
+        hx-swap="outerHTML" hx-include=".overview_table_filters:not(#current_booking_needed),#change_booking_needed" hx-trigger="click"><i class="fa fa-book-open-cover" aria-hidden="true"></i> Show Non-Booked <span class="badge bg-primary">{{booking_needed_count}}</span></button>
+        <input type="text" style="display:None" id="current_booking_needed" class="overview_table_filters non_site_dependant_overview_table_filters" name="booking_needed" value="false"/>
         <input type="text" style="display:None" id="change_booking_needed" name="booking_needed" value="true"/>
 </div>
 {%endif%}

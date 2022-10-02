@@ -1,8 +1,11 @@
 {%load static%}
 <div id="content">
     <div class="row">
-        <button hidden hx-get="{% url 'analytics' %}" hx-push-url="true" hx-swap="outerHTML" hx-include=".non_site_dependant_results_table_filters" hx-indicator=".top-htmx-indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
+        <button hidden hx-get="{% url 'analytics' %}" hx-push-url="true" hx-swap="outerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator=".top-htmx-indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
         {%block extra_top_left_buttons %}
+        <div class="col-md-auto">
+            <a class="btn btn-secondary" href="{%url 'campaign-leads-home'%}"><i class="fa-solid fa-arrow-left"></i> Back</a>             
+        </div>
         {%include 'core/htmx/site_selection.html'%}
         {%endblock%}
         <div class="col">                
@@ -19,7 +22,7 @@
                         data-bs-trigger="hover" 
                         data-bs-placement="top"
                         data-bs-html="true"
-                        data-bs-content="This shows the analytics for Leads and Sales for the chosen site (top left), between the times chosen (right).<br><br><small> (Jobie Note: Need to add gradient on percentage and time scale based table i.e 3 months shows individual weeks instead) </small>">Leads & sales <i class="fa-solid fa-circle-info"></i></h5> 
+                        data-bs-content="This shows the analytics for Leads and Sales for the chosen site (top left), between the times chosen (right).<br><br><small> (Jobie Note: Need to add gradient on percentage and time scale based table i.e 3 months shows individual weeks instead) </small>">Leads & Sales <i class="fa-solid fa-circle-info"></i></h5> 
                     </div>
                 </div>
 
@@ -38,7 +41,7 @@
                         data-bs-trigger="hover" 
                         data-bs-placement="top"
                         data-bs-html="true"
-                        data-bs-content="This shows the analytics for Leads and Bookings for the chosen site (top left), between the times chosen (right).<br><br><small> (Jobie Note: Need to add gradient on percentage and time scale based table i.e 3 months shows individual weeks instead) </small>">Leads & sales <i class="fa-solid fa-circle-info"></i></h5> 
+                        data-bs-content="This shows the analytics for Leads and Bookings for the chosen site (top left), between the times chosen (right).<br><br><small> (Jobie Note: Need to add gradient on percentage and time scale based table i.e 3 months shows individual weeks instead) </small>">Leads & Bookings <i class="fa-solid fa-circle-info"></i></h5> 
                     </div>
                 </div>
 

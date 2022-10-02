@@ -22,6 +22,7 @@
 
         {%block scripts%}
         <script>
+            
             function fallbackCopyTextToClipboard(text) {
                 var textArea = document.createElement("textarea");
                 textArea.value = text;
@@ -134,12 +135,15 @@
                             
                             {%if request.user.is_authenticated%} 
                             <li class="dropdown">
-                                <a href="#" class="nav-link dropdown-toggle px-sm-0 px-1 {%if 'campaign-leads/' in request.path%} active{%endif%}" id="dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <a href="#" class="nav-link dropdown-toggle px-sm-0 px-1" style="{%if 'campaign-leads/' in request.path%} font-weight:bold{%endif%}" id="dropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fs-5 bi-bootstrap"></i><span class="ms-1 d-none d-sm-inline">My Products </span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdown">
                                     {%if request.user.profile.get_company.campaign_leads_enabled%} 
-                                    <a href="{% url 'campaign-leads-home'%}" class="dropdown-item {%if 'campaign-leads/' in request.path%}active{%endif%}">My Campaign Leads</a>
+                                    <a href="{% url 'campaign-leads-home'%}" class="dropdown-item"  style="{%if 'campaign-leads/' in request.path%} font-weight:bold{%endif%}">My Campaign Leads</a>
+                                    {%endif%}
+                                    {%if request.user.profile.get_company.free_taster_enabled%} 
+                                    <a href="{% url 'free-taster-overview'%}" class="dropdown-item"  style="{%if 'free-taster/' in request.path%} font-weight:bold{%endif%}">My Free Taster Links</a>
                                     {%endif%}
                                 </ul>
                             </li>
@@ -150,7 +154,7 @@
                                     <i class="fs-5 bi-bootstrap"></i><span class="ms-1 d-none d-sm-inline">All Products</span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdown">
-                                    <a href="{% url 'campaign-leads-product-page'%}" class="dropdown-item {%if 'campaign-leads-product-page' in request.path%}active{%endif%}">Campaign Leads</a>
+                                    <a href="{% url 'campaign-leads-product-page'%}" class="dropdown-item" style="{%if 'campaign-leads-product-page/' in request.path%} font-weight:bold{%endif%}">Campaign Leads</a>
                                 </ul>
                             </li>
                         </ul>
@@ -184,7 +188,9 @@
                 </div>
             </div>
         </div>
+        {%block snackbar%}
         <div id="snackbar"></div>
+        {%endblock snackbar%}
         
     </body>
 </html>

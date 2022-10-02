@@ -9,7 +9,7 @@
                     data-bs-placement="top"
                     data-bs-content="See communication history for this lead."
                     hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
-                    hx-include="#communication_history"
+                    hx-vals='{"template_name": "communication_history"}'
                     hx-get="{% url 'campaign-lead-get-modal-content' param1=lead.pk %}" 
                     hx-push-url="false"
                     hx-swap="innerHTML" hx-trigger="click">
@@ -24,7 +24,7 @@
                     data-bs-placement="top"
                     data-bs-content="See booking history for this lead."
                     hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
-                    hx-include="#booking_history"
+                    hx-vals='{"template_name": "booking_history"}'
                     hx-get="{% url 'campaign-lead-get-modal-content' param1=lead.pk %}" 
                     hx-push-url="false"
                     hx-swap="innerHTML" hx-trigger="click">
@@ -39,7 +39,7 @@
                     data-bs-placement="top"
                     data-bs-content="See note history for this lead."
                     hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
-                    hx-include="#note_history"
+                    hx-vals='{"template_name": "note_history"}'
                     hx-get="{% url 'campaign-lead-get-modal-content' param1=lead.pk %}" 
                     hx-push-url="false"
                     hx-swap="innerHTML" hx-trigger="click">

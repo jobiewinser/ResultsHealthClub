@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from campaign_leads.models import Campaignlead, WhatsappTemplate
 from active_campaign.api import ActiveCampaign
 from active_campaign.models import ActiveCampaignList
-from active_campaign.views import get_active_campaign_list_qs, get_and_generate_active_campaign_list_objects
+from active_campaign.views import get_active_campaign_list_qs
 from core.core_decorators import campaign_leads_enabled_required
 from core.models import Profile, Site
 from core.views import get_site_pk_from_request
@@ -44,7 +44,7 @@ class CampaignleadsOverviewView(TemplateView):
         self.request.GET._mutable = True       
         context = super(CampaignleadsOverviewView, self).get_context_data(**kwargs)  
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
-            self.template_name = 'campaign_leads/htmx/leads_board.html'   
+            self.template_name = 'campaign_leads/htmx/leads_board_htmx.html'   
             context['active_campaign_lists'] = get_active_campaign_list_qs(self.request)
         leads = Campaignlead.objects.filter(complete=False, booking=None)
         active_campaign_list_pk = self.request.GET.get('active_campaign_list_pk', None)
@@ -55,6 +55,7 @@ class CampaignleadsOverviewView(TemplateView):
         if site_pk and not site_pk == 'all':
             leads = leads.filter(active_campaign_list__site__pk=site_pk)
             self.request.GET['site_pk'] = site_pk    
+            context['site'] = Site.objects.get(pk=site_pk)
         
         context['site_list'] = Site.objects.all()
         leads = leads.annotate(calls=Count('communication', filter=Q(communication__type='a')))
@@ -146,6 +147,8 @@ class LeadConfigurationView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(LeadConfigurationView, self).get_context_data(**kwargs)
-        context['active_campaign_lists'] = get_and_generate_active_campaign_list_objects()
+        context['active_campaign_lists'] = []
+        if self.request.user.profile.company:
+            context['active_campaign_lists'] = self.request.user.profile.company.first().get_and_generate_active_campaign_list_objects()
         context['site_list'] = Site.objects.all()
         return context

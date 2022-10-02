@@ -3,11 +3,17 @@ from django.db.models.deletion import SET_NULL
 from django.contrib.auth.models import User
 
 from campaign_leads.models import Campaignlead
+from twilio.models import TwilioMessage
+from django.db.models import Q, Count
 
 class Site(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     name = models.TextField(blank=True, null=True)
     company = models.ManyToManyField("core.Company")
+    whatsapp_number = models.CharField(max_length=50, null=True, blank=True)
+
+    def get_fresh_messages(self):
+        return TwilioMessage.objects.filter(Q(system_user_number=self.whatsapp_number)).distinct('lead')
 
     def get_leads_created_in_month_and_year(self, date):
         return Campaignlead.objects.filter(active_campaign_list__site=self, created__month=date.month, created__year=date.year)
@@ -23,11 +29,25 @@ class Company(models.Model):
     company_logo_black = models.ImageField(default='default.jpg', upload_to='company_images')
     company_logo_trans = models.ImageField(default='default.jpg', upload_to='company_images')
     campaign_leads_enabled = models.BooleanField(default=False)#
+    free_taster_enabled = models.BooleanField(default=False)#
+    active_campaign_url = models.TextField(null=True, blank=True)
     @property
     def get_campaign_leads_enabled(self):
         return self.campaign_leads_enabled
     def __str__(self):
-        return f"{self.company_name}"
+        return f"{self.company_name}"   
+
+    def get_and_generate_active_campaign_list_objects(self):
+        from active_campaign.api import ActiveCampaign
+        from active_campaign.models import ActiveCampaignList
+        for active_campaign_list_dict in ActiveCampaign().get_lists(self.active_campaign_url).get('lists',[]):
+            active_campaign_list, created = ActiveCampaignList.objects.get_or_create(
+                active_campaign_id = active_campaign_list_dict.pop('id'),
+                name = active_campaign_list_dict.pop('name')
+            )
+            active_campaign_list.json_data = active_campaign_list_dict
+            active_campaign_list.save()
+        return ActiveCampaignList.objects.all()
  
 # Extending User Model Using a One-To-One Link
 class Profile(models.Model):

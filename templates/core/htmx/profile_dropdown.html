@@ -4,7 +4,7 @@
     hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
     hx-swap="innerHTML" hx-trigger="click"> {% endcomment %}
         <span style="font-size:12px">Logged in as {{user.profile}} </b> 
-        <img src="/media/{{user.profile.avatar}}" width="40" height="40" class="rounded-circle">
+        <img src="/media/{{user.profile.avatar}}" width="60" height="60" class="rounded-circle">
     </button>
     {% comment %} <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
         <li>
