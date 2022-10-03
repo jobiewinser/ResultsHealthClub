@@ -6,6 +6,8 @@ from campaign_leads.models import Campaignlead
 from twilio.models import TwilioMessage
 from django.db.models import Q, Count
 
+from whatsapp.models import WhatsAppMessage
+
 class Site(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     name = models.TextField(blank=True, null=True)
@@ -20,7 +22,8 @@ class Site(models.Model):
         return fake_company
 
     def get_fresh_messages(self):
-        return TwilioMessage.objects.filter(Q(system_user_number=self.whatsapp_number)).distinct('lead')
+        # return WhatsAppMessage.objects.filter(system_user_number=self.whatsapp_number).distinct('lead')
+        return WhatsAppMessage.objects.filter(system_user_number=self.whatsapp_number)
 
     def get_leads_created_in_month_and_year(self, date):
         return Campaignlead.objects.filter(active_campaign_list__site=self, created__month=date.month, created__year=date.year)

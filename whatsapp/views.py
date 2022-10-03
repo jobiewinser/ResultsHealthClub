@@ -9,7 +9,7 @@ from whatsapp.models import WhatsAppMessage, WhatsAppMessageStatus
 logger = logging.getLogger(__name__)
 from django.views import View 
 from django.utils.decorators import method_decorator
-
+from core.models import ErrorModel
 @method_decorator(csrf_exempt, name="dispatch")
 class Webhooks(View):
     def get(self, request, *args, **kwargs):
@@ -48,14 +48,19 @@ class Webhooks(View):
                     existing_messages = WhatsAppMessage.objects.filter( wamid=wamid )
                     if not existing_messages:
                         # Likely a message from a customer     
-                        WhatsAppMessage.objects.create(
+                        lead = Campaignlead.objects.filter(whatsapp_number=to_number).last()
+                        message = WhatsAppMessage.objects.create(
                             wamid=wamid,
                             message = message.get('text').get('body',''),
                             datetime = datetime_from_request,
-                            phone_to = f"{to_number}",
-                            phone_from = from_number,
-                            communication=communication
-                            )
+                            customer_number = from_number,
+                            system_user_number = to_number,
+                            communication=communication,
+                            inbound=True,
+                            lead = lead
+                        )
+                        message.save()
+
                 for status_dict in value.get('statuses', []):
                     whats_app_messages = WhatsAppMessage.objects.filter(wamid=status_dict.get('id'))
                     if whats_app_messages:

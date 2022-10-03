@@ -54,7 +54,7 @@ def create_campaign_lead(request, **kwargs):
         lead = Campaignlead.objects.create(
             first_name=first_name,
             # last_name=last_name,
-            whatsapp_number=f"whatsapp:+{country_code}{phone}",
+            whatsapp_number=f"{country_code}{phone}",
             # country_code=country_code,
             active_campaign_list=manually_created_list
         )

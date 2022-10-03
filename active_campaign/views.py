@@ -56,7 +56,7 @@ class Webhooks(View):
                             Campaignlead.objects.create(
                                 active_campaign_contact_id=data.get('contact[id]'),
                                 first_name=data.get('contact[first_name]', "None"),
-                                whatsapp_number=f"whatsapp:+{phone_number_whole}",
+                                whatsapp_number=phone_number_whole,
                                 active_campaign_list=active_campaign_list,
                                 active_campaign_form_id=data.get('form[id]', None),
                                 possible_duplicate = possible_duplicate

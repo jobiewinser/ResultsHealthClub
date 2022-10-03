@@ -99,10 +99,11 @@ class Campaignlead(models.Model):
                         wamid=response_message.get('id'),
                         message=message,
                         communication=communication,
-                        phone_from=self.active_campaign_list.site.whatsapp_business_phone_number,
-                        phone_to=recipient_number,
-                        template=template
-                        )
+                        system_user_number=self.active_campaign_list.site.whatsapp_business_phone_number,
+                        customer_number=recipient_number,
+                        template=template,
+                        inbound=False
+                    )
             else:
                 communication = Communication.objects.get_or_create(    
                     datetime = datetime.now(),
