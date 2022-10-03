@@ -22,6 +22,7 @@ class Webhooks(View):
     def post(self, request, *args, **kwargs):
         logger.debug(str(request.POST))
         body = json.loads(request.body)
+        print(body)
         for entry in body.get('entry'):
             for change in entry.get('changes'):
                 value = change.get('value')
