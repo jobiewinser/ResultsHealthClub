@@ -1,10 +1,11 @@
 {% extends 'core/base.html' %}
-    {%load core_tags%}
+{%load core_tags%}
 {%load static tz core_tags%}
 {%block scripts%}
 {{block.super}}
 <script>
     $(document).ready(function() {
+        initDataTable();
     });
     function initDataTable() {
         dt = $('#overview_table').DataTable(          
@@ -23,42 +24,49 @@
     
 </script>
 {%endblock scripts%}
+{%block overide_content%}    
+<div class="col d-flex flex-column h-sm-100 p-0" style="overflow-x:hidden"> 
+    <main class="row">
+        <div class="row p-0 mt-2">
 
-{%block extra_top_left_buttons %}
-<div class="col-md-auto">
-    <a class="btn btn-success"
-    href="{% url 'configuration' %}"><i class="fa-light fa-gear"></i> Back to Configuration</a>
+            {%block extra_top_left_buttons %}
+            <div class="col-md-auto">
+                <a class="btn btn-secondary" href="{%url 'configuration'%}"><i class="fa-solid fa-arrow-left"></i> Back to config</a>             
+            </div>
+            {%endblock%}
+        </div>
+        <div class="row">
+            <div class="col">
+                <table id="overview_table" class="table"> 
+                    <thead> 
+                        <tr>
+                            <th>
+                                Name
+                            </th>
+                            <th>
+                                Site
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody> 
+                        {%for active_campaign_list in active_campaign_lists%}
+                        <tr id="row_{{active_campaign_list.pk}}">
+                            <td>
+                                {{active_campaign_list.name}}
+                            </td>
+                            <td> 
+                                {%include 'active_campaign/htmx/leads_configuration_select.html'%}
+                            <button hidden 
+                            hx-post="{% url 'set-active-campaign-list-site' list_pk=active_campaign_list.pk %}" 
+                            hx-swap="outerHTML" hx-include="#site_pk_{{active_campaign_list.pk}}" 
+                            id="submit_site_pk_{{active_campaign_list.pk}}"></button>
+                            </td>
+                        </tr>
+                        {%endfor%}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
 </div>
-{%endblock%}
-
-{%block table%}
-<br>
-<table id="overview_table" class="table"> 
-    <thead> 
-        <tr>
-            <th>
-                Name
-            </th>
-            <th>
-                Site
-            </th>
-        </tr>
-    </thead>
-    <tbody> 
-        {%for active_campaign_list in active_campaign_lists%}
-        <tr id="row_{{active_campaign_list.pk}}">
-            <td>
-                {{active_campaign_list.name}}
-            </td>
-            <td> 
-                {%include 'active_campaign/htmx/leads_configuration_select.html'%}
-               <button hidden 
-               hx-post="{% url 'set-active-campaign-list-site' list_pk=active_campaign_list.pk %}" 
-               hx-swap="outerHTML" hx-include="#site_pk_{{active_campaign_list.pk}}" 
-               id="submit_site_pk_{{active_campaign_list.pk}}"></button>
-            </td>
-        </tr>
-        {%endfor%}
-    </tbody>
-</table>
-{%endblock table%}
+{%endblock overide_content%}

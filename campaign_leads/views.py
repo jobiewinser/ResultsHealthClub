@@ -30,12 +30,9 @@ try:
             )
 except Exception as e:
     pass
-@method_decorator(login_required, name='dispatch')
+
+
 @method_decorator(campaign_leads_enabled_required, name='dispatch')
-class CampaignLeadsHomeView(TemplateView):
-    template_name='campaign_leads/campaign_leads_home.html'
-
-
 @method_decorator(login_required, name='dispatch')
 class CampaignleadsOverviewView(TemplateView):
     template_name='campaign_leads/campaign_leads_overview.html'
@@ -82,6 +79,7 @@ class CampaignleadsOverviewView(TemplateView):
         return context
         
 
+@method_decorator(campaign_leads_enabled_required, name='dispatch')
 @method_decorator(login_required, name='dispatch')
 class CampaignBookingsOverviewView(TemplateView):
     template_name='campaign_leads/campaign_bookings_overview.html'
@@ -118,6 +116,7 @@ class CampaignBookingsOverviewView(TemplateView):
         # whatsapp = Whatsapp()
         return context
         
+@method_decorator(campaign_leads_enabled_required, name='dispatch')
 @method_decorator(login_required, name='dispatch')
 class WhatsappTemplatesView(TemplateView):
     template_name='campaign_leads/whatsapp_templates.html'
@@ -141,6 +140,7 @@ class WhatsappTemplatesView(TemplateView):
         context['hide_show_all'] = True
         return context
         
+@method_decorator(campaign_leads_enabled_required, name='dispatch')
 @method_decorator(login_required, name='dispatch')
 class LeadConfigurationView(TemplateView):
     template_name='active_campaign/leads_configuration.html'

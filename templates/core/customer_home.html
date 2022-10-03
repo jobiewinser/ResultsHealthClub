@@ -1,0 +1,58 @@
+{% extends 'core/base.html' %}
+{%load static tz core_tags%}
+
+{%block scripts%}
+{{block.super}}
+<script>
+    $(document).ready(function() {
+    });
+</script>
+{%endblock scripts%}
+{%block content%}
+
+<div class="row">
+    <div class="col">
+        <div class="card pointer" onclick="window.location.replace('{%url 'campaign-leads-overview'%}')">
+            <div class="card-header center">
+                <a>Campaign leads</a>
+            </div>
+            <div class="card-body center">
+                <h1><i class="fa-regular fa-phone"></i></h1>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col">
+        <div class="card pointer" onclick="window.location.replace('{%url 'campaign-booking-overview'%}')">
+            <div class="card-header center">
+                <a>Booking Table</a>
+            </div>
+            <div class="card-body center">
+                <h1><i class="fa-regular fa-table"></i></h1>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col">
+        <div class="card pointer" onclick="window.location.replace('{%url 'analytics'%}')">
+            <div class="card-header center">
+                <a>Analytics</a>
+            </div>
+            <div class="card-body center">
+                <h1><i class="fa-regular fa-chart-line-up"></i></h1>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col">
+        <div class="card pointer" onclick="window.location.replace('{%url 'configuration'%}')">
+            <div class="card-header center">
+                <a>Configuration</a>
+            </div>
+            <div class="card-body center">
+                <h1><i class="fa-regular fa-gear"></i></h1>
+            </div>
+        </div>
+    </div>
+</div>
+{%endblock content%}

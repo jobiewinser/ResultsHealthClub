@@ -121,33 +121,42 @@
             <div class="row vh-100 overflow-auto">
                 <div class="col-12 col-sm-3 col-xl-2 px-sm-2 px-0 bg-dark d-flex sticky-top">
                     <div class="d-flex flex-sm-column flex-row flex-grow-1 align-items-center align-items-sm-start px-3 pt-2 text-white">
-                        <a href="/" class="d-flex align-items-center pb-sm-3 mb-md-0 me-md-auto text-white text-decoration-none">
+                    <a href="/" class="d-flex align-items-center pb-sm-3 mb-md-0 me-md-auto text-white text-decoration-none">
                             {% comment %} <span class="fs-5">B<span class="d-none d-sm-inline">rand</span></span>                             {% endcomment %}
                             <span class="fs-5"><a class="navbar-brand" href="{%url 'home'%}"><img class="side_nav_logo" src="{% static 'img/logo_white.png' %}" alt="winser systems logo"></a></span>
 
                         </a>
                         <ul class="nav nav-pills flex-sm-column flex-row flex-nowrap flex-shrink-1 flex-sm-grow-0 flex-grow-1 mb-sm-auto mb-0 justify-content-center align-items-center align-items-sm-start" id="menu">
+                            {%if request.user.is_authenticated%} 
+                            <li class="nav-item">
+                                <a href="{%url 'customer-home'%}" class="nav-link px-sm-0 px-2">
+                                    <i class="fs-5 bi-house"></i><span class="ms-1 d-none d-sm-inline">Customer Home</span>
+                                </a>
+                            </li>
+                            {%else%}
                             <li class="nav-item">
                                 <a href="{%url 'home'%}" class="nav-link px-sm-0 px-2">
                                     <i class="fs-5 bi-house"></i><span class="ms-1 d-none d-sm-inline">Home</span>
                                 </a>
                             </li>
+                            {%endif%}
+
                             
-                            {%if request.user.is_authenticated%} 
+                            {% comment %} {%if request.user.is_authenticated%} 
                             <li class="dropdown">
                                 <a href="#" class="nav-link dropdown-toggle px-sm-0 px-1" style="{%if 'campaign-leads/' in request.path%} font-weight:bold{%endif%}" id="dropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fs-5 bi-bootstrap"></i><span class="ms-1 d-none d-sm-inline">My Products </span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdown">
                                     {%if request.user.profile.get_company.campaign_leads_enabled%} 
-                                    <a href="{% url 'campaign-leads-home'%}" class="dropdown-item"  style="{%if 'campaign-leads/' in request.path%} font-weight:bold{%endif%}">My Campaign Leads</a>
+                                    <a href="{% url 'customer-home'%}" class="dropdown-item"  style="{%if 'campaign-leads/' in request.path%} font-weight:bold{%endif%}">My Campaign Leads</a>
                                     {%endif%}
                                     {%if request.user.profile.get_company.free_taster_enabled%} 
                                     <a href="{% url 'free-taster-overview'%}" class="dropdown-item"  style="{%if 'free-taster/' in request.path%} font-weight:bold{%endif%}">My Free Taster Links</a>
                                     {%endif%}
                                 </ul>
                             </li>
-                            {%endif%}
+                            {%endif%} {% endcomment %}
                             
                             <li class="dropdown">
                                 <a href="#" class="nav-link dropdown-toggle px-sm-0 px-1" id="dropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -157,6 +166,14 @@
                                     <a href="{% url 'campaign-leads-product-page'%}" class="dropdown-item" style="{%if 'campaign-leads-product-page/' in request.path%} font-weight:bold{%endif%}">Campaign Leads</a>
                                 </ul>
                             </li>
+                            <br>
+                            <li class="dropdown">
+                                <a href="https://portfolio.jobiewinser.co.uk/leads-management-privacy-policy/" class="nav-link px-sm-0 px-1">
+                                    <i class="fa-solid fa-circle-info"></i><span class="ms-1 d-none d-sm-inline">Privacy Policy</span>
+                                </a>
+                            </li>
+
+                            
                         </ul>
                         <div id="profile-nav-section" style="width:100%" class="p-2">
                         {%include 'core/htmx/profile-nav-section.html'%}
@@ -164,9 +181,9 @@
                     </div>
                 </div>
                 {%block overide_content%}    
-                <div class="col d-flex flex-column h-sm-100 p-0">
-                    <main class="row overflow-auto">
-                        {%block content%}
+                <div class="col d-flex flex-column h-sm-100 p-0" style="overflow-x:hidden"> 
+                    <main class="row  p-0 mt-2"">
+                        {%block content%} 
                         {%endblock content%}
                     </main>
                 </div>

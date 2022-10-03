@@ -11,6 +11,13 @@ from core.models import FreeTasterLink, FreeTasterLinkClick, Profile, Site
 from django.contrib.auth import authenticate
 from django.contrib.auth import login
 logger = logging.getLogger(__name__)
+
+
+@method_decorator(login_required, name='dispatch')
+class CustomerHomeView(TemplateView):
+    template_name='core/customer_home.html'
+
+
 class HomeView(TemplateView):
     template_name='core/home.html'
 class CampaignLeadsProductPageView(TemplateView):

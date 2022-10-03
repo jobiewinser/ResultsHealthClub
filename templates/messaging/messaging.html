@@ -1,33 +1,37 @@
 {%load static%}
-{% comment %} <script>
+<script>
         $(document).ready(function() {  
-            const user_username = JSON.parse(document.getElementById('user_username').textContent);
-            document.querySelector('#submit').onclick = function (e) {
-                const messageInputDom = document.querySelector('#input');
-                const message = messageInputDom.value;
-                chatSocket.send(JSON.stringify({
-                    'message': message,
-                    'username': user_username,
-                }));
-                messageInputDom.value = '';
-            };
-            
-            const boxName = JSON.parse(document.getElementById('box-name').textContent);
-            const chatSocket = new WebSocket(
-                'ws://' +
-                window.location.host +
-                '/ws/chat/' +
-                boxName +
-                '/'
-            );
-            
-            chatSocket.onmessage = function (e) {
-                const data = JSON.parse(e.data);
-                document.querySelector('#chat-text').value += (data.message + ' sent by ' + data.username   + '\n') // add message to text box
-            }
+
+            document.body.addEventListener('htmx:afterSwap', function(evt) {   
+                if (evt.detail.target.id == 'next_chat_window'){
+                    let id = $(evt.srcElement).data('lead-pk');
+                    if (id != undefined){
+                        const user = {{user.pk}};
+                        console.log('#message_submit_'+id,$(evt.detail.elt))
+                        document.querySelector('#message_submit_'+id).onclick = function (e) {
+                            const messageInputDom = document.querySelector('#message_input_'+id);
+                            const message = messageInputDom.value;
+                            chatSocket.send(JSON.stringify({
+                                'message': message,
+                                'user': user,
+                            }));
+                            messageInputDom.value = '';
+                        };
+                        
+                        const chatSocket = new WebSocket(
+                            'ws://'+window.location.host+'/ws/chat/'+id+'/'
+                        );
+                        
+                        chatSocket.onmessage = function (e) {
+                            const data = JSON.parse(e.data);
+                            document.querySelector('#chat-text').value += (data.message + ' sent by ' + data.username   + '\n') // add message to text box
+                        }
+                    }
+                }
+            })
         })
         
-</script> {% endcomment %}
+</script>
 <link href="{% static 'css/chat.css' %}" rel="stylesheet" />
     <span id="next_chat_window"></span>
     {%if site%}

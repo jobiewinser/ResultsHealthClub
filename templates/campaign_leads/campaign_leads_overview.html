@@ -74,7 +74,7 @@
         <div class="row p-0 mt-2">
             {%block extra_top_left_buttons %}
             <div class="col-md-auto">
-                <a class="btn btn-secondary" href="{%url 'campaign-leads-home'%}"><i class="fa-solid fa-arrow-left"></i> Back</a>             
+                <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>             
             </div>
             {%include 'core/htmx/site_selection.html'%}
             <button hidden hx-get="{{request.path}}" hx-push-url="true" hx-swap="outerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator=".top-htmx-indicator" hx-target="#leads_board" id="change_site" class="btn btn-primary btn-sm"></button>

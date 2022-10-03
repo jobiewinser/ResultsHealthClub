@@ -70,43 +70,49 @@ class Campaignlead(models.Model):
     
 
 
-    # def send_whatsapp_message(self, whatsapp_template_send_order, user=None):
-    #     if settings.ENABLE_WHATSAPP_MESSAGING:
-    #         template = WhatsappTemplate.objects.get(send_order = whatsapp_template_send_order, site=self.active_campaign_list.site)
-    #         whatsapp = Whatsapp()
-    #         message = f"{template.rendered(self)}" 
-    #         recipient_number = f"{self.country_code}{self.phone}"
-    #         if settings.WHATSAPP_PHONE_OVERRIDE:
-    #             recipient_number = settings.WHATSAPP_PHONE_OVERRIDE     
-    #         response = whatsapp.send_message(recipient_number, message, self.active_campaign_list.site.whatsapp_business_phone_number_id, self.active_campaign_list.site.whatsapp_access_token)
-    #         reponse_messages = response.get('messages',[])
-    #         if reponse_messages:
-    #             for response_message in reponse_messages:
-    #                 communication = Communication.objects.get_or_create(    
-    #                     datetime = datetime.now(),
-    #                     lead = self,
-    #                     type = 'b',
-    #                     automatic = True,
-    #                     staff_user = user
-    #                 )[0]
-    #                 WhatsAppMessage.objects.get_or_create(
-    #                     wamid=response_message.get('id'),
-    #                     message=message,
-    #                     communication=communication,
-    #                     phone_from=self.active_campaign_list.site.whatsapp_business_phone_number,
-    #                     phone_to=recipient_number,
-    #                     template=template
-    #                     )
-    #         else:
-    #             communication = Communication.objects.get_or_create(    
-    #                 datetime = datetime.now(),
-    #                 lead = self,
-    #                 type = 'b',
-    #                 automatic = True,
-    #                 staff_user = user,
-    #                 successful = False,
-    #                 error_json = response
-    #             )[0]
+    def send_whatsapp_message(self, whatsapp_template_send_order=None, message="", user=None):
+        print("settings.ENABLE_WHATSAPP_MESSAGING, settings.ENABLE_WHATSAPP_MESSAGING")
+        print("self.active_campaign_list.site.whatsapp_business_phone_number_id", self.active_campaign_list.site.whatsapp_business_phone_number_id)
+        print("self.active_campaign_list.site.whatsapp_access_token", self.active_campaign_list.site.whatsapp_access_token)
+        if settings.ENABLE_WHATSAPP_MESSAGING and self.active_campaign_list.site.whatsapp_business_phone_number_id and self.active_campaign_list.site.whatsapp_access_token:
+            whatsapp = Whatsapp()
+            if whatsapp_template_send_order:
+                template = WhatsappTemplate.objects.get(send_order = whatsapp_template_send_order, site=self.active_campaign_list.site)
+                message = f"{template.rendered(self)}" 
+            else:
+                message = message
+            recipient_number = f"{self.whatsapp_number.split('+')[-1]}"
+            if settings.WHATSAPP_PHONE_OVERRIDE:
+                recipient_number = settings.WHATSAPP_PHONE_OVERRIDE     
+            response = whatsapp.send_message(recipient_number, message, self.active_campaign_list.site.whatsapp_business_phone_number_id, self.active_campaign_list.site.whatsapp_access_token)
+            reponse_messages = response.get('messages',[])
+            if reponse_messages:
+                for response_message in reponse_messages:
+                    communication = Communication.objects.get_or_create(    
+                        datetime = datetime.now(),
+                        lead = self,
+                        type = 'b',
+                        automatic = True,
+                        staff_user = user
+                    )[0]
+                    WhatsAppMessage.objects.get_or_create(
+                        wamid=response_message.get('id'),
+                        message=message,
+                        communication=communication,
+                        phone_from=self.active_campaign_list.site.whatsapp_business_phone_number,
+                        phone_to=recipient_number,
+                        template=template
+                        )
+            else:
+                communication = Communication.objects.get_or_create(    
+                    datetime = datetime.now(),
+                    lead = self,
+                    type = 'b',
+                    automatic = True,
+                    staff_user = user,
+                    successful = False,
+                    error_json = response
+                )[0]
 
 @receiver(models.signals.post_save, sender=Campaignlead)
 def execute_after_save(sender, instance, created, *args, **kwargs):

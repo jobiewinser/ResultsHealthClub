@@ -94,6 +94,9 @@ vertical-align: middle;
     text-align:center;
     cursor: pointer;
 }
+.pointer {
+    cursor: pointer;
+}
 .current-user-highlight {
     background-color: rgba(25, 135, 84, 0.3) !important;
     border: rgba(25, 135, 84, 0.8) !important;

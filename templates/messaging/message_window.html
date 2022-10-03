@@ -1,7 +1,7 @@
 {%load static%}
 
 
-<div class="card chat_bottom_window p-0" id="chat_card_{{lead.pk}}">
+<div class="card chat_bottom_window p-0" id="chat_card_{{lead.pk}}" data-lead-pk="{{lead.pk}}">
     <div class="card-header chat_bottom_header center" >
         <div class="row">
             <div class="col p-0" data-bs-toggle="collapse" data-bs-target="#messageWindowCollapse_{{lead.pk}}" aria-expanded="true" aria-controls="messageWindowCollapse_{{lead.pk}}">
@@ -36,12 +36,12 @@
         {%endfor%}
         <div style="position: absolute; right:0; bottom: 0; width:100%" class="row"> 
             <div class="col"> 
-                <input class="form-control" type="text">
+                <input class="form-control" id="message_input_{{lead.pk}}"  type="text">
         
                 </input>
             </div>
             <div class="col-auto"> 
-                <button class="badge bg-primary"><i class="fa-solid fa-paper-plane-top"></i></button>
+                <button class="badge bg-primary" id="message_submit_{{lead.pk}}"><i class="fa-solid fa-paper-plane-top"></i></button>
             </div>
         </div>
     </div>

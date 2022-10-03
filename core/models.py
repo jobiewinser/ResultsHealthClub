@@ -11,6 +11,13 @@ class Site(models.Model):
     name = models.TextField(blank=True, null=True)
     company = models.ManyToManyField("core.Company")
     whatsapp_number = models.CharField(max_length=50, null=True, blank=True)
+    whatsapp_business_phone_number_id = models.CharField(max_length=50, null=True, blank=True)
+    @property
+    def get_company(self):
+        if self.company.all():
+            return self.company.all()[0]
+        fake_company = Company
+        return fake_company
 
     def get_fresh_messages(self):
         return TwilioMessage.objects.filter(Q(system_user_number=self.whatsapp_number)).distinct('lead')

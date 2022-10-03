@@ -17,7 +17,6 @@ from django.urls import path
 import campaign_leads.views as campaignleadsviews
 import campaign_leads.htmx as campaignleadshtmx
 urlpatterns = [
-    path('home/', campaignleadsviews.CampaignLeadsHomeView.as_view(), name='campaign-leads-home'),
     
 
 
