@@ -25,7 +25,7 @@ class WhatsAppWebhook(models.Model):
 class WhatsAppMessage(models.Model):
     wamid = models.TextField(null=True, blank=True)   
     raw_webhook = models.ForeignKey("twilio.TwilioRawWebhook", null=True, blank=True, on_delete=models.SET_NULL)
-    lead = models.ForeignKey("campaign_leads.Campaignlead", null=True, blank=True, on_delete=models.SET_NULL)
+    # lead = models.ForeignKey("campaign_leads.Campaignlead", null=True, blank=True, on_delete=models.SET_NULL)
     inbound = models.BooleanField(default=True)
     errors = models.ManyToManyField("core.ErrorModel", null=True, blank=True)
 

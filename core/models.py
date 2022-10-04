@@ -14,6 +14,7 @@ class Site(models.Model):
     company = models.ManyToManyField("core.Company")
     whatsapp_number = models.CharField(max_length=50, null=True, blank=True)
     whatsapp_business_phone_number_id = models.CharField(max_length=50, null=True, blank=True)
+    whatsapp_access_token = models.TextField(blank=True, null=True)
     @property
     def get_company(self):
         if self.company.all():
@@ -23,7 +24,7 @@ class Site(models.Model):
 
     def get_fresh_messages(self):
         # return WhatsAppMessage.objects.filter(system_user_number=self.whatsapp_number).distinct('lead')
-        return WhatsAppMessage.objects.filter(system_user_number=self.whatsapp_number)
+        return WhatsAppMessage.objects.filter(system_user_number=self.whatsapp_number).order_by('datetime').order_by('communication__lead').distinct('communication__lead')
 
     def get_leads_created_in_month_and_year(self, date):
         return Campaignlead.objects.filter(active_campaign_list__site=self, created__month=date.month, created__year=date.year)
@@ -66,6 +67,11 @@ class Profile(models.Model):
     avatar = models.ImageField(default='default.jpg', upload_to='profile_images')
     site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
     company = models.ManyToManyField("core.Company")
+    @property
+    def name(self):
+        if self.user.last_name:
+            return f"{self.user.first_name} {self.user.last_name}"
+        return self.user.first_name
     @property
     def get_company(self):
         if self.company.all():

@@ -22,9 +22,24 @@
                             'ws://'+window.location.host+'/ws/chat/'+id+'/'
                         );
                         
+                        {% comment %} chatSocket.onmessage = function (e) {
+                            const data = JSON.parse(e.data);
+                            console.log(data)
+                            $('#message_input_'+id).val('')
+                        } {% endcomment %}
+                        
                         chatSocket.onmessage = function (e) {
                             const data = JSON.parse(e.data);
-                            document.querySelector('#chat-text').value += (data.message + ' sent by ' + data.username   + '\n') // add message to text box
+                            console.log(data)
+                            $(`<div class="row">
+                                <div class="col p-0 ps-1 m-1 card">
+                                    `+data.message+`
+                                </div>
+                                <div class="col-auto p-0 ps-1 m-1">
+                                    <img src="`+data.user_avatar+`" alt="" width="22" height="22" class="rounded-circle">
+                                </div>
+                            </div>`).insertBefore('#message_input_div_'+id);
+                            $('#message_input_'+id).val('')
                         }
                     }
                 }
@@ -41,9 +56,9 @@
         </div>
         <div class="card-body collapse p-0 all_chat_card_body" id="messageCollapse">
                 {%for message in site.get_fresh_messages%}
-                {%if message.lead%}
+                {%if message.communication.lead%}
                 <div class="row chat_row {%if message.inbound%}active_chat_row{%else%}inactive_chat_row{%endif%}"
-                hx-get="{%url 'leads-message-window' lead_pk=message.lead.pk%}"
+                hx-get="{%url 'leads-message-window' lead_pk=message.communication.lead.pk%}"
                 hx-indicator=".top-htmx-indicator" 
                 hx-target="#next_chat_window"
                 hx-push-url="false"
@@ -55,12 +70,12 @@
                     <div class="col p-0 ps-1">
                         <div class="row chat_lead_name_row">
                             <div class="col p-0">
-                                {{message.lead.name}}
+                                {{message.communication.lead.name}}
                             </div>
                         </div>
                         <div class="row chat_message_row">
                             <div class="col p-0">
-                                {%if message.inbound%}{{message.lead.name}}{%else%}You{%endif%}: {{message.Body}}
+                                {%if message.inbound%}{{message.communication.lead.name}}{%else%}You{%endif%}: {{message.Body}}
                             </div>
                         </div>
                     </div>

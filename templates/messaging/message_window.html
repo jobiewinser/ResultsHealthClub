@@ -13,28 +13,28 @@
         </div>
     </div>
     <div class="card-body chat_card_body collapse show p-0" id="messageWindowCollapse_{{lead.pk}}">
-        {%for message in lead.whatsappmessage_set.all%}
-            {%if message.inbound%}
+        {%for communication in lead.communication_set.all%}
+            {%if communication.whatsappmessage.inbound%}
                 <div class="row">
                     <div class="col-auto p-0 ps-1 m-1">
                         <img src="{% static 'img/blank-profile-picture.png' %}" alt="" width="22" height="22" class="rounded-circle">
                     </div>
                     <div class="col p-0 ps-1 m-1 card">
-                        {{message.message}}
+                        {{communication.whatsappmessage.message}}
                     </div>
                 </div>
             {%else%}
                 <div class="row">
                     <div class="col p-0 ps-1 m-1 card">
-                        {{message.Body}}
+                        {{communication.whatsappmessage.message}}
                     </div>
                     <div class="col-auto p-0 ps-1 m-1">
-                        <img src="{% static 'img/blank-profile-picture.png' %}" alt="" width="22" height="22" class="rounded-circle">
+                        <img src="{{communication.staff_user.profile.avatar.url}}" alt="" width="22" height="22" class="rounded-circle">
                     </div>
                 </div>
             {%endif%}
         {%endfor%}
-        <div style="position: absolute; right:0; bottom: 0; width:100%" class="row"> 
+        <div style="position: absolute; right:0; bottom: 0; width:100%" class="row" id="message_input_div_{{lead.pk}}"> 
             <div class="col"> 
                 <input class="form-control" id="message_input_{{lead.pk}}"  type="text">
         

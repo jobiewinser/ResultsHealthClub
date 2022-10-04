@@ -1,15 +1,18 @@
 from datetime import datetime
 import logging
+from django.conf import settings
 from django.http import HttpResponse
 import json
 from django.views.decorators.csrf import csrf_exempt
 from campaign_leads.models import Campaignlead, Communication
+from messaging.consumers import ChatRoomConsumer
 
 from whatsapp.models import WhatsAppMessage, WhatsAppMessageStatus
 logger = logging.getLogger(__name__)
 from django.views import View 
 from django.utils.decorators import method_decorator
 from core.models import ErrorModel
+from asgiref.sync import async_to_sync, sync_to_async
 @method_decorator(csrf_exempt, name="dispatch")
 class Webhooks(View):
     def get(self, request, *args, **kwargs):
@@ -32,23 +35,23 @@ class Webhooks(View):
                     to_number = metadata.get('display_phone_number')
                     from_number = message.get('from')
                     datetime_from_request = datetime.fromtimestamp(int(message.get('timestamp')))
-                    try:
-                        lead = Campaignlead.objects.get(phone__icontains=from_number[-10:])
-                        communication = Communication.objects.get_or_create(    
-                            datetime = datetime_from_request,
-                            lead = lead,
-                            type = 'b',
-                            successful = True,
-                            automatic = False,
-                            staff_user = None
-                        )[0]
-                    except Exception as e:
-                        lead = None
-                        communication = None
                     existing_messages = WhatsAppMessage.objects.filter( wamid=wamid )
-                    if not existing_messages:
+                    if not existing_messages or settings.DEBUG:
+                        try:
+                            lead = Campaignlead.objects.get(whatsapp_number__icontains=from_number[-10:])
+                            communication = Communication.objects.get_or_create(    
+                                datetime = datetime_from_request,
+                                lead = lead,
+                                type = 'b',
+                                successful = True,
+                                automatic = False,
+                                staff_user = None
+                            )[0]
+                        except Exception as e:
+                            lead = None
+                            communication = None
                         # Likely a message from a customer     
-                        lead = Campaignlead.objects.filter(whatsapp_number=to_number).last()
+                        lead = Campaignlead.objects.filter(whatsapp_number=from_number).last()
                         message = WhatsAppMessage.objects.create(
                             wamid=wamid,
                             message = message.get('text').get('body',''),
@@ -56,10 +59,21 @@ class Webhooks(View):
                             customer_number = from_number,
                             system_user_number = to_number,
                             communication=communication,
-                            inbound=True,
-                            lead = lead
+                            inbound=True\
                         )
                         message.save()
+                        chat_room_consumer = ChatRoomConsumer()
+                        async_to_sync(chat_room_consumer.group_send)(
+                            f"chat_{str(lead.pk)}",
+                            {'text_data':json.dumps(
+                                {
+                                    "message": message.message,
+                                    "user_name": lead.name,
+                                    "user_avatar": None,
+                                }
+                            )}
+                        )
+                        
 
                 for status_dict in value.get('statuses', []):
                     whats_app_messages = WhatsAppMessage.objects.filter(wamid=status_dict.get('id'))
