@@ -23,7 +23,7 @@
                         };
                         
                         const chatSocket = new WebSocket(
-                            'ws://'+window.location.host+'/wss/chat/'+id+'/{{site.pk}}/'
+                            'wss://'+window.location.host+'/wss/chat/'+id+'/{{site.pk}}/'
                         );
                         
                         {% comment %} chatSocket.onmessage = function (e) {
