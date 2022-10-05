@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 GYM_CHOICES = (
@@ -25,16 +26,17 @@ class WhatsAppWebhook(models.Model):
 class WhatsAppMessage(models.Model):
     wamid = models.TextField(null=True, blank=True)   
     raw_webhook = models.ForeignKey("twilio.TwilioRawWebhook", null=True, blank=True, on_delete=models.SET_NULL)
-    # lead = models.ForeignKey("campaign_leads.Campaignlead", null=True, blank=True, on_delete=models.SET_NULL)
+    lead = models.ForeignKey("campaign_leads.Campaignlead", null=True, blank=True, on_delete=models.SET_NULL)
     inbound = models.BooleanField(default=True)
     errors = models.ManyToManyField("core.ErrorModel", null=True, blank=True)
-
+    site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
     conversationid = models.TextField(null=True, blank=True)    
     datetime = models.DateTimeField(null=True, blank=True)
     message = models.TextField(null=True, blank=True)   
     system_user_number = models.CharField(max_length=50, null=True, blank=True)
     customer_number = models.CharField(max_length=50, null=True, blank=True)
-    communication = models.OneToOneField("campaign_leads.Communication", on_delete=models.SET_NULL, null=True, blank=True) 
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    call = models.OneToOneField("campaign_leads.Call", on_delete=models.SET_NULL, null=True, blank=True) 
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     template = models.ForeignKey("campaign_leads.WhatsappTemplate", on_delete=models.SET_NULL, null=True, blank=True)
     # company = models.ManyToManyField("core.Company")

@@ -29,9 +29,6 @@
                 } else if (evt.detail.pathInfo.path.includes("add-booking")){
                     $('#generic_modal').modal('hide');
                     snackbarShow('Successfully added a booking', 'success')
-                } else if (evt.detail.pathInfo.path.includes("log-communication")){
-                    $('#generic_modal').modal('hide');
-                    snackbarShow('Successfully logged a communication', 'success')
                 } else if (evt.detail.pathInfo.path.includes("create-campaign-lead")){
                     $('#refresh_overview_table').click(); 
                     $('#generic_modal').modal('hide');
@@ -102,8 +99,7 @@
                     <span hx-swap-oob="true" id="site_pk_span">   
                         <input type="text" style="display:None" id="site_pk" name="site_pk" value="{{request.GET.site_pk}}"/>
                     </span>
-                    <input type="text" style="display:None" id="log_communication" name="template_name" value="log_communication"/>
-                    <input type="text" style="display:None" id="communication_history" name="template_name" value="communication_history"/>
+                    <input type="text" style="display:None" id="call_history" name="template_name" value="call_history"/>
                     <input type="text" style="display:None" id="booking_history" name="template_name" value="booking_history"/>
                     <input type="text" style="display:None" id="note_history" name="template_name" value="note_history"/>
 

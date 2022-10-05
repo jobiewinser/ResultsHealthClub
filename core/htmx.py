@@ -106,7 +106,7 @@ def generate_free_taster_link(request, **kwargs):
                 guid = str(uuid.uuid4())[:8]
                 while FreeTasterLink.objects.filter(guid=guid):
                     guid = str(uuid.uuid4())[:8]
-                generated_link = FreeTasterLink.objects.create(customer_name=customer_name, staff_user=request.user, guid=guid, site=Site.objects.get(pk=site_pk))
+                generated_link = FreeTasterLink.objects.create(customer_name=customer_name, user=request.user, guid=guid, site=Site.objects.get(pk=site_pk))
                 return render(request, f"core/htmx/generated_link_display.html", {'generated_link':generated_link})  
     except Exception as e:
         logger.debug("generate_free_taster_link Error "+str(e))

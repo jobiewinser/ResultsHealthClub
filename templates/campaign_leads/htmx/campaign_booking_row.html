@@ -63,83 +63,9 @@
         </span>       
         {%endwith%}  
     </td>
-    {% comment %} <td>
-        {% with lead.time_until_next_whatsapp as time_until_next_whatsapp %}  
-        <span class="primary_td_layer">
-            {{time_until_next_whatsapp.date}} 
-        </span>
-        <br>
-        <span class="secondary_td_layer">
-            {{time_until_next_whatsapp.time}}
-        </span>  
-        {%endwith%}
-    </td> {% endcomment %}
+    
     <td class="double_layer_td">       
-        <span class="primary_td_layer">           
-            {% comment %} <div class="btn-group btn-space mb-1">
-                <button class="btn btn-secondary btn-sm" type="button"
-                    data-bs-toggle="popover" 
-                    data-bs-trigger="hover" 
-                    data-bs-placement="top"
-                    data-bs-content="Log a text message communication attempt"
-                    hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
-                    hx-include="#log_communication"
-                    hx-get="{% url 'campaign-lead-get-modal-content' param1=lead.pk param2='d' %}" 
-                    hx-push-url="false"
-                    hx-swap="innerHTML"><i class="fa-sharp fa-regular fa-message-sms"></i></button>
-                <button class="btn btn-secondary btn-sm" type="button"
-                    data-bs-toggle="popover" 
-                    data-bs-trigger="hover" 
-                    data-bs-placement="top"
-                    data-bs-content="Log an email communication attempt"
-                    hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
-                    hx-include="#log_communication"
-                    hx-get="{% url 'campaign-lead-get-modal-content' param1=lead.pk param2='c' %}" 
-                    hx-push-url="false"
-                    hx-swap="innerHTML" hx-trigger="click"><i class="fa fa-envelope" aria-hidden="true"></i></button>
-                <button class="btn btn-secondary btn-sm" type="button"
-                    data-bs-toggle="popover" 
-                    data-bs-trigger="hover" 
-                    data-bs-placement="top"
-                    data-bs-content="Log a phone call communication attempt"
-                    hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
-                    hx-include="#log_communication"
-                    hx-get="{% url 'campaign-lead-get-modal-content' param1=lead.pk param2='a' %}" 
-                    hx-push-url="false"
-                    hx-swap="innerHTML" hx-trigger="click"><i class="fa fa-phone" aria-hidden="true"></i></button>
-                <button class="btn btn-secondary btn-sm" type="button"
-                    data-bs-toggle="popover" 
-                    data-bs-trigger="hover" 
-                    data-bs-placement="top"
-                    data-bs-content="Add a booking"
-                    hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
-                    hx-include="#add_booking"
-                    hx-get="{% url 'campaign-lead-get-modal-content' param1=lead.pk %}" 
-                    hx-push-url="false"
-                    hx-swap="innerHTML" hx-trigger="click"><i class="fa fa-book-open-cover" aria-hidden="true"></i></button>
-                <button class="btn btn-secondary btn-sm" type="button"
-                    data-bs-toggle="popover" 
-                    data-bs-trigger="hover" 
-                    data-bs-placement="top"
-                    data-bs-content="See communication history for this lead."
-                    hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
-                    hx-include="#communication_history"
-                    hx-get="{% url 'campaign-lead-get-modal-content' param1=lead.pk %}" 
-                    hx-push-url="false"
-                    hx-swap="innerHTML" hx-trigger="click"><i class="fa-regular fa-clock-rotate-left" ></i> <span style="color:Silver">{{lead.successful_communication.count}}</span></button>
-            </div>           {% endcomment %}
-            {% comment %} <div class="btn-group btn-space mb-1">
-                <button class="btn btn-secondary btn-sm" type="button"
-                    data-bs-toggle="popover" 
-                    data-bs-trigger="hover" 
-                    data-bs-placement="top"
-                    data-bs-content="Add a booking"
-                    hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
-                    hx-include="#add_booking"
-                    hx-get="{% url 'campaign-lead-get-modal-content' param1=lead.pk %}" 
-                    hx-push-url="false"
-                    hx-swap="innerHTML" hx-trigger="click"><i class="fa fa-book-open-cover" aria-hidden="true"></i></button>
-            </div> {% endcomment %}
+        <span class="primary_td_layer">     
 
             
             <div class="btn-group btn-space btn-space-with-history mb-1">
@@ -153,12 +79,12 @@
                     data-bs-toggle="popover" 
                     data-bs-trigger="hover" 
                     data-bs-placement="top"
-                    data-bs-content="See communication history for this lead."
+                    data-bs-content="See call history for this lead."
                     hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
-                    hx-vals='{"template_name": "communication_history"}'
+                    hx-vals='{"template_name": "call_history"}'
                     hx-get="{% url 'campaign-lead-get-modal-content' param1=lead.pk %}" 
                     hx-push-url="false"
-                    hx-swap="innerHTML" hx-trigger="click"><i class="fa-regular fa-clock-rotate-left" ></i> <span style="color:Silver">{{lead.successful_communication.count}}</span></button>
+                    hx-swap="innerHTML" hx-trigger="click"><i class="fa-regular fa-clock-rotate-left" ></i> <span style="color:Silver">{{lead.call_set.all.count}}</span></button>
             </div>
 
             
@@ -167,22 +93,12 @@
                     data-bs-toggle="popover" 
                     data-bs-trigger="hover" 
                     data-bs-placement="top"
-                    data-bs-content="Log a phone call communication attempt"
+                    data-bs-content="See call history for this lead."
                     hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
-                    hx-vals='{"template_name": "log_communication"}'
-                    hx-get="{% url 'campaign-lead-get-modal-content' param1=lead.pk param2='a' %}" 
-                    hx-push-url="false"
-                    hx-swap="innerHTML" hx-trigger="click"><i class="fa fa-phone" aria-hidden="true"></i></button>
-                <button class="btn btn-secondary btn-sm" type="button"
-                    data-bs-toggle="popover" 
-                    data-bs-trigger="hover" 
-                    data-bs-placement="top"
-                    data-bs-content="See communication history for this lead."
-                    hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
-                    hx-vals='{"template_name": "communication_history"}'
+                    hx-vals='{"template_name": "call_history"}'
                     hx-get="{% url 'campaign-lead-get-modal-content' param1=lead.pk %}" 
                     hx-push-url="false"
-                    hx-swap="innerHTML" hx-trigger="click"><i class="fa-regular fa-clock-rotate-left" ></i> <span style="color:Silver">{{lead.successful_communication.count}}</span></button>
+                    hx-swap="innerHTML" hx-trigger="click"><i class="fa-regular fa-clock-rotate-left" ></i> <span style="color:Silver">{{lead.call_set.all.count}}</span></button>
             </div>
         </span>
         <br>

@@ -7,15 +7,15 @@
                     data-bs-toggle="popover" 
                     data-bs-trigger="hover" 
                     data-bs-placement="top"
-                    data-bs-content="See communication history for this lead."
+                    data-bs-content="See call history for this lead."
                     hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
-                    hx-vals='{"template_name": "communication_history"}'
+                    hx-vals='{"template_name": "call_history"}'
                     hx-get="{% url 'campaign-lead-get-modal-content' param1=lead.pk %}" 
                     hx-push-url="false"
                     hx-swap="innerHTML" hx-trigger="click">
-                        Communication History 
+                        Call History 
                         <span class="badge bg-info" style="font-size:10px">
-                            {{lead.communication_set.all.count}}                
+                            {{lead.call_set.all.count}}                
                         </span>
                 </button>
                 <button class="btn btn-sm btn-secondary"
@@ -62,7 +62,7 @@
                   </tr>
                 </thead>
                 <tbody class="noteBody">
-                    {%for communication in lead.communication_set.all%}
+                    {%for call in lead.call_set.all%}
                     <tr>
                         <td colspan="2"
                         data-bs-html="true" 
@@ -70,21 +70,21 @@
                         data-bs-trigger="hover" 
                         data-bs-placement="right"
                         data-bs-content="
-                        <b>{%if communication.successful == True%}Successful{%elif communication.successful == False%}Unsuccessful{%endif%}</b> communication
-                        {%if communication.note_set.all%}
+                        <b>Call</b>
+                        {%if call.note_set.all%}
                         <br>
                         <b>Notes:</b>
                         <ul>
-                            {%for note in communication.note_set.all%}
-                            <li>{{note.text}} - <i>{{note.staff_user}}, {{note.datetime}}</i></li>
+                            {%for note in call.note_set.all%}
+                            <li>{{note.text}} - <i>{{note.user}}, {{note.datetime}}</i></li>
                             {%endfor%}
                         </ul>
                         {%endif%}
-                        {%if communication.whatsappmessage.whatsappmessagestatus_set.all%}
+                        {%if call.whatsappmessage.whatsappmessagestatus_set.all%}
                         <br>
                         <b>Message Status:</b>
                         <ul>
-                            {%for status in communication.whatsappmessage.whatsappmessagestatus_set.all%}
+                            {%for status in call.whatsappmessage.whatsappmessagestatus_set.all%}
                             <li><b>{{status.status}}</b> {{status.datetime}} </li>
                             {%endfor%}
                         </ul>
@@ -93,16 +93,16 @@
                             <div class="row">   
                                 <div class="col p-0">                     
                                     <span class="primary_td_layer">
-                                        <i  class="fa fa-{%if communication.type == 'a'%}phone{%elif communication.type == 'b'%}whatsapp{%elif communication.type == 'c'%}envelope{%elif communication.type == 'd'%}message-sms{%endif%}" 
-                                            style="color:{%if communication.successful == True%}green{%elif communication.successful == False%}red{%else%}grey{%endif%}" 
+                                        <i  class="fa fa-{%if call.type == 'a'%}phone{%elif call.type == 'b'%}whatsapp{%elif call.type == 'c'%}envelope{%elif call.type == 'd'%}message-sms{%endif%}" 
+                                            style="color:grey" 
                                             aria-hidden="true"></i>  
                                             - 
-                                            {{communication.datetime}}</span>
+                                            {{call.datetime}}</span>
                                     <br>
-                                    <span class="secondary_td_layer">{{communication.staff_user.first_name}} {{communication.staff_user.last_name}}</span>    
+                                    <span class="secondary_td_layer">{{call.user.first_name}} {{call.user.last_name}}</span>    
                                 </div>
                                 <div class="col-md-auto  p-0">
-                                    {%if communication.note_set.all%}
+                                    {%if call.note_set.all%}
                                         <i class="fa-duotone fa-note"></i>
                                     {%endif%}
                                 </div>
@@ -110,63 +110,12 @@
                         </td>
                     </tr>
                     {%endfor%}
-                    {% comment %} <tr>
-                        <td colspan="2">
-                            <i class="fa fa-phone" style="color:red" aria-hidden="true"></i>
-                            <span style="font-weight: bold; color:#a9a9a9;">
-                                Stuart Farquhar <i class="fa-solid fa-arrow-right"> </i>
-                            </span>
-                            <span style="font-weight: bold; color:#033dfc;">
-                                Mark Benden 
-                            </span> 
-                            - 
-                            <span style="font-style: italic; color:#a9a9a9;">
-                                09-09-2022
-                            </span>
-                            <br>
-                            <span style="">
-                                Call unsuccessful.
-                            </span>                            
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            <i class="fa fa-envelope" style="color:green" aria-hidden="true"></i>
-                            <span style="font-weight: bold; color:#a9a9a9;">
-                                Eleanor Thorpe <i class="fa-solid fa-arrow-right"> </i>
-                            </span>
-                            <span style="font-weight: bold; color:#033dfc;">
-                                Mark Benden 
-                            </span> 
-                            - 
-                            <span style="font-style: italic; color:#a9a9a9;">
-                                06-09-2022
-                            </span>
-                            <br>
-                        </td>
-                    </tr> {% endcomment %}
-                    {% comment %} <tr>
-                        <td colspan="2">
-                            <i class="fa fa-whatsapp" style="color:green" aria-hidden="true"></i>
-                            <span style="font-weight: bold; color:#a9a9a9;">
-                                System (Automatic) <i class="fa-solid fa-arrow-right"> </i>
-                            </span>
-                            <span style="font-weight: bold; color:#033dfc;">
-                                Mark Benden 
-                            </span> 
-                            - 
-                            <span style="font-style: italic; color:#a9a9a9;">
-                                05-09-2022
-                            </span>
-                            <br>
-                        </td>
-                    </tr> {% endcomment %}
                 </tbody>
               </table>
         </div>
     </div>
 </span>
 <span hx-swap-oob="true" id="generic_modal_title">
-    Communication History - {{lead.name}}
+    Call History - {{lead.name}}
     <input type="text" style="display:None" id="modal_lead_pk" name="lead_pk" value="{{lead.pk}}"/>
 </span>

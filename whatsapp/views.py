@@ -4,14 +4,14 @@ from django.conf import settings
 from django.http import HttpResponse
 import json
 from django.views.decorators.csrf import csrf_exempt
-from campaign_leads.models import Campaignlead, Communication
+from campaign_leads.models import Campaignlead, Call
 from messaging.consumers import ChatRoomConsumer
 
 from whatsapp.models import WhatsAppMessage, WhatsAppMessageStatus
 logger = logging.getLogger(__name__)
 from django.views import View 
 from django.utils.decorators import method_decorator
-from core.models import ErrorModel
+from core.models import ErrorModel, Site
 from asgiref.sync import async_to_sync, sync_to_async
 @method_decorator(csrf_exempt, name="dispatch")
 class Webhooks(View):
@@ -39,40 +39,47 @@ class Webhooks(View):
                     if not existing_messages or settings.DEBUG:
                         try:
                             lead = Campaignlead.objects.get(whatsapp_number__icontains=from_number[-10:])
-                            communication = Communication.objects.get_or_create(    
-                                datetime = datetime_from_request,
-                                lead = lead,
-                                type = 'b',
-                                successful = True,
-                                automatic = False,
-                                staff_user = None
-                            )[0]
+                            name = lead.name
                         except Exception as e:
                             lead = None
-                            communication = None
+                            name = str(from_number)
                         # Likely a message from a customer     
                         lead = Campaignlead.objects.filter(whatsapp_number=from_number).last()
+                        site = Site.objects.get(whatsapp_number=to_number)
                         message = WhatsAppMessage.objects.create(
                             wamid=wamid,
                             message = message.get('text').get('body',''),
                             datetime = datetime_from_request,
                             customer_number = from_number,
                             system_user_number = to_number,
-                            communication=communication,
-                            inbound=True\
+                            inbound=True,
+                            site=site,
+                            lead=lead,
                         )
                         message.save()
-                        chat_room_consumer = ChatRoomConsumer()
-                        async_to_sync(chat_room_consumer.group_send)(
-                            f"chat_{str(lead.pk)}",
-                            {'text_data':json.dumps(
-                                {
-                                    "message": message.message,
-                                    "user_name": lead.name,
-                                    "user_avatar": None,
-                                }
-                            )}
+                        group_name = f"chat_{from_number}_{site.pk}"
+                        from channels.layers import get_channel_layer
+                        channel_layer = get_channel_layer()
+                        async_to_sync(channel_layer.group_send)(
+                            group_name,
+                            {
+                                'type': 'chatbox_message',
+                                "message": message.message,
+                                "user_name": name,
+                                "inbound": True,
+                            }
                         )
+                        # .group_send)(
+                        #     f"chat_{str(lead.pk)}",
+                        #     {'text_data':json.dumps(
+                        #         {
+                        #             "message": message.message,
+                        #             "user_name": lead.name,
+                        #             "user_avatar": None,
+                        #         }
+                        #     )}
+                        # )
+                        
                         
 
                 for status_dict in value.get('statuses', []):
@@ -83,13 +90,6 @@ class Webhooks(View):
                             datetime = datetime.fromtimestamp(int(status_dict.get('timestamp'))),
                             status = status_dict.get('status'),
                         )[0]
-                        if status_dict.get('status') == 'read':
-                            try:
-                                communication = whatsapp_message_status.whats_app_message.communication
-                                communication.successful = True
-                                communication.save()
-                            except:
-                                pass
                         
         response = HttpResponse("")
         response.status_code = 200     

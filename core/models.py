@@ -1,10 +1,13 @@
+from datetime import datetime
+from django.conf import settings
 from django.db import models
 from django.db.models.deletion import SET_NULL
 from django.contrib.auth.models import User
 
-from campaign_leads.models import Campaignlead
+from campaign_leads.models import Call, Campaignlead, WhatsappTemplate
 from twilio.models import TwilioMessage
 from django.db.models import Q, Count
+from whatsapp.api import Whatsapp
 
 from whatsapp.models import WhatsAppMessage
 
@@ -22,9 +25,35 @@ class Site(models.Model):
         fake_company = Company
         return fake_company
 
+    def send_whatsapp_message(self, customer_number=None, lead=None, whatsapp_template_send_order=None, message="", user=None, template_used=None):
+        if settings.WHATSAPP_PHONE_OVERRIDE:
+            customer_number = settings.WHATSAPP_PHONE_OVERRIDE     
+        if lead:
+            customer_number = lead.whatsapp_number
+        if settings.ENABLE_WHATSAPP_MESSAGING and self.whatsapp_business_phone_number_id and self.whatsapp_access_token and message:
+            whatsapp = Whatsapp()
+            if '+' in self.whatsapp_number:
+                customer_number = f"{self.whatsapp_number.split('+')[-1]}"
+            response = whatsapp.send_message(customer_number, message, self.whatsapp_business_phone_number_id, self.whatsapp_access_token)
+            reponse_messages = response.get('messages',[])
+            if reponse_messages:
+                for response_message in reponse_messages:
+                    WhatsAppMessage.objects.get_or_create(
+                        wamid=response_message.get('id'),
+                        message=message,
+                        lead=lead,
+                        site=self,
+                        user=user,
+                        system_user_number=self.whatsapp_number,
+                        customer_number=customer_number,
+                        template=template_used,
+                        inbound=False
+                    )
+                return True
+            return False
+
     def get_fresh_messages(self):
-        # return WhatsAppMessage.objects.filter(system_user_number=self.whatsapp_number).distinct('lead')
-        return WhatsAppMessage.objects.filter(system_user_number=self.whatsapp_number).order_by('datetime').order_by('communication__lead').distinct('communication__lead')
+        return WhatsAppMessage.objects.filter(site=self).order_by('datetime').order_by('customer_number').distinct('customer_number')
 
     def get_leads_created_in_month_and_year(self, date):
         return Campaignlead.objects.filter(active_campaign_list__site=self, created__month=date.month, created__year=date.year)
@@ -84,7 +113,7 @@ class Profile(models.Model):
         return f"{self.user.first_name} {self.user.last_name}"
 class FreeTasterLink(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    staff_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     guid = models.TextField(blank=True, null=True)
     customer_name = models.TextField(null=True, blank=True)
     site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)

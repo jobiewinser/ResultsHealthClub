@@ -7,7 +7,7 @@ from django.contrib.auth import login
 from django.middleware.csrf import get_token
 from django.contrib.auth.decorators import login_required
 
-from campaign_leads.models import Campaignlead, Booking, Communication, Note, WhatsappTemplate, communication_choices_dict
+from campaign_leads.models import Campaignlead, Booking, Call, Note, WhatsappTemplate
 from campaign_leads.views import CampaignBookingsOverviewView
 from active_campaign.models import ActiveCampaignList
 from core.models import Site
@@ -29,12 +29,6 @@ def get_modal_content(request, **kwargs):
             param1 = kwargs.get('param1', '')
             if param1:
                 context['lead'] = Campaignlead.objects.get(pk=param1)
-            
-            # if template_name == 'switch_user':
-            #     context['users'] = User.objects.filter(is_staff=True).order_by('first_name')
-            if template_name == 'log_communication':
-                context['communication_type'] = kwargs.get('param2')
-                context['communication_type_display'] = communication_choices_dict[kwargs.get('param2')]
                 
             return render(request, f"campaign_leads/htmx/{template_name}.html", context)   
     except Exception as e:
@@ -76,7 +70,7 @@ def get_leads_column_meta_data(request, **kwargs):
             leads = leads.filter(active_campaign_list__site__pk=site_pk)
             # request.GET['site_pk'] = site_pk 
             
-        leads = leads.annotate(calls=Count('communication', filter=Q(communication__type='a')))
+        leads = leads.annotate(calls=Count('calls'))
         querysets = [
             ('Fresh', leads.filter(calls=0), 0)
         ]
@@ -97,46 +91,6 @@ def get_leads_column_meta_data(request, **kwargs):
         return HttpResponse(e, status=500)
 
 @login_required
-def log_communication(request, **kwargs):
-    logger.debug(str(request.user))
-    try:        
-        lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'))
-        date_occurred = request.POST.get('date_occurred')
-        time_occurred = request.POST.get('time_occurred')
-        communication_type = request.POST.get('communication_type')
-        if communication_type == 'a':
-            successful = (request.POST.get('customer_answered', 'off') == 'on')
-        else:
-            successful = None
-        log_datetime = datetime.strptime(f"{date_occurred} {time_occurred}", '%Y-%m-%d %H:%M')
-        communication = Communication.objects.create(
-            datetime=log_datetime,
-            lead = lead,
-            type = communication_type,
-            successful = successful,
-            staff_user=request.user
-        )
-
-        note = request.POST.get('note','')
-        if note:
-            Note.objects.create(
-                communication=communication,
-                lead=lead,
-                text=note,
-                staff_user=request.user,
-                datetime=log_datetime
-                )
-                
-        context = {
-            'lead': lead,
-        }
-        
-        return render(request, "campaign_leads/htmx/campaign_booking_row.html", context)   
-    except Exception as e:
-        logger.debug("log_communication Error "+str(e))
-        return HttpResponse(e, status=500)
-
-@login_required
 def add_booking(request, **kwargs):
     logger.debug(str(request.user))
     try:        
@@ -152,7 +106,7 @@ def add_booking(request, **kwargs):
             datetime = booking_datetime,
             lead = lead,
             type = booking_type,
-            staff_user=request.user
+            user=request.user
         )
 
         note = request.POST.get('note','')
@@ -161,7 +115,7 @@ def add_booking(request, **kwargs):
                 booking=booking,
                 lead=lead,
                 text=note,
-                staff_user=request.user,
+                user=request.user,
                 datetime=booking_datetime
                 )
                 
@@ -211,24 +165,23 @@ def new_call(request, **kwargs):
         if request.user.is_staff:
             log_datetime = datetime.now()
             call_count = int(kwargs.get('call_count'))
-            lead = Campaignlead.objects.filter(pk=kwargs.get('lead_pk')).annotate(calls=Count('communication', filter=Q(communication__type='a'))).first()
+            lead = Campaignlead.objects.filter(pk=kwargs.get('lead_pk')).annotate(calls=Count('call')).first()
             if lead.calls < call_count:
                 while lead.calls < call_count:
-                    communication = Communication.objects.create(
+                    call = Call.objects.create(
                         datetime=log_datetime,
                         lead = lead,
                         type = 'a',
-                        successful = False,
-                        staff_user=request.user
+                        user=request.user
                     )
-                    lead = Campaignlead.objects.filter(pk=kwargs.get('lead_pk')).annotate(calls=Count('communication', filter=Q(communication__type='a'))).first()
+                    lead = Campaignlead.objects.filter(pk=kwargs.get('lead_pk')).annotate(calls=Count('call')).first()
             elif lead.calls > call_count:
                 while lead.calls > call_count:
-                    Communication.objects.filter(
+                    Call.objects.filter(
                         lead = lead,
                         type = 'a'
                     ).order_by('-datetime').first().delete()
-                    lead = Campaignlead.objects.filter(pk=kwargs.get('lead_pk')).annotate(calls=Count('communication', filter=Q(communication__type='a'))).first()
+                    lead = Campaignlead.objects.filter(pk=kwargs.get('lead_pk')).annotate(calls=Count('call')).first()
            
             lead.save()
 

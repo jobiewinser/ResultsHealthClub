@@ -4,9 +4,12 @@
 
             document.body.addEventListener('htmx:afterSwap', function(evt) {   
                 if (evt.detail.target.id == 'next_chat_window'){
-                    let id = $(evt.srcElement).data('lead-pk');
+
+                    let id = $(evt.srcElement).data('whatsapp-number');
+                    $("#messageWindowCollapse_"+id).scrollTop($($("#messageWindowCollapse_"+id)).height());
                     if (id != undefined){
-                        const user = {{user.pk}};
+                        const user = "{{user.pk}}";
+                        const site_pk = "{{site_pk}}";
                         console.log('#message_submit_'+id,$(evt.detail.elt))
                         document.querySelector('#message_submit_'+id).onclick = function (e) {
                             const messageInputDom = document.querySelector('#message_input_'+id);
@@ -14,12 +17,13 @@
                             chatSocket.send(JSON.stringify({
                                 'message': message,
                                 'user': user,
+                                'site_pk': site_pk,
                             }));
                             messageInputDom.value = '';
                         };
                         
                         const chatSocket = new WebSocket(
-                            'ws://'+window.location.host+'/ws/chat/'+id+'/'
+                            'ws://'+window.location.host+'/ws/chat/'+id+'/{{site.pk}}/'
                         );
                         
                         {% comment %} chatSocket.onmessage = function (e) {
@@ -31,15 +35,32 @@
                         chatSocket.onmessage = function (e) {
                             const data = JSON.parse(e.data);
                             console.log(data)
-                            $(`<div class="row">
-                                <div class="col p-0 ps-1 m-1 card">
-                                    `+data.message+`
-                                </div>
-                                <div class="col-auto p-0 ps-1 m-1">
-                                    <img src="`+data.user_avatar+`" alt="" width="22" height="22" class="rounded-circle">
-                                </div>
-                            </div>`).insertBefore('#message_input_div_'+id);
-                            $('#message_input_'+id).val('')
+                            let user_avatar = data.user_avatar
+                            if (user_avatar == null) {
+                                user_avatar = "{% static 'img/blank-profile-picture.png' %}"
+                            }
+                            if (data.inbound == true){
+                                $(`<div class="row">
+                                    <div class="col-auto p-0 ps-1 m-1">
+                                        <img src="`+user_avatar+`" alt="" width="22" height="22" class="rounded-circle">
+                                    </div>
+                                    <div class="col p-0 ps-1 m-1 card">
+                                        `+data.message+`
+                                    </div>
+                                </div>`).insertBefore('#message_input_div_'+id);
+                                
+                            } else{
+                                $(`<div class="row">
+                                    <div class="col p-0 ps-1 m-1 card">
+                                        `+data.message+`
+                                    </div>
+                                    <div class="col-auto p-0 ps-1 m-1">
+                                        <img src="`+user_avatar+`" alt="" width="22" height="22" class="rounded-circle">
+                                    </div>
+                                </div>`).insertBefore('#message_input_div_'+id);
+                                $('#message_input_'+id).val('')
+                            }
+                            $("#messageWindowCollapse_"+id).scrollTop($($("#messageWindowCollapse_"+id)).height());
                         }
                     }
                 }
@@ -56,9 +77,8 @@
         </div>
         <div class="card-body collapse p-0 all_chat_card_body" id="messageCollapse">
                 {%for message in site.get_fresh_messages%}
-                {%if message.communication.lead%}
                 <div class="row chat_row {%if message.inbound%}active_chat_row{%else%}inactive_chat_row{%endif%}"
-                hx-get="{%url 'leads-message-window' lead_pk=message.communication.lead.pk%}"
+                hx-get="{%url 'message-window' customer_number=message.customer_number chat_box_site_pk=site.pk%}"
                 hx-indicator=".top-htmx-indicator" 
                 hx-target="#next_chat_window"
                 hx-push-url="false"
@@ -70,17 +90,16 @@
                     <div class="col p-0 ps-1">
                         <div class="row chat_lead_name_row">
                             <div class="col p-0">
-                                {{message.communication.lead.name}}
+                                {%if message.lead.name%}{{message.lead.name}}{%else%}{{message.customer_number}}{%endif%}
                             </div>
                         </div>
                         <div class="row chat_message_row">
                             <div class="col p-0">
-                                {%if message.inbound%}{{message.communication.lead.name}}{%else%}You{%endif%}: {{message.Body}}
+                                {%if message.inbound%}Them{%else%}You{%endif%}: {{message.message}}
                             </div>
                         </div>
                     </div>
                 </div>
-                {%endif%}
                 {%endfor%}
         </div>
     </div>

@@ -55,7 +55,7 @@ class CampaignleadsOverviewView(TemplateView):
             context['site'] = Site.objects.get(pk=site_pk)
         
         context['site_list'] = Site.objects.all()
-        leads = leads.annotate(calls=Count('communication', filter=Q(communication__type='a')))
+        leads = leads.annotate(calls=Count('call'))
         context['querysets'] = [
             ('Fresh', leads.filter(calls=0), 0)
         ]

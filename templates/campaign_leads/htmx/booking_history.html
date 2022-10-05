@@ -7,15 +7,15 @@
                     data-bs-toggle="popover" 
                     data-bs-trigger="hover" 
                     data-bs-placement="top"
-                    data-bs-content="See communication history for this lead."
+                    data-bs-content="See call history for this lead."
                     hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
-                    hx-vals='{"template_name": "communication_history"}'
+                    hx-vals='{"template_name": "call_history"}'
                     hx-get="{% url 'campaign-lead-get-modal-content' param1=lead.pk %}" 
                     hx-push-url="false"
                     hx-swap="innerHTML" hx-trigger="click">
-                        Communication History
+                        Call History
                         <span class="badge bg-info" style="font-size:10px">
-                            {{lead.communication_set.all.count}}                
+                            {{lead.call_set.all.count}}                
                         </span>
                 </button>
                 <button class="btn btn-sm btn-success"
@@ -77,7 +77,7 @@
                         <b>Notes:</b>
                         <ul>
                             {%for note in booking.note_set.all%}
-                            <li>{{note.text}} - <i>{{note.staff_user}}, {{note.datetime}}</i></li>
+                            <li>{{note.text}} - <i>{{note.user}}, {{note.datetime}}</i></li>
                             {%endfor%}
                         </ul>
                         {%endif%}
@@ -86,7 +86,7 @@
                                 <div class="col p-0">                            
                                     <span class="primary_td_layer"><i class="fa-solid fa-{%if booking.type == 'a'%}person{%elif booking.type == 'b'%}phone{%endif%}"></i> - {{booking.datetime}}</span>
                                     <br>
-                                    <span class="secondary_td_layer">{{booking.staff_user.first_name}} {{booking.staff_user.last_name}}</span>  
+                                    <span class="secondary_td_layer">{{booking.user.first_name}} {{booking.user.last_name}}</span>  
                                 </div>
                                 <div class="col-md-auto  p-0">
                                     {%if booking.note_set.all%}

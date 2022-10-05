@@ -40,7 +40,7 @@ urlpatterns = [
     
     path('get-leads-column-meta-data/', campaignleadshtmx.get_leads_column_meta_data, name='get-leads-column-meta-data' ),
     path('create-campaign-lead/', campaignleadshtmx.create_campaign_lead, name='create-campaign-lead' ),
-    path('log-communication/', campaignleadshtmx.log_communication, name='log-communication' ),
+    
     path('add-booking/', campaignleadshtmx.add_booking, name='add-booking' ),
     path('mark-arrived/', campaignleadshtmx.mark_arrived, name='mark-arrived' ),
     path('mark-sold/', campaignleadshtmx.mark_sold, name='mark-sold' ),

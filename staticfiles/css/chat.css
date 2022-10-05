@@ -13,7 +13,9 @@
     margin-right:4px;
 }
 .chat_card_body{
-    height:350px
+    height:350px;
+    overflow-y: scroll;
+    margin-bottom:50px
 }
 
 .all_chat_card_body{

@@ -56,7 +56,7 @@ class MessageWebhooks(View):
                 message.errors.add(error)
         lead = Campaignlead.objects.filter(whatsapp_number=post_dict.get('From', '')).last()
         if lead:
-            message.communication.lead = lead
+            message.lead = lead
         message.save()
         response = HttpResponse("")
         response.status_code = 200             

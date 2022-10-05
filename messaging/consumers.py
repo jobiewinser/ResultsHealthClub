@@ -1,13 +1,16 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from campaign_leads.models import Campaignlead
+from core.models import Site
 
 from whatsapp.api import Whatsapp
+from whatsapp.models import WhatsAppMessage
 
 class ChatRoomConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        self.chat_box_name = self.scope["url_route"]["kwargs"]["chat_box_name"]
-        self.group_name = "chat_%s" % self.chat_box_name
+        self.chat_box_whatsapp_number = self.scope["url_route"]["kwargs"]["chat_box_whatsapp_number"]
+        self.chat_box_site_pk = self.scope["url_route"]["kwargs"]["chat_box_site_pk"]
+        self.group_name = f"chat_{self.chat_box_whatsapp_number}_{self.chat_box_site_pk}"
         self.user = self.scope["user"]
 
         await self.channel_layer.group_add(self.group_name, self.channel_name)
@@ -23,8 +26,8 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
         message = text_data_json["message"]
 
         user = self.scope["user"]
-        if(user.is_authenticated and self.chat_box_name):
-            if await send_whatsapp_message_to_lead(message, self.chat_box_name, user):
+        if(user.is_authenticated and self.chat_box_whatsapp_number):
+            if await send_whatsapp_message_to_number(message, self.chat_box_whatsapp_number, user, self.scope["url_route"]["kwargs"]["chat_box_site_pk"]):
                 avatar, name = await message_details_user(user)
                 await self.channel_layer.group_send(
                     self.group_name,
@@ -33,32 +36,39 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
                         "message": message,
                         "user_name": name,
                         "user_avatar": avatar,
+                        "inbound": False
                     },
                 )
     # Receive message from room group.
-    # async def chatbox_message(self, event):
-    #     message = event["message"]
-    #     user_name = event["user_name"]
-    #     user_avatar = event["user_avatar"]
-    #     #send message and user of sender to websocket
-    #     await self.send(
-    #         text_data=json.dumps(
-    #             {
-    #                 "message": message,
-    #                 "user_name": user_name,
-    #                 "user_avatar": user_avatar,
-    #             }
-    #         )
-    #     )
+    async def chatbox_message(self, event):
+        message = event["message"]
+        user_name = event.get("user_name", None)
+        user_avatar = event.get("user_avatar", None)
+        inbound = event.get("inbound", None)
+        #send message and user of sender to websocket
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "message": message,
+                    "user_name": user_name,
+                    "user_avatar": user_avatar,
+                    "inbound": inbound,
+                }
+            )
+        )
 
     pass
 from asgiref.sync import async_to_sync, sync_to_async
 
 @sync_to_async
-def send_whatsapp_message_to_lead(message, lead_pk, user):    
-    lead = Campaignlead.objects.get(pk=lead_pk)    
-    if lead.active_campaign_list.site.get_company == user.profile.get_company:        
-        return lead.send_whatsapp_message(message=message, user=user)
+def send_whatsapp_message_to_number(message, whatsapp_number, user, site_pk):    
+    lead = Campaignlead.objects.filter(whatsapp_number=whatsapp_number).first()  
+    if lead:     
+        if lead.active_campaign_list.site.get_company == user.profile.get_company: 
+            return Site.objects.get(pk = site_pk).send_whatsapp_message(customer_number=whatsapp_number, message=message, user=user, lead=lead)
+    user_company_site_pk_list = Site.objects.filter(company=user.profile.company).values_list('pk', flat=True)
+    if WhatsAppMessage.objects.filter(customer_number=whatsapp_number, site__pk__in=user_company_site_pk_list):
+        return Site.objects.get(pk = site_pk).send_whatsapp_message(customer_number=whatsapp_number, message=message, user=user)
     return False
 
 @sync_to_async

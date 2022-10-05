@@ -10,16 +10,6 @@ from django.conf import settings
 from django.dispatch import receiver
 # Create your models here.
 
-
-COMMUNICATION_CHOICES = (
-                    ('a', 'Phone'),
-                    ('b', 'Whatsapp'),
-                    ('c', 'Email'),
-                    ('d', 'Text')
-                )
-communication_choices_dict = {}
-for tuple in COMMUNICATION_CHOICES:
-    communication_choices_dict[tuple[0]] = tuple[1]
 BOOKING_CHOICES = (
                     ('a', 'In Person'),
                     ('b', 'Phone'),
@@ -50,72 +40,24 @@ class Campaignlead(models.Model):
             return f"{self.first_name} {self.last_name}"
         return self.first_name
     @property
-    def last_whatsapp_communication(self):
-        whatsapp_communications = self.communication_set.filter(type='b')
-        if whatsapp_communications:
-            return whatsapp_communications.first()
+    def last_whatsapp(self):
+        whatsapps = self.call_set.all()
+        if whatsapps:
+            return whatsapps.first()
         return None
     
     @property
     def time_until_next_whatsapp(self):
-        last_whatsapp_communication = self.last_whatsapp_communication
-        print(last_whatsapp_communication)
-        if last_whatsapp_communication:
-            return last_whatsapp_communication.datetime.replace(hour=9).replace(minute=30).replace(second=0) + timedelta(days=1)
-        return "Never"
-    
-    @property
-    def successful_communication(self):
-        return self.communication_set.filter(successful=True)
-    
+        last_whatsapp = self.last_whatsapp
+        print(last_whatsapp)
+        if last_whatsapp:
+            return last_whatsapp.datetime.replace(hour=9).replace(minute=30).replace(second=0) + timedelta(days=1)
+        return "Never"  
 
-
-    def send_whatsapp_message(self, whatsapp_template_send_order=None, message="", user=None):
-        temp0 = settings.ENABLE_WHATSAPP_MESSAGING
-        temp1 = self.active_campaign_list.site.whatsapp_business_phone_number_id
-        temp2 = self.active_campaign_list.site.whatsapp_access_token
-        if settings.ENABLE_WHATSAPP_MESSAGING and self.active_campaign_list.site.whatsapp_business_phone_number_id and self.active_campaign_list.site.whatsapp_access_token:
-            whatsapp = Whatsapp()
-            if whatsapp_template_send_order:
-                template = WhatsappTemplate.objects.get(send_order = whatsapp_template_send_order, site=self.active_campaign_list.site)
-                message = f"{template.rendered(self)}" 
-            else:
-                template = None
-                message = message
-            recipient_number = f"{self.whatsapp_number.split('+')[-1]}"
-            if settings.WHATSAPP_PHONE_OVERRIDE:
-                recipient_number = settings.WHATSAPP_PHONE_OVERRIDE     
-            response = whatsapp.send_message(recipient_number, message, self.active_campaign_list.site.whatsapp_business_phone_number_id, self.active_campaign_list.site.whatsapp_access_token)
-            reponse_messages = response.get('messages',[])
-            if reponse_messages:
-                for response_message in reponse_messages:
-                    communication = Communication.objects.get_or_create(    
-                        datetime = datetime.now(),
-                        lead = self,
-                        type = 'b',
-                        automatic = True,
-                        staff_user = user
-                    )[0]
-                    WhatsAppMessage.objects.get_or_create(
-                        wamid=response_message.get('id'),
-                        message=message,
-                        communication=communication,
-                        system_user_number=self.active_campaign_list.site.whatsapp_number,
-                        customer_number=recipient_number,
-                        template=template,
-                        inbound=False
-                    )
-                return True
-            communication = Communication.objects.get_or_create(    
-                datetime = datetime.now(),
-                lead = self,
-                type = 'b',
-                automatic = True,
-                staff_user = user,
-                successful = False,
-                error_json = response
-            )[0]
-            return False
+    def send_automatic_whatsapp_message(self, whatsapp_template_send_order):
+        template = WhatsappTemplate.objects.get(send_order = whatsapp_template_send_order, site=self.active_campaign_list.site)
+        message = f"{template.rendered(self)}" 
+        return self.active_campaign_list.site.get_fresh_messages(customer_number=self.whatsapp_number, lead=self, message=message, template_used=template)
 
 @receiver(models.signals.post_save, sender=Campaignlead)
 def execute_after_save(sender, instance, created, *args, **kwargs):
@@ -124,14 +66,11 @@ def execute_after_save(sender, instance, created, *args, **kwargs):
         pass
     # WILL EVENTUALLY SEND TWILIO
         
-class Communication(models.Model):
+class Call(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     datetime = models.DateTimeField(null=False, blank=False)
     lead = models.ForeignKey(Campaignlead, on_delete=models.CASCADE, null=True, blank=True)
-    type = models.CharField(choices=COMMUNICATION_CHOICES, max_length=2, null=False, blank=False)
-    successful = models.BooleanField(default=None, null=True, blank=True)
-    automatic = models.BooleanField(default=False)
-    staff_user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     error_json = models.JSONField(default=dict)
     class Meta:
         ordering = ['-datetime']
@@ -141,17 +80,17 @@ class Booking(models.Model):
     datetime = models.DateTimeField(null=False, blank=False)
     lead = models.ForeignKey(Campaignlead, on_delete=models.CASCADE)
     type = models.CharField(choices=BOOKING_CHOICES, max_length=2, null=False, blank=False)
-    staff_user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     class Meta:
         ordering = ['-datetime']
 
 class Note(models.Model):
     text = models.TextField(null=False, blank=False)
     lead = models.ForeignKey(Campaignlead, on_delete=models.CASCADE, null=True, blank=True)
-    communication = models.ForeignKey('campaign_leads.Communication', on_delete=models.CASCADE, null=True, blank=True)
+    call = models.ForeignKey('campaign_leads.Call', on_delete=models.CASCADE, null=True, blank=True)
     booking = models.ForeignKey(Booking, on_delete=models.CASCADE, null=True, blank=True)
-    staff_user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    #This referes to the date it was created unless it's attached to a communication/booking, then it's set to the related datetime
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    #This referes to the date it was created unless it's attached to a call/booking, then it's set to the related datetime
     datetime = models.DateTimeField(null=True, blank=True) 
     class Meta:
         ordering = ['-datetime']
