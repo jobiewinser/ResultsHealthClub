@@ -134,7 +134,7 @@ static/**
 migrations
 
 media/**
-asgi.py
+
 nano.save
 settings.py1
 .requirements.txt.swp
