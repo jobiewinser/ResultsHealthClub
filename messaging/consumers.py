@@ -8,6 +8,7 @@ from whatsapp.models import WhatsAppMessage
 
 class ChatRoomConsumer(AsyncWebsocketConsumer):
     async def connect(self):
+        print("Connect Print")
         self.chat_box_whatsapp_number = self.scope["url_route"]["kwargs"]["chat_box_whatsapp_number"]
         self.chat_box_site_pk = self.scope["url_route"]["kwargs"]["chat_box_site_pk"]
         self.group_name = f"chat_{self.chat_box_whatsapp_number}_{self.chat_box_site_pk}"
