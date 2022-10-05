@@ -10,8 +10,8 @@ websocket_urlpatterns=[
                     ),
                 ]
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'WinserSystems.settings')
-
+# os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'WinserSystems.settings')
+DJANGO_SETTINGS_MODULE = 'WinserSystems.settings'
 application = ProtocolTypeRouter( 
     {
         "websocket": AuthMiddlewareStack(
