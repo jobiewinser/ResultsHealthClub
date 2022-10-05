@@ -28,31 +28,36 @@ class Site(models.Model):
         return fake_company
 
     def send_whatsapp_message(self, customer_number=None, lead=None, whatsapp_template_send_order=None, message="", user=None, template_used=None):  
-        if lead:
-            customer_number = lead.whatsapp_number
-        if settings.ENABLE_WHATSAPP_MESSAGING and self.whatsapp_business_phone_number_id and self.whatsapp_access_token and message:
-            whatsapp = Whatsapp()
-            if '+' in self.whatsapp_number:
-                customer_number = f"{self.whatsapp_number.split('+')[-1]}"
-            response = whatsapp.send_message(customer_number, message, self.whatsapp_business_phone_number_id, self.whatsapp_access_token)
-            reponse_messages = response.get('messages',[])
-            if reponse_messages:
-                for response_message in reponse_messages:
-                    WhatsAppMessage.objects.get_or_create(
-                        wamid=response_message.get('id'),
-                        message=message,
-                        lead=lead,
-                        site=self,
-                        user=user,
-                        system_user_number=self.whatsapp_number,
-                        customer_number=customer_number,
-                        template=template_used,
-                        inbound=False
-                    )
-                logger.debug("site.send_whatsapp_message success") 
-                return True
-            
-            logger.debug("site.send_whatsapp_message fail") 
+        try:
+            logger.debug("site.send_whatsapp_message start") 
+            if lead:
+                customer_number = lead.whatsapp_number
+            if settings.ENABLE_WHATSAPP_MESSAGING and self.whatsapp_business_phone_number_id and self.whatsapp_access_token and message:
+                whatsapp = Whatsapp()
+                if '+' in self.whatsapp_number:
+                    customer_number = f"{self.whatsapp_number.split('+')[-1]}"
+                response = whatsapp.send_message(customer_number, message, self.whatsapp_business_phone_number_id, self.whatsapp_access_token)
+                reponse_messages = response.get('messages',[])
+                if reponse_messages:
+                    for response_message in reponse_messages:
+                        WhatsAppMessage.objects.get_or_create(
+                            wamid=response_message.get('id'),
+                            message=message,
+                            lead=lead,
+                            site=self,
+                            user=user,
+                            system_user_number=self.whatsapp_number,
+                            customer_number=customer_number,
+                            template=template_used,
+                            inbound=False
+                        )
+                    logger.debug("site.send_whatsapp_message success") 
+                    return True
+                
+                logger.debug("site.send_whatsapp_message fail") 
+                return False
+        except Exception as e:
+            logger.debug("site.send_whatsapp_message error: "+str(e)) 
             return False
 
     def get_fresh_messages(self):
