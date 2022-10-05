@@ -56,6 +56,13 @@ class Site(models.Model):
                 
                 logger.debug("site.send_whatsapp_message fail") 
                 return False
+            logger.debug(f"""site.send_whatsapp_message error: 
+            
+                (settings.ENABLE_WHATSAPP_MESSAGING,{str(settings.ENABLE_WHATSAPP_MESSAGING)})             
+                (self.whatsapp_business_phone_number_id,{str(self.whatsapp_business_phone_number_id)})             
+                (self.whatsapp_access_token,{str(self.whatsapp_access_token)}) 
+                (message,{str(message)}) 
+            """) 
         except Exception as e:
             logger.debug("site.send_whatsapp_message error: "+str(e)) 
             return False
