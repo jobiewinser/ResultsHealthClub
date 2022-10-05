@@ -3,6 +3,8 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 from django.urls import re_path
 from messaging import consumers
 import os
+import django
+
 # URLs that handle the WebSocket connection are placed here.
 websocket_urlpatterns=[
                     re_path(
@@ -10,8 +12,9 @@ websocket_urlpatterns=[
                     ),
                 ]
 
-# os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'WinserSystems.settings')
-DJANGO_SETTINGS_MODULE = 'WinserSystems.settings'
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'WinserSystems.settings')
+django.setup()
 application = ProtocolTypeRouter( 
     {
         "websocket": AuthMiddlewareStack(
