@@ -3,9 +3,9 @@
     <div class="row">
         <div class="col center">
             
-            {%if user.profile.company_set.all%}
+            {%if user.profile.company.all%}
             <div class="form-group">
-                <h4>Company: <b> {{user.profile.company_set.first.company_name}}</b></h4>
+                <h4>Company: <b> {{user.profile.company.all.first.company_name}}</b></h4>
             </div>
             <div class="form-group">
                 <label class="form-label" for="site_pk">Default Site: </label>

@@ -109,8 +109,8 @@ def get_active_campaign_list_qs(request):
 def get_active_campaign_lists(request, **kwargs):
     # try:
     if not settings.DEBUG:
-        if request.user.profile.company:
-            request.user.profile.company.first().get_and_generate_active_campaign_list_objects()
+        if request.user.profile.company.all():
+            request.user.profile.company.all().first().get_and_generate_active_campaign_list_objects()
         return render(request, f"active_campaign/htmx/active_campaign_lists_select.html", 
         {'active_campaign_lists':get_active_campaign_list_qs(request)})
     return render(request, f"active_campaign/htmx/active_campaign_lists_select.html", 

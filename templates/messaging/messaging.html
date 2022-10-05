@@ -1,4 +1,4 @@
-{%load static%}
+{%load static core_tags%}
 <script>
         $(document).ready(function() {  
 
@@ -23,7 +23,11 @@
                         };
                         
                         const chatSocket = new WebSocket(
+                            {%if 'DEBUG'|settings_value%}
+                            'ws://'+window.location.host+'/ws/chat/'+id+'/{{site.pk}}/'
+                            {%else%}
                             'wss://'+window.location.host+'/ws/chat/'+id+'/{{site.pk}}/'
+                            {%endif%}
                         );
                         
                         {% comment %} chatSocket.onmessage = function (e) {

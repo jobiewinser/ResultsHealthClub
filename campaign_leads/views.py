@@ -148,7 +148,7 @@ class LeadConfigurationView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(LeadConfigurationView, self).get_context_data(**kwargs)
         context['active_campaign_lists'] = []
-        if self.request.user.profile.company:
-            context['active_campaign_lists'] = self.request.user.profile.company.first().get_and_generate_active_campaign_list_objects()
+        if self.request.user.profile.company.all():
+            context['active_campaign_lists'] = self.request.user.profile.company.all().first().get_and_generate_active_campaign_list_objects()
         context['site_list'] = Site.objects.all()
         return context

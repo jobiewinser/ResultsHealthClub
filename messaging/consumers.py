@@ -67,7 +67,7 @@ def send_whatsapp_message_to_number(message, whatsapp_number, user, site_pk):
     if lead:     
         if lead.active_campaign_list.site.get_company == user.profile.get_company: 
             return Site.objects.get(pk = site_pk).send_whatsapp_message(customer_number=whatsapp_number, message=message, user=user, lead=lead)
-    user_company_site_pk_list = Site.objects.filter(company=user.profile.company).values_list('pk', flat=True)
+    user_company_site_pk_list = Site.objects.filter(company__in=user.profile.company.all()).values_list('pk', flat=True)
     if WhatsAppMessage.objects.filter(customer_number=whatsapp_number, site__pk__in=user_company_site_pk_list):
         return Site.objects.get(pk = site_pk).send_whatsapp_message(customer_number=whatsapp_number, message=message, user=user)
     return False

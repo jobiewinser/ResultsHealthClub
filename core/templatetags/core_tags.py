@@ -5,6 +5,7 @@ import time
 import calendar
 
 from dateutil import relativedelta
+from django.conf import settings
 register = template.Library()
 
 import math
@@ -26,8 +27,11 @@ def last_x_chars(var,x):
     return str(var)[x:]
 @register.simple_tag
 def get_env_var(key):
-    return os.environ.get(key)
-    
+    return os.environ.get(key)    
+@register.filter
+def settings_value(name):
+    return getattr(settings, name, "")
+
 @register.filter
 def roundup_tag(number, round_target):
     try:
