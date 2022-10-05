@@ -25,9 +25,7 @@ class Site(models.Model):
         fake_company = Company
         return fake_company
 
-    def send_whatsapp_message(self, customer_number=None, lead=None, whatsapp_template_send_order=None, message="", user=None, template_used=None):
-        if settings.WHATSAPP_PHONE_OVERRIDE:
-            customer_number = settings.WHATSAPP_PHONE_OVERRIDE     
+    def send_whatsapp_message(self, customer_number=None, lead=None, whatsapp_template_send_order=None, message="", user=None, template_used=None):  
         if lead:
             customer_number = lead.whatsapp_number
         if settings.ENABLE_WHATSAPP_MESSAGING and self.whatsapp_business_phone_number_id and self.whatsapp_access_token and message:

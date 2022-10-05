@@ -33,8 +33,8 @@ class Whatsapp:
     #POST
     def send_message(self, recipient_number, message, whatsapp_business_phone_number_id, whatsapp_access_token, preview_url = False):   
         if message:
-            if settings.WHATSAPP_PHONE_OVERRIDE:
-                recipient_number = settings.WHATSAPP_PHONE_OVERRIDE     
+            if settings.WHATSAPP_PHONE_OVERRIDE1 and not recipient_number == settings.WHATSAPP_PHONE_OVERRIDE2:
+                recipient_number = settings.WHATSAPP_PHONE_OVERRIDE1    
             url = f"{self.whatsapp_url}{whatsapp_business_phone_number_id}/messages"
             headers = self._get_headers(whatsapp_access_token)
             body = { 

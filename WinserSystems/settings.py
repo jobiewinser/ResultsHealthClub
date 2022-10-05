@@ -22,7 +22,7 @@ load_dotenv(dotenv_path=env_path)
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-WHATSAPP_PHONE_OVERRIDE=False
+WHATSAPP_PHONE_OVERRIDE1=False
 
 
 LOGGING = {
@@ -99,7 +99,8 @@ else:
     )
 
 if DEBUG:
-    WHATSAPP_PHONE_OVERRIDE='447827777940'
+    WHATSAPP_PHONE_OVERRIDE1='447827777940'
+    WHATSAPP_PHONE_OVERRIDE2='447974214718'
 ENABLE_WHATSAPP_MESSAGING = os.getenv('ENABLE_WHATSAPP_MESSAGING') == 'True'
 
 # Application definition
