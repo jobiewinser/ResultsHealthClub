@@ -8,6 +8,8 @@ from campaign_leads.models import Call, Campaignlead, WhatsappTemplate
 from twilio.models import TwilioMessage
 from django.db.models import Q, Count
 from whatsapp.api import Whatsapp
+import logging
+logger = logging.getLogger(__name__)
 
 from whatsapp.models import WhatsAppMessage
 
@@ -47,7 +49,10 @@ class Site(models.Model):
                         template=template_used,
                         inbound=False
                     )
+                logger.debug("site.send_whatsapp_message success") 
                 return True
+            
+            logger.debug("site.send_whatsapp_message fail") 
             return False
 
     def get_fresh_messages(self):
