@@ -62,6 +62,7 @@ class Webhooks(View):
                         channel_layer = get_channel_layer()
                         
                         logger.debug(f"webhook sending to chat start: groupname {group_name}") 
+                        print(f"webhook sending to chat start: groupname {group_name}") 
                         async_to_sync(channel_layer.group_send)(
                             group_name,
                             {
@@ -72,6 +73,7 @@ class Webhooks(View):
                             }
                         )
                         logger.debug("webhook sending to chat end")
+                        print("webhook sending to chat end")
                         # .group_send)(
                         #     f"chat_{str(lead.pk)}",
                         #     {'text_data':json.dumps(
