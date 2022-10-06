@@ -39,10 +39,10 @@ class Webhooks(View):
                     if not existing_messages or settings.DEBUG:
                         try:
                             lead = Campaignlead.objects.get(whatsapp_number__icontains=from_number[-10:])
-                            name = lead.name
+                            # name = lead.name
                         except Exception as e:
                             lead = None
-                            name = str(from_number)
+                        name = str(from_number)
                         # Likely a message from a customer     
                         lead = Campaignlead.objects.filter(whatsapp_number=from_number).last()
                         site = Site.objects.get(whatsapp_number=to_number)
@@ -61,12 +61,12 @@ class Webhooks(View):
                         from channels.layers import get_channel_layer
                         channel_layer = get_channel_layer()
                         
-                        logger.debug("webhook sending to chat start") 
+                        logger.debug(f"webhook sending to chat start: groupname {group_name}") 
                         async_to_sync(channel_layer.group_send)(
                             group_name,
                             {
                                 'type': 'chatbox_message',
-                                "message": message.message,
+                                "message": message.message.get('text').get('body',''),
                                 "user_name": name,
                                 "inbound": True,
                             }
