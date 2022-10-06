@@ -56,7 +56,7 @@ class Webhooks(View):
                     datetime_from_request = datetime.fromtimestamp(int(message.get('timestamp')))
                     x = x+1
                     print(x)
-                    existing_messages = WhatsAppMessage.objects.filter( wamid=wamid ).exclude(wamid=1)
+                    existing_messages = WhatsAppMessage.objects.filter( wamid=wamid ).exclude(wamid="ABGGFlA5Fpa1")
                     x = x+1
                     print(x)
                     print(f"existing_messages", str(existing_messages))
