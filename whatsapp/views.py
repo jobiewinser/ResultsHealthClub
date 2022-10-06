@@ -60,6 +60,7 @@ class Webhooks(View):
                     x = x+1
                     print(x)
                     if not existing_messages or settings.DEBUG:
+                        print("REACHED past if not existing_messages or settings.DEBUG")
                         x = x+1
                         print(x)
                         try:
