@@ -59,6 +59,7 @@ class Webhooks(View):
                     existing_messages = WhatsAppMessage.objects.filter( wamid=wamid ).exclude(wamid=1)
                     x = x+1
                     print(x)
+                    print(f"existing_messages", str(existing_messages))
                     if not existing_messages or settings.DEBUG:
                         print("REACHED past if not existing_messages or settings.DEBUG")
                         x = x+1
