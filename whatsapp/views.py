@@ -5,7 +5,7 @@ from django.http import HttpResponse
 import json
 from django.views.decorators.csrf import csrf_exempt
 from campaign_leads.models import Campaignlead, Call
-from messaging.consumers import ChatRoomConsumer
+from messaging.consumers import ChatConsumer
 
 from whatsapp.models import WhatsAppMessage, WhatsAppMessageStatus
 logger = logging.getLogger(__name__)
@@ -104,3 +104,25 @@ class Webhooks(View):
         response.status_code = 200     
         
         return response
+        
+from django.contrib.auth.decorators import login_required
+@login_required
+def clear_chat_from_session(request):
+    try:
+        request.session['open_chats'].remove(request.POST.get('whatsapp_number'))
+    except Exception as e:
+        pass
+    return HttpResponse("", "text", 200)
+        
+from django.contrib.auth.decorators import login_required
+@login_required
+def add_chat_to_session(request):
+    try:
+        temp = request.session['open_chats']
+        if not 'open_chats' in request.session:
+            request.session['open_chats'] = [request.POST.get('whatsapp_number')]
+        elif not request.POST.get('whatsapp_number') in request.session['open_chats']:
+            request.session['open_chats'].append(request.POST.get('whatsapp_number'))
+    except Exception as e:
+        pass
+    return HttpResponse("", "text", 200)

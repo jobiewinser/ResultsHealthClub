@@ -8,7 +8,7 @@
                 {%if lead.name%}{{lead.name}}{%else%}{{customer_number}}{%endif%}
             </div>
             <div class="col-auto p-0">
-                <i class="fa-sharp fa-solid fa-circle-xmark" onclick="$('#chat_card_{{customer_number}}').remove()"></i>
+                <i class="fa-sharp fa-solid fa-circle-xmark" onclick="$('#chat_card_{{customer_number}}').remove(); clear_chat_from_session('{{customer_number}}')"></i>
             </div>
         </div>
     </div>
@@ -34,15 +34,17 @@
                 </div>
             {%endif%}
         {%endfor%}
+        <form action="javascript:void(0);">
         <div style="position: absolute; right:0; bottom: 0; width:100%" class="row" id="message_input_div_{{customer_number}}"> 
-            <div class="col"> 
-                <input class="form-control" id="message_input_{{customer_number}}"  type="text">
-        
-                </input>
-            </div>
-            <div class="col-auto"> 
-                <button class="badge bg-primary" id="message_submit_{{customer_number}}"><i class="fa-solid fa-paper-plane-top"></i></button>
-            </div>
+                <div class="col"> 
+                    <input class="form-control" id="message_input_{{customer_number}}"  type="text">
+            
+                    </input>
+                </div>
+                <div class="col-auto"> 
+                    <button class="badge bg-primary" id="message_submit_{{customer_number}}"><i class="fa-solid fa-paper-plane-top"></i></button>
+                </div>
         </div>
+    </form>
     </div>
 </div>

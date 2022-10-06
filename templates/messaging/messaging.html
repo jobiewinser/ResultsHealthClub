@@ -6,35 +6,42 @@
                 if (evt.detail.target.id == 'next_chat_window'){
 
                     let id = $(evt.srcElement).data('whatsapp-number');
-                    $("#messageWindowCollapse_"+id).scrollTop($($("#messageWindowCollapse_"+id)).height());
+                    $("#messageWindowCollapse_"+id).scrollTop($($("#messageWindowCollapse_"+id)).height() * 2);
                     if (id != undefined){
                         const user = "{{user.pk}}";
                         const site_pk = "{{site_pk}}";
                         console.log('#message_submit_'+id,$(evt.detail.elt))
                         document.querySelector('#message_submit_'+id).onclick = function (e) {
+
+
                             const messageInputDom = document.querySelector('#message_input_'+id);
                             const message = messageInputDom.value;
+
+                            $(`<div class="row pending message_pending_`+id+`">
+                                <div class="col p-0 ps-1 m-1 card">
+                                    `+message+`
+                                </div>
+                                <div class="col-auto p-0 ps-1 m-1">
+                                    <img src="`+"{{request.user.profile.avatar.url}}"+`" alt="" width="22" height="22" class="rounded-circle">
+                                </div>
+                            </div>`).insertBefore('#message_input_div_'+id);
+
                             chatSocket.send(JSON.stringify({
                                 'message': message,
                                 'user': user,
                                 'site_pk': site_pk,
                             }));
                             messageInputDom.value = '';
+                            $("#messageWindowCollapse_"+id).scrollTop($($("#messageWindowCollapse_"+id)).height() * 2);
                         };
                         
-                        const chatSocket = new WebSocket(
-                            {%if 'DEBUG'|settings_value%}
-                            'ws://'+window.location.host+'/ws/chat/'+id+'/{{site.pk}}/'
-                            {%else%}
-                            'wss://'+window.location.host+'/ws/chat/'+id+'/{{site.pk}}/'
-                            {%endif%}
+                        const chatSocket = new WebSocket(                            
+                            'ws{%if not 'DEBUG'|settings_value%}s{%endif%}://'+window.location.host+'/ws/chat/'+id+'/{{site.pk}}/'                            
                         );
                         
-                        {% comment %} chatSocket.onmessage = function (e) {
-                            const data = JSON.parse(e.data);
-                            console.log(data)
-                            $('#message_input_'+id).val('')
-                        } {% endcomment %}
+                        {% comment %} const chatListSocket = new WebSocket(                            
+                            'ws{%if not 'DEBUG'|settings_value%}s{%endif%}://'+window.location.host+'/ws/chatlist/{{site.pk}}/'                            
+                        ); {% endcomment %}
                         
                         chatSocket.onmessage = function (e) {
                             const data = JSON.parse(e.data);
@@ -54,22 +61,47 @@
                                 </div>`).insertBefore('#message_input_div_'+id);
                                 
                             } else{
-                                $(`<div class="row">
+                                let new_chat =  $(`<div class="row">
                                     <div class="col p-0 ps-1 m-1 card">
                                         `+data.message+`
                                     </div>
                                     <div class="col-auto p-0 ps-1 m-1">
                                         <img src="`+user_avatar+`" alt="" width="22" height="22" class="rounded-circle">
                                     </div>
-                                </div>`).insertBefore('#message_input_div_'+id);
-                                $('#message_input_'+id).val('')
+                                </div>`);
+                                if ($('.message_pending_'+id).length > 0){
+                                    $('.message_pending_'+id).first().replaceWith(new_chat);
+                                } else {                                
+                                    new_chat.insertBefore('#message_input_div_'+id);
+                                }
                             }
-                            $("#messageWindowCollapse_"+id).scrollTop($($("#messageWindowCollapse_"+id)).height());
                         }
                     }
                 }
             })
         })
+        function clear_chat_from_session(whatsapp_number){
+            var respStatus = $.ajax({
+                type:'POST',
+                url:'{%url "clear-chat-from-session"%}',
+                data:{'whatsapp_number':whatsapp_number, 'csrfmiddlewaretoken':'{{ csrf_token }}'},
+                success: function (data) {
+                },
+                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                }
+            })
+        }
+        function add_chat_to_session(whatsapp_number){
+            var respStatus = $.ajax({
+                type:'POST',
+                url:'{%url "add-chat-to-session"%}',
+                data:{'whatsapp_number':whatsapp_number, 'csrfmiddlewaretoken':'{{ csrf_token }}'},
+                success: function (data) {
+                },
+                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                }
+            })
+        }
         
 </script>
 <link href="{% static 'css/chat.css' %}" rel="stylesheet" />
@@ -86,7 +118,8 @@
                 hx-indicator=".top-htmx-indicator" 
                 hx-target="#next_chat_window"
                 hx-push-url="false"
-                hx-swap="outerHTML" hx-trigger="click"   
+                hx-swap="outerHTML" hx-trigger="click"  
+                onclick="add_chat_to_session({{message.customer_number}})" 
                 >
                     <div class="col-auto p-0">
                         <img src="{% static 'img/blank-profile-picture.png' %}" alt="" width="44" height="44" class="rounded-circle">

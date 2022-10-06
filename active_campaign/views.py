@@ -17,9 +17,7 @@ from django.conf import settings
 class Webhooks(View):
     def get(self, request, *args, **kwargs):
         logger.debug(str(request.GET))
-        response = HttpResponse("")
-        response.status_code = 200
-        return response
+        return HttpResponse("", "text", 200)
 
     def post(self, request, *args, **kwargs): 
         try:
@@ -61,14 +59,10 @@ class Webhooks(View):
                                 active_campaign_form_id=data.get('form[id]', None),
                                 possible_duplicate = possible_duplicate
                             )
-            response = HttpResponse("")
-            response.status_code = 200             
-            return response
+            return HttpResponse("", "text", 200)
         except Exception as e:     
-            logger.error(f"Webhooks POST {str(e)}")         
-            response = HttpResponse(str(e))
-            response.status_code = 500             
-            return response
+            logger.error(f"Webhooks POST {str(e)}")     
+            return HttpResponse(str(e), "text", 500)
 
 
 # @login_required

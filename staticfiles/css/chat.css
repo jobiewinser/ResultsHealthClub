@@ -56,3 +56,7 @@
     color: #A7A7A7;
     font-weight:300;
 }
+
+.pending {
+    opacity: 40%;
+}
