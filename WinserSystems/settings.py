@@ -276,6 +276,6 @@ USE_TZ = True
 ASGI_APPLICATION = "WinserSystems.routing.application" #routing.py will be created later
 CHANNEL_LAYERS = {
     'default': {
-        'BACKEND': "channels.layers.InMemoryChannelLayer"
+        'BACKEND': "channels_redis.core.RedisChannelLayer"
         }
 }
