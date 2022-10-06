@@ -46,7 +46,7 @@ class Webhooks(View):
                         # Likely a message from a customer     
                         lead = Campaignlead.objects.filter(whatsapp_number=from_number).last()
                         site = Site.objects.get(whatsapp_number=to_number)
-                        message = WhatsAppMessage.objects.create(
+                        whatsapp_message = WhatsAppMessage.objects.create(
                             wamid=wamid,
                             message = message.get('text').get('body',''),
                             datetime = datetime_from_request,
@@ -56,7 +56,7 @@ class Webhooks(View):
                             site=site,
                             lead=lead,
                         )
-                        message.save()
+                        whatsapp_message.save()
                         group_name = f"chat_{from_number}_{site.pk}"
                         from channels.layers import get_channel_layer
                         channel_layer = get_channel_layer()
@@ -66,7 +66,7 @@ class Webhooks(View):
                             group_name,
                             {
                                 'type': 'chatbox_message',
-                                "message": message.message.get('text').get('body',''),
+                                "message": message.get('text').get('body',''),
                                 "user_name": name,
                                 "inbound": True,
                             }
