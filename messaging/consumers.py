@@ -6,7 +6,8 @@ from core.models import Site
 
 from whatsapp.api import Whatsapp
 from whatsapp.models import WhatsAppMessage
-import logging
+import logging    
+from channels.layers import get_channel_layer
 logger = logging.getLogger(__name__)
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -45,6 +46,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 {
                     "message": event.get("message", None),
                     "user_name": event.get("user_name", None),
+                    "whatsapp_number": event.get("whatsapp_number", None),
                     "user_avatar": event.get("user_avatar", None),
                     "inbound": event.get("inbound", None),
                 }
@@ -62,30 +64,31 @@ class ChatListConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_discard(self.group_name, self.channel_name)
 
     # This function receive messages from WebSocket.
-    # async def receive(self, text_data):        
-    #     text_data_json = json.loads(text_data)
-    #     message = text_data_json["message"]
-    #     user = self.scope["user"]
-    #     if(user.is_authenticated and self.chat_box_whatsapp_number):
-    #         if await send_whatsapp_message_to_number(message, self.chat_box_whatsapp_number, user, self.scope["url_route"]["kwargs"]["chat_box_site_pk"]):
-    #             avatar, name = await message_details_user(user)
-    #             await self.channel_layer.group_send(
-    #                 self.group_name,
-    #                 {
-    #                     "type": "chatbox_message",
-    #                     "message": message,
-    #                     "user_name": name,
-    #                     "user_avatar": avatar,
-    #                     "inbound": False
-    #                 },
-    #             )
+    async def receive(self, text_data):        
+        text_data_json = json.loads(text_data)
+        message = text_data_json["message"]
+        user = self.scope["user"]
+        if(user.is_authenticated and self.chat_box_whatsapp_number):
+            if await send_whatsapp_message_to_number(message, self.chat_box_whatsapp_number, user, self.scope["url_route"]["kwargs"]["chat_box_site_pk"]):
+                avatar, name = await message_details_user(user)
+                await self.channel_layer.group_send(
+                    self.group_name,
+                    {
+                        "type": "chatbox_message",
+                        "message": message,
+                        "user_name": name,
+                        "user_avatar": avatar,
+                        "inbound": False
+                    },
+                )
     # Receive message from room group.
-    async def chatbox_message(self, event):
+    async def chatlist_message(self, event):
         await self.send(
             text_data=json.dumps(
                 {
                     "message": event.get("message", None),
                     "user_name": event.get("user_name", None),
+                    "whatsapp_number": event.get("whatsapp_number", None),
                     "user_avatar": event.get("user_avatar", None),
                     "inbound": event.get("inbound", None),
                 }
@@ -98,7 +101,19 @@ class ChatListConsumer(AsyncWebsocketConsumer):
 
 from asgiref.sync import async_to_sync, sync_to_async
 @sync_to_async
-def send_whatsapp_message_to_number(message, whatsapp_number, user, site_pk):   
+def send_whatsapp_message_to_number(message, whatsapp_number, user, site_pk):  
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        f"chatlist_{site_pk}",
+        {
+            'type': 'chatlist_message',
+            "message": message,
+            "user_name": f"{user.profile.name()}",
+            "whatsapp_number": whatsapp_number,
+            "user_avatar": f"{user.profile.avatar.url}", 
+            "inbound": True,
+        }
+    ) 
     if settings.ENABLE_WHATSAPP_MESSAGING:
         logger.debug("send_whatsapp_message_to_number start") 
         lead = Campaignlead.objects.filter(whatsapp_number=whatsapp_number).first()  

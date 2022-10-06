@@ -1,19 +1,35 @@
 {%load static core_tags%}
 <script>
-        $(document).ready(function() {  
+        $(document).ready(function() {          
+            console.log({{request.session.open_chats|safe}})                
+            const chatListSocket = new WebSocket(                            
+                'ws{%if not 'DEBUG'|settings_value%}s{%endif%}://'+window.location.host+'/ws/chatlist/{{site.pk}}/'                            
+            );
+            chatListSocket.onmessage = function (e) {
+                const data = JSON.parse(e.data);
+                $('#latest_message_avatar_'+data.whatsapp_number).attr("src", data.user_avatar);
+                if (typeof data.user_name === 'string') {
+                    $('#latest_message_name_'+data.whatsapp_number).html(data.user_name)
+                } else {
+                    $('#latest_message_name_'+data.whatsapp_number).html(data.whatsapp_number)
+                }
+                if (data.inbound) {
+                    $('#latest_message_content_'+data.whatsapp_number).html("Them: " + data.message)
+                    $('#latest_message_row_'+data.whatsapp_number).removeClass("inactive_chat_row")
+                } else {                    
+                    $('#latest_message_content_'+data.whatsapp_number).html("You: " + data.message)
+                    $('#latest_message_row_'+data.whatsapp_number).addClass("inactive_chat_row")
+                }                
+            }
 
             document.body.addEventListener('htmx:afterSwap', function(evt) {   
                 if (evt.detail.target.id == 'next_chat_window'){
-
                     let id = $(evt.srcElement).data('whatsapp-number');
-                    $("#messageWindowCollapse_"+id).scrollTop($($("#messageWindowCollapse_"+id)).height() * 2);
                     if (id != undefined){
                         const user = "{{user.pk}}";
                         const site_pk = "{{site_pk}}";
                         console.log('#message_submit_'+id,$(evt.detail.elt))
                         document.querySelector('#message_submit_'+id).onclick = function (e) {
-
-
                             const messageInputDom = document.querySelector('#message_input_'+id);
                             const message = messageInputDom.value;
 
@@ -39,13 +55,8 @@
                             'ws{%if not 'DEBUG'|settings_value%}s{%endif%}://'+window.location.host+'/ws/chat/'+id+'/{{site.pk}}/'                            
                         );
                         
-                        {% comment %} const chatListSocket = new WebSocket(                            
-                            'ws{%if not 'DEBUG'|settings_value%}s{%endif%}://'+window.location.host+'/ws/chatlist/{{site.pk}}/'                            
-                        ); {% endcomment %}
-                        
                         chatSocket.onmessage = function (e) {
                             const data = JSON.parse(e.data);
-                            console.log(data)
                             let user_avatar = data.user_avatar
                             if (user_avatar == null) {
                                 user_avatar = "{% static 'img/blank-profile-picture.png' %}"
@@ -75,8 +86,10 @@
                                     new_chat.insertBefore('#message_input_div_'+id);
                                 }
                             }
+                            $("#messageWindowCollapse_"+id).scrollTop($($("#messageWindowCollapse_"+id)).height() * 2);
                         }
                     }
+                    $("#messageWindowCollapse_"+id).scrollTop($($("#messageWindowCollapse_"+id)).height() * 2);
                 }
             })
         })
@@ -119,19 +132,21 @@
                 hx-target="#next_chat_window"
                 hx-push-url="false"
                 hx-swap="outerHTML" hx-trigger="click"  
+                data-whatsapp-number="{{message.customer_number}}"
+                id="latest_message_row_{{message.customer_number}}"
                 onclick="add_chat_to_session({{message.customer_number}})" 
                 >
                     <div class="col-auto p-0">
-                        <img src="{% static 'img/blank-profile-picture.png' %}" alt="" width="44" height="44" class="rounded-circle">
+                        <img id="latest_message_avatar_{{message.customer_number}}" src="{%if message.inbound%}{% static 'img/blank-profile-picture.png' %}{%else%}{{message.user.profile.avatar.url}}{%endif%}" alt="" width="44" height="44" class="rounded-circle">
                     </div>
                     <div class="col p-0 ps-1">
                         <div class="row chat_lead_name_row">
-                            <div class="col p-0">
+                            <div class="col p-0" id="latest_message_name_{{message.customer_number}}">
                                 {%if message.lead.name%}{{message.lead.name}}{%else%}{{message.customer_number}}{%endif%}
                             </div>
                         </div>
                         <div class="row chat_message_row">
-                            <div class="col p-0">
+                            <div class="col p-0" id="latest_message_content_{{message.customer_number}}">
                                 {%if message.inbound%}Them{%else%}You{%endif%}: {{message.message}}
                             </div>
                         </div>

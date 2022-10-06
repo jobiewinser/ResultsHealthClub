@@ -46,7 +46,6 @@ class Webhooks(View):
                             # name = lead.name
                         except Exception as e:
                             lead = None
-                        name = str(from_number)
                         # Likely a message from a customer     
                         lead = Campaignlead.objects.filter(whatsapp_number=from_number).last()
                         site = Site.objects.get(whatsapp_number=to_number)
@@ -61,18 +60,29 @@ class Webhooks(View):
                             lead=lead,
                         )
                         whatsapp_message.save()
-                        group_name = f"chat_{from_number}_{site.pk}"
                         from channels.layers import get_channel_layer
                         channel_layer = get_channel_layer()
                         
-                        logger.debug(f"webhook sending to chat start: groupname {group_name}") 
-                        print(f"webhook sending to chat start: groupname {group_name}") 
+                        name = lead.name
                         async_to_sync(channel_layer.group_send)(
-                            group_name,
+                            f"chat_{from_number}_{site.pk}",
                             {
                                 'type': 'chatbox_message',
                                 "message": message.get('text').get('body',''),
                                 "user_name": name,
+                                "whatsapp_number": from_number,
+                                "inbound": True,
+                            }
+                        )
+                        
+                        async_to_sync(channel_layer.group_send)(
+                            f"chatlist_{site.pk}",
+                            {
+                                'type': 'chatlist_message',
+                                "message": message.get('text').get('body',''),
+                                "user_name": name,
+                                "whatsapp_number": from_number,
+                                "user_avatar": "/static/img/blank-profile-picture.png", 
                                 "inbound": True,
                             }
                         )
