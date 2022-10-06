@@ -43,10 +43,12 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
                 )
     # Receive message from room group.
     async def chatbox_message(self, event):
+        print("chatbox_message")
         message = event["message"]
         user_name = event.get("user_name", None)
         user_avatar = event.get("user_avatar", None)
         inbound = event.get("inbound", None)
+        print(message, user_name, user_avatar, inbound)
         #send message and user of sender to websocket
         await self.send(
             text_data=json.dumps(
@@ -58,6 +60,7 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
                 }
             )
         )
+        print("await self.send")
 
     pass
 from asgiref.sync import async_to_sync, sync_to_async

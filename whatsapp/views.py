@@ -26,60 +26,30 @@ class Webhooks(View):
         body = json.loads(request.body)
         print(str(body))
         logger.debug(str(body))
-        x = 0
-        x = x+1
-        print(x)
+        
         for entry in body.get('entry'):
-            x = x+1
-            print(x)
             for change in entry.get('changes'):
-                x = x+1
-                print(x)
                 value = change.get('value')
-                x = x+1
-                print(x)
                 for message in value.get('messages', []):
-                    x = x+1
-                    print(x)
                     metadata = value.get('metadata')
-                    x = x+1
-                    print(x)
                     wamid = message.get('id')
-                    x = x+1
-                    print(x)
                     to_number = metadata.get('display_phone_number')
-                    x = x+1
-                    print(x)
                     from_number = message.get('from')
-                    x = x+1
-                    print(x)
                     datetime_from_request = datetime.fromtimestamp(int(message.get('timestamp')))
-                    x = x+1
-                    print(x)
                     existing_messages = WhatsAppMessage.objects.filter( wamid=wamid ).exclude(wamid="ABGGFlA5Fpa1")
-                    x = x+1
-                    print(x)
                     print(f"existing_messages", str(existing_messages))
                     print(f"wamid", str(wamid))
                     if not existing_messages or settings.DEBUG:
                         print("REACHED past if not existing_messages or settings.DEBUG")
-                        x = x+1
-                        print(x)
                         try:
                             lead = Campaignlead.objects.get(whatsapp_number__icontains=from_number[-10:])
                             # name = lead.name
                         except Exception as e:
                             lead = None
                         name = str(from_number)
-                        x = x+1
-                        print(x)
                         # Likely a message from a customer     
                         lead = Campaignlead.objects.filter(whatsapp_number=from_number).last()
-                        x = x+1
-                        print(x)
                         site = Site.objects.get(whatsapp_number=to_number)
-                        x = x+1
-                        print(x)
                         whatsapp_message = WhatsAppMessage.objects.create(
                             wamid=wamid,
                             message = message.get('text').get('body',''),
@@ -90,20 +60,10 @@ class Webhooks(View):
                             site=site,
                             lead=lead,
                         )
-                        x = x+1
-                        print(x)
                         whatsapp_message.save()
-                        x = x+1
-                        print(x)
                         group_name = f"chat_{from_number}_{site.pk}"
-                        x = x+1
-                        print(x)
                         from channels.layers import get_channel_layer
-                        x = x+1
-                        print(x)
                         channel_layer = get_channel_layer()
-                        x = x+1
-                        print(x)
                         
                         logger.debug(f"webhook sending to chat start: groupname {group_name}") 
                         print(f"webhook sending to chat start: groupname {group_name}") 
