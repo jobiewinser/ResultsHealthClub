@@ -111,7 +111,7 @@ def send_whatsapp_message_to_number(message, whatsapp_number, user, site_pk):
             "user_name": f"{user.profile.name()}",
             "whatsapp_number": whatsapp_number,
             "user_avatar": f"{user.profile.avatar.url}", 
-            "inbound": True,
+            "inbound": False,
         }
     ) 
     if settings.ENABLE_WHATSAPP_MESSAGING:
