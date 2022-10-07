@@ -15,7 +15,6 @@ class WhatsAppMessageAdmin(admin.ModelAdmin):
         'system_user_number',  
         'customer_number',  
         'site',  
-        'call',   
         'created',  
         'template'
         ]

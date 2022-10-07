@@ -14,10 +14,6 @@ class WhatsAppWebhook(models.Model):
                         ('a', 'POST'),
                         ('b', 'GET'),
                     )
-    WHATSAPP_WEBHOOK_TYPE_CHOICES = (
-                        ('a', 'Message'),
-                        ('b', 'Status'),
-                    )
     json_data = models.JSONField(null=True, blank=True)
     errors = models.ManyToManyField("core.ErrorModel", null=True, blank=True)
     request_type = models.CharField(choices=REQUEST_TYPE_CHOICES, default='a', max_length=1)
