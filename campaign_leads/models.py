@@ -64,7 +64,6 @@ def execute_after_save(sender, instance, created, *args, **kwargs):
     if created and not instance.complete:
         instance.send_template_whatsapp_message(1)
         pass
-    # WILL EVENTUALLY SEND TWILIO
         
 class Call(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)

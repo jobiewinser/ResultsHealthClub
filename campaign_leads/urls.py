@@ -26,7 +26,6 @@ urlpatterns = [
 
 
 
-    path('configuration/whatsapp-templates/', campaignleadsviews.WhatsappTemplatesView.as_view(), name='whatsapp-templates'),
     path('configuration/lead-configuration/', campaignleadsviews.LeadConfigurationView.as_view(), name='lead-configuration'),
     
 

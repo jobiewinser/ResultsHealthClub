@@ -20,6 +20,7 @@ class Site(models.Model):
     whatsapp_number = models.CharField(max_length=50, null=True, blank=True)
     whatsapp_business_phone_number_id = models.CharField(max_length=50, null=True, blank=True)
     whatsapp_access_token = models.TextField(blank=True, null=True)
+    whatsapp_business_account_id = models.TextField(null=True, blank=True)
     @property
     def get_company(self):
         if self.company.all():
@@ -33,10 +34,10 @@ class Site(models.Model):
             if lead:
                 customer_number = lead.whatsapp_number
             if settings.ENABLE_WHATSAPP_MESSAGING and self.whatsapp_business_phone_number_id and self.whatsapp_access_token and message:
-                whatsapp = Whatsapp()
+                whatsapp = Whatsapp(self.whatsapp_access_token)
                 if '+' in self.whatsapp_number:
                     customer_number = f"{self.whatsapp_number.split('+')[-1]}"
-                response = whatsapp.send_message(customer_number, message, self.whatsapp_business_phone_number_id, self.whatsapp_access_token)
+                response = whatsapp.send_message(customer_number, message, self.whatsapp_business_phone_number_id)
                 reponse_messages = response.get('messages',[])
                 if reponse_messages:
                     for response_message in reponse_messages:

@@ -1,0 +1,77 @@
+<div id="content">
+    <div class="row">
+        <button hidden hx-get="{% url 'whatsapp-templates' %}" hx-push-url="true" hx-swap="outerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator=".top-htmx-indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
+        <div class="col-md-auto">
+            <a class="btn btn-secondary" href="{%url 'configuration'%}"><i class="fa-solid fa-arrow-left"></i> Back to config</a>             
+        </div>
+        {%include 'core/htmx/site_selection.html'%}
+        <div class="col">
+        </div>
+        <div class="col-md-auto">
+            <button class="btn btn-success btn-sm me-2"><i class="fa fa-plus" aria-hidden="true"></i> Add</button>            
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col">
+            {% comment %} <ul class="nav nav-pills">
+                <div class="row m-3" id="template_area">
+                </div>
+            </ul> {% endcomment %}
+            <table id="overview_table" class="table"> 
+                <thead> 
+                    <tr>
+                        <th>
+                            Name
+                        </th>
+                        <th>
+                            Status
+                        </th>
+                        <th>
+                            Category
+                        </th>
+                        <th>
+                            Language
+                        </th>
+                        <th>
+                            ID
+                        </th>
+                        <th>  
+                        </th>
+                    </tr>
+                </thead>
+                <tbody> 
+                    {%for template in templates%}
+                    {%if not 'sample_' in template.name%}
+                    <tr id="template_row_{{template.id}}">
+                        <td>
+                            {{template.name}}
+                        </td>
+                        <td> 
+                            {{template.status}}
+                        </td>
+                        <td>
+                            {{template.category}}
+                        </td>
+                        <td>
+                            {{template.language}}
+                        </td>
+                        <td> 
+                            {{template.id}}
+                        </td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" onclick="window.location.href = '{%url 'whatsapp-templates' template_id=template.id site_pk=site.pk%}'"><i class="fa fa-pencil" aria-hidden="true"></i> Edit</button>
+                            <button class="btn btn-danger btn-sm"
+                                hx-delete="{%url 'whatsapp-templates-delete'%}" 
+                                hx-vals='{"site_pk": "{{site.pk}}", "template_name": "{{template.name}}"}'
+                                hx-confirm="Are you sure you want to delete this template?" hx-target="#template_row_{{template.id}}" hx-swap="outerHTML" hx-indicator=".top-htmx-indicator">
+                                <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                            </button>
+                        </td>
+                    </tr>
+                    {%endif%}
+                    {%endfor%}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

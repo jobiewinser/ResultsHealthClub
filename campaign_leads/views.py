@@ -118,30 +118,6 @@ class CampaignBookingsOverviewView(TemplateView):
         
 @method_decorator(campaign_leads_enabled_required, name='dispatch')
 @method_decorator(login_required, name='dispatch')
-class WhatsappTemplatesView(TemplateView):
-    template_name='campaign_leads/whatsapp_templates.html'
-
-    def get_context_data(self, **kwargs):
-        self.request.GET._mutable = True     
-        context = super(WhatsappTemplatesView, self).get_context_data(**kwargs)
-        if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
-            self.template_name = 'campaign_leads/htmx/whatsapp_templates_content.html'   
-        site_pk = self.request.GET.get('site_pk')
-        if site_pk:
-            context['templates'] = WhatsappTemplate.objects.filter(site=Site.objects.get(pk=site_pk))
-        else:
-            if self.request.user.profile.site:
-                context['templates'] = WhatsappTemplate.objects.filter(site=self.request.user.profile.site)
-                self.request.GET['site_pk'] = self.request.user.profile.site.pk
-            else:
-                context['templates'] = WhatsappTemplate.objects.filter(site=Site.objects.all().first())
-                self.request.GET['site_pk'] = Site.objects.all().first().pk
-        context['site_list'] = Site.objects.all()
-        context['hide_show_all'] = True
-        return context
-        
-@method_decorator(campaign_leads_enabled_required, name='dispatch')
-@method_decorator(login_required, name='dispatch')
 class LeadConfigurationView(TemplateView):
     template_name='active_campaign/leads_configuration.html'
 

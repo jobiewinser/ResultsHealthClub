@@ -1,12 +1,13 @@
 from datetime import datetime
 import logging
 from django.conf import settings
-from django.http import HttpResponse
+from django.http import HttpResponse, QueryDict
 import json
 from django.views.decorators.csrf import csrf_exempt
 from campaign_leads.models import Campaignlead, Call
 from messaging.consumers import ChatConsumer
-
+from whatsapp.api import Whatsapp
+from django.views.generic import TemplateView
 from whatsapp.models import WhatsAppMessage, WhatsAppMessageStatus, WhatsAppWebhook
 logger = logging.getLogger(__name__)
 from django.views import View 
@@ -130,3 +131,59 @@ def add_chat_to_session(request):
     except Exception as e:
         pass
     return HttpResponse("", "text", 200)
+
+
+        
+# @method_decorator(campaign_leads_enabled_required, name='dispatch')
+@method_decorator(login_required, name='dispatch')
+class WhatsappTemplatesView(TemplateView):
+    template_name='campaign_leads/whatsapp_templates.html'
+
+    def get_context_data(self, **kwargs):
+        self.request.GET._mutable = True     
+        context = super(WhatsappTemplatesView, self).get_context_data(**kwargs)
+        if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+            self.template_name = 'campaign_leads/whatsapp_templates_content.html'   
+        site_pk = self.request.GET.get('site_pk')
+        site = None
+        if site_pk:
+            if not site_pk == 'all':
+                site = Site.objects.get(pk=site_pk)
+        else:
+            if self.request.user.profile.site:
+                self.request.GET['site_pk'] = self.request.user.profile.site.pk
+                site = self.request.user.profile.site
+        if site:
+            whatsapp = Whatsapp(site.whatsapp_access_token)
+            templates = whatsapp.get_templates(site.whatsapp_business_account_id)
+            context['templates'] = templates.get('data')
+        context['site_list'] = Site.objects.all()
+        context['site'] = site
+        return context
+        
+# @method_decorator(campaign_leads_enabled_required, name='dispatch')
+@method_decorator(login_required, name='dispatch')
+class WhatsappTemplatesEditView(TemplateView):
+    template_name='campaign_leads/whatsapp_template_edit.html'
+
+    def get_context_data(self, **kwargs):
+        self.request.GET._mutable = True     
+        context = super(WhatsappTemplatesEditView, self).get_context_data(**kwargs)
+        site = Site.objects.get(pk=kwargs.get('site_pk'))
+        whatsapp = Whatsapp(site.whatsapp_access_token)
+        template = whatsapp.get_template(site.whatsapp_business_account_id, kwargs.get('template_id'))
+        context['template'] = template
+        context['variables'] = {
+            '{first_name}': "Jobie",
+            '{last_name}': "Winser",
+            '{company_name}': "Winser Systems",
+            '{company_number}': "+44 7872 000364",
+        }
+        return context
+def delete_whatsapp_template_htmx(request):
+    body = QueryDict(request.body)
+    site = Site.objects.get(pk=body.get('site_pk'))
+    whatsapp = Whatsapp(site.whatsapp_access_token)
+    whatsapp.delete_template(site.whatsapp_business_account_id, body.get('template_name'))
+    return HttpResponse("", status=200)
+
