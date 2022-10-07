@@ -13,7 +13,19 @@
         </div>
 
         <span class="secondary_td_layer">{{lead.active_campaign_list.name}}</span><br>
-        <span class="secondary_td_layer"><i class="fa fa-whatsapp" aria-hidden="true"></i> {{lead.whatsapp_number}}</span>
+        <span class="secondary_td_layer">
+            <i class="fa fa-whatsapp" aria-hidden="true"></i> {{lead.whatsapp_number}} 
+            <button class="btn btn-xs btn-success" 
+                hx-get="{%url 'message-window' customer_number=message.customer_number chat_box_site_pk=site.pk%}"
+                hx-indicator=".top-htmx-indicator" 
+                hx-target="#next_chat_window"
+                hx-push-url="false"
+                hx-swap="outerHTML" hx-trigger="click"  
+                data-whatsapp-number="{{message.customer_number}}"
+                onclick="add_chat_to_session({{message.customer_number}})" >
+                Chat
+            </button>
+        </span>
     </article>
     {%endwith%}
 </span>
