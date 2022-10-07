@@ -15,7 +15,8 @@
         <span class="secondary_td_layer">{{lead.active_campaign_list.name}}</span><br>
         <span class="secondary_td_layer">
             <i class="fa fa-whatsapp" aria-hidden="true"></i> {{lead.whatsapp_number}} 
-            <button class="btn btn-xs btn-success" 
+            {%if site%}
+            <button class="btn btn-xs btn-success text-white" 
                 hx-get="{%url 'message-window' customer_number=lead.whatsapp_number chat_box_site_pk=site.pk%}"
                 hx-indicator=".top-htmx-indicator" 
                 hx-target="#next_chat_window"
@@ -25,6 +26,7 @@
                 onclick="add_chat_to_session({{lead.whatsapp_number}} )" >
                 Chat
             </button>
+            {%endif%}
         </span>
     </article>
     {%endwith%}

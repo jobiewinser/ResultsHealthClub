@@ -52,7 +52,8 @@ def create_campaign_lead(request, **kwargs):
             # country_code=country_code,
             active_campaign_list=manually_created_list
         )
-        return render(request, 'campaign_leads/htmx/lead_article.html', {'lead':lead,'max_call_count':1,'call_count':0})
+        context = {'lead':lead,'max_call_count':1,'call_count':0, 'site':site}
+        return render(request, 'campaign_leads/htmx/lead_article.html', context)
     except Exception as e:
         logger.debug("create_campaign_lead Error "+str(e))
         return HttpResponse(e, status=500)
