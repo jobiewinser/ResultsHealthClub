@@ -137,7 +137,7 @@
                 onclick="add_chat_to_session({{message.customer_number}})" 
                 >
                     <div class="col-auto p-0">
-                        <img id="latest_message_avatar_{{message.customer_number}}" src="{%if message.inbound%}{% static 'img/blank-profile-picture.png' %}{%else%}{%if message.user%}{{message.user.profile.avatar.url}}{%else%}{{message.site.company.all.first.company_logo_black.url}}{%endif%}{%endif%}" alt="" width="44" height="44" class="rounded-circle">
+                        <img id="latest_message_avatar_{{message.customer_number}}" src="{%if message.inbound%}{% static 'img/blank-profile-picture.png' %}{%else%}{%if message.user.profile.avatar.url%}{{message.user.profile.avatar.url}}{%else%}{{message.site.company.all.first.company_logo_black.url}}{%endif%}{%endif%}" alt="" width="44" height="44" class="rounded-circle">
                     </div>
                     <div class="col p-0 ps-1">
                         <div class="row chat_lead_name_row">

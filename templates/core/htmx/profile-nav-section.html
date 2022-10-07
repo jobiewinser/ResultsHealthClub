@@ -6,6 +6,7 @@
 <a href="#" class="align-items-center text-white text-decoration-none" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
     <img src="{%if user.profile.avatar%}/media/{{user.profile.avatar}}{%else%}{% static 'img/blank-profile-picture.png' %}{%endif%}" alt="" width="55" height="55" class="rounded-circle me-2">
     <span class="hide_small"><strong>{{user.profile}}</strong></span>
+    {%if user.profile.site.company.all.first.company_logo_black.url%}<img src="{{user.profile.site.company.all.first.company_logo_black.url}}" alt="" width="55" height="55" class="rounded-circle me-2">{%endif%}
 </a>
 <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
     {% comment %} <li><a class="dropdown-item" href="#"hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" hx-include="#switch_user"
