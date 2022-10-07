@@ -57,6 +57,7 @@ class Campaignlead(models.Model):
     def send_template_whatsapp_message(self, whatsapp_template_send_order):
         template = WhatsappTemplate.objects.get(send_order = whatsapp_template_send_order, site=self.active_campaign_list.site)
         message = f"{template.rendered(self)}" 
+        print(self, self.whatsapp_number, self, message, template)
         return self.active_campaign_list.site.send_whatsapp_message(self, customer_number=self.whatsapp_number, lead=self, message=message, template_used=template)
 
 @receiver(models.signals.post_save, sender=Campaignlead)
