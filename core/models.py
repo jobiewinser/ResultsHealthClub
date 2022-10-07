@@ -68,7 +68,7 @@ class Site(models.Model):
             return False
 
     def get_fresh_messages(self):
-        return WhatsAppMessage.objects.filter(site=self).order_by('datetime').order_by('customer_number').distinct('customer_number')
+        return WhatsAppMessage.objects.filter(site=self).order_by('-datetime').order_by('customer_number').distinct('customer_number')
 
     def get_leads_created_in_month_and_year(self, date):
         return Campaignlead.objects.filter(active_campaign_list__site=self, created__month=date.month, created__year=date.year)
