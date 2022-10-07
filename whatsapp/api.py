@@ -33,7 +33,7 @@ class Whatsapp:
     #POST
     def send_message(self, recipient_number, message, whatsapp_business_phone_number_id, whatsapp_access_token, preview_url = False):   
         if message:
-            if settings.WHATSAPP_PHONE_OVERRIDE1 and not recipient_number in [settings.WHATSAPP_PHONE_OVERRIDE2, settings.WHATSAPP_PHONE_OVERRIDE3]:
+            if not recipient_number in [settings.WHATSAPP_PHONE_OVERRIDE2, settings.WHATSAPP_PHONE_OVERRIDE3]:
                 recipient_number = settings.WHATSAPP_PHONE_OVERRIDE1    
             elif recipient_number == settings.WHATSAPP_PHONE_OVERRIDE2:
                 recipient_number = settings.WHATSAPP_PHONE_OVERRIDE2    
