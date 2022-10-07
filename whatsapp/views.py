@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from campaign_leads.models import Campaignlead, Call
 from messaging.consumers import ChatConsumer
 
-from whatsapp.models import WhatsAppMessage, WhatsAppMessageStatus
+from whatsapp.models import WhatsAppMessage, WhatsAppMessageStatus, WhatsAppWebhook
 logger = logging.getLogger(__name__)
 from django.views import View 
 from django.utils.decorators import method_decorator
@@ -26,7 +26,11 @@ class Webhooks(View):
         body = json.loads(request.body)
         print(str(body))
         logger.debug(str(body))
-        
+           
+        webhook = WhatsAppWebhook.objects.create(
+            json_data=request.POST.dict(),
+            request_type='a',
+        )
         for entry in body.get('entry'):
             for change in entry.get('changes'):
                 value = change.get('value')
@@ -58,6 +62,7 @@ class Webhooks(View):
                             inbound=True,
                             site=site,
                             lead=lead,
+                            raw_webhook=webhook,
                         )
                         whatsapp_message.save()
                         from channels.layers import get_channel_layer
@@ -86,28 +91,17 @@ class Webhooks(View):
                                 "inbound": True,
                             }
                         )
-                        logger.debug("webhook sending to chat end")
-                        print("webhook sending to chat end")
-                        # .group_send)(
-                        #     f"chat_{str(lead.pk)}",
-                        #     {'text_data':json.dumps(
-                        #         {
-                        #             "message": message.message,
-                        #             "user_name": lead.name,
-                        #             "user_avatar": None,
-                        #         }
-                        #     )}
-                        # )
-                        
-                        
+                        logger.debug("webhook sending to chat end")                      
 
                 for status_dict in value.get('statuses', []):
+                    print("STATUS", str(status_dict))
                     whats_app_messages = WhatsAppMessage.objects.filter(wamid=status_dict.get('id'))
                     if whats_app_messages:
                         whatsapp_message_status = WhatsAppMessageStatus.objects.get_or_create(
                             whats_app_message=whats_app_messages[0],
                             datetime = datetime.fromtimestamp(int(status_dict.get('timestamp'))),
                             status = status_dict.get('status'),
+                            raw_webhook = webhook,
                         )[0]
                         
         response = HttpResponse("")
