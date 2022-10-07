@@ -54,15 +54,15 @@ class Campaignlead(models.Model):
             return last_whatsapp.datetime.replace(hour=9).replace(minute=30).replace(second=0) + timedelta(days=1)
         return "Never"  
 
-    def send_automatic_whatsapp_message(self, whatsapp_template_send_order):
+    def send_template_whatsapp_message(self, whatsapp_template_send_order):
         template = WhatsappTemplate.objects.get(send_order = whatsapp_template_send_order, site=self.active_campaign_list.site)
         message = f"{template.rendered(self)}" 
-        return self.active_campaign_list.site.get_fresh_messages(customer_number=self.whatsapp_number, lead=self, message=message, template_used=template)
+        return self.active_campaign_list.site.send_whatsapp_message(self, customer_number=self.whatsapp_number, lead=self, message=message, template_used=template)
 
 @receiver(models.signals.post_save, sender=Campaignlead)
 def execute_after_save(sender, instance, created, *args, **kwargs):
     if created and not instance.complete:
-        # instance.send_whatsapp_message(1, user=None)
+        instance.send_whatsapp_message(1, user=None)
         pass
     # WILL EVENTUALLY SEND TWILIO
         

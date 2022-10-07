@@ -27,7 +27,7 @@ class Site(models.Model):
         fake_company = Company
         return fake_company
 
-    def send_whatsapp_message(self, customer_number=None, lead=None, whatsapp_template_send_order=None, message="", user=None, template_used=None):  
+    def send_whatsapp_message(self, customer_number=None, lead=None, message="", user=None, template_used=None):  
         try:
             logger.debug("site.send_whatsapp_message start") 
             if lead:
