@@ -95,10 +95,10 @@ class Webhooks(View):
 
                 for status_dict in value.get('statuses', []):
                     print("STATUS", str(status_dict))
-                    whats_app_messages = WhatsAppMessage.objects.filter(wamid=status_dict.get('id'))
-                    if whats_app_messages:
+                    whatsapp_messages = WhatsAppMessage.objects.filter(wamid=status_dict.get('id'))
+                    if whatsapp_messages:
                         whatsapp_message_status = WhatsAppMessageStatus.objects.get_or_create(
-                            whats_app_message=whats_app_messages[0],
+                            whatsapp_message=whatsapp_messages[0],
                             datetime = datetime.fromtimestamp(int(status_dict.get('timestamp'))),
                             status = status_dict.get('status'),
                             raw_webhook = webhook,

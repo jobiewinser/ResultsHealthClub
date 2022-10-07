@@ -38,7 +38,7 @@ class WhatsAppMessage(models.Model):
         ordering = ['-datetime']
     
 class WhatsAppMessageStatus(models.Model):
-    whats_app_message = models.ForeignKey(WhatsAppMessage, on_delete=models.CASCADE, null=True, blank=True)    
+    whatsapp_message = models.ForeignKey(WhatsAppMessage, on_delete=models.CASCADE, null=True, blank=True)    
     datetime = models.DateTimeField(null=True, blank=True)
     status = models.TextField(null=True, blank=True)   
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)

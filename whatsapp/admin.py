@@ -4,19 +4,38 @@ from django.apps import apps
 
 from whatsapp.models import *
 
+class WhatsAppWebhookAdmin(admin.ModelAdmin):
+    list_display = [
+        'request_type',  
+        'errors',   
+        'created',  
+        'json_data',   
+        ]
+    search_fields = ['pk']
+admin.site.register(WhatsAppWebhook, WhatsAppWebhookAdmin)
 class WhatsAppMessageAdmin(admin.ModelAdmin):
     list_display = [
-        'wamid',    
-        'raw_webhook',
-        'inbound',  
-        'conversationid',     
-        'datetime',  
-        'message',  
         'system_user_number',  
-        'customer_number',  
+        'customer_number', 
+        'inbound',     
+        'datetime',  
+        'message',   
         'site',  
         'created',  
-        'template'
+        'template',
+        'conversationid',  
+        'wamid',    
+        'raw_webhook',
         ]
     search_fields = ['pk']
 admin.site.register(WhatsAppMessage, WhatsAppMessageAdmin)
+class WhatsAppMessageStatusAdmin(admin.ModelAdmin):
+    list_display = [
+        'whatsapp_message',  
+        'datetime', 
+        'status',     
+        'created',  
+        'raw_webhook',   
+    ]
+    search_fields = ['pk']
+admin.site.register(WhatsAppMessageStatus, WhatsAppMessageStatusAdmin)
