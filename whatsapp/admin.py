@@ -7,7 +7,6 @@ from whatsapp.models import *
 class WhatsAppWebhookAdmin(admin.ModelAdmin):
     list_display = [
         'request_type',  
-        'errors',   
         'created',  
         'json_data',   
         ]
