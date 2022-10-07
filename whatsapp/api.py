@@ -15,8 +15,7 @@ from django.template import loader
 logger = logging.getLogger(__name__)
 # https://developers.facebook.com/docs/whatsapp/cloud-api/reference
 # https://business.facebook.com/settings/people/100085397745468?business_id=851701125750291
-class Whatsapp:
-    
+class Whatsapp:    
     # whatsapp_access_token = os.getenv("WHATSAPP_ACCESS_TOKEN")
     whatsapp_url = os.getenv("WHATSAPP_URL")
     whatsapp_app_id = os.getenv("WHATSAPP_APP_ID")
