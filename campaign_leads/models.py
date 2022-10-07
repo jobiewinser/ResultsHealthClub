@@ -62,7 +62,7 @@ class Campaignlead(models.Model):
 @receiver(models.signals.post_save, sender=Campaignlead)
 def execute_after_save(sender, instance, created, *args, **kwargs):
     if created and not instance.complete:
-        instance.send_whatsapp_message(1, user=None)
+        instance.active_campaign_list.site.send_whatsapp_message(1, user=None)
         pass
     # WILL EVENTUALLY SEND TWILIO
         
