@@ -171,8 +171,7 @@ def new_call(request, **kwargs):
                 while lead.calls < call_count:
                     call = Call.objects.create(
                         datetime=log_datetime,
-                        lead = lead,
-                        type = 'a',
+                        lead = lead,                        
                         user=request.user
                     )
                     lead = Campaignlead.objects.filter(pk=kwargs.get('lead_pk')).annotate(calls=Count('call')).first()
@@ -180,7 +179,6 @@ def new_call(request, **kwargs):
                 while lead.calls > call_count:
                     Call.objects.filter(
                         lead = lead,
-                        type = 'a'
                     ).order_by('-datetime').first().delete()
                     lead = Campaignlead.objects.filter(pk=kwargs.get('lead_pk')).annotate(calls=Count('call')).first()
            

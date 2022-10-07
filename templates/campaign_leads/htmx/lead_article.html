@@ -14,19 +14,29 @@
 
         <span class="secondary_td_layer">{{lead.active_campaign_list.name}}</span><br>
         <span class="secondary_td_layer">
-            <i class="fa fa-whatsapp" aria-hidden="true"></i> {{lead.whatsapp_number}} 
-            {%if site%}
-            <button class="btn btn-xs btn-success text-white" 
-                hx-get="{%url 'message-window' customer_number=lead.whatsapp_number chat_box_site_pk=site.pk%}"
-                hx-indicator=".top-htmx-indicator" 
-                hx-target="#next_chat_window"
-                hx-push-url="false"
-                hx-swap="outerHTML" hx-trigger="click"  
-                data-whatsapp-number="{{lead.whatsapp_number}} "
-                onclick="add_chat_to_session({{lead.whatsapp_number}} )" >
-                Chat
-            </button>
-            {%endif%}
+            <div class="row">
+                <div class="col">
+                    <i class="fa fa-whatsapp" aria-hidden="true"></i> {{lead.whatsapp_number}}
+                </div>
+                <div class="col-md-auto" style="text-align:right"> 
+                    {%if site%}
+                    <button class="btn btn-sm btn-success text-white position-relative" 
+                        hx-get="{%url 'message-window' customer_number=lead.whatsapp_number chat_box_site_pk=site.pk%}"
+                        hx-indicator=".top-htmx-indicator" 
+                        hx-target="#next_chat_window"
+                        hx-push-url="false"
+                        hx-swap="outerHTML" hx-trigger="click"  
+                        data-whatsapp-number="{{lead.whatsapp_number}} "
+                        onclick="add_chat_to_session({{lead.whatsapp_number}} )" >
+                        Chat
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                          1+
+                          <span class="visually-hidden">unread messages</span>
+                        </span>
+                    </button>
+                    {%endif%}
+                </div>
+            </div>
         </span>
     </article>
     {%endwith%}
