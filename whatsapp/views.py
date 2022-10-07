@@ -28,7 +28,7 @@ class Webhooks(View):
         logger.debug(str(body))
            
         webhook = WhatsAppWebhook.objects.create(
-            json_data=request.POST.dict(),
+            json_data=body,
             request_type='a',
         )
         for entry in body.get('entry'):
