@@ -16,7 +16,7 @@
         <span class="secondary_td_layer">
             <i class="fa fa-whatsapp" aria-hidden="true"></i> {{lead.whatsapp_number}} 
             <button class="btn btn-xs btn-success" 
-                hx-get="{%url 'message-window' customer_number=message.customer_number chat_box_site_pk=site.pk%}"
+                hx-get="{%url 'message-window' customer_number=lead.whatsapp_number chat_box_site_pk=site.pk%}"
                 hx-indicator=".top-htmx-indicator" 
                 hx-target="#next_chat_window"
                 hx-push-url="false"
