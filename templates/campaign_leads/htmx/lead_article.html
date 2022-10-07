@@ -21,8 +21,8 @@
                 hx-target="#next_chat_window"
                 hx-push-url="false"
                 hx-swap="outerHTML" hx-trigger="click"  
-                data-whatsapp-number="{{message.customer_number}}"
-                onclick="add_chat_to_session({{message.customer_number}})" >
+                data-whatsapp-number="{{lead.whatsapp_number}} "
+                onclick="add_chat_to_session({{lead.whatsapp_number}} )" >
                 Chat
             </button>
         </span>
