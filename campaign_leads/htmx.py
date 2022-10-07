@@ -70,7 +70,7 @@ def get_leads_column_meta_data(request, **kwargs):
             leads = leads.filter(active_campaign_list__site__pk=site_pk)
             # request.GET['site_pk'] = site_pk 
             
-        leads = leads.annotate(calls=Count('calls'))
+        leads = leads.annotate(calls=Count('call_set'))
         querysets = [
             ('Fresh', leads.filter(calls=0), 0)
         ]
