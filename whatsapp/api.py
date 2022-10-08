@@ -58,7 +58,7 @@ class Whatsapp():
             "name": template_object.pending_name,
             "category": template_object.pending_category,
             "language": "en_UK",
-            "components": json.dumps(template_object.pending_components),
+            "components": template_object.pending_components,
         }
         response = requests.post(url=url, json=body, headers=headers)
         response_body = response.json()
@@ -69,7 +69,7 @@ class Whatsapp():
             url = f"{self.whatsapp_url}{template_object.message_template_id}"
             headers = self._get_headers()
             body = { 
-                "components": json.dumps(template_object.pending_components),
+                "components": template_object.pending_components
             }
             response = requests.post(url=url, json=body, headers=headers)
             response_body = response.json()

@@ -23,10 +23,11 @@
     }
     function replaceVariables(content){
         for (const [k,v] of Object.entries(variables)){
-            var find = k;
+            {% comment %} var find = k;
             var regex = new RegExp(find, "g");
             console.log(regex)
-            content = content.replace(regex,v[1])
+            content = content.replace(regex,v[1]) {% endcomment %}
+            content = content.replaceAll(k, v[1])
         }
         return content
     }
@@ -123,11 +124,11 @@
                             </select>
                         </div>
                         <div class="col">
-                            <textarea style="width:300px; height:50px;" 
+                            <input type="text" style="width:300px;" 
                             id="template_header" 
                             name="template_header" 
                             class="template_editor_input form-control" 
-                            oninput="renderTemplate()">{%for component in template.pending_components%}{%if component.type == 'HEADER'%}{{component.text}}{%endif%}{%endfor%}</textarea>
+                            oninput="renderTemplate();" value="{%for component in template.pending_components%}{%if component.type == 'HEADER'%}{{component.text}}{%endif%}{%endfor%}">
                         </div>
                     </div>
 
@@ -146,7 +147,7 @@
                             id="template_body" 
                             name="template_body" 
                             class="template_editor_input form-control" 
-                            oninput="renderTemplate()">{%for component in template.pending_components%}{%if component.type == 'BODY'%}{{component.text}}{%endif%}{%endfor%}</textarea>
+                            oninput="renderTemplate();">{%for component in template.pending_components%}{%if component.type == 'BODY'%}{{component.text}}{%endif%}{%endfor%}</textarea>
                         </div>
                     </div>
 
@@ -161,11 +162,11 @@
                             </select>
                         </div>
                         <div class="col">
-                            <textarea style="width:300px; height:50px;" 
+                            <input type="text" style="width:300px;" 
                             id="template_footer" 
                             name="template_footer" 
                             class="template_editor_input form-control" 
-                            oninput="renderTemplate()">{%for component in template.pending_components%}{%if component.type == 'FOOTER'%}{{component.text}}{%endif%}{%endfor%}</textarea>
+                            oninput="renderTemplate();" value="{%for component in template.pending_components%}{%if component.type == 'FOOTER'%}{{component.text}}{%endif%}{%endfor%}">
                         </div>
                     </div>
                 </div>
@@ -173,7 +174,7 @@
                     <i class="fa-solid fa-arrow-right align-self-center" style="font-size:40px"></i>                    
                 </div>
                 <div class="col center">
-                    <button class="btn btn-success m-3"
+                    <button class="btn template_save_button btn-success m-3"
                         onclick="saveTemplate()"
                         data-bs-toggle="popover" 
                         data-bs-trigger="hover" 

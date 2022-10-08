@@ -111,16 +111,24 @@ class Webhooks(View):
 
                 elif field == 'message_template_status_update':
                     for status_dict in value.get('statuses', []):
-                        print("STATUS", str(status_dict))
-                        whatsapp_messages = WhatsAppMessage.objects.filter(wamid=status_dict.get('id'))
-                        if whatsapp_messages:
-                            whatsapp_message_status = WhatsAppMessageStatus.objects.get_or_create(
-                                whatsapp_message=whatsapp_messages[0],
-                                datetime = datetime.fromtimestamp(int(status_dict.get('timestamp'))),
-                                status = status_dict.get('status'),
-                                raw_webhook = webhook,
-                            )[0]
+                        value = status_dict.get('value')
+                        template = WhatsappTemplate.objects.get(message_template_id=value.get('message_template_id'))
+                        template.status=value.get('event')
+                        template.latest_reason=value.get('reason')
+                        template.name=value.get('message_template_name')
+                        template.language=value.get('message_template_language')
                         
+                        if value.get('event', "") == 'APPROVED':
+                            if template.pending_name:
+                                template.name = template.pending_name
+                                template.pending_name = ""
+                            if template.pending_category:
+                                template.category = template.pending_category
+                                template.pending_category = ""
+                            if template.pending_language:
+                                template.language = template.pending_language
+                                template.pending_language = ""
+                        template.save()
         response = HttpResponse("")
         response.status_code = 200     
         
@@ -256,8 +264,8 @@ def save_whatsapp_template_ajax(request):
     if request.user.profile.site == template.site:
         template.pending_components = [
             {'type': 'HEADER', 'format': 'TEXT', 'text': request.POST.get('header')},
-            {'type': 'BODY', 'format': 'TEXT', 'text': request.POST.get('body')},
-            {'type': 'FOOTER', 'format': 'TEXT', 'text': request.POST.get('footer')},
+            {'type': 'BODY', 'text': request.POST.get('body')},
+            {'type': 'FOOTER', 'text': request.POST.get('footer')},
         ]
         template.save()
     return HttpResponse("", status=200)
