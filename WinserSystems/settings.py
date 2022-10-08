@@ -77,7 +77,7 @@ LOGGING = {
 SECRET_KEY = os.getenv("SECRET_KEY")
 if os.getenv('ENVIRONMENT') == 'development':
     ALLOWED_HOSTS = ['*']
-    DEBUG = False
+    DEBUG = True
     CSRF_COOKIE_SECURE = False
     SESSION_COOKIE_SECURE = False
     STATIC_URL = '/static/'

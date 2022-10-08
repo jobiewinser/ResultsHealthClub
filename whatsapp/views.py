@@ -187,27 +187,28 @@ def refresh_template_data(site):
     whatsapp = Whatsapp(site.whatsapp_access_token)
     templates = whatsapp.get_templates(site.whatsapp_business_account_id)
     for api_template in templates['data']:
-        template, created = WhatsappTemplate.objects.get_or_create(
-            message_template_id = api_template.get('id'),
-            site = site,
-        )
-        template.status = api_template.get('status')
-        template.name = api_template.get('name')
-        template.language = api_template.get('language')
-        template.category = api_template.get('category')
-        components = []
-        for dict in api_template.get('components', []):
-            json_dict = {}
-            for k,v in dict.items():
-                json_dict[k] = str(v)
-            components.append(json_dict)
-        
-        template.components = components
-        try:
-            template.save()
-        except Exception as e:
-            pass
-        print()
+        if not api_template.get('status') == "PENDING_DELETION":
+            template, created = WhatsappTemplate.objects.get_or_create(
+                message_template_id = api_template.get('id'),
+                site = site,
+            )
+            template.status = api_template.get('status')
+            template.name = api_template.get('name')
+            template.language = api_template.get('language')
+            template.category = api_template.get('category')
+            components = []
+            for dict in api_template.get('components', []):
+                json_dict = {}
+                for k,v in dict.items():
+                    json_dict[k] = str(v)
+                components.append(json_dict)
+            
+            template.components = components
+            try:
+                template.save()
+            except Exception as e:
+                pass
+            print()
 # @method_decorator(campaign_leads_enabled_required, name='dispatch')
 @method_decorator(login_required, name='dispatch')
 class WhatsappTemplatesEditView(TemplateView):
