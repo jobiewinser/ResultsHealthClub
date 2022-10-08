@@ -245,7 +245,9 @@ def delete_whatsapp_template_htmx(request):
     body = QueryDict(request.body)
     site = Site.objects.get(pk=body.get('site_pk'))
     whatsapp = Whatsapp(site.whatsapp_access_token)
-    whatsapp.delete_template(site.whatsapp_business_account_id, body.get('template_name'))
+    template = WhatsappTemplate.objects.get(pk=body.get('template_pk'))
+    if template.message_template_id:
+        whatsapp.delete_template(site.whatsapp_business_account_id, template.name)
     return HttpResponse("", status=200)
 def whatsapp_approval_htmx(request):
     template = WhatsappTemplate.objects.get(pk=request.POST.get('template_pk'))
