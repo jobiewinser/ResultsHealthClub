@@ -254,7 +254,10 @@ def whatsapp_approval_htmx(request):
     template = WhatsappTemplate.objects.get(pk=request.POST.get('template_pk'))
     if request.user.profile.site == template.site:
         whatsapp = Whatsapp(template.site.whatsapp_access_token)
-        whatsapp.edit_template(template)
+        if template.message_template_id:
+            whatsapp.edit_template(template)
+        else:
+            whatsapp.create_template(template)
         return render('campaign_leads/whatsapp_templates_row.html', {'template':template})
 
 def save_whatsapp_template_ajax(request):
