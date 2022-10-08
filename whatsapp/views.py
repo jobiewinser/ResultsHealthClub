@@ -164,7 +164,6 @@ class WhatsappTemplatesView(TemplateView):
     template_name='campaign_leads/whatsapp_templates.html'
 
     def get_context_data(self, **kwargs):
-        print(2/0)
         self.request.GET._mutable = True     
         context = super(WhatsappTemplatesView, self).get_context_data(**kwargs)
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
