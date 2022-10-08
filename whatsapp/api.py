@@ -57,11 +57,13 @@ class Whatsapp():
         body = { 
             "name": template_object.pending_name,
             "category": template_object.pending_category,
-            "language": "en_UK",
+            "language": "en_GB",
             "components": template_object.pending_components,
         }
         response = requests.post(url=url, json=body, headers=headers)
         response_body = response.json()
+        template_object.message_template_id = response_body['id']
+        template_object.save()
         return response_body
     #POST
     def edit_template(self, template_object):   
@@ -84,9 +86,9 @@ class Whatsapp():
             return response_body
             
     #GET
-    def get_template(self, whatsapp_business_account_id, template_id):   
+    def get_template(self, whatsapp_business_account_id, message_template_id):   
         if whatsapp_business_account_id:  
-            url = f"{self.whatsapp_url}{template_id}"
+            url = f"{self.whatsapp_url}{message_template_id}"
             headers = self._get_headers()
             response = requests.get(url=url, headers=headers)
             response_body = response.json()
