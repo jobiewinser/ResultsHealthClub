@@ -51,13 +51,29 @@ class Whatsapp():
             print(response_body)
             return response_body
     #POST
-    def create_template(self, content, name, whatsapp_business_account_id):   
-        if content and name and whatsapp_business_account_id:  
-            return "response_body"
+    def create_template(self, template_object):   
+        url = f"{self.whatsapp_url}{template_object.site.whatsapp_business_account_id}/message_templates"
+        headers = self._get_headers()
+        body = { 
+            "name": template_object.pending_name,
+            "category": template_object.pending_category,
+            "language": "en_UK",
+            "components": json.dumps(template_object.pending_components),
+        }
+        response = requests.post(url=url, json=body, headers=headers)
+        response_body = response.json()
+        return response_body
     #POST
-    def edit_template(self, content, name, whatsapp_business_account_id):   
-        if content and name and whatsapp_business_account_id:  
-            return "response_body"
+    def edit_template(self, template_object):   
+        if template_object.status in ["APPROVED", "REJECTED", "PAUSED"]:
+            url = f"{self.whatsapp_url}{template_object.message_template_id}"
+            headers = self._get_headers()
+            body = { 
+                "components": json.dumps(template_object.pending_components),
+            }
+            response = requests.post(url=url, json=body, headers=headers)
+            response_body = response.json()
+            return response_body
     #GET
     def get_templates(self, whatsapp_business_account_id):   
         if whatsapp_business_account_id:  
@@ -75,7 +91,7 @@ class Whatsapp():
             response = requests.get(url=url, headers=headers)
             response_body = response.json()
             return response_body
-    #GET
+    #DELETE
     def delete_template(self, whatsapp_business_account_id, template_name):   
         if whatsapp_business_account_id:  
             url = f"{self.whatsapp_url}{whatsapp_business_account_id}/message_templates"

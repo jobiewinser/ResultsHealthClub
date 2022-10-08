@@ -4,7 +4,7 @@ from django.db import models
 from django.db.models.deletion import SET_NULL
 from django.contrib.auth.models import User
 
-from campaign_leads.models import Call, Campaignlead, WhatsappTemplate
+from campaign_leads.models import Call, Campaignlead
 from twilio.models import TwilioMessage
 from django.db.models import Q, Count
 from whatsapp.api import Whatsapp
@@ -44,6 +44,7 @@ class Site(models.Model):
                         WhatsAppMessage.objects.get_or_create(
                             wamid=response_message.get('id'),
                             message=message,
+                            datetime=datetime.now(),
                             lead=lead,
                             site=self,
                             user=user,

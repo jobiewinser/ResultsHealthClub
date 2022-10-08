@@ -60,6 +60,8 @@
                         chatSocket.onmessage = function (e) {
                             const data = JSON.parse(e.data);
                             let user_avatar = data.user_avatar
+                            let user_name = data.user_name
+                            let datetime = data.datetime
                             if (user_avatar == null) {
                                 user_avatar = "{% static 'img/blank-profile-picture.png' %}"
                             }
@@ -74,7 +76,15 @@
                                 </div>`).insertBefore('#message_input_div_'+id);
                                 
                             } else{
-                                let new_chat =  $(`<div class="row">
+                                let new_chat =  $(`<div class="row" id="message_row_`+id+`"
+                                data-bs-toggle="popover" 
+                                data-bs-trigger="hover" 
+                                data-bs-html="true" 
+                                data-bs-placement="top"
+                                data-bs-title="Message Details"
+                                data-bs-content="
+                                Sent at <b>`+datetime+`</b><br>
+                                By <b>`+user_name+`</b>">
                                     <div class="col p-0 ps-1 m-1 card">
                                         `+data.message+`
                                     </div>
@@ -88,6 +98,8 @@
                                     new_chat.insertBefore('#message_input_div_'+id);
                                 }
                             }
+                            $('#message_row_'+id).popover();
+                            console.log($('#message_row_'+id))
                             $("#messageWindowCollapse_"+id).scrollTop($($("#messageWindowCollapse_"+id)).height() * 2);
                         }
                     }

@@ -89,6 +89,14 @@ def nice_date_tag(date):
         return str(date.strftime("%-d %B %Y"))
     except Exception as e:
         return str(date)
+@register.filter
+def nice_datetime_tag(date):
+    try:
+        if date.date() == datetime.today().date():
+            return f"{date.strftime('%H:%M')} today"
+        return str(date.strftime("%H:%M %-d %B %Y"))
+    except Exception as e:
+        return str(date)
 
     
 @register.filter

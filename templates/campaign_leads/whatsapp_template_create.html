@@ -8,16 +8,9 @@
 <script>
     let variables = {{variables|safe}}
     function renderTemplate(){
-        let content = ""
-        if ($('#template_header').val() != "") {
-            content = replaceVariables("<b>"+$('#template_header').val()+"</b> <br><br>  ")
-        }
-        if ($('#template_body').val() != "") {
-            content = content + replaceVariables("<p>"+$('#template_body').val().replace(/\r\n|\r|\n/g,"<br />")+"</p>")
-        }
-        if ($('#template_footer').val() != "") {
-            content = content + replaceVariables("<small>"+$('#template_footer').val()+"</small>")     
-        }
+        let content = replaceVariables("<b>"+$('#template_header').val()+"</b>")
+        content = content + replaceVariables("<br> <br> <p>"+$('#template_body').val()+"</p>")
+        content = content + replaceVariables("<small>"+$('#template_footer').val()+"</small>")     
         
         $('#template_render').html(content)
     }
@@ -25,8 +18,7 @@
         for (const [k,v] of Object.entries(variables)){
             var find = k;
             var regex = new RegExp(find, "g");
-            console.log(regex)
-            content = content.replace(regex,v[1])
+            content = content.replace(regex,v)
         }
         return content
     }
@@ -35,15 +27,13 @@
             type:'POST',
             url:'{%url "whatsapp-template-save"%}',
             data:{
-                'template_pk':{{template.pk}}, 
+                'create':true,
                 'header':$('#template_header').val(), 
                 'body':$('#template_body').val(), 
                 'footer':$('#template_footer').val(), 
                 'csrfmiddlewaretoken':'{{ csrf_token }}'
             },
             success: function (data) {
-                $(window).unbind('beforeunload');
-                window.location.href = "{%url 'whatsapp-templates'%}";
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
             }
@@ -71,13 +61,13 @@
         <div class="col">
         </div>
     </div>
-    <div class="row m-3">
+    {% comment %} <div class="row m-3">
         <div class="col">
             <div class="alert alert-info">
                 The information below does not reflect the real template on Whatsapp, this is an edited draft that can be sent to Whatsapp for approval later through the <a href="{%url 'whatsapp-templates'%}">Template Table</a>.
             </div>
         </div>
-    </div>
+    </div> {% endcomment %}
     <div class="row mt-2">
         <div class="col">
         </div>
@@ -85,26 +75,43 @@
             <div class="row mt-2">
                 <div class="col-md-auto center"  style="">
                     <h5>Template Name</h5>
-                    <div class="row">
-                        <div class="col"
-                        data-bs-toggle="popover" 
-                        data-bs-trigger="hover" 
-                        data-bs-placement="top"
-                        data-bs-title="Why is this input disabled?"
-                        data-bs-content="This input can't be changed for template edits. Please only make small changes, otherwise create a new template.">
-                            <input class="form-control" disabled id="template_name" value="{{template.name}}" name="template_name">
+                    <div class="row"
+                    data-bs-toggle="popover" 
+                    data-bs-trigger="hover" 
+                    data-bs-html="true" 
+                    data-bs-placement="top"
+                    data-bs-title="What does this do?"
+                    data-bs-content="
+                    <p>
+                        The template name does not appear for recipients, it's for your/Whatsapp's reference.
+                    </p>
+                    ">
+                        <div class="col">
+                            <input class="form-control" id="template_name" value="{{template.name}}" name="template_name">
                         </div>
                     </div>
                     
                     <h5>Category</h5>
-                    <div class="row">
-                        <div class="col"
-                        data-bs-toggle="popover" 
-                        data-bs-trigger="hover" 
-                        data-bs-placement="top"
-                        data-bs-title="Why is this input disabled?"
-                        data-bs-content="This input can't be changed for template edits. Please only make small changes, otherwise create a new template.">
-                            <select id="template_category" disabled name="template_category" class="form-select form-select-sm align-self-center m-1">
+                    <div class="row"
+                    data-bs-toggle="popover" 
+                    data-bs-trigger="hover" 
+                    data-bs-html="true" 
+                    data-bs-placement="top"
+                    data-bs-title="What do these categories mean?"
+                    data-bs-content="
+                    <b>Transactional</b>
+                    <p>
+                        Send account updates, order updates, alerts and more to share important information.
+                    </p>
+                    <br>
+                    <b>Marketing</b>
+                    <p>
+                        Send promotional offers, product announcements and more to increase awareness.
+                    </p>
+                    <br>
+                    ">
+                        <div class="col">
+                            <select id="template_category" name="template_category" class="form-select form-select-sm align-self-center m-1">
                                 {%for k,v in categories.items%}
                                 <option {%if template.category == k%}selected {%endif%}value="{{k}}">{{k}}</option>
                                 {%endfor%}        
@@ -117,7 +124,7 @@
                         <div class="col-md-auto">
                             <select id="variable_choice"  onclick="$('#template_header').val($('#template_header').val()+$(this).val()).trigger('input'); $(this).val('');" name="variable_choice" class="form-select form-select-sm align-self-center m-1">
                                 {%for k,v in variables.items%}
-                                <option value="{{k}}">{{v.0}}</option>
+                                <option value="{{k}}">{{k}}</option>
                                 {%endfor%}     
                                 <option selected value="">Insert a variable</option>     
                             </select>
@@ -127,7 +134,7 @@
                             id="template_header" 
                             name="template_header" 
                             class="template_editor_input form-control" 
-                            oninput="renderTemplate()">{%for component in template.pending_components%}{%if component.type == 'HEADER'%}{{component.text}}{%endif%}{%endfor%}</textarea>
+                            oninput="renderTemplate()">{%for component in template.components%}{%if component.type == 'HEADER'%}{{component.text}}{%endif%}{%endfor%}</textarea>
                         </div>
                     </div>
 
@@ -136,7 +143,7 @@
                         <div class="col-md-auto">
                             <select id="variable_choice"  onclick="$('#template_body').val($('#template_body').val()+$(this).val()).trigger('input'); $(this).val('');" name="variable_choice" class="form-select form-select-sm align-self-center m-1">
                                 {%for k,v in variables.items%}
-                                <option value="{{k}}">{{v.0}}</option>
+                                <option value="{{k}}">{{k}}</option>
                                 {%endfor%}     
                                 <option selected value="">Insert a variable</option>     
                             </select>
@@ -146,7 +153,7 @@
                             id="template_body" 
                             name="template_body" 
                             class="template_editor_input form-control" 
-                            oninput="renderTemplate()">{%for component in template.pending_components%}{%if component.type == 'BODY'%}{{component.text}}{%endif%}{%endfor%}</textarea>
+                            oninput="renderTemplate()">{%for component in template.components%}{%if component.type == 'BODY'%}{{component.text}}{%endif%}{%endfor%}</textarea>
                         </div>
                     </div>
 
@@ -155,7 +162,7 @@
                         <div class="col-md-auto">
                             <select id="variable_choice"  onclick="$('#template_footer').val($('#template_footer').val()+$(this).val()).trigger('input'); $(this).val('');" name="variable_choice" class="form-select form-select-sm align-self-center m-1">
                                 {%for k,v in variables.items%}
-                                <option value="{{k}}">{{v.0}}</option>
+                                <option value="{{k}}">{{k}}</option>
                                 {%endfor%}     
                                 <option selected value="">Insert a variable</option>     
                             </select>
@@ -165,7 +172,7 @@
                             id="template_footer" 
                             name="template_footer" 
                             class="template_editor_input form-control" 
-                            oninput="renderTemplate()">{%for component in template.pending_components%}{%if component.type == 'FOOTER'%}{{component.text}}{%endif%}{%endfor%}</textarea>
+                            oninput="renderTemplate()">{%for component in template.components%}{%if component.type == 'FOOTER'%}{{component.text}}{%endif%}{%endfor%}</textarea>
                         </div>
                     </div>
                 </div>
@@ -181,7 +188,7 @@
                         data-bs-title="What does this do?"
                         data-bs-content="This saves your changes to this system, but does not push it to Whatsapp to review. You must request a review from the template table. You may save your work then come back to it later here before requesting approval from Whatsapp.">
                         <i class="fa fa-save" aria-hidden="true"></i> 
-                        Save Changes
+                        Create Template
                     </button>
                     <div class="marvel-device nexus5">
                         <div class="screen">

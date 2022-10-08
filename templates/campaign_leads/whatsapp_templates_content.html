@@ -8,9 +8,22 @@
         <div class="col">
         </div>
         <div class="col-md-auto">
-            <button class="btn btn-success btn-sm me-2"><i class="fa fa-plus" aria-hidden="true"></i> Add</button>            
+            <button class="btn btn-success btn-sm me-2"
+            onclick="window.location.href = '{%url 'whatsapp-template'%}'">
+                <i class="fa fa-plus" aria-hidden="true"></i> Add
+            </button>            
         </div>
     </div>
+    
+    <div class="row m-3">
+        <div class="col">
+            <div class="alert alert-warning">
+                <p>Message templates in an Aproved state can be edited up to 10 times in a 30 day window, or 1 time in a 24 hour window.</p>
+                <p>Messages in Rejected or Paused states can be edited an unlimited number of times.</p>
+            </div>
+        </div>
+    </div>
+
     <div class="row mt-2">
         <div class="col">
             {% comment %} <ul class="nav nav-pills">
@@ -24,9 +37,6 @@
                             Name
                         </th>
                         <th>
-                            Status
-                        </th>
-                        <th>
                             Category
                         </th>
                         <th>
@@ -34,6 +44,9 @@
                         </th>
                         <th>
                             ID
+                        </th>
+                        <th>
+                            Status
                         </th>
                         <th>  
                         </th>
@@ -43,30 +56,7 @@
                     {%for template in templates%}
                     {%if not 'sample_' in template.name%}
                     <tr id="template_row_{{template.id}}">
-                        <td>
-                            {{template.name}}
-                        </td>
-                        <td> 
-                            {{template.status}}
-                        </td>
-                        <td>
-                            {{template.category}}
-                        </td>
-                        <td>
-                            {{template.language}}
-                        </td>
-                        <td> 
-                            {{template.id}}
-                        </td>
-                        <td>
-                            <button class="btn btn-warning btn-sm" onclick="window.location.href = '{%url 'whatsapp-templates' template_id=template.id site_pk=site.pk%}'"><i class="fa fa-pencil" aria-hidden="true"></i> Edit</button>
-                            <button class="btn btn-danger btn-sm"
-                                hx-delete="{%url 'whatsapp-templates-delete'%}" 
-                                hx-vals='{"site_pk": "{{site.pk}}", "template_name": "{{template.name}}"}'
-                                hx-confirm="Are you sure you want to delete this template?" hx-target="#template_row_{{template.id}}" hx-swap="outerHTML" hx-indicator=".top-htmx-indicator">
-                                <i class="fa fa-trash" aria-hidden="true"></i> Delete
-                            </button>
-                        </td>
+                        {%include 'campaign_leads/whatsapp_templates_row.html'%}
                     </tr>
                     {%endif%}
                     {%endfor%}

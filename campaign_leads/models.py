@@ -94,40 +94,6 @@ class Note(models.Model):
     class Meta:
         ordering = ['-datetime']
 
-
-class CustomWhatsappTemplateQuerySet(models.QuerySet):
-    def delete(self):
-        pass
-class WhatsappTemplateManager(models.Manager):
-    def get_queryset(self):
-        return CustomWhatsappTemplateQuerySet(self.model, using=self._db)
-
-
-WHATSAPP_ORDER_CHOICES = (
-                    (1, 'First'),
-                    (2, 'Second'),
-                    (3, 'Third')
-                )
-class WhatsappTemplate(models.Model):
-    # name = models.TextField(null=False, blank=False)
-    send_order = models.IntegerField(choices=WHATSAPP_ORDER_CHOICES, null=False, blank=False, default=1)
-    text = models.TextField(null=False, blank=False)
-    edited_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    edited = models.DateTimeField(null=True, blank=True) 
-    created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
-
-    objects = WhatsappTemplateManager()
-    class Meta:
-        ordering = ['pk']
-    def delete(self):
-        self.save()
-
-    def rendered_demo(self):
-        return self.text.replace('{first_name}', 'Jobie')
-
-    def rendered(self, lead):
-        return self.text.replace('{first_name}', str(lead.first_name))
 # try:
 #     template, created = WhatsappTemplate.objects.get_or_create(pk=1)
 #     template.name = "Immediate Lead Followup"

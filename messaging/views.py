@@ -4,7 +4,7 @@ from campaign_leads.models import Campaignlead
 from whatsapp.models import WhatsAppMessage
 
 def message_window(request, **kwargs):
-    messages = WhatsAppMessage.objects.filter(customer_number=kwargs.get('customer_number'), site__pk=kwargs.get('chat_box_site_pk'))
+    messages = WhatsAppMessage.objects.filter(customer_number=kwargs.get('customer_number'), site__pk=kwargs.get('chat_box_site_pk')).order_by('datetime')
     context = {}
     context["messages"] = messages
     context["lead"] = Campaignlead.objects.filter(whatsapp_number=kwargs.get('customer_number')).first()

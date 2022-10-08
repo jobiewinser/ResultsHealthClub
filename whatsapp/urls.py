@@ -20,6 +20,10 @@ urlpatterns = [
     path('ajax-clear-chat-from-session/', whatsappviews.clear_chat_from_session, name='clear-chat-from-session' ),
     path('ajax-add-chat-to-session/', whatsappviews.add_chat_to_session, name='add-chat-to-session' ),
     path('configuration/whatsapp-templates/', whatsappviews.WhatsappTemplatesView.as_view(), name='whatsapp-templates'),
-    path('configuration/whatsapp-templates/<str:template_id>/<str:site_pk>/', whatsappviews.WhatsappTemplatesEditView.as_view(), name='whatsapp-templates'),
-    path('configuration/whatsapp-templates/delete/', whatsappviews.delete_whatsapp_template_htmx, name='whatsapp-templates-delete'),
+    path('configuration/whatsapp-template/<str:template_id>/<str:site_pk>/', whatsappviews.WhatsappTemplatesEditView.as_view(), name='whatsapp-template'),
+    path('configuration/whatsapp-template/', whatsappviews.WhatsappTemplatesCreateView.as_view(), name='whatsapp-template'),
+    path('configuration/whatsapp-template/delete/', whatsappviews.delete_whatsapp_template_htmx, name='whatsapp-template-delete'),
+    path('configuration/whatsapp-templates/save/', whatsappviews.save_whatsapp_template_ajax, name='whatsapp-template-save'),
+    path('configuration/whatsapp-templates/approval/', whatsappviews.whatsapp_approval_htmx, name='whatsapp-approval'),
+    
 ]

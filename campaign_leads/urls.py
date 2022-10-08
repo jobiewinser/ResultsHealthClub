@@ -44,8 +44,8 @@ urlpatterns = [
     path('mark-arrived/', campaignleadshtmx.mark_arrived, name='mark-arrived' ),
     path('mark-sold/', campaignleadshtmx.mark_sold, name='mark-sold' ),
     # path('test-whatsapp-message/', campaignleadshtmx.test_whatsapp_message, name='test-whatsapp-message' ),
-    path('template-editor/', campaignleadshtmx.template_editor, name='template-editor' ),
-    path('template-save/', campaignleadshtmx.template_save, name='template-save' ),
+    # path('template-editor/', campaignleadshtmx.template_editor, name='template-editor' ),
+    # path('template-save/', campaignleadshtmx.template_save, name='template-save' ),
     
     path('campaign-lead-get-modal-content/', campaignleadshtmx.get_modal_content, name='campaign-lead-get-modal-content' ),
     path('campaign-lead-get-modal-content/<str:param1>/', campaignleadshtmx.get_modal_content, name='campaign-lead-get-modal-content' ),

@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
-from campaign_leads.models import Campaignlead, WhatsappTemplate
+from campaign_leads.models import Campaignlead
 from active_campaign.api import ActiveCampaign
 from active_campaign.models import ActiveCampaignList
 from active_campaign.views import get_active_campaign_list_qs
@@ -17,19 +17,19 @@ logger = logging.getLogger(__name__)
 
     
 
-try:
-    for site in Site.objects.all():
-        WhatsappTemplate.objects.get_or_create(site=site, send_order=1)
-        WhatsappTemplate.objects.get_or_create(site=site, send_order=2)
-        WhatsappTemplate.objects.get_or_create(site=site, send_order=3)
-        if not ActiveCampaignList.objects.filter(site=site, manual=True):
-            ActiveCampaignList.objects.create(
-                name=f"Manually Created ({site.name})",
-                site=site,
-                manual=True,
-            )
-except Exception as e:
-    pass
+# try:
+#     for site in Site.objects.all():
+#         WhatsappTemplate.objects.get_or_create(site=site, send_order=1)
+#         WhatsappTemplate.objects.get_or_create(site=site, send_order=2)
+#         WhatsappTemplate.objects.get_or_create(site=site, send_order=3)
+#         if not ActiveCampaignList.objects.filter(site=site, manual=True):
+#             ActiveCampaignList.objects.create(
+#                 name=f"Manually Created ({site.name})",
+#                 site=site,
+#                 manual=True,
+#             )
+# except Exception as e:
+#     pass
 
 
 @method_decorator(campaign_leads_enabled_required, name='dispatch')

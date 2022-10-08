@@ -7,7 +7,7 @@ from django.contrib.auth import login
 from django.middleware.csrf import get_token
 from django.contrib.auth.decorators import login_required
 
-from campaign_leads.models import Campaignlead, Booking, Call, Note, WhatsappTemplate
+from campaign_leads.models import Campaignlead, Booking, Call, Note
 from campaign_leads.views import CampaignBookingsOverviewView
 from active_campaign.models import ActiveCampaignList
 from core.models import Site
@@ -242,29 +242,29 @@ def mark_sold(request, **kwargs):
 #             return render(request, "campaign_leads/htmx/campaign_booking_row.html", {'lead':lead}) 
 #     except Exception as e:
 #         logger.debug("mark_done Error "+str(e))
+# #         return HttpResponse(e, status=500)
+# @login_required
+# def template_editor(request, **kwargs):
+#     logger.debug(str(request.user))
+#     try:
+#         if request.user.is_staff:
+#             template = WhatsappTemplate.objects.get(pk=request.GET.get('template_pk'))
+#             return render(request, "campaign_leads/htmx/template_editor.html", {'template':template}) 
+#     except Exception as e:
+#         logger.debug("mark_done Error "+str(e))
 #         return HttpResponse(e, status=500)
-@login_required
-def template_editor(request, **kwargs):
-    logger.debug(str(request.user))
-    try:
-        if request.user.is_staff:
-            template = WhatsappTemplate.objects.get(pk=request.GET.get('template_pk'))
-            return render(request, "campaign_leads/htmx/template_editor.html", {'template':template}) 
-    except Exception as e:
-        logger.debug("mark_done Error "+str(e))
-        return HttpResponse(e, status=500)
 
-@login_required
-def template_save(request, **kwargs):
-    logger.debug(str(request.user))
-    try:
-        if request.user.is_staff:
-            template = WhatsappTemplate.objects.get(pk=request.POST.get('template_pk'))
-            template.text = request.POST.get('template_text')
-            template.save()
-            return render(request, "campaign_leads/htmx/template_editor.html", {'template':template}) 
-    except Exception as e:
-        logger.debug("mark_done Error "+str(e))
-        return HttpResponse(e, status=500)
+# @login_required
+# def template_save(request, **kwargs):
+#     logger.debug(str(request.user))
+#     try:
+#         if request.user.is_staff:
+#             template = WhatsappTemplate.objects.get(pk=request.POST.get('template_pk'))
+#             template.text = request.POST.get('template_text')
+#             template.save()
+#             return render(request, "campaign_leads/htmx/template_editor.html", {'template':template}) 
+#     except Exception as e:
+#         logger.debug("mark_done Error "+str(e))
+#         return HttpResponse(e, status=500)
 
         

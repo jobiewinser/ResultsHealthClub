@@ -1,8 +1,10 @@
+from datetime import datetime
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.conf import settings
 from campaign_leads.models import Campaignlead
 from core.models import Site
+from core.templatetags.core_tags import nice_datetime_tag
 
 from whatsapp.api import Whatsapp
 from whatsapp.models import WhatsAppMessage
@@ -36,6 +38,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         "message": message,
                         "user_name": name,
                         "user_avatar": avatar,
+                        "datetime": nice_datetime_tag(datetime.now()),
                         "inbound": False
                     },
                 )
@@ -48,6 +51,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     "user_name": event.get("user_name", None),
                     "whatsapp_number": event.get("whatsapp_number", None),
                     "user_avatar": event.get("user_avatar", None),
+                    "datetime": nice_datetime_tag(datetime.now()),
                     "inbound": event.get("inbound", None),
                 }
             )
@@ -78,6 +82,7 @@ class ChatListConsumer(AsyncWebsocketConsumer):
                         "message": message,
                         "user_name": name,
                         "user_avatar": avatar,
+                        "datetime": nice_datetime_tag(datetime.now()),
                         "inbound": False
                     },
                 )
@@ -90,6 +95,7 @@ class ChatListConsumer(AsyncWebsocketConsumer):
                     "user_name": event.get("user_name", None),
                     "whatsapp_number": event.get("whatsapp_number", None),
                     "user_avatar": event.get("user_avatar", None),
+                    "datetime": nice_datetime_tag(datetime.now()),
                     "inbound": event.get("inbound", None),
                 }
             )
@@ -111,6 +117,7 @@ def send_whatsapp_message_to_number(message, whatsapp_number, user, site_pk):
             "user_name": f"{user.profile.name()}",
             "whatsapp_number": whatsapp_number,
             "user_avatar": f"{user.profile.avatar.url}", 
+            "datetime": nice_datetime_tag(datetime.now()),
             "inbound": False,
         }
     ) 
