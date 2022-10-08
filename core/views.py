@@ -113,11 +113,11 @@ def handler500(request):
                 
             error_description = f"<p>user id: {str(id)} <br> user name: {str(name)} <br> url: {str(path)}  <br> Error type: {str(value)}  <br> Request Body: {str(body)}  <br> Request Headers: {str(headers)} <br><br><br> Traceback: {str(traceback.format_exception(type, value, tb))}</p>"
             send_mail(
-                subject='Results Prod - 500 error ',
+                subject='Winser Systems Prod - 500 error ',
                 message=error_description,
-                from_email='jobiewinser@live.co.uk',
-                recipient_list=['jobiewinser@live.co.uk'])
+                from_email='jobiewinser@gmail.com',
+                recipient_list=['jobiewinser@gmail.com'])
 
     except Exception as e:
-            logger.error(   "couldn't send error email", str(e))
+        logger.error(   "couldn't send error email", str(e))
     return render(request, '500.html', status=500)

@@ -77,7 +77,7 @@ LOGGING = {
 SECRET_KEY = os.getenv("SECRET_KEY")
 if os.getenv('ENVIRONMENT') == 'development':
     ALLOWED_HOSTS = ['*']
-    DEBUG = True
+    DEBUG = False
     CSRF_COOKIE_SECURE = False
     SESSION_COOKIE_SECURE = False
     STATIC_URL = '/static/'
@@ -244,10 +244,10 @@ REST_FRAMEWORK = {
 }
 
 CORS_ALLOWED_ORIGINS = [
-    'http://results.jobiewinser.co.uk',
+    'https://app.winser.uk',
     # '82.37.38.164'
 ]
-CSRF_TRUSTED_ORIGINS = ['http://results.jobiewinser.co.uk']
+CSRF_TRUSTED_ORIGINS = ['https://app.winser.uk']
 
 CORS_REPLACE_HTTPS_REFERER = True
 
@@ -263,8 +263,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'jobiewinser@gmail.com'
-EMAIL_HOST_PASSWORD = 'zcosfvgjmblebclj'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
 TIME_ZONE = 'Europe/London'
 
