@@ -1,7 +1,16 @@
 {% extends 'campaign_leads/whatsapp_template_edit.html' %}
 {%load static%}
 
-{%block template_pk%}'created':true,{%endblock template_pk%}
+
+{%block ajax_data%}
+'created':true,
+'name':$('#template_name').val(), 
+'category':$('#template_category').val(), 
+'header':$('#template_header').val(), 
+'body':$('#template_body').val(), 
+'footer':$('#template_footer').val(), 
+'csrfmiddlewaretoken':'{{ csrf_token }}'
+{%endblock ajax_data%}
 
 {%block template_name%}
 <h5>Template Name</h5>

@@ -36,11 +36,13 @@
             type:'POST',
             url:'{%url "whatsapp-template-save"%}',
             data:{
-                {%block template_pk%}'template_pk':{{template.pk}},{%endblock template_pk%}
+                {%block ajax_data%}
+                'template_pk':{{template.pk}},
                 'header':$('#template_header').val(), 
                 'body':$('#template_body').val(), 
                 'footer':$('#template_footer').val(), 
                 'csrfmiddlewaretoken':'{{ csrf_token }}'
+                {%endblock ajax_data%}
             },
             success: function (data) {
                 $(window).unbind('beforeunload');
@@ -211,7 +213,7 @@
                                                 " alt="{{request.user.profile.company.all.first}} Logo">
                                             </div>
                                             <div class="name">
-                                                <span>{{request.user.profile.company.all.first.company_name}}</span>
+                                                <span>{%if request.user.profile.company.all.first.company_name%}{{request.user.profile.company.all.first.company_name}}{%else%}Company{%endif%}</span>
                                                 <span class="status">online</span>
                                             </div>
                                             <div class="actions more">

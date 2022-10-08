@@ -3,7 +3,7 @@
     {%if template.pending_name%}
     <br>
     <span class="secondary_td_layer">
-        Draft: {{template.pending_name}}{            
+        Draft: {{template.pending_name}}          
     </span>   
     {%endif%}
 </td>
@@ -14,7 +14,7 @@
     {%if template.pending_category%}
     <br>
     <span class="secondary_td_layer">
-        Draft: {{template.pending_category}}{            
+        Draft: {{template.pending_category}}          
     </span>    
     {%endif%}
 </td>
@@ -28,7 +28,18 @@
 </td>
 <td class="double_layer_td">
     <span class="primary_td_layer">
-        {{template.status}}        
+        {%if template.status%}{{template.status}}{%endif%} 
+        {%if template.latest_reason%}
+        <div 
+        data-bs-toggle="popover" 
+        data-bs-trigger="hover" 
+        data-bs-html="true" 
+        data-bs-placement="top"
+        data-bs-title="Reasons for Error?"
+        data-bs-content="{{template.latest_reason}}">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        {%endif%}    
     </span>   
     {%if template.pending_components%}
     <br>
