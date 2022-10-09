@@ -262,7 +262,7 @@ def whatsapp_approval_htmx(request):
             whatsapp.edit_template(template)
         else:
             whatsapp.create_template(template)
-        return render(request, 'whatsapp/whatsapp_templates_row.html', {'template':template, 'site':template.site})
+        return render(request, 'whatsapp/whatsapp_templates_row.html', {'template':template, 'site':template.site, 'WHATSAPP_ORDER_CHOICES': WHATSAPP_ORDER_CHOICES})
 
 def whatsapp_assign_send_order_htmx(request):
     template = WhatsappTemplate.objects.get(pk=request.POST.get('template_pk'))
@@ -273,7 +273,10 @@ def whatsapp_assign_send_order_htmx(request):
             templates_with_send_order_already.update(send_order=0)
         template.send_order = send_order
         template.save()
-        return render(request, 'whatsapp/whatsapp_templates_row.html', {'template':template, 'site':template.site, 'templates_with_send_order_already':templates_with_send_order_already})
+        return render(request, 'whatsapp/whatsapp_templates_row.html', {'template':template, 
+                                                                        'site':template.site,
+                                                                        'templates_with_send_order_already':templates_with_send_order_already, 
+                                                                        'WHATSAPP_ORDER_CHOICES': WHATSAPP_ORDER_CHOICES})
 
 def whatsapp_clear_changes_htmx(request):
     template = WhatsappTemplate.objects.get(pk=request.POST.get('template_pk'))
@@ -283,7 +286,7 @@ def whatsapp_clear_changes_htmx(request):
         template.pending_language = None
         template.pending_name = None
         template.save()
-        return render(request, 'whatsapp/whatsapp_templates_row.html', {'template':template, 'site':template.site})
+        return render(request, 'whatsapp/whatsapp_templates_row.html', {'template':template, 'site':template.site, 'WHATSAPP_ORDER_CHOICES': WHATSAPP_ORDER_CHOICES})
 
 def save_whatsapp_template_ajax(request):
     if request.POST.get('created', False):

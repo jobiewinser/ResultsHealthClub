@@ -62,7 +62,16 @@
 </td>
 {%if site%}
 <td>    
-    <select id="send_order_choice_{{template.pk}}" onchange="$('#assign_send_order_{{template.pk}}').click()" name="send_order" class="form-select">
+    {%if not template.name == 'hello_world'%}
+    <select id="send_order_choice_{{template.pk}}" onchange="$('#assign_send_order_{{template.pk}}').click()" name="send_order" class="form-select"
+    data-bs-toggle="popover" 
+    data-bs-trigger="hover" 
+    data-bs-html="true" 
+    data-bs-placement="top"
+    data-bs-title="What do these options mean?"
+    data-bs-content="<p>The options in this list determine when the template is automatically sent to your customer using your chosen communication method (Whatsapp).</p>
+    <p>Each option can only be assigned to 1 template, so choosing an already chosen may clear auto send choice for another template.</p>
+    ">
         <option value="" {%if not template.send_order%}selected{%endif%}>Select a Whatsapp Template {{site_pk}}</option>
         {%for order_tuple in WHATSAPP_ORDER_CHOICES%}
         <option {%if template.send_order == order_tuple.0%}selected{%endif%} value="{{order_tuple.0}}">{{order_tuple.1}}</option>
@@ -73,6 +82,7 @@
         hx-vals='{"site_pk": "{{site.pk}}", "template_pk": "{{template.pk}}"}'
         hx-target="#template_row_{{template.pk}}" id="assign_send_order_{{template.pk}}" 
         class="btn btn-primary btn-sm">assign</button>
+    {%endif%}
 </td>
 {%endif%}
 <td>
