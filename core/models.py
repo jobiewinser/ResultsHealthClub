@@ -82,9 +82,9 @@ class Site(models.Model):
 class Company(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     company_name = models.TextField(null=True, blank=True)
-    company_logo_white = models.ImageField(default='default.jpg', upload_to='company_images')
-    company_logo_black = models.ImageField(default='default.jpg', upload_to='company_images')
-    company_logo_trans = models.ImageField(default='default.jpg', upload_to='company_images')
+    company_logo_white = models.ImageField(default='default.png', upload_to='company_images')
+    company_logo_black = models.ImageField(default='default.png', upload_to='company_images')
+    company_logo_trans = models.ImageField(default='default.png', upload_to='company_images')
     campaign_leads_enabled = models.BooleanField(default=False)#
     free_taster_enabled = models.BooleanField(default=False)#
     active_campaign_url = models.TextField(null=True, blank=True)
@@ -110,7 +110,7 @@ class Company(models.Model):
 class Profile(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    avatar = models.ImageField(default='default.jpg', upload_to='profile_images')
+    avatar = models.ImageField(default='default.png', upload_to='profile_images')
     site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
     company = models.ManyToManyField("core.Company")
     @property
