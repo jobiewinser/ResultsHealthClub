@@ -102,13 +102,13 @@ class Campaignlead(models.Model):
 
             components =   [] 
 
-            text = ""
+            whole_text = ""
             for component in template.components:
                 params = []
                 component_type = component.get('type', "").lower()
                 # if component_type == 'header':
                 text = component.get('text', '')
-                print(text)
+                whole_text = f"{whole_text} <br> {text}"
                 if '{{1}}' in text:
                     params.append(              
                         {
@@ -153,6 +153,7 @@ class Campaignlead(models.Model):
                         wamid=response_message.get('id'),
                         datetime=datetime.now(),
                         lead=self,
+                        message=whole_text,
                         site=self.campaign.site,
                         system_user_number=self.whatsapp_number,
                         customer_number=self.whatsapp_number,

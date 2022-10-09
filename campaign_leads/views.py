@@ -43,7 +43,7 @@ def get_campaign_qs(request):
     )    
     campaign_qs = Campaign.objects.annotate(
         first_model_count=Subquery(first_model_query)
-    )     
+    )
     site_pk = get_site_pk_from_request(request)
     if site_pk and not site_pk == 'all':
         campaign_qs = campaign_qs.filter(site__pk=site_pk)
