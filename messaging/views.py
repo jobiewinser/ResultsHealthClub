@@ -22,7 +22,7 @@ def message_window(request, **kwargs):
 @login_required
 def get_messaging_section(request, **kwargs):
     try:
-        request.GET._mutable = True
+        # request.GET._mutable = True
         site = Site.objects.get(pk=request.GET.get('site_pk'))
         return render(request, f"messaging/messaging.html", {'site':site})   
     except Exception as e:
@@ -32,11 +32,28 @@ def get_messaging_section(request, **kwargs):
 @login_required
 def get_messaging_list_row(request, **kwargs):
     try:
-        request.GET._mutable = True
+    #     request.GET._mutable = True
         site = Site.objects.get(pk=request.GET.get('site_pk'))
         message = WhatsAppMessage.objects.filter(site=site, customer_number=request.GET.get('whatsapp_number')).last()
         return render(request, "messaging/htmx/message_list_row.html", {'site':site, 'message':message})   
     except Exception as e:
         logger.debug("get_messaging_list_row Error "+str(e))
+        return HttpResponse(e, status=500)
+
+@login_required
+def send_first_template_whatsapp_htmx(request, **kwargs):
+    try:
+        lead = Campaignlead.objects.get(pk=kwargs.get('lead_pk'))
+        if not lead.whatsappmessage_set.all():
+            lead.send_template_whatsapp_message(1, communication_method='a')
+        messages = WhatsAppMessage.objects.filter(customer_number=kwargs.get('customer_number'), site__pk=kwargs.get('chat_box_site_pk')).order_by('datetime')
+        context = {}
+        context["messages"] = messages
+        context["lead"] = lead
+        context["customer_number"] = lead.whatsapp_number
+        context["site_pk"] = lead.campaign.site
+        return render(request, "messaging/message_window_htmx.html", context)
+    except Exception as e:
+        logger.debug("send_first_template_whatsapp_htmx Error "+str(e))
         return HttpResponse(e, status=500)
 

@@ -12,6 +12,9 @@ from django.conf import settings
 from django.dispatch import receiver
 from polymorphic.models import PolymorphicModel
 # Create your models here.
+from whatsapp.models import template_variables
+import logging
+logger = logging.getLogger(__name__)
 
 BOOKING_CHOICES = (
                     ('a', 'In Person'),
@@ -86,10 +89,78 @@ class Campaignlead(models.Model):
         return "Never"  
 
     def send_template_whatsapp_message(self, send_order, communication_method = 'a'):
-        if communication_method == 'whatsapp':
+        if communication_method == 'a':
             template = WhatsappTemplate.objects.get(send_order = send_order, site=self.campaign.site)
-            message = f"{template.rendered(self)}" 
-            return self.campaign.site.send_whatsapp_message(customer_number=self.whatsapp_number, lead=self, message=message, template_used=template)
+            whatsapp = Whatsapp(self.campaign.site.whatsapp_access_token)
+            template_live = whatsapp.get_template(template.site.whatsapp_business_account_id, template.message_template_id)
+            template.name = template_live['name']
+
+            template.category = template_live['category']
+            template.language = template_live['language']
+            template.components = template_live['components']
+            template.save()
+
+            components =   [] 
+
+            text = ""
+            for component in template.components:
+                params = []
+                component_type = component.get('type', "").lower()
+                # if component_type == 'header':
+                text = component.get('text', '')
+                print(text)
+                if '{{1}}' in text:
+                    params.append(              
+                        {
+                            "type": "text",
+                            "text":  self.first_name
+                        }
+                    )
+                if '{{3}}' in text:
+                    params.append(           
+                        {
+                            "type": "text",
+                            "text":  self.campaign.company.company_name
+                        }
+                    )
+                if '{{4}}' in text:
+                    params.append(                   
+                        {
+                            "type": "text",
+                            "text":  self.campaign.site.whatsapp_number
+                        }
+                    )
+                if params:
+                    components.append(
+                        {
+                            "type": component_type,
+                            "parameters": params
+                        }
+                    )
+            
+            
+
+            language = {
+                "policy":"deterministic",
+                "code":template.language
+            }
+
+            response = whatsapp.send_template_message(self.whatsapp_number, self.campaign.site.whatsapp_business_phone_number_id, template.name, language, components)
+            reponse_messages = response.get('messages',[])
+            if reponse_messages:
+                for response_message in reponse_messages:
+                    WhatsAppMessage.objects.get_or_create(
+                        wamid=response_message.get('id'),
+                        datetime=datetime.now(),
+                        lead=self,
+                        site=self.campaign.site,
+                        system_user_number=self.whatsapp_number,
+                        customer_number=self.whatsapp_number,
+                        template=template,
+                        inbound=False
+                    )
+                logger.debug("site.send_template_whatsapp_message success") 
+                return True
         return HttpResponse("No Communication method specified", status=500)
 
 @receiver(models.signals.post_save, sender=Campaignlead)

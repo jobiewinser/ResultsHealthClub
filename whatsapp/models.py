@@ -65,9 +65,9 @@ WHATSAPP_ORDER_CHOICES = (
 )
 template_variables = {
     '{{1}}': ["First Name", "Jobie"],
-    '{{2}}': ["Last Name", "Winser"],
+    # '{{2}}': ["Last Name", "Winser"],
     '{{3}}': ["Company Name", "Winser Systems"],
-    '{{4}}': ["Company Number", "+44 7872 000364"],
+    '{{4}}': ["Site Number", "+44 7872 000364"],
 }
 class WhatsappTemplate(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -145,8 +145,8 @@ class WhatsappTemplate(models.Model):
         if self.site:
             return self.site.name
         return ''
-    def rendered_demo(self):
-        return self.text.replace('{1}', 'Jobie')
+    # def rendered_demo(self):
+    #     return self.text.replace('{1}', 'Jobie')
 
-    def rendered(self, lead):
-        return self.text.replace('{1}', str(lead.first_name))
+    # def rendered(self, lead):
+    #     return self.text.replace('{1}', str(lead.first_name))

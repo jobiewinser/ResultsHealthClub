@@ -33,7 +33,7 @@ class Whatsapp():
                    }
         return headers
     #POST
-    def send_message(self, recipient_number, message, whatsapp_business_phone_number_id, preview_url = False):   
+    def send_free_text_message(self, recipient_number, message, whatsapp_business_phone_number_id, preview_url = False):   
         if message:  
             url = f"{self.whatsapp_url}{whatsapp_business_phone_number_id}/messages"
             headers = self._get_headers()
@@ -44,6 +44,35 @@ class Whatsapp():
                 "text": json.dumps({
                     "body": f"{message}",
                     "preview_url": preview_url,
+                    })
+            }
+            response = requests.post(url=url, json=body, headers=headers)
+            response_body = response.json()
+            print(response_body)
+            return response_body
+    def send_template_message(self, recipient_number, whatsapp_business_phone_number_id, template_name, language, components):  
+        #  "components": [{
+        #     "type": "body",
+        #     "parameters": [{
+        #                     "type": "text",
+        #                     "text": "name"
+        #                 },
+        #                 {
+        #                 "type": "text",
+        #                 "text": "Hi there"
+        #                 }]
+        #         }] 
+        if template_name:  
+            url = f"{self.whatsapp_url}{whatsapp_business_phone_number_id}/messages"
+            headers = self._get_headers()
+            body = { 
+                "messaging_product": "whatsapp", 
+                "to": f"{recipient_number}", 
+                "type": "template",
+                "template": json.dumps({
+                    "name": template_name,
+                    "language": language,
+                    "components": components
                     })
             }
             response = requests.post(url=url, json=body, headers=headers)

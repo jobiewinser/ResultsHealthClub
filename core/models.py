@@ -50,7 +50,7 @@ class Site(models.Model):
                 whatsapp = Whatsapp(self.whatsapp_access_token)
                 if '+' in self.whatsapp_number:
                     customer_number = f"{self.whatsapp_number.split('+')[-1]}"
-                response = whatsapp.send_message(customer_number, message, self.whatsapp_business_phone_number_id)
+                response = whatsapp.send_free_text_message(customer_number, message, self.whatsapp_business_phone_number_id)
                 reponse_messages = response.get('messages',[])
                 if reponse_messages:
                     for response_message in reponse_messages:
