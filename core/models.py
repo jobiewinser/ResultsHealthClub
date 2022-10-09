@@ -115,7 +115,7 @@ class Company(models.Model):
             from active_campaign.models import ActiveCampaignList
             
             if not settings.DEBUG:
-                for campaign_dict in ActiveCampaign(self.active_campaign_api_key).get_lists(self.active_campaign_url).get('lists',[]):
+                for campaign_dict in ActiveCampaign(self.active_campaign_api_key, self.active_campaign_url).get_lists(self.active_campaign_url).get('lists',[]):
                     campaign, created = ActiveCampaignList.objects.get_or_create(
                         active_campaign_id = campaign_dict.pop('id'),
                         name = campaign_dict.pop('name'),

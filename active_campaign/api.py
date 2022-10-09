@@ -21,8 +21,9 @@ class ActiveCampaign:
     # active_campaign_url = os.getenv("ACTIVE_CAMPAIGN_URL")
     site_url = os.getenv("SITE_URL")
 
-    def __init__(self, active_campaign_api_key):
+    def __init__(self, active_campaign_api_key, active_campaign_url):
         self.active_campaign_api_key = active_campaign_api_key
+        self.active_campaign_url = active_campaign_url
 
     def _get_headers(self):
         headers = {
