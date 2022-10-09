@@ -12,6 +12,7 @@ class WhatsAppWebhookAdmin(admin.ModelAdmin):
         ]
     search_fields = ['pk']
 admin.site.register(WhatsAppWebhook, WhatsAppWebhookAdmin)
+
 class WhatsAppMessageAdmin(admin.ModelAdmin):
     list_display = [
         'system_user_number',  
@@ -28,6 +29,7 @@ class WhatsAppMessageAdmin(admin.ModelAdmin):
         ]
     search_fields = ['pk']
 admin.site.register(WhatsAppMessage, WhatsAppMessageAdmin)
+
 class WhatsAppMessageStatusAdmin(admin.ModelAdmin):
     list_display = [
         'whatsapp_message',  
@@ -38,3 +40,18 @@ class WhatsAppMessageStatusAdmin(admin.ModelAdmin):
     ]
     search_fields = ['pk']
 admin.site.register(WhatsAppMessageStatus, WhatsAppMessageStatusAdmin)
+
+class WhatsAppTemplateAdmin(admin.ModelAdmin):
+    list_display = [
+        'pk', 
+        'name',  
+        'site_name',  
+        'category', 
+        'language',     
+        'created',  
+        'send_order',  
+        'edited',   
+        'edited_by',   
+    ]
+    search_fields = ['pk']
+admin.site.register(WhatsappTemplate, WhatsAppTemplateAdmin)

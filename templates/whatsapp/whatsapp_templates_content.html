@@ -16,11 +16,13 @@
     </div>
     
     <div class="row m-3">
-        <div class="col">
-            <div class="alert alert-warning">
-                <p>Message templates in an Aproved state can be edited up to 10 times in a 30 day window, or 1 time in a 24 hour window.</p>
-                <p>Messages in Rejected or Paused states can be edited an unlimited number of times.</p>
-            </div>
+        <div class="col m-3 alert alert-warning">
+            <p>Message templates in an Aproved state can be edited up to 10 times in a 30 day window, or 1 time in a 24 hour window.</p>
+            <p class="m-0">Messages in Rejected or Paused states can be edited an unlimited number of times.</p>
+        </div>
+        <div class="col m-3 alert alert-info">
+            <p>Template names must be unique.</p>
+            <p class="m-0">Once you have saved your edits/new template, click the green submit button to send it for approval to Whatsapp.</p>
         </div>
     </div>
 
@@ -48,6 +50,11 @@
                         <th>
                             Status
                         </th>
+                        {%if site%}
+                        <th>
+                            Auto send
+                        </th>
+                        {%endif%}
                         <th>  
                         </th>
                     </tr>
@@ -56,7 +63,7 @@
                     {%for template in templates%}
                     {%if not 'sample_' in template.name%}
                     <tr id="template_row_{{template.id}}">
-                        {%include 'campaign_leads/whatsapp_templates_row.html'%}
+                        {%include 'whatsapp/whatsapp_templates_row.html'%}
                     </tr>
                     {%endif%}
                     {%endfor%}

@@ -1,5 +1,17 @@
-<td>
+{%load core_tags%}
+<td
+    data-bs-toggle="popover" 
+    data-bs-trigger="hover" 
+    data-bs-html="true" 
+    data-bs-placement="top"
+    data-bs-title="Additional Information?"
+    data-bs-content="
+    Last edited by: <b>{%if template.edited_by.profile.name%}{{template.edited_by.profile.name}}{%else%}Unknown{%endif%}</b>     
+    at <b>{%if template.edited.profile.name%}{{template.edited|nice_date_tag}}{%else%}Unknown{%endif%}</b>">
     <span class="primary_td_layer">{{template.name}}</span> 
+    {%if template.name == 'hello_world'%}
+    <span class="badge bg-secondary">Example</span>
+    {%endif%}
     {%if template.pending_name%}
     <br>
     <span class="secondary_td_layer">
@@ -36,7 +48,7 @@
         data-bs-html="true" 
         data-bs-placement="top"
         data-bs-title="Reasons for Error?"
-        data-bs-content="{{template.latest_reason}}">
+        data-bs-content="{{template.latst_reason}}">
             <i class="fa-solid fa-triangle-exclamation"></i>
         </div>
         {%endif%}    
@@ -48,19 +60,41 @@
     </span>   
     {%endif%}
 </td>
+{%if site%}
+<td>    
+    <select id="send_order_choice_{{template.pk}}" onchange="$('#assign_send_order_{{template.pk}}').click()" name="send_order" class="form-select">
+        <option value="" {%if not template.send_order%}selected{%endif%}>Select a Whatsapp Template {{site_pk}}</option>
+        {%for order_tuple in WHATSAPP_ORDER_CHOICES%}
+        <option {%if template.send_order == order_tuple.0%}selected{%endif%} value="{{order_tuple.0}}">{{order_tuple.1}}</option>
+        {%endfor%}
+    </select>
+    <button hidden hx-post="{% url 'whatsapp-assign-send-order' %}" hx-swap="outerHTML" 
+        hx-include="#send_order_choice_{{template.pk}}" hx-indicator=".top-htmx-indicator" 
+        hx-vals='{"site_pk": "{{site.pk}}", "template_pk": "{{template.pk}}"}'
+        hx-target="#template_row_{{template.pk}}" id="assign_send_order_{{template.pk}}" 
+        class="btn btn-primary btn-sm">assign</button>
+</td>
+{%endif%}
 <td>
+    {%if not template.name == 'hello_world'%}
     {%if template.pending_components%}
+    <button class="btn btn-danger btn-sm" hx-confirm="Are you sure you want to clear your changes made to this template since the last whatsapp approval?"
+    hx-post="{% url 'whatsapp-clear-changes' %}" hx-vals='{"template_pk":"{{template.pk}}"}' 
+    hx-indicator=".top-htmx-indicator" hx-target="#template_row_{{template.pk}}"
+    hx-swap="innerHTML"
+    ><i class="fa fa-arrow-rotate-left"></i> Clear Changes</button>
     <button class="btn btn-success btn-sm" hx-confirm="Are you sure you want to request approval for this template?"
     hx-post="{% url 'whatsapp-approval' %}" hx-vals='{"template_pk":"{{template.pk}}"}' 
-    hx-indicator=".top-htmx-indicator" hx-target="#template_row_{{template.id}}"
+    hx-indicator=".top-htmx-indicator" hx-target="#template_row_{{template.pk}}"
     hx-swap="innerHTML"
     ><i class="fa fa-whatsapp" aria-hidden="true"></i> Submit to Whatsapp</button>
     {%endif%}
     <button class="btn btn-warning btn-sm" onclick="window.location.href = '{%url 'whatsapp-template' template_id=template.message_template_id site_pk=site.pk%}'"><i class="fa fa-pencil" aria-hidden="true"></i> Edit</button>
-    <button class="btn btn-danger btn-sm"
+    <button class="btn btn-dark btn-sm"
         hx-delete="{%url 'whatsapp-template-delete'%}" 
         hx-vals='{"site_pk": "{{site.pk}}", "template_pk": "{{template.pk}}"}'
         hx-confirm="Are you sure you want to delete this template?" hx-target="#template_row_{{template.pk}}" hx-swap="outerHTML" hx-indicator=".top-htmx-indicator">
         <i class="fa fa-trash" aria-hidden="true"></i> Delete
     </button>
+    {%endif%}
 </td>

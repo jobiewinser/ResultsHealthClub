@@ -59,9 +59,9 @@ class WhatsAppMessageStatus(models.Model):
 
 WHATSAPP_ORDER_CHOICES = (
     (0, 'Never'),
-    (1, 'First'),
-    (2, 'Second'),
-    (3, 'Third')
+    (1, 'Send on Lead Creation'),
+    (2, 'Send 24 Hrs after Lead Creation'),
+    (3, 'Send 48 Hrs after Lead Creation')
 )
 template_variables = {
     '{{1}}': ["First Name", "Jobie"],
@@ -140,6 +140,9 @@ class WhatsappTemplate(models.Model):
     #     elif self.components:
     #         for component in self.components
     #     return edit_components
+    @property
+    def site_name(self):
+        return self.site.name
     def rendered_demo(self):
         return self.text.replace('{1}', 'Jobie')
 

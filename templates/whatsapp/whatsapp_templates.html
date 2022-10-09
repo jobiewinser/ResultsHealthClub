@@ -14,10 +14,13 @@
         });  
     });
     function initDataTable() {
+        try{$("#overview_table").dataTable().fnDestroy();}catch{}
+
         dt = $('#overview_table').DataTable(          
             {  
                 order: [[ 1, 'asc' ]],
-                iDisplayLength: 10
+                iDisplayLength: 10,
+                stateSave: true,
             }
         );
     }
@@ -25,5 +28,5 @@
 {%endblock scripts%}
 
 {%block content%} 
-{%include 'campaign_leads/whatsapp_templates_content.html'%}
+{%include 'whatsapp/whatsapp_templates_content.html'%}
 {%endblock content%}

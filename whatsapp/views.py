@@ -9,7 +9,7 @@ from campaign_leads.models import Campaignlead, Call
 from messaging.consumers import ChatConsumer
 from whatsapp.api import Whatsapp
 from django.views.generic import TemplateView
-from whatsapp.models import WhatsAppMessage, WhatsAppMessageStatus, WhatsAppWebhook, WhatsappTemplate, template_variables
+from whatsapp.models import WHATSAPP_ORDER_CHOICES, WhatsAppMessage, WhatsAppMessageStatus, WhatsAppWebhook, WhatsappTemplate, template_variables
 logger = logging.getLogger(__name__)
 from django.views import View 
 from django.utils.decorators import method_decorator
@@ -164,13 +164,13 @@ def add_chat_to_session(request):
 # @method_decorator(campaign_leads_enabled_required, name='dispatch')
 @method_decorator(login_required, name='dispatch')
 class WhatsappTemplatesView(TemplateView):
-    template_name='campaign_leads/whatsapp_templates.html'
+    template_name='whatsapp/whatsapp_templates.html'
 
     def get_context_data(self, **kwargs):
         self.request.GET._mutable = True     
         context = super(WhatsappTemplatesView, self).get_context_data(**kwargs)
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
-            self.template_name = 'campaign_leads/whatsapp_templates_content.html'   
+            self.template_name = 'whatsapp/whatsapp_templates_content.html'   
         site_pk = self.request.GET.get('site_pk')
         site = None
         if site_pk:
@@ -185,6 +185,7 @@ class WhatsappTemplatesView(TemplateView):
             context['templates'] = WhatsappTemplate.objects.filter(site=site)
         context['site_list'] = Site.objects.all()
         context['site'] = site
+        context['WHATSAPP_ORDER_CHOICES'] = WHATSAPP_ORDER_CHOICES
         return context
 def refresh_template_data(site):
     whatsapp = Whatsapp(site.whatsapp_access_token)
@@ -215,7 +216,7 @@ def refresh_template_data(site):
 # @method_decorator(campaign_leads_enabled_required, name='dispatch')
 @method_decorator(login_required, name='dispatch')
 class WhatsappTemplatesEditView(TemplateView):
-    template_name='campaign_leads/whatsapp_template_edit.html'
+    template_name='whatsapp/whatsapp_template_edit.html'
 
     def get_context_data(self, **kwargs):
         self.request.GET._mutable = True     
@@ -231,7 +232,7 @@ class WhatsappTemplatesEditView(TemplateView):
             return context
 @method_decorator(login_required, name='dispatch')
 class WhatsappTemplatesCreateView(TemplateView):
-    template_name='campaign_leads/whatsapp_template_create.html'
+    template_name='whatsapp/whatsapp_template_create.html'
 
     def get_context_data(self, **kwargs):
         self.request.GET._mutable = True     
@@ -261,7 +262,28 @@ def whatsapp_approval_htmx(request):
             whatsapp.edit_template(template)
         else:
             whatsapp.create_template(template)
-        return render('campaign_leads/whatsapp_templates_row.html', {'template':template})
+        return render(request, 'whatsapp/whatsapp_templates_row.html', {'template':template, 'site':template.site})
+
+def whatsapp_assign_send_order_htmx(request):
+    template = WhatsappTemplate.objects.get(pk=request.POST.get('template_pk'))
+    if request.user.profile.site == template.site:
+        send_order = request.POST.get('send_order')
+        templates_with_send_order_already = WhatsappTemplate.objects.filter(send_order = send_order)
+        if templates_with_send_order_already:
+            templates_with_send_order_already.update(send_order=0)
+        template.send_order = send_order
+        template.save()
+        return render(request, 'whatsapp/whatsapp_templates_row.html', {'template':template, 'site':template.site, 'templates_with_send_order_already':templates_with_send_order_already})
+
+def whatsapp_clear_changes_htmx(request):
+    template = WhatsappTemplate.objects.get(pk=request.POST.get('template_pk'))
+    if request.user.profile.site == template.site:
+        template.pending_category = None
+        template.pending_components = None
+        template.pending_language = None
+        template.pending_name = None
+        template.save()
+        return render(request, 'whatsapp/whatsapp_templates_row.html', {'template':template, 'site':template.site})
 
 def save_whatsapp_template_ajax(request):
     if request.POST.get('created', False):
@@ -272,11 +294,27 @@ def save_whatsapp_template_ajax(request):
     else:
         template = WhatsappTemplate.objects.get(pk=request.POST.get('template_pk'))
     if request.user.profile.site == template.site:
-        template.pending_components = [
-            {'type': 'HEADER', 'format': 'TEXT', 'text': request.POST.get('header')},
-            {'type': 'BODY', 'text': request.POST.get('body')},
-            {'type': 'FOOTER', 'text': request.POST.get('footer')},
-        ]
-        template.save()
+        new_components = [
+                {'type': 'HEADER', 'format': 'TEXT', 'text': request.POST.get('header')},
+                {'type': 'BODY', 'text': request.POST.get('body')},
+                {'type': 'FOOTER', 'text': request.POST.get('footer')},
+            ]
+        changes_made = False
+        if template.pending_components:
+            if not new_components == template.pending_components:
+                changes_made = True
+        else:
+            if not new_components == template.components:
+                changes_made = True
+        
+        if changes_made:
+            template.pending_components = [
+                {'type': 'HEADER', 'format': 'TEXT', 'text': request.POST.get('header')},
+                {'type': 'BODY', 'text': request.POST.get('body')},
+                {'type': 'FOOTER', 'text': request.POST.get('footer')},
+            ]
+            template.edited_by = request.user
+            template.edited = datetime.now()
+            template.save()
     return HttpResponse("", status=200)
 

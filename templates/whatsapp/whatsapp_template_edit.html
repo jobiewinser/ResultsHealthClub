@@ -135,7 +135,7 @@
                             id="template_header" 
                             name="template_header" 
                             class="template_editor_input form-control" 
-                            oninput="renderTemplate();" value="{%for component in template.pending_components%}{%if component.type == 'HEADER'%}{{component.text}}{%endif%}{%endfor%}">
+                            oninput="renderTemplate();" value="{%if template.pending_components%}{%for component in template.pending_components%}{%if component.type == 'HEADER'%}{{component.text}}{%endif%}{%endfor%}{%else%}{%for component in template.components%}{%if component.type == 'HEADER'%}{{component.text}}{%endif%}{%endfor%}{%endif%}">
                         </div>
                     </div>
 
@@ -151,10 +151,10 @@
                         </div>
                         <div class="col">
                             <textarea style="width:300px; height:340px;" 
-                            id="template_body" 
-                            name="template_body" 
-                            class="template_editor_input form-control" 
-                            oninput="renderTemplate();">{%for component in template.pending_components%}{%if component.type == 'BODY'%}{{component.text}}{%endif%}{%endfor%}</textarea>
+                                id="template_body" 
+                                name="template_body" 
+                                class="template_editor_input form-control" 
+                                oninput="renderTemplate();">{%if template.pending_components%}{%for component in template.pending_components%}{%if component.type == 'BODY'%}{{component.text}}{%endif%}{%endfor%}{%else%}{%for component in template.components%}{%if component.type == 'BODY'%}{{component.text}}{%endif%}{%endfor%}{%endif%}</textarea>
                         </div>
                     </div>
 
@@ -173,7 +173,8 @@
                             id="template_footer" 
                             name="template_footer" 
                             class="template_editor_input form-control" 
-                            oninput="renderTemplate();" value="{%for component in template.pending_components%}{%if component.type == 'FOOTER'%}{{component.text}}{%endif%}{%endfor%}">
+                            oninput="renderTemplate();" 
+                            value="{%if template.pending_components%}{%for component in template.pending_components%}{%if component.type == 'FOOTER'%}{{component.text}}{%endif%}{%endfor%}{%else%}{%for component in template.components%}{%if component.type == 'FOOTER'%}{{component.text}}{%endif%}{%endfor%}{%endif%}">
                         </div>
                     </div>
                 </div>

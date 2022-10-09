@@ -25,5 +25,7 @@ urlpatterns = [
     path('configuration/whatsapp-template/delete/', whatsappviews.delete_whatsapp_template_htmx, name='whatsapp-template-delete'),
     path('configuration/whatsapp-templates/save/', whatsappviews.save_whatsapp_template_ajax, name='whatsapp-template-save'),
     path('configuration/whatsapp-templates/approval/', whatsappviews.whatsapp_approval_htmx, name='whatsapp-approval'),
+    path('configuration/whatsapp-templates/assign-send-order/', whatsappviews.whatsapp_assign_send_order_htmx, name='whatsapp-assign-send-order'),
+    path('configuration/whatsapp-templates/clear-changes/', whatsappviews.whatsapp_clear_changes_htmx, name='whatsapp-clear-changes'),
     
 ]
