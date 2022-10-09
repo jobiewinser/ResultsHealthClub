@@ -176,13 +176,14 @@ class WhatsappTemplatesView(TemplateView):
         if site_pk:
             if not site_pk == 'all':
                 site = Site.objects.get(pk=site_pk)
-        else:
+        if not site:
             if self.request.user.profile.site:
                 self.request.GET['site_pk'] = self.request.user.profile.site.pk
                 site = self.request.user.profile.site
-        if site:
-            refresh_template_data(site)
-            context['templates'] = WhatsappTemplate.objects.filter(site=site)
+            else:
+                site = Site.objects.get(company=self.request.user.profile.company.first())
+        refresh_template_data(site)
+        context['templates'] = WhatsappTemplate.objects.filter(site=site)
         context['site_list'] = Site.objects.all()
         context['site'] = site
         context['WHATSAPP_ORDER_CHOICES'] = WHATSAPP_ORDER_CHOICES

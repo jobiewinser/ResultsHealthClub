@@ -4,7 +4,9 @@
         <div class="col-md-auto">
             <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>             
         </div>
+        {%with True as hide_show_all%}
         {%include 'core/htmx/site_selection.html'%}
+        {%endwith%}
         <div class="col">
         </div>
         <div class="col-md-auto">
