@@ -6,6 +6,7 @@ const dragStart = target => {
 const dragEnd = target => {
     target.classList.remove('dragging');
     document.querySelector('#add_booking_area').classList.remove('shown');
+    document.querySelector('#chat_bottom').classList.adremoved('temp_hidden');
     console.log("dragEnd", target)
 };
 
@@ -24,6 +25,7 @@ const drag = event => {
     event.dataTransfer.setData('text/plain', event.currentTarget.dataset.id);
     console.log("drag")
     document.querySelector('#add_booking_area').classList.add('shown');
+    document.querySelector('#chat_bottom').classList.add('temp_hidden');
 };
 
 const drop = event => {
@@ -37,6 +39,7 @@ const drop = event => {
     handleDraggedItem(dragged_elem_id, event.currentTarget)
     console.log("drop", event.currentTarget)
     document.querySelector('#add_booking_area').classList.remove('shown');
+    document.querySelector('#chat_bottom').classList.remove('temp_hidden');
 };
 
 const drop_booking = event => {
@@ -44,6 +47,7 @@ const drop_booking = event => {
     event.preventDefault();
     console.log("drop_booking", event.currentTarget)
     document.querySelector('#add_booking_area').classList.remove('shown');
+    document.querySelector('#chat_bottom').classList.remove('temp_hidden');
     
     htmx.ajax('GET', '/campaign-leads/campaign-lead-get-modal-content/'+dragged_elem.data('id')+'/?template_name=add_booking', {target:'#generic_modal_body'})
 };

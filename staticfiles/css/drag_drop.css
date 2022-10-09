@@ -1,7 +1,6 @@
 .board {
     display: flex;
     justify-content: center;
-    margin-top: 50px;
 }
 
 .draggable-card {
@@ -9,7 +8,7 @@
     margin-bottom: 10px;
     border-radius: 6px;
     cursor: pointer;
-    width: 250px;
+    width: 220px;
     height: 120px;
     cursor: grab;
     transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
@@ -27,7 +26,7 @@
 .column {
     margin: 10px;
     padding: 10px;
-    background: unset;
+    /* background: unset; */
     transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
     width:250px
 }

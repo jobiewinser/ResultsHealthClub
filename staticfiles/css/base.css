@@ -15,7 +15,17 @@ body {
 .nav-link {
     color: white
 }
-
+.fixed_top_buttons {
+    top:0;
+    padding:5px;
+    margin-top:0px;
+    position:fixed;
+    background-color: rgba(33, 37, 41 , 0.5) !important;
+    height:50px
+}
+.below_fixed_top_buttons{
+    margin-top:50px !important;
+}
 @font-face {
     font-family: 'Roboto-Regular';
     src: local('Roboto-Regular'), url('/static/fonts/Roboto/Roboto-Regular.ttf') format("truetype");
@@ -518,22 +528,51 @@ tr.odd td {
     border-top: 4px solid rgba(96, 248, 61, 1)
 }
 
+
+
+.highlight-100 {
+    background: rgba(231, 0, 0, 0.1)
+}
+
+.highlight-80 {
+    background: rgba(231, 36, 29, 0.1)
+}
+
+.highlight-60 {
+    background: rgba(239, 131, 44, 0.1)
+}
+
+.highlight-40 {
+    background: rgba(255, 253, 70, 0.1)
+}
+
+.highlight-20 {
+    background: rgba(156, 250, 64, 0.1)
+}
+
+.highlight-0 {
+    background: rgba(96, 248, 61, 0.1)
+}
+
 .column-done {
     flex: 0 0 250px;
+    min-height:100vh;
 }
 
 #leads_board {
-    justify-content: unset
+    justify-content: unset;
 }
 
 #add_booking_area {
     visibility: hidden;
     position: absolute;
     right: 2%;
-    top: 50%;
-    width: 200px;
-    height: 100px;
-    background-color: rgba(25, 135, 84, 0.6);
+    top: 40vh;
+    width: 20vw;
+    height: 20vh;
+    z-index: 1000;
+    background-color: rgba(25, 135, 84, 0.9);
+    border-radius:10px
 }
 
 #add_booking_area.shown {

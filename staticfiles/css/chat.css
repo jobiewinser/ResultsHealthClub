@@ -1,9 +1,12 @@
 #chat_bottom{
-    position:absolute;
+    position:fixed;
     bottom:0;
     right:5%;
     text-align:right;
     width:unset;
+}
+#chat_bottom.temp_hidden{
+    visibility: hidden;
 }
 
 .chat_bottom_window{

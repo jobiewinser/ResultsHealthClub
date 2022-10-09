@@ -1,5 +1,6 @@
 from datetime import timedelta, datetime
 import os
+import uuid
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -20,6 +21,24 @@ for tuple in BOOKING_CHOICES:
 
 # class AdCampaign(models.Model):
 #     name = models.TextField(null=True, blank=True)
+
+class Campaign(models.Model):
+    name = models.TextField(null=True, blank=True)   
+    created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    json_data = models.JSONField(default=dict)
+    guid = models.TextField(null=True, blank=True)
+    webhook_created = models.BooleanField(default=False)
+    webhook_id = models.TextField(null=True, blank=True)
+    site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
+    manual = models.BooleanField(default=False)
+    def get_active_leads_qs(self):
+        return self.campaignlead_set.filter(complete=False)
+@receiver(models.signals.post_save, sender=Campaign)
+def execute_after_save(sender, instance, created, *args, **kwargs):
+    if created:
+        instance.guid = str(uuid.uuid4())[:16]
+        instance.save()
+
 
 class Campaignlead(models.Model):
     first_name = models.TextField(null=True, blank=True)

@@ -1,5 +1,7 @@
+{%load core_tags%}
 {%for queryset_title, queryset, call_count in querysets%}
-<div class="column column-done" data-call-count="{{ call_count }}" ondrop="drop(event)" ondragover="allowDrop(event)">
+{%with call_count|division_percentage_max_100:max_call_count as call_percentage%}
+<div class="column column-done highlight-{{call_percentage|roundup_tag:20}}" data-call-count="{{ call_count }}" ondrop="drop(event)" ondragover="allowDrop(event)">
     <div class="m-2 manually_add_lead_div">
     <h2 class="m-0">{{queryset_title}} <img  class="htmx-indicator column-htmx-indicator" src="https://htmx.org/img/bars.svg"/></h2> 
     {%with call_count as counter%}
@@ -10,6 +12,7 @@
     {%include 'campaign_leads/htmx/lead_article.html'%}
     {%endfor%}
 </div>
+{%endwith%}
 {%endfor%}
 
 <span hidden id="max_call_count_span">

@@ -60,7 +60,6 @@
                                                                                                                     swap:'outerHTML'})
         let call_count = parseInt($(drag_target).data("call-count"));
         let max_call_count = parseInt($('#max_call_count').val());
-        console.log(call_count, max_call_count)
         if (call_count > max_call_count) {
             $('#add_column').click();
         }
@@ -70,8 +69,8 @@
 
 {%block overide_content%}       
 <div class="col d-flex flex-column h-sm-100 p-0" style="overflow-x:hidden"> 
-    <main class="row overflow-auto">
-        <div class="row p-0 mt-2">
+    <main class="row overflow-auto below_fixed_top_buttons">
+        <div class="row fixed_top_buttons">
             {%block extra_top_left_buttons %}
             <div class="col-md-auto">
                 <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>             
@@ -123,8 +122,20 @@
         </div>
     </main>
     <div id="add_booking_area" class="" ondrop="drop_booking(event)" ondragover="allowDrop(event)">
-        Add Booking
+        
+        <div class="card-body center text-white">
+            <h3>Add Booking
+                <i class="fa-duotone fa-calendar-days"></i>
+            </h3>
+        </div>
     </div>
+    {% comment %} <div id="add_booking_area" class="" ondrop="drop_booking(event)" ondragover="allowDrop(event)">
+        <div class="card">
+            <div class="card-header center">
+                <a>Add Booking</a>
+            </div>
+        </div>
+    </div> {% endcomment %}
 </div>
 {%endblock overide_content%}
 
@@ -133,7 +144,7 @@
 <span id="chat_bottom" class="" style="
 display: flex;
 flex-wrap: wrap;
-align-items: flex-end;">
+align-items: flex-start;">
     {%include 'messaging/messaging.html'%} 
 </span>
 {%endblock snackbar%}

@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from campaign_leads.models import Campaignlead
 from core.views import get_site_pk_from_request
 from active_campaign.api import ActiveCampaign
-from active_campaign.models import CampaignWebhook, ActiveCampaignList
+from active_campaign.models import ActiveCampaignWebhook, ActiveCampaignList
 from core.models import Site
 logger = logging.getLogger(__name__)
 from django.views import View 
@@ -24,7 +24,7 @@ class Webhooks(View):
             logger.debug(str(request.POST))     
             data = request.POST  
             guid = kwargs.get('guid')
-            CampaignWebhook.objects.create(json_data = data, guid=guid)       
+            ActiveCampaignWebhook.objects.create(json_data = data, guid=guid)       
             if data.get('type') in ['subscribe','update']:
                 if guid:
                     active_campaign_list = ActiveCampaignList.objects.get(guid=guid)

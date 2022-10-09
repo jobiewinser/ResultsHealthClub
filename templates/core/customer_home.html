@@ -11,47 +11,89 @@
 {%block content%}
 
 <div class="row">
-    <div class="col">
-        <div class="card pointer" onclick="window.location.replace('{%url 'campaign-leads-overview'%}')">
-            <div class="card-header center">
-                <a>Campaign leads</a>
-            </div>
-            <div class="card-body center">
-                <h1><i class="fa-regular fa-phone"></i></h1>
-            </div>
+    <div class="col-md center">
+        <h3>Apps</h3>
+    </div>
+</div>
+
+<div class="row card m-4 p-3">
+    <div class="row">
+        <div class="col-md center m-3">
+            <h4>Core</h4>
         </div>
     </div>
     
-    <div class="col">
-        <div class="card pointer" onclick="window.location.replace('{%url 'campaign-booking-overview'%}')">
-            <div class="card-header center">
-                <a>Booking Table</a>
+    <div class="row">
+        <div class="col">
+        </div>
+        <div class="col-md-2">
+            <div class="card pointer" onclick="window.location.replace('{%url 'whatsapp-templates'%}')">
+                <div class="card-header center">
+                    <a>Whatsapp Template</a>
+                </div>
+                <div class="card-body center">
+                    <h1><i class="fa fa-whatsapp"></i></h1>
+                </div>
             </div>
-            <div class="card-body center">
-                <h1><i class="fa-regular fa-table"></i></h1>
-            </div>
+        </div>  
+        <div class="col">
+        </div>      
+    </div>
+</div>
+
+<div class="row card m-4 p-3">
+    <div class="row">
+        <div class="col-md center m-3">
+            <h4>Leads Management</h4>
         </div>
     </div>
-    
-    <div class="col">
-        <div class="card pointer" onclick="window.location.replace('{%url 'analytics'%}')">
-            <div class="card-header center">
-                <a>Analytics</a>
-            </div>
-            <div class="card-body center">
-                <h1><i class="fa-regular fa-chart-line-up"></i></h1>
+    <div class="row">
+        <div class="col">
+        </div>
+        <div class="col-md-2">
+            <div class="card pointer" onclick="window.location.replace('{%url 'campaign-leads-overview'%}')">
+                <div class="card-header center">
+                    <a>Campaign leads</a>
+                </div>
+                <div class="card-body center">
+                    <h1><i class="fa-regular fa-phone"></i></h1>
+                </div>
             </div>
         </div>
-    </div>
-    
-    <div class="col">
-        <div class="card pointer" onclick="window.location.replace('{%url 'configuration'%}')">
-            <div class="card-header center">
-                <a>Configuration</a>
+        
+        <div class="col-md-2">
+            <div class="card pointer" onclick="window.location.replace('{%url 'campaign-booking-overview'%}')">
+                <div class="card-header center">
+                    <a>Booking Table</a>
+                </div>
+                <div class="card-body center">
+                    <h1><i class="fa-regular fa-table"></i></h1>
+                </div>
             </div>
-            <div class="card-body center">
-                <h1><i class="fa-regular fa-gear"></i></h1>
+        </div>
+        
+        <div class="col-md-2">
+            <div class="card pointer" onclick="window.location.replace('{%url 'analytics'%}')">
+                <div class="card-header center">
+                    <a>Analytics</a>
+                </div>
+                <div class="card-body center">
+                    <h1><i class="fa-regular fa-chart-line-up"></i></h1>
+                </div>
             </div>
+        </div>
+        
+        <div class="col-md-2">
+            <div class="card pointer" onclick="window.location.replace('{%url 'lead-configuration'%}')">
+                <div class="card-header center">
+                    <a>Lead Configuration</a>
+                </div>
+                <div class="card-body center">
+                    <h1><i class="fa-regular fa-gear"></i></h1>
+                </div>
+            </div>
+        </div>
+        <div class="col">
         </div>
     </div>
 </div>

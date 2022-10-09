@@ -2,7 +2,7 @@
 <span class="column-drag"
     draggable="true" ondragstart="drag(event)" data-id="{{lead.pk}}" id="lead-{{lead.pk}}">
     {%with call_count|division_percentage_max_100:max_call_count as call_percentage%}
-    <article class="card draggable-card top-highlight-{{call_percentage|roundup_tag:20}}">
+    <article style="margin-right:50px"  class="card draggable-card top-highlight-{{call_percentage|roundup_tag:20}}">
         <div class="row">
             <div class="col p-0">
                 <span class="primary_td_layer">{{lead.name}}</span>
