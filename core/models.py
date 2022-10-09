@@ -86,7 +86,8 @@ class Company(models.Model):
     company_logo_black = models.ImageField(default='default.png', upload_to='company_images')
     company_logo_trans = models.ImageField(default='default.png', upload_to='company_images')
     campaign_leads_enabled = models.BooleanField(default=False)#
-    free_taster_enabled = models.BooleanField(default=False)#
+    free_taster_enabled = models.BooleanField(default=False)
+    active_campaign_enabled = models.BooleanField(default=False)
     active_campaign_url = models.TextField(null=True, blank=True)
     @property
     def get_campaign_leads_enabled(self):

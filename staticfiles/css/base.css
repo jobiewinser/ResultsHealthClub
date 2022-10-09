@@ -531,32 +531,27 @@ tr.odd td {
 
 
 .highlight-100 {
-    background: rgba(231, 0, 0, 0.1)
+    background: rgba(231, 0, 0, 0.05)
 }
 
 .highlight-80 {
-    background: rgba(231, 36, 29, 0.1)
+    background: rgba(231, 36, 29, 0.05)
 }
 
 .highlight-60 {
-    background: rgba(239, 131, 44, 0.1)
+    background: rgba(239, 131, 44, 0.05)
 }
 
 .highlight-40 {
-    background: rgba(255, 253, 70, 0.1)
+    background: rgba(255, 253, 70, 0.05)
 }
 
 .highlight-20 {
-    background: rgba(156, 250, 64, 0.1)
+    background: rgba(156, 250, 64, 0.05)
 }
 
 .highlight-0 {
-    background: rgba(96, 248, 61, 0.1)
-}
-
-.column-done {
-    flex: 0 0 250px;
-    min-height:100vh;
+    background: rgba(96, 248, 61, 0.05)
 }
 
 #leads_board {

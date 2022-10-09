@@ -7,13 +7,13 @@ from django.contrib.auth import login
 from django.middleware.csrf import get_token
 from django.contrib.auth.decorators import login_required
 
-from campaign_leads.models import Campaignlead, Booking, Call, Note
+from campaign_leads.models import Campaign, Campaignlead, Booking, Call, Note
 from campaign_leads.views import CampaignBookingsOverviewView
 from active_campaign.models import ActiveCampaignList
 from core.models import Site
 from core.views import get_site_pk_from_request
 from django.db.models import Q, Count
-
+from django.contrib import messages
 logger = logging.getLogger(__name__)
 
 @login_required
@@ -24,7 +24,7 @@ def get_modal_content(request, **kwargs):
         if site_pk:
             request.GET['site_pk'] = site_pk
         if request.user.is_staff:
-            template_name = request.GET.get('template_name', '')
+            template_name = request.GET.get('ptemplate_name', '')
             context = {'site_list':Site.objects.all()}
             param1 = kwargs.get('param1', '')
             if param1:
@@ -34,7 +34,21 @@ def get_modal_content(request, **kwargs):
     except Exception as e:
         logger.debug("get_modal_content Error "+str(e))
         return HttpResponse(e, status=500)
-
+def generate_lead(self, first_name, phone_number, lead_generation_app='a', request=None):
+    if lead_generation_app == 'b' and not self.company.active_campaign_enabled:
+        if request:
+            messages.add_message(request, messages.ERROR, f'Active Campaign is not enabled for {self.company.company_name}')
+        return None
+    if lead_generation_app == 'a':
+        manually_created_list = Campaign.objects.get(site=self, manual=True)
+        lead = Campaignlead.objects.create(
+            first_name=first_name,
+            # last_name=last_name,
+            whatsapp_number=phone_number,
+            # country_code=country_code,
+            campaign=manually_created_list
+        )
+        return lead
 @login_required
 def create_campaign_lead(request, **kwargs):
     logger.debug(str(request.user))
@@ -44,14 +58,8 @@ def create_campaign_lead(request, **kwargs):
         phone = request.POST.get('phone')
         country_code = request.POST.get('countryCode')
         site = Site.objects.get(pk=request.POST.get('site_pk'))
-        manually_created_list = ActiveCampaignList.objects.get(site=site, manual=True)
-        lead = Campaignlead.objects.create(
-            first_name=first_name,
-            # last_name=last_name,
-            whatsapp_number=f"{country_code}{phone}",
-            # country_code=country_code,
-            active_campaign_list=manually_created_list
-        )
+
+        lead = generate_lead(first_name, f"{country_code}{phone}")
         context = {'lead':lead,'max_call_count':1,'call_count':0, 'site':site}
         return render(request, 'campaign_leads/htmx/lead_article.html', context)
     except Exception as e:

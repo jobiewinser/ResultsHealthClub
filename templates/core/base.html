@@ -158,7 +158,7 @@
                             </li>
                             {%endif%} {% endcomment %}
                             
-                            <li class="dropdown">
+                            {% comment %} <li class="dropdown">
                                 <a href="#" class="nav-link dropdown-toggle px-sm-0 px-1" id="dropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fs-5 bi-bootstrap"></i><span class="ms-1 d-none d-sm-inline">All Products</span>
                                 </a>
@@ -166,7 +166,7 @@
                                     <a href="{% url 'campaign-leads-product-page'%}" class="dropdown-item" style="{%if 'campaign-leads-product-page/' in request.path%} font-weight:bold{%endif%}">Campaign Leads</a>
                                 </ul>
                             </li>
-                            <br>
+                            <br> {% endcomment %}
                             <li class="dropdown">
                                 <a href="https://portfolio.jobiewinser.co.uk/leads-management-privacy-policy/" class="nav-link px-sm-0 px-1">
                                     <i class="fa-solid fa-circle-info"></i><span class="ms-1 d-none d-sm-inline">Privacy Policy</span>

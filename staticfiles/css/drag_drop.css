@@ -23,12 +23,15 @@
     transform: scale(.8);
 }
 
-.column {
-    margin: 10px;
+.column-done {
+    margin-top: 10px;
     padding: 10px;
     /* background: unset; */
     transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-    width:250px
+    width:250px;
+    flex: 0 0 250px;
+    min-height:100vh;
+    border-right: 1px solid rgba(33, 37, 41 , 0.5);
 }
 
 .column.column-ip {
