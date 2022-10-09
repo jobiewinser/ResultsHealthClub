@@ -7,7 +7,7 @@
     {%endfor%}
     </select>
     <button hidden 
-    hx-post="{% url 'set-active-campaign-list-site' list_pk=campaign.pk %}" 
+    hx-post="{% url 'set-campaign-site' campaign_pk=campaign.pk %}" 
     hx-swap="outerHTML" hx-indicator=".top-htmx-indicator" hx-target="#site_select_span_{{campaign.pk}}"
     hx-include="#site_pk_{{campaign.pk}}" 
     id="submit_site_pk_{{campaign.pk}}"></button>

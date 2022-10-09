@@ -27,17 +27,28 @@
 </script>
 {%endblock scripts%}
 {%block overide_content%}    
-<div class="col d-flex flex-column h-sm-100 p-0" style="overflow-x:hidden"> 
-    <main class="row">
-        <div class="row p-0 mt-2">
-
-            {%block extra_top_left_buttons %}
-            <div class="col-md-auto">
-                <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>            
-            </div>
-            {%endblock%}
+<div class="col d-flex flex-column h-sm-100 p-0" style="overflow-x:hidden">  
+    <div class="fixed_top_buttons">
+        {%block extra_top_left_buttons %}
+        <div class="col-md-auto">
+            <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>            
         </div>
-        <div class="row">
+        {%endblock%}
+        <div class="col">   
+        </div>        
+        <div class="col-md-auto">
+            <span class="badge bg-dark text-white"><h6 class="m-1">Leads Configuration</h6></span>      
+        </div>
+    </div>
+    <main class="row overflow-auto below_fixed_top_buttons">
+
+        <div class="row m-3">
+            <div class="col m-3 alert alert-info">
+                <p>From this page you can assign all of your campaigns to the various sites you may have attached to your company.</p>
+            </div>
+        </div>
+
+        <div class="row mt-2">
             <div class="col">
                 <table id="overview_table" class="table"> 
                     <thead> 
@@ -57,9 +68,9 @@
                                 {{campaign.name}}
                             </td>
                             <td> 
-                                {%include 'active_campaign/htmx/leads_configuration_select.html'%}
+                                {%include 'campaign_leads/htmx/leads_configuration_select.html'%}
                             <button hidden 
-                            hx-post="{% url 'set-active-campaign-list-site' list_pk=campaign.pk %}" 
+                            hx-post="{% url 'set-campaign-site' campaign_pk=campaign.pk %}" 
                             hx-swap="outerHTML" hx-include="#site_pk_{{campaign.pk}}" 
                             id="submit_site_pk_{{campaign.pk}}"></button>
                             </td>

@@ -27,18 +27,13 @@
                 $('#refresh_overview_table').click(); 
             } {% endcomment %}
             if (evt.detail.xhr.status == 200){
-                if (![undefined, ''].includes(evt.detail.pathInfo.path)){
-                    if (evt.detail.pathInfo.path.includes("create-campaign-lead")){
+                if (![undefined, ''].includes(evt.detail.pathInfo.requestPath)){
+                    if (evt.detail.pathInfo.requestPath.includes("create-campaign-lead")){
                         {% comment %} $('#refresh_overview_table').click();  {% endcomment %}
                         $('#generic_modal').modal('hide');
                         $('#refresh_column_metadata').click()
                         snackbarShow('Successfully manually created a campaign lead', 'success')
-                    } 
-                                    {% comment %} else if (evt.detail.pathInfo.path.includes("new-call")){                    
-                                        $('#refresh_column_metadata').click()
-                                        snackbarShow('Successfully added call', 'success')
-                                    }  {% endcomment %}
-                    else if (evt.detail.pathInfo.path.includes("add-booking")){
+                    } else if (evt.detail.pathInfo.requestPath.includes("add-booking")){
                         $('#generic_modal').modal('hide');
                         snackbarShow('Successfully added a booking', 'success')
                     }  
@@ -105,49 +100,52 @@
 
 {%block overide_content%}       
 <div class="col d-flex flex-column h-sm-100 p-0" style="overflow-x:hidden"> 
-    <main class="row overflow-auto below_fixed_top_buttons">
-        <div class="row fixed_top_buttons">
-            {%block extra_top_left_buttons %}
-            <div class="col-md-auto">
-                <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>             
-            </div>
-            {%include 'core/htmx/site_selection.html'%}
-            <button hidden hx-get="{{request.path}}" hx-push-url="true" hx-swap="outerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator=".htmx-indicator" hx-target="#leads_board" id="change_site" class="btn btn-primary btn-sm"></button>
-            <button hidden
-                hx-get="{{request.path}}" 
-                hx-swap="outerHTML" hx-push-url="true" hx-include=".overview_table_filters" hx-indicator=".htmx-indicator" hx-target="#leads_board" id="filter_campaign" class="btn btn-primary btn-sm"></button>
-            <div class="col-md-auto" hx-get="{% url 'get-campaign'%}" hx-include=".overview_table_filters" hx-trigger="load" hx-indicator=".htmx-indicator" hx-target="#campaign_list_span" hx-swap="outerHTML">
-                <span id="campaign_list_span">   
-                    <select class="form-select">
-                        <option>Loading</option>
-                    </select>    
-                </span>
-            </div>
-            <button hidden hx-get="{% url 'get-campaign'%}" hx-include=".overview_table_filters" id="refresh_campaign_list_span" hx-indicator=".htmx-indicator" hx-target="#campaign_list_span" hx-trigger="click" hx-swap="outerHTML"></button>
-            <button hidden hx-get="{% url 'campaign-leads-overview'%}" hx-include=".overview_table_filters" id="refresh_overview_table" hx-indicator=".htmx-indicator" hx-target="#overview_table" hx-trigger="click" hx-swap="outerHTML"></button>
-            <input type="text" style="display:None" id="add_booking" name="template_name" value="add_booking"/>
-            {%endblock%}
-            <div class="col-md-auto">
-                <button class="btn btn-primary btn-sm" 
-                    data-bs-toggle="popover" 
-                    data-bs-trigger="hover" 
-                    data-bs-placement="top"
-                    data-bs-content="Manually create a campaign lead."
-                    hx-indicator=".htmx-indicator" hx-target="#generic_modal_body" 
-                    hx-include="#site_pk"
-                    hx-get="{% url 'campaign-lead-get-modal-content' %}" 
-                    hx-push-url="false"
-                    hx-vals='{"template_name": "create_campaign_lead"}'
-                    hx-swap="innerHTML" hx-trigger="click">
-                        <i class="fa fa-plus" aria-hidden="true"></i> Manually Add Campaign Lead
-                </button>
-
-            </div>
-            <div class="col">                
-            </div>
-            {%block extra_top_right_buttons %}
-            {%endblock%}
+    <div class="fixed_top_buttons">
+        {%block extra_top_left_buttons %}
+        <div class="col-md-auto me-2">
+            <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>             
         </div>
+        {%include 'core/htmx/site_selection.html'%}
+        <button hidden hx-get="{{request.path}}" hx-push-url="false" hx-swap="outerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator=".htmx-indicator" hx-target="#leads_board" id="change_site" class="btn btn-primary btn-sm"></button>
+        <button hidden
+            hx-get="{{request.path}}" 
+            hx-swap="outerHTML" hx-push-url="false" hx-include=".overview_table_filters" hx-indicator=".htmx-indicator" hx-target="#leads_board" id="filter_campaign" class="btn btn-primary btn-sm"></button>
+        <div class="col-md-auto me-2" hx-get="{% url 'get-campaign'%}" hx-include=".overview_table_filters" hx-trigger="load" hx-indicator=".htmx-indicator" hx-target="#campaign_list_span" hx-swap="outerHTML">
+            <span id="campaign_list_span">   
+                <select class="form-select">
+                    <option>Loading</option>
+                </select>    
+            </span>
+        </div>
+        <button hidden hx-get="{% url 'get-campaign'%}" hx-include=".overview_table_filters" id="refresh_campaign_list_span" hx-indicator=".htmx-indicator" hx-target="#campaign_list_span" hx-trigger="click" hx-swap="outerHTML"></button>
+        <button hidden hx-get="{% url 'campaign-leads-overview'%}" hx-include=".overview_table_filters" id="refresh_overview_table" hx-indicator=".htmx-indicator" hx-target="#overview_table" hx-trigger="click" hx-swap="outerHTML"></button>
+        <input type="text" style="display:None" id="add_booking" name="template_name" value="add_booking"/>
+        {%endblock%}
+        <div class="col-md-auto me-2">
+            <button class="btn btn-primary btn-sm" 
+                data-bs-toggle="popover" 
+                data-bs-trigger="hover" 
+                data-bs-placement="top"
+                data-bs-content="Manually create a campaign lead."
+                hx-indicator=".htmx-indicator" hx-target="#generic_modal_body" 
+                hx-include="#site_pk"
+                hx-get="{% url 'campaign-lead-get-modal-content' %}" 
+                hx-push-url="false"
+                hx-vals='{"template_name": "create_campaign_lead"}'
+                hx-swap="innerHTML" hx-trigger="click">
+                    <i class="fa fa-plus" aria-hidden="true"></i> Manually Add Campaign Lead
+            </button>
+
+        </div>
+        <div class="col">                
+        </div>
+        {%block extra_top_right_buttons %}    
+        <div class="col-md-auto">
+            <span class="badge bg-dark text-white"><h6 class="m-1">Campaign Leads</h6></span>      
+        </div>
+        {%endblock%}
+    </div>
+    <main class="row overflow-auto below_fixed_top_buttons">
         <div class="row p-0">
             <div class="col-md-auto">
                 {%include 'campaign_leads/htmx/leads_board.html' %}

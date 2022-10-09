@@ -121,7 +121,7 @@ class Company(models.Model):
                 )
                 campaign.json_data = campaign_dict
                 campaign.save()
-        return ActiveCampaignList.objects.all()
+        return Campaign.objects.all()
  
 # Extending User Model Using a One-To-One Link
 class Profile(models.Model):

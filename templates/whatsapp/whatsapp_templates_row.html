@@ -14,7 +14,7 @@
     {%endif%}
     {%if template.pending_name%}
     <br>
-    <span class="secondary_td_layer">
+    <span class="secondary_td_layer nowrap">
         Draft: {{template.pending_name}}          
     </span>   
     {%endif%}
@@ -25,7 +25,7 @@
     </span> 
     {%if template.pending_category%}
     <br>
-    <span class="secondary_td_layer">
+    <span class="secondary_td_layer nowrap">
         Draft: {{template.pending_category}}          
     </span>    
     {%endif%}
@@ -55,7 +55,7 @@
     </span>   
     {%if template.pending_components%}
     <br>
-    <span class="secondary_td_layer">
+    <span class="secondary_td_layer nowrap">
             {%if not template.status == 'AWAITING_APPROVAL'%}Draft awaiting submission <i class="fa-solid fa-arrow-right"></i>{%else%}Waiting for Whatsapp approval{%endif%}          
     </span>   
     {%endif%}
@@ -88,19 +88,19 @@
 <td>
     {%if not template.name == 'hello_world'%}
     {%if template.pending_components%}
-    <button class="btn btn-danger btn-sm" hx-confirm="Are you sure you want to clear your changes made to this template since the last whatsapp approval?"
+    <button class="btn btn-danger btn-sm m-1" hx-confirm="Are you sure you want to clear your changes made to this template since the last whatsapp approval?"
     hx-post="{% url 'whatsapp-clear-changes' %}" hx-vals='{"template_pk":"{{template.pk}}"}' 
     hx-indicator=".top-htmx-indicator" hx-target="#template_row_{{template.pk}}"
     hx-swap="innerHTML"
     ><i class="fa fa-arrow-rotate-left"></i> Clear Changes</button>
-    <button class="btn btn-success btn-sm" hx-confirm="Are you sure you want to request approval for this template?"
+    <button class="btn btn-success btn-sm m-1" hx-confirm="Are you sure you want to request approval for this template?"
     hx-post="{% url 'whatsapp-approval' %}" hx-vals='{"template_pk":"{{template.pk}}"}' 
     hx-indicator=".top-htmx-indicator" hx-target="#template_row_{{template.pk}}"
     hx-swap="innerHTML"
     ><i class="fa fa-whatsapp" aria-hidden="true"></i> Submit to Whatsapp</button>
     {%endif%}
-    <button class="btn btn-warning btn-sm" onclick="window.location.href = '{%url 'whatsapp-template' template_id=template.message_template_id site_pk=site.pk%}'"><i class="fa fa-pencil" aria-hidden="true"></i> Edit</button>
-    <button class="btn btn-dark btn-sm"
+    <button class="btn btn-warning btn-sm m-1" onclick="window.location.href = '{%url 'whatsapp-template' template_id=template.message_template_id site_pk=site.pk%}'"><i class="fa fa-pencil" aria-hidden="true"></i> Edit</button>
+    <button class="btn btn-dark btn-sm m-1"
         hx-delete="{%url 'whatsapp-template-delete'%}" 
         hx-vals='{"site_pk": "{{site.pk}}", "template_pk": "{{template.pk}}"}'
         hx-confirm="Are you sure you want to delete this template?" hx-target="#template_row_{{template.pk}}" hx-swap="outerHTML" hx-indicator=".top-htmx-indicator">

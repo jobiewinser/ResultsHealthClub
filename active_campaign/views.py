@@ -1,7 +1,7 @@
 import logging
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from campaign_leads.models import Campaignlead
+from campaign_leads.models import Campaign, Campaignlead
 from campaign_leads.views import get_campaign_qs
 from core.views import get_site_pk_from_request
 from active_campaign.api import ActiveCampaign
@@ -89,15 +89,15 @@ logger = logging.getLogger(__name__)
 def set_campaign_site(request, **kwargs):
     try:
         print(request.POST.get('site_pk'))
-        campaigns = ActiveCampaignList.objects.get(pk=kwargs.get('list_pk'))
+        campaign = Campaign.objects.get(pk=kwargs.get('campaign_pk'))
         site_pk = request.POST.get('site_pk',None)
         if site_pk:
             site = Site.objects.get(pk=site_pk)
-            campaigns.site = site
+            campaign.site = site
         else:
-            campaigns.site = None
-        campaigns.save()
-        return render(request, 'campaign_leads/htmx/leads_configuration_select.html', {'campaigns':campaigns, 'site_list':Site.objects.all()})
+            campaign.site = None
+        campaign.save()
+        return render(request, 'campaign_leads/htmx/leads_configuration_select.html', {'campaign':campaign, 'site_list':Site.objects.all()})
     except Exception as e:        
         logger.error(f"set_campaign_site {str(e)}")
         return HttpResponse("Couldn't set Campaign Site", status=500)

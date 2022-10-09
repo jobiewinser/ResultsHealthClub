@@ -39,7 +39,7 @@
         <div class="row m-3">
             {%block extra_top_left_buttons %}
             {%include 'core/htmx/site_selection.html'%}
-            <button hidden hx-get="{% url 'free-taster-overview' %}" hx-push-url="true" hx-swap="outerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator=".top-htmx-indicator" hx-target="#overview_table" id="change_site" class="btn btn-primary btn-sm"></button>
+            <button hidden hx-get="{% url 'free-taster-overview' %}" hx-push-url="false" hx-swap="outerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator=".top-htmx-indicator" hx-target="#overview_table" id="change_site" class="btn btn-primary btn-sm"></button>
             {%endblock%}
             <div class="col">                
             </div>

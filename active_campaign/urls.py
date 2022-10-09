@@ -17,6 +17,6 @@ from django.urls import path
 import active_campaign.views as activecampaignviews
 urlpatterns = [
     path('active-campaign-webhooks/<str:guid>/', activecampaignviews.Webhooks.as_view(), name='active-campaign-webhooks' ),
-    path('set-active-campaign-list-site/<int:list_pk>/', activecampaignviews.set_campaign_site, name='set-active-campaign-list-site'),
+    path('set-campaign-site/<int:campaign_pk>/', activecampaignviews.set_campaign_site, name='set-campaign-site'),
     
 ]

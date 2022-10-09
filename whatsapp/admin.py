@@ -45,6 +45,7 @@ class WhatsAppTemplateAdmin(admin.ModelAdmin):
     list_display = [
         'pk', 
         'name',  
+        'message_template_id',  
         'site_name',  
         'category', 
         'language',     

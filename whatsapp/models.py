@@ -117,7 +117,7 @@ class WhatsappTemplate(models.Model):
 
     hidden = models.BooleanField(default=False)
     site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
-
+    company = models.ForeignKey("core.Company", on_delete=models.SET_NULL, null=True, blank=True)
     # objects = WhatsappTemplateManager()
     class Meta:
         ordering = ['pk']
@@ -142,7 +142,9 @@ class WhatsappTemplate(models.Model):
     #     return edit_components
     @property
     def site_name(self):
-        return self.site.name
+        if self.site:
+            return self.site.name
+        return ''
     def rendered_demo(self):
         return self.text.replace('{1}', 'Jobie')
 

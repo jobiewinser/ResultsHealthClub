@@ -34,6 +34,8 @@
 </script>
 {%endblock scripts%}
 
-{%block content%} 
+{%block overide_content%}       
+<div class="col d-flex flex-column h-sm-100 p-0" style="overflow-x:hidden" id="whatsapp_templates_content">  
 {%include 'whatsapp/whatsapp_templates_content.html'%}
-{%endblock content%}
+</div>
+{%endblock overide_content%}
