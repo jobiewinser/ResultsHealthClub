@@ -2,11 +2,10 @@
 <script>
         $(document).ready(function() {          
             console.log({{request.session.open_chats|safe}})   
-            {% if site%}             
+            {% if site%}           
             const chatListSocket = new WebSocket(                            
                 'ws{%if not 'DEBUG'|settings_value%}s{%endif%}://'+window.location.host+'/ws/chatlist/{{site.pk}}/'                            
             );
-            {%endif%}
             chatListSocket.onmessage = function (e) {
                 const data = JSON.parse(e.data);
                 $('#latest_message_avatar_'+data.whatsapp_number).attr("src", data.user_avatar);
@@ -23,6 +22,7 @@
                     $('#latest_message_row_'+data.whatsapp_number).addClass("inactive_chat_row")
                 }                
             }
+            {%endif%}
 
             document.body.addEventListener('htmx:afterSwap', function(evt) {   
                 if (evt.detail.target.id == 'next_chat_window'){

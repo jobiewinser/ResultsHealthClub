@@ -3,11 +3,13 @@ from django.conf import settings
 from django.db import models
 from django.db.models.deletion import SET_NULL
 from django.contrib.auth.models import User
+from django.http import HttpResponse
 
-from campaign_leads.models import Call, Campaignlead
+from campaign_leads.models import Call, Campaign, Campaignlead, ManualCampaign
 from twilio.models import TwilioMessage
 from django.db.models import Q, Count
 from whatsapp.api import Whatsapp
+from django.contrib import messages
 import logging
 logger = logging.getLogger(__name__)
 
@@ -27,6 +29,17 @@ class Site(models.Model):
             return self.company.all()[0]
         fake_company = Company
         return fake_company
+    def generate_lead(self, first_name, phone_number, lead_generation_app='a', request=None):
+        if lead_generation_app == 'b' and not self.company.active_campaign_enabled:
+            return HttpResponse(f"Active Campaign is not enabled for {self.company.company_name}", status=500)
+        if lead_generation_app == 'a':
+            manually_created_campaign, created = ManualCampaign.objects.get_or_create(site=self)
+            lead = Campaignlead.objects.create(
+                first_name=first_name,
+                whatsapp_number=phone_number,
+                campaign=manually_created_campaign
+            )
+            return lead
 
     def send_whatsapp_message(self, customer_number=None, lead=None, message="", user=None, template_used=None):  
         try:

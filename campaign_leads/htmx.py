@@ -23,8 +23,8 @@ def get_modal_content(request, **kwargs):
         site_pk = get_site_pk_from_request(request)
         if site_pk:
             request.GET['site_pk'] = site_pk
-        if request.user.is_staff:
-            template_name = request.GET.get('ptemplate_name', '')
+        if request.user.is_authenticated:
+            template_name = request.GET.get('template_name', '')
             context = {'site_list':Site.objects.all()}
             param1 = kwargs.get('param1', '')
             if param1:
@@ -34,37 +34,35 @@ def get_modal_content(request, **kwargs):
     except Exception as e:
         logger.debug("get_modal_content Error "+str(e))
         return HttpResponse(e, status=500)
-def generate_lead(self, first_name, phone_number, lead_generation_app='a', request=None):
-    if lead_generation_app == 'b' and not self.company.active_campaign_enabled:
-        if request:
-            messages.add_message(request, messages.ERROR, f'Active Campaign is not enabled for {self.company.company_name}')
-        return None
-    if lead_generation_app == 'a':
-        manually_created_list = Campaign.objects.get(site=self, manual=True)
-        lead = Campaignlead.objects.create(
-            first_name=first_name,
-            # last_name=last_name,
-            whatsapp_number=phone_number,
-            # country_code=country_code,
-            campaign=manually_created_list
-        )
-        return lead
 @login_required
 def create_campaign_lead(request, **kwargs):
     logger.debug(str(request.user))
     try:
         first_name = request.POST.get('first_name')
-        # last_name = request.POST.get('last_name')
+        if not first_name:
+            return HttpResponse("Please provide a first name", status=500)
+        
         phone = request.POST.get('phone')
+        if not phone:
+            return HttpResponse("Please provide a valid Phone Number", status=500)
+        
         country_code = request.POST.get('countryCode')
-        site = Site.objects.get(pk=request.POST.get('site_pk'))
+        if not country_code:
+            return HttpResponse("Please provide a Country Code", status=500)
+        
+        site = Site.objects.get(pk=request.POST.get('site_pk'))        
+        if not first_name:
+            return HttpResponse("Please provide a Choice of Site", status=500)
 
-        lead = generate_lead(first_name, f"{country_code}{phone}")
+        lead = site.generate_lead(first_name, f"{country_code}{phone}", request=request)
+        
         context = {'lead':lead,'max_call_count':1,'call_count':0, 'site':site}
         return render(request, 'campaign_leads/htmx/lead_article.html', context)
     except Exception as e:
+        # messages.add_message(request, messages.ERROR, f'Error with creating a campaign lead')
         logger.debug("create_campaign_lead Error "+str(e))
-        return HttpResponse(e, status=500)
+        # raise Exception
+        return HttpResponse("Error with creating a campaign lead", status=500)
 @login_required
 def get_leads_column_meta_data(request, **kwargs):
     logger.debug(str(request.user))
@@ -142,7 +140,7 @@ def add_booking(request, **kwargs):
 def mark_done(request, **kwargs):
     logger.debug(str(request.user))
     try:
-        if request.user.is_staff:
+        if request.user.is_authenticated:
             lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'))
             lead.complete = not lead.complete
             lead.save()
@@ -157,7 +155,7 @@ def mark_done(request, **kwargs):
 def new_leads_column(request, **kwargs):
     logger.debug(str(request.user))
     try:
-        if request.user.is_staff:
+        if request.user.is_authenticated:
             max_call_count = int(request.GET.get('max_call_count', 1))+2
             querysets = [
                 (f"Call {max_call_count}", Campaignlead.objects.none(), max_call_count)
@@ -171,7 +169,7 @@ def new_leads_column(request, **kwargs):
 def new_call(request, **kwargs):
     logger.debug(str(request.user))
     try:
-        if request.user.is_staff:
+        if request.user.is_authenticated:
             log_datetime = datetime.now()
             call_count = int(kwargs.get('call_count'))
             lead = Campaignlead.objects.filter(pk=kwargs.get('lead_pk')).annotate(calls=Count('call')).first()
@@ -203,7 +201,7 @@ def new_call(request, **kwargs):
 def delete_lead(request, **kwargs):
     logger.debug(str(request.user))
     try:
-        if request.user.is_staff:
+        if request.user.is_authenticated:
             lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'))
             lead.delete()
 
@@ -216,7 +214,7 @@ def delete_lead(request, **kwargs):
 def mark_arrived(request, **kwargs):
     logger.debug(str(request.user))
     try:
-        if request.user.is_staff:
+        if request.user.is_authenticated:
             lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'))
             lead.arrived = not lead.arrived
             lead.save()
@@ -230,7 +228,7 @@ def mark_arrived(request, **kwargs):
 def mark_sold(request, **kwargs):
     logger.debug(str(request.user))
     try:
-        if request.user.is_staff:
+        if request.user.is_authenticated:
             lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'))
             lead.sold = not lead.sold
             lead.complete = not lead.complete
@@ -244,7 +242,7 @@ def mark_sold(request, **kwargs):
 # def test_whatsapp_message(request, **kwargs):
 #     logger.debug(str(request.user))
 #     try:
-#         if request.user.is_staff:
+#         if request.user.is_authenticated:
 #             lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'))
 #             lead.send_whatsapp_message('testing api', request.user)
 #             return render(request, "campaign_leads/htmx/campaign_booking_row.html", {'lead':lead}) 
@@ -255,7 +253,7 @@ def mark_sold(request, **kwargs):
 # def template_editor(request, **kwargs):
 #     logger.debug(str(request.user))
 #     try:
-#         if request.user.is_staff:
+#         if request.user.is_authenticated:
 #             template = WhatsappTemplate.objects.get(pk=request.GET.get('template_pk'))
 #             return render(request, "campaign_leads/htmx/template_editor.html", {'template':template}) 
 #     except Exception as e:
@@ -266,7 +264,7 @@ def mark_sold(request, **kwargs):
 # def template_save(request, **kwargs):
 #     logger.debug(str(request.user))
 #     try:
-#         if request.user.is_staff:
+#         if request.user.is_authenticated:
 #             template = WhatsappTemplate.objects.get(pk=request.POST.get('template_pk'))
 #             template.text = request.POST.get('template_text')
 #             template.save()

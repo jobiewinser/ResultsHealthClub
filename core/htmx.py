@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 # def switch_user(request, **kwargs):
 #     logger.debug(str(request.user))
 #     try:
-#         if request.user.is_staff:
+#         if request.user.is_authenticated:
 #             user_pk = request.POST.get('user_pk')
 #             if type(user_pk) == list:
 #                 user_pk = user_pk[0]
@@ -38,11 +38,11 @@ def get_modal_content(request, **kwargs):
         site_pk = get_site_pk_from_request(request)
         if site_pk:
             request.GET['site_pk'] = site_pk
-        if request.user.is_staff:
+        if request.user.is_authenticated:
             template_name = request.GET.get('template_name', '')
             context = {'site_list':Site.objects.all()}
             # if template_name == 'switch_user':
-            #     context['users'] = User.objects.filter(is_staff=True).order_by('first_name')
+            #     context['users'] = User.objects.filter(is_authenticated=True).order_by('first_name')
             if template_name == 'edit_user':
                 user_pk = request.GET.get('user_pk', None)
                 if user_pk:
@@ -57,7 +57,7 @@ def get_modal_content(request, **kwargs):
 class ModifyUser(View):
     def post(self, request, **kwargs):
         try:
-            if request.user.is_staff:
+            if request.user.is_authenticated:
                 action = request.POST.get('action', '')
                 if action == 'add':
                     first_name = request.POST.get('first_name', '')
@@ -67,7 +67,7 @@ class ModifyUser(View):
                                                 first_name=first_name,
                                                 last_name=last_name,
                                                 password=os.getenv("DEFAULT_USER_PASSWORD"), 
-                                                is_staff=True)
+                                                is_authenticated=True)
                     Profile.objects.create(user = user, 
                                             avatar = request.FILES['profile_picture'], 
                                             site=Site.objects.get(pk=site_pk))
@@ -79,7 +79,7 @@ class ModifyUser(View):
                     # user.username=f"{first_name}{last_name}" 
                     user.first_name=first_name
                     user.last_name=last_name
-                    user.is_staff=True
+                    user.is_authenticated=True
                     user.save()
 
                     profile = Profile.objects.get_or_create(user = user)[0]
@@ -117,7 +117,7 @@ def generate_free_taster_link(request, **kwargs):
 def delete_free_taster_link(request, **kwargs):
     logger.debug(str(request.user))
     try:
-        if request.user.is_staff:
+        if request.user.is_authenticated:
             link_pk = request.POST.get('link_pk','')
             if link_pk:
                 FreeTasterLink.objects.get(pk=link_pk).delete()

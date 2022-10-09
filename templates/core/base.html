@@ -74,8 +74,7 @@
                     document.body.addEventListener('htmx:afterSwap', function(evt) {  
                         if (evt.detail.target.id == 'generic_modal_body'){
                             $('#generic_modal').modal('show');
-                        }         
-                        console.log(evt.detail.xhr.status)               
+                        }          
                         if (evt.detail.xhr.status == 200){
                         } else {
                             snackbarShow(evt.detail.xhr.responseText, 'danger')
@@ -98,6 +97,8 @@
                             } else {                                
                                 $('#'+src_id+"_error").html("<div id='"+src_id+"_error' style='color:red'>Not Found</div>");
                             }
+                        }else if (status == 500){
+                            snackbarShow('Error: '+evt.detail.xhr.response, 'danger')           
                         }
                     });                    
 

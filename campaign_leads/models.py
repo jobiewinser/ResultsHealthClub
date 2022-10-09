@@ -3,9 +3,10 @@ import os
 import uuid
 from django.db import models
 from django.contrib.auth.models import User
+from django.http import HttpResponse
 
 from whatsapp.api import Whatsapp
-from whatsapp.models import WhatsAppMessage
+from whatsapp.models import WhatsAppMessage, WhatsappTemplate
 
 from django.conf import settings
 from django.dispatch import receiver
@@ -52,7 +53,7 @@ class Campaignlead(models.Model):
     last_name = models.TextField(null=True, blank=True)
     whatsapp_number = models.TextField(null=True, blank=True)
     # country_code = models.TextField(null=True, blank=True)
-    active_campaign_list = models.ForeignKey("active_campaign.ActiveCampaignList", on_delete=models.CASCADE, null=True, blank=True)
+    campaign = models.ForeignKey("campaign_leads.Campaign", on_delete=models.CASCADE, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     arrived = models.BooleanField(default=False)
     sold = models.BooleanField(default=False)
@@ -80,15 +81,17 @@ class Campaignlead(models.Model):
             return last_whatsapp.datetime.replace(hour=9).replace(minute=30).replace(second=0) + timedelta(days=1)
         return "Never"  
 
-    def send_template_whatsapp_message(self, whatsapp_template_send_order):
-        template = WhatsappTemplate.objects.get(send_order = whatsapp_template_send_order, site=self.active_campaign_list.site)
-        message = f"{template.rendered(self)}" 
-        return self.active_campaign_list.site.send_whatsapp_message(customer_number=self.whatsapp_number, lead=self, message=message, template_used=template)
+    def send_template_whatsapp_message(self, send_order, communication_method = 'a'):
+        if communication_method == 'whatsapp':
+            template = WhatsappTemplate.objects.get(send_order = send_order, site=self.active_campaign_list.site)
+            message = f"{template.rendered(self)}" 
+            return self.active_campaign_list.site.send_whatsapp_message(customer_number=self.whatsapp_number, lead=self, message=message, template_used=template)
+        return HttpResponse("No Communication method specified", status=500)
 
 @receiver(models.signals.post_save, sender=Campaignlead)
 def execute_after_save(sender, instance, created, *args, **kwargs):
     if created and not instance.complete:
-        instance.send_template_whatsapp_message(1)
+        instance.send_template_whatsapp_message(1, communication_method='a')
         pass
         
 class Call(models.Model):
