@@ -113,14 +113,16 @@ class Company(models.Model):
         if self.active_campaign_enabled and self.active_campaign_url:
             from active_campaign.api import ActiveCampaign
             from active_campaign.models import ActiveCampaignList
-            for campaign_dict in ActiveCampaign().get_lists(self.active_campaign_url).get('lists',[]):
-                campaign, created = ActiveCampaignList.objects.get_or_create(
-                    active_campaign_id = campaign_dict.pop('id'),
-                    name = campaign_dict.pop('name'),
-                    company = self,
-                )
-                campaign.json_data = campaign_dict
-                campaign.save()
+            
+            if not settings.DEBUG:
+                for campaign_dict in ActiveCampaign(self.active_campaign_api_key).get_lists(self.active_campaign_url).get('lists',[]):
+                    campaign, created = ActiveCampaignList.objects.get_or_create(
+                        active_campaign_id = campaign_dict.pop('id'),
+                        name = campaign_dict.pop('name'),
+                        company = self,
+                    )
+                    campaign.json_data = campaign_dict
+                    campaign.save()
         return Campaign.objects.all()
  
 # Extending User Model Using a One-To-One Link

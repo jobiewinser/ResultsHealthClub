@@ -17,9 +17,12 @@ logger = logging.getLogger(__name__)
 # https://developers.activecampaign.com/reference
 class ActiveCampaign:
     
-    active_campaign_api_key = os.getenv("ACTIVE_CAMPAIGN_API_KEY")
-    active_campaign_url = os.getenv("ACTIVE_CAMPAIGN_URL")
+    # active_campaign_api_key = os.getenv("ACTIVE_CAMPAIGN_API_KEY")
+    # active_campaign_url = os.getenv("ACTIVE_CAMPAIGN_URL")
     site_url = os.getenv("SITE_URL")
+
+    def __init__(self, active_campaign_api_key):
+        self.active_campaign_api_key = active_campaign_api_key
 
     def _get_headers(self):
         headers = {

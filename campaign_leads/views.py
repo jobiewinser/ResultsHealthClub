@@ -166,11 +166,8 @@ class LeadConfigurationView(TemplateView):
 @login_required
 def get_campaigns(request, **kwargs):
     try:
-        if not settings.DEBUG:
-            if request.user.profile.company.all():
-                request.user.profile.company.all().first().get_and_generate_campaign_objects()
-            return render(request, f"campaign_leads/htmx/campaign_select.html", 
-            {'campaigns':get_campaign_qs(request)})
+        if request.user.profile.company.all():
+            request.user.profile.company.all().first().get_and_generate_campaign_objects()
         return render(request, f"campaign_leads/htmx/campaign_select.html", 
         {'campaigns':get_campaign_qs(request)})
     except Exception as e:        
