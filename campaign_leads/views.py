@@ -168,7 +168,7 @@ def get_campaigns(request, **kwargs):
     try:
         if not settings.DEBUG:
             if request.user.profile.company.all():
-                request.user.profile.company.all().first().get_and_generate_active_campaign_list_objects()
+                request.user.profile.company.all().first().get_and_generate_campaign_objects()
             return render(request, f"campaign_leads/htmx/campaign_select.html", 
             {'campaigns':get_campaign_qs(request)})
         return render(request, f"campaign_leads/htmx/campaign_select.html", 
