@@ -28,7 +28,7 @@
                     <div class="col-auto p-0 ps-1 m-1">
                         <img src="{% static 'img/blank-profile-picture.png' %}" alt="" width="22" height="22" class="rounded-circle">
                     </div>
-                    <div class="col p-0 ps-1 m-1 card">
+                    <div class="col p-0 ps-1 m-1 card chat_row_{{customer_number}}">
                         {{whatsappmessage.message}}
                     </div>
                 </div>
@@ -42,7 +42,7 @@
                 data-bs-content="
                 Sent at <b>{{whatsappmessage.datetime|nice_datetime_tag}}</b><br>
                 By <b>{{whatsappmessage.user.profile.name}}</b>">
-                    <div class="col p-0 ps-1 m-1 card">
+                    <div class="col p-0 ps-1 m-1 card chat_row_{{customer_number}}">
                         {{whatsappmessage.message}}
                     </div>
                     <div class="col-auto p-0 ps-1 m-1">

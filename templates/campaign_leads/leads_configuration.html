@@ -3,6 +3,8 @@
 {%load static tz core_tags%}
 {%block scripts%}
 {{block.super}}
+<link href="{% static 'css/datatables.css' %}" rel="stylesheet" />
+<script src="{% static 'js/datatables.js' %}"></script> 
 <script>
     $(document).ready(function() {
         initDataTable();
@@ -49,17 +51,17 @@
                         </tr>
                     </thead>
                     <tbody> 
-                        {%for active_campaign_list in active_campaign_lists%}
-                        <tr id="row_{{active_campaign_list.pk}}">
+                        {%for campaign in campaigns%}
+                        <tr id="row_{{campaign.pk}}">
                             <td>
-                                {{active_campaign_list.name}}
+                                {{campaign.name}}
                             </td>
                             <td> 
                                 {%include 'active_campaign/htmx/leads_configuration_select.html'%}
                             <button hidden 
-                            hx-post="{% url 'set-active-campaign-list-site' list_pk=active_campaign_list.pk %}" 
-                            hx-swap="outerHTML" hx-include="#site_pk_{{active_campaign_list.pk}}" 
-                            id="submit_site_pk_{{active_campaign_list.pk}}"></button>
+                            hx-post="{% url 'set-active-campaign-list-site' list_pk=campaign.pk %}" 
+                            hx-swap="outerHTML" hx-include="#site_pk_{{campaign.pk}}" 
+                            id="submit_site_pk_{{campaign.pk}}"></button>
                             </td>
                         </tr>
                         {%endfor%}

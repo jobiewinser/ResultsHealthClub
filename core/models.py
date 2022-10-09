@@ -33,7 +33,7 @@ class Site(models.Model):
         if lead_generation_app == 'b' and not self.company.active_campaign_enabled:
             return HttpResponse(f"Active Campaign is not enabled for {self.company.company_name}", status=500)
         if lead_generation_app == 'a':
-            manually_created_campaign, created = ManualCampaign.objects.get_or_create(site=self)
+            manually_created_campaign, created = ManualCampaign.objects.get_or_create(site=self, name=f"Manually Created")
             lead = Campaignlead.objects.create(
                 first_name=first_name,
                 whatsapp_number=phone_number,
@@ -86,10 +86,10 @@ class Site(models.Model):
         return WhatsAppMessage.objects.filter(site=self).order_by('-datetime').order_by('customer_number').distinct('customer_number')
 
     def get_leads_created_in_month_and_year(self, date):
-        return Campaignlead.objects.filter(active_campaign_list__site=self, created__month=date.month, created__year=date.year)
+        return Campaignlead.objects.filter(campaign__site=self, created__month=date.month, created__year=date.year)
 
     def get_leads_created_between_dates(self, start_date, end_date):
-        return Campaignlead.objects.filter(active_campaign_list__site=self, created__gte=start_date, created__lte=end_date)
+        return Campaignlead.objects.filter(campaign__site=self, created__gte=start_date, created__lte=end_date)
  
 # Extending User Model Using a One-To-One Link
 class Company(models.Model):
@@ -102,22 +102,25 @@ class Company(models.Model):
     free_taster_enabled = models.BooleanField(default=False)
     active_campaign_enabled = models.BooleanField(default=False)
     active_campaign_url = models.TextField(null=True, blank=True)
+    active_campaign_api_key = models.TextField(null=True, blank=True)
     @property
     def get_campaign_leads_enabled(self):
         return self.campaign_leads_enabled
     def __str__(self):
         return f"{self.company_name}"   
 
-    def get_and_generate_active_campaign_list_objects(self):
-        from active_campaign.api import ActiveCampaign
-        from active_campaign.models import ActiveCampaignList
-        for active_campaign_list_dict in ActiveCampaign().get_lists(self.active_campaign_url).get('lists',[]):
-            active_campaign_list, created = ActiveCampaignList.objects.get_or_create(
-                active_campaign_id = active_campaign_list_dict.pop('id'),
-                name = active_campaign_list_dict.pop('name')
-            )
-            active_campaign_list.json_data = active_campaign_list_dict
-            active_campaign_list.save()
+    def get_and_generate_campaign_objects(self):
+        if self.active_campaign_enabled and self.active_campaign_url:
+            from active_campaign.api import ActiveCampaign
+            from active_campaign.models import ActiveCampaignList
+            for campaign_dict in ActiveCampaign().get_lists(self.active_campaign_url).get('lists',[]):
+                campaign, created = ActiveCampaignList.objects.get_or_create(
+                    active_campaign_id = campaign_dict.pop('id'),
+                    name = campaign_dict.pop('name'),
+                    company = self,
+                )
+                campaign.json_data = campaign_dict
+                campaign.save()
         return ActiveCampaignList.objects.all()
  
 # Extending User Model Using a One-To-One Link

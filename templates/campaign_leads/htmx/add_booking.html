@@ -42,7 +42,7 @@
         <div class="col">
             <div class="m-3">
                 <button class="btn btn-primary"
-                hx-indicator=".top-htmx-indicator" hx-target="#lead-{{lead.pk}}" 
+                hx-indicator=".htmx-indicator" hx-target="#lead-{{lead.pk}}" 
                 hx-include=".booking_input"
                 hx-post="{% url 'add-booking' %}" 
                 hx-push-url="false"

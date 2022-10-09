@@ -79,7 +79,7 @@ class ModifyUser(View):
                     # user.username=f"{first_name}{last_name}" 
                     user.first_name=first_name
                     user.last_name=last_name
-                    user.is_authenticated=True
+                    # user.is_authenticated=True
                     user.save()
 
                     profile = Profile.objects.get_or_create(user = user)[0]

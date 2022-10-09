@@ -38,6 +38,15 @@ def roundup_tag(number, round_target):
         return roundup(float(number), float(round_target))
     except:
         return ""
+@register.filter
+def sum_cost_tag(queryset_or_list):
+    total_cost = 0
+    try:
+        for item in queryset_or_list:
+            total_cost = float(item.cost)
+        return total_cost
+    except:
+        return "Error"
 
 @register.filter
 def percentage_to_colour(percentage, opacity=1):
@@ -93,8 +102,8 @@ def nice_date_tag(date):
 def nice_datetime_tag(date):
     try:
         if date.date() == datetime.today().date():
-            return f"{date.strftime('%H:%M')} today"
-        return str(date.strftime("%H:%M %-d %B %Y"))
+            return f"{date.strftime('%H:%M')} - today"
+        return str(date.strftime("%H:%M - %-d %B %Y"))
     except Exception as e:
         return str(date)
 

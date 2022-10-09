@@ -71,8 +71,10 @@ class Webhooks(View):
                             whatsapp_message.save()
                             from channels.layers import get_channel_layer
                             channel_layer = get_channel_layer()
-                            
-                            name = lead.name
+                            if lead:
+                                name = lead.name
+                            else:
+                                name = from_number
                             async_to_sync(channel_layer.group_send)(
                                 f"chat_{from_number}_{site.pk}",
                                 {
@@ -181,7 +183,7 @@ class WhatsappTemplatesView(TemplateView):
                 self.request.GET['site_pk'] = self.request.user.profile.site.pk
                 site = self.request.user.profile.site
             else:
-                site = Site.objects.get(company=self.request.user.profile.company.first())
+                site = Site.objects.filter(company=self.request.user.profile.company.first()).first()
         refresh_template_data(site)
         context['templates'] = WhatsappTemplate.objects.filter(site=site)
         context['site_list'] = Site.objects.all()
@@ -191,29 +193,30 @@ class WhatsappTemplatesView(TemplateView):
 def refresh_template_data(site):
     whatsapp = Whatsapp(site.whatsapp_access_token)
     templates = whatsapp.get_templates(site.whatsapp_business_account_id)
-    for api_template in templates['data']:
-        if not api_template.get('status') == "PENDING_DELETION":
-            template, created = WhatsappTemplate.objects.get_or_create(
-                message_template_id = api_template.get('id'),
-                site = site,
-            )
-            template.status = api_template.get('status')
-            template.name = api_template.get('name')
-            template.language = api_template.get('language')
-            template.category = api_template.get('category')
-            components = []
-            for dict in api_template.get('components', []):
-                json_dict = {}
-                for k,v in dict.items():
-                    json_dict[k] = str(v)
-                components.append(json_dict)
-            
-            template.components = components
-            try:
-                template.save()
-            except Exception as e:
-                pass
-            print()
+    if templates:
+        for api_template in templates.get('data', []):
+            if not api_template.get('status') == "PENDING_DELETION":
+                template, created = WhatsappTemplate.objects.get_or_create(
+                    message_template_id = api_template.get('id'),
+                    site = site,
+                )
+                template.status = api_template.get('status')
+                template.name = api_template.get('name')
+                template.language = api_template.get('language')
+                template.category = api_template.get('category')
+                components = []
+                for dict in api_template.get('components', []):
+                    json_dict = {}
+                    for k,v in dict.items():
+                        json_dict[k] = str(v)
+                    components.append(json_dict)
+                
+                template.components = components
+                try:
+                    template.save()
+                except Exception as e:
+                    pass
+                print()
 # @method_decorator(campaign_leads_enabled_required, name='dispatch')
 @method_decorator(login_required, name='dispatch')
 class WhatsappTemplatesEditView(TemplateView):

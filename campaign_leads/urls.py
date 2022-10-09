@@ -33,12 +33,12 @@ urlpatterns = [
     path('mark-done/', campaignleadshtmx.mark_done, name='mark-done' ),
     
     path('new-leads-column/', campaignleadshtmx.new_leads_column, name='new-leads-column' ),
-    path('new-call/', campaignleadshtmx.new_call, name='new-call' ),
-    path('new-call/<int:lead_pk>/<int:call_count>/<int:max_call_count>/', campaignleadshtmx.new_call, name='new-call' ),
     path('delete-lead/', campaignleadshtmx.delete_lead, name='delete-lead' ),
     
     path('get-leads-column-meta-data/', campaignleadshtmx.get_leads_column_meta_data, name='get-leads-column-meta-data' ),
     path('create-campaign-lead/', campaignleadshtmx.create_campaign_lead, name='create-campaign-lead' ),
+    
+    path('get-campaign/', campaignleadsviews.get_campaigns, name='get-campaign'),
     
     path('add-booking/', campaignleadshtmx.add_booking, name='add-booking' ),
     path('mark-arrived/', campaignleadshtmx.mark_arrived, name='mark-arrived' ),
@@ -50,5 +50,8 @@ urlpatterns = [
     path('campaign-lead-get-modal-content/', campaignleadshtmx.get_modal_content, name='campaign-lead-get-modal-content' ),
     path('campaign-lead-get-modal-content/<str:param1>/', campaignleadshtmx.get_modal_content, name='campaign-lead-get-modal-content' ),
     path('campaign-lead-get-modal-content/<str:param1>/<str:param2>/', campaignleadshtmx.get_modal_content, name='campaign-lead-get-modal-content' ),
+
+    path('new-call/', campaignleadsviews.new_call, name='new-call' ),
+    path('new-call/<int:lead_pk>/<int:call_count>/<int:max_call_count>/', campaignleadsviews.new_call, name='new-call' ),
     
 ]

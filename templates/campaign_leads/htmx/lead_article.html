@@ -8,31 +8,28 @@
                 <span class="primary_td_layer">{{lead.name}}</span>
             </div>
             <div class="col-md-auto p-0">
-                <span style="color:rgb(96, 248, 61y)" class="secondary_td_layer">£190</span>
+                <span style="color:rgb(96, 248, 61y)" class="secondary_td_layer">£{{lead.cost|floatformat:2}}</span>
             </div>
         </div>
 
-        <span class="secondary_td_layer">{{lead.active_campaign_list.name}}</span><br>
+        <span class="secondary_td_layer">{{lead.campaign.name}}</span><br>
         <span class="secondary_td_layer">
             <div class="row">
-                <div class="col">
+                <div class="col p-0">
                     <i class="fa fa-whatsapp" aria-hidden="true"></i> {{lead.whatsapp_number}}
                 </div>
-                <div class="col-md-auto" style="text-align:right"> 
+                <div class="col-md-auto p-0" style="text-align:right"> 
                     {%if site%}
                     <button class="btn btn-sm btn-success text-white position-relative" 
                         hx-get="{%url 'message-window' customer_number=lead.whatsapp_number chat_box_site_pk=site.pk%}"
-                        hx-indicator=".top-htmx-indicator" 
+                        hx-indicator=".htmx-indicator" 
                         hx-target="#next_chat_window"
                         hx-push-url="false"
                         hx-swap="outerHTML" hx-trigger="click"  
-                        data-whatsapp-number="{{lead.whatsapp_number}} "
-                        onclick="add_chat_to_session({{lead.whatsapp_number}} )" >
-                        Chat
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                          1+
-                          <span class="visually-hidden">unread messages</span>
-                        </span>
+                        data-whatsapp-number="{{lead.whatsapp_number}}">
+                            Chat
+                            <span id="chat_notification_{{lead.whatsapp_number}}">
+                            </span>
                     </button>
                     {%endif%}
                 </div>

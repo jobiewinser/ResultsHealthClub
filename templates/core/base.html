@@ -74,7 +74,14 @@
                     document.body.addEventListener('htmx:afterSwap', function(evt) {  
                         if (evt.detail.target.id == 'generic_modal_body'){
                             $('#generic_modal').modal('show');
-                        }          
+                        }
+                        if (![undefined, ''].includes(evt.detail.pathInfo.path)){
+                            console.log(evt.detail.pathInfo.path)
+                            if (evt.detail.pathInfo.path.includes("modify-user")){
+                                $('#generic_modal').modal('hide');
+                                snackbarShow('Successfully modifed/added user', 'success')
+                            }
+                        }
                         if (evt.detail.xhr.status == 200){
                         } else {
                             snackbarShow(evt.detail.xhr.responseText, 'danger')
@@ -88,8 +95,10 @@
                         let srcElement = $(evt.srcElement);
                         let src_id = srcElement.attr('id');
                         if(status == 200) {
-                            if (evt.detail.pathInfo.path.includes("login")){
-                                window.location.replace("/");
+                            if (![undefined, ''].includes(evt.detail.pathInfo.path)){
+                                if (evt.detail.pathInfo.path.includes("login")){
+                                    window.location.replace("/");
+                                }
                             }
                         } else if (status == 404) {
                             if ($('#'+src_id+"_error").length == 0){                                
@@ -101,6 +110,7 @@
                             snackbarShow('Error: '+evt.detail.xhr.response, 'danger')           
                         }
                     });                    
+                    
 
                     document.body.addEventListener('htmx:configRequest', function(evt) {    
                         evt.detail.headers['x-csrftoken'] = $('#csrf_token').val();
@@ -127,6 +137,7 @@
                             <span class="fs-5"><a class="navbar-brand" href="{%url 'home'%}"><img class="side_nav_logo" src="{% static 'img/logo_white.png' %}" alt="winser systems logo"></a></span>
 
                         </a>
+                        <div id="pb" class="progress-bar top-htmx-indicator" style="width:100%"></div>
                         <ul class="nav nav-pills flex-sm-column flex-row flex-nowrap flex-shrink-1 flex-sm-grow-0 flex-grow-1 mb-sm-auto mb-0 justify-content-center align-items-center align-items-sm-start" id="menu">
                             {%if request.user.is_authenticated%} 
                             <li class="nav-item">

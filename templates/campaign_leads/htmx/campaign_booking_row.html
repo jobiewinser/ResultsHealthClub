@@ -34,9 +34,9 @@
     </td> {% endcomment %}
     <td class="double_layer_td">
         {% comment %} Live Well Female {% endcomment %}        
-        <span class="primary_td_layer">{{lead.active_campaign_list.name}}</span>
+        <span class="primary_td_layer">{{lead.campaign.name}}</span>
         <br>
-        <span class="secondary_td_layer">{{lead.active_campaign_list.site.name}}</span>
+        <span class="secondary_td_layer">{{lead.campaign.site.name}}</span>
     </td>
     <td>                 
         {%with lead.booking_set.all.0.datetime|timezone:'Europe/London' as latest_booking%}

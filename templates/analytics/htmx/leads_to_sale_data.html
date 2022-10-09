@@ -48,8 +48,8 @@
     </div>
 </span>
 <script>
-const leads_to_sales_chart_var = document.getElementById('leads_to_sales_chart');
-const leads_to_sales_chart = new Chart(leads_to_sales_chart_var, {
+leads_to_sales_chart_var = document.getElementById('leads_to_sales_chart');
+leads_to_sales_chart = new Chart(leads_to_sales_chart_var, {
     type: '{%if graph_type%}{{graph_type}}{%else%}bar{%endif%}',
     data: {
         labels: [{%for label in time_label_set%}'{{label    }}'{% if not forloop.last %},{%endif%}{%endfor%}],

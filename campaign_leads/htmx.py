@@ -9,7 +9,6 @@ from django.contrib.auth.decorators import login_required
 
 from campaign_leads.models import Campaign, Campaignlead, Booking, Call, Note
 from campaign_leads.views import CampaignBookingsOverviewView
-from active_campaign.models import ActiveCampaignList
 from core.models import Site
 from core.views import get_site_pk_from_request
 from django.db.models import Q, Count
@@ -34,6 +33,9 @@ def get_modal_content(request, **kwargs):
     except Exception as e:
         logger.debug("get_modal_content Error "+str(e))
         return HttpResponse(e, status=500)
+
+
+
 @login_required
 def create_campaign_lead(request, **kwargs):
     logger.debug(str(request.user))
@@ -68,13 +70,13 @@ def get_leads_column_meta_data(request, **kwargs):
     logger.debug(str(request.user))
     try:
         leads = Campaignlead.objects.filter(complete=False, booking=None)
-        active_campaign_list_pk = request.GET.get('active_campaign_list_pk', None)
-        if active_campaign_list_pk:
-            leads = leads.filter(active_campaign_list=ActiveCampaignList.objects.get(pk=active_campaign_list_pk))
-            # request.GET['active_campaign_list_pk'] = active_campaign_list_pk
+        campaign_pk = request.GET.get('campaign_pk', None)
+        if campaign_pk:
+            leads = leads.filter(campaign=Campaign.objects.get(pk=campaign_pk))
+            # request.GET['campaign_pk'] = campaign_pk
         site_pk = get_site_pk_from_request(request)
         if site_pk and not site_pk == 'all':
-            leads = leads.filter(active_campaign_list__site__pk=site_pk)
+            leads = leads.filter(campaign__site__pk=site_pk)
             # request.GET['site_pk'] = site_pk 
             
         leads = leads.annotate(calls=Count('call'))
@@ -164,37 +166,6 @@ def new_leads_column(request, **kwargs):
     except Exception as e:
         logger.debug("new_call Error "+str(e))
         return HttpResponse(e, status=500)
-
-@login_required
-def new_call(request, **kwargs):
-    logger.debug(str(request.user))
-    try:
-        if request.user.is_authenticated:
-            log_datetime = datetime.now()
-            call_count = int(kwargs.get('call_count'))
-            lead = Campaignlead.objects.filter(pk=kwargs.get('lead_pk')).annotate(calls=Count('call')).first()
-            if lead.calls < call_count:
-                while lead.calls < call_count:
-                    call = Call.objects.create(
-                        datetime=log_datetime,
-                        lead = lead,                        
-                        user=request.user
-                    )
-                    lead = Campaignlead.objects.filter(pk=kwargs.get('lead_pk')).annotate(calls=Count('call')).first()
-            elif lead.calls > call_count:
-                while lead.calls > call_count:
-                    Call.objects.filter(
-                        lead = lead,
-                    ).order_by('-datetime').first().delete()
-                    lead = Campaignlead.objects.filter(pk=kwargs.get('lead_pk')).annotate(calls=Count('call')).first()
-           
-            lead.save()
-
-            return render(request, 'campaign_leads/htmx/lead_article.html', {'lead':lead,'max_call_count':kwargs.get('max_call_count', 1), 'call_count':call_count})
-    except Exception as e:
-        logger.debug("new_call Error "+str(e))
-        return HttpResponse(e, status=500)
-
 
 
 @login_required

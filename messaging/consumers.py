@@ -125,7 +125,7 @@ def send_whatsapp_message_to_number(message, whatsapp_number, user, site_pk):
         logger.debug("send_whatsapp_message_to_number start") 
         lead = Campaignlead.objects.filter(whatsapp_number=whatsapp_number).first()  
         if lead:     
-            if lead.active_campaign_list.site.get_company == user.profile.get_company: 
+            if lead.campaign.company == user.profile.get_company: 
                 logger.debug("send_whatsapp_message_to_number success lead true") 
                 return Site.objects.get(pk = site_pk).send_whatsapp_message(customer_number=whatsapp_number, message=message, user=user, lead=lead)
         user_company_site_pk_list = Site.objects.filter(company__in=user.profile.company.all()).values_list('pk', flat=True)

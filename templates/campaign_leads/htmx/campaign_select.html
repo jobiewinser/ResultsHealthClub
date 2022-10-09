@@ -1,0 +1,13 @@
+{%load core_tags%}
+<span id="campaign_list_span">    
+    <select class="form-select select2 overview_table_filters" onchange="$('#filter_campaign').click()" id="campaign_pk" name="campaign_pk">
+        <option value="">Show all campaigns for this site</option>
+        {%for campaign in campaigns%}
+        {%if campaign.get_active_leads_qs.count%}
+            <option {%if request.GET.campaign_pk|str_to_int == campaign.pk%}selected{%endif%} value="{{campaign.pk}}">{{campaign.name}}
+                 {% comment %} ({{campaign.get_active_leads_qs.count}} active) {% endcomment %}
+                </option>
+        {%endif%}
+        {%endfor%}
+    </select>
+</span>

@@ -7,7 +7,7 @@ from django.http import HttpResponse
 
 from whatsapp.api import Whatsapp
 from whatsapp.models import WhatsAppMessage, WhatsappTemplate
-
+from django.db.models import Sum
 from django.conf import settings
 from django.dispatch import receiver
 from polymorphic.models import PolymorphicModel
@@ -27,11 +27,13 @@ for tuple in BOOKING_CHOICES:
 class Campaign(PolymorphicModel):
     name = models.TextField(null=True, blank=True)   
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    product_cost = models.FloatField(default=100)
     json_data = models.JSONField(default=dict)
     guid = models.TextField(null=True, blank=True)
     webhook_created = models.BooleanField(default=False)
     webhook_id = models.TextField(null=True, blank=True)
     site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
+    company = models.ForeignKey("core.Company", on_delete=models.SET_NULL, null=True, blank=True)
     def get_active_leads_qs(self):
         return self.campaignlead_set.filter(complete=False)
     def is_manual(self):
@@ -48,6 +50,7 @@ class ManualCampaign(Campaign):
     def is_manual(self):
         return True
 
+
 class Campaignlead(models.Model):
     first_name = models.TextField(null=True, blank=True)
     last_name = models.TextField(null=True, blank=True)
@@ -61,6 +64,7 @@ class Campaignlead(models.Model):
     active_campaign_contact_id = models.TextField(null=True, blank=True)
     active_campaign_form_id = models.TextField(null=True, blank=True)
     possible_duplicate = models.BooleanField(default=False)
+    
     @property
     def name(self):
         if self.last_name:
@@ -83,9 +87,9 @@ class Campaignlead(models.Model):
 
     def send_template_whatsapp_message(self, send_order, communication_method = 'a'):
         if communication_method == 'whatsapp':
-            template = WhatsappTemplate.objects.get(send_order = send_order, site=self.active_campaign_list.site)
+            template = WhatsappTemplate.objects.get(send_order = send_order, site=self.campaign.site)
             message = f"{template.rendered(self)}" 
-            return self.active_campaign_list.site.send_whatsapp_message(customer_number=self.whatsapp_number, lead=self, message=message, template_used=template)
+            return self.campaign.site.send_whatsapp_message(customer_number=self.whatsapp_number, lead=self, message=message, template_used=template)
         return HttpResponse("No Communication method specified", status=500)
 
 @receiver(models.signals.post_save, sender=Campaignlead)

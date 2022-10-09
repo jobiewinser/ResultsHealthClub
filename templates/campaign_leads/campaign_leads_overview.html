@@ -11,8 +11,10 @@
     $(document).ready(function() {  
         initDataTable();
         document.body.addEventListener('htmx:beforeRequest', function(evt) {  
-            if (evt.detail.target.id == 'overview_table' || evt.detail.pathInfo.path.includes("academy-booking-overview")){
-                $("#overview_table").dataTable().fnDestroy();
+            if (![undefined, ''].includes(evt.detail.pathInfo.path) && ![undefined, ''].includes(evt.detail.target.id)){
+                if (evt.detail.target.id == 'overview_table' || evt.detail.pathInfo.path.includes("academy-booking-overview")){
+                    $("#overview_table").dataTable().fnDestroy();
+                }
             }
         });
 
@@ -20,26 +22,27 @@
             if (evt.detail.target.id == 'overview_table'){
                 initDataTable(); 
             }
-            else if (evt.detail.pathInfo.path.includes("modify-user")){
-                $('#generic_modal').modal('hide');
-                snackbarShow('Successfully modifed/added user', 'success')
-            }            
+                        
             {% comment %} if (evt.detail.target.classList.contains('academy_booking_row')) {
                 $('#refresh_overview_table').click(); 
             } {% endcomment %}
             if (evt.detail.xhr.status == 200){
-                if (evt.detail.pathInfo.path.includes("create-campaign-lead")){
-                    {% comment %} $('#refresh_overview_table').click();  {% endcomment %}
-                    $('#generic_modal').modal('hide');
-                    $('#refresh_column_metadata').click()
-                    snackbarShow('Successfully manually created a campaign lead', 'success')
-                } else if (evt.detail.pathInfo.path.includes("new-call")){
-                    $('#refresh_column_metadata').click()
-                    snackbarShow('Successfully added call', 'success')
-                } else if (evt.detail.pathInfo.path.includes("add-booking")){
-                    $('#generic_modal').modal('hide');
-                    snackbarShow('Successfully added a booking', 'success')
-                }               
+                if (![undefined, ''].includes(evt.detail.pathInfo.path)){
+                    if (evt.detail.pathInfo.path.includes("create-campaign-lead")){
+                        {% comment %} $('#refresh_overview_table').click();  {% endcomment %}
+                        $('#generic_modal').modal('hide');
+                        $('#refresh_column_metadata').click()
+                        snackbarShow('Successfully manually created a campaign lead', 'success')
+                    } 
+                                    {% comment %} else if (evt.detail.pathInfo.path.includes("new-call")){                    
+                                        $('#refresh_column_metadata').click()
+                                        snackbarShow('Successfully added call', 'success')
+                                    }  {% endcomment %}
+                    else if (evt.detail.pathInfo.path.includes("add-booking")){
+                        $('#generic_modal').modal('hide');
+                        snackbarShow('Successfully added a booking', 'success')
+                    }  
+                }             
             }
             
             $('[data-bs-toggle=popover]').popover();
@@ -56,12 +59,45 @@
     
     function handleDraggedItem(dragged_elem_id, drag_target){
         dragged_elem = $('#'+dragged_elem_id)
-        htmx.ajax('POST', '{% url "new-call" %}'+dragged_elem.data('id')+'/'+$(drag_target).data("call-count")+'/'+$('#max_call_count').val()+'/', {target:'#'+dragged_elem_id, 
-                                                                                                                    swap:'outerHTML'})
+        var respStatus = $.ajax({
+            type:'POST',
+            url:'{% url "new-call" %}'+dragged_elem.data('id')+'/'+$(drag_target).data("call-count")+'/'+$('#max_call_count').val()+'/',
+            data:{'csrfmiddlewaretoken':'{{ csrf_token }}'},
+            success: function (data) {                
+                $('#refresh_column_metadata').click()
+                snackbarShow('Successfully added call', 'success')
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+            }
+        })
         let call_count = parseInt($(drag_target).data("call-count"));
         let max_call_count = parseInt($('#max_call_count').val());
         if (call_count > max_call_count) {
             $('#add_column').click();
+        }
+    }
+    function clear_chat_from_session(whatsapp_number){
+        var respStatus = $.ajax({
+            type:'POST',
+            url:'{%url "clear-chat-from-session"%}',
+            data:{'whatsapp_number':whatsapp_number, 'csrfmiddlewaretoken':'{{ csrf_token }}'},
+            success: function (data) {
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+            }
+        })
+    }
+    function add_chat_to_session(whatsapp_number){
+        if ($('#chat_card_'+whatsapp_number).length === 0){
+            var respStatus = $.ajax({
+                type:'POST',
+                url:'{%url "add-chat-to-session"%}',
+                data:{'whatsapp_number':whatsapp_number, 'csrfmiddlewaretoken':'{{ csrf_token }}'},
+                success: function (data) {
+                },
+                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                }
+            })
         }
     }
 </script>
@@ -76,19 +112,19 @@
                 <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>             
             </div>
             {%include 'core/htmx/site_selection.html'%}
-            <button hidden hx-get="{{request.path}}" hx-push-url="true" hx-swap="outerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator=".top-htmx-indicator" hx-target="#leads_board" id="change_site" class="btn btn-primary btn-sm"></button>
+            <button hidden hx-get="{{request.path}}" hx-push-url="true" hx-swap="outerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator=".htmx-indicator" hx-target="#leads_board" id="change_site" class="btn btn-primary btn-sm"></button>
             <button hidden
                 hx-get="{{request.path}}" 
-                hx-swap="outerHTML" hx-push-url="true" hx-include=".overview_table_filters" hx-indicator=".top-htmx-indicator" hx-target="#leads_board" id="filter_active_campaign_list" class="btn btn-primary btn-sm"></button>
-            <div class="col-md-auto" hx-get="{% url 'get-active-campaign-lists'%}" hx-include=".overview_table_filters" hx-trigger="load" hx-indicator=".top-htmx-indicator" hx-target="#campaign_list_span" hx-swap="outerHTML">
+                hx-swap="outerHTML" hx-push-url="true" hx-include=".overview_table_filters" hx-indicator=".htmx-indicator" hx-target="#leads_board" id="filter_campaign" class="btn btn-primary btn-sm"></button>
+            <div class="col-md-auto" hx-get="{% url 'get-campaign'%}" hx-include=".overview_table_filters" hx-trigger="load" hx-indicator=".htmx-indicator" hx-target="#campaign_list_span" hx-swap="outerHTML">
                 <span id="campaign_list_span">   
                     <select class="form-select">
                         <option>Loading</option>
                     </select>    
                 </span>
             </div>
-            <button hidden hx-get="{% url 'get-active-campaign-lists'%}" hx-include=".overview_table_filters" id="refresh_campaign_list_span" hx-indicator=".top-htmx-indicator" hx-target="#campaign_list_span" hx-trigger="click" hx-swap="outerHTML"></button>
-            <button hidden hx-get="{% url 'campaign-leads-overview'%}" hx-include=".overview_table_filters" id="refresh_overview_table" hx-indicator=".top-htmx-indicator" hx-target="#overview_table" hx-trigger="click" hx-swap="outerHTML"></button>
+            <button hidden hx-get="{% url 'get-campaign'%}" hx-include=".overview_table_filters" id="refresh_campaign_list_span" hx-indicator=".htmx-indicator" hx-target="#campaign_list_span" hx-trigger="click" hx-swap="outerHTML"></button>
+            <button hidden hx-get="{% url 'campaign-leads-overview'%}" hx-include=".overview_table_filters" id="refresh_overview_table" hx-indicator=".htmx-indicator" hx-target="#overview_table" hx-trigger="click" hx-swap="outerHTML"></button>
             <input type="text" style="display:None" id="add_booking" name="template_name" value="add_booking"/>
             {%endblock%}
             <div class="col-md-auto">
@@ -97,7 +133,7 @@
                     data-bs-trigger="hover" 
                     data-bs-placement="top"
                     data-bs-content="Manually create a campaign lead."
-                    hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
+                    hx-indicator=".htmx-indicator" hx-target="#generic_modal_body" 
                     hx-include="#site_pk"
                     hx-get="{% url 'campaign-lead-get-modal-content' %}" 
                     hx-push-url="false"
@@ -141,10 +177,27 @@
 
 {%block snackbar%}
 {{block.super}}
-<span id="chat_bottom" class="" style="
+<span id="chat_bottom" class="" style=" 
 display: flex;
 flex-wrap: wrap;
 align-items: flex-start;">
-    {%include 'messaging/messaging.html'%} 
+
+{%if site%}
+<input hidden
+hx-get="{%url 'get-messaging-window'%}"
+hx-target="#chat_bottom"
+hx-swap="#outerHTML"
+hx-indicator=".htmx-indicator"                 
+hx-vals='{"site_pk": "{{site.pk}}"}'
+hx-trigger="load"/>
+{%else%}
+<link href="/static/css/chat.css" rel="stylesheet">
+        <span id="next_chat_window"></span>
+<div class="card card-body chat_bottom_window">
+    <div class="card-header chat_bottom_header">
+        Select a site to chat
+    </div>
+</div>
+{%endif%}
 </span>
 {%endblock snackbar%}

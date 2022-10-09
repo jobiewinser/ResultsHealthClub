@@ -4,6 +4,7 @@
     right:5%;
     text-align:right;
     width:unset;
+    overflow-x:hidden;
 }
 #chat_bottom.temp_hidden{
     visibility: hidden;
@@ -21,16 +22,16 @@
     margin-bottom:50px
 }
 
-.all_chat_card_body{
-    height:400px
+.message_list_body{
+    height:400px;
+    overflow-y: scroll;
 }
 
 .chat_row{
     white-space: nowrap;
     overflow:hidden;
-    height:4
-    60px;
-    padding:8px;
+    width:100%;
+    padding:2px;
 }
 .chat_bottom_header:hover{
     cursor: pointer;

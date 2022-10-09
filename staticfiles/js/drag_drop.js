@@ -6,7 +6,7 @@ const dragStart = target => {
 const dragEnd = target => {
     target.classList.remove('dragging');
     document.querySelector('#add_booking_area').classList.remove('shown');
-    document.querySelector('#chat_bottom').classList.adremoved('temp_hidden');
+    document.querySelector('#chat_bottom').classList.remove('temp_hidden');
     console.log("dragEnd", target)
 };
 

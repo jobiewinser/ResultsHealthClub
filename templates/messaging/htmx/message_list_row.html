@@ -1,0 +1,36 @@
+{%load static core_tags%}
+<div class="row chat_row {%if message.inbound%}active_chat_row{%else%}inactive_chat_row{%endif%}"
+    hx-get="{%url 'message-window' customer_number=message.customer_number chat_box_site_pk=site.pk%}"
+    hx-indicator=".htmx-indicator" 
+    hx-target="#next_chat_window"
+    hx-push-url="false"
+    hx-swap="outerHTML" hx-trigger="click"  
+
+    data-bs-toggle="popover" 
+    data-bs-trigger="hover" 
+    data-bs-html="true" 
+    data-bs-placement="top"
+    data-bs-title="Message Details"
+    data-bs-content="
+    Sent at <b>{{message.datetime|nice_datetime_tag}}</b><br>
+    By <b>{%if message.lead.name%}{{message.lead.name}}{%else%}{{message.customer_number}}{%endif%}</b>"
+
+    data-whatsapp-number="{{message.customer_number}}"
+    id="latest_message_row_{{message.customer_number}}"
+    >
+    <div class="col-auto p-0">
+        <img id="latest_message_avatar_{{message.customer_number}}" src="{%if message.inbound%}{% static 'img/blank-profile-picture.png' %}{%else%}{%if message.user.profile.avatar.url%}{{message.user.profile.avatar.url}}{%else%}{{message.site.company.all.first.company_logo_black.url}}{%endif%}{%endif%}" alt="" width="38" height="38" class="rounded-circle">
+    </div>
+    <div class="col p-0 ps-1">
+        <div class="row chat_lead_name_row">
+            <div class="col p-0" id="latest_message_name_{{message.customer_number}}">
+                {%if message.lead.name%}{{message.lead.name}}{%else%}{{message.customer_number}}{%endif%}
+            </div>
+        </div>
+        <div class="row chat_message_row">
+            <div class="col p-0" id="latest_message_content_{{message.customer_number}}">
+                {%if message.inbound%}Them{%else%}You{%endif%}: {{message.message}}
+            </div>
+        </div>
+    </div>
+</div>

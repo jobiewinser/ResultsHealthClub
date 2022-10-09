@@ -17,7 +17,7 @@ def get_sales_to_leads_between_dates_with_timeframe_differences(start_date, end_
         while index_date < end_date + timeframe:
             qs = Campaignlead.objects.filter(created__gte=index_date, created__lt=index_date + timeframe)
             if site:
-                qs = qs.filter(active_campaign_list__site=site)
+                qs = qs.filter(campaign__site=site)
             leads = qs.count()
             sales = qs.filter(sold=True).count()
             if leads:
@@ -49,7 +49,7 @@ def get_bookings_to_leads_between_dates_with_timeframe_differences(start_date, e
         while index_date < end_date + timeframe:
             qs = Campaignlead.objects.filter(created__gte=index_date, created__lt=index_date + timeframe)
             if site:
-                qs = qs.filter(active_campaign_list__site=site)
+                qs = qs.filter(campaign__site=site)
             leads = qs.count()
             booked_leads_count = qs.exclude(booking=None).count()
             if leads:
