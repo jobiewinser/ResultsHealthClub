@@ -10,18 +10,16 @@ class ActiveCampaignWebhook(models.Model):
     json_data = models.JSONField(default=dict)
     guid = models.TextField(null=True, blank=True)
 
-class ActiveCampaignList(models.Model):
+class ActiveCampaignList(Campaign):
     pass
-# class ActiveCampaignList(Campaign):
-#     pass
-    # active_campaign_id = models.TextField(null=True, blank=True)
-    # def create_webhook(self):
-    #     if self.name and self.guid and not self.webhook_id and not settings.DEBUG and not 'manually' in self.name.lower():
-    #         response = ActiveCampaign().create_webhook(str(self.name), str(self.guid), str(self.active_campaign_id))
-    #         if response.status_code in [200, 201]:
-    #             self.webhook_created = True
-    #             self.webhook_id = response.json().get('webhook').get('id')
-    #             self.save()
+    active_campaign_id = models.TextField(null=True, blank=True)
+    def create_webhook(self):
+        if self.name and self.guid and not self.webhook_id and not settings.DEBUG and not 'manually' in self.name.lower():
+            response = ActiveCampaign().create_webhook(str(self.name), str(self.guid), str(self.active_campaign_id))
+            if response.status_code in [200, 201]:
+                self.webhook_created = True
+                self.webhook_id = response.json().get('webhook').get('id')
+                self.save()
 
 @receiver(models.signals.post_save, sender=ActiveCampaignList)
 def execute_after_save(sender, instance, created, *args, **kwargs):
