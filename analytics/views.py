@@ -4,7 +4,8 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 import logging
 from django.http import HttpResponseRedirect
-from core.models import FreeTasterLink, FreeTasterLinkClick, Profile, Site  
+from core.models import FreeTasterLink, FreeTasterLinkClick, Profile, Site
+from core.views import get_site_pk_from_request  
 # Create your views here.
 logger = logging.getLogger(__name__)
 
@@ -19,11 +20,11 @@ class AnalyticsOverviewView(TemplateView):
         context = super(AnalyticsOverviewView, self).get_context_data(**kwargs)    
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'analytics/htmx/analytics_overview_content.html'
-        site_pk = self.request.GET.get('site_pk')
-        if not site_pk:
-            if self.request.user.profile.site:
-                self.request.GET['site_pk'] = self.request.user.profile.site.pk       
-            else:
-                self.request.GET['site_pk'] = Site.objects.all().first().pk  
+        site_pk = get_site_pk_from_request(self.request)
+        if site_pk and not site_pk == 'all':
+            self.request.GET['site_pk'] = site_pk 
+            context['site'] = Site.objects.get(pk=site_pk)
+
+
         context['site_list'] = Site.objects.all()   
         return context

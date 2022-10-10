@@ -132,6 +132,7 @@ class CampaignBookingsOverviewView(TemplateView):
         if site_pk and not site_pk == 'all':
             leads = leads.filter(campaign__site__pk=site_pk)
             self.request.GET['site_pk'] = site_pk 
+            context['site'] = Site.objects.get(pk=site_pk)
             
         context['complete_count'] = leads.filter(complete=True).count()
         complete_filter = (self.request.GET.get('complete', '').lower() =='true')
