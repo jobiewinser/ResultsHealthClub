@@ -227,7 +227,7 @@ class WhatsappTemplatesEditView(TemplateView):
     def get_context_data(self, **kwargs):
         self.request.GET._mutable = True     
         context = super(WhatsappTemplatesEditView, self).get_context_data(**kwargs)
-        template = WhatsappTemplate.objects.get(message_template_id=kwargs.get('template_id'))
+        template = WhatsappTemplate.objects.get(pk=kwargs.get('template_pk'))
         if self.request.user.profile.get_company == template.company:
             context['template'] = template
             context['variables'] = template_variables
