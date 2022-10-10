@@ -111,29 +111,28 @@ class Webhooks(View):
                                 raw_webhook = webhook,
                             )[0]                
 
-                elif field == 'message_template_status_update':
-                    for status_dict in value.get('statuses', []):
-                        value = status_dict.get('value')
-                        template = WhatsappTemplate.objects.get(message_template_id=value.get('message_template_id'))
-                        template.status=value.get('event')
-                        template.latest_reason=value.get('reason')
-                        template.name=value.get('message_template_name')
-                        template.language=value.get('message_template_language')
-                        whatsapp = Whatsapp(template.site.whatsapp_access_token)
-                        template_live = whatsapp.get_template(template.site.whatsapp_business_account_id, template.message_template_id)
-                        if value.get('event', "") == 'APPROVED':
-                            template.name = template_live.name
-                            template.pending_name = ""
+                elif field == 'message_template_status_update':                    
+                    value = status_dict.get('value')
+                    template = WhatsappTemplate.objects.get(message_template_id=value.get('message_template_id'))
+                    template.status=value.get('event')
+                    template.latest_reason=value.get('reason')
+                    template.name=value.get('message_template_name')
+                    template.language=value.get('message_template_language')
+                    whatsapp = Whatsapp(template.site.whatsapp_access_token)
+                    template_live = whatsapp.get_template(template.site.whatsapp_business_account_id, template.message_template_id)
+                    if value.get('event', "") == 'APPROVED':
+                        template.name = template_live.name
+                        template.pending_name = ""
 
-                            template.category = template_live.category
-                            template.pending_category = ""
+                        template.category = template_live.category
+                        template.pending_category = ""
 
-                            template.language = template_live.language
-                            template.pending_language = ""
+                        template.language = template_live.language
+                        template.pending_language = ""
 
-                            template.components = template_live.components
-                            template.pending_components = []
-                        template.save()
+                        template.components = template_live.components
+                        template.pending_components = []
+                    template.save()
         response = HttpResponse("")
         response.status_code = 200     
         
