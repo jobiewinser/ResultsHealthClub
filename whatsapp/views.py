@@ -112,7 +112,6 @@ class Webhooks(View):
                             )[0]                
 
                 elif field == 'message_template_status_update':                    
-                    value = status_dict.get('value')
                     template = WhatsappTemplate.objects.get(message_template_id=value.get('message_template_id'))
                     template.status=value.get('event')
                     template.latest_reason=value.get('reason')
