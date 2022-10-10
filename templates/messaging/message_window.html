@@ -19,13 +19,13 @@
         <form id="message_form_{{customer_number}}" hx-ws="send:submit">
             <div style="position: absolute; right:0; bottom: 0; width:100%" class="row" id="message_input_div_{{customer_number}}"> 
                     <div class="col"> 
-                        <input class="form-control" id="message_input_{{customer_number}}"  name="message"  type="text">
+                        <input class="form-control message_input_text" id="message_input_{{customer_number}}"  name="message"  type="text">
                         </input>
                         <input hidden class="form-control" value="{{customer_number}}"  name="chat_box_whatsapp_number"  type="text">
                         </input>                        
                     </div>
                     <div class="col-auto"> 
-                        <button onclick="this.value= ''" class="badge bg-primary message_submit" id="message_submit_{{customer_number}}"><i class="fa-solid fa-paper-plane-top"></i></button>
+                        <button onclick="setTimeout(function (){$('#message_input_{{customer_number}}').val('')}, 10);" class="badge bg-primary message_submit" id="message_submit_{{customer_number}}"><i class="fa-solid fa-paper-plane-top"></i></button>
                     </div>
             </div>
         </form>

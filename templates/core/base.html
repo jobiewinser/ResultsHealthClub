@@ -76,7 +76,6 @@
                             $('#generic_modal').modal('show');
                         }
                         if (![undefined, ''].includes(evt.detail.pathInfo.path)){
-                            console.log(evt.detail.pathInfo.path)
                             if (evt.detail.pathInfo.path.includes("modify-user")){
                                 $('#generic_modal').modal('hide');
                                 snackbarShow('Successfully modifed/added user', 'success')
@@ -199,7 +198,7 @@
                 </div>
                 {%block overide_content%}    
                 <div class="col d-flex flex-column h-sm-100 p-0" style="overflow-x:hidden"> 
-                    <main class="row  p-0 mt-2"">
+                    <main class="row  p-0 mt-2">
                         {%block content%} 
                         {%endblock content%}
                     </main>
@@ -252,23 +251,7 @@
             
         $(document).ready(function() {
             document.body.addEventListener('htmx:afterSwap', function(evt) {  
-                console.log(evt)
             });
-            {% comment %} document.querySelector('.message_submit').onclick = function (e) {
-                const messageInputDom = document.querySelector('#message_input_'+id);
-                const message = messageInputDom.value;
-                if (message != ''){
-                    $(`<div class="row chat_row_`+id+` pending message_pending_`+id+`">
-                        <div class="col p-0 ps-1 m-1 card chat_row_`+id+`">
-                            `+message+`
-                        </div>
-                        <div class="col-auto p-0 ps-1 m-1">
-                            <img src="`+"{{request.user.profile.avatar.url}}"+`" alt="" width="22" height="22" class="rounded-circle">
-                        </div>
-                    </div>`).insertBefore('#message_input_div_'+id);
-                }
-                
-            }; {% endcomment %}
         });
         </script>
         {%endblock chat_bottom%}
