@@ -51,7 +51,7 @@ align-items: flex-start;" hx-ws="connect:/ws/chatlistrow/{{site.pk}}/">
         <span id="next_chat_window"></span>
         {%if site%}
         <div class="card chat_bottom_window p-0">
-            <div class="card-header chat_bottom_header center " data-bs-toggle="collapse" data-bs-target="#messageCollapse" aria-expanded="false" aria-controls="messageCollapse">
+            <div class="card-header chat_bottom_header center " data-bs-toggle="collapse" data-bs-target="#messageCollapse_{{site.pk}}" aria-expanded="false" aria-controls="messageCollapse_{{site.pk}}">
                 <b>Chats for {{site.name}}</b>
             </div>
             <div class="card-body message_list_body collapse show p-0" id="messageCollapse_{{site.pk}}">
