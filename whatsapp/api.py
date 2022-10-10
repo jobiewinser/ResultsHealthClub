@@ -91,6 +91,7 @@ class Whatsapp():
         }
         response = requests.post(url=url, json=body, headers=headers)
         response_body = response.json()
+        print(response_body)
         template_object.message_template_id = response_body['id']
         template_object.save()
         return response_body
