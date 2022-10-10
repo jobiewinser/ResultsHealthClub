@@ -19,7 +19,7 @@
                     <i class="fa fa-whatsapp" aria-hidden="true"></i> {{lead.whatsapp_number}}
                 </div>
                 <div class="col-md-auto p-0" style="text-align:right"> 
-                    {%if not lead.whatsappmessage_set.all%}
+                    {%if not lead.message_set.all%}
                     <button class="btn btn-sm btn-success text-white position-relative" 
                         hx-get="{%url 'send-first-template-whatsapp' lead_pk=lead.pk%}"
                         hx-indicator=".htmx-indicator" 

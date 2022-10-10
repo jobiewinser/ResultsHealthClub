@@ -13,9 +13,9 @@ from channels.layers import get_channel_layer
 logger = logging.getLogger(__name__)
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        self.chat_box_whatsapp_number = self.scope["url_route"]["kwargs"]["chat_box_whatsapp_number"]
+        # self.chat_box_whatsapp_number = self.scope["url_route"]["kwargs"]["chat_box_whatsapp_number"]
         self.chat_box_site_pk = self.scope["url_route"]["kwargs"]["chat_box_site_pk"]
-        self.group_name = f"chat_{self.chat_box_whatsapp_number}_{self.chat_box_site_pk}"
+        self.group_name = f"chatlistrow_{self.chat_box_site_pk}"
         self.user = self.scope["user"]
         await self.channel_layer.group_add(self.group_name, self.channel_name)
         await self.accept()
@@ -43,63 +43,65 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     },
                 )
     # Receive message from room group.
+    
     async def chatbox_message(self, event):
         await self.send(
-            text_data=json.dumps(
-                {
-                    "message": event.get("message", None),
-                    "user_name": event.get("user_name", None),
-                    "whatsapp_number": event.get("whatsapp_number", None),
-                    "user_avatar": event.get("user_avatar", None),
-                    "datetime": nice_datetime_tag(datetime.now()),
-                    "inbound": event.get("inbound", None),
-                }
-            )
+            text_data=event['message']
+            # json.dumps(
+            #     {
+            #         "message": event.get("message", None),
+            #         "user_name": event.get("user_name", None),
+            #         "whatsapp_number": event.get("whatsapp_number", None),
+            #         "user_avatar": event.get("user_avatar", None),
+            #         "datetime": nice_datetime_tag(datetime.now()),
+            #         "inbound": event.get("inbound", None),
+            #     }
+            # )
         )
-class ChatListConsumer(AsyncWebsocketConsumer):
-    async def connect(self):
-        self.chat_box_site_pk = self.scope["url_route"]["kwargs"]["chat_box_site_pk"]
-        self.group_name = f"chatlist_{self.chat_box_site_pk}"
-        self.user = self.scope["user"]
-        await self.channel_layer.group_add(self.group_name, self.channel_name)
-        await self.accept()
+# class ChatListConsumer(AsyncWebsocketConsumer):
+#     async def connect(self):
+#         self.chat_box_site_pk = self.scope["url_route"]["kwargs"]["chat_box_site_pk"]
+#         self.group_name = f"chatlist_{self.chat_box_site_pk}"
+#         self.user = self.scope["user"]
+#         await self.channel_layer.group_add(self.group_name, self.channel_name)
+#         await self.accept()
 
-    async def disconnect(self, close_code):
-        await self.channel_layer.group_discard(self.group_name, self.channel_name)
+#     async def disconnect(self, close_code):
+#         await self.channel_layer.group_discard(self.group_name, self.channel_name)
 
-    # This function receive messages from WebSocket.
-    async def receive(self, text_data):        
-        text_data_json = json.loads(text_data)
-        message = text_data_json["message"]
-        user = self.scope["user"]
-        if(user.is_authenticated and self.chat_box_whatsapp_number):
-            if await send_whatsapp_message_to_number(message, self.chat_box_whatsapp_number, user, self.scope["url_route"]["kwargs"]["chat_box_site_pk"]):
-                avatar, name = await message_details_user(user)
-                await self.channel_layer.group_send(
-                    self.group_name,
-                    {
-                        "type": "chatbox_message",
-                        "message": message,
-                        "user_name": name,
-                        "user_avatar": avatar,
-                        "datetime": nice_datetime_tag(datetime.now()),
-                        "inbound": False
-                    },
-                )
-    # Receive message from room group.
-    async def chatlist_message(self, event):
-        await self.send(
-            text_data=json.dumps(
-                {
-                    "message": event.get("message", None),
-                    "user_name": event.get("user_name", None),
-                    "whatsapp_number": event.get("whatsapp_number", None),
-                    "user_avatar": event.get("user_avatar", None),
-                    "datetime": nice_datetime_tag(datetime.now()),
-                    "inbound": event.get("inbound", None),
-                }
-            )
-        )
+#     # This function receive messages from WebSocket.
+#     async def receive(self, text_data):        
+#         text_data_json = json.loads(text_data)
+#         message = text_data_json["message"]
+#         user = self.scope["user"]
+#         if(user.is_authenticated and self.chat_box_whatsapp_number):
+#             if await send_whatsapp_message_to_number(message, self.chat_box_whatsapp_number, user, self.scope["url_route"]["kwargs"]["chat_box_site_pk"]):
+#                 avatar, name = await message_details_user(user)
+#                 await self.channel_layer.group_send(
+#                     self.group_name,
+#                     {
+#                         "type": "chatbox_message",
+#                         "message": message,
+#                         "user_name": name,
+#                         "user_avatar": avatar,
+#                         "datetime": nice_datetime_tag(datetime.now()),
+#                         "inbound": False
+#                     },
+#                 )
+#     # Receive message from room group.
+#     async def chatlist_message(self, event):
+#         await self.send(
+#             text_data=json.dumps(
+#                 {
+#                     "message": event.get("message", None),
+#                     "user_name": event.get("user_name", None),
+#                     "whatsapp_number": event.get("whatsapp_number", None),
+#                     "user_avatar": event.get("user_avatar", None),
+#                     "datetime": nice_datetime_tag(datetime.now()),
+#                     "inbound": event.get("inbound", None),
+#                 }
+#             )
+#         )
 
 
 

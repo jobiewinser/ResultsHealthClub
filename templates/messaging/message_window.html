@@ -13,43 +13,8 @@
         </div>
     </div>
     <div class="card-body chat_card_body collapse show p-0" id="messageWindowCollapse_{{customer_number}}">
-        {%for whatsappmessage in messages%}
-            {%if whatsappmessage.inbound%}
-                <div class="row"
-                    data-bs-toggle="popover" 
-                    data-bs-trigger="hover" 
-                    data-bs-html="true" 
-                    data-bs-placement="top"
-                    data-bs-title="Message Details"
-                    data-bs-content="
-                    Sent at <b>{{whatsappmessage.datetime|nice_datetime_tag}}</b><br>
-                    By <b>{%if lead.name%}{{lead.name}}{%else%}{{customer_number}}{%endif%}</b>"
-                >
-                    <div class="col-auto p-0 ps-1 m-1">
-                        <img src="{% static 'img/blank-profile-picture.png' %}" alt="" width="22" height="22" class="rounded-circle">
-                    </div>
-                    <div class="col p-0 ps-1 m-1 card chat_row_{{customer_number}}">
-                        {{whatsappmessage.message}}
-                    </div>
-                </div>
-            {%else%}
-                <div class="row"
-                data-bs-toggle="popover" 
-                data-bs-trigger="hover" 
-                data-bs-html="true" 
-                data-bs-placement="top"
-                data-bs-title="Message Details"
-                data-bs-content="
-                Sent at <b>{{whatsappmessage.datetime|nice_datetime_tag}}</b><br>
-                By <b>{{whatsappmessage.user.profile.name}}</b>">
-                    <div class="col p-0 ps-1 m-1 card chat_row_{{customer_number}}">
-                        {{whatsappmessage.message}}
-                    </div>
-                    <div class="col-auto p-0 ps-1 m-1">
-                        <img src="{{whatsappmessage.user.profile.avatar.url}}" alt="" width="22" height="22" class="rounded-circle">
-                    </div>
-                </div>
-            {%endif%}
+        {%for message in messages%}
+            {%include 'messaging/htmx/message_chat_row.html'%}
         {%endfor%}
         <form action="javascript:void(0);">
         <div style="position: absolute; right:0; bottom: 0; width:100%" class="row" id="message_input_div_{{customer_number}}"> 

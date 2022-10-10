@@ -4,42 +4,9 @@ display: flex;
 flex-wrap: wrap;
 align-items: flex-start;">
     <script>
-        $(document).ready(function() {          
-            console.log("{{request.session.open_chats|safe}}")   
-            {% if site%}           
-            const chatListSocket = new WebSocket(                            
-                'ws{%if not 'DEBUG'|settings_value%}s{%endif%}://'+window.location.host+'/ws/chatlist/{{site.pk}}/'                            
-            );
-            chatListSocket.onmessage = function (e) {
-                const data = JSON.parse(e.data);
-                if ($('#latest_message_content_'+data.whatsapp_number).length > 0){
-                    let messages_list_row = $('#latest_message_content_'+data.whatsapp_number).closest('.chat_row')
-                    messages_list_row.prependTo("#messageCollapse");
-                    $('#latest_message_avatar_'+data.whatsapp_number).attr("src", data.user_avatar);
-                    if (typeof data.user_name === 'string') {
-                        $('#latest_message_name_'+data.whatsapp_number).html(data.user_name)
-                    } else {
-                        $('#latest_message_name_'+data.whatsapp_number).html(data.whatsapp_number)
-                    }
-                    if (data.inbound) {
-                        $('#latest_message_content_'+data.whatsapp_number).html("Them: " + data.message)
-                        $('#latest_message_row_'+data.whatsapp_number).removeClass("inactive_chat_row")
-                        $('#latest_message_content_'+data.whatsapp_number).attr("data-bs-content", "Sent <b>Now</b><br>By <b>"+data.whatsapp_number+"</b>");
-                        messages_list_row.attr("data-bs-content", "Received <b>Now</b><br>By <b>"+data.whatsapp_number+"</b>");
-                    } else {                    
-                        $('#latest_message_content_'+data.whatsapp_number).html("You: " + data.message)
-                        $('#latest_message_row_'+data.whatsapp_number).addClass("inactive_chat_row")
-                        $('#latest_message_content_'+data.whatsapp_number).attr("data-bs-content", "Sent <b>Now</b><br>By <b>"+data.whatsapp_number+"</b>");
-                        messages_list_row.attr("data-bs-content", "Sent <b>Now</b><br>By <b>"+data.whatsapp_number+"</b>");
-                    }                        
-                    messages_list_row.attr("data-bs-toggle", "popover").attr("data-bs-trigger", "hover").attr("data-bs-html", "true").attr("data-bs-placement", "top").attr("data-bs-title", "Message Details").popover();
-                } else {
-                    
-                    htmx.ajax('GET', '/get-message-list-row/?site_pk={{site.pk}}&whatsapp_number='+data.whatsapp_number, {target:'#messageCollapse', swap:'afterbegin'})
-                }
+        $(document).ready(function() {   
+            {% if site%}      
 
-                
-            }
             {%endif%}
             document.body.addEventListener('htmx:beforeRequest', function(evt) {  
                 if (evt.detail.target.id == 'next_chat_window'){
@@ -51,97 +18,32 @@ align-items: flex-start;">
                     }
                 }
             });
-            document.body.addEventListener('htmx:afterSwap', function(evt) {   
-                if (evt.detail.target.id == 'next_chat_window'){
-                    let id = $(evt.srcElement).data('whatsapp-number');
-                    if (id != undefined){
-                        const user = "{{user.pk}}";
-                        const site_pk = "{{site_pk}}";
-                        document.querySelector('#message_submit_'+id).onclick = function (e) {
-                            const messageInputDom = document.querySelector('#message_input_'+id);
-                            const message = messageInputDom.value;
-                            if (message != ''){
-                                $(`<div class="row chat_row_`+id+` pending message_pending_`+id+`">
-                                    <div class="col p-0 ps-1 m-1 card chat_row_`+id+`">
-                                        `+message+`
-                                    </div>
-                                    <div class="col-auto p-0 ps-1 m-1">
-                                        <img src="`+"{{request.user.profile.avatar.url}}"+`" alt="" width="22" height="22" class="rounded-circle">
-                                    </div>
-                                </div>`).insertBefore('#message_input_div_'+id);
-
-                                chatSocket.send(JSON.stringify({
-                                    'message': message,
-                                    'user': user,
-                                    'site_pk': site_pk,
-                                }));
-                                messageInputDom.value = '';
-                                {% comment %} $("#messageWindowCollapse_"+id).scrollTop($($("#messageWindowCollapse_"+id)).height() + (50 * document.querySelectorAll('.chat_row_'+id).length)); {% endcomment %}
-                            }
-                        };
-                        
-                        const chatSocket = new WebSocket(                            
-                            'ws{%if not 'DEBUG'|settings_value%}s{%endif%}://'+window.location.host+'/ws/chat/'+id+'/{{site.pk}}/'                            
-                        );
-                        
-                        chatSocket.onmessage = function (e) {
-                            const data = JSON.parse(e.data);
-                            let user_avatar = data.user_avatar
-                            let user_name = data.user_name
-                            let datetime = data.datetime
-                            if (user_avatar == null) {
-                                user_avatar = "{% static 'img/blank-profile-picture.png' %}"
-                            }
-                            if (data.inbound == true){
-                                $(`<div class="row" id="message_row_`+id+`">
-                                    <div class="col-auto p-0 ps-1 m-1">
-                                        <img src="`+user_avatar+`" alt="" width="22" height="22" class="rounded-circle">
-                                    </div>
-                                    <div class="col p-0 ps-1 m-1 card chat_row_`+id+`">
-                                        `+data.message+`
-                                    </div>
-                                </div>`).insertBefore('#message_input_div_'+id);
-                                $('#chat_notification_'+id).append( $(
-                                    "<span hx-swap-oob='true' id='chat_notification_"+id+"''> \
-                                        <span class='position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle'> \
-                                            <span class='visually-hidden'>New alerts</span> \
-                                        </span> \
-                                    </span>"
-                                 ) )
-                                
-                            } else{
-                                let new_chat =  $(`<div class="row" id="message_row_`+id+`"
-                                data-bs-toggle="popover" 
-                                data-bs-trigger="hover" 
-                                data-bs-html="true" 
-                                data-bs-placement="top"
-                                data-bs-title="Message Details"
-                                data-bs-content="
-                                Sent at <b>`+datetime+`</b><br>
-                                By <b>`+user_name+`</b>">
-                                    <div class="col p-0 ps-1 m-1 card chat_row_`+id+`">
-                                        `+data.message+`
-                                    </div>
-                                    <div class="col-auto p-0 ps-1 m-1">
-                                        <img src="`+user_avatar+`" alt="" width="22" height="22" class="rounded-circle">
-                                    </div>
-                                </div>`);
-                                if ($('.message_pending_'+id).length > 0){
-                                    $('.message_pending_'+id).first().replaceWith(new_chat);
-                                } else {                                
-                                    new_chat.insertBefore('#message_input_div_'+id);
-                                }
-                                $('#chat_notification_'+id).html('')
-                            }
-                            $('#message_row_'+id).popover();                            
-
-                            $("#messageWindowCollapse_"+id).scrollTop($($("#messageWindowCollapse_"+id)).height() + (50 * document.querySelectorAll('.chat_row_'+id).length));
-                        }
-                    }
-                    $("#messageWindowCollapse_"+id).scrollTop($($("#messageWindowCollapse_"+id)).height() + (50 * document.querySelectorAll('.chat_row_'+id).length));
+            
+        })
+        function clear_chat_from_session(whatsapp_number){
+            var respStatus = $.ajax({
+                type:'POST',
+                url:'{%url "clear-chat-from-session"%}',
+                data:{'whatsapp_number':whatsapp_number, 'csrfmiddlewaretoken':'{{ csrf_token }}'},
+                success: function (data) {
+                },
+                error: function(XMLHttpRequest, textStatus, errorThrown) {
                 }
             })
-        })
+        }
+        function add_chat_to_session(whatsapp_number){
+            if ($('#chat_card_'+whatsapp_number).length === 0){
+                var respStatus = $.ajax({
+                    type:'POST',
+                    url:'{%url "add-chat-to-session"%}',
+                    data:{'whatsapp_number':whatsapp_number, 'csrfmiddlewaretoken':'{{ csrf_token }}'},
+                    success: function (data) {
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    }
+                })
+            }
+        }
         
         
     </script>
@@ -152,7 +54,7 @@ align-items: flex-start;">
             <div class="card-header chat_bottom_header center " data-bs-toggle="collapse" data-bs-target="#messageCollapse" aria-expanded="false" aria-controls="messageCollapse">
                 <b>Chats for {{site.name}}</b>
             </div>
-            <div class="card-body message_list_body collapse show p-0" id="messageCollapse">
+            <div class="card-body message_list_body collapse show p-0" id="messageCollapse_{{site.pk}}" hx-ws="connect:/ws/chatlistrow/{{site.pk}}/" >
                 {%for message in site.get_fresh_messages%}
                 {%include 'messaging/htmx/message_list_row.html' %}
                 {%endfor%}
@@ -169,12 +71,10 @@ align-items: flex-start;">
 
 {%if site%}
 {%for message in site.get_fresh_messages%}
-{%if message.inbound%}
 <span hx-swap-oob="true" id="chat_notification_{{message.customer_number}}">
     <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
         <span class="visually-hidden">New alerts</span>
     </span>
 </span>
-{%endif%}
 {%endfor%}
 {%endif%}

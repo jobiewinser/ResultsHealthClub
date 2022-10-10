@@ -10,6 +10,7 @@ from messaging.consumers import ChatConsumer
 from whatsapp.api import Whatsapp
 from django.views.generic import TemplateView
 from whatsapp.models import WHATSAPP_ORDER_CHOICES, WhatsAppMessage, WhatsAppMessageStatus, WhatsAppWebhook, WhatsappTemplate, template_variables
+from django.template import loader
 logger = logging.getLogger(__name__)
 from django.views import View 
 from django.utils.decorators import method_decorator
@@ -71,32 +72,26 @@ class Webhooks(View):
                             whatsapp_message.save()
                             from channels.layers import get_channel_layer
                             channel_layer = get_channel_layer()
-                            if lead:
-                                name = lead.name
-                            else:
-                                name = from_number
+                            
+                            message_context = {
+                                "message": whatsapp_message,
+                                "site": site,
+                            }
+                            rendered_message_list_row = loader.render_to_string('messaging/htmx/message_list_row.html', message_context)
+                            rendered_message_chat_row = loader.render_to_string('messaging/htmx/message_chat_row.html', message_context)
+                            rendered_htmx = f"""
+                            <span id='messageCollapse_{site.pk}' hx-swap-oob='afterbegin'>{rendered_message_list_row}</span>
+
+                            <span id='messageWindowCollapse_{from_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>
+                            """
                             async_to_sync(channel_layer.group_send)(
-                                f"chat_{from_number}_{site.pk}",
+                                f"chatlistrow_{site.pk}",
                                 {
                                     'type': 'chatbox_message',
-                                    "message": message.get('text').get('body',''),
-                                    "user_name": name,
-                                    "whatsapp_number": from_number,
-                                    "inbound": True,
+                                    "message": rendered_htmx,
                                 }
                             )
                             
-                            async_to_sync(channel_layer.group_send)(
-                                f"chatlist_{site.pk}",
-                                {
-                                    'type': 'chatlist_message',
-                                    "message": message.get('text').get('body',''),
-                                    "user_name": name,
-                                    "whatsapp_number": from_number,
-                                    "user_avatar": "/static/img/blank-profile-picture.png", 
-                                    "inbound": True,
-                                }
-                            )
                             logger.debug("webhook sending to chat end")                     
 
                 elif field == 'statuses':

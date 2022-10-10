@@ -5,7 +5,10 @@
     hx-target="#next_chat_window"
     hx-push-url="false"
     hx-swap="outerHTML" hx-trigger="click"  
+    id="message_list_row_{{message.customer_number}}_{{site.pk}}"
+    {% comment %} {%if htmx_swap_params%}{{htmx_swap_params|safe}}{%endif%} {% endcomment %}
 
+    
     data-bs-toggle="popover" 
     data-bs-trigger="hover" 
     data-bs-html="true" 

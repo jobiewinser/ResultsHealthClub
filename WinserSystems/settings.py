@@ -117,6 +117,7 @@ INSTALLED_APPS = [
     'campaign_leads',
     'active_campaign',
     'whatsapp',
+    'messaging',
     'twilio',
     'analytics',
     'core',
