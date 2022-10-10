@@ -132,7 +132,7 @@ class Webhooks(View):
                             template.pending_language = ""
 
                             template.components = template_live.components
-                            template.pending_language = ""
+                            template.pending_components = []
                         template.save()
         response = HttpResponse("")
         response.status_code = 200     
