@@ -185,7 +185,7 @@ class WhatsappTemplatesView(TemplateView):
             else:
                 site = Site.objects.filter(company=self.request.user.profile.company.first()).first()
         refresh_template_data(site)
-        context['templates'] = WhatsappTemplate.objects.filter(site=site)
+        context['templates'] = WhatsappTemplate.objects.filter(site=site).exclude(archived=True)
         context['site_list'] = Site.objects.all()
         context['site'] = site
         context['WHATSAPP_ORDER_CHOICES'] = WHATSAPP_ORDER_CHOICES
@@ -258,7 +258,8 @@ def delete_whatsapp_template_htmx(request):
     template = WhatsappTemplate.objects.get(pk=body.get('template_pk'))
     if template.message_template_id:
         whatsapp.delete_template(site.whatsapp_business_account_id, template.name)
-    template.delete()
+    # template.delete()
+    template.archived = True
     return HttpResponse("", status=200)
 def whatsapp_approval_htmx(request):
     template = WhatsappTemplate.objects.get(pk=request.POST.get('template_pk'))
