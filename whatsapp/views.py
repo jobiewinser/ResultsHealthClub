@@ -80,6 +80,9 @@ class Webhooks(View):
                             rendered_message_list_row = loader.render_to_string('messaging/htmx/message_list_row.html', message_context)
                             rendered_message_chat_row = loader.render_to_string('messaging/htmx/message_chat_row.html', message_context)
                             rendered_htmx = f"""
+
+                            
+                            <span id='message_list_row_{from_number}_{site.pk}' hx-swap-oob='delete'></span>
                             <span id='messageCollapse_{site.pk}' hx-swap-oob='afterbegin'>{rendered_message_list_row}</span>
 
                             <span id='messageWindowCollapse_{from_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>

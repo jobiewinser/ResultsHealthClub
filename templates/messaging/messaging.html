@@ -2,7 +2,7 @@
 <span id="chat_bottom" class="" style=" 
 display: flex;
 flex-wrap: wrap;
-align-items: flex-start;">
+align-items: flex-start;" hx-ws="connect:/ws/chatlistrow/{{site.pk}}/">
     <script>
         $(document).ready(function() {   
             {% if site%}      
@@ -54,7 +54,7 @@ align-items: flex-start;">
             <div class="card-header chat_bottom_header center " data-bs-toggle="collapse" data-bs-target="#messageCollapse" aria-expanded="false" aria-controls="messageCollapse">
                 <b>Chats for {{site.name}}</b>
             </div>
-            <div class="card-body message_list_body collapse show p-0" id="messageCollapse_{{site.pk}}" hx-ws="connect:/ws/chatlistrow/{{site.pk}}/" >
+            <div class="card-body message_list_body collapse show p-0" id="messageCollapse_{{site.pk}}">
                 {%for message in site.get_fresh_messages%}
                 {%include 'messaging/htmx/message_list_row.html' %}
                 {%endfor%}

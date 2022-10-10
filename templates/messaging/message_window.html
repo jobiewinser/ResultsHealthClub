@@ -16,17 +16,18 @@
         {%for message in messages%}
             {%include 'messaging/htmx/message_chat_row.html'%}
         {%endfor%}
-        <form action="javascript:void(0);">
-        <div style="position: absolute; right:0; bottom: 0; width:100%" class="row" id="message_input_div_{{customer_number}}"> 
-                <div class="col"> 
-                    <input class="form-control" id="message_input_{{customer_number}}"  type="text">
-            
-                    </input>
-                </div>
-                <div class="col-auto"> 
-                    <button class="badge bg-primary" id="message_submit_{{customer_number}}"><i class="fa-solid fa-paper-plane-top"></i></button>
-                </div>
-        </div>
-    </form>
+        <form id="message_form_{{customer_number}}" hx-ws="send:submit">
+            <div style="position: absolute; right:0; bottom: 0; width:100%" class="row" id="message_input_div_{{customer_number}}"> 
+                    <div class="col"> 
+                        <input class="form-control" id="message_input_{{customer_number}}"  name="message"  type="text">
+                        </input>
+                        <input hidden class="form-control" value="{{customer_number}}"  name="chat_box_whatsapp_number"  type="text">
+                        </input>                        
+                    </div>
+                    <div class="col-auto"> 
+                        <button onclick="this.value= ''" class="badge bg-primary message_submit" id="message_submit_{{customer_number}}"><i class="fa-solid fa-paper-plane-top"></i></button>
+                    </div>
+            </div>
+        </form>
     </div>
 </div>

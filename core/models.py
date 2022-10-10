@@ -54,7 +54,7 @@ class Site(models.Model):
                 reponse_messages = response.get('messages',[])
                 if reponse_messages:
                     for response_message in reponse_messages:
-                        WhatsAppMessage.objects.get_or_create(
+                        message, created = WhatsAppMessage.objects.get_or_create(
                             wamid=response_message.get('id'),
                             message=message,
                             datetime=datetime.now(),
@@ -67,10 +67,10 @@ class Site(models.Model):
                             inbound=False
                         )
                     logger.debug("site.send_whatsapp_message success") 
-                    return True
+                    return message
                 
                 logger.debug("site.send_whatsapp_message fail") 
-                return False
+                return None
             logger.debug(f"""site.send_whatsapp_message error: 
             
                 (settings.ENABLE_WHATSAPP_MESSAGING,{str(settings.ENABLE_WHATSAPP_MESSAGING)})             
@@ -80,7 +80,7 @@ class Site(models.Model):
             """) 
         except Exception as e:
             logger.debug("site.send_whatsapp_message error: "+str(e)) 
-            return False
+            return None
 
     def get_fresh_messages(self):
         return WhatsAppMessage.objects.filter(site=self).order_by('-datetime').order_by('customer_number').distinct('customer_number')

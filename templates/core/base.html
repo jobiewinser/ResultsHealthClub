@@ -224,6 +224,54 @@
         </div>
         {%block snackbar%}
         <div id="snackbar"></div>
+        {%block chat_bottom%}
+        <span id="chat_bottom" class="" style=" 
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;">
+        
+        {%if site%}
+        <input hidden
+        hx-get="{%url 'get-messaging-window'%}"
+        hx-target="#chat_bottom"
+        hx-swap="#outerHTML"
+        hx-indicator=".htmx-indicator"                 
+        hx-vals='{"site_pk": "{{site.pk}}"}'
+        hx-trigger="load"/>
+        {%else%}
+        <link href="/static/css/chat.css" rel="stylesheet">
+                <span id="next_chat_window"></span>
+        <div class="card card-body chat_bottom_window">
+            <div class="card-header chat_bottom_header">
+                Select a site to chat
+            </div>
+        </div>
+        {%endif%}
+        </span>
+        <script>
+            
+        $(document).ready(function() {
+            document.body.addEventListener('htmx:afterSwap', function(evt) {  
+                console.log(evt)
+            });
+            {% comment %} document.querySelector('.message_submit').onclick = function (e) {
+                const messageInputDom = document.querySelector('#message_input_'+id);
+                const message = messageInputDom.value;
+                if (message != ''){
+                    $(`<div class="row chat_row_`+id+` pending message_pending_`+id+`">
+                        <div class="col p-0 ps-1 m-1 card chat_row_`+id+`">
+                            `+message+`
+                        </div>
+                        <div class="col-auto p-0 ps-1 m-1">
+                            <img src="`+"{{request.user.profile.avatar.url}}"+`" alt="" width="22" height="22" class="rounded-circle">
+                        </div>
+                    </div>`).insertBefore('#message_input_div_'+id);
+                }
+                
+            }; {% endcomment %}
+        });
+        </script>
+        {%endblock chat_bottom%}
         {%endblock snackbar%}
         
     </body>
