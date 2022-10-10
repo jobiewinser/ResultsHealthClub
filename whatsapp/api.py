@@ -93,14 +93,14 @@ class Whatsapp():
                 
         from django.core.mail import send_mail
         from django.shortcuts import render
-        description = f"<p>body: {str(body)}}"
+        response = requests.post(url=url, json=body, headers=headers)
+        response_body = response.json()
+        description = f"<p>body: {str(body)}</p><br><p>response_body: {str(response_body)}</p>"
         send_mail(
             subject='Winser Systems Prod - create template ',
             message=description,
             from_email='jobiewinser@gmail.com',
             recipient_list=['jobiewinser@gmail.com'])
-        response = requests.post(url=url, json=body, headers=headers)
-        response_body = response.json()
         print(response_body)
         template_object.message_template_id = response_body['id']
         template_object.save()
