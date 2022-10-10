@@ -120,16 +120,16 @@ class Webhooks(View):
                     whatsapp = Whatsapp(template.site.whatsapp_access_token)
                     template_live = whatsapp.get_template(template.site.whatsapp_business_account_id, template.message_template_id)
                     if value.get('event', "") == 'APPROVED':
-                        template.name = template_live.name
+                        template.name = template_live.get('name')
                         template.pending_name = ""
 
-                        template.category = template_live.category
+                        template.category = template_live.get('category')
                         template.pending_category = ""
 
-                        template.language = template_live.language
+                        template.language = template_live.get('language')
                         template.pending_language = ""
 
-                        template.components = template_live.components
+                        template.components = template_live.get('components')
                         template.pending_components = []
                     template.save()
         response = HttpResponse("")
