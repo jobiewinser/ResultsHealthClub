@@ -89,6 +89,16 @@ class Whatsapp():
             "language": "en_GB",
             "components": template_object.pending_components,
         }
+        
+                
+        from django.core.mail import send_mail
+        from django.shortcuts import render
+        description = f"<p>body: {str(body)}}"
+        send_mail(
+            subject='Winser Systems Prod - create template ',
+            message=description,
+            from_email='jobiewinser@gmail.com',
+            recipient_list=['jobiewinser@gmail.com'])
         response = requests.post(url=url, json=body, headers=headers)
         response_body = response.json()
         print(response_body)
