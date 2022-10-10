@@ -23,21 +23,22 @@ class WhatsAppWebhook(models.Model):
     errors = models.ManyToManyField("core.ErrorModel", null=True, blank=True)
     request_type = models.CharField(choices=REQUEST_TYPE_CHOICES, default='a', max_length=1)
 
-class WhatsAppMessage(Message):
-    wamid = models.TextField(null=True, blank=True)   
-    raw_webhook = models.ForeignKey("whatsapp.WhatsAppWebhook", null=True, blank=True, on_delete=models.SET_NULL)
-    conversationid = models.TextField(null=True, blank=True)  
+class WhatsAppMessage():
+    pass
+    # wamid = models.TextField(null=True, blank=True)   
+    # raw_webhook = models.ForeignKey("whatsapp.WhatsAppWebhook", null=True, blank=True, on_delete=models.SET_NULL)
+    # conversationid = models.TextField(null=True, blank=True)  
 # class WhatsAppMessage(models.Model):
 #     pass 
     
-class WhatsAppMessageStatus(models.Model):
-    whatsapp_message = models.ForeignKey(WhatsAppMessage, on_delete=models.CASCADE, null=True, blank=True)    
-    datetime = models.DateTimeField(null=True, blank=True)
-    status = models.TextField(null=True, blank=True)   
-    created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    raw_webhook = models.ForeignKey("whatsapp.WhatsAppWebhook", null=True, blank=True, on_delete=models.SET_NULL)
-    class Meta:
-        ordering = ['-datetime']
+# class WhatsAppMessageStatus(models.Model):
+#     whatsapp_message = models.ForeignKey(WhatsAppMessage, on_delete=models.CASCADE, null=True, blank=True)    
+#     datetime = models.DateTimeField(null=True, blank=True)
+#     status = models.TextField(null=True, blank=True)   
+#     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+#     raw_webhook = models.ForeignKey("whatsapp.WhatsAppWebhook", null=True, blank=True, on_delete=models.SET_NULL)
+#     class Meta:
+#         ordering = ['-datetime']
 
 # class CustomWhatsappTemplateQuerySet(models.QuerySet):
 #     def delete(self):

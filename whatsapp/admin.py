@@ -13,33 +13,33 @@ class WhatsAppWebhookAdmin(admin.ModelAdmin):
     search_fields = ['pk']
 admin.site.register(WhatsAppWebhook, WhatsAppWebhookAdmin)
 
-class WhatsAppMessageAdmin(admin.ModelAdmin):
-    list_display = [
-        'system_user_number',  
-        'customer_number', 
-        'inbound',     
-        'datetime',  
-        'message',   
-        'site',  
-        'created',  
-        'template',
-        'conversationid',  
-        'wamid',    
-        'raw_webhook',
-        ]
-    search_fields = ['pk']
-admin.site.register(WhatsAppMessage, WhatsAppMessageAdmin)
+# class WhatsAppMessageAdmin(admin.ModelAdmin):
+#     list_display = [
+#         'system_user_number',  
+#         'customer_number', 
+#         'inbound',     
+#         'datetime',  
+#         'message',   
+#         'site',  
+#         'created',  
+#         'template',
+#         'conversationid',  
+#         'wamid',    
+#         'raw_webhook',
+#         ]
+#     search_fields = ['pk']
+# admin.site.register(WhatsAppMessage, WhatsAppMessageAdmin)
 
-class WhatsAppMessageStatusAdmin(admin.ModelAdmin):
-    list_display = [
-        'whatsapp_message',  
-        'datetime', 
-        'status',     
-        'created',  
-        'raw_webhook',   
-    ]
-    search_fields = ['pk']
-admin.site.register(WhatsAppMessageStatus, WhatsAppMessageStatusAdmin)
+# class WhatsAppMessageStatusAdmin(admin.ModelAdmin):
+#     list_display = [
+#         'whatsapp_message',  
+#         'datetime', 
+#         'status',     
+#         'created',  
+#         'raw_webhook',   
+#     ]
+#     search_fields = ['pk']
+# admin.site.register(WhatsAppMessageStatus, WhatsAppMessageStatusAdmin)
 
 class WhatsAppTemplateAdmin(admin.ModelAdmin):
     list_display = [
