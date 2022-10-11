@@ -19,7 +19,7 @@
     {%if message.inbound%}
         By <b>{%if message.lead.name%}{{message.lead.name}}{%else%}{{message.customer_number}}{%endif%}</b>
     {%else%}
-        {%if message.user.profile.name%}{{message.user.profile.name}}{%else%}Winser Systems{%endif%}
+        By <b>{%if message.user.profile.name%}{{message.user.profile.name}}{%else%}Winser Systems{%endif%}</b>
     {%endif%}"
     data-whatsapp-number="{{message.customer_number}}"
     id="latest_message_row_{{message.customer_number}}"

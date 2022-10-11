@@ -46,8 +46,22 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 <span id='message_list_row_{chat_box_whatsapp_number}_{site.pk}' hx-swap-oob='delete'></span>
                 <span id='messageCollapse_{site.pk}' hx-swap-oob='afterbegin'>{rendered_message_list_row}</span>
 
-                <span id='messageWindowCollapse_{chat_box_whatsapp_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>
+                <span id='messageWindowCollapse_{chat_box_whatsapp_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>                
                 """
+
+                if message.inbound:
+                    rendered_htmx = f"""{rendered_htmx}
+                    <span hx-swap-oob="true" id="chat_notification_{message.customer_number}">
+                        <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
+                            <span class="visually-hidden">New alerts</span>
+                        </span>
+                    </span>
+                    """
+                else:
+                    rendered_htmx = f"""{rendered_htmx}
+                    <span hx-swap-oob="true" id="chat_notification_{message.customer_number}">
+                    </span>
+                    """
                 
                 await self.channel_layer.group_send(
                     self.group_name,
