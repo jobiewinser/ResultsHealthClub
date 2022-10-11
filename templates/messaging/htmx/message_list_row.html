@@ -15,9 +15,12 @@
     data-bs-placement="top"
     data-bs-title="Message Details"
     data-bs-content="
-    Sent at <b>{{message.datetime|nice_datetime_tag}}</b><br>
-    By <b>{%if message.lead.name%}{{message.lead.name}}{%else%}{{message.customer_number}}{%endif%}</b>"
-
+        Sent at <b>{{message.datetime|nice_datetime_tag}}</b><br>
+    {%if message.inbound%}
+        By <b>{%if message.lead.name%}{{message.lead.name}}{%else%}{{message.customer_number}}{%endif%}</b>
+    {%else%}
+        {%if message.user.profile.name%}{{message.user.profile.name}}{%else%}Winser Systems{%endif%}
+    {%endif%}"
     data-whatsapp-number="{{message.customer_number}}"
     id="latest_message_row_{{message.customer_number}}"
     >
