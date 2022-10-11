@@ -44,7 +44,7 @@ def get_messaging_list_row(request, **kwargs):
 def send_first_template_whatsapp_htmx(request, **kwargs):
     try:
         lead = Campaignlead.objects.get(pk=kwargs.get('lead_pk'))
-        if not lead.whatsappmessage_set.all():
+        if not lead.message_set.all():
             lead.send_template_whatsapp_message(1, communication_method='a')
         messages = WhatsAppMessage.objects.filter(customer_number=kwargs.get('customer_number'), site__pk=kwargs.get('chat_box_site_pk')).order_by('datetime')
         context = {}
