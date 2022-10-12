@@ -31,18 +31,17 @@ class Site(models.Model):
     calendly_webhook_created = models.BooleanField(default=False)    
 
     def save(self, *args, **kwargs):  # noqa D102
-        try:
-            if not self.calendly_webhook_created:
-                if self.calendly_token and self.company.calendly_enabled:
-                    calendly = Calendly(self.calendly_token)
-                    if self.calendly_user:
-                        calendly.create_webhook_subscription(user = self.calendly_user)
-                    elif self.calendly_organization:
-                        calendly.create_webhook_subscription(organization = self.calendly_organization)
-
-            super(Campaignlead, self).save(*args, **kwargs)
-        except Exception as e:
-            pass
+        # try:
+        if not self.calendly_webhook_created:
+            if self.calendly_token and self.company.calendly_enabled:
+                calendly = Calendly(self.calendly_token)
+                if self.calendly_user:
+                    calendly.create_webhook_subscription(user = self.calendly_user)
+                elif self.calendly_organization:
+                    calendly.create_webhook_subscription(organization = self.calendly_organization)
+        # except:
+        #     pass
+        return super(Campaignlead, self).save(*args, **kwargs)
     @property
     def get_company(self):
         if self.company.all():
