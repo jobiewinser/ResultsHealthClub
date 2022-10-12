@@ -33,7 +33,7 @@ class Site(models.Model):
     def save(self, *args, **kwargs):  # noqa D102
         # try:
         if not self.calendly_webhook_created:
-            if self.calendly_token and self.company.calendly_enabled:
+            if self.calendly_token and self.company.all()[0].calendly_enabled:
                 calendly = Calendly(self.calendly_token)
                 if self.calendly_user:
                     calendly.create_webhook_subscription(user = self.calendly_user)
@@ -49,8 +49,8 @@ class Site(models.Model):
         fake_company = Company
         return fake_company
     def generate_lead(self, first_name, email, phone_number, lead_generation_app='a', request=None):
-        if lead_generation_app == 'b' and not self.company.active_campaign_enabled:
-            return HttpResponse(f"Active Campaign is not enabled for {self.company.company_name}", status=500)
+        if lead_generation_app == 'b' and not self.company.all()[0].active_campaign_enabled:
+            return HttpResponse(f"Active Campaign is not enabled for {self.company.all()[0].company_name}", status=500)
         if lead_generation_app == 'a':
             manually_created_campaign, created = ManualCampaign.objects.get_or_create(site=self, name=f"Manually Created")
             lead = Campaignlead.objects.create(
