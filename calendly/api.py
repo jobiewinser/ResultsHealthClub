@@ -48,5 +48,6 @@ class Calendly():
                 body.update({'organization':organization, 'scope':'organization'})
             response = requests.post(url=url, json=body, headers=headers)
             response_body = response.json()
-            print(response_body)
+            print("response_body", response_body)
+            print("body", body)
             return response_body
