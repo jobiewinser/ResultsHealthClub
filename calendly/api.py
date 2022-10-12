@@ -43,9 +43,9 @@ class Calendly():
         }
         if user or organization:
             if user:
-                body.update({'user':user, 'scope':'user'})
+                body.update({'user':f"https://api.calendly.com/organizations/{user}", 'scope':'user'})
             else:
-                body.update({'organization':organization, 'scope':'organization'})
+                body.update({'organization':f"https://api.calendly.com/users/{organization}", 'scope':'organization'})
             response = requests.post(url=url, json=body, headers=headers)
             response_body = response.json()
             print("response_body", response_body)
