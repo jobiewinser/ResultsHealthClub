@@ -35,10 +35,10 @@ class Site(models.Model):
             if not self.calendly_webhook_created:
                 if self.calendly_token and self.company.calendly_enabled:
                     calendly = Calendly(self.calendly_token)
-                    if self.create_webhook_subscription:
+                    if self.calendly_user:
                         calendly.create_webhook_subscription(user = self.calendly_user)
-                    elif self.create_webhook_subscription:
-                        calendly.create_webhook_subscription(user = self.calendly_user)
+                    elif self.calendly_organization:
+                        calendly.create_webhook_subscription(organization = self.calendly_organization)
 
             super(Campaignlead, self).save(*args, **kwargs)
         except Exception as e:
