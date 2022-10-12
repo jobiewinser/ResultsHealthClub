@@ -5,7 +5,7 @@ from campaign_leads.models import Campaign, Campaignlead
 from campaign_leads.views import get_campaign_qs
 from core.views import get_site_pk_from_request
 from active_campaign.api import ActiveCampaign
-from active_campaign.models import ActiveCampaignWebhook, ActiveCampaignList
+from active_campaign.models import ActiveCampaignWebhookRequest, ActiveCampaignList
 from core.models import Site
 logger = logging.getLogger(__name__)
 from django.views import View 
@@ -24,7 +24,7 @@ class Webhooks(View):
             logger.debug(str(request.POST))     
             data = request.POST  
             guid = kwargs.get('guid')
-            ActiveCampaignWebhook.objects.create(json_data = data, guid=guid)       
+            ActiveCampaignWebhookRequest.objects.create(json_data = data, guid=guid)       
             if data.get('type') in ['subscribe','update']:
                 if guid:
                     active_campaign_list = ActiveCampaignList.objects.get(guid=guid)
@@ -57,7 +57,8 @@ class Webhooks(View):
                                 whatsapp_number=phone_number_whole,
                                 active_campaign_list=active_campaign_list,
                                 active_campaign_form_id=data.get('form[id]', None),
-                                possible_duplicate = possible_duplicate
+                                possible_duplicate = possible_duplicate,
+                                email = data.get('contact[email]', "")
                             )
             return HttpResponse("", "text", 200)
         except Exception as e:     
@@ -88,7 +89,6 @@ logger = logging.getLogger(__name__)
 @login_required
 def set_campaign_site(request, **kwargs):
     try:
-        print(request.POST.get('site_pk'))
         campaign = Campaign.objects.get(pk=kwargs.get('campaign_pk'))
         site_pk = request.POST.get('site_pk',None)
         if site_pk:

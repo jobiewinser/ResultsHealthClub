@@ -9,7 +9,7 @@ from campaign_leads.models import Campaignlead, Call
 from messaging.consumers import ChatConsumer
 from whatsapp.api import Whatsapp
 from django.views.generic import TemplateView
-from whatsapp.models import WHATSAPP_ORDER_CHOICES, WhatsAppMessage, WhatsAppMessageStatus, WhatsAppWebhook, WhatsappTemplate, template_variables
+from whatsapp.models import WHATSAPP_ORDER_CHOICES, WhatsAppMessage, WhatsAppMessageStatus, WhatsAppWebhookRequest, WhatsappTemplate, template_variables
 from django.template import loader
 logger = logging.getLogger(__name__)
 from django.views import View 
@@ -30,7 +30,7 @@ class Webhooks(View):
         print(str(body))
         logger.debug(str(body))
            
-        webhook = WhatsAppWebhook.objects.create(
+        webhook = WhatsAppWebhookRequest.objects.create(
             json_data=body,
             request_type='a',
         )

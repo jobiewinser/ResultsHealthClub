@@ -119,6 +119,7 @@ INSTALLED_APPS = [
     'whatsapp',
     'messaging',
     'twilio',
+    'calendly',
     'analytics',
     'core',
     'import_export',

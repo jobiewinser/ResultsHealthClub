@@ -4,14 +4,14 @@ from django.apps import apps
 
 from whatsapp.models import *
 
-class WhatsAppWebhookAdmin(admin.ModelAdmin):
+class WhatsAppWebhookRequestAdmin(admin.ModelAdmin):
     list_display = [
         'request_type',  
         'created',  
         'json_data',   
         ]
     search_fields = ['pk']
-admin.site.register(WhatsAppWebhook, WhatsAppWebhookAdmin)
+admin.site.register(WhatsAppWebhookRequest, WhatsAppWebhookRequestAdmin)
 
 class WhatsAppMessageAdmin(admin.ModelAdmin):
     list_display = [

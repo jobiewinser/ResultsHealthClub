@@ -6,7 +6,7 @@ from django.conf import settings
 from campaign_leads.models import Campaign
 
 from core.models import Site
-class ActiveCampaignWebhook(models.Model):
+class ActiveCampaignWebhookRequest(models.Model):
     json_data = models.JSONField(default=dict)
     guid = models.TextField(null=True, blank=True)
 

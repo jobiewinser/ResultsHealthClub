@@ -1,14 +1,37 @@
+{%load static%}
 <span>
+    <script>
+        $(document).ready(function() {
+            function isCalendlyEvent(e) {
+                return e.origin === "https://calendly.com" && e.data.event && e.data.event.indexOf("calendly.") === 0;
+            };
+            
+            window.addEventListener("message", function(e) {
+                if(isCalendlyEvent(e)) {
+                    $('#calendly_loading').remove()
+                    /* Example to get the name of the event */
+                    {% comment %} console.log("Event name:", e.data.event); {% endcomment %}
+                    
+                    /* Example to get the payload of the event */
+                    {% comment %} console.log("Event details:", e.data.payload); {% endcomment %}
+                }
+            });
+            
+            Calendly.initInlineWidget({
+                url: 'https://calendly.com/winsersystems/test-2',
+                parentElement: document.getElementById('calendly_id'),
+                prefill: {
+                    name: "{{lead.name}}",
+                    email: "{{lead.email}}",
+                    customAnswers: "",
+                },
+                utm: {}
+               });
+        });
+    </script>
     <div class="row">
-        <div class="col">
-            <div class="calendly-inline-widget" style="min-width:320px;height:580px;" data-auto-load="false">
-                <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js"></script>
-                <script>
-                Calendly.initInlineWidget({
-                url: 'https://calendly.com/winsersystems/test-2'
-                });
-                </script>
-            </div>
+        <div class="col center" id="calendly_id" style="min-width:380px;height:580px;">
+            <img id="calendly_loading" src="{% static 'gif/loading.gif' %}" alt="" width="200">
         </div>
     </div>
     {% comment %} <div class="row">
