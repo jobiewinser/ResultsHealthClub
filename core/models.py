@@ -41,7 +41,7 @@ class Site(models.Model):
                     calendly.create_webhook_subscription(organization = self.calendly_organization)
         # except:
         #     pass
-        return super(Campaignlead, self).save(*args, **kwargs)
+        return super(Site, self).save(*args, **kwargs)
     @property
     def get_company(self):
         if self.company.all():
