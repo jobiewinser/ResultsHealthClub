@@ -74,6 +74,6 @@ class Webhooks(View):
 def calendly_booking_success(request):
     lead = Campaignlead.objects.get(pk = request.POST['lead_pk'])
     uri = request.POST['uri']
-    if lead.campaign.site.company.all()[0] == request.user.profile.get_company:
-        Booking.objects.get_or_create(user=request.user, calendly_event_uri=uri, lead=lead)
+    # if lead.campaign.site.company.all()[0] == request.user.profile.get_company:
+    Booking.objects.get_or_create(user=request.user, calendly_event_uri=uri, lead=lead)
     return HttpResponse("", status=200)
