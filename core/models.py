@@ -114,8 +114,11 @@ def execute_after_save(sender, instance, created, *args, **kwargs):
     if not instance.guid:
         instance.guid = str(uuid.uuid4())[:16]
         instance.save()
-    if not settings.DEBUG and instance.calendly_token and instance.guid and instance.company.all()[0].calendly_enabled:
-        instance.create_calendly_webhook()  
+    if not settings.DEBUG and instance.calendly_token and instance.guid and instance.company.all()[0].calendly_enabled and not instance.calendly_webhook_created:
+        try:
+            instance.create_calendly_webhook()  
+        except:
+            pass
         instance.calendly_webhook_created = True 
         instance.save()
 # Extending User Model Using a One-To-One Link
