@@ -38,3 +38,6 @@ class Webhooks(View):
             json_data=body,
             request_type='a',
         )
+        response = HttpResponse(challenge)
+        response.status_code = 200
+        return response
