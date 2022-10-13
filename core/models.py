@@ -40,6 +40,7 @@ class Site(models.Model):
                         calendly.create_webhook_subscription(user = self.calendly_user)
                     elif self.calendly_organization:
                         calendly.create_webhook_subscription(organization = self.calendly_organization)
+                    self.calendly_webhook_created = True
         # except:
         #     pass
         return super(Site, self).save(*args, **kwargs)
