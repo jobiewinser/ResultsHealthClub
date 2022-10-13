@@ -188,7 +188,7 @@ class Booking(models.Model):
     lead = models.ForeignKey(Campaignlead, on_delete=models.CASCADE)
     type = models.CharField(choices=BOOKING_CHOICES, max_length=2, null=False, blank=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    calendly_uri = models.TextField(null=True, blank=True)
+    calendly_event_uri = models.TextField(null=True, blank=True)
     class Meta:
         ordering = ['-datetime']
 

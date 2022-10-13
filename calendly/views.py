@@ -39,7 +39,7 @@ class Webhooks(View):
             json_data=body,
             request_type='a',
         )
-        booking = Booking.objects.get(calendly_uri=body.get('payload').get('uri'))
+        booking = Booking.objects.get(calendly_event_uri=body.get('payload').get('event'))
         calendly = Calendly(booking.lead.campaign.site.calendly_token)
         updated_booking_details_1 = calendly.get_from_uri(body.get('payload').get('uri'))
         start_time = datetime.strptime(updated_booking_details_1['resource']['start_time'], '%Y-%m-%dT%H:%M:%S.%fZ')
@@ -74,8 +74,6 @@ class Webhooks(View):
 def calendly_booking_success(request):
     lead = Campaignlead.objects.get(pk = request.POST['lead_pk'])
     uri = request.POST['uri']
-    temp1 = lead.campaign.site.company.all()[0]
-    temp2 = request.user.profile.get_company
     if lead.campaign.site.company.all()[0] == request.user.profile.get_company:
-        Booking.objects.get_or_create(user=request.user, calendly_uri=uri, lead=lead)
+        Booking.objects.get_or_create(user=request.user, calendly_event_uri=uri, lead=lead)
     return HttpResponse("", status=200)
