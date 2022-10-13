@@ -48,14 +48,12 @@
                 $('#calendly_loading').remove()
                 /* Example to get the name of the event */
                 console.log("Event name:", e.data.event);
-                
-                /* Example to get the payload of the event */
                 console.log("Event details:", e.data.payload);
-                if (e.data.event == "calendly.event_scheduled") {                        
+                if (e.data.event == "calendly.event_scheduled") {               
                     var respStatus = $.ajax({
                         type:'POST',
                         url:'{%url "calendly-booking-success"%}',
-                        data:{'lead_pk':'{{lead.pk}}', 'uri':e.data.payload.event.uri, 'csrfmiddlewaretoken':'{{ csrf_token }}'},
+                        data:{'lead_pk':$('#modal_lead_pk').val(), 'uri':e.data.payload.event.uri, 'csrfmiddlewaretoken':'{{ csrf_token }}'},
                         success: function (data) {
                         },
                         error: function(XMLHttpRequest, textStatus, errorThrown) {
