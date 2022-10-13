@@ -31,11 +31,11 @@ class Calendly():
                    }
         return headers
     #POST
-    def create_webhook_subscription(self, organization = None, user = None):   
+    def create_webhook_subscription(self, guid, organization = None, user = None):   
         url = f"{self.calendly_url}webhook_subscriptions"
         headers = self._get_headers()
         body = { 
-            "url": f"{self.site_url}/calendly-webhooks/",
+            "url": f"{self.site_url}/calendly-webhooks/{guid}/",
             "events": [
                 "invitee.created",
                 "invitee.canceled"
@@ -51,6 +51,14 @@ class Calendly():
             print("response_body", response_body)
             print("body", body)
             return response_body
+    #GET
+    def get_from_uri(self, uri):   
+        headers = self._get_headers()
+        
+        response = requests.get(url=uri, headers=headers)
+        response_body = response.json()
+        print("response_body", response_body)
+        return response_body
     #GET
     def list_webhook_subscriptions(self, organization = None, user = None):   
         url = f"{self.calendly_url}webhook_subscriptions?organization=https://api.calendly.com/organizations/{organization}&scope=organization"

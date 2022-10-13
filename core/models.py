@@ -1,8 +1,10 @@
 from datetime import datetime
+import uuid
 from django.conf import settings
 from django.db import models
 from django.db.models.deletion import SET_NULL
 from django.contrib.auth.models import User
+from django.dispatch import receiver
 from django.http import HttpResponse
 from calendly.api import Calendly
 
@@ -25,25 +27,18 @@ class Site(models.Model):
     whatsapp_access_token = models.TextField(blank=True, null=True)
     whatsapp_business_account_id = models.TextField(null=True, blank=True)
     calendly_token = models.TextField(blank=True, null=True)
-    calendly_token = models.TextField(blank=True, null=True)
     calendly_user = models.TextField(blank=True, null=True)
     calendly_organization = models.TextField(blank=True, null=True)   
-    calendly_webhook_created = models.BooleanField(default=False)    
+    calendly_webhook_created = models.BooleanField(default=False)  
+    guid = models.TextField(null=True, blank=True) 
 
-    def save(self, *args, **kwargs):  # noqa D102
-        # try:
-        if not settings.DEBUG:
-            if not self.calendly_webhook_created:
-                if self.calendly_token and self.company.all()[0].calendly_enabled:
-                    calendly = Calendly(self.calendly_token)
-                    if self.calendly_user:
-                        calendly.create_webhook_subscription(user = self.calendly_user)
-                    elif self.calendly_organization:
-                        calendly.create_webhook_subscription(organization = self.calendly_organization)
-                    self.calendly_webhook_created = True
-        # except:
-        #     pass
-        return super(Site, self).save(*args, **kwargs)
+    def create_calendly_webhook(self):
+        calendly = Calendly(self.calendly_token)
+        if self.calendly_user:
+            calendly.create_webhook_subscription(self.guid, user = self.calendly_user)
+        elif self.calendly_organization:
+            calendly.create_webhook_subscription(self.guid, organization = self.calendly_organization)
+
     @property
     def get_company(self):
         if self.company.all():
@@ -113,6 +108,16 @@ class Site(models.Model):
     def get_leads_created_between_dates(self, start_date, end_date):
         return Campaignlead.objects.filter(campaign__site=self, created__gte=start_date, created__lte=end_date)
  
+
+@receiver(models.signals.post_save, sender=Site)
+def execute_after_save(sender, instance, created, *args, **kwargs):  
+    if not instance.guid:
+        instance.guid = str(uuid.uuid4())[:16]
+        instance.save()
+    if not settings.DEBUG and instance.calendly_token and instance.guid and instance.company.all()[0].calendly_enabled:
+        instance.create_calendly_webhook()  
+        instance.calendly_webhook_created = True 
+        instance.save()
 # Extending User Model Using a One-To-One Link
 class Company(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)

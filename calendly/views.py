@@ -1,15 +1,16 @@
 from django.shortcuts import render
 
-from datetime import datetime
+from datetime import datetime, timezone
 import logging
 from django.conf import settings
 from django.http import HttpResponse, QueryDict
 import json
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+import pytz
+from calendly.api import Calendly
 from calendly.models import CalendlyWebhookRequest
-from campaign_leads.models import Campaignlead, Call
-from messaging.consumers import ChatConsumer
+from campaign_leads.models import Booking, Campaignlead, Call
 from whatsapp.api import Whatsapp
 from django.views.generic import TemplateView
 from whatsapp.models import WHATSAPP_ORDER_CHOICES, WhatsAppMessage, WhatsAppMessageStatus, WhatsAppWebhookRequest, WhatsappTemplate, template_variables
@@ -38,6 +39,43 @@ class Webhooks(View):
             json_data=body,
             request_type='a',
         )
-        response = HttpResponse(challenge)
+        booking = Booking.objects.get(calendly_uri=body.get('payload').get('uri'))
+        calendly = Calendly(booking.lead.campaign.site.calendly_token)
+        updated_booking_details_1 = calendly.get_from_uri(body.get('payload').get('uri'))
+        start_time = datetime.strptime(updated_booking_details_1['resource']['start_time'], '%Y-%m-%dT%H:%M:%S.%fZ')
+        
+        timezone = pytz.timezone("GMT")
+        start_time = timezone.localize(start_time)
+
+        booking.datetime = start_time
+        booking.save()
+
+        from channels.layers import get_channel_layer
+        channel_layer = get_channel_layer()          
+        lead = booking.lead
+        print(lead.campaign.site.company.all()[0].pk)
+        campaign_pk = lead.campaign.site.company.all()[0].pk
+        async_to_sync(channel_layer.group_send)(
+            f"lead_{campaign_pk}",
+            {
+                'type': 'lead_update',
+                'data':{
+                    # 'company_pk':campaign_pk,
+                    'lead_pk':lead.pk,
+                }
+            }
+        )
+        
+
+        response = HttpResponse()
         response.status_code = 200
         return response
+
+def calendly_booking_success(request):
+    lead = Campaignlead.objects.get(pk = request.POST['lead_pk'])
+    uri = request.POST['uri']
+    temp1 = lead.campaign.site.company.all()[0]
+    temp2 = request.user.profile.get_company
+    if lead.campaign.site.company.all()[0] == request.user.profile.get_company:
+        Booking.objects.get_or_create(user=request.user, calendly_uri=uri, lead=lead)
+    return HttpResponse("", status=200)

@@ -184,10 +184,11 @@ class Call(models.Model):
 
 class Booking(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    datetime = models.DateTimeField(null=False, blank=False)
+    datetime = models.DateTimeField(null=True, blank=True)
     lead = models.ForeignKey(Campaignlead, on_delete=models.CASCADE)
     type = models.CharField(choices=BOOKING_CHOICES, max_length=2, null=False, blank=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    calendly_uri = models.TextField(null=True, blank=True)
     class Meta:
         ordering = ['-datetime']
 

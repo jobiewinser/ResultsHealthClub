@@ -57,9 +57,8 @@ class CampaignleadsOverviewView(TemplateView):
     def get(self, request, *args, **kwargs):
         
         calendly = Calendly(request.user.profile.site.calendly_token)
-        calendly.list_webhook_subscriptions(request.user.profile.site.calendly_organization)
+        # calendly.list_webhook_subscriptions(request.user.profile.site.calendly_organization)
         # calendly.delete_webhook_subscriptions("d77af483-c769-4ac9-b870-71193ad27072")
-
 
         try:
             return super().get(request, *args, **kwargs)
@@ -73,7 +72,8 @@ class CampaignleadsOverviewView(TemplateView):
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'campaign_leads/htmx/leads_board_htmx.html'   
             context['campaigns'] = get_campaign_qs(self.request)
-        leads = Campaignlead.objects.filter(complete=False, booking=None)
+        # leads = Campaignlead.objects.filter(complete=False, booking=None)
+        leads = Campaignlead.objects.filter()
         campaign_pk = self.request.GET.get('campaign_pk', None)
         if campaign_pk:
             try:
@@ -113,6 +113,7 @@ class CampaignleadsOverviewView(TemplateView):
                 (f"Call 1", leads.none(), 1)
             )
         context['max_call_count'] = index
+        context['company'] = self.request.user.profile.company.all()[0]
             
         # whatsapp = Whatsapp()
         return context
