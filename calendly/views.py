@@ -39,7 +39,13 @@ class Webhooks(View):
             json_data=body,
             request_type='a',
         )
-        booking = Booking.objects.get(calendly_event_uri=body.get('payload').get('event'))
+        try:
+            booking = Booking.objects.get(calendly_event_uri=body.get('payload').get('event'))
+        except Exception as e:            
+            error = ErrorModel.objects.create(json_data={'error':str(e)})
+            webhook.errors.add(error)
+            webhook.save()
+            return HttpResponse("", status=500)
         calendly = Calendly(booking.lead.campaign.site.calendly_token)
         updated_booking_details_1 = calendly.get_from_uri(body.get('payload').get('uri'))
         start_time = datetime.strptime(updated_booking_details_1['resource']['start_time'], '%Y-%m-%dT%H:%M:%S.%fZ')
