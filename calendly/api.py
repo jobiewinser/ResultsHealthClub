@@ -35,7 +35,7 @@ class Calendly():
         url = f"{self.calendly_url}webhook_subscriptions"
         headers = self._get_headers()
         body = { 
-            "url": f"{self.site_url}/active-campaign-webhooks/",
+            "url": f"{self.site_url}/calendly-webhooks/",
             "events": [
                 "invitee.created",
                 "invitee.canceled"
@@ -51,3 +51,23 @@ class Calendly():
             print("response_body", response_body)
             print("body", body)
             return response_body
+    #GET
+    def list_webhook_subscriptions(self, organization = None, user = None):   
+        url = f"{self.calendly_url}webhook_subscriptions?organization=https://api.calendly.com/organizations/{organization}&scope=organization"
+        headers = self._get_headers()
+        
+        response = requests.get(url=url, headers=headers)
+        response_body = response.json()
+        print("response_body", response_body)
+        return response_body
+    #DELETE
+    def delete_webhook_subscriptions(self, webhook_guuid):   
+        url = f"{self.calendly_url}webhook_subscriptions/{webhook_guuid}"
+        headers = self._get_headers()
+        
+        response = requests.delete(url=url, headers=headers)
+        response_body = response.json()
+        print("response_body", response_body)
+        return response_body
+
+    

@@ -32,13 +32,14 @@ class Site(models.Model):
 
     def save(self, *args, **kwargs):  # noqa D102
         # try:
-        if not self.calendly_webhook_created:
-            if self.calendly_token and self.company.all()[0].calendly_enabled:
-                calendly = Calendly(self.calendly_token)
-                if self.calendly_user:
-                    calendly.create_webhook_subscription(user = self.calendly_user)
-                elif self.calendly_organization:
-                    calendly.create_webhook_subscription(organization = self.calendly_organization)
+        if not settings.DEBUG:
+            if not self.calendly_webhook_created:
+                if self.calendly_token and self.company.all()[0].calendly_enabled:
+                    calendly = Calendly(self.calendly_token)
+                    if self.calendly_user:
+                        calendly.create_webhook_subscription(user = self.calendly_user)
+                    elif self.calendly_organization:
+                        calendly.create_webhook_subscription(organization = self.calendly_organization)
         # except:
         #     pass
         return super(Site, self).save(*args, **kwargs)

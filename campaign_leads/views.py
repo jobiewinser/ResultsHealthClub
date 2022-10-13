@@ -6,6 +6,7 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
+from calendly.api import Calendly
 from campaign_leads.models import Call, Campaign, Campaignlead
 from active_campaign.api import ActiveCampaign
 from active_campaign.models import ActiveCampaignList
@@ -54,6 +55,12 @@ def get_campaign_qs(request):
 class CampaignleadsOverviewView(TemplateView):
     template_name='campaign_leads/campaign_leads_overview.html'
     def get(self, request, *args, **kwargs):
+        
+        calendly = Calendly(request.user.profile.site.calendly_token)
+        calendly.list_webhook_subscriptions(request.user.profile.site.calendly_organization)
+        # calendly.delete_webhook_subscriptions("51039058-ae5a-4173-b48d-25c34358ec6d")
+
+
         try:
             return super().get(request, *args, **kwargs)
         except Exception as e:        
