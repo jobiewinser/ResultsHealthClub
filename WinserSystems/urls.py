@@ -27,6 +27,7 @@ urlpatterns = [
     path('', include('whatsapp.urls')),
     path('', include('active_campaign.urls')),
     path('', include('analytics.urls')),
+    path('', include('calendly.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('twilio/', include('twilio.urls')),
 ]

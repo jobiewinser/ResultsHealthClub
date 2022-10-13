@@ -57,7 +57,7 @@ class CampaignleadsOverviewView(TemplateView):
     def get(self, request, *args, **kwargs):
         
         calendly = Calendly(request.user.profile.site.calendly_token)
-        # calendly.list_webhook_subscriptions(request.user.profile.site.calendly_organization)
+        calendly.list_webhook_subscriptions(request.user.profile.site.calendly_organization)
         # calendly.delete_webhook_subscriptions("d77af483-c769-4ac9-b870-71193ad27072")
 
 
