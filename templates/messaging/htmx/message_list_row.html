@@ -1,6 +1,6 @@
 {%load static core_tags%}
 <div class="row chat_row {%if message.inbound%}active_chat_row{%else%}inactive_chat_row{%endif%}"
-    hx-get="{%url 'message-window' customer_number=message.customer_number chat_box_site_pk=site.pk%}"
+    hx-get="{%url 'message-window' customer_number=message.customer_number messaging_site_pk=site.pk%}"
     hx-indicator=".htmx-indicator" 
     hx-target="#next_chat_window"
     hx-push-url="false"

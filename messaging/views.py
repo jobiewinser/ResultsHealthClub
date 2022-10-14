@@ -11,12 +11,12 @@ logger = logging.getLogger(__name__)
 
 @login_required
 def message_window(request, **kwargs):
-    messages = WhatsAppMessage.objects.filter(customer_number=kwargs.get('customer_number'), site__pk=kwargs.get('chat_box_site_pk')).order_by('datetime')
+    messages = WhatsAppMessage.objects.filter(customer_number=kwargs.get('customer_number'), site__pk=kwargs.get('messaging_site_pk')).order_by('datetime')
     context = {}
     context["messages"] = messages
     context["lead"] = Campaignlead.objects.filter(whatsapp_number=kwargs.get('customer_number')).first()
     context["customer_number"] = kwargs.get('customer_number')
-    context["site_pk"] = kwargs.get('chat_box_site_pk')
+    context["site_pk"] = kwargs.get('messaging_site_pk')
     return render(request, "messaging/message_window_htmx.html", context)
 
 @login_required
@@ -46,7 +46,7 @@ def send_first_template_whatsapp_htmx(request, **kwargs):
         lead = Campaignlead.objects.get(pk=kwargs.get('lead_pk'))
         if not lead.message_set.all():
             lead.send_template_whatsapp_message(1, communication_method='a')
-        messages = WhatsAppMessage.objects.filter(customer_number=kwargs.get('customer_number'), site__pk=kwargs.get('chat_box_site_pk')).order_by('datetime')
+        messages = WhatsAppMessage.objects.filter(customer_number=kwargs.get('customer_number'), site__pk=kwargs.get('messaging_site_pk')).order_by('datetime')
         context = {}
         context["messages"] = messages
         context["lead"] = lead

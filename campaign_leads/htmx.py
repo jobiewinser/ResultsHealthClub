@@ -43,6 +43,10 @@ def create_campaign_lead(request, **kwargs):
         first_name = request.POST.get('first_name')
         if not first_name:
             return HttpResponse("Please provide a first name", status=500)
+
+        email = request.POST.get('email')
+        if not email:
+            return HttpResponse("Please provide a email", status=500)
         
         phone = request.POST.get('phone')
         if not phone:
@@ -56,7 +60,7 @@ def create_campaign_lead(request, **kwargs):
         if not first_name:
             return HttpResponse("Please provide a Choice of Site", status=500)
 
-        lead = site.generate_lead(first_name, f"{country_code}{phone}", request=request)
+        lead = site.generate_lead(first_name, email, f"{country_code}{phone}", request=request)
         
         context = {'lead':lead,'max_call_count':1,'call_count':0, 'site':site}
         return render(request, 'campaign_leads/htmx/lead_article.html', context)

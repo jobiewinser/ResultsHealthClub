@@ -31,7 +31,7 @@
                     </button>
                     {%elif site%}
                     <button class="btn btn-sm btn-success text-white position-relative" 
-                        hx-get="{%url 'message-window' customer_number=lead.whatsapp_number chat_box_site_pk=site.pk%}"
+                        hx-get="{%url 'message-window' customer_number=lead.whatsapp_number messaging_site_pk=site.pk%}"
                         hx-indicator=".htmx-indicator" 
                         hx-target="#next_chat_window"
                         hx-push-url="false"

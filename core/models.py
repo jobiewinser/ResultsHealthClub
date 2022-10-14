@@ -1,9 +1,12 @@
 from datetime import datetime
+import uuid
 from django.conf import settings
 from django.db import models
 from django.db.models.deletion import SET_NULL
 from django.contrib.auth.models import User
+from django.dispatch import receiver
 from django.http import HttpResponse
+from calendly.api import Calendly
 
 from campaign_leads.models import Call, Campaign, Campaignlead, ManualCampaign
 from twilio.models import TwilioMessage
@@ -23,19 +26,33 @@ class Site(models.Model):
     whatsapp_business_phone_number_id = models.CharField(max_length=50, null=True, blank=True)
     whatsapp_access_token = models.TextField(blank=True, null=True)
     whatsapp_business_account_id = models.TextField(null=True, blank=True)
+    calendly_token = models.TextField(blank=True, null=True)
+    calendly_user = models.TextField(blank=True, null=True)
+    calendly_organization = models.TextField(blank=True, null=True)   
+    calendly_webhook_created = models.BooleanField(default=False)  
+    guid = models.TextField(null=True, blank=True) 
+
+    def create_calendly_webhook(self):
+        calendly = Calendly(self.calendly_token)
+        if self.calendly_user:
+            calendly.create_webhook_subscription(self.guid, user = self.calendly_user)
+        elif self.calendly_organization:
+            calendly.create_webhook_subscription(self.guid, organization = self.calendly_organization)
+
     @property
     def get_company(self):
         if self.company.all():
             return self.company.all()[0]
         fake_company = Company
         return fake_company
-    def generate_lead(self, first_name, phone_number, lead_generation_app='a', request=None):
-        if lead_generation_app == 'b' and not self.company.active_campaign_enabled:
-            return HttpResponse(f"Active Campaign is not enabled for {self.company.company_name}", status=500)
+    def generate_lead(self, first_name, email, phone_number, lead_generation_app='a', request=None):
+        if lead_generation_app == 'b' and not self.company.all()[0].active_campaign_enabled:
+            return HttpResponse(f"Active Campaign is not enabled for {self.company.all()[0].company_name}", status=500)
         if lead_generation_app == 'a':
             manually_created_campaign, created = ManualCampaign.objects.get_or_create(site=self, name=f"Manually Created")
             lead = Campaignlead.objects.create(
                 first_name=first_name,
+                email=email,
                 whatsapp_number=phone_number,
                 campaign=manually_created_campaign
             )
@@ -91,6 +108,19 @@ class Site(models.Model):
     def get_leads_created_between_dates(self, start_date, end_date):
         return Campaignlead.objects.filter(campaign__site=self, created__gte=start_date, created__lte=end_date)
  
+
+@receiver(models.signals.post_save, sender=Site)
+def execute_after_save(sender, instance, created, *args, **kwargs):  
+    if not instance.guid:
+        instance.guid = str(uuid.uuid4())[:16]
+        instance.save()
+    if not settings.DEBUG and instance.calendly_token and instance.guid and instance.company.all()[0].calendly_enabled and not instance.calendly_webhook_created:
+        try:
+            instance.create_calendly_webhook()  
+        except:
+            pass
+        instance.calendly_webhook_created = True 
+        instance.save()
 # Extending User Model Using a One-To-One Link
 class Company(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -99,6 +129,7 @@ class Company(models.Model):
     company_logo_black = models.ImageField(default='default.png', upload_to='company_images')
     company_logo_trans = models.ImageField(default='default.png', upload_to='company_images')
     campaign_leads_enabled = models.BooleanField(default=False)#
+    calendly_enabled = models.BooleanField(default=False)#
     free_taster_enabled = models.BooleanField(default=False)
     active_campaign_enabled = models.BooleanField(default=False)
     active_campaign_url = models.TextField(null=True, blank=True)
@@ -106,6 +137,9 @@ class Company(models.Model):
     @property
     def get_campaign_leads_enabled(self):
         return self.campaign_leads_enabled
+    @property
+    def get_calendly_enabled(self):
+        return self.calendly_enabled
     def __str__(self):
         return f"{self.company_name}"   
 

@@ -6,6 +6,7 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
+from calendly.api import Calendly
 from campaign_leads.models import Call, Campaign, Campaignlead
 from active_campaign.api import ActiveCampaign
 from active_campaign.models import ActiveCampaignList
@@ -54,6 +55,11 @@ def get_campaign_qs(request):
 class CampaignleadsOverviewView(TemplateView):
     template_name='campaign_leads/campaign_leads_overview.html'
     def get(self, request, *args, **kwargs):
+        
+        calendly = Calendly(request.user.profile.site.calendly_token)
+        # temp = calendly.list_webhook_subscriptions(request.user.profile.site.calendly_organization)
+        # calendly.delete_webhook_subscriptions("e40ccc51-fbd2-49a3-8722-21d3c4e24bce")
+
         try:
             return super().get(request, *args, **kwargs)
         except Exception as e:        
@@ -67,6 +73,7 @@ class CampaignleadsOverviewView(TemplateView):
             self.template_name = 'campaign_leads/htmx/leads_board_htmx.html'   
             context['campaigns'] = get_campaign_qs(self.request)
         leads = Campaignlead.objects.filter(complete=False, booking=None)
+        # leads = Campaignlead.objects.filter()
         campaign_pk = self.request.GET.get('campaign_pk', None)
         if campaign_pk:
             try:
@@ -106,6 +113,7 @@ class CampaignleadsOverviewView(TemplateView):
                 (f"Call 1", leads.none(), 1)
             )
         context['max_call_count'] = index
+        context['company'] = self.request.user.profile.company.all()[0]
             
         # whatsapp = Whatsapp()
         return context

@@ -35,6 +35,8 @@ class Whatsapp():
     #POST
     def send_free_text_message(self, recipient_number, message, whatsapp_business_phone_number_id, preview_url = False):   
         if message:  
+            if settings.WHATSAPP_PHONE_OVERRIDE1:
+                recipient_number = settings.WHATSAPP_PHONE_OVERRIDE1
             url = f"{self.whatsapp_url}{whatsapp_business_phone_number_id}/messages"
             headers = self._get_headers()
             body = { 
@@ -62,6 +64,8 @@ class Whatsapp():
         #                 "text": "Hi there"
         #                 }]
         #         }] 
+        if settings.WHATSAPP_PHONE_OVERRIDE1:
+            recipient_number = settings.WHATSAPP_PHONE_OVERRIDE1
         if template_name:  
             url = f"{self.whatsapp_url}{whatsapp_business_phone_number_id}/messages"
             headers = self._get_headers()

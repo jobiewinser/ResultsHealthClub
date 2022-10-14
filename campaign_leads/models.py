@@ -4,6 +4,7 @@ import uuid
 from django.db import models
 from django.contrib.auth.models import User
 from django.http import HttpResponse
+from calendly.api import Calendly
 
 from whatsapp.api import Whatsapp
 from whatsapp.models import WhatsAppMessage, WhatsappTemplate
@@ -57,6 +58,8 @@ class ManualCampaign(Campaign):
 class Campaignlead(models.Model):
     first_name = models.TextField(null=True, blank=True)
     last_name = models.TextField(null=True, blank=True)
+    email = models.TextField(null=True, blank=True)
+    
     whatsapp_number = models.TextField(null=True, blank=True)
     # country_code = models.TextField(null=True, blank=True)
     campaign = models.ForeignKey("campaign_leads.Campaign", on_delete=models.CASCADE, null=True, blank=True)
@@ -181,10 +184,11 @@ class Call(models.Model):
 
 class Booking(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    datetime = models.DateTimeField(null=False, blank=False)
+    datetime = models.DateTimeField(null=True, blank=True)
     lead = models.ForeignKey(Campaignlead, on_delete=models.CASCADE)
     type = models.CharField(choices=BOOKING_CHOICES, max_length=2, null=False, blank=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    calendly_event_uri = models.TextField(null=True, blank=True)
     class Meta:
         ordering = ['-datetime']
 

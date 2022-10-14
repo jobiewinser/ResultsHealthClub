@@ -14,9 +14,8 @@ from channels.layers import get_channel_layer
 logger = logging.getLogger(__name__)
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        # self.chat_box_whatsapp_number = self.scope["url_route"]["kwargs"]["chat_box_whatsapp_number"]
-        self.chat_box_site_pk = self.scope["url_route"]["kwargs"]["chat_box_site_pk"]
-        self.group_name = f"chatlistrow_{self.chat_box_site_pk}"
+        self.messaging_site_pk = self.scope["url_route"]["kwargs"]["messaging_site_pk"]
+        self.group_name = f"messaging_{self.messaging_site_pk}"
         self.user = self.scope["user"]
         await self.channel_layer.group_add(self.group_name, self.channel_name)
         await self.accept()
@@ -28,12 +27,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):        
         text_data_json = json.loads(text_data)
         input_message = text_data_json["message"]
-        chat_box_whatsapp_number = text_data_json["chat_box_whatsapp_number"]
+        messaging_whatsapp_number = text_data_json["messaging_whatsapp_number"]
         user = self.scope["user"]
         if(user.is_authenticated):
-            message = await send_whatsapp_message_to_number(input_message, chat_box_whatsapp_number, user, self.scope["url_route"]["kwargs"]["chat_box_site_pk"])
+            message = await send_whatsapp_message_to_number(input_message, messaging_whatsapp_number, user, self.scope["url_route"]["kwargs"]["messaging_site_pk"])
             if message:
-                site = await get_site(self.scope["url_route"]["kwargs"]["chat_box_site_pk"])
+                site = await get_site(self.scope["url_route"]["kwargs"]["messaging_site_pk"])
                 message_context = {
                     "message": message,
                     "site": site,
@@ -41,12 +40,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 rendered_message_list_row = loader.render_to_string('messaging/htmx/message_list_row.html', message_context)
                 rendered_message_chat_row = loader.render_to_string('messaging/htmx/message_chat_row.html', message_context)
                 rendered_htmx = f"""
-
-                
-                <span id='message_list_row_{chat_box_whatsapp_number}_{site.pk}' hx-swap-oob='delete'></span>
-                <span id='messageCollapse_{site.pk}' hx-swap-oob='afterbegin'>{rendered_message_list_row}</span>
-
-                <span id='messageWindowCollapse_{chat_box_whatsapp_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>                
+                <span id='message_list_row_{messaging_whatsapp_number}_{site.pk}' hx-swap-oob='delete'></span>
+                <span id='messageCollapse_{site.pk}' hx-swap-oob='afterbegin '>{rendered_message_list_row}</span>
+                <span id='messageWindowCollapse_{messaging_whatsapp_number} focus-scroll:true' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>                
                 """
 
                 if message.inbound:
@@ -70,92 +66,19 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         "message": rendered_htmx,
                     }
                 )
-    # Receive message from room group.
-    
+    # Receive message from room group.    
     async def chatbox_message(self, event):
         await self.send(
             text_data=event['message']
-            # json.dumps(
-            #     {
-            #         "message": event.get("message", None),
-            #         "user_name": event.get("user_name", None),
-            #         "whatsapp_number": event.get("whatsapp_number", None),
-            #         "user_avatar": event.get("user_avatar", None),
-            #         "datetime": nice_datetime_tag(datetime.now()),
-            #         "inbound": event.get("inbound", None),
-            #     }
-            # )
         )
-# class ChatListConsumer(AsyncWebsocketConsumer):
-#     async def connect(self):
-#         self.chat_box_site_pk = self.scope["url_route"]["kwargs"]["chat_box_site_pk"]
-#         self.group_name = f"chatlist_{self.chat_box_site_pk}"
-#         self.user = self.scope["user"]
-#         await self.channel_layer.group_add(self.group_name, self.channel_name)
-#         await self.accept()
-
-#     async def disconnect(self, close_code):
-#         await self.channel_layer.group_discard(self.group_name, self.channel_name)
-
-#     # This function receive messages from WebSocket.
-#     async def receive(self, text_data):        
-#         text_data_json = json.loads(text_data)
-#         message = text_data_json["message"]
-#         user = self.scope["user"]
-#         if(user.is_authenticated and self.chat_box_whatsapp_number):
-#             if await send_whatsapp_message_to_number(message, self.chat_box_whatsapp_number, user, self.scope["url_route"]["kwargs"]["chat_box_site_pk"]):
-#                 avatar, name = await message_details_user(user)
-#                 await self.channel_layer.group_send(
-#                     self.group_name,
-#                     {
-#                         "type": "chatbox_message",
-#                         "message": message,
-#                         "user_name": name,
-#                         "user_avatar": avatar,
-#                         "datetime": nice_datetime_tag(datetime.now()),
-#                         "inbound": False
-#                     },
-#                 )
-#     # Receive message from room group.
-#     async def chatlist_message(self, event):
-#         await self.send(
-#             text_data=json.dumps(
-#                 {
-#                     "message": event.get("message", None),
-#                     "user_name": event.get("user_name", None),
-#                     "whatsapp_number": event.get("whatsapp_number", None),
-#                     "user_avatar": event.get("user_avatar", None),
-#                     "datetime": nice_datetime_tag(datetime.now()),
-#                     "inbound": event.get("inbound", None),
-#                 }
-#             )
-#         )
-
-
-
-
-
 from asgiref.sync import async_to_sync, sync_to_async
 @sync_to_async
 def send_whatsapp_message_to_number(message, whatsapp_number, user, site_pk):  
-    # channel_layer = get_channel_layer()
-    # async_to_sync(channel_layer.group_send)(
-    #     f"chatlist_{site_pk}",
-    #     {
-    #         'type': 'chatlist_message',
-    #         "message": message,
-    #         "user_name": f"{user.profile.name()}",
-    #         "whatsapp_number": whatsapp_number,
-    #         "user_avatar": f"{user.profile.avatar.url}", 
-    #         "datetime": nice_datetime_tag(datetime.now()),
-    #         "inbound": False,
-    #     }
-    # ) 
     if settings.ENABLE_WHATSAPP_MESSAGING:
         logger.debug("send_whatsapp_message_to_number start") 
         lead = Campaignlead.objects.filter(whatsapp_number=whatsapp_number).first()  
         if lead:     
-            if lead.campaign.company == user.profile.get_company: 
+            if lead.campaign.site.company == user.profile.get_company: 
                 logger.debug("send_whatsapp_message_to_number success lead true") 
                 return Site.objects.get(pk = site_pk).send_whatsapp_message(customer_number=whatsapp_number, message=message, user=user, lead=lead)
         user_company_site_pk_list = Site.objects.filter(company__in=user.profile.company.all()).values_list('pk', flat=True)
@@ -165,17 +88,87 @@ def send_whatsapp_message_to_number(message, whatsapp_number, user, site_pk):
         logger.debug("send_whatsapp_message_to_number fail") 
         return None
     return None
-
 @sync_to_async
 def message_details_user(user):   
     logger.debug("message_details_user start")
     avatar = user.profile.avatar.url
     name = user.profile.name()
     return avatar, name
-
-
 @sync_to_async
 def get_site(site_pk):   
     return Site.objects.get(pk=site_pk)
+# @sync_to_async
+# def get_lead(lead_pk):   
+#     return Campaignlead.objects.get(pk=lead_pk)
 
+
+    
+class LeadsConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.company_pk = self.scope["url_route"]["kwargs"]["company_pk"]
+        self.group_name = f"lead_{self.company_pk}"
+        self.user = self.scope["user"]
+        await self.channel_layer.group_add(self.group_name, self.channel_name)
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard(self.group_name, self.channel_name)
+
+    # This function receive messages from WebSocket.
+    async def receive(self, text_data):        
+        text_data_json = json.loads(text_data)
+        user = self.scope["user"]
+        if(user.is_authenticated):
+            lead_pk = text_data_json["lead_pk"]
+            new_position = text_data_json["new_position"]
+            
+            await self.channel_layer.group_send(
+                self.group_name,
+                {
+                    'type': 'lead_update',
+                    "message": get_leads_htmx(lead_pk, new_position=new_position),
+                }
+            )
+
+    # Receive message from room group.    
+    async def lead_update(self, event):
+        message = await get_leads_htmx(event['data']['lead_pk'])
+        await self.send(
+            text_data=json.dumps({
+                'message':message
+            })
+        )
+
+@sync_to_async
+def get_leads_htmx(lead_pk, new_position=None):
+    # new_position = text_data_json["new_position"]
+    if lead_pk:
+        if not new_position:    
+            return f"<span hx-swap-oob='delete' id='lead-{lead_pk}'></span>"
+            # await self.channel_layer.group_send(
+            #     self.group_name,
+            #     {
+            #         'type': 'lead_update',
+            #         "message": f"<span hx-swap-oob='delete' id='lead-{lead_pk}'></span>",
+            #     }
+            # )
+        else:
+            lead = Campaignlead.objects.get(pk=lead_pk) 
+            message_context = {
+                "messaleadge": lead,
+                "site": lead.campaign.site,
+            }
+            rendered_message_list_row = loader.render_to_string('campaign_leads/htmx/lead_article.html', message_context)
+            rendered_htmx = f"""
+                <span id='lead-{lead_pk}' hx-swap-oob='outerHTML'>{rendered_message_list_row}</span>           
+            """
+            return rendered_htmx
+            
+            # await self.channel_layer.group_send(
+            #     self.group_name,
+            #     {
+            #         'type': 'lead_update',
+            #         "message": rendered_htmx,
+            #     }
+            # )
 

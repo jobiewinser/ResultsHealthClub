@@ -1,5 +1,26 @@
+{%load static%}
 <span>
+    <script>
+        $(document).ready(function() {
+            
+            Calendly.initInlineWidget({
+                url: 'https://calendly.com/winsersystems/test-2',
+                parentElement: document.getElementById('calendly_id'),
+                prefill: {
+                    name: "{{lead.name}}",
+                    email: "{{lead.email}}",
+                    customAnswers: "",
+                },
+                utm: {}
+               });
+        });
+    </script>
     <div class="row">
+        <div class="col center" id="calendly_id" style="min-width:380px;height:580px;">
+            <img id="calendly_loading" src="{% static 'gif/loading.gif' %}" alt="" width="200">
+        </div>
+    </div>
+    {% comment %} <div class="row">
         <div class="col">
             <div class="m-3">
                 <label class="form-label custom-badge-label" for="booking_date">Date of Booking</label>
@@ -51,7 +72,7 @@
                 </button>
             </div>
         </div>
-    </div>
+    </div> {% endcomment %}
 </span>
 <span hx-swap-oob="true" id="generic_modal_title">
     Add Booking - {{lead.name}}

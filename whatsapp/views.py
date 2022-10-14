@@ -6,10 +6,9 @@ import json
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from campaign_leads.models import Campaignlead, Call
-from messaging.consumers import ChatConsumer
 from whatsapp.api import Whatsapp
 from django.views.generic import TemplateView
-from whatsapp.models import WHATSAPP_ORDER_CHOICES, WhatsAppMessage, WhatsAppMessageStatus, WhatsAppWebhook, WhatsappTemplate, template_variables
+from whatsapp.models import WHATSAPP_ORDER_CHOICES, WhatsAppMessage, WhatsAppMessageStatus, WhatsAppWebhookRequest, WhatsappTemplate, template_variables
 from django.template import loader
 logger = logging.getLogger(__name__)
 from django.views import View 
@@ -30,7 +29,7 @@ class Webhooks(View):
         print(str(body))
         logger.debug(str(body))
            
-        webhook = WhatsAppWebhook.objects.create(
+        webhook = WhatsAppWebhookRequest.objects.create(
             json_data=body,
             request_type='a',
         )
@@ -71,8 +70,7 @@ class Webhooks(View):
                             )
                             whatsapp_message.save()
                             from channels.layers import get_channel_layer
-                            channel_layer = get_channel_layer()
-                            
+                            channel_layer = get_channel_layer()                            
                             message_context = {
                                 "message": whatsapp_message,
                                 "site": site,
@@ -88,7 +86,7 @@ class Webhooks(View):
                             <span id='messageWindowCollapse_{from_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>
                             """
                             async_to_sync(channel_layer.group_send)(
-                                f"chatlistrow_{site.pk}",
+                                f"messaging_{site.pk}",
                                 {
                                     'type': 'chatbox_message',
                                     "message": rendered_htmx,

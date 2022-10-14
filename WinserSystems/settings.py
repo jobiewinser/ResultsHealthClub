@@ -22,7 +22,6 @@ load_dotenv(dotenv_path=env_path)
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-WHATSAPP_PHONE_OVERRIDE1=False
 
 
 LOGGING = {
@@ -119,6 +118,7 @@ INSTALLED_APPS = [
     'whatsapp',
     'messaging',
     'twilio',
+    'calendly',
     'analytics',
     'core',
     'import_export',
