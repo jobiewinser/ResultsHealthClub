@@ -50,7 +50,7 @@ class WhatsAppTemplateAdmin(admin.ModelAdmin):
         'category', 
         'language',     
         'created',  
-        'send_order',  
+        # 'send_order',  
         'edited',   
         'edited_by',   
     ]

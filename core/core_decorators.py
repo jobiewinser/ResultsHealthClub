@@ -16,7 +16,7 @@ def campaign_leads_enabled_required(function=None, redirect_field_name=REDIRECT_
     """
     print()
     actual_decorator = user_passes_test(
-        lambda u: u.profile.get_company.campaign_leads_enabled,
+        lambda u: u.profile.company.campaign_leads_enabled,
         login_url=login_url,
         redirect_field_name=redirect_field_name
     )

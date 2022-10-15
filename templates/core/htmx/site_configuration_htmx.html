@@ -1,0 +1,48 @@
+{%load core_tags%}
+{%load static tz core_tags%}
+
+<span id="content">
+<div class="fixed_top_buttons">
+    {%block extra_top_left_buttons %}
+    <div class="col-md-auto me-2">
+        <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>             
+    </div>
+    {%include 'core/htmx/site_selection.html'%}
+    {%endblock extra_top_left_buttons %}
+
+    <button hidden hx-get="{{request.path}}" hx-push-url="false" hx-swap="outerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator=".htmx-indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
+
+    <div class="col">                
+    </div>    
+    <div class="col-md-auto">
+        <span class="badge bg-dark text-white"><h6 class="m-1">Site Configuration</h6></span>      
+    </div>
+</div>
+
+<main class="row overflow-auto below_fixed_top_buttons" style="min-height:90vh">
+    <div class="row p-0">
+        <div class="col-md-auto">
+            <div class="m-3">
+                <label for="site_name" class="form-label">Name</label>
+                <input value="{{site.name}}" type="text" name="name" class="form-control site_configuration_input" id="site_name" aria-describedby="emailHelp">
+                <div id="emailHelp" class="form-text">The name of this site.</div>
+            </div>
+            <div class="m-3 form-check">
+                <input type="checkbox" onClick="this.checked=!this.checked" class="form-check-input" id="calendly_configured" {%if site.calendly_token and site.calendly_organization %}checked{%endif%}>
+                <label class="form-check-label" for="exampleCheck1">Calendly Enabled? <small><i>(configured by Winser Systems)</i></small></label>
+            </div>
+            <div class="m-3 form-check">
+                <button class="btn btn-success" 
+                hx-confirm="Are you sure you want to make these changes to this site?"
+                hx-post="" hx-vals='{"site_pk":"{{site.pk}}"}' 
+                hx-include=".site_configuration_input" hx-vals='{"site_pk":"{{site.pk}}"}' 
+                hx-indicator=".top-htmx-indicator" hx-target="#content"
+                hx-swap="outerHTML">Save Changes</button>
+            </div>
+        </div>
+        <div class="col">
+        </div>
+    </div>
+</main>
+
+</span>

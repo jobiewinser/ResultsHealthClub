@@ -60,8 +60,8 @@ class Webhooks(View):
         from channels.layers import get_channel_layer
         channel_layer = get_channel_layer()          
         lead = booking.lead
-        print(lead.campaign.site.company.all()[0].pk)
-        campaign_pk = lead.campaign.site.company.all()[0].pk
+        print(lead.campaign.site.company.pk)
+        campaign_pk = lead.campaign.site.company.pk
         async_to_sync(channel_layer.group_send)(
             f"lead_{campaign_pk}",
             {
@@ -81,6 +81,6 @@ class Webhooks(View):
 def calendly_booking_success(request):
     lead = Campaignlead.objects.get(pk = request.POST['lead_pk'])
     uri = request.POST['uri']
-    # if lead.campaign.site.company.all()[0] == request.user.profile.get_company:
+    # if lead.campaign.site.company == request.user.profile.company:
     Booking.objects.get_or_create(user=request.user, calendly_event_uri=uri, lead=lead)
     return HttpResponse("", status=200)

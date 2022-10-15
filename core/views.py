@@ -7,9 +7,11 @@ from django.contrib.auth.decorators import login_required
 import logging
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.models import User
-from core.models import Company, FreeTasterLink, FreeTasterLinkClick, Profile, Site  
+from core.models import ROLE_CHOICES, Company, FreeTasterLink, FreeTasterLinkClick, Profile, Site  
 from django.contrib.auth import authenticate
 from django.contrib.auth import login
+
+from core.user_permission_functions import get_available_sites_for_user
 logger = logging.getLogger(__name__)
 try:
     super_users = User.objects.filter(email="jobiewinser@gmail.com")
@@ -55,6 +57,53 @@ except:
 @method_decorator(login_required, name='dispatch')
 class CustomerHomeView(TemplateView):
     template_name='core/customer_home.html'
+    
+
+@method_decorator(login_required, name='dispatch')
+class SiteConfigurationView(TemplateView):
+    template_name='core/site_configuration.html'
+
+    def get_context_data(self, **kwargs):
+        self.request.GET._mutable = True       
+        context = super(SiteConfigurationView, self).get_context_data(**kwargs)
+        if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+            self.template_name = 'core/htmx/site_configuration_htmx.html'
+        context['site_list'] = get_available_sites_for_user(self.request.user)
+        site_pk = get_site_pk_from_request(self.request)
+        if site_pk:
+            self.request.GET['site_pk'] = site_pk      
+            context['site'] = Site.objects.get(pk=site_pk)       
+        return context
+    def post(self, request):
+        self.request.POST._mutable = True 
+        site = Site.objects.get(pk=request.POST.get('site_pk'))
+        name = request.POST.get('name', None)
+        if name:
+            site.name = name
+        site.save()
+        context = {'site':site, 'site_list':get_available_sites_for_user(self.request.user)}
+        context['site_list'] = get_available_sites_for_user(self.request.user)
+        site_pk = get_site_pk_from_request(self.request)
+        if site_pk:
+            self.request.POST['site_pk'] = site_pk      
+            context['site'] = Site.objects.get(pk=site_pk)    
+        return render(request, 'core/htmx/site_configuration_htmx.html', context)
+
+@method_decorator(login_required, name='dispatch')
+class CompanyConfigurationView(TemplateView):
+    template_name='core/company_configuration.html'
+
+    def get_context_data(self, **kwargs):
+        self.request.GET._mutable = True       
+        context = super(CompanyConfigurationView, self).get_context_data(**kwargs)
+        if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+            self.template_name = 'core/htmx/company_configuration_htmx.html'
+        context['site_list'] = get_available_sites_for_user(self.request.user)
+        site_pk = get_site_pk_from_request(self.request)
+        if site_pk:
+            self.request.GET['site_pk'] = site_pk    
+        context['role_choices'] = ROLE_CHOICES
+        return context
 
 
 class HomeView(TemplateView):
@@ -78,7 +127,7 @@ class FreeTasterOverviewView(TemplateView):
         context = super(FreeTasterOverviewView, self).get_context_data(**kwargs)
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'core/htmx/free_taster_table_htmx.html'
-        context['site_list'] = Site.objects.all()
+        context['site_list'] = get_available_sites_for_user(self.request.user)
         free_taster_links = FreeTasterLink.objects.all()
 
         site_pk = get_site_pk_from_request(self.request)
@@ -105,8 +154,12 @@ def free_taster_redirect(request, **kwargs):
         pass
     return HttpResponseRedirect("https://WinserSystemss.co.uk/book-free-taster-sessions-abingdon/")
 
-def get_site_pk_from_request(request):    
-    site_pk = request.GET.get('site_pk', None)
+def get_site_pk_from_request(request):  
+    if request.method == 'GET':
+        request_dict = request.GET
+    elif request.method == 'POST':
+        request_dict = request.POST
+    site_pk = request_dict.get('site_pk', None)
     if site_pk:
         return site_pk
     profiles = Profile.objects.filter(user=request.user)

@@ -182,3 +182,10 @@ def today_date_input_tag(anything):
 @register.filter
 def today_date_tag(anything):
     return datetime.now()
+@register.filter
+def get_key_in_get_or_post(request, key):
+    if request.method == 'GET':
+        return request.GET.get(key, None)
+    if request.method == 'POST':
+        return request.POST.get(key, None)
+    return None

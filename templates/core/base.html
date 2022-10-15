@@ -160,10 +160,10 @@
                                     <i class="fs-5 bi-bootstrap"></i><span class="ms-1 d-none d-sm-inline">My Products </span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdown">
-                                    {%if request.user.profile.get_company.campaign_leads_enabled%} 
+                                    {%if request.user.profile.company.campaign_leads_enabled%} 
                                     <a href="{% url 'customer-home'%}" class="dropdown-item"  style="{%if 'campaign-leads/' in request.path%} font-weight:bold{%endif%}">My Campaign Leads</a>
                                     {%endif%}
-                                    {%if request.user.profile.get_company.free_taster_enabled%} 
+                                    {%if request.user.profile.company.free_taster_enabled%} 
                                     <a href="{% url 'free-taster-overview'%}" class="dropdown-item"  style="{%if 'free-taster/' in request.path%} font-weight:bold{%endif%}">My Free Taster Links</a>
                                     {%endif%}
                                 </ul>

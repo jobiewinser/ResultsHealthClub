@@ -7,10 +7,18 @@
 <script>
     $(document).ready(function() {
         $("[data-bs-toggle=popover]").popover();
-        initDataTable();
+        document.body.addEventListener('htmx:afterRequest', function(evt) {  
+            if (evt.detail.xhr.status == 200){
+                if (evt.detail.pathInfo.requestPath.includes('whatsapp-templates-assign-site')){
+                    $('#generic_modal').modal('hide');
+                    snackbarShow('Successfully transferred template', 'success')
+                }
+            }
+        });
+        {% comment %} initDataTable(); {% endcomment %}
         document.body.addEventListener('htmx:afterSwap', function(evt) {  
             $("[data-bs-toggle=popover]").popover();
-            initDataTable();
+            {% comment %} initDataTable(); {% endcomment %}
         });  
     });
     let SearchTerm = ""
@@ -19,7 +27,7 @@
 
         dt = $('#overview_table').DataTable(          
             {  
-                order: [[5, 'desc' ]],
+                order: [[0, 'desc' ]],
                 iDisplayLength: 10,
                 search: {
                    search: SearchTerm

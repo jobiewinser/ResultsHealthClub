@@ -6,7 +6,7 @@
     </div>
     {%with True as hide_show_all%}
     {%include 'core/htmx/site_selection.html'%}
-    {%endwith%}
+    {%endwith%}    
     {%endblock extra_top_left_buttons %}
     <div class="col">
     </div>
@@ -47,23 +47,24 @@
                         <th>
                             Name
                         </th>
-                        <th>
+                        {% comment %} <th>
                             Category
-                        </th>
-                        <th>
+                        </th> {% endcomment %}
+                        {% comment %} <th>
                             Language
-                        </th>
+                        </th> {% endcomment %}
                         <th>
                             ID
                         </th>
                         <th>
                             Status
                         </th>
-                        {%if site%}
                         <th>
-                            Auto send
+                            Site
                         </th>
-                        {%endif%}
+                        {% comment %} <th>
+                            Auto send
+                        </th> {% endcomment %}
                         <th>  
                         </th>
                     </tr>

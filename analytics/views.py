@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 import logging
 from django.http import HttpResponseRedirect
 from core.models import FreeTasterLink, FreeTasterLinkClick, Profile, Site
+from core.user_permission_functions import get_available_sites_for_user
 from core.views import get_site_pk_from_request  
 # Create your views here.
 logger = logging.getLogger(__name__)
@@ -26,5 +27,6 @@ class AnalyticsOverviewView(TemplateView):
             context['site'] = Site.objects.get(pk=site_pk)
 
 
-        context['site_list'] = Site.objects.all()   
+        context['site_list'] = get_available_sites_for_user(self.request.user)
         return context
+

@@ -50,6 +50,7 @@ align-items: flex-start;" hx-ws="connect:/ws/messaging/{{site.pk}}/">
     <link href="{% static 'css/chat.css' %}" rel="stylesheet" />
         <span id="next_chat_window"></span>
         {%if site%}
+        {%for system_phone_number in site.whatsappnumber_set.all%}
         <div class="card chat_bottom_window p-0">
             <div class="card-header chat_bottom_header center " data-bs-toggle="collapse" data-bs-target="#messageCollapse_{{site.pk}}" aria-expanded="false" aria-controls="messageCollapse_{{site.pk}}">
                 <b>Chats for {{site.name}}</b>
@@ -60,6 +61,7 @@ align-items: flex-start;" hx-ws="connect:/ws/messaging/{{site.pk}}/">
                 {%endfor%}
             </div>
         </div>
+        {%endfor%}
         {%else%}
         <div class="card card-body chat_bottom_window">
             <div class="card-header chat_bottom_header" >
@@ -67,7 +69,7 @@ align-items: flex-start;" hx-ws="connect:/ws/messaging/{{site.pk}}/">
             </div>
         </div>
         {%endif%}
-</span>
+    </span>
 
 {%if site%}
 {%for message in site.get_fresh_messages%}

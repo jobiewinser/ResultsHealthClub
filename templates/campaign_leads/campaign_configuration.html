@@ -1,5 +1,4 @@
 {% extends 'core/base.html' %}
-{%load core_tags%}
 {%load static tz core_tags%}
 {%block scripts%}
 {{block.super}}
@@ -12,14 +11,8 @@
     function initDataTable() {
         dt = $('#overview_table').DataTable(          
             {  
-                order: [[ 1, 'asc' ]],
-                iDisplayLength: 10,
-                
-                'columns': 
-                [
-                    { 'searchable': true },
-                    { 'searchable': false },
-                ]
+                order: [[ 0, 'asc' ]],
+                iDisplayLength: 100,
             }
         );
     }
@@ -28,7 +21,7 @@
 {%endblock scripts%}
 {%block overide_content%}    
 <div class="col d-flex flex-column h-sm-100 p-0" style="overflow-x:hidden">  
-    <div class="fixed_top_buttons">
+    <div class="fixed_top_buttons"> 
         {%block extra_top_left_buttons %}
         <div class="col-md-auto">
             <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>            
@@ -59,21 +52,21 @@
                             <th>
                                 Site
                             </th>
+                            <th>
+                                1st Auto-Send Template
+                            </th>
+                            <th>
+                                2nd Auto-Send Template
+                            </th>
+                            <th>
+                                3rd Auto-Send Template
+                            </th>
                         </tr>
                     </thead>
                     <tbody> 
                         {%for campaign in campaigns%}
                         <tr id="row_{{campaign.pk}}">
-                            <td>
-                                {{campaign.name}}
-                            </td>
-                            <td> 
-                                {%include 'campaign_leads/htmx/leads_configuration_select.html'%}
-                            <button hidden 
-                            hx-post="{% url 'set-campaign-site' campaign_pk=campaign.pk %}" 
-                            hx-swap="outerHTML" hx-include="#site_pk_{{campaign.pk}}" 
-                            id="submit_site_pk_{{campaign.pk}}"></button>
-                            </td>
+                            {%include 'campaign_leads/campaign_configuration_row.html'%}
                         </tr>
                         {%endfor%}
                     </tbody>

@@ -1,0 +1,21 @@
+<span>
+    <div class="row">
+        <div class="col">
+            <select class="form-select" name="site_pk" id="site_pk_{{template.pk}}" onchange="if(this.value.toString() == '{{template.site.pk}}'){$('#assign_site_{{template.pk}}').attr('disabled', true)}else{$('#assign_site_{{template.pk}}').attr('disabled', false)}">
+                {%for site in site_list%}
+                <option {%if template.site.pk == site.pk %}selected{%endif%} value="{{site.pk}}">{{site.name}}</option>
+                {%endfor%}
+            </select>
+            <br>
+            <button disabled hx-post="{% url 'whatsapp-assign-site' %}" hx-swap="delete" 
+                hx-include="#site_pk_{{template.pk}}" hx-indicator=".top-htmx-indicator" 
+                hx-vals='{"template_pk": "{{template.pk}}"}'
+                hx-target="#template_row_{{template.pk}}" id="assign_site_{{template.pk}}" 
+                class="btn btn-primary btn-sm">Transfer</button>
+        </div>
+    </div>
+</span>
+<span hx-swap-oob="true" id="generic_modal_title">
+    Transfer Template - {{template.name}}
+    <input type="text" style="display:None" id="modal_lead_pk" name="lead_pk" value="{{lead.pk}}"/>
+</span>

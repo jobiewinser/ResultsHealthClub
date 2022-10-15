@@ -61,7 +61,7 @@ template_variables = {
 }
 class WhatsappTemplate(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    send_order = models.IntegerField(choices=WHATSAPP_ORDER_CHOICES, null=True, blank=True, default=0)
+    # send_order = models.IntegerField(choices=WHATSAPP_ORDER_CHOICES, null=True, blank=True, default=0)
     edited_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     edited = models.DateTimeField(null=True, blank=True) 
 
@@ -131,6 +131,14 @@ class WhatsappTemplate(models.Model):
     #     elif self.components:
     #         for component in self.components
     #     return edit_components
+    @property
+    def company_sites_with_same_whatsapp_business_details(self):
+        try:
+            from core.models import Site
+            temp = Site.objects.filter(company=self.site.company, whatsapp_business_account_id=self.site.whatsapp_business_account_id).exclude(pk=self.site.pk)
+            return temp
+        except Exception as e:
+            return Site.objects.none()
     @property
     def site_name(self):
         if self.site:

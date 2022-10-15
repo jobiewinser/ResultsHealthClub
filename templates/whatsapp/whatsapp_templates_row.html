@@ -1,4 +1,5 @@
 {%load core_tags%}
+{%with template.company_sites_with_same_whatsapp_business_details as company_sites_with_same_whatsapp_business_details%}
 <td
     data-bs-toggle="popover" 
     data-bs-trigger="hover" 
@@ -8,6 +9,7 @@
     data-bs-content="
     Last edited by: <b>{%if template.edited_by.profile.name%}{{template.edited_by.profile.name}}{%else%}Unknown{%endif%}</b>     
     at <b>{%if template.edited.profile.name%}{{template.edited|nice_date_tag}}{%else%}Unknown{%endif%}</b>">
+    <small>({%if template.language%}{{template.language}}{%endif%})</small>
     <span class="primary_td_layer">{{template.name}}</span> 
     {%if template.name == 'hello_world'%}
     <span class="badge bg-secondary">Example</span>
@@ -19,7 +21,7 @@
     </span>   
     {%endif%}
 </td>
-<td>
+{% comment %} <td>
     <span class="primary_td_layer">
         {{template.category}}
     </span> 
@@ -29,12 +31,12 @@
         Draft: {{template.pending_category}}          
     </span>    
     {%endif%}
-</td>
-<td>
+</td> {% endcomment %}
+{% comment %} <td>
     <span class="primary_td_layer">
         {%if template.language%}{{template.language}}{%endif%}  
     </span>
-</td>
+</td> {% endcomment %}
 <td> 
     {%if template.message_template_id%}{{template.message_template_id}}{%else%}<i>Not Submitted Yet</i>{%endif%}  
 </td>
@@ -60,31 +62,6 @@
     </span>   
     {%endif%}
 </td>
-{%if site%}
-<td>    
-    {%if not template.name == 'hello_world'%}
-    <select id="send_order_choice_{{template.pk}}" onchange="$('#assign_send_order_{{template.pk}}').click()" name="send_order" class="form-select"
-    data-bs-toggle="popover" 
-    data-bs-trigger="hover" 
-    data-bs-html="true" 
-    data-bs-placement="top"
-    data-bs-title="What do these options mean?"
-    data-bs-content="<p>The options in this list determine when the template is automatically sent to your customer using your chosen communication method (Whatsapp).</p>
-    <p>Each option can only be assigned to 1 template, so choosing an already chosen may clear auto send choice for another template.</p>
-    ">
-        <option value="" {%if not template.send_order%}selected{%endif%}>Select a Whatsapp Template {{site_pk}}</option>
-        {%for order_tuple in WHATSAPP_ORDER_CHOICES%}
-        <option {%if template.send_order == order_tuple.0%}selected{%endif%} value="{{order_tuple.0}}">{{order_tuple.1}}</option>
-        {%endfor%}
-    </select>
-    <button hidden hx-post="{% url 'whatsapp-assign-send-order' %}" hx-swap="outerHTML" 
-        hx-include="#send_order_choice_{{template.pk}}" hx-indicator=".top-htmx-indicator" 
-        hx-vals='{"site_pk": "{{site.pk}}", "template_pk": "{{template.pk}}"}'
-        hx-target="#template_row_{{template.pk}}" id="assign_send_order_{{template.pk}}" 
-        class="btn btn-primary btn-sm">assign</button>
-    {%endif%}
-</td>
-{%endif%}
 <td>
     {%if not template.name == 'hello_world'%}
     {%if template.pending_components%}
@@ -99,12 +76,64 @@
     hx-swap="innerHTML"
     ><i class="fa fa-whatsapp" aria-hidden="true"></i> Submit to Whatsapp</button>
     {%endif%}
-    <button class="btn btn-warning btn-sm m-1" onclick="window.location.href = '{%url 'whatsapp-template' template_pk=template.pk site_pk=site.pk%}'"><i class="fa fa-pencil" aria-hidden="true"></i> Edit</button>
-    <button class="btn btn-dark btn-sm m-1"
-        hx-delete="{%url 'whatsapp-template-delete'%}" 
-        hx-vals='{"site_pk": "{{site.pk}}", "template_pk": "{{template.pk}}"}'
-        hx-confirm="Are you sure you want to delete this template?" hx-target="#template_row_{{template.pk}}" hx-swap="outerHTML" hx-indicator=".top-htmx-indicator">
-        <i class="fa fa-trash" aria-hidden="true"></i> Delete
+
+    <button class="btn btn-warning btn-sm m-1" onclick="window.location.href = '{%url 'whatsapp-template' template_pk=template.pk %}'"
+        data-bs-toggle="popover" 
+        data-bs-trigger="hover" 
+        data-bs-html="true" 
+        data-bs-placement="top"
+        data-bs-title="What does this do?"
+        data-bs-content="
+        <p>
+            Clicking edit will allow you to make changes to this template. These changes are not submitted to whatsapp until you choose to do so.
+        </p>
+        "><i class="fa fa-pencil" aria-hidden="true"></i> Edit
     </button>
+    
+    <button class="btn btn-dark btn-sm m-1" 
+        hx-post="{%url 'whatsapp-template-delete'%}"
+        hx-vals='{"template_pk": "{{template.pk}}"}'
+        hx-confirm="Are you sure you want to delete this template?" hx-target="#template_row_{{template.pk}}" hx-swap="outerHTML" hx-indicator=".top-htmx-indicator"
+        hx-include="#site_pk_{{template.pk}}" hx-indicator=".top-htmx-indicator" 
+        hx-target="#template_row_{{template.pk}}" id="delete_template_{{template.pk}}"
+        data-bs-toggle="popover" 
+        data-bs-trigger="hover" 
+        data-bs-html="true" 
+        data-bs-placement="top"
+        data-bs-title="What does this do?"
+        data-bs-content="
+        <p>
+            This button deletes the template from Winser Systems and also requests for whatsapp to delete the template on their systems.
+        </p>
+        "> 
+            <i class="fa fa-trash" aria-hidden="true"></i> Delete
+    </button>
+    <span
+        data-bs-toggle="popover" 
+        data-bs-trigger="hover" 
+        data-bs-html="true" 
+        data-bs-placement="top"
+        data-bs-title="What does this do?"
+        data-bs-content="
+        <p>
+            This button allows you to transfer this template to another site under the same company, as long as they share the same whatsapp business account.
+        </p>
+        {%if not company_sites_with_same_whatsapp_business_details%}
+            <p>
+                This button is disabled because you do not have another site linked to your whatsapp business account.
+            </p>
+        {%endif%}
+        ">
+        <button class="btn btn-primary btn-sm m-1" 
+            {%if not company_sites_with_same_whatsapp_business_details%}disabled{%endif%}
+            hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
+            hx-vals='{"template_name": "transfer_template", "whatsapp_template_pk": "{{template.pk}}"}'
+            hx-get="{% url 'campaign-lead-get-modal-content' %}" 
+            hx-push-url="false"
+            hx-swap="innerHTML" hx-trigger="click" id="transfer_template_{{template.pk}}"> 
+                <i class="fa fa-arrow-right" aria-hidden="true"></i> Transfer
+        </button>
+    </span>
     {%endif%}
 </td>
+{%endwith%}

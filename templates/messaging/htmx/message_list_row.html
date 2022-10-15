@@ -1,11 +1,11 @@
 {%load static core_tags%}
 <div class="row chat_row {%if message.inbound%}active_chat_row{%else%}inactive_chat_row{%endif%}"
-    hx-get="{%url 'message-window' customer_number=message.customer_number messaging_site_pk=site.pk%}"
+    hx-get="{%url 'message-window' customer_number=message.customer_number messaging_phone_number=system_phone_number%}"
     hx-indicator=".htmx-indicator" 
     hx-target="#next_chat_window"
     hx-push-url="false"
     hx-swap="outerHTML" hx-trigger="click"  
-    id="message_list_row_{{message.customer_number}}_{{site.pk}}"
+    id="message_list_row_{{message.customer_number}}_{{system_phone_number}}"
     {% comment %} {%if htmx_swap_params%}{{htmx_swap_params|safe}}{%endif%} {% endcomment %}
 
     
@@ -25,7 +25,7 @@
     id="latest_message_row_{{message.customer_number}}"
     >
     <div class="col-auto p-0">
-        <img id="latest_message_avatar_{{message.customer_number}}" src="{%if message.inbound%}{% static 'img/blank-profile-picture.png' %}{%else%}{%if message.user.profile.avatar.url%}{{message.user.profile.avatar.url}}{%else%}{{message.site.company.all.first.company_logo_black.url}}{%endif%}{%endif%}" alt="" width="38" height="38" class="rounded-circle">
+        <img id="latest_message_avatar_{{message.customer_number}}" src="{%if message.inbound%}{% static 'img/blank-profile-picture.png' %}{%else%}{%if message.user.profile.avatar.url%}{{message.user.profile.avatar.url}}{%else%}{{message.site.company.company_logo_black.url}}{%endif%}{%endif%}" alt="" width="38" height="38" class="rounded-circle">
     </div>
     <div class="col p-0 ps-1">
         <div class="row chat_lead_name_row">

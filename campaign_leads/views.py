@@ -9,9 +9,10 @@ from django.contrib.auth.decorators import login_required
 from calendly.api import Calendly
 from campaign_leads.models import Call, Campaign, Campaignlead
 from active_campaign.api import ActiveCampaign
-from active_campaign.models import ActiveCampaignList
+from active_campaign.models import ActiveCampaign
 from core.core_decorators import campaign_leads_enabled_required
 from core.models import Profile, Site
+from core.user_permission_functions import get_available_sites_for_user
 from core.views import get_site_pk_from_request
 from django.db.models import Q, Count
 from django.db.models import OuterRef, Subquery, Count
@@ -19,21 +20,6 @@ from django.db.models import F
 from whatsapp.api import Whatsapp
 logger = logging.getLogger(__name__)
 
-    
-
-# try:
-#     for site in Site.objects.all():
-#         WhatsappTemplate.objects.get_or_create(site=site, send_order=1)
-#         WhatsappTemplate.objects.get_or_create(site=site, send_order=2)
-#         WhatsappTemplate.objects.get_or_create(site=site, send_order=3)
-#         if not ActiveCampaignList.objects.filter(site=site, manual=True):
-#             ActiveCampaignList.objects.create(
-#                 name=f"Manually Created ({site.name})",
-#                 site=site,
-#                 manual=True,
-#             )
-# except Exception as e:
-#     pass
 
 def get_campaign_qs(request):
     first_model_query = (Campaignlead.objects
@@ -92,7 +78,7 @@ class CampaignleadsOverviewView(TemplateView):
             except:
                 pass
         
-        context['site_list'] = Site.objects.all()
+        context['site_list'] = get_available_sites_for_user(self.request.user)
         leads = leads.annotate(calls=Count('call'), cost=F('campaign__product_cost'))
         
         context['querysets'] = [
@@ -113,7 +99,7 @@ class CampaignleadsOverviewView(TemplateView):
                 (f"Call 1", leads.none(), 1)
             )
         context['max_call_count'] = index
-        context['company'] = self.request.user.profile.company.all()[0]
+        context['company'] = self.request.user.profile.company
             
         # whatsapp = Whatsapp()
         return context
@@ -153,7 +139,7 @@ class CampaignBookingsOverviewView(TemplateView):
 
 
 
-        context['site_list'] = Site.objects.all()
+        context['site_list'] = get_available_sites_for_user(self.request.user)
         context['leads'] = leads
         # whatsapp = Whatsapp()
         return context
@@ -161,22 +147,22 @@ class CampaignBookingsOverviewView(TemplateView):
 @method_decorator(campaign_leads_enabled_required, name='dispatch')
 @method_decorator(login_required, name='dispatch')
 class LeadConfigurationView(TemplateView):
-    template_name='campaign_leads/leads_configuration.html'
+    template_name='campaign_leads/campaign_configuration.html'
 
     def get_context_data(self, **kwargs):
         context = super(LeadConfigurationView, self).get_context_data(**kwargs)
         context['campaigns'] = []
-        if self.request.user.profile.company.all():
-            context['campaigns'] = self.request.user.profile.company.all().first().get_and_generate_campaign_objects()
-        context['site_list'] = Site.objects.all()
+        if self.request.user.profile.company:
+            context['campaigns'] = self.request.user.profile.company.get_and_generate_campaign_objects()
+        context['site_list'] = get_available_sites_for_user(self.request.user)
         return context
 
         
 @login_required
 def get_campaigns(request, **kwargs):
     try:
-        if request.user.profile.company.all():
-            request.user.profile.company.all().first().get_and_generate_campaign_objects()
+        if request.user.profile.company:
+            request.user.profile.company.get_and_generate_campaign_objects()
         return render(request, f"campaign_leads/htmx/campaign_select.html", 
         {'campaigns':get_campaign_qs(request)})
     except Exception as e:        

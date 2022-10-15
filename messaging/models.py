@@ -16,6 +16,6 @@ class Message(PolymorphicModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     template = models.ForeignKey("whatsapp.WhatsappTemplate", on_delete=models.SET_NULL, null=True, blank=True)
-    # company = models.ManyToManyField("core.Company")
+    # company = models.ForeignKey("core.Company", on_delete=models.SET_NULL, null=True, blank=True)
     class Meta:
         ordering = ['-datetime']

@@ -15,15 +15,21 @@ from whatsapp.api import Whatsapp
 from django.contrib import messages
 import logging
 logger = logging.getLogger(__name__)
-
+from polymorphic.models import PolymorphicModel
 from whatsapp.models import WhatsAppMessage
 
+class PhoneNumber(PolymorphicModel):
+    number = models.CharField(max_length=30, null=True, blank=True)
+    alias = models.TextField(blank=True, null=True)
+    site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
+class WhatsappNumber(PhoneNumber):
+    whatsapp_business_phone_number_id = models.CharField(max_length=50, null=True, blank=True)
+    pass
 class Site(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     name = models.TextField(blank=True, null=True)
-    company = models.ManyToManyField("core.Company")
-    whatsapp_number = models.CharField(max_length=50, null=True, blank=True)
-    whatsapp_business_phone_number_id = models.CharField(max_length=50, null=True, blank=True)
+    company = models.ForeignKey("core.Company", on_delete=models.SET_NULL, null=True, blank=True)
+    # whatsapp_number = models.CharField(max_length=50, null=True, blank=True)
     whatsapp_access_token = models.TextField(blank=True, null=True)
     whatsapp_business_account_id = models.TextField(null=True, blank=True)
     calendly_token = models.TextField(blank=True, null=True)
@@ -39,15 +45,9 @@ class Site(models.Model):
         elif self.calendly_organization:
             calendly.create_webhook_subscription(self.guid, organization = self.calendly_organization)
 
-    @property
-    def get_company(self):
-        if self.company.all():
-            return self.company.all()[0]
-        fake_company = Company
-        return fake_company
     def generate_lead(self, first_name, email, phone_number, lead_generation_app='a', request=None):
-        if lead_generation_app == 'b' and not self.company.all()[0].active_campaign_enabled:
-            return HttpResponse(f"Active Campaign is not enabled for {self.company.all()[0].company_name}", status=500)
+        if lead_generation_app == 'b' and not self.company.active_campaign_enabled:
+            return HttpResponse(f"Active Campaign is not enabled for {self.company.company_name}", status=500)
         if lead_generation_app == 'a':
             manually_created_campaign, created = ManualCampaign.objects.get_or_create(site=self, name=f"Manually Created")
             lead = Campaignlead.objects.create(
@@ -114,7 +114,7 @@ def execute_after_save(sender, instance, created, *args, **kwargs):
     if not instance.guid:
         instance.guid = str(uuid.uuid4())[:16]
         instance.save()
-    if not settings.DEBUG and instance.calendly_token and instance.guid and instance.company.all()[0].calendly_enabled and not instance.calendly_webhook_created:
+    if not settings.DEBUG and instance.calendly_token and instance.guid and instance.company.calendly_enabled and not instance.calendly_webhook_created:
         try:
             instance.create_calendly_webhook()  
         except:
@@ -135,6 +135,9 @@ class Company(models.Model):
     active_campaign_url = models.TextField(null=True, blank=True)
     active_campaign_api_key = models.TextField(null=True, blank=True)
     @property
+    def users(self):
+        return User.objects.filter(profile__company=self)
+    @property
     def get_campaign_leads_enabled(self):
         return self.campaign_leads_enabled
     @property
@@ -146,11 +149,11 @@ class Company(models.Model):
     def get_and_generate_campaign_objects(self):
         if self.active_campaign_enabled and self.active_campaign_url:
             from active_campaign.api import ActiveCampaign
-            from active_campaign.models import ActiveCampaignList
+            from active_campaign.models import ActiveCampaign
             
             if not settings.DEBUG:
                 for campaign_dict in ActiveCampaign(self.active_campaign_api_key, self.active_campaign_url).get_lists(self.active_campaign_url).get('lists',[]):
-                    campaign, created = ActiveCampaignList.objects.get_or_create(
+                    campaign, created = ActiveCampaign.objects.get_or_create(
                         active_campaign_id = campaign_dict.pop('id'),
                         name = campaign_dict.pop('name'),
                         company = self,
@@ -159,24 +162,26 @@ class Company(models.Model):
                     campaign.save()
         return Campaign.objects.all()
  
+ROLE_CHOICES = (
+                    ('a', 'Owner'),
+                    ('b', 'Manager'),
+                    ('c', 'Employee'),
+                )
 # Extending User Model Using a One-To-One Link
 class Profile(models.Model):
+    role = models.CharField(choices=ROLE_CHOICES, default='c', max_length=1)
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     avatar = models.ImageField(default='default.png', upload_to='profile_images')
     site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
-    company = models.ManyToManyField("core.Company")
+    company = models.ForeignKey("core.Company", on_delete=models.SET_NULL, null=True, blank=True)
+    sites_allowed = models.ManyToManyField("core.Site", related_name="profile_sites_allowed", null=True, blank=True)
     @property
     def name(self):
         if self.user.last_name:
             return f"{self.user.first_name} {self.user.last_name}"
         return self.user.first_name
-    @property
-    def get_company(self):
-        if self.company.all():
-            return self.company.all()[0]
-        fake_company = Company
-        return fake_company
+        
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name}"
     def name(self):

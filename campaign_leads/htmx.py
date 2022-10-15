@@ -10,21 +10,28 @@ from django.contrib.auth.decorators import login_required
 from campaign_leads.models import Campaign, Campaignlead, Booking, Call, Note
 from campaign_leads.views import CampaignBookingsOverviewView
 from core.models import Site
+from core.user_permission_functions import get_available_sites_for_user
 from core.views import get_site_pk_from_request
 from django.db.models import Q, Count
 from django.contrib import messages
-logger = logging.getLogger(__name__)
+
+from whatsapp.models import WhatsappTemplate
+logger = logging.getLogger(__name__) 
 
 @login_required
 def get_modal_content(request, **kwargs):
     try:
         request.GET._mutable = True
         site_pk = get_site_pk_from_request(request)
+        context = {}
         if site_pk:
             request.GET['site_pk'] = site_pk
+        whatsapp_template_pk = request.GET.get('whatsapp_template_pk')
+        if whatsapp_template_pk:
+            context['template'] = WhatsappTemplate.objects.get(pk=whatsapp_template_pk)
         if request.user.is_authenticated:
             template_name = request.GET.get('template_name', '')
-            context = {'site_list':Site.objects.all()}
+            context['site_list'] = get_available_sites_for_user(request.user)
             param1 = kwargs.get('param1', '')
             if param1:
                 context['lead'] = Campaignlead.objects.get(pk=param1)
@@ -38,8 +45,8 @@ def get_modal_content(request, **kwargs):
 
 @login_required
 def create_campaign_lead(request, **kwargs):
-    logger.debug(str(request.user))
-    try:
+    # logger.debug(str(request.user))
+    # try:
         first_name = request.POST.get('first_name')
         if not first_name:
             return HttpResponse("Please provide a first name", status=500)
@@ -64,11 +71,11 @@ def create_campaign_lead(request, **kwargs):
         
         context = {'lead':lead,'max_call_count':1,'call_count':0, 'site':site}
         return render(request, 'campaign_leads/htmx/lead_article.html', context)
-    except Exception as e:
-        # messages.add_message(request, messages.ERROR, f'Error with creating a campaign lead')
-        logger.debug("create_campaign_lead Error "+str(e))
-        # raise Exception
-        return HttpResponse("Error with creating a campaign lead", status=500)
+    # except Exception as e:
+    #     # messages.add_message(request, messages.ERROR, f'Error with creating a campaign lead')
+    #     logger.debug("create_campaign_lead Error "+str(e))
+    #     # raise Exception
+    #     return HttpResponse("Error with creating a campaign lead", status=500)
 @login_required
 def get_leads_column_meta_data(request, **kwargs):
     logger.debug(str(request.user))

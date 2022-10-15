@@ -10,7 +10,8 @@ from django.contrib.auth import login
 from django.middleware.csrf import get_token
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.views import View 
+from django.views import View
+from core.user_permission_functions import get_available_sites_for_user 
 from core.views import get_site_pk_from_request
 from django.http import QueryDict
 
@@ -40,7 +41,7 @@ def get_modal_content(request, **kwargs):
             request.GET['site_pk'] = site_pk
         if request.user.is_authenticated:
             template_name = request.GET.get('template_name', '')
-            context = {'site_list':Site.objects.all()}
+            context = {'site_list':get_available_sites_for_user(request.user)}
             # if template_name == 'switch_user':
             #     context['users'] = User.objects.filter(is_authenticated=True).order_by('first_name')
             if template_name == 'edit_user':

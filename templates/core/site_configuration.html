@@ -1,0 +1,26 @@
+{% extends 'core/base.html' %}
+{%load static tz core_tags%}
+
+{%block scripts%}
+{{block.super}}
+<script>
+    $(document).ready(function() {
+        document.body.addEventListener('htmx:beforeRequest', function(evt) {  
+        });
+        document.body.addEventListener('htmx:afterSwap', function(evt) {              
+        });
+    });
+</script>
+{%endblock scripts%}
+
+{%block overide_content%}   
+
+{%block extra_top_left_buttons %}
+{%endblock%}
+{%block extra_top_right_buttons %}
+{%endblock%}    
+
+<div class="col d-flex flex-column h-sm-100 p-0" style="overflow-x:hidden;"> 
+        {%include 'core/htmx/site_configuration_htmx.html'%}
+</div>
+{%endblock overide_content%}

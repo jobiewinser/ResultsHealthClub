@@ -206,15 +206,15 @@
                                                 <i class="zmdi zmdi-arrow-left"></i>
                                             </div>
                                             <div class="avatar">
-                                                <img src="{%if request.user.profile.company.all.first.company_logo_black.url%}
-                                                {{request.user.profile.company.all.first.company_logo_black.url}}
+                                                <img src="{%if request.user.profile.company.company_logo_black.url%}
+                                                {{request.user.profile.company.company_logo_black.url}}
                                                 {%else%}
                                                 {% static 'img/blank-profile-picture.png' %}
                                                 {%endif%}
-                                                " alt="{{request.user.profile.company.all.first}} Logo">
+                                                " alt="{{request.user.profile.company}} Logo">
                                             </div>
                                             <div class="name">
-                                                <span>{%if request.user.profile.company.all.first.company_name%}{{request.user.profile.company.all.first.company_name}}{%else%}Company{%endif%}</span>
+                                                <span>{%if request.user.profile.company.company_name%}{{request.user.profile.company.company_name}}{%else%}Company{%endif%}</span>
                                                 <span class="status">online</span>
                                             </div>
                                             <div class="actions more">

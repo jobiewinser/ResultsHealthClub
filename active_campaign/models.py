@@ -10,7 +10,7 @@ class ActiveCampaignWebhookRequest(models.Model):
     json_data = models.JSONField(default=dict)
     guid = models.TextField(null=True, blank=True)
 
-class ActiveCampaignList(Campaign):
+class ActiveCampaign(Campaign):
     pass
     active_campaign_id = models.TextField(null=True, blank=True)
     def create_webhook(self):
@@ -21,7 +21,7 @@ class ActiveCampaignList(Campaign):
                 self.webhook_id = response.json().get('webhook').get('id')
                 self.save()
 
-@receiver(models.signals.post_save, sender=ActiveCampaignList)
+@receiver(models.signals.post_save, sender=ActiveCampaign)
 def execute_after_save(sender, instance, created, *args, **kwargs):
     if created:
         instance.guid = str(uuid.uuid4())[:16]

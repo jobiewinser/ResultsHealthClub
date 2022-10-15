@@ -38,10 +38,16 @@ class Campaign(PolymorphicModel):
     webhook_id = models.TextField(null=True, blank=True)
     site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
     company = models.ForeignKey("core.Company", on_delete=models.SET_NULL, null=True, blank=True)
+    first_send_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="first_send_template_campaign", on_delete=models.SET_NULL, null=True, blank=True)
+    second_send_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="second_send_template_campaign", on_delete=models.SET_NULL, null=True, blank=True)
+    third_send_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="third_send_template_campaign", on_delete=models.SET_NULL, null=True, blank=True)
     def get_active_leads_qs(self):
         return self.campaignlead_set.filter(complete=False)
     def is_manual(self):
         return False
+    @property
+    def get_site_templates(self):
+        return WhatsappTemplate.objects.filter(site=self.site)
 @receiver(models.signals.post_save, sender=Campaign)
 def execute_after_save(sender, instance, created, *args, **kwargs):
     if created:
@@ -93,53 +99,67 @@ class Campaignlead(models.Model):
 
     def send_template_whatsapp_message(self, send_order, communication_method = 'a'):
         if communication_method == 'a':
-            template = WhatsappTemplate.objects.get(send_order = send_order, site=self.campaign.site)
-            whatsapp = Whatsapp(self.campaign.site.whatsapp_access_token)
-            template_live = whatsapp.get_template(template.site.whatsapp_business_account_id, template.message_template_id)
-            template.name = template_live['name']
+            if send_order == 1:
+                template = self.campaign.first_send_template
+            elif send_order == 2:
+                template = self.campaign.second_send_template
+            elif send_order == 3:
+                template = self.campaign.third_send_template
+            if template:
+                if template.site.whatsapp_business_account_id:
+                    if template.message_template_id:
+                        whatsapp = Whatsapp(self.campaign.site.whatsapp_access_token)
+                        template_live = whatsapp.get_template(template.site.whatsapp_business_account_id, template.message_template_id)
+                        template.name = template_live['name']
 
-            template.category = template_live['category']
-            template.language = template_live['language']
-            template.components = template_live['components']
-            template.save()
+                        template.category = template_live['category']
+                        template.language = template_live['language']
+                        template.components = template_live['components']
+                        template.save()
 
-            components =   [] 
+                        components =   [] 
 
-            whole_text = ""
-            for component in template.components:
-                params = []
-                component_type = component.get('type', "").lower()
-                # if component_type == 'header':
-                text = component.get('text', '')
-                whole_text = f"{whole_text} <br> {text}"
-                if '{{1}}' in text:
-                    params.append(              
-                        {
-                            "type": "text",
-                            "text":  self.first_name
-                        }
-                    )
-                if '{{3}}' in text:
-                    params.append(           
-                        {
-                            "type": "text",
-                            "text":  self.campaign.company.company_name
-                        }
-                    )
-                if '{{4}}' in text:
-                    params.append(                   
-                        {
-                            "type": "text",
-                            "text":  self.campaign.site.whatsapp_number
-                        }
-                    )
-                if params:
-                    components.append(
-                        {
-                            "type": component_type,
-                            "parameters": params
-                        }
-                    )
+                        whole_text = ""
+                        for component in template.components:
+                            params = []
+                            component_type = component.get('type', "").lower()
+                            # if component_type == 'header':
+                            text = component.get('text', '')
+                            whole_text = f"{whole_text} <br> {text}"
+                            if '{{1}}' in text:
+                                params.append(              
+                                    {
+                                        "type": "text",
+                                        "text":  self.first_name
+                                    }
+                                )
+                            if '{{3}}' in text:
+                                params.append(           
+                                    {
+                                        "type": "text",
+                                        "text":  self.campaign.company.company_name
+                                    }
+                                )
+                            if '{{4}}' in text:
+                                params.append(                   
+                                    {
+                                        "type": "text",
+                                        "text":  self.campaign.site.whatsapp_number
+                                    }
+                                )
+                            if params:
+                                components.append(
+                                    {
+                                        "type": component_type,
+                                        "parameters": params
+                                    }
+                                )
+                    else:
+                        print("errorhere selected template not found on Whatsapp's system")
+                else:
+                    print("errorhere no Whatsapp Business Account Linked")
+            else:
+                print("errorhere no suitable template found")
             
             
 
