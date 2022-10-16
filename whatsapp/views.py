@@ -87,7 +87,7 @@ class Webhooks(View):
                             <span id='latest_message_row_{from_number}' hx-swap-oob='delete'></span>
                             <span id='messageCollapse_{whatsappnumber.pk}' hx-swap-oob='afterbegin'>{rendered_message_list_row}</span>
 
-                            <span id='messageWindowCollapse_{from_number}' hx-swap-oob='beforeend"'>{rendered_message_chat_row}</span>
+                            <span id='messageWindowCollapse_{from_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>
                             """
                             async_to_sync(channel_layer.group_send)(
                                 f"messaging_{whatsappnumber.pk}",

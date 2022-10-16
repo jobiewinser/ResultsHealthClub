@@ -201,11 +201,25 @@
         {%block chat_bottom%}
             <script>            
             $(document).ready(function() {
-                document.body.addEventListener('htmx:afterSwap', function(evt) {  
+                document.body.addEventListener('htmx:afterSwap', function(evt) {
+                    if (evt.detail.pathInfo.requestPath.includes("message-window")){
+                        try{
+                            $(evt.target.lastElementChild).scrollTop($(evt.target.lastElementChild)[0].scrollHeight - $(evt.target.lastElementChild)[0].clientHeight);
+                        }catch{}
+                        
+                    
+                    }
+                });
+                document.body.addEventListener('htmx:oobAfterSwap', function(evt) { 
+                    if ($(evt.detail.target).hasClass('chat_card_body')){                        
+                        $(evt.detail.target).animate({
+                            scrollTop: $(evt.detail.target)[0].scrollHeight - $(evt.detail.target)[0].clientHeight
+                          }, 1000);
+                    }
                 });
                 
                 document.body.addEventListener('htmx', function(evt) { 
-                    console.log(evt)
+                    
                 });
             });
             </script>
