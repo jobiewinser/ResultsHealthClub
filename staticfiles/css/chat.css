@@ -15,6 +15,7 @@
     text-align:left;
     margin-left:4px;
     margin-right:4px;
+    margin-top: auto;
 }
 .chat_card_body{
     height:350px;
@@ -32,6 +33,11 @@
     overflow:hidden;
     width:100%;
     padding:2px;
+}
+
+.chat_bottom_header{
+    background-color:rgba(33, 37, 41, 1);
+    color:white;
 }
 .chat_bottom_header:hover{
     cursor: pointer;

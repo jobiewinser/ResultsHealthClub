@@ -30,7 +30,7 @@
                             1st <i class="fa fa-whatsapp"></i>
                     </button>
                     {%elif site%}
-                    <button class="btn btn-sm btn-success text-white position-relative" 
+                    {% comment %} <button class="btn btn-sm btn-success text-white position-relative" 
                         hx-get="{%url 'message-window' customer_number=lead.whatsapp_number site_pk=site.pk%}"
                         hx-indicator=".htmx-indicator" 
                         hx-target="#next_chat_window_{{system_phone_number}}"
@@ -40,7 +40,7 @@
                             Chat
                             <span id="chat_notification_{{lead.whatsapp_number}}">
                             </span>
-                    </button>
+                    </button> {% endcomment %}
                     {%endif%}
                 </div>
             </div>

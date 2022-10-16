@@ -2,26 +2,38 @@ from django.http import HttpResponse
 from django.shortcuts import render
 
 from campaign_leads.models import Campaignlead
-from core.models import Site
+from core.models import Site, WhatsappNumber
+from core.user_permission_functions import get_allowed_site_chats_for_user, get_user_allowed_to_use_site_messaging
 from whatsapp.models import WhatsAppMessage
 from django.contrib.auth.decorators import login_required
 
 import logging
 logger = logging.getLogger(__name__)
 
+
+@login_required
+def message_list(request, **kwargs):
+    site = Site.objects.get(pk=request.GET.get('site_pk'))
+    whatsappnumber = WhatsappNumber.objects.get(pk=request.GET.get('whatsappnumber_pk'))
+    if get_user_allowed_to_use_site_messaging(request.user, site):
+        context = {'chat_site':site, "whatsappnumber":whatsappnumber}
+        return render(request, "messaging/messaging.html", context)
+
 @login_required
 def message_window(request, **kwargs):
-    messages = WhatsAppMessage.objects.filter(customer_number=kwargs.get('customer_number'), system_user_number=kwargs.get('messaging_phone_number')).order_by('datetime')
+    whatsappnumber = WhatsappNumber.objects.get(pk=kwargs.get('whatsappnumber_pk'))
+    messages = WhatsAppMessage.objects.filter(customer_number=kwargs.get('customer_number'), whatsappnumber=whatsappnumber).order_by('datetime')
     context = {}
     context["messages"] = messages
     context["lead"] = Campaignlead.objects.filter(whatsapp_number=kwargs.get('customer_number')).first()
     context["customer_number"] = kwargs.get('customer_number')
-    messaging_phone_number = kwargs.get('messaging_phone_number')
-    if messaging_phone_number:
-        context["system_phone_number"] = messaging_phone_number
-    else:
-        numbers = request.user.profile.site.watsappnumber_set.all().value_list('number')
-        latest_message = WhatsAppMessage.objects.filter
+    context['whatsappnumber'] = whatsappnumber
+    # messaging_phone_number = kwargs.get('messaging_phone_number')
+    # if messaging_phone_number:
+    #     context["system_phone_number"] = messaging_phone_number
+    # else:
+    #     numbers = request.user.profile.site.watsappnumber_set.all().value_list('number')
+    #     latest_message = WhatsAppMessage.objects.filter
 
     return render(request, "messaging/message_window_htmx.html", context)
 

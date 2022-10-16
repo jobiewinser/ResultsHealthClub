@@ -27,6 +27,7 @@ class WhatsAppMessage(Message):
     wamid = models.TextField(null=True, blank=True)   
     raw_webhook = models.ForeignKey("whatsapp.WhatsAppWebhookRequest", null=True, blank=True, on_delete=models.SET_NULL)
     conversationid = models.TextField(null=True, blank=True)  
+    whatsappnumber = models.ForeignKey("core.WhatsappNumber", null=True, blank=True, on_delete=models.SET_NULL)
 # class WhatsAppMessage(models.Model):
 #     pass 
     

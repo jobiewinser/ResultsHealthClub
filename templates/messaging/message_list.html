@@ -1,0 +1,18 @@
+<div class="card chat_bottom_window p-0" id="chat_list_bottom_window">
+    <div class="card-header chat_bottom_header" data-bs-toggle="collapse" data-bs-target="#messageCollapse_{{whatsappnumber.pk}}" aria-expanded="false" aria-controls="messageCollapse_{{whatsappnumber.pk}}">
+        
+        
+        <span class="primary_td_layer text-white">
+            Site: {{chat_site.name}}
+        </span>
+        <br>
+        <span class="secondary_td_layer">
+            Your Number: {%if whatsappnumber.alias%}{{whatsappnumber.alias}}{%else%}{{whatsappnumber.number}}{%endif%}
+        </span> 
+    </div>
+    <div class="card-body message_list_body collapse show p-0" id="messageCollapse_{{whatsappnumber.pk}}">
+        {%for message in whatsappnumber.get_fresh_messages%}
+        {%include 'messaging/htmx/message_list_row.html' %}
+        {%endfor%}
+    </div>
+</div>

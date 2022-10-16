@@ -74,7 +74,7 @@ class SiteConfigurationView(TemplateView):
         if site_pk:
             self.request.GET['site_pk'] = site_pk      
             context['site'] = Site.objects.get(pk=site_pk)     
-        context['whatsapp_numbers'] = context['site'].get_phone_numbers()  
+        context['whatsapp_numbers'] = context['site'].get_live_whatsapp_phone_numbers()  
         return context
     def post(self, request):
         self.request.POST._mutable = True 

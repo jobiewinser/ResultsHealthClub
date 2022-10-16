@@ -3,7 +3,7 @@ import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.conf import settings
 from campaign_leads.models import Campaignlead
-from core.models import Site
+from core.models import Site, WhatsappNumber
 from core.templatetags.core_tags import nice_datetime_tag
 from django.template import loader
 
@@ -14,8 +14,8 @@ from channels.layers import get_channel_layer
 logger = logging.getLogger(__name__)
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        self.messaging_phone_number = self.scope["url_route"]["kwargs"]["messaging_phone_number"]
-        self.group_name = f"messaging_{self.messaging_phone_number}"
+        self.whatsappnumber_pk = self.scope["url_route"]["kwargs"]["whatsappnumber_pk"]
+        self.group_name = f"messaging_{self.whatsappnumber_pk}"
         self.user = self.scope["user"]
         await self.channel_layer.group_add(self.group_name, self.channel_name)
         await self.accept()
@@ -27,38 +27,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):        
         text_data_json = json.loads(text_data)
         input_message = text_data_json["message"]
-        messaging_whatsapp_number = text_data_json["messaging_whatsapp_number"]
+        messaging_customer_number = text_data_json["messaging_customer_number"]
         user = self.scope["user"]
         if(user.is_authenticated):
-            message = await send_whatsapp_message_to_number(input_message, messaging_whatsapp_number, user, self.scope["url_route"]["kwargs"]["messaging_phone_number"])
+            message = await send_whatsapp_message_to_number(input_message, messaging_customer_number, user, self.scope["url_route"]["kwargs"]["whatsappnumber_pk"])
             if message:
-                site = await get_site(self.scope["url_route"]["kwargs"]["messaging_phone_number"])
+                whatsappnumber = await get_whatsappnumber(self.scope["url_route"]["kwargs"]["whatsappnumber_pk"])
                 message_context = {
                     "message": message,
-                    "site": site,
+                    "whatsappnumber": whatsappnumber,
                 }
-                rendered_message_list_row = loader.render_to_string('messaging/htmx/message_list_row.html', message_context)
-                rendered_message_chat_row = loader.render_to_string('messaging/htmx/message_chat_row.html', message_context)
-                rendered_htmx = f"""
-                <span id='message_list_row_{messaging_whatsapp_number}_{site.pk}' hx-swap-oob='delete'></span>
-                <span id='messageCollapse_{site.pk}' hx-swap-oob='afterbegin '>{rendered_message_list_row}</span>
-                <span id='messageWindowCollapse_{messaging_whatsapp_number} focus-scroll:true' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>                
-                """
-
-                if message.inbound:
-                    rendered_htmx = f"""{rendered_htmx}
-                    <span hx-swap-oob="true" id="chat_notification_{message.customer_number}">
-                        <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
-                            <span class="visually-hidden">New alerts</span>
-                        </span>
-                    </span>
-                    """
-                else:
-                    rendered_htmx = f"""{rendered_htmx}
-                    <span hx-swap-oob="true" id="chat_notification_{message.customer_number}">
-                    </span>
-                    """
                 
+                rendered_htmx = await get_rendered_htmx(message, message_context, messaging_customer_number, whatsappnumber)
                 await self.channel_layer.group_send(
                     self.group_name,
                     {
@@ -73,18 +53,19 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 from asgiref.sync import async_to_sync, sync_to_async
 @sync_to_async
-def send_whatsapp_message_to_number(message, whatsapp_number, user, site_pk):  
+def send_whatsapp_message_to_number(message, customer_number, user, whatsappnumber_pk):  
     if settings.ENABLE_WHATSAPP_MESSAGING:
+        whatsappnumber = WhatsappNumber.objects.get(pk=whatsappnumber_pk)
         logger.debug("send_whatsapp_message_to_number start") 
-        lead = Campaignlead.objects.filter(whatsapp_number=whatsapp_number).first()  
+        lead = Campaignlead.objects.filter(whatsapp_number=customer_number).first()  
         if lead:     
             if lead.campaign.site.company == user.profile.company: 
                 logger.debug("send_whatsapp_message_to_number success lead true") 
-                return Site.objects.get(pk = site_pk).send_whatsapp_message(customer_number=whatsapp_number, message=message, user=user, lead=lead)
-        user_company_site_pk_list = Site.objects.filter(company__in=user.profile.company).values_list('pk', flat=True)
-        if WhatsAppMessage.objects.filter(customer_number=whatsapp_number, site__pk__in=user_company_site_pk_list):
+                return whatsappnumber.send_whatsapp_message(customer_number=customer_number, message=message, user=user, lead=lead)
+
+        if WhatsAppMessage.objects.filter(whatsappnumber=whatsappnumber, customer_number=customer_number):
             logger.debug("send_whatsapp_message_to_number success lead false") 
-            return Site.objects.get(pk = site_pk).send_whatsapp_message(customer_number=whatsapp_number, message=message, user=user)
+            return whatsappnumber.send_whatsapp_message(customer_number=customer_number, message=message, user=user)
         logger.debug("send_whatsapp_message_to_number fail") 
         return None
     return None
@@ -95,12 +76,35 @@ def message_details_user(user):
     name = user.profile.name()
     return avatar, name
 @sync_to_async
-def get_site(site_pk):   
-    return Site.objects.get(pk=site_pk)
+def get_whatsappnumber(whatsappnumber_pk):   
+    return WhatsappNumber.objects.get(pk=whatsappnumber_pk)
 # @sync_to_async
 # def get_lead(lead_pk):   
 #     return Campaignlead.objects.get(pk=lead_pk)
+@sync_to_async
+def get_rendered_htmx(message, message_context, messaging_customer_number, whatsappnumber):
+    rendered_message_list_row = loader.render_to_string('messaging/htmx/message_list_row.html', message_context)
+    rendered_message_chat_row = loader.render_to_string('messaging/htmx/message_chat_row.html', message_context)
+    rendered_htmx = f"""
+    <span id='message_list_row_{messaging_customer_number}_{whatsappnumber.pk}' hx-swap-oob='delete'></span>
+    <span id='messageCollapse_{whatsappnumber.pk}' hx-swap-oob='afterbegin '>{rendered_message_list_row}</span>
+    <span id='messageWindowCollapse_{messaging_customer_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>                
+    """
 
+    if message.inbound:
+        rendered_htmx = f"""{rendered_htmx}
+        <span hx-swap-oob="true" id="chat_notification_{message.customer_number}">
+            <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
+                <span class="visually-hidden">New alerts</span>
+            </span>
+        </span>
+        """
+    else:
+        rendered_htmx = f"""{rendered_htmx}
+        <span hx-swap-oob="true" id="chat_notification_{message.customer_number}">
+        </span>
+        """
+    return rendered_htmx
 
     
 class LeadsConsumer(AsyncWebsocketConsumer):

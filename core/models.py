@@ -24,11 +24,17 @@ class PhoneNumber(PolymorphicModel):
     site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
     company = models.ForeignKey("core.Company", on_delete=models.SET_NULL, null=True, blank=True)
     archived = models.BooleanField(default=False)
+    @property
+    def is_whatsapp(self):
+        return False
 class WhatsappNumber(PhoneNumber):
     whatsapp_business_phone_number_id = models.CharField(max_length=50, null=True, blank=True)
     quality_rating = models.CharField(max_length=50, null=True, blank=True)
     code_verification_status = models.CharField(max_length=50, null=True, blank=True)
     verified_name = models.CharField(max_length=50, null=True, blank=True)
+    @property
+    def is_whatsapp(self):
+        return True
     pass
 
     @property
@@ -41,7 +47,50 @@ class WhatsappNumber(PhoneNumber):
 
     @property
     def get_fresh_messages(self):
-        return WhatsAppMessage.objects.filter(system_user_number=self.number).order_by('customer_number', '-datetime').distinct('customer_number')
+        return WhatsAppMessage.objects.filter(whatsappnumber=self).order_by('customer_number', '-datetime').distinct('customer_number')
+
+    def send_whatsapp_message(self, customer_number=None, lead=None, message="", user=None, template_used=None):  
+        try:
+            logger.debug("site.send_whatsapp_message start") 
+            if lead:
+                customer_number = lead.whatsapp_number
+            if settings.ENABLE_WHATSAPP_MESSAGING and self.whatsapp_business_phone_number_id and self.site.whatsapp_access_token and message:
+                whatsapp = Whatsapp(self.site.whatsapp_access_token)
+                if '+' in self.number:
+                    customer_number = f"{self.number.split('+')[-1]}"
+                response = whatsapp.send_free_text_message(customer_number, message, self.whatsapp_business_phone_number_id)
+                reponse_messages = response.get('messages',[])
+                if reponse_messages:
+                    for response_message in reponse_messages:
+                        message, created = WhatsAppMessage.objects.get_or_create(
+                            wamid=response_message.get('id'),
+                            message=message,
+                            datetime=datetime.now(),
+                            lead=lead,
+                            site=self.site,
+                            user=user,
+                            system_user_number=self.number,
+                            customer_number=customer_number,
+                            template=template_used,
+                            inbound=False,
+                            whatsappnumber=self,
+                        )
+                    logger.debug("site.send_whatsapp_message success") 
+                    return message
+                
+                logger.debug("site.send_whatsapp_message fail") 
+                return None
+            logger.debug(f"""site.send_whatsapp_message error: 
+            
+                (settings.ENABLE_WHATSAPP_MESSAGING,{str(settings.ENABLE_WHATSAPP_MESSAGING)})             
+                (self.whatsapp_business_phone_number_id,{str(self.whatsapp_business_phone_number_id)})             
+                (self.site.whatsapp_access_token,{str(self.site.whatsapp_access_token)}) 
+                (message,{str(message)}) 
+            """) 
+        except Exception as e:
+            logger.debug("site.send_whatsapp_message error: "+str(e)) 
+            return None
+
 class Site(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     name = models.TextField(blank=True, null=True)
@@ -56,7 +105,7 @@ class Site(models.Model):
     calendly_webhook_created = models.BooleanField(default=False)  
     guid = models.TextField(null=True, blank=True) 
 
-    def get_phone_numbers(self):
+    def get_live_whatsapp_phone_numbers(self):
         whatsapp = Whatsapp(self.whatsapp_access_token)  
         phone_numbers = whatsapp.get_phone_numbers(self.whatsapp_business_account_id)  
         whatsapp_number_ids = []
@@ -75,6 +124,8 @@ class Site(models.Model):
             WhatsappNumber.objects.filter(site=self).exclude(whatsapp_business_phone_number_id__in=whatsapp_number_ids)
         else:
             WhatsappNumber.objects.filter(site=self).exclude(whatsapp_business_phone_number_id__in=whatsapp_number_ids).update(archived=True)
+        return self.return_phone_numbers()
+    def return_phone_numbers(self):
         return WhatsappNumber.objects.filter(site=self, archived=False)
     def create_calendly_webhook(self):
         calendly = Calendly(self.calendly_token)
@@ -96,46 +147,6 @@ class Site(models.Model):
             )
             return lead
 
-    def send_whatsapp_message(self, customer_number=None, lead=None, message="", user=None, template_used=None):  
-        try:
-            logger.debug("site.send_whatsapp_message start") 
-            if lead:
-                customer_number = lead.whatsapp_number
-            if settings.ENABLE_WHATSAPP_MESSAGING and self.whatsapp_business_phone_number_id and self.whatsapp_access_token and message:
-                whatsapp = Whatsapp(self.whatsapp_access_token)
-                if '+' in self.whatsapp_number:
-                    customer_number = f"{self.whatsapp_number.split('+')[-1]}"
-                response = whatsapp.send_free_text_message(customer_number, message, self.whatsapp_business_phone_number_id)
-                reponse_messages = response.get('messages',[])
-                if reponse_messages:
-                    for response_message in reponse_messages:
-                        message, created = WhatsAppMessage.objects.get_or_create(
-                            wamid=response_message.get('id'),
-                            message=message,
-                            datetime=datetime.now(),
-                            lead=lead,
-                            site=self,
-                            user=user,
-                            system_user_number=self.whatsapp_number,
-                            customer_number=customer_number,
-                            template=template_used,
-                            inbound=False
-                        )
-                    logger.debug("site.send_whatsapp_message success") 
-                    return message
-                
-                logger.debug("site.send_whatsapp_message fail") 
-                return None
-            logger.debug(f"""site.send_whatsapp_message error: 
-            
-                (settings.ENABLE_WHATSAPP_MESSAGING,{str(settings.ENABLE_WHATSAPP_MESSAGING)})             
-                (self.whatsapp_business_phone_number_id,{str(self.whatsapp_business_phone_number_id)})             
-                (self.whatsapp_access_token,{str(self.whatsapp_access_token)}) 
-                (message,{str(message)}) 
-            """) 
-        except Exception as e:
-            logger.debug("site.send_whatsapp_message error: "+str(e)) 
-            return None
 
     def get_leads_created_in_month_and_year(self, date):
         return Campaignlead.objects.filter(campaign__site=self, created__month=date.month, created__year=date.year)

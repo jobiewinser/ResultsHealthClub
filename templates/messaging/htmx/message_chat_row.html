@@ -1,7 +1,7 @@
 {%load static core_tags%}
 {%if message.inbound%}
     <div class="row"
-        id="message_chat_row_{{message.customer_number}}_{{site.pk}}"
+        id="message_chat_row_{{message.customer_number}}_{{whatsappnumber.pk}}"
         data-bs-toggle="popover" 
         data-bs-trigger="hover" 
         data-bs-html="true" 
@@ -20,7 +20,7 @@
     </div>
 {%else%}
     <div class="row"
-        id="message_chat_row_{{message.customer_number}}_{{site.pk}}"
+        id="message_chat_row_{{message.customer_number}}_{{whatsappnumber.pk}}"
         data-bs-toggle="popover" 
         data-bs-trigger="hover" 
         data-bs-html="true" 

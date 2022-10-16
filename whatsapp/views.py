@@ -7,6 +7,7 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from campaign_leads.models import Campaign, Campaignlead, Call
 from core.user_permission_functions import get_available_sites_for_user, get_user_allowed_to_edit_template, get_user_allowed_to_edit_whatsappnumber
+from messaging.models import Message
 from whatsapp.api import Whatsapp
 from django.views.generic import TemplateView
 from whatsapp.models import WHATSAPP_ORDER_CHOICES, WhatsAppMessage, WhatsAppMessageStatus, WhatsAppWebhookRequest, WhatsappTemplate, template_variables
@@ -57,7 +58,8 @@ class Webhooks(View):
                                 lead = None
                             # Likely a message from a customer     
                             lead = Campaignlead.objects.filter(whatsapp_number=from_number).last()
-                            site = Site.objects.get(whatsapp_number=to_number)
+                            whatsappnumber = WhatsappNumber.objects.get(number=to_number)
+                            site = Site.objects.get(phonenumber=whatsappnumber)
                             whatsapp_message = WhatsAppMessage.objects.create(
                                 wamid=wamid,
                                 message = message.get('text').get('body',''),
@@ -68,6 +70,7 @@ class Webhooks(View):
                                 site=site,
                                 lead=lead,
                                 raw_webhook=webhook,
+                                whatsappnumber=whatsappnumber,
                             )
                             whatsapp_message.save()
                             from channels.layers import get_channel_layer
@@ -75,19 +78,19 @@ class Webhooks(View):
                             message_context = {
                                 "message": whatsapp_message,
                                 "site": site,
+                                "whatsappnumber": whatsappnumber,
                             }
                             rendered_message_list_row = loader.render_to_string('messaging/htmx/message_list_row.html', message_context)
                             rendered_message_chat_row = loader.render_to_string('messaging/htmx/message_chat_row.html', message_context)
                             rendered_htmx = f"""
 
-                            
-                            <span id='message_list_row_{from_number}_{site.pk}' hx-swap-oob='delete'></span>
-                            <span id='messageCollapse_{site.pk}' hx-swap-oob='afterbegin'>{rendered_message_list_row}</span>
+                            <span id='latest_message_row_{from_number}' hx-swap-oob='delete'></span>
+                            <span id='messageCollapse_{whatsappnumber.pk}' hx-swap-oob='afterbegin'>{rendered_message_list_row}</span>
 
-                            <span id='messageWindowCollapse_{from_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>
+                            <span id='messageWindowCollapse_{from_number}' hx-swap-oob='beforeend"'>{rendered_message_chat_row}</span>
                             """
                             async_to_sync(channel_layer.group_send)(
-                                f"messaging_{site.pk}",
+                                f"messaging_{whatsappnumber.pk}",
                                 {
                                     'type': 'chatbox_message',
                                     "message": rendered_htmx,
@@ -318,7 +321,7 @@ def whatsapp_number_make_default(request):
         site = whatsappnumber.site
         site.default_number = whatsappnumber
         site.save()
-        return render(request, 'core/htmx/site_configuration_htmx.html', {'whatsapp_numbers':site.get_phone_numbers(), 'site': site, 'site_list': get_available_sites_for_user(request.user)})
+        return render(request, 'core/htmx/site_configuration_htmx.html', {'whatsapp_numbers':site.get_live_whatsapp_phone_numbers(), 'site': site, 'site_list': get_available_sites_for_user(request.user)})
     return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
     
 
@@ -347,6 +350,7 @@ def whatsapp_number_change_site(request):
                 whatsappnumber.site = site
                 whatsappnumber.save()
                 Site.objects.filter(default_number=whatsappnumber).update(default_number=None)
+                WhatsAppMessage.objects.filter(whatsappnumber=whatsappnumber).update(site=site)
                 return HttpResponse("",status=200)
     return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
 

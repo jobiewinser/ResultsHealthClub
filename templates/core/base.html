@@ -197,38 +197,20 @@
         </div>
         {%block snackbar%}
         <div id="snackbar"></div>
+
         {%block chat_bottom%}
-        <span id="chat_bottom" class="" style=" 
-        display: flex;
-        flex-wrap: wrap;
-        align-items: flex-start;">
-        
-        {%if site%}
-        <input hidden
-        hx-get="{%url 'get-messaging-window'%}"
-        hx-target="#chat_bottom"
-        hx-swap="#outerHTML"
-        hx-indicator=".htmx-indicator"                 
-        hx-vals='{"site_pk": "{{site.pk}}"}'
-        hx-trigger="load"/>
-        {%else%}
-        <link href="/static/css/chat.css" rel="stylesheet">
-                <span id="next_chat_window_{{system_phone_number}}"></span>
-        <div class="card card-body chat_bottom_window">
-            <div class="card-header chat_bottom_header">
-                Select a site to chat
-            </div>
-        </div>
-        {%endif%}
-        </span>
-        <script>
-            
-        $(document).ready(function() {
-            document.body.addEventListener('htmx:afterSwap', function(evt) {  
+            <script>            
+            $(document).ready(function() {
+                document.body.addEventListener('htmx:afterSwap', function(evt) {  
+                });
+                
+                document.body.addEventListener('htmx', function(evt) { 
+                    console.log(evt)
+                });
             });
-        });
-        </script>
+            </script>
         {%endblock chat_bottom%}
+
         {%endblock snackbar%}
         
     </body>

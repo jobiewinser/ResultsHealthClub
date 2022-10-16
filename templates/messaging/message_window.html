@@ -1,11 +1,17 @@
 {%load static core_tags%}
 
 
-<div class="card chat_bottom_window p-0" id="chat_card_{{customer_number}}" data-whatsapp-number="{{customer_number}}">
-    <div class="card-header chat_bottom_header center" >
+<div class="card chat_bottom_window customer_chat_bottom_window p-0" id="chat_card_{{customer_number}}" data-whatsapp-number="{{customer_number}}">
+    <div class="card-header chat_bottom_header" >
         <div class="row">
-            <div class="col p-0" data-bs-toggle="collapse" data-bs-target="#messageWindowCollapse_{{customer_number}}" aria-expanded="true" aria-controls="messageWindowCollapse_{{customer_number}}">
-                {%if lead.name%}{{lead.name}}{%else%}{{customer_number}}{%endif%}
+            <div class="col p-0 left" data-bs-toggle="collapse" data-bs-target="#messageWindowCollapse_{{customer_number}}" aria-expanded="true" aria-controls="messageWindowCollapse_{{customer_number}}">
+                <span class="primary_td_layer text-white">
+                    Recipient: {%if lead.name%}{{lead.name}}{%else%}{{customer_number}}{%endif%}
+                </span>
+                <br>
+                <span class="secondary_td_layer">
+                    Your Number: {%if whatsappnumber.alias%}{{whatsappnumber.alias}}{%else%}{{whatsappnumber.number}}{%endif%}
+                </span> 
             </div>
             <div class="col-auto p-0">
                 <i class="fa-sharp fa-solid fa-circle-xmark" onclick="$('#chat_card_{{customer_number}}').remove(); clear_chat_from_session('{{customer_number}}')"></i>
@@ -20,7 +26,7 @@
             <div style="position: absolute; right:0; bottom: 0; width:100%" class="row" id="message_input_div_{{customer_number}}"> 
                     <div class="col"> 
                         <input class="form-control message_input_text" id="message_input_{{customer_number}}"  name="message"  type="text"/>
-                        <input hidden class="form-control" value="{{customer_number}}"  name="messaging_whatsapp_number"  type="text"/>
+                        <input hidden class="form-control" value="{{customer_number}}"  name="messaging_customer_number"  type="text"/>
                     </div>
                     <div class="col-auto"> 
                         <button onclick="setTimeout(function (){$('#message_input_{{customer_number}}').val('')}, 10);" class="badge bg-primary message_submit" id="message_submit_{{customer_number}}"><i class="fa-solid fa-paper-plane-top"></i></button>
