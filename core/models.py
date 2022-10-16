@@ -47,6 +47,7 @@ class Site(models.Model):
     name = models.TextField(blank=True, null=True)
     company = models.ForeignKey("core.Company", on_delete=models.SET_NULL, null=True, blank=True)
     # whatsapp_number = models.CharField(max_length=50, null=True, blank=True)
+    default_number = models.ForeignKey("core.WhatsappNumber", on_delete=models.SET_NULL, null=True, blank=True, related_name="site_default_number")
     whatsapp_access_token = models.TextField(blank=True, null=True)
     whatsapp_business_account_id = models.TextField(null=True, blank=True)
     calendly_token = models.TextField(blank=True, null=True)
@@ -61,7 +62,7 @@ class Site(models.Model):
         whatsapp_number_ids = []
         for number in phone_numbers['data']:
             whatsappnumber, created = WhatsappNumber.objects.get_or_create(whatsapp_business_phone_number_id=number['id'])
-            if not whatsappnumber.company or whatsappnumber.company == self.company:
+            if not whatsappnumber.company or whatsappnumber.company == self.company and created:
                 whatsappnumber.number = number['display_phone_number'].replace("+", "").replace(" ", "")
                 whatsappnumber.quality_rating = number['quality_rating']
                 whatsappnumber.code_verification_status = number['code_verification_status']
@@ -69,8 +70,11 @@ class Site(models.Model):
                 whatsappnumber.company = self.company
                 whatsappnumber.site = self
                 whatsappnumber.save()
-                whatsapp_number_ids.append(number['id'])
-        WhatsappNumber.objects.filter(site=self).exclude(whatsapp_business_phone_number_id__in=whatsapp_number_ids).update(archived=True)
+            whatsapp_number_ids.append(number['id'])
+        if settings.DEBUG:
+            WhatsappNumber.objects.filter(site=self).exclude(whatsapp_business_phone_number_id__in=whatsapp_number_ids)
+        else:
+            WhatsappNumber.objects.filter(site=self).exclude(whatsapp_business_phone_number_id__in=whatsapp_number_ids).update(archived=True)
         return WhatsappNumber.objects.filter(site=self, archived=False)
     def create_calendly_webhook(self):
         calendly = Calendly(self.calendly_token)

@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 
 from campaign_leads.models import Campaign, Campaignlead, Booking, Call, Note
 from campaign_leads.views import CampaignBookingsOverviewView
-from core.models import Site
+from core.models import Site, WhatsappNumber
 from core.user_permission_functions import get_available_sites_for_user
 from core.views import get_site_pk_from_request
 from django.db.models import Q, Count
@@ -32,7 +32,7 @@ def get_modal_content(request, **kwargs):
 
         whatsappnumber_pk = request.GET.get('whatsappnumber_pk')
         if whatsappnumber_pk:
-            context['whatsappnumber'] = WhatsappTemplate.objects.get(pk=whatsappnumber_pk)
+            context['whatsappnumber'] = WhatsappNumber.objects.get(pk=whatsappnumber_pk)
 
         if request.user.is_authenticated:
             template_name = request.GET.get('template_name', '')

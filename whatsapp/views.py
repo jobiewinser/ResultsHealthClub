@@ -273,6 +273,7 @@ def delete_whatsapp_template_htmx(request):
         whatsapp.delete_template(site.whatsapp_business_account_id, template.name)
     template.delete()
     template.archived = True
+    template.save()
     return HttpResponse("", status=200)
 
 @login_required
@@ -311,6 +312,14 @@ def whatsapp_number_change_alias(request):
             whatsappnumber.save()
             return HttpResponse("",status=200)
     return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
+def whatsapp_number_make_default(request):
+    whatsappnumber = WhatsappNumber.objects.get(pk=request.POST.get('whatsappnumber_pk'))
+    if get_user_allowed_to_edit_whatsappnumber(request.user, whatsappnumber):
+        site = whatsappnumber.site
+        site.default_number = whatsappnumber
+        site.save()
+        return render(request, 'core/htmx/site_configuration_htmx.html', {'whatsapp_numbers':site.get_phone_numbers(), 'site': site, 'site_list': get_available_sites_for_user(request.user)})
+    return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
     
 
 def whatsapp_template_change_site(request):
@@ -325,6 +334,19 @@ def whatsapp_template_change_site(request):
                 Campaign.objects.filter(first_send_template=template).update(first_send_template=None)
                 Campaign.objects.filter(second_send_template=template).update(second_send_template=None)
                 Campaign.objects.filter(third_send_template=template).update(third_send_template=None)
+                return HttpResponse("",status=200)
+    return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
+
+def whatsapp_number_change_site(request):
+    whatsappnumber = WhatsappNumber.objects.get(pk=request.POST.get('whatsappnumber_pk'))
+    if get_user_allowed_to_edit_whatsappnumber(request.user, whatsappnumber):
+        site_pk = request.POST.get('site_pk', None)
+        if site_pk:
+            site = Site.objects.get(pk=site_pk)
+            if site.company == whatsappnumber.site.company and site.whatsapp_business_account_id == whatsappnumber.site.whatsapp_business_account_id:
+                whatsappnumber.site = site
+                whatsappnumber.save()
+                Site.objects.filter(default_number=whatsappnumber).update(default_number=None)
                 return HttpResponse("",status=200)
     return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
 

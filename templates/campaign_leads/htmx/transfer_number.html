@@ -1,13 +1,13 @@
 <span>
     <div class="row">
         <div class="col">
-            <select class="form-select" name="site_pk" id="site_pk_{{whatsappnumber.pk}}" onchange="if(this.value.toString() == '{{whatsappnumber.site.pk}}'){$('#assign_site_{{whatsappnumber.pk}}').attr('disabled', true)}else{$('#assign_site_{{whatsappnumber.pk}}').attr('disabled', false)}">
+            <select class="form-select" name="site_pk" id="site_pk_{{whatsappnumber.pk}}" onchange="console.log(this.value.toString(), '{{whatsappnumber.site.pk}}'); if(this.value.toString() == '{{whatsappnumber.site.pk}}'){$('#assign_site_{{whatsappnumber.pk}}').attr('disabled', true)}else{$('#assign_site_{{whatsappnumber.pk}}').attr('disabled', false)}">
                 {%for site in site_list%}
                 <option {%if whatsappnumber.site.pk == site.pk %}selected{%endif%} value="{{site.pk}}">{{site.name}}</option>
                 {%endfor%}
             </select>
             <br>
-            <button disabled hx-post="{% url 'whatsapp-assign-number' %}" hx-swap="delete" 
+            <button disabled hx-post="{% url 'whatsapp-change-number-site' %}" hx-swap="delete" 
                 hx-include="#site_pk_{{whatsappnumber.pk}}" hx-indicator=".top-htmx-indicator" 
                 hx-vals='{"whatsappnumber_pk": "{{whatsappnumber.pk}}"}'
                 hx-target="#whatsappnumber_row_{{whatsappnumber.pk}}" id="assign_site_{{whatsappnumber.pk}}" 
