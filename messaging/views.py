@@ -29,8 +29,8 @@ def message_window(request, **kwargs):
 def get_messaging_section(request, **kwargs):
     try:
         # request.GET._mutable = True
-        site = Site.objects.get(pk=request.GET.get('site_pk'))
-        return render(request, f"messaging/messaging.html", {'site':site})   
+        # site = Site.objects.get(pk=request.GET.get('site_pk'))
+        return render(request, f"messaging/messaging.html", {})   
     except Exception as e:
         logger.debug("get_messaging_section Error "+str(e))
         return HttpResponse(e, status=500)

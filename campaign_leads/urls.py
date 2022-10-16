@@ -20,13 +20,13 @@ urlpatterns = [
     
 
 
-    path('booking-and-calender/', campaignleadsviews.CampaignBookingsOverviewView.as_view(), name='campaign-booking-overview'),
+    path('booking/', campaignleadsviews.CampaignBookingsOverviewView.as_view(), name='campaign-booking-overview'),
     path('leads-and-calls/', campaignleadsviews.CampaignleadsOverviewView.as_view(), name='campaign-leads-overview'),    
 
 
 
 
-    path('configuration/lead-configuration/', campaignleadsviews.LeadConfigurationView.as_view(), name='lead-configuration'),
+    path('configuration/campaign-configuration/', campaignleadsviews.LeadConfigurationView.as_view(), name='campaign-configuration'),
     
 
     

@@ -13,6 +13,7 @@
     <div class="m-4"><button class="btn btn-primary btn-block" type="submit" id="login_button"
         hx-post="{%url 'login-htmx'%}"
         hx-include=".login_input"
+        hx-swap="delete"
         >Log In</button></div>
     {% comment %} <a href="#" class="forgot">Forgot your email or password?</a> {% endcomment %}
 </span>

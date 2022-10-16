@@ -6,6 +6,19 @@ body {
     margin: 0;
 }
 
+.cartoon-background::after {
+    background: #efe7dd url(/static/img/background.png) repeat; background-size: 90px !important;
+    content: "";
+    opacity: 0.65;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    position: absolute;
+    z-index: -1;   
+    min-height:100%;
+}
+
 .side_nav {
     min-height: 100vh;
     /* width: 250px; */
@@ -561,6 +574,8 @@ tr.odd td {
 
 #leads_board {
     justify-content: unset;
+    max-height:85vh;
+    overflow-y:scroll;
 }
 
 #add_booking_area {
@@ -629,4 +644,10 @@ tr.odd td {
     padding: 2px 2px;
     font-size: 11px;
     line-height: 1.2em;
+}
+.column_metadata{
+    background-color:white;
+    margin:4px;
+    padding:4px;
+    border-radius:5px;
 }

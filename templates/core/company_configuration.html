@@ -13,14 +13,20 @@
 </script>
 {%endblock scripts%}
 
-{%block overide_content%}   
 
 {%block extra_top_left_buttons %}
-{%endblock%}
-{%block extra_top_right_buttons %}
-{%endblock%}    
-
-<div class="col d-flex flex-column h-sm-100 p-0" style="overflow-x:hidden;"> 
-        {%include 'core/htmx/company_configuration_htmx.html'%}
+<div class="col-md-auto">
+    <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>             
 </div>
-{%endblock overide_content%}
+{%include 'core/htmx/site_selection.html'%}
+{%endblock extra_top_left_buttons %}
+
+{%block extra_top_right_buttons %}
+<div class="col-md-auto">
+<span class="badge bg-dark text-white"><h6 class="m-1">Company Configuration</h6></span>           
+</div>
+{%endblock extra_top_right_buttons %}
+
+{%block content%}   
+        {%include 'core/htmx/company_configuration_htmx.html'%}
+{%endblock content%}

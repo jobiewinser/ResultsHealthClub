@@ -6,7 +6,7 @@ import json
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from campaign_leads.models import Campaign, Campaignlead, Call
-from core.user_permission_functions import get_available_sites_for_user
+from core.user_permission_functions import get_available_sites_for_user, get_user_allowed_to_edit_template, get_user_allowed_to_edit_whatsappnumber
 from whatsapp.api import Whatsapp
 from django.views.generic import TemplateView
 from whatsapp.models import WHATSAPP_ORDER_CHOICES, WhatsAppMessage, WhatsAppMessageStatus, WhatsAppWebhookRequest, WhatsappTemplate, template_variables
@@ -14,7 +14,7 @@ from django.template import loader
 logger = logging.getLogger(__name__)
 from django.views import View 
 from django.utils.decorators import method_decorator
-from core.models import ErrorModel, Site
+from core.models import ErrorModel, Site, WhatsappNumber
 from asgiref.sync import async_to_sync, sync_to_async
 @method_decorator(csrf_exempt, name="dispatch")
 class Webhooks(View):
@@ -300,6 +300,34 @@ def whatsapp_clear_changes_htmx(request):
         template.pending_name = None
         template.save()
         return render(request, 'whatsapp/whatsapp_templates_row.html', {'template':template, 'site_list': get_available_sites_for_user(request.user), 'WHATSAPP_ORDER_CHOICES': WHATSAPP_ORDER_CHOICES})
+
+
+def whatsapp_number_change_alias(request):
+    whatsappnumber = WhatsappNumber.objects.get(pk=request.POST.get('whatsappnumber_pk'))
+    if get_user_allowed_to_edit_whatsappnumber(request.user, whatsappnumber):
+        alias = request.POST.get('alias', None)
+        if alias:
+            whatsappnumber.alias = alias
+            whatsappnumber.save()
+            return HttpResponse("",status=200)
+    return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
+    
+
+def whatsapp_template_change_site(request):
+    template = WhatsappTemplate.objects.get(pk=request.POST.get('template_pk'))
+    if get_user_allowed_to_edit_template(request.user, template):
+        site_pk = request.POST.get('site_pk', None)
+        if site_pk:
+            site = Site.objects.get(pk=site_pk)
+            if site.company == template.site.company and site.whatsapp_business_account_id == template.site.whatsapp_business_account_id:
+                template.site = site
+                template.save()
+                Campaign.objects.filter(first_send_template=template).update(first_send_template=None)
+                Campaign.objects.filter(second_send_template=template).update(second_send_template=None)
+                Campaign.objects.filter(third_send_template=template).update(third_send_template=None)
+                return HttpResponse("",status=200)
+    return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
+
 
 def save_whatsapp_template_ajax(request):
     if request.POST.get('created', False):

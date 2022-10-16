@@ -7,7 +7,7 @@
                 {%endfor%}
             </select>
             <br>
-            <button disabled hx-post="{% url 'whatsapp-assign-site' %}" hx-swap="delete" 
+            <button disabled hx-post="{% url 'whatsapp-change-template-site' %}" hx-swap="delete" 
                 hx-include="#site_pk_{{template.pk}}" hx-indicator=".top-htmx-indicator" 
                 hx-vals='{"template_pk": "{{template.pk}}"}'
                 hx-target="#template_row_{{template.pk}}" id="assign_site_{{template.pk}}" 

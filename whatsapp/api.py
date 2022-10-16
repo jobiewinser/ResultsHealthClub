@@ -149,8 +149,8 @@ class Whatsapp():
             response_body = response.json()
             return response_body
             
-    def get_phone_numbers(self):        
-        url = f"{self.whatsapp_url}{self.whatsapp_business_account_id}/phone_numbers?access_token={self.whatsapp_access_token}"
+    def get_phone_numbers(self, whatsapp_business_account_id):        
+        url = f"{self.whatsapp_url}{whatsapp_business_account_id}/phone_numbers?access_token={self.whatsapp_access_token}"
         # headers = self._get_headers()
         response = requests.get(url=url)
         response_body = response.json()

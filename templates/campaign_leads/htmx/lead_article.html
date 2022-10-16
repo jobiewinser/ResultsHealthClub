@@ -23,7 +23,7 @@
                     <button class="btn btn-sm btn-success text-white position-relative" 
                         hx-get="{%url 'send-first-template-whatsapp' lead_pk=lead.pk%}"
                         hx-indicator=".htmx-indicator" 
-                        hx-target="#next_chat_window"
+                        hx-target="#next_chat_window_{{system_phone_number}}"
                         hx-push-url="false"
                         hx-swap="outerHTML" hx-trigger="click"  
                         data-whatsapp-number="{{lead.whatsapp_number}}">
@@ -33,7 +33,7 @@
                     <button class="btn btn-sm btn-success text-white position-relative" 
                         hx-get="{%url 'message-window' customer_number=lead.whatsapp_number site_pk=site.pk%}"
                         hx-indicator=".htmx-indicator" 
-                        hx-target="#next_chat_window"
+                        hx-target="#next_chat_window_{{system_phone_number}}"
                         hx-push-url="false"
                         hx-swap="outerHTML" hx-trigger="click"  
                         data-whatsapp-number="{{lead.whatsapp_number}}">

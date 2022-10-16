@@ -43,7 +43,7 @@ def sum_cost_tag(queryset_or_list):
     total_cost = 0
     try:
         for item in queryset_or_list:
-            total_cost = float(item.cost)
+            total_cost = total_cost + float(item.cost)
         return total_cost
     except:
         return "Error"

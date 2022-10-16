@@ -70,9 +70,9 @@
             
             <script>
                 let dt = null;
-                $(document).ready(function() {    
+                $(document).ready(function() {  
                     $("[data-bs-toggle=popover]").popover();
-                    document.body.addEventListener('htmx:afterSwap', function(evt) {  
+                    document.body.addEventListener('htmx:afterRequest', function(evt) {   
                         if (evt.detail.target.id == 'generic_modal_body'){
                             $('#generic_modal').modal('show');
                         }
@@ -100,6 +100,12 @@
                                     window.location.replace("/");
                                 }
                             }
+                            if (![undefined, ''].includes(evt.detail.pathInfo.requestPath)){
+                                if (evt.detail.pathInfo.requestPath.includes("login-htmx")){
+                                    snackbarShow('Successfully logged in', 'success');
+                                    location.reload();;
+                                }
+                            }
                         } else if (status == 404) {
                             if ($('#'+src_id+"_error").length == 0){                                
                                 $("#"+src_id).after("<div id='"+src_id+"_error' style='color:red'>Not Found</div>");
@@ -113,7 +119,7 @@
                     
 
                     document.body.addEventListener('htmx:configRequest', function(evt) {    
-                        evt.detail.headers['x-csrftoken'] = $('#csrf_token').val();
+                        evt.detail.headers['x-csrftoken'] = '{{csrf_token}}';
                     });
                 });
             </script>
@@ -127,84 +133,51 @@
         
     </head>
 
-    <body>
-        <div class="container-fluid overflow-hidden p-0">
-            <div class="row vh-100 overflow-auto">
-                <div class="col-12 col-sm-3 col-xl-2 px-sm-2 px-0 bg-dark d-flex sticky-top">
-                    <div class="d-flex flex-sm-column flex-row flex-grow-1 align-items-center align-items-sm-start px-3 pt-2 text-white">
-                    <a href="/" class="d-flex align-items-center pb-sm-3 mb-md-0 me-md-auto text-white text-decoration-none">
-                            {% comment %} <span class="fs-5">B<span class="d-none d-sm-inline">rand</span></span>                             {% endcomment %}
-                            <span class="fs-5"><a class="navbar-brand" href="{%url 'home'%}"><img class="side_nav_logo" src="{% static 'img/logo_white.png' %}" alt="winser systems logo"></a></span>
+    <body class="cartoon-background">
+        <nav class="navbar navbar-expand-lg navbar-light bg-dark">
+            <div class="container-fluid ">
+                <a class="navbar-brand" href="{%url 'customer-home'%}">
+                    <img class="side_nav_logo" src="{% static 'img/logo-dark-back-img.png' %}" style="height:50px" alt="winser systems logo">
+                </a>
+                <a class="navbar-brand" href="{%url 'customer-home'%}">
+                <img class="side_nav_logo" src="{% static 'img/logo-dark-back-text.png' %}" style="height:25px" alt="winser systems logo">
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item ">
+                        <a class="nav-link active text-white" aria-current="page" href="{%url 'customer-home'%}">Home</a>
+                    </li>
+                    </ul>
 
-                        </a>
-                        <div id="pb" class="progress-bar top-htmx-indicator" style="width:100%"></div>
-                        <ul class="nav nav-pills flex-sm-column flex-row flex-nowrap flex-shrink-1 flex-sm-grow-0 flex-grow-1 mb-sm-auto mb-0 justify-content-center align-items-center align-items-sm-start" id="menu">
-                            {%if request.user.is_authenticated%} 
-                            <li class="nav-item">
-                                <a href="{%url 'customer-home'%}" class="nav-link px-sm-0 px-2">
-                                    <i class="fs-5 bi-house"></i><span class="ms-1 d-none d-sm-inline">Customer Home</span>
-                                </a>
-                            </li>
-                            {%else%}
-                            <li class="nav-item">
-                                <a href="{%url 'home'%}" class="nav-link px-sm-0 px-2">
-                                    <i class="fs-5 bi-house"></i><span class="ms-1 d-none d-sm-inline">Home</span>
-                                </a>
-                            </li>
-                            {%endif%}
-
-                            
-                            {% comment %} {%if request.user.is_authenticated%} 
-                            <li class="dropdown">
-                                <a href="#" class="nav-link dropdown-toggle px-sm-0 px-1" style="{%if 'campaign-leads/' in request.path%} font-weight:bold{%endif%}" id="dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fs-5 bi-bootstrap"></i><span class="ms-1 d-none d-sm-inline">My Products </span>
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdown">
-                                    {%if request.user.profile.company.campaign_leads_enabled%} 
-                                    <a href="{% url 'customer-home'%}" class="dropdown-item"  style="{%if 'campaign-leads/' in request.path%} font-weight:bold{%endif%}">My Campaign Leads</a>
-                                    {%endif%}
-                                    {%if request.user.profile.company.free_taster_enabled%} 
-                                    <a href="{% url 'free-taster-overview'%}" class="dropdown-item"  style="{%if 'free-taster/' in request.path%} font-weight:bold{%endif%}">My Free Taster Links</a>
-                                    {%endif%}
-                                </ul>
-                            </li>
-                            {%endif%} {% endcomment %}
-                            
-                            {% comment %} <li class="dropdown">
-                                <a href="#" class="nav-link dropdown-toggle px-sm-0 px-1" id="dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fs-5 bi-bootstrap"></i><span class="ms-1 d-none d-sm-inline">All Products</span>
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdown">
-                                    <a href="{% url 'campaign-leads-product-page'%}" class="dropdown-item" style="{%if 'campaign-leads-product-page/' in request.path%} font-weight:bold{%endif%}">Campaign Leads</a>
-                                </ul>
-                            </li>
-                            <br> {% endcomment %}
-                            <li class="dropdown">
-                                <a href="https://portfolio.jobiewinser.co.uk/leads-management-privacy-policy/" class="nav-link px-sm-0 px-1">
-                                    <i class="fa-solid fa-circle-info"></i><span class="ms-1 d-none d-sm-inline">Privacy Policy</span>
-                                </a>
-                            </li>
-                            <li class="dropdown">
-                                <a href="/admin" class="nav-link px-sm-0 px-1">
-                                    <i class="fa-solid fa-circle-info"></i><span class="ms-1 d-none d-sm-inline">Admin Panel</span>
-                                </a>
-                            </li>
-
-                            
-                        </ul>
-                        <div id="profile-nav-section" style="width:100%" class="p-2">
-                        {%include 'core/htmx/profile-nav-section.html'%}
-                        </div>
-                    </div>
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item ">
+                        <img  class="top-htmx-indicator htmx-indicator" id="top-htmx-indicator" src="https://htmx.org/img/bars.svg"/>
+                    </li>
+                    </ul>
+                    
+                    {%include 'core/htmx/profile-nav-section.html'%}
                 </div>
-                {%block overide_content%}    
-                <div class="col d-flex flex-column h-sm-100 p-0" style="overflow-x:hidden"> 
-                    <main class="row  p-0 mt-2">
-                        {%block content%} 
-                        {%endblock content%}
-                    </main>
+            </div>
+        </nav>
+        <div class="container-fluid  p-0">
+            <div class="row  mt-2">
+                {%block extra_top_left_buttons %}
+                {%endblock extra_top_left_buttons %}
+
+                <div class="col">
                 </div>
-                {%endblock overide_content%}
+
+                {%block extra_top_right_buttons %}                    
+                {%endblock extra_top_right_buttons %}
+            </div>
+            <div class="row ">
+                <div class="col" style=""> 
+                    {%block content%} 
+                    {%endblock content%}
+                </div>
             </div>
         </div>
 
@@ -240,7 +213,7 @@
         hx-trigger="load"/>
         {%else%}
         <link href="/static/css/chat.css" rel="stylesheet">
-                <span id="next_chat_window"></span>
+                <span id="next_chat_window_{{system_phone_number}}"></span>
         <div class="card card-body chat_bottom_window">
             <div class="card-header chat_bottom_header">
                 Select a site to chat

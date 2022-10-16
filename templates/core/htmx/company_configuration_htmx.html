@@ -2,24 +2,10 @@
 {%load static tz core_tags%}
 {%with request.user.profile.company as company%}
 <span id="content">
-<div class="fixed_top_buttons">
-    {%block extra_top_left_buttons %}
-    <div class="col-md-auto me-2">
-        <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>             
-    </div>
-    {%endblock extra_top_left_buttons %}
-
-
-    <div class="col">                
-    </div>    
-    <div class="col-md-auto">
-        <span class="badge bg-dark text-white"><h6 class="m-1">Company Configuration</h6></span>      
-    </div>
-</div>
-
-<main class="row overflow-auto below_fixed_top_buttons" style="min-height:90vh">
-    <div class="row p-0">
-        <div class="col p-0 m-3">
+    <div class="row mt-2">
+        <div class="col">
+        </div>
+        <div class="col-md-auto card p-2">
             <table class="table">
                 <thead>
                     <tr>
@@ -49,8 +35,8 @@
                 </tbody>
             </table>
         </div>
+        <div class="col">
+        </div>
     </div>
-</main>
-
 </span>
 {%endwith%}

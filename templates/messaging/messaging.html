@@ -1,15 +1,17 @@
-{%load static core_tags%}
+{%load static core_tags user_permission_tags%}
 <span id="chat_bottom" class="" style=" 
-display: flex;
-flex-wrap: wrap;
-align-items: flex-start;" hx-ws="connect:/ws/messaging/{{site.pk}}/">
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;" 
+    {% comment %} hx-ws="connect:/ws/messaging/{{site.pk}}/" {% endcomment %}
+    >
     <script>
         $(document).ready(function() {   
             {% if site%}      
 
             {%endif%}
             document.body.addEventListener('htmx:beforeRequest', function(evt) {  
-                if (evt.detail.target.id == 'next_chat_window'){
+                if (evt.detail.target.id == 'next_chat_window_{{system_phone_number}}'){
                     let phone_number = $(evt.srcElement).data('whatsapp-number');            
                     if ($('#chat_card_'+phone_number).length > 0){
                         evt.preventDefault()
@@ -48,30 +50,53 @@ align-items: flex-start;" hx-ws="connect:/ws/messaging/{{site.pk}}/">
         
     </script>
     <link href="{% static 'css/chat.css' %}" rel="stylesheet" />
-        <span id="next_chat_window"></span>
-        {%if site%}
-        {%for system_phone_number in site.whatsappnumber_set.all%}
-        <div class="card chat_bottom_window p-0">
-            <div class="card-header chat_bottom_header center " data-bs-toggle="collapse" data-bs-target="#messageCollapse_{{site.pk}}" aria-expanded="false" aria-controls="messageCollapse_{{site.pk}}">
-                <b>Chats for {{site.name}}</b>
-            </div>
-            <div class="card-body message_list_body collapse show p-0" id="messageCollapse_{{site.pk}}">
-                {%for message in site.get_fresh_messages%}
-                {%include 'messaging/htmx/message_list_row.html' %}
+
+    <div class="w-100">
+        <div class="scroller scroller-left float-start mt-2"><i class="bi bi-caret-left-fill"></i></div>
+        <div class="scroller scroller-right float-end mt-2"><i class="bi bi-caret-right-fill"></i></div>
+        <div class="wrapper-nav">
+            <nav class="nav nav-tabs list mt-2" id="siteMessageTab" role="tablist">
+                {%for site in request.user|get_allowed_site_chats_for_user_tag%}                    
+                <a class="nav-item nav-link pointer {% if forloop.first %}active{%endif%}" data-bs-target="#site_tab_{{site.pk}}" role="tab" data-bs-toggle="tab" {% if forloop.first %}aria-controls="public" aria-selected="true"{%endif%}>{{site.name}}</a>
+                {%endfor%}
+            </nav>
+        </div>
+        <div class="tab-content p-3" id="siteMessageTabContent">
+            {%for site in request.user|get_allowed_site_chats_for_user_tag%}
+            <div role="tabpanel" class="tab-pane fade {% if forloop.first %}active{%endif%} show mt-2" id="site_tab_{{site.pk}}" aria-labelledby="public-tab" >
+
+                <div class="wrapper-nav">
+                    <nav class="nav nav-tabs list mt-2" id="numberMessageTab" role="tablist">
+                        {%for system_phone_number in site|get_allowed_number_chats_for_user_tag:request.user%}                    
+                        <a class="nav-item nav-link pointer {% if forloop.first %}active{%endif%}" data-bs-target="#number_tab_{{site.pk}}" role="tab" data-bs-toggle="tab" {% if forloop.first %}aria-controls="public" aria-selected="true"{%endif%}>{%if system_phone_number.alias%}{{system_phone_number.alias}}{%else%}{{system_phone_number.number}}{%endif%}</a>
+                        {%endfor%}
+                    </nav>
+                </div>
+
+                {%for system_phone_number in site|get_allowed_number_chats_for_user_tag:request.user%}    
+                <div role="tabpanel" class="tab-pane fade {% if forloop.first %}active{%endif%} show mt-2" id="number_tab_{{site.pk}}" aria-labelledby="public-tab" >
+                    <span id="next_chat_window_{{system_phone_number}}"></span>
+                    <div class="card chat_bottom_window p-0">
+                        <div class="card-header chat_bottom_header center " data-bs-toggle="collapse" data-bs-target=".messageCollapse" aria-expanded="false" aria-controls="messageCollapse">
+                            <small><b>{{site.name}}</b> - <i>{%if system_phone_number.alias%}{{system_phone_number.alias}}{%else%}{{system_phone_number.number}}{%endif%}</i></small>
+                        </div>
+                        <div class="card-body message_list_body collapse show p-0 messageCollapse" id="messageCollapse_{{site.pk}}">
+                            {%for message in site.get_fresh_messages%}
+                            {% comment %} {%include 'messaging/htmx/message_list_row.html' %} {% endcomment %}
+                            {%endfor%}
+                        </div>
+                    </div>
+                </div>
                 {%endfor%}
             </div>
+            {%endfor%}
         </div>
-        {%endfor%}
-        {%else%}
-        <div class="card card-body chat_bottom_window">
-            <div class="card-header chat_bottom_header" >
-                Select a site to chat
-            </div>
-        </div>
-        {%endif%}
-    </span>
+    </div>
 
-{%if site%}
+        
+</span>
+
+{% comment %} {%if site%}
 {%for message in site.get_fresh_messages%}
 {%if message.inbound%}
 <span hx-swap-oob="true" id="chat_notification_{{message.customer_number}}">
@@ -84,4 +109,4 @@ align-items: flex-start;" hx-ws="connect:/ws/messaging/{{site.pk}}/">
 </span>
 {%endif%}
 {%endfor%}
-{%endif%}
+{%endif%} {% endcomment %}

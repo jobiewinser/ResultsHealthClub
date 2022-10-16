@@ -22,9 +22,26 @@ class PhoneNumber(PolymorphicModel):
     number = models.CharField(max_length=30, null=True, blank=True)
     alias = models.TextField(blank=True, null=True)
     site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
+    company = models.ForeignKey("core.Company", on_delete=models.SET_NULL, null=True, blank=True)
+    archived = models.BooleanField(default=False)
 class WhatsappNumber(PhoneNumber):
     whatsapp_business_phone_number_id = models.CharField(max_length=50, null=True, blank=True)
+    quality_rating = models.CharField(max_length=50, null=True, blank=True)
+    code_verification_status = models.CharField(max_length=50, null=True, blank=True)
+    verified_name = models.CharField(max_length=50, null=True, blank=True)
     pass
+
+    @property
+    def company_sites_with_same_whatsapp_business_details(self):
+        try:
+            from core.models import Site
+            return Site.objects.filter(company=self.site.company, whatsapp_business_account_id=self.site.whatsapp_business_account_id).exclude(pk=self.site.pk)
+        except Exception as e:
+            return Site.objects.none()
+
+    @property
+    def get_fresh_messages(self):
+        return WhatsAppMessage.objects.filter(system_user_number=self.number).order_by('customer_number', '-datetime').distinct('customer_number')
 class Site(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     name = models.TextField(blank=True, null=True)
@@ -38,6 +55,23 @@ class Site(models.Model):
     calendly_webhook_created = models.BooleanField(default=False)  
     guid = models.TextField(null=True, blank=True) 
 
+    def get_phone_numbers(self):
+        whatsapp = Whatsapp(self.whatsapp_access_token)  
+        phone_numbers = whatsapp.get_phone_numbers(self.whatsapp_business_account_id)  
+        whatsapp_number_ids = []
+        for number in phone_numbers['data']:
+            whatsappnumber, created = WhatsappNumber.objects.get_or_create(whatsapp_business_phone_number_id=number['id'])
+            if not whatsappnumber.company or whatsappnumber.company == self.company:
+                whatsappnumber.number = number['display_phone_number'].replace("+", "").replace(" ", "")
+                whatsappnumber.quality_rating = number['quality_rating']
+                whatsappnumber.code_verification_status = number['code_verification_status']
+                whatsappnumber.verified_name = number['verified_name']
+                whatsappnumber.company = self.company
+                whatsappnumber.site = self
+                whatsappnumber.save()
+                whatsapp_number_ids.append(number['id'])
+        WhatsappNumber.objects.filter(site=self).exclude(whatsapp_business_phone_number_id__in=whatsapp_number_ids).update(archived=True)
+        return WhatsappNumber.objects.filter(site=self, archived=False)
     def create_calendly_webhook(self):
         calendly = Calendly(self.calendly_token)
         if self.calendly_user:
@@ -98,9 +132,6 @@ class Site(models.Model):
         except Exception as e:
             logger.debug("site.send_whatsapp_message error: "+str(e)) 
             return None
-
-    def get_fresh_messages(self):
-        return WhatsAppMessage.objects.filter(site=self).order_by('customer_number', '-datetime').distinct('customer_number')
 
     def get_leads_created_in_month_and_year(self, date):
         return Campaignlead.objects.filter(campaign__site=self, created__month=date.month, created__year=date.year)

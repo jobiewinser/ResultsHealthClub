@@ -12,6 +12,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import login
 
 from core.user_permission_functions import get_available_sites_for_user
+from whatsapp.api import Whatsapp
 logger = logging.getLogger(__name__)
 try:
     super_users = User.objects.filter(email="jobiewinser@gmail.com")
@@ -54,7 +55,7 @@ except:
     pass
 
 
-@method_decorator(login_required, name='dispatch')
+# @method_decorator(login_required, name='dispatch')
 class CustomerHomeView(TemplateView):
     template_name='core/customer_home.html'
     
@@ -72,7 +73,8 @@ class SiteConfigurationView(TemplateView):
         site_pk = get_site_pk_from_request(self.request)
         if site_pk:
             self.request.GET['site_pk'] = site_pk      
-            context['site'] = Site.objects.get(pk=site_pk)       
+            context['site'] = Site.objects.get(pk=site_pk)     
+        context['whatsapp_numbers'] = context['site'].get_phone_numbers()  
         return context
     def post(self, request):
         self.request.POST._mutable = True 
