@@ -78,18 +78,20 @@ class SiteConfigurationView(TemplateView):
         return context
     def post(self, request):
         self.request.POST._mutable = True 
-        site = Site.objects.get(pk=request.POST.get('site_pk'))
-        name = request.POST.get('name', None)
-        if name:
-            site.name = name
+        site = Site.objects.get(pk=request.POST.get('site_pk'))   
+        response_text = ""     
+        if 'name' in request.POST:
+            site.name = request.POST['name']
+            response_text = f"{site.name}"
         site.save()
-        context = {'site':site, 'site_list':get_available_sites_for_user(self.request.user)}
-        context['site_list'] = get_available_sites_for_user(self.request.user)
-        site_pk = get_site_pk_from_request(self.request)
-        if site_pk:
-            self.request.POST['site_pk'] = site_pk      
-            context['site'] = Site.objects.get(pk=site_pk)    
-        return render(request, 'core/htmx/site_configuration_htmx.html', context)
+        return HttpResponse(response_text, status=200)
+        # context = {'site':site, 'site_list':get_available_sites_for_user(self.request.user)}
+        # context['site_list'] = get_available_sites_for_user(self.request.user)
+        # site_pk = get_site_pk_from_request(self.request)
+        # if site_pk:
+        #     self.request.POST['site_pk'] = site_pk      
+        #     context['site'] = Site.objects.get(pk=site_pk)    
+        # return render(request, 'core/htmx/site_configuration_htmx.html', context)
 
 @method_decorator(login_required, name='dispatch')
 class CompanyConfigurationView(TemplateView):

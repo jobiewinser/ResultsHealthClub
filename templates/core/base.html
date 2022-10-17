@@ -104,6 +104,9 @@
                                 if (evt.detail.pathInfo.requestPath.includes("login-htmx")){
                                     snackbarShow('Successfully logged in', 'success');
                                     location.reload();;
+                                }else if (evt.detail.pathInfo.requestPath.includes("modify-user")){
+                                    snackbarShow('Successfully logged in', 'success');
+                                    location.reload();;
                                 }
                             }
                         } else if (status == 404) {
@@ -133,7 +136,7 @@
         
     </head>
 
-    <body class="cartoon-background">
+    <body class="cartoon-background" style="height:100vh">
         <nav class="navbar navbar-expand-lg navbar-light bg-dark">
             <div class="container-fluid ">
                 <a class="navbar-brand" href="{%url 'customer-home'%}">

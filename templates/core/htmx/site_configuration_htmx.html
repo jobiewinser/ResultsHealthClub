@@ -7,9 +7,20 @@
         </div>
         <div class="col-md-auto card p-2">
             <div class="m-3">
-                <label for="site_name" class="form-label">Name</label>
-                <input value="{{site.name}}" type="text" name="name" class="form-control site_configuration_input" id="site_name" aria-describedby="emailHelp">
-                <div id="emailHelp" class="form-text">The name of this site.</div>
+                <div class="row">
+                    <div class="col p-0">
+                        <label for="site_name" class="form-label">Name</label>
+                        <input value="{{site.name}}" type="text" name="name" class="form-control site_configuration_input" id="site_name" aria-describedby="emailHelp" oninput="$('#change_name').click();">
+                        <div id="emailHelp" class="form-text">The name of this site.</div>
+                    </div>
+                    <div class="col-md-auto pe-0">
+                        <img  class="htmx-indicator" id="htmx_indicator_name" src="https://htmx.org/img/bars.svg"/>
+                        <button hidden hx-post="" hx-swap="innerHTML"  hx-target=".name_display_{{site.pk}}"
+                            hx-include="#site_name" hx-indicator="#htmx_indicator_name" 
+                            hx-vals='{"site_pk": "{{site.pk}}"}' id="change_name" 
+                            class="btn btn-primary btn-sm"></button>
+                    </div>
+                </div>
             </div>
             <div class="m-3 form-check">
                 <input type="checkbox" onClick="this.checked=!this.checked" class="form-check-input" id="calendly_configured" {%if site.calendly_token and site.calendly_organization %}checked{%endif%}>
@@ -69,7 +80,7 @@
                                         <button hidden hx-post="{% url 'whatsapp-change-number-alias' %}" hx-swap="none" 
                                             hx-include="#alias_change_{{number.pk}}" hx-indicator="#htmx_indicator_alias_{{number.pk}}" 
                                             hx-vals='{"whatsappnumber_pk": "{{number.pk}}"}' id="change_alias_{{number.pk}}" 
-                                            class="btn btn-primary btn-sm">assign</button>
+                                            class="btn btn-primary btn-sm"></button>
                                     </div>
                                 </div>
                             </td>
@@ -77,7 +88,9 @@
                                 {{number.number}}
                             </td>
                             <td>
+                                <span class="name_display_{{site.pk}}">
                                 {{number.site.name}}
+                                </span>
                             </td>
                             <td>
                                 {{number.company.company_name}}
@@ -135,12 +148,12 @@
             </div>
 
             <div class="m-3">
-                <button class="btn btn-success" 
-                hx-confirm="Are you sure you want to make these changes to this site?"
-                hx-post="" hx-vals='{"site_pk":"{{site.pk}}"}' 
-                hx-include=".site_configuration_input" hx-vals='{"site_pk":"{{site.pk}}"}' 
-                hx-indicator=".top-htmx-indicator" hx-target="#content"
-                hx-swap="outerHTML">Save Changes</button>
+                {% comment %} <button class="btn btn-success" 
+                    hx-confirm="Are you sure you want to make these changes to this site?"
+                    hx-post="" hx-vals='{"site_pk":"{{site.pk}}"}' 
+                    hx-include=".site_configuration_input" hx-vals='{"site_pk":"{{site.pk}}"}' 
+                    hx-indicator=".top-htmx-indicator" hx-target="#content"
+                    hx-swap="outerHTML">Save Changes</button> {% endcomment %}
             </div>
         </div>
         <div class="col">

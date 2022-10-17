@@ -8,8 +8,8 @@
         </a>
         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
             <li><a class="dropdown-item" href="#"
-                hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" hx-include="#user-select-{{user.pk}}"
-                hx-vals='{"template_name": "edit_user"}'
+                hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
+                hx-vals='{"template_name": "edit_user", "user_pk":"{{request.user.pk}}"}'
                 hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
                 hx-swap="innerHTML" hx-trigger="click">Edit Profile</a></li>
             <li><hr class="dropdown-divider"></li>

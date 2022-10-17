@@ -45,8 +45,8 @@
             <button class="btn btn-light" type="button"
             hx-encoding="multipart/form-data"
                 hx-post="{% url 'modify-user' %}" hx-include=".edit_user_input"
-                hx-swap="innerHTML"
-                hx-indicator=".top-htmx-indicator" hx-target="#profile-nav-section">
+                hx-swap="none"
+                hx-indicator=".top-htmx-indicator">
                 Save Profile
             </button>
         </div>

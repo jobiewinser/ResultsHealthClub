@@ -229,7 +229,10 @@ class Profile(models.Model):
         return self.user.first_name
         
     def __str__(self):
-        return f"{self.user.first_name} {self.user.last_name}"
+        if self.user.first_name or self.user.last_name:
+            return f"{self.user.first_name} {self.user.last_name}"
+        else:
+            return str(self.pk)
     def name(self):
         return f"{self.user.first_name} {self.user.last_name}"
 class FreeTasterLink(models.Model):
