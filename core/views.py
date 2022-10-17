@@ -11,7 +11,7 @@ from core.models import ROLE_CHOICES, Company, FreeTasterLink, FreeTasterLinkCli
 from django.contrib.auth import authenticate
 from django.contrib.auth import login
 
-from core.user_permission_functions import get_available_sites_for_user
+from core.user_permission_functions import get_available_sites_for_user, get_user_allowed_to_edit_other_user
 from whatsapp.api import Whatsapp
 logger = logging.getLogger(__name__)
 try:
@@ -85,13 +85,6 @@ class SiteConfigurationView(TemplateView):
             response_text = f"{site.name}"
         site.save()
         return HttpResponse(response_text, status=200)
-        # context = {'site':site, 'site_list':get_available_sites_for_user(self.request.user)}
-        # context['site_list'] = get_available_sites_for_user(self.request.user)
-        # site_pk = get_site_pk_from_request(self.request)
-        # if site_pk:
-        #     self.request.POST['site_pk'] = site_pk      
-        #     context['site'] = Site.objects.get(pk=site_pk)    
-        # return render(request, 'core/htmx/site_configuration_htmx.html', context)
 
 @method_decorator(login_required, name='dispatch')
 class CompanyConfigurationView(TemplateView):
@@ -107,13 +100,42 @@ class CompanyConfigurationView(TemplateView):
         if site_pk:
             self.request.GET['site_pk'] = site_pk    
         context['role_choices'] = ROLE_CHOICES
+        context['site_list'] = get_available_sites_for_user(self.request.user)
         return context
+def change_profile_role(request):
+    user = User.objects.get(pk=request.POST.get('user_pk'))
+    if get_user_allowed_to_edit_other_user(request.user, user):
+        role = request.POST.get('role', None)
+        if role in ['b','c']:
+            context = {}
+            user.profile.role = role
+            user.profile.save()
+            context['user'] = user
+            context['role_choices'] = ROLE_CHOICES
+            context['site_list'] = get_available_sites_for_user(request.user)
+            return render(request, 'core/htmx/company_configuration_row.html', context)
+    return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
+def change_profile_site(request):
+    user = User.objects.get(pk=request.POST.get('user_pk'))
+    if get_user_allowed_to_edit_other_user(request.user, user):
+        site_pk = request.POST.get('site_pk', None)
+        if site_pk:
+            context = {}
+            user.profile.site = Site.objects.get(pk=site_pk)
+            user.profile.save()
+            context['user'] = user
+            context['role_choices'] = ROLE_CHOICES
+            context['site_list'] = get_available_sites_for_user(request.user)
+            return render(request, 'core/htmx/company_configuration_row.html', context)
+    return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
 
 
 class HomeView(TemplateView):
     template_name='core/home.html'
 class CampaignLeadsProductPageView(TemplateView):
     template_name='core/campaign_leads_product_page.html'
+
+
 
 def custom_login_post(request):    
     user = authenticate(username=request.POST.get('username', ''), email=request.POST.get('email', ''), password=request.POST.get('password', ''))

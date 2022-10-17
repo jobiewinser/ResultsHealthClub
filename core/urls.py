@@ -26,6 +26,8 @@ urlpatterns = [
     path('site-configuration/', coreviews.SiteConfigurationView.as_view(), name='site-configuration'),
 
 
+    path('configuration/change-profile-role/', coreviews.change_profile_role, name='change-profile-role'),
+    path('configuration/change-profile-site/', coreviews.change_profile_site, name='change-profile-site'),
 
     # path('switch-user/', corehtmx.switch_user, name='switch-user' ),
     path('get-modal-content/', corehtmx.get_modal_content, name='get-modal-content' ),

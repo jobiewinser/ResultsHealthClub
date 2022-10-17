@@ -3,7 +3,7 @@
     <div class="row">
         <div class="col center" >
             
-            {%if user.profile.company%}
+            {% comment %} {%if user.profile.company%}
             <div class="form-group">
                 <label class="form-label" for="site_pk">Default Site: </label>
                 <select class="form-select add_user_input" name="site_pk" id="site_pk">
@@ -12,7 +12,7 @@
                     {%endfor%}
                 </select>   
             </div>
-            {%endif%}
+            {%endif%} {% endcomment %}
                     
             <br>
             <div class="form-group">

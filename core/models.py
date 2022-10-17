@@ -182,7 +182,7 @@ class Company(models.Model):
     active_campaign_api_key = models.TextField(null=True, blank=True)
     @property
     def users(self):
-        return User.objects.filter(profile__company=self)
+        return User.objects.filter(profile__company=self).order_by('profile__site', 'profile__role')
     @property
     def get_campaign_leads_enabled(self):
         return self.campaign_leads_enabled

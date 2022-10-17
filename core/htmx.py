@@ -1,7 +1,7 @@
 import json
 import os
 import uuid
-from core.models import FreeTasterLink, Profile, Site
+from core.models import ROLE_CHOICES, FreeTasterLink, Profile, Site
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import render
@@ -11,7 +11,7 @@ from django.middleware.csrf import get_token
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views import View
-from core.user_permission_functions import get_available_sites_for_user 
+from core.user_permission_functions import get_available_sites_for_user, get_user_allowed_to_edit_other_user 
 from core.views import get_site_pk_from_request
 from django.http import QueryDict
 
@@ -48,6 +48,11 @@ def get_modal_content(request, **kwargs):
                 user_pk = request.GET.get('user_pk', None)
                 if user_pk:
                     context["edit_user"] = User.objects.get(pk=user_pk)
+            if template_name == 'edit_permissions':
+                user_pk = request.GET.get('user_pk', None)
+                if user_pk:
+                    context["edit_permissions"] = User.objects.get(pk=user_pk)
+            
             return render(request, f"campaign_leads/htmx/{template_name}.html", context)   
     except Exception as e:
         logger.debug("get_modal_content Error "+str(e))
@@ -58,29 +63,28 @@ def get_modal_content(request, **kwargs):
 class ModifyUser(View):
     def post(self, request, **kwargs):
         try:
-            if request.user.is_authenticated:
-                action = request.POST.get('action', '')
-                if action == 'add':
+            action = request.POST.get('action', '')
+            if action == 'add':
+                first_name = request.POST.get('first_name', '')
+                last_name = request.POST.get('last_name', '')
+                site_pk = request.POST.get('site_pk', '')
+                user = User.objects.create(username=f"{first_name}{last_name}", 
+                                            first_name=first_name,
+                                            last_name=last_name,
+                                            password=os.getenv("DEFAULT_USER_PASSWORD"), 
+                                            is_authenticated=True)
+                Profile.objects.create(user = user, 
+                                        avatar = request.FILES['profile_picture'], 
+                                        site=Site.objects.get(pk=site_pk))
+            elif action == 'edit':       
+                user = User.objects.get(pk=request.POST['user_pk'])         
+                if get_user_allowed_to_edit_other_user(request.user, user):
                     first_name = request.POST.get('first_name', '')
                     last_name = request.POST.get('last_name', '')
                     site_pk = request.POST.get('site_pk', '')
-                    user = User.objects.create(username=f"{first_name}{last_name}", 
-                                                first_name=first_name,
-                                                last_name=last_name,
-                                                password=os.getenv("DEFAULT_USER_PASSWORD"), 
-                                                is_authenticated=True)
-                    Profile.objects.create(user = user, 
-                                            avatar = request.FILES['profile_picture'], 
-                                            site=Site.objects.get(pk=site_pk))
-                elif action == 'edit':
-                    first_name = request.POST.get('first_name', '')
-                    last_name = request.POST.get('last_name', '')
-                    site_pk = request.POST.get('site_pk', '')
-                    user = User.objects.get(pk=request.POST['user_pk'])
-                    # user.username=f"{first_name}{last_name}" 
+                    user.username=f"{first_name}{last_name}" 
                     user.first_name=first_name
                     user.last_name=last_name
-                    # user.is_authenticated=True
                     user.save()
 
                     profile = Profile.objects.get_or_create(user = user)[0]
@@ -90,8 +94,13 @@ class ModifyUser(View):
                     if site_pk:
                         profile.site=Site.objects.get(pk=site_pk)
                     profile.save()   
-
-                return render(request, "core/htmx/profile-nav-section.html", {'user':User.objects.get(pk=user.pk)})   
+                else:
+                    return HttpResponse("You do not have permission to do this", status=500)
+            context = {}
+            context['user'] = user
+            context['role_choices'] = ROLE_CHOICES
+            context['site_list'] = get_available_sites_for_user(request.user)
+            return render(request, "core/htmx/company_configuration_row.html", context)   
         except Exception as e:
             logger.debug("ModifyUser Post Error "+str(e))
             return HttpResponse(e, status=500)

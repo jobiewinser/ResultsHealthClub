@@ -7,7 +7,7 @@
             <div class="form-group">
                 <h4>Company: <b> {{user.profile.company.company_name}}</b></h4>
             </div>
-            <div class="form-group">
+            {% comment %} <div class="form-group">
                 <label class="form-label" for="site_pk">Default Site: </label>
                 <select class="form-select edit_user_input" name="site_pk" id="site_pk">
                     {%if not edit_user.profile.site%}<option value="">Show All Sites</option>{%endif%}
@@ -15,9 +15,10 @@
                     <option {%if edit_user.profile.site == site%}selected{%endif%} value="{{site.pk}}">{{site.name}}</option>
                     {%endfor%}
                 </select>   
-            </div>
+            </div> {% endcomment %}
             {%endif%}
                     
+            <br>
             <br>
             <div class="form-group">
                 <label class="form-label" for="first_name">First Name: </label>

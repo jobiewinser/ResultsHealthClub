@@ -8,12 +8,13 @@
         <img class="crop-squarelogo" src="{% static 'img/logo_black.png' %}" style="object-fit: cover; width:20vh" alt="winser systems logo">
         <hr class="m-1">
     </div>
-    <div class="m-2">Username <input class="form-control login_input" type="text" id="id_username" name="username" placeholder="Username"></div>
-    <div class="m-2">Password <input class="form-control login_input" type="password" id="id_password" name="password" placeholder="Password"></div>
-    <div class="m-4"><button class="btn btn-primary btn-block" type="submit" id="login_button"
-        hx-post="{%url 'login-htmx'%}"
+    <form hx-post="{%url 'login-htmx'%}"
         hx-include=".login_input"
-        hx-swap="delete"
-        >Log In</button></div>
+        hx-swap="delete">
+        <div class="m-2">Username <input class="form-control login_input" type="text" id="id_username" name="username" placeholder="Username"></div>
+        <div class="m-2">Password <input class="form-control login_input" type="password" id="id_password" name="password" placeholder="Password"></div>
+        <div class="m-4"><button class="btn btn-primary btn-block" type="submit" id="login_button"
+            >Log In</button></div>
+    </form>
     {% comment %} <a href="#" class="forgot">Forgot your email or password?</a> {% endcomment %}
 </span>
