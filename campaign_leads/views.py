@@ -8,7 +8,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from calendly.api import Calendly
 from campaign_leads.models import Call, Campaign, Campaignlead
-from active_campaign.api import ActiveCampaign
+from active_campaign.api import ActiveCampaignApi
 from active_campaign.models import ActiveCampaign
 from core.core_decorators import campaign_leads_enabled_required
 from core.models import Profile, Site

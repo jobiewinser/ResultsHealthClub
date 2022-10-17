@@ -194,11 +194,11 @@ class Company(models.Model):
 
     def get_and_generate_campaign_objects(self):
         if self.active_campaign_enabled and self.active_campaign_url:
-            from active_campaign.api import ActiveCampaign
+            from active_campaign.api import ActiveCampaignApi
             from active_campaign.models import ActiveCampaign
             
             if not settings.DEBUG:
-                for campaign_dict in ActiveCampaign(self.active_campaign_api_key, self.active_campaign_url).get_lists(self.active_campaign_url).get('lists',[]):
+                for campaign_dict in ActiveCampaignApi(self.active_campaign_api_key, self.active_campaign_url).get_lists(self.active_campaign_url).get('lists',[]):
                     campaign, created = ActiveCampaign.objects.get_or_create(
                         active_campaign_id = campaign_dict.pop('id'),
                         name = campaign_dict.pop('name'),

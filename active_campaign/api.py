@@ -15,7 +15,7 @@ from django.template import loader
 logger = logging.getLogger(__name__)
 
 # https://developers.activecampaign.com/reference
-class ActiveCampaign:
+class ActiveCampaignApi:
     
     # active_campaign_api_key = os.getenv("ACTIVE_CAMPAIGN_API_KEY")
     # active_campaign_url = os.getenv("ACTIVE_CAMPAIGN_URL")
