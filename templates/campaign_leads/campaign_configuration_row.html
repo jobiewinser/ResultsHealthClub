@@ -25,7 +25,8 @@ hx-post="{% url 'set-campaign-site' campaign_pk=campaign.pk %}"
 hx-swap="outerHTML" hx-include="#site_pk_{{campaign.pk}}" 
 id="submit_site_pk_{{campaign.pk}}"></button>
 </td>
-<td>                                 
+<td>              
+    <span hidden>{{campaign.first_send_template.name}}</span>                   
     <select class="form-select" name="first_template_pk" id="first_template_{{campaign.pk}}" onchange="$('#assign_first_template_{{campaign.pk}}').click();"    
         data-bs-toggle="popover" 
         data-bs-trigger="hover" 
@@ -53,7 +54,8 @@ id="submit_site_pk_{{campaign.pk}}"></button>
         hx-target="#row_{{campaign.pk}}" id="assign_first_template_{{campaign.pk}}" 
         class="btn btn-primary btn-sm">assign</button>
 </td>
-<td>                             
+<td>          
+    <span hidden>{{campaign.second_send_template.name}}</span>                           
     <select class="form-select" name="second_template_pk" id="second_template_{{campaign.pk}}" onchange="$('#assign_second_template_{{campaign.pk}}').click();"    
         data-bs-toggle="popover" 
         data-bs-trigger="hover" 
@@ -81,7 +83,8 @@ id="submit_site_pk_{{campaign.pk}}"></button>
         hx-target="#row_{{campaign.pk}}" id="assign_second_template_{{campaign.pk}}" 
         class="btn btn-primary btn-sm">assign</button>             
 </td>
-<td>                           
+<td>          
+    <span hidden>{{campaign.third_send_template.name}}</span>                         
     <select class="form-select" name="third_template_pk" id="third_template_{{campaign.pk}}" onchange="$('#assign_third_template_{{campaign.pk}}').click();"    
         data-bs-toggle="popover" 
         data-bs-trigger="hover" 
