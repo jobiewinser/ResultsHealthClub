@@ -160,14 +160,14 @@ class LeadConfigurationView(TemplateView):
         
 @login_required
 def get_campaigns(request, **kwargs):
-    try:
-        if request.user.profile.company:
-            request.user.profile.company.get_and_generate_campaign_objects()
-        return render(request, f"campaign_leads/htmx/campaign_select.html", 
-        {'campaigns':get_campaign_qs(request)})
-    except Exception as e:        
-        logger.error(f"get_campaigns {str(e)}")
-        return HttpResponse("Couldn't get Campaigns", status=500)
+    # try:
+    if request.user.profile.company:
+        request.user.profile.company.get_and_generate_campaign_objects()
+    return render(request, f"campaign_leads/htmx/campaign_select.html", 
+    {'campaigns':get_campaign_qs(request)})
+    # except Exception as e:        
+    #     logger.error(f"get_campaigns {str(e)}")
+    #     return HttpResponse("Couldn't get Campaigns", status=500)
 
 @login_required
 def new_call(request, **kwargs):
