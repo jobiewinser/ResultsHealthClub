@@ -9,7 +9,7 @@
 <script src="{% static 'js/datatables.js' %}"></script> 
 <script>
     $(document).ready(function() {  
-        initDataTable();
+        
         document.body.addEventListener('htmx:beforeRequest', function(evt) {  
             if (![undefined, ''].includes(evt.detail.pathInfo.path) && ![undefined, ''].includes(evt.detail.target.id)){
                 if (evt.detail.target.id == 'overview_table' || evt.detail.pathInfo.path.includes("academy-booking-overview")){
@@ -19,19 +19,13 @@
         });
 
         document.body.addEventListener('htmx:afterSwap', function(evt) {   
-            if (evt.detail.target.id == 'overview_table'){
-                initDataTable(); 
-            }
-                        
-            {% comment %} if (evt.detail.target.classList.contains('academy_booking_row')) {
-                $('#refresh_overview_table').click(); 
-            } {% endcomment %}
+            
             if (evt.detail.xhr.status == 200){
                 if (![undefined, ''].includes(evt.detail.pathInfo.requestPath)){
                     if (evt.detail.pathInfo.requestPath.includes("create-campaign-lead")){
                         {% comment %} $('#refresh_overview_table').click();  {% endcomment %}
                         $('#generic_modal').modal('hide');
-                        $('#refresh_column_metadata').click()
+                        // $('#refresh_column_metadata').click()
                         snackbarShow('Successfully manually created a campaign lead', 'success')
                     } else if (evt.detail.pathInfo.requestPath.includes("add-booking")){
                         $('#generic_modal').modal('hide');
@@ -62,20 +56,13 @@
                 }
             }
         });
+
+        set_total_costs();
     });
         
     function isCalendlyEvent(e) {
         return e.origin === "https://calendly.com" && e.data.event && e.data.event.indexOf("calendly.") === 0;
     };
-
-    function initDataTable() {
-        dt = $('#overview_table').DataTable(            
-        {  
-            order: [[ 4, 'asc' ],[ 2, 'asc' ]],
-            iDisplayLength: 10
-        }
-        );
-    }
     
     function handleDraggedItem(dragged_elem_id, drag_target){
         dragged_elem = $('#'+dragged_elem_id)
@@ -84,7 +71,7 @@
             url:'{% url "new-call" %}'+dragged_elem.data('id')+'/'+$(drag_target).data("call-count")+'/'+$('#max_call_count').val()+'/',
             data:{'csrfmiddlewaretoken':'{{ csrf_token }}'},
             success: function (data) {                
-                $('#refresh_column_metadata').click()
+                // $('#refresh_column_metadata').click()
                 snackbarShow('Successfully added call', 'success')
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
@@ -119,6 +106,19 @@
                 }
             })
         }
+    }
+    function set_total_costs(){
+        console.log("set_total_costs")        
+        $('.total_cost').each(function () {
+            let total_cost = 0.00;
+            $(this).closest('.column').find(".lead_cost").each(function() {
+              console.log($(this).data('cost'));
+              total_cost += parseFloat($(this).data('cost'));
+            });
+            total_cost = total_cost.toFixed(2);
+
+            $(this).val(total_cost).html(total_cost);
+        });
     }
 </script>
 {%endblock scripts%}

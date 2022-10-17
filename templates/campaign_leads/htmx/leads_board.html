@@ -1,5 +1,5 @@
 <span id="leads_board" class="board" hx-ws="connect:/ws/lead/{{company.pk}}/">
-    <button hidden hx-get="{% url 'get-leads-column-meta-data'%}" hx-include=".overview_table_filters" id="refresh_column_metadata" hx-indicator=".column-htmx-indicator" hx-target="#column_metadata_0" hx-trigger="click" hx-swap="outerHTML"></button>
+    <!-- <button hidden hx-get="{% url 'get-leads-column-meta-data'%}" hx-include=".overview_table_filters" id="refresh_column_metadata" hx-indicator=".column-htmx-indicator" hx-target="#column_metadata_0" hx-trigger="click" hx-swap="outerHTML"></button> -->
     <button hidden hx-get="{% url "new-leads-column" %}" hx-include="#max_call_count" id="add_column" hx-indicator=".column-htmx-indicator" hx-target="#leads_board" hx-trigger="click" hx-swap="beforeend"></button>
     {%include 'campaign_leads/htmx/lead_columns.html' %}
 </span>

@@ -40,6 +40,7 @@ const drop = event => {
     console.log("drop", event.currentTarget)
     document.querySelector('#add_booking_area').classList.remove('shown');
     document.querySelector('#chat_bottom').classList.remove('temp_hidden');
+    set_total_costs();
 };
 
 const drop_booking = event => {

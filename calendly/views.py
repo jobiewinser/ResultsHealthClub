@@ -10,7 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 import pytz
 from calendly.api import Calendly
 from calendly.models import CalendlyWebhookRequest
-from campaign_leads.models import Booking, Campaignlead, Call
+Omnis rerum molestia
 from whatsapp.api import Whatsapp
 from django.views.generic import TemplateView
 from whatsapp.models import WHATSAPP_ORDER_CHOICES, WhatsAppMessage, WhatsAppMessageStatus, WhatsAppWebhookRequest, WhatsappTemplate, template_variables
@@ -25,10 +25,7 @@ from asgiref.sync import async_to_sync, sync_to_async
 class Webhooks(View):
     def get(self, request, *args, **kwargs):
         logger.debug(str(request.GET))
-        challenge = request.GET.get('hub.challenge',{})
-        response = HttpResponse(challenge)
-        response.status_code = 200
-        return response
+        return HttpResponse("", status = 200)
 
     def post(self, request, *args, **kwargs):
         body = json.loads(request.body)
