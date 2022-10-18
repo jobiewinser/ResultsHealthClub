@@ -4,7 +4,7 @@
         $(document).ready(function() {
             
             Calendly.initInlineWidget({
-                url: 'https://calendly.com/resultsgymabingdon',
+                url: '{{request.user.profile.calendly_org_page',
                 parentElement: document.getElementById('calendly_id'),
                 prefill: {
                     name: "{{lead.name}}",
