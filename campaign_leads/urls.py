@@ -53,5 +53,9 @@ urlpatterns = [
 
     path('new-call/', campaignleadsviews.new_call, name='new-call' ),
     path('new-call/<int:lead_pk>/<int:call_count>/<int:max_call_count>/', campaignleadsviews.new_call, name='new-call' ),
+
+    
+    path('configuration/campaign-assign-auto-send-template/', campaignleadsviews.campaign_assign_auto_send_template_htmx, name='campaign-assign-auto-send-template'), 
+    path('configuration/campaign-assign-product_cost/', campaignleadsviews.campaign_assign_product_cost_htmx, name='campaign-assign-product_cost'), 
     
 ]

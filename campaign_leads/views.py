@@ -18,6 +18,7 @@ from django.db.models import Q, Count
 from django.db.models import OuterRef, Subquery, Count
 from django.db.models import F
 from whatsapp.api import Whatsapp
+from whatsapp.models import WhatsappTemplate
 logger = logging.getLogger(__name__)
 
 
@@ -198,3 +199,30 @@ def new_call(request, **kwargs):
     except Exception as e:
         logger.debug("new_call Error "+str(e))
         return HttpResponse(e, status=500)
+
+@login_required
+def campaign_assign_auto_send_template_htmx(request):
+    campaign = Campaign.objects.get(pk=request.POST.get('campaign_pk'))
+    first_template_pk = request.POST.get('first_template_pk')
+    second_template_pk = request.POST.get('second_template_pk')
+    third_template_pk = request.POST.get('third_template_pk')
+    if first_template_pk:
+        campaign.first_send_template = WhatsappTemplate.objects.get(pk=first_template_pk)
+    if second_template_pk:
+        campaign.second_send_template = WhatsappTemplate.objects.get(pk=second_template_pk)
+    if third_template_pk:
+        campaign.third_send_template = WhatsappTemplate.objects.get(pk=third_template_pk)
+    campaign.save()
+    return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign,
+                                                                            'site_list': get_available_sites_for_user(request.user)})
+
+@login_required
+def campaign_assign_product_cost_htmx(request):
+    campaign = Campaign.objects.get(pk=request.POST.get('campaign_pk'))
+    product_cost = request.POST.get('product_cost')
+    if product_cost:
+        campaign.product_cost = product_cost
+        campaign.save()
+    return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign,
+                                                                            'site_list': get_available_sites_for_user(request.user)})
+

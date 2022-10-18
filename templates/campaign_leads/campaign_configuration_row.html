@@ -25,9 +25,22 @@ hx-post="{% url 'set-campaign-site' campaign_pk=campaign.pk %}"
 hx-swap="outerHTML" hx-include="#site_pk_{{campaign.pk}}" 
 id="submit_site_pk_{{campaign.pk}}"></button>
 </td>
+<td>
+    <input type="number" min="0.00" max="10000.00" step="0.01" value="{{campaign.product_cost}}" name="product_cost"
+        hx-post="{% url 'campaign-assign-product_cost' %}" hx-swap="innerHTML" 
+        hx-trigger="change"
+        hx-indicator=".top-htmx-indicator" 
+        hx-vals='{"campaign_pk": "{{campaign.pk}}"}'
+        hx-target="#row_{{campaign.pk}}"/>
+</td>
 <td>              
     <span hidden>{{campaign.first_send_template.name}}</span>                   
-    <select class="form-select" name="first_template_pk" id="first_template_{{campaign.pk}}" onchange="$('#assign_first_template_{{campaign.pk}}').click();"    
+    <select class="form-select" name="first_template_pk" id="first_template_{{campaign.pk}}" 
+        hx-post="{% url 'campaign-assign-auto-send-template' %}" hx-swap="innerHTML" 
+        hx-trigger="change"
+        hx-indicator=".top-htmx-indicator" 
+        hx-vals='{"campaign_pk": "{{campaign.pk}}"}'
+        hx-target="#row_{{campaign.pk}}"   
         data-bs-toggle="popover" 
         data-bs-trigger="hover" 
         data-bs-html="true" 
@@ -48,15 +61,15 @@ id="submit_site_pk_{{campaign.pk}}"></button>
         {%endif%}
         {%endfor%}
     </select>
-    <button hidden hx-post="{% url 'whatsapp-assign-auto-send-template' %}" hx-swap="innerHTML" 
-        hx-include="#first_template_{{campaign.pk}}" hx-indicator=".top-htmx-indicator" 
-        hx-vals='{"campaign_pk": "{{campaign.pk}}"}'
-        hx-target="#row_{{campaign.pk}}" id="assign_first_template_{{campaign.pk}}" 
-        class="btn btn-primary btn-sm">assign</button>
+    
 </td>
 <td>          
     <span hidden>{{campaign.second_send_template.name}}</span>                           
-    <select class="form-select" name="second_template_pk" id="second_template_{{campaign.pk}}" onchange="$('#assign_second_template_{{campaign.pk}}').click();"    
+    <select class="form-select" name="second_template_pk" id="second_template_{{campaign.pk}}" 
+        hx-post="{% url 'campaign-assign-auto-send-template' %}" hx-swap="innerHTML" 
+        hx-indicator=".top-htmx-indicator" hx-trigger="change"
+        hx-vals='{"campaign_pk": "{{campaign.pk}}"}'
+        hx-target="#row_{{campaign.pk}}"
         data-bs-toggle="popover" 
         data-bs-trigger="hover" 
         data-bs-html="true" 
@@ -76,16 +89,15 @@ id="submit_site_pk_{{campaign.pk}}"></button>
         <option {%if campaign.second_send_template.pk == template.pk %}selected{%endif%} value="{{template.pk}}">{{template.name}}</option>
         {%endif%}
         {%endfor%}
-    </select>            
-    <button hidden hx-post="{% url 'whatsapp-assign-auto-send-template' %}" hx-swap="innerHTML" 
-        hx-include="#second_template_{{campaign.pk}}" hx-indicator=".top-htmx-indicator" 
-        hx-vals='{"campaign_pk": "{{campaign.pk}}"}'
-        hx-target="#row_{{campaign.pk}}" id="assign_second_template_{{campaign.pk}}" 
-        class="btn btn-primary btn-sm">assign</button>             
+    </select>                           
 </td>
 <td>          
     <span hidden>{{campaign.third_send_template.name}}</span>                         
-    <select class="form-select" name="third_template_pk" id="third_template_{{campaign.pk}}" onchange="$('#assign_third_template_{{campaign.pk}}').click();"    
+    <select class="form-select" name="third_template_pk" id="third_template_{{campaign.pk}}" 
+        hx-post="{% url 'campaign-assign-auto-send-template' %}" hx-swap="innerHTML" 
+        hx-indicator=".top-htmx-indicator" hx-trigger="change"
+        hx-vals='{"campaign_pk": "{{campaign.pk}}"}'
+        hx-target="#row_{{campaign.pk}}"
         data-bs-toggle="popover" 
         data-bs-trigger="hover" 
         data-bs-html="true" 
@@ -105,10 +117,5 @@ id="submit_site_pk_{{campaign.pk}}"></button>
         <option {%if campaign.third_send_template.pk == template.pk %}selected{%endif%} value="{{template.pk}}">{{template.name}}</option>
         {%endif%}
         {%endfor%}
-    </select>           
-    <button hidden hx-post="{% url 'whatsapp-assign-auto-send-template' %}" hx-swap="innerHTML" 
-        hx-include="#third_template_{{campaign.pk}}" hx-indicator=".top-htmx-indicator" 
-        hx-vals='{"campaign_pk": "{{campaign.pk}}"}'
-        hx-target="#row_{{campaign.pk}}" id="assign_third_template_{{campaign.pk}}" 
-        class="btn btn-primary btn-sm">assign</button>                
+    </select>                             
 </td>

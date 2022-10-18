@@ -279,21 +279,6 @@ def delete_whatsapp_template_htmx(request):
     template.save()
     return HttpResponse("", status=200)
 
-@login_required
-def whatsapp_assign_auto_send_template_htmx(request):
-    campaign = Campaign.objects.get(pk=request.POST.get('campaign_pk'))
-    first_template_pk = request.POST.get('first_template_pk')
-    second_template_pk = request.POST.get('second_template_pk')
-    third_template_pk = request.POST.get('third_template_pk')
-    if first_template_pk:
-        campaign.first_send_template = WhatsappTemplate.objects.get(pk=first_template_pk)
-    if second_template_pk:
-        campaign.second_send_template = WhatsappTemplate.objects.get(pk=second_template_pk)
-    if third_template_pk:
-        campaign.third_send_template = WhatsappTemplate.objects.get(pk=third_template_pk)
-    campaign.save()
-    return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign,
-                                                                            'site_list': get_available_sites_for_user(request.user)})
          
 def whatsapp_clear_changes_htmx(request):
     template = WhatsappTemplate.objects.get(pk=request.POST.get('template_pk'))
