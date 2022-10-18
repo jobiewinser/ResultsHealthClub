@@ -92,7 +92,7 @@ class Whatsapp():
         for component in pending_components:
             text = component.get('text', '')
             if '[[1]]' in text:
-                text.replace('[[1]]','{{'+counter+'}}')
+                text.replace('[[1]]','{{'+str(counter)+'}}')
                 counter = counter + 1
             component['text'] = text
             
@@ -128,7 +128,7 @@ class Whatsapp():
             for component in pending_components:
                 text = component.get('text', '')
                 if '[[1]]' in text:
-                    text.replace('[[1]]','{{'+counter+'}}')
+                    text.replace('[[1]]','{{'+str(counter)+'}}')
                     counter = counter + 1
                 component['text'] = text
 
