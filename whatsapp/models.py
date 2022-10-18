@@ -55,10 +55,7 @@ WHATSAPP_ORDER_CHOICES = (
     (3, 'Send 48 Hrs after Lead Creation')
 )
 template_variables = {
-    '{{1}}': ["First Name", "Jobie"],
-    # '{{2}}': ["Last Name", "Winser"],
-    '{{3}}': ["Company Name", "Winser Systems"],
-    '{{4}}': ["Site Number", "+44 7872 000364"],
+    '[[1]]': ["First Name", "Jobie"],    
 }
 class WhatsappTemplate(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)

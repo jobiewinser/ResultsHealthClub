@@ -211,11 +211,11 @@ def refresh_template_data(site):
                 template.language = api_template.get('language')
                 template.category = api_template.get('category')
                 components = []
-                for dict in api_template.get('components', []):
-                    json_dict = {}
-                    for k,v in dict.items():
-                        json_dict[k] = str(v)
-                    components.append(json_dict)
+                # for dict in api_template.get('components', []):
+                #     json_dict = {}
+                #     for k,v in dict.items():
+                #         json_dict[k] = str(v)
+                #     components.append(json_dict)
                 
                 template.components = components
                 try:

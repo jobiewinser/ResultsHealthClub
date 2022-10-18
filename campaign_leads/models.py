@@ -120,33 +120,36 @@ class Campaignlead(models.Model):
                         components =   [] 
 
                         whole_text = ""
+                        counter = 1
                         for component in template.components:
                             params = []
                             component_type = component.get('type', "").lower()
                             # if component_type == 'header':
                             text = component.get('text', '')
-                            whole_text = f"{whole_text} <br> {text}"
-                            if '{{1}}' in text:
+                            if '[[1]]' in text:
                                 params.append(              
                                     {
                                         "type": "text",
                                         "text":  self.first_name
                                     }
                                 )
-                            if '{{3}}' in text:
-                                params.append(           
-                                    {
-                                        "type": "text",
-                                        "text":  self.campaign.company.company_name
-                                    }
-                                )
-                            if '{{4}}' in text:
-                                params.append(                   
-                                    {
-                                        "type": "text",
-                                        "text":  self.campaign.site.whatsapp_number
-                                    }
-                                )
+                                text.replace('[[1]]','{{'+counter+'}}')
+                                counter = counter + 1
+                            # if '{{3}}' in text:
+                            #     params.append(           
+                            #         {
+                            #             "type": "text",
+                            #             "text":  self.campaign.company.company_name
+                            #         }
+                            #     )
+                            # if '{{4}}' in text:
+                            #     params.append(                   
+                            #         {
+                            #             "type": "text",
+                            #             "text":  self.campaign.site.whatsapp_number
+                            #         }
+                            #     )
+                            whole_text = f"{whole_text} <br> {text}"
                             if params:
                                 components.append(
                                     {
