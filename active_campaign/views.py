@@ -28,8 +28,8 @@ class Webhooks(View):
             ActiveCampaignWebhookRequest.objects.create(json_data = data, guid=guid)       
             if data.get('type') in ['subscribe','update']:
                 if guid:
-                    active_campaign_list = ActiveCampaign.objects.get(guid=guid)
-                    if active_campaign_list.site:
+                    campaign = ActiveCampaign.objects.get(guid=guid)
+                    if campaign.site:
                         phone_number_whole = str(data.get('contact[phone]', "")).replace(' ','')
                         # phone_number_whole = str(data.get('contact[phone]', "")).replace('+','').replace(' ','')
                         # if phone_number_whole:
@@ -47,7 +47,7 @@ class Webhooks(View):
                         #     country_code = "None"
                         possible_duplicate  = False
                         if Campaignlead.objects.filter(
-                                active_campaign_list=active_campaign_list,
+                                campaign=campaign,
                                 active_campaign_contact_id=data.get('contact[id]')
                             ): 
                             possible_duplicate  = True
@@ -56,7 +56,7 @@ class Webhooks(View):
                                 active_campaign_contact_id=data.get('contact[id]'),
                                 first_name=data.get('contact[first_name]', "None"),
                                 whatsapp_number=phone_number_whole,
-                                active_campaign_list=active_campaign_list,
+                                campaign=campaign,
                                 active_campaign_form_id=data.get('form[id]', None),
                                 possible_duplicate = possible_duplicate,
                                 email = data.get('contact[email]', "")
