@@ -47,7 +47,7 @@
                     var respStatus = $.ajax({
                         type:'POST',
                         url:'{%url "calendly-booking-success"%}',
-                        data:{'lead_pk':$('#modal_lead_pk').val(), 'event':e.data.payload.event, 'csrfmiddlewaretoken':'{{ csrf_token }}'},
+                        data:{'lead_pk':$('#modal_lead_pk').val(), 'event':e.data.payload.event.uri, 'csrfmiddlewaretoken':'{{ csrf_token }}'},
                         success: function (data) {
                         },
                         error: function(XMLHttpRequest, textStatus, errorThrown) {
