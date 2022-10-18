@@ -8,8 +8,8 @@
                 <span class="primary_td_layer">{{lead.name}}</span>
             </div>
             <div class="col-md-auto p-0">
-                <!-- <span style="color:rgb(96, 248, 61y)" class="secondary_td_layer">£{{lead.cost|floatformat:2}}</span> -->
-                <span style="color:rgb(96, 248, 61y)" class="secondary_td_layer">£<span class="lead_cost" id="lead_cost_{{lead.pk}}" data-cost="{{lead.cost|floatformat:2}}">{{lead.cost|floatformat:2}}</span></span>
+                <!-- <span style="color:rgb(96, 248, 61y)" class="secondary_td_layer">£{{lead.campaign.product_cost|floatformat:2}}</span> -->
+                <span style="color:rgb(96, 248, 61y)" class="secondary_td_layer">£<span class="lead_cost" id="lead_cost_{{lead.pk}}" data-cost="{{lead.campaign.product_cost|floatformat:2}}">{{lead.campaign.product_cost|floatformat:2}}</span></span>
             </div>
         </div>
 
@@ -24,6 +24,7 @@
                     <button class="btn btn-sm btn-success text-white position-relative" 
                         hx-get="{%url 'send-first-template-whatsapp' lead_pk=lead.pk%}"
                         hx-indicator=".htmx-indicator" 
+                        hx-include="#max_call_count"
                         hx-target="#lead-{{lead.pk}}"
                         hx-push-url="false"
                         hx-swap="outerHTML" hx-trigger="click"  

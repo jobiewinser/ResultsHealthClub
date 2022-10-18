@@ -76,6 +76,7 @@ class Campaignlead(models.Model):
     active_campaign_contact_id = models.TextField(null=True, blank=True)
     active_campaign_form_id = models.TextField(null=True, blank=True)
     possible_duplicate = models.BooleanField(default=False)
+    last_dragged = models.DateTimeField(null=True, blank=True)
     
     @property
     def name(self):
@@ -149,7 +150,7 @@ class Campaignlead(models.Model):
                             #             "text":  self.campaign.site.whatsapp_number
                             #         }
                             #     )
-                            # whole_text = f"{whole_text} <br> {text}"
+                            whole_text = f"{whole_text} <br> {text}"
                             if params:
                                 components.append(
                                     {

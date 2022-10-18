@@ -19,6 +19,7 @@ from django.db.models import OuterRef, Subquery, Count
 from django.db.models import F
 from whatsapp.api import Whatsapp
 from whatsapp.models import WhatsappTemplate
+from django.template import loader
 logger = logging.getLogger(__name__)
 
 
@@ -80,7 +81,8 @@ class CampaignleadsOverviewView(TemplateView):
                 pass
         
         context['site_list'] = get_available_sites_for_user(self.request.user)
-        leads = leads.annotate(calls=Count('call'), cost=F('campaign__product_cost'))
+        leads = leads.annotate(calls=Count('call'))
+        # leads = leads.annotate(calls=Count('call'), cost=F('campaign__product_cost'))
         
         context['querysets'] = [
             ('Fresh', leads.filter(calls=0), 0)
@@ -192,8 +194,27 @@ def new_call(request, **kwargs):
                         lead = lead,
                     ).order_by('-datetime').first().delete()
                     lead = Campaignlead.objects.filter(pk=kwargs.get('lead_pk')).annotate(calls=Count('call')).first()
-           
+            lead.last_dragged = datetime.now()
             lead.save()
+
+            
+            from channels.layers import get_channel_layer
+            from asgiref.sync import async_to_sync, sync_to_async
+            channel_layer = get_channel_layer()   
+            context = {}         
+            context["lead"] = lead
+            context['max_call_count'] = "0"
+            rendered_html = loader.render_to_string('campaign_leads/htmx/lead_article.html', context)
+            async_to_sync(channel_layer.group_send)(
+                    f"lead_{lead.campaign.pk}",
+                    {
+                        'type': 'lead_update',
+                        'data':{
+                            'lead_pk':lead.pk,
+                        }
+                    }
+            )
+            
             return HttpResponse("", status="200")
             # return render(request, 'campaign_leads/htmx/lead_article.html', {'lead':lead,'max_call_count':kwargs.get('max_call_count', 1), 'call_count':call_count})
     except Exception as e:

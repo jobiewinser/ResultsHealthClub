@@ -40,41 +40,42 @@ class Webhooks(View):
             try:
                 event_url = body.get('payload').get('event')
                 booking = Booking.objects.get(calendly_event_uri=event_url)
+                calendly = Calendly(booking.lead.campaign.site.calendly_token)
+                updated_booking_details_1 = calendly.get_from_uri(event_url)
+                start_time = datetime.strptime(updated_booking_details_1['resource']['start_time'], '%Y-%m-%dT%H:%M:%S.%fZ')
+                
+                timezone = pytz.timezone("GMT")
+                start_time = timezone.localize(start_time)
+
+                booking.datetime = start_time
+                booking.save()
+
+                from channels.layers import get_channel_layer
+                channel_layer = get_channel_layer()          
+                lead = booking.lead
+                print(lead.campaign.site.company.pk)
+                campaign_pk = lead.campaign.site.company.pk
+                async_to_sync(channel_layer.group_send)(
+                    f"lead_{campaign_pk}",
+                    {
+                        'type': 'lead_update',
+                        'data':{
+                            # 'company_pk':campaign_pk,
+                            'lead_pk':lead.pk,
+                        }
+                    }
+                )
+                
+
+                response = HttpResponse()
+                response.status_code = 200
+                return response
             except Exception as e:            
                 error = ErrorModel.objects.create(json_data={'error':str(e)})
                 webhook.errors.add(error)
                 webhook.save()
                 # raise Exception
-            calendly = Calendly(booking.lead.campaign.site.calendly_token)
-            updated_booking_details_1 = calendly.get_from_uri(event_url)
-            start_time = datetime.strptime(updated_booking_details_1['resource']['start_time'], '%Y-%m-%dT%H:%M:%S.%fZ')
             
-            timezone = pytz.timezone("GMT")
-            start_time = timezone.localize(start_time)
-
-            booking.datetime = start_time
-            booking.save()
-
-            from channels.layers import get_channel_layer
-            channel_layer = get_channel_layer()          
-            lead = booking.lead
-            print(lead.campaign.site.company.pk)
-            campaign_pk = lead.campaign.site.company.pk
-            async_to_sync(channel_layer.group_send)(
-                f"lead_{campaign_pk}",
-                {
-                    'type': 'lead_update',
-                    'data':{
-                        # 'company_pk':campaign_pk,
-                        'lead_pk':lead.pk,
-                    }
-                }
-            )
-            
-
-            response = HttpResponse()
-            response.status_code = 200
-            return response
         except ObjectDoesNotExist:
             response = HttpResponse()
             response.status_code = 200
