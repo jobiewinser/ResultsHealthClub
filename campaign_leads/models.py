@@ -114,7 +114,7 @@ class Campaignlead(models.Model):
 
                         template.category = template_live['category']
                         template.language = template_live['language']
-                        template.components = template_live['components']
+                        # template.components = template_live['components']
                         template.save()
 
                         components =   [] 
@@ -193,8 +193,10 @@ class Campaignlead(models.Model):
 @receiver(models.signals.post_save, sender=Campaignlead)
 def execute_after_save(sender, instance, created, *args, **kwargs):
     if created and not instance.complete:
-        instance.send_template_whatsapp_message(1, communication_method='a')
-        pass
+        try:
+            instance.send_template_whatsapp_message(1, communication_method='a')
+        except:
+            pass
         
 class Call(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
