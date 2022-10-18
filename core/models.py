@@ -197,15 +197,15 @@ class Company(models.Model):
             from active_campaign.api import ActiveCampaignApi
             from active_campaign.models import ActiveCampaign
             
-            if not settings.DEBUG:
-                for campaign_dict in ActiveCampaignApi(self.active_campaign_api_key, self.active_campaign_url).get_lists(self.active_campaign_url).get('lists',[]):
-                    campaign, created = ActiveCampaign.objects.get_or_create(
-                        active_campaign_id = campaign_dict.pop('id'),
-                        name = campaign_dict.pop('name'),
-                        company = self,
-                    )
-                    campaign.json_data = campaign_dict
-                    campaign.save()
+            # if not settings.DEBUG:
+            for campaign_dict in ActiveCampaignApi(self.active_campaign_api_key, self.active_campaign_url).get_lists(self.active_campaign_url).get('lists',[]):
+                campaign, created = ActiveCampaign.objects.get_or_create(
+                    active_campaign_id = campaign_dict.pop('id'),
+                    name = campaign_dict.pop('name'),
+                    company = self,
+                )
+                campaign.json_data = campaign_dict
+                campaign.save()
         return Campaign.objects.all()
  
 ROLE_CHOICES = (
