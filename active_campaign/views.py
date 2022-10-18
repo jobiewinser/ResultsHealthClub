@@ -21,7 +21,7 @@ class Webhooks(View):
         return HttpResponse("", "text", 200)
 
     def post(self, request, *args, **kwargs): 
-        try:
+        # try:
             logger.debug(str(request.POST))     
             data = request.POST  
             guid = kwargs.get('guid')
@@ -62,9 +62,9 @@ class Webhooks(View):
                                 email = data.get('contact[email]', "")
                             )
             return HttpResponse("", "text", 200)
-        except Exception as e:     
-            logger.error(f"Webhooks POST {str(e)}")     
-            return HttpResponse(str(e), "text", 500)
+        # except Exception as e:     
+        #     logger.error(f"Webhooks POST {str(e)}")     
+        #     return HttpResponse(str(e), "text", 500)
 
 
 # @login_required

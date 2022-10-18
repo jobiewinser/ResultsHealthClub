@@ -63,7 +63,7 @@
     {%endif%}
 </td>
 <td>
-    {%if not template.name == 'hello_world'%}
+    {%if not template.name == 'hello_world' and not template.status == 'PENDING' and not template.status == 'AWAITING_APPROVAL'%}
     {%if template.pending_components%}
     <button class="btn btn-danger btn-sm m-1" hx-confirm="Are you sure you want to clear your changes made to this template since the last whatsapp approval?"
     hx-post="{% url 'whatsapp-clear-changes' %}" hx-vals='{"template_pk":"{{template.pk}}"}' 
