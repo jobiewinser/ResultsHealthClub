@@ -87,11 +87,20 @@ class Whatsapp():
     def create_template(self, template_object):   
         url = f"{self.whatsapp_url}{template_object.site.whatsapp_business_account_id}/message_templates"
         headers = self._get_headers()
+        pending_components = template_object.pending_components
+        counter = 1
+        for component in pending_components:
+            text = component.get('text', '')
+            if '[[1]]' in text:
+                text.replace('[[1]]','{{'+counter+'}}')
+                counter = counter + 1
+            component['text'] = text
+            
         body = { 
             "name": template_object.pending_name,
             "category": template_object.pending_category,
             "language": "en_GB",
-            "components": template_object.pending_components,
+            "components": pending_components,
         }
         
                 
@@ -114,8 +123,18 @@ class Whatsapp():
         if template_object.status in ["APPROVED", "REJECTED", "PAUSED"]:
             url = f"{self.whatsapp_url}{template_object.message_template_id}"
             headers = self._get_headers()
+            pending_components = template_object.pending_components
+            counter = 1
+            for component in pending_components:
+                text = component.get('text', '')
+                if '[[1]]' in text:
+                    text.replace('[[1]]','{{'+counter+'}}')
+                    counter = counter + 1
+                component['text'] = text
+
+
             body = { 
-                "components": template_object.pending_components
+                "components": pending_components
             }
             response = requests.post(url=url, json=body, headers=headers)
             response_body = response.json()

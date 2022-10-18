@@ -23,34 +23,43 @@
     }
     function replaceVariables(content){
         for (const [k,v] of Object.entries(variables)){
-            {% comment %} var find = k;
-            var regex = new RegExp(find, "g");
-            console.log(regex)
-            content = content.replace(regex,v[1]) {% endcomment %}
             content = content.replaceAll(k, v[1])
         }
         return content
     }
     function saveTemplate(){
-        var respStatus = $.ajax({
-            type:'POST',
-            url:'{%url "whatsapp-template-save"%}',
-            data:{
-                {%block ajax_data%}
-                'template_pk':{{template.pk}},
-                'header':$('#template_header').val(), 
-                'body':$('#template_body').val(), 
-                'footer':$('#template_footer').val(), 
-                'csrfmiddlewaretoken':'{{ csrf_token }}'
-                {%endblock ajax_data%}
-            },
-            success: function (data) {
-                $(window).unbind('beforeunload');
-                window.location.href = "{%url 'whatsapp-templates'%}";
-            },
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
+        let variables_valid = true;
+        let header = $('#template_header').val();
+        let body = $('#template_body').val();
+        let footer = $('#template_footer').val();
+        for (const text of [header, body, footer]){
+            if (text.indexOf('{') !== -1 || text.indexOf('}') !== -1){
+                variables_valid = false;
             }
-        })
+        }
+        if (variables_valid){
+            var respStatus = $.ajax({
+                type:'POST',
+                url:'{%url "whatsapp-template-save"%}',
+                data:{
+                    {%block ajax_data%}
+                    'template_pk':{{template.pk}},
+                    'header':header, 
+                    'body':body, 
+                    'footer':footer, 
+                    'csrfmiddlewaretoken':'{{ csrf_token }}'
+                    {%endblock ajax_data%}
+                },
+                success: function (data) {
+                    $(window).unbind('beforeunload');
+                    window.location.href = "{%url 'whatsapp-templates'%}";
+                },
+                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                }
+            })
+        } else {
+            alert('Your template contains some invalid characters ( "{" or "}" ). Replace any "{{x}}" variables with properly entered variables.')
+        }
     }
     $(document).ready(function() {  
         $("[data-bs-toggle=popover]").popover();

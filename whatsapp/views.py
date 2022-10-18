@@ -135,7 +135,7 @@ class Webhooks(View):
                             template.language = template_live.get('language')
                             template.pending_language = ""
 
-                            template.components = template_live.get('components')
+                            template.components = template.pending_components
                             template.pending_components = []
                         template.save()
         response = HttpResponse("")
@@ -210,14 +210,15 @@ def refresh_template_data(site):
                 template.name = api_template.get('name')
                 template.language = api_template.get('language')
                 template.category = api_template.get('category')
-                components = []
-                # for dict in api_template.get('components', []):
-                #     json_dict = {}
-                #     for k,v in dict.items():
-                #         json_dict[k] = str(v)
-                #     components.append(json_dict)
-                
-                template.components = components
+                if not template.components:
+                    components = []
+                    for dict in api_template.get('components', []):
+                        json_dict = {}
+                        for k,v in dict.items():
+                            json_dict[k] = str(v)
+                        components.append(json_dict)
+                    
+                    template.components = components
                 try:
                     template.save()
                 except Exception as e:
@@ -372,6 +373,7 @@ def save_whatsapp_template_ajax(request):
                 {'type': 'BODY', 'text': request.POST.get('body')},
                 {'type': 'FOOTER', 'text': request.POST.get('footer')},
             ]
+            
             template.edited_by = request.user
             template.edited = datetime.now()
             template.save()

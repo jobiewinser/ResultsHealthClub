@@ -133,7 +133,7 @@ class Campaignlead(models.Model):
                                         "text":  self.first_name
                                     }
                                 )
-                                text.replace('[[1]]','{{'+counter+'}}')
+                                # text.replace('[[1]]','{{'+counter+'}}')
                                 counter = counter + 1
                             # if '{{3}}' in text:
                             #     params.append(           
@@ -149,7 +149,7 @@ class Campaignlead(models.Model):
                             #             "text":  self.campaign.site.whatsapp_number
                             #         }
                             #     )
-                            whole_text = f"{whole_text} <br> {text}"
+                            # whole_text = f"{whole_text} <br> {text}"
                             if params:
                                 components.append(
                                     {
