@@ -10,6 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 import pytz
 from calendly.api import Calendly
 from calendly.models import CalendlyWebhookRequest
+from campaign_leads.models import Booking, Campaignlead
 from whatsapp.api import Whatsapp
 from django.views.generic import TemplateView
 from whatsapp.models import WHATSAPP_ORDER_CHOICES, WhatsAppMessage, WhatsAppMessageStatus, WhatsAppWebhookRequest, WhatsappTemplate, template_variables
