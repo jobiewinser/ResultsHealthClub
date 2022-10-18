@@ -10,10 +10,11 @@
     });
     function initDataTable() {
         dt = $('#overview_table').DataTable(          
-            {% comment %} {  
+            {   
+                searching: false,
                 order: [[ 0, 'asc' ]],
                 iDisplayLength: 100,
-            } {% endcomment %}
+            }
         );
     }
     
