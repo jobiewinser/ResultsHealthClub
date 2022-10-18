@@ -70,7 +70,7 @@ def send_first_template_whatsapp_htmx(request, **kwargs):
         context["lead"] = lead
         context["customer_number"] = lead.whatsapp_number
         context["site_pk"] = lead.campaign.site
-        return render(request, "messaging/message_window_htmx.html", context)
+        return render(request, "campaign_leads/htmx/lead_article.html", context)
     except Exception as e:
         logger.debug("send_first_template_whatsapp_htmx Error "+str(e))
         return HttpResponse(e, status=500)
