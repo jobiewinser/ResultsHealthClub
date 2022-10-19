@@ -1,16 +1,22 @@
 {%load core_tags%}
 {%for queryset_title, queryset, call_count in querysets%}
 {%with call_count|division_percentage_max_100:max_call_count as call_percentage%}
-<div class="column column-done" data-call-count="{{ call_count }}" ondrop="drop(event)" ondragover="allowDrop(event)">
+<div class="column-done">
     <div class="m-2 manually_add_lead_div">
     <h2 class="m-0">{{queryset_title}} <img  class="htmx-indicator column-htmx-indicator" src="https://htmx.org/img/bars.svg"/></h2> 
     {%with call_count as counter%}
     {%include 'campaign_leads/htmx/column_metadata.html'%}
     {%endwith%}
     </div>
-    {%for lead in queryset%}
-    {%include 'campaign_leads/htmx/lead_article.html'%}
-    {%endfor%}
+    <div 
+    id="{%if campaign.pk%}campaign_column_{{campaign.pk}}_calls_{{call_count}}{%elif site.pk%}site_column_{{site.pk}}_calls_{{call_count}}{%else%}company_column_{{request.user.profile.company.pk}}_calls_{{call_count}}{%endif%}" 
+    class="column {%if campaign.pk%}campaign_column_{{campaign.pk}}_calls_{{call_count}}{%elif site.pk%}site_column_{{site.pk}}_calls_{{call_count}}{%else%}company_column_{{request.user.profile.company.pk}}_calls_{{call_count}}{%endif%}"
+    ondrop="drop(event)" 
+    ondragover="allowDrop(event)" style="height:100%" data-call-count="{{ call_count }}">
+        {%for lead in queryset%}
+        {%include 'campaign_leads/htmx/lead_article.html'%}
+        {%endfor%}
+    </div>
 </div>
 {%endwith%}
 {%endfor%}

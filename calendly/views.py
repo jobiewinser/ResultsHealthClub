@@ -61,7 +61,7 @@ class Webhooks(View):
                         'type': 'lead_update',
                         'data':{
                             # 'company_pk':campaign_pk,
-                            'lead_pk':lead.pk,
+                            'rendered_html': f"<span hx-swap-oob='delete' id='lead-{lead.pk}'></span>",
                         }
                     }
                 )

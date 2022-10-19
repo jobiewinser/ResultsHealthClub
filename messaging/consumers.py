@@ -38,12 +38,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     "whatsappnumber": whatsappnumber,
                 }
                 
-                rendered_htmx = await get_rendered_htmx(message, message_context, messaging_customer_number, whatsappnumber)
+                rendered_html = await get_rendered_html(message, message_context, messaging_customer_number, whatsappnumber)
                 await self.channel_layer.group_send(
                     self.group_name,
                     {
                         'type': 'chatbox_message',
-                        "message": rendered_htmx,
+                        "message": rendered_html,
                     }
                 )
     # Receive message from room group.    
@@ -82,17 +82,17 @@ def get_whatsappnumber(whatsappnumber_pk):
 # def get_lead(lead_pk):   
 #     return Campaignlead.objects.get(pk=lead_pk)
 @sync_to_async
-def get_rendered_htmx(message, message_context, messaging_customer_number, whatsappnumber):
+def get_rendered_html(message, message_context, messaging_customer_number, whatsappnumber):
     rendered_message_list_row = loader.render_to_string('messaging/htmx/message_list_row.html', message_context)
     rendered_message_chat_row = loader.render_to_string('messaging/htmx/message_chat_row.html', message_context)
-    rendered_htmx = f"""
+    rendered_html = f"""
     <span id='message_list_row_{messaging_customer_number}_{whatsappnumber.pk}' hx-swap-oob='delete'></span>
     <span id='messageCollapse_{whatsappnumber.pk}' hx-swap-oob='afterbegin '>{rendered_message_list_row}</span>
     <span id='messageWindowCollapse_{messaging_customer_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>                
     """
 
     if message.inbound:
-        rendered_htmx = f"""{rendered_htmx}
+        rendered_html = f"""{rendered_html}
         <span hx-swap-oob="true" id="chat_notification_{message.customer_number}">
             <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
                 <span class="visually-hidden">New alerts</span>
@@ -100,11 +100,11 @@ def get_rendered_htmx(message, message_context, messaging_customer_number, whats
         </span>
         """
     else:
-        rendered_htmx = f"""{rendered_htmx}
+        rendered_html = f"""{rendered_html}
         <span hx-swap-oob="true" id="chat_notification_{message.customer_number}">
         </span>
         """
-    return rendered_htmx
+    return rendered_html
 
     
 class LeadsConsumer(AsyncWebsocketConsumer):
@@ -123,56 +123,26 @@ class LeadsConsumer(AsyncWebsocketConsumer):
         text_data_json = json.loads(text_data)
         user = self.scope["user"]
         if(user.is_authenticated):
-            lead_pk = text_data_json["lead_pk"]
-            new_position = text_data_json["new_position"]
-            
             await self.channel_layer.group_send(
                 self.group_name,
                 {
                     'type': 'lead_update',
-                    "message": get_leads_htmx(lead_pk, new_position=new_position),
+                    "message": text_data_json["rendered_html"],
                 }
             )
 
     # Receive message from room group.    
     async def lead_update(self, event):
-        message = await get_leads_htmx(event['data']['lead_pk'])
         await self.send(
             text_data=json.dumps({
-                'message':message
+                'message':event['data']['rendered_html'].replace("\n", "").lstrip().rstrip()
             })
         )
-
-@sync_to_async
-def get_leads_htmx(lead_pk, new_position=None):
-    # new_position = text_data_json["new_position"]
-    if lead_pk:
-        if not new_position:    
-            return f"<span hx-swap-oob='delete' id='lead-{lead_pk}'></span>"
-            # await self.channel_layer.group_send(
-            #     self.group_name,
-            #     {
-            #         'type': 'lead_update',
-            #         "message": f"<span hx-swap-oob='delete' id='lead-{lead_pk}'></span>",
-            #     }
-            # )
-        else:
-            lead = Campaignlead.objects.get(pk=lead_pk) 
-            message_context = {
-                "messaleadge": lead,
-                "site": lead.campaign.site,
-            }
-            rendered_message_list_row = loader.render_to_string('campaign_leads/htmx/lead_article.html', message_context)
-            rendered_htmx = f"""
-                <span id='lead-{lead_pk}' hx-swap-oob='outerHTML'>{rendered_message_list_row}</span>           
-            """
-            return rendered_htmx
-            
-            # await self.channel_layer.group_send(
-            #     self.group_name,
-            #     {
-            #         'type': 'lead_update',
-            #         "message": rendered_htmx,
-            #     }
-            # )
+    async def lead_move(self, event):
+        await self.send(
+            text_data=json.dumps({
+                'message':event['data']['rendered_html']
+                # 'message':"<span hx-swap-oob='afterbegin:.column'>TEST</span>"
+            })
+        )
 

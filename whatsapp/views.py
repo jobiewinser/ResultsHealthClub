@@ -82,7 +82,7 @@ class Webhooks(View):
                             }
                             rendered_message_list_row = loader.render_to_string('messaging/htmx/message_list_row.html', message_context)
                             rendered_message_chat_row = loader.render_to_string('messaging/htmx/message_chat_row.html', message_context)
-                            rendered_htmx = f"""
+                            rendered_html = f"""
 
                             <span id='latest_message_row_{from_number}' hx-swap-oob='delete'></span>
                             <span id='messageCollapse_{whatsappnumber.pk}' hx-swap-oob='afterbegin'>{rendered_message_list_row}</span>
@@ -93,7 +93,7 @@ class Webhooks(View):
                                 f"messaging_{whatsappnumber.pk}",
                                 {
                                     'type': 'chatbox_message',
-                                    "message": rendered_htmx,
+                                    "message": rendered_html,
                                 }
                             )
                             

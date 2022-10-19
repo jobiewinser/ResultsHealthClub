@@ -35,6 +35,7 @@ urlpatterns = [
     path('new-leads-column/', campaignleadshtmx.new_leads_column, name='new-leads-column' ),
     path('delete-lead/', campaignleadshtmx.delete_lead, name='delete-lead' ),
     
+    path('refresh-lead-article/<str:lead_pk>/', campaignleadshtmx.refresh_lead_article, name='refresh-lead-article' ),
     path('get-leads-column-meta-data/', campaignleadshtmx.get_leads_column_meta_data, name='get-leads-column-meta-data' ),
     path('create-campaign-lead/', campaignleadshtmx.create_campaign_lead, name='create-campaign-lead' ),
     

@@ -60,7 +60,7 @@ class CampaignleadsOverviewView(TemplateView):
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'campaign_leads/htmx/leads_board_htmx.html'   
             context['campaigns'] = get_campaign_qs(self.request)
-        leads = Campaignlead.objects.filter(complete=False, booking=None)
+        leads = Campaignlead.objects.filter(complete=False, booking__datetime=None)
         # leads = Campaignlead.objects.filter()
         campaign_pk = self.request.GET.get('campaign_pk', None)
         if campaign_pk:
@@ -81,7 +81,7 @@ class CampaignleadsOverviewView(TemplateView):
                 pass
         
         context['site_list'] = get_available_sites_for_user(self.request.user)
-        leads = leads.annotate(calls=Count('call'))
+        leads = leads.annotate(calls=Count('call')).order_by('-last_dragged')
         # leads = leads.annotate(calls=Count('call'), cost=F('campaign__product_cost'))
         
         context['querysets'] = [
@@ -154,9 +154,18 @@ class LeadConfigurationView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(LeadConfigurationView, self).get_context_data(**kwargs)
+        company = self.request.user.profile.company
+        for campaign_dict in ActiveCampaignApi(company.active_campaign_api_key, company.active_campaign_url).get_lists(company.active_campaign_url).get('lists',[]):
+            campaign, created = ActiveCampaign.objects.get_or_create(
+                active_campaign_id = campaign_dict.pop('id'),
+                name = campaign_dict.pop('name'),
+                company = company,
+            )
+            campaign.json_data = campaign_dict
+            campaign.save()
         context['campaigns'] = []
-        if self.request.user.profile.company:
-            context['campaigns'] = self.request.user.profile.company.get_and_generate_campaign_objects()
+        if company:
+            context['campaigns'] = company.get_and_generate_campaign_objects()
         context['site_list'] = get_available_sites_for_user(self.request.user)
         return context
 
@@ -201,16 +210,13 @@ def new_call(request, **kwargs):
             from channels.layers import get_channel_layer
             from asgiref.sync import async_to_sync, sync_to_async
             channel_layer = get_channel_layer()   
-            context = {}         
-            context["lead"] = lead
-            context['max_call_count'] = "0"
-            rendered_html = loader.render_to_string('campaign_leads/htmx/lead_article.html', context)
+            
             async_to_sync(channel_layer.group_send)(
-                    f"lead_{lead.campaign.pk}",
+                    f"lead_{lead.campaign.site.company.pk}",
                     {
-                        'type': 'lead_update',
+                        'type': 'lead_move',
                         'data':{
-                            'lead_pk':lead.pk,
+                            'rendered_html':get_leads_html(lead, new_position=Call.objects.filter(lead=lead).count()),
                         }
                     }
             )
@@ -220,6 +226,16 @@ def new_call(request, **kwargs):
     except Exception as e:
         logger.debug("new_call Error "+str(e))
         return HttpResponse(e, status=500)
+
+def get_leads_html(lead, new_position=None):
+    delete_htmx = f"<span hx-swap-oob='delete' id='lead-{lead.pk}'></span>"
+    if lead:
+        if new_position == None:    
+            return delete_htmx
+        else:
+            rendered_html = f"<span hx-swap-oob='afterbegin:.campaign_column_{lead.campaign.pk}_calls_{new_position},.site_column_{lead.campaign.site.pk}_calls_{new_position},.company_column_{lead.campaign.site.company.pk}_calls_{new_position}'><a hx-get='/campaign-leads/refresh-lead-article/{lead.pk}/' hx-swap='outerHTML' hx-indicator='.lead-refresh-htmx-indicator' hx-trigger='load' href='#'><img  class='lead-refresh-htmx-indicator' src='https://htmx.org/img/bars.svg'/></a> </span>"
+            from django.utils.safestring import mark_safe
+            return mark_safe(f"{rendered_html} {delete_htmx}")
 
 @login_required
 def campaign_assign_auto_send_template_htmx(request):

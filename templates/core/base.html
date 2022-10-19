@@ -214,11 +214,15 @@
                     }
                 });
                 document.body.addEventListener('htmx:oobAfterSwap', function(evt) { 
+                    console.log(evt)
                     if ($(evt.detail.target).hasClass('chat_card_body')){                        
                         $(evt.detail.target).animate({
                             scrollTop: $(evt.detail.target)[0].scrollHeight - $(evt.detail.target)[0].clientHeight
                           }, 1000);
                     }
+                });
+                document.body.addEventListener('htmx:oobBeforeSwap', function(evt) { 
+                    console.log("oobBeforeSwap", evt.detail.fragment)
                 });
                 
                 document.body.addEventListener('htmx', function(evt) { 

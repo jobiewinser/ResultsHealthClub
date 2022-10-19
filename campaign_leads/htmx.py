@@ -114,6 +114,16 @@ def get_leads_column_meta_data(request, **kwargs):
     except Exception as e:
         logger.debug("get_leads_column_meta_data Error "+str(e))
         return HttpResponse(e, status=500)
+@login_required
+def refresh_lead_article(request, **kwargs):
+    logger.debug(str(request.user))
+    try:
+        lead = Campaignlead.objects.get(pk=kwargs.get('lead_pk'))
+       
+        return render(request, 'campaign_leads/htmx/lead_article.html', {'lead':lead, 'max_call_count':0})
+    except Exception as e:
+        logger.debug("get_leads_column_meta_data Error "+str(e))
+        return HttpResponse(e, status=500)
 
 @login_required
 def add_booking(request, **kwargs):

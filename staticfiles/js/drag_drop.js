@@ -1,29 +1,29 @@
 const dragStart = target => {
     target.classList.add('dragging');
-    console.log("dragStart")
+    // console.log("dragStart")
 };
 
 const dragEnd = target => {
     target.classList.remove('dragging');
     document.querySelector('#add_booking_area').classList.remove('shown');
     document.querySelector('#chat_bottom').classList.remove('temp_hidden');
-    console.log("dragEnd", target)
+    // console.log("dragEnd", target)
 };
 
 const dragEnter = event => {
     event.currentTarget.classList.add('drop');
-    console.log("dragEnter")
+    // console.log("dragEnter")
 };
 
 const dragLeave = event => {
     event.currentTarget.classList.remove('drop');
-    console.log("dragLeave")
+    // console.log("dragLeave")
 };
 
 const drag = event => {
     event.dataTransfer.setData('text/html', event.currentTarget.outerHTML);
     event.dataTransfer.setData('text/plain', event.currentTarget.dataset.id);
-    console.log("drag")
+    // console.log("drag")
     document.querySelector('#add_booking_area').classList.add('shown');
     document.querySelector('#chat_bottom').classList.add('temp_hidden');
 };
@@ -35,9 +35,9 @@ const drop = event => {
     dragged_elem.remove();
     
     event.preventDefault();
-    event.currentTarget.innerHTML = event.currentTarget.innerHTML + event.dataTransfer.getData('text/html');
+    event.currentTarget.innerHTML = event.dataTransfer.getData('text/html') + event.currentTarget.innerHTML;
     handleDraggedItem(dragged_elem_id, event.currentTarget)
-    console.log("drop", event.currentTarget)
+    // console.log("drop", event.currentTarget)
     document.querySelector('#add_booking_area').classList.remove('shown');
     document.querySelector('#chat_bottom').classList.remove('temp_hidden');
     set_total_costs();
@@ -46,7 +46,7 @@ const drop = event => {
 const drop_booking = event => {
     let dragged_elem = $(`[data-id="${event.dataTransfer.getData('text/plain')}"]`)
     event.preventDefault();
-    console.log("drop_booking", event.currentTarget)
+    // console.log("drop_booking", event.currentTarget)
     document.querySelector('#add_booking_area').classList.remove('shown');
     document.querySelector('#chat_bottom').classList.remove('temp_hidden');
     
@@ -54,7 +54,7 @@ const drop_booking = event => {
 };
 
 function handleDraggedItem(elem){
-    console.log("handleDraggedItem")
+    // console.log("handleDraggedItem")
 }
 
 const allowDrop = event => {
