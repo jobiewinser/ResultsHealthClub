@@ -43,15 +43,22 @@
 <td class="double_layer_td">
     <span class="primary_td_layer">
         {%if template.status%}{{template.status}}{%endif%} 
-        {%if template.latest_reason%}
+        {%if template.active_errors%}
         <div 
         data-bs-toggle="popover" 
         data-bs-trigger="hover" 
         data-bs-html="true" 
         data-bs-placement="top"
-        data-bs-title="Reasons for Error?"
-        data-bs-content="{{template.latest_reason}}">
-            <i class="fa-solid fa-triangle-exclamation"></i>
+        data-bs-title="Errors"
+        data-bs-content="
+        <b>Errors:</b>
+        <ul>
+            {%for error in template.active_errors%}
+            <li>{{error.created}} - {{error.get_type_display}}</li>
+            {%endfor%}
+        </ul>
+        ">
+            <i class="fa-solid fa-triangle-exclamation"></i> <small>hover</small>
         </div>
         {%endif%}    
     </span>   

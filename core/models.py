@@ -8,7 +8,7 @@ from django.dispatch import receiver
 from django.http import HttpResponse
 from calendly.api import Calendly
 
-from campaign_leads.models import Call, Campaign, Campaignlead, ManualCampaign
+from campaign_leads.models import Campaign, Campaignlead, ManualCampaign
 from twilio.models import TwilioMessage
 from django.db.models import Q, Count
 from whatsapp.api import Whatsapp
@@ -17,6 +17,17 @@ import logging
 logger = logging.getLogger(__name__)
 from polymorphic.models import PolymorphicModel
 from whatsapp.models import WhatsAppMessage
+
+class AttachedError(models.Model): 
+    created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    ERROR_TYPES = (
+                        ('1', 'You can only edit an active template once every 24 hours'),
+                    )
+    type = models.CharField(choices=ERROR_TYPES, default='c', max_length=5)
+    attached_field = models.CharField(null=True, blank=True, max_length=50)
+    whatsapp_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="errors", on_delete=models.CASCADE)
+    archived = models.BooleanField(default=False)
+    archived_time = models.DateTimeField(null=True, blank=True)
 
 class PhoneNumber(PolymorphicModel):
     number = models.CharField(max_length=30, null=True, blank=True)

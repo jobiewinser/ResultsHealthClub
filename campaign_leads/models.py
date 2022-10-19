@@ -1,19 +1,12 @@
 from datetime import timedelta, datetime
-import os
 import uuid
 from django.db import models
 from django.contrib.auth.models import User
 from django.http import HttpResponse
-from calendly.api import Calendly
-
 from whatsapp.api import Whatsapp
 from whatsapp.models import WhatsAppMessage, WhatsappTemplate
-from django.db.models import Sum
-from django.conf import settings
 from django.dispatch import receiver
 from polymorphic.models import PolymorphicModel
-# Create your models here.
-from whatsapp.models import template_variables
 import logging
 logger = logging.getLogger(__name__)
 

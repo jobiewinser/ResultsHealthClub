@@ -63,7 +63,7 @@ class WhatsappTemplate(models.Model):
     edited_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     edited = models.DateTimeField(null=True, blank=True) 
 
-    latest_reason = models.TextField(null=True, blank=True)
+    # latest_reason = models.TextField(null=True, blank=True)
     status = models.TextField(null=True, blank=True)
 
     message_template_id = models.TextField(null=True, blank=True)
@@ -129,6 +129,10 @@ class WhatsappTemplate(models.Model):
     #     elif self.components:
     #         for component in self.components
     #     return edit_components
+    
+    @property
+    def active_errors(self):
+        return self.errors.filter(archived=False)
     @property
     def company_sites_with_same_whatsapp_business_details(self):
         try:

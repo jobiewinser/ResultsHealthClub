@@ -12,6 +12,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
 from django.http.response import HttpResponseRedirect
 from django.template import loader
+
+
+from whatsapp.models import WhatsappTemplate
 logger = logging.getLogger(__name__)
 # https://developers.facebook.com/docs/whatsapp/cloud-api/reference
 # https://business.facebook.com/settings/people/100085397745468?business_id=851701125750291
@@ -131,13 +134,28 @@ class Whatsapp():
                     text.replace('[[1]]','{{'+str(counter)+'}}')
                     counter = counter + 1
                 component['text'] = text
-
-
             body = { 
                 "components": pending_components
             }
             response = requests.post(url=url, json=body, headers=headers)
             response_body = response.json()
+            potential_error = response_body.get('error', None)
+            from core.models import AttachedError
+            if potential_error:
+                code = potential_error.get('code')
+                if str(code) == '100':
+                    AttachedError.objects.create(
+                        type = '1',
+                        attached_field = "whatsapp_template",
+                        whatsapp_template = template_object,
+                    )
+            else:
+                AttachedError.objects.filter(
+                    type = '1',
+                    whatsapp_template = template_object,
+                    archived = True,
+                ).update(archived = False)
+
             print("edit_template", str(response_body))
             return response_body
     #GET
