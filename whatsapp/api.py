@@ -137,8 +137,8 @@ class Whatsapp():
                 "components": pending_components
             }
             response = requests.post(url=url, json=body, headers=headers)
-            print("edit_template", str(response))
             response_body = response.json()
+            print("edit_template", str(response_body))
             return response_body
     #GET
     def get_templates(self, whatsapp_business_account_id):   
