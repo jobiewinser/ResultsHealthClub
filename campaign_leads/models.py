@@ -169,7 +169,7 @@ class Campaignlead(models.Model):
                             #             "text":  self.campaign.site.whatsapp_number
                             #         }
                             #     )
-                            whole_text = f"{whole_text} <br> {text}"
+                            whole_text = f"{whole_text} \n {text}"
                             if params:
                                 components.append(
                                     {
