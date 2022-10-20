@@ -205,7 +205,7 @@ class Campaignlead(models.Model):
                 "code":template.language
             }
 
-            response = whatsapp.send_template_message(self.whatsapp_number, self.campaign.site.default_number.whatsapp_business_phone_number_id, template.name, language, components)
+            response = whatsapp.send_template_message(self.whatsapp_number, self.campaign.site.default_number.whatsapp_business_phone_number_id, template, language, components)
             reponse_messages = response.get('messages',[])
             if reponse_messages:
                 for response_message in reponse_messages:

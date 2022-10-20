@@ -22,6 +22,8 @@ class AttachedError(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     ERROR_TYPES = (
                         ('101', "You can only edit an active template once every 24 hours"),
+                        ('102', "The system can not send Whatsapp Templates without a template name"),
+                        ('103', "The number of parameters submitted does not match the Whatsapp Template (contact Winser Systems)"),
                         ('201', "Whatsapp Template not found Whatsapp's system"),
                         ('202', "There is no Whatsapp Business linked to this Lead's assosciated Site"),
                         ('203', "There is no 1st Whatsapp Template linked to this Lead's assosciated Site"),
@@ -32,7 +34,12 @@ class AttachedError(models.Model):
     attached_field = models.CharField(null=True, blank=True, max_length=50)
     whatsapp_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="errors", on_delete=models.SET_NULL, null=True, blank=True)
     campaign_lead = models.ForeignKey("campaign_leads.Campaignlead", related_name="errors", on_delete=models.SET_NULL, null=True, blank=True)
+    whatsapp_number = models.ForeignKey("core.WhatsappNumber", related_name="errors", on_delete=models.SET_NULL, null=True, blank=True)
+
+    recipient_number = models.TextField(blank=True, null=True)
     
+    admin_action_required = models.BooleanField(default=False)
+
     archived = models.BooleanField(default=False)
     archived_time = models.DateTimeField(null=True, blank=True)
 

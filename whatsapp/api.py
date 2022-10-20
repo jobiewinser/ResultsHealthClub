@@ -36,11 +36,12 @@ class Whatsapp():
                    }
         return headers
     #POST
-    def send_free_text_message(self, recipient_number, message, whatsapp_business_phone_number_id, preview_url = False):   
+    def send_free_text_message(self, recipient_number, message, whatsapp_number, preview_url = False):   
+        from core.models import AttachedError
         if message:  
             if settings.WHATSAPP_PHONE_OVERRIDE1:
                 recipient_number = settings.WHATSAPP_PHONE_OVERRIDE1
-            url = f"{self.whatsapp_url}{whatsapp_business_phone_number_id}/messages"
+            url = f"{self.whatsapp_url}{whatsapp_number.whatsapp_business_phone_number_id}/messages"
             headers = self._get_headers()
             body = { 
                 "messaging_product": "whatsapp", 
@@ -53,9 +54,31 @@ class Whatsapp():
             }
             response = requests.post(url=url, json=body, headers=headers)
             response_body = response.json()
+
+            potential_error = response_body.get('error', None)
+            if potential_error:
+                code = potential_error.get('code')
+                if str(code) == '132000':
+                    AttachedError.objects.create(
+                        type = '103',
+                        attached_field = "whatsapp_number",
+                        whatsapp_number = whatsapp_number,
+                        recipient_number = recipient_number,
+                        admin_action_required = True,
+                    )
+            else:
+                AttachedError.objects.filter(
+                    type = '103',
+                    whatsapp_number = whatsapp_number,
+                    archived = False,
+                    recipient_number = recipient_number,
+                ).update(archived = True)
+
             print(response_body)
             return response_body
-    def send_template_message(self, recipient_number, whatsapp_business_phone_number_id, template_name, language, components):  
+    def send_template_message(self, recipient_number, whatsapp_number, template_object, language, components):  
+        from core.models import AttachedError
+        template_name = template_object.name
         #  "components": [{
         #     "type": "body",
         #     "parameters": [{
@@ -70,7 +93,14 @@ class Whatsapp():
         if settings.WHATSAPP_PHONE_OVERRIDE1:
             recipient_number = settings.WHATSAPP_PHONE_OVERRIDE1
         if template_name:  
-            url = f"{self.whatsapp_url}{whatsapp_business_phone_number_id}/messages"
+            AttachedError.objects.filter(
+                type = '102',
+                whatsapp_template = template_object,
+                recipient_number = recipient_number,
+                whatsapp_number = whatsapp_number,
+                archived = False,
+            ).update(archived = True)
+            url = f"{self.whatsapp_url}{whatsapp_number.whatsapp_business_phone_number_id}/messages"
             headers = self._get_headers()
             body = { 
                 "messaging_product": "whatsapp", 
@@ -84,8 +114,39 @@ class Whatsapp():
             }
             response = requests.post(url=url, json=body, headers=headers)
             response_body = response.json()
+            
+            
+            potential_error = response_body.get('error', None)
+            if potential_error:
+                code = potential_error.get('code')
+                if str(code) == '132000':
+                    AttachedError.objects.create(
+                        type = '103',
+                        attached_field = "whatsapp_template",
+                        whatsapp_template = template_object,
+                        recipient_number = recipient_number,
+                        whatsapp_number = whatsapp_number,
+                        admin_action_required = True,
+                    )
+            else:
+                AttachedError.objects.filter(
+                    type = '103',
+                    whatsapp_template = template_object,
+                    archived = False,
+                    whatsapp_number = whatsapp_number,
+                    recipient_number = recipient_number,
+                ).update(archived = True)
+
             print(response_body)
             return response_body
+        else:
+            AttachedError.objects.create(
+                type = '102',
+                attached_field = "whatsapp_template",
+                whatsapp_template = template_object,
+                whatsapp_number = whatsapp_number,
+                recipient_number = recipient_number,
+            )
     #POST
     def create_template(self, template_object):   
         url = f"{self.whatsapp_url}{template_object.site.whatsapp_business_account_id}/message_templates"
