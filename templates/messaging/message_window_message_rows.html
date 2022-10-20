@@ -1,9 +1,9 @@
 {%load static core_tags tz%}
-{%if messages|length == 20%}
+{%if messages|length > 0%}
 <span hx-get="{%url 'get-more-messages'%}" hx-vals='{"customer_number":"{{customer_number}}","whatsappnumber_pk":"{{whatsappnumber.pk}}","created_before_date":"{{messages.0.datetime|timestamp}}"}' hx-indicator=".htmx-indicator" hx-swap="outerHTML" hx-trigger="intersect once">
 </span>
-{%else%}
-*End of chat history*
+{% comment %} {%else%}
+*End of chat history* {% endcomment %}
 {%endif%}
 {%for message in messages%}
     {%include 'messaging/htmx/message_chat_row.html'%}
