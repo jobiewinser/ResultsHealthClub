@@ -106,16 +106,11 @@ class Whatsapp():
                 "messaging_product": "whatsapp", 
                 "to": f"{recipient_number}", 
                 "type": "template",
-                # "template": json.dumps({
-                #     "name": template_name,
-                #     "language": language,
-                #     "components": components
-                #     })
-                "template": {
+                "template": json.dumps({
                     "name": template_name,
                     "language": language,
                     "components": components
-                    }
+                    })
             }
             print("")
             print("")

@@ -143,9 +143,9 @@ class Campaignlead(models.Model):
                         for component in template.components:
                             params = []
                             component_type = component.get('type', "").lower()
-                            
+
                             text = component.get('text', '')
-                            if component_type in ['header', 'body']:
+                            if component_type in ['body']:
                                 if '[[1]]' in text:
                                     params.append(              
                                         {
