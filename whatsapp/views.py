@@ -265,7 +265,7 @@ def whatsapp_approval_htmx(request):
             whatsapp.edit_template(template)
         else:
             whatsapp.create_template(template)
-        return render(request, 'whatsapp/whatsapp_templates_row.html', {'template':template, 'site':template.site, 'WHATSAPP_ORDER_CHOICES': WHATSAPP_ORDER_CHOICES})
+        return render(request, 'whatsapp/whatsapp_templates_row.html', {'template':WhatsappTemplate.objects.get(pk=request.POST.get('template_pk')), 'site':template.site, 'WHATSAPP_ORDER_CHOICES': WHATSAPP_ORDER_CHOICES})
 
 @login_required
 def delete_whatsapp_template_htmx(request):
