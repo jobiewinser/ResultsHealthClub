@@ -210,7 +210,7 @@ def refresh_template_data(site):
                 template.name = api_template.get('name')
                 template.language = api_template.get('language')
                 template.category = api_template.get('category')
-                if not template.components:
+                if not template.components and not template.pending_components:
                     components = []
                     for dict in api_template.get('components', []):
                         json_dict = {}
