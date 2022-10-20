@@ -246,7 +246,7 @@ def get_leads_html(lead, new_position=None):
         if new_position == None:    
             return delete_htmx
         else:
-            rendered_html = f"<span hx-swap-oob='afterbegin:.campaign_column_{lead.campaign.pk}_calls_{new_position},.site_column_{lead.campaign.site.pk}_calls_{new_position},.company_column_{lead.campaign.site.company.pk}_calls_{new_position}'><a hx-get='/campaign-leads/refresh-lead-article/{lead.pk}/' hx-swap='outerHTML' hx-indicator='.lead-refresh-htmx-indicator' hx-trigger='load' href='#'><img  class='lead-refresh-htmx-indicator' src='https://htmx.org/img/bars.svg'/></a> </span>"
+            rendered_html = f"<span hx-swap-oob='afterbegin:.campaign_column_{lead.campaign.pk}_calls_{new_position},.site_column_{lead.campaign.site.pk}_calls_{new_position},.company_column_{lead.campaign.site.company.pk}_calls_{new_position}'><a hx-get='/campaign-leads/refresh-lead-article/{lead.pk}/' hx-swap='outerHTML' hx-indicator='.htmx-indicator' hx-trigger='load' href='#'></a> </span>"
             from django.utils.safestring import mark_safe
             return mark_safe(f"{rendered_html} {delete_htmx}")
 
