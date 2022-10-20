@@ -153,7 +153,7 @@ class Campaignlead(models.Model):
                                             "text":  self.first_name
                                         }
                                     )
-                                    text.replace('[[1]]',self.first_name)
+                                    text = text.replace('[[1]]',self.first_name)
                                     counter = counter + 1
                             # if '{{3}}' in text:
                             #     params.append(           
