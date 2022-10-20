@@ -75,7 +75,7 @@ class Campaignlead(models.Model):
     @property
     def active_errors(self):        
         from core.models import AttachedError
-        return AttachedError.objects.filter(Q(campaign_lead=self)|Q(recipient_number=self.whatsapp_number)).filter(archived=False)
+        return AttachedError.objects.filter(Q(campaign_lead=self)|Q(recipient_number=self.whatsapp_number, whatsapp_number__site=self.campaign.site)).filter(archived=False)
 
     @property
     def name(self):

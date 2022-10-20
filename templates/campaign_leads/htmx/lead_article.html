@@ -7,7 +7,7 @@
             <div class="col p-0 elipses-overflow">
                 <span class="primary_td_layer">
                     
-                    {%if template.active_errors%}
+                    {%if lead.active_errors%}
                     <span 
                     data-bs-toggle="popover" 
                     data-bs-trigger="hover" 
@@ -17,7 +17,7 @@
                     data-bs-content="
                     <b>Errors:</b>
                     <ul>
-                        {%for error in template.active_errors%}
+                        {%for error in lead.active_errors%}
                         <li>{{error.created}} - {{error.get_type_display}}</li>
                         {%endfor%}
                     </ul>
