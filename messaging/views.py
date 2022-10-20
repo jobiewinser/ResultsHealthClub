@@ -4,6 +4,7 @@ from django.shortcuts import render
 from campaign_leads.models import Campaignlead
 from core.models import Site, WhatsappNumber
 from core.user_permission_functions import get_allowed_site_chats_for_user, get_user_allowed_to_use_site_messaging
+from core.views import get_site_pk_from_request
 from whatsapp.models import WhatsAppMessage
 from django.contrib.auth.decorators import login_required
 
@@ -76,3 +77,34 @@ def send_first_template_whatsapp_htmx(request, **kwargs):
         logger.debug("send_first_template_whatsapp_htmx Error "+str(e))
         return HttpResponse(e, status=500)
 
+@login_required
+def get_modal_content(request, **kwargs):
+    try:
+        request.GET._mutable = True
+        site_pk = get_site_pk_from_request(request)
+        context = {}
+        if site_pk:
+            request.GET['site_pk'] = site_pk
+
+        lead_pk = request.GET.get('lead_pk')
+        if lead_pk:
+            lead = Campaignlead.objects.get(pk=lead_pk)
+            context['lead'] = lead
+            if request.GET.get('template_name', None) == "message_window_modal":
+                whatsappnumber = lead.campaign.site.default_number
+                customer_number = lead.whatsapp_number
+                context['customer_number'] = customer_number
+                context['whatsappnumber'] = whatsappnumber
+                context['messages'] = WhatsAppMessage.objects.filter(customer_number=customer_number, whatsappnumber=whatsappnumber).order_by('datetime')
+        
+        if request.user.is_authenticated:
+            template_name = request.GET.get('template_name', '')
+            # context['site_list'] = get_available_sites_for_user(request.user)
+            param1 = kwargs.get('param1', '')
+            if param1:
+                context['lead'] = Campaignlead.objects.get(pk=param1)
+                
+            return render(request, f"messaging/htmx/{template_name}.html", context)   
+    except Exception as e:
+        logger.debug("get_modal_content Error "+str(e))
+        return HttpResponse(e, status=500)

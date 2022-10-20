@@ -33,7 +33,7 @@ def get_modal_content(request, **kwargs):
         whatsappnumber_pk = request.GET.get('whatsappnumber_pk')
         if whatsappnumber_pk:
             context['whatsappnumber'] = WhatsappNumber.objects.get(pk=whatsappnumber_pk)
-
+        
         if request.user.is_authenticated:
             template_name = request.GET.get('template_name', '')
             # context['site_list'] = get_available_sites_for_user(request.user)

@@ -71,8 +71,11 @@ class WhatsappNumber(PhoneNumber):
             return Site.objects.none()
 
     @property
-    def get_fresh_messages(self):
+    def get_latest_messages(self):
         return WhatsAppMessage.objects.filter(whatsappnumber=self).order_by('customer_number', '-datetime').distinct('customer_number')
+    @property
+    def get_latest_inbound_messages(self):
+        return WhatsAppMessage.objects.filter(whatsappnumber=self, inbound=True).order_by('customer_number', '-datetime').distinct('customer_number')
 
     def send_whatsapp_message(self, customer_number=None, lead=None, message="", user=None, template_used=None):  
         try:
@@ -178,6 +181,9 @@ class Site(models.Model):
 
     def get_leads_created_between_dates(self, start_date, end_date):
         return Campaignlead.objects.filter(campaign__site=self, created__gte=start_date, created__lte=end_date)
+
+    def get_(self, date):
+        return Campaignlead.objects.filter(campaign__site=self, created__month=date.month, created__year=date.year)
  
 
 @receiver(models.signals.post_save, sender=Site)

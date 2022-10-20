@@ -14,4 +14,5 @@ urlpatterns = [
     path('get-message-list-row/', get_messaging_list_row, name='get-message-list-row' ),
     path('send-first-template-whatsapp/<str:lead_pk>/', send_first_template_whatsapp_htmx, name='send-first-template-whatsapp' ),
     
+    path('messaging-get-modal-content/', get_modal_content, name='messaging-get-modal-content' ),
 ]

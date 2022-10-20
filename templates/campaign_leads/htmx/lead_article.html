@@ -52,18 +52,19 @@
                         data-whatsapp-number="{{lead.whatsapp_number}}">
                             1st <i class="fa fa-whatsapp"></i>
                     </button>
-                    {%elif site%}
-                    {% comment %} <button class="btn btn-sm btn-success text-white position-relative" 
-                        hx-get="{%url 'message-window' customer_number=lead.whatsapp_number site_pk=site.pk%}"
-                        hx-indicator=".htmx-indicator" 
-                        hx-target="#next_chat_window_{{system_phone_number}}"
+                    {%else%}
+                    <button class="btn btn-sm btn-success text-white position-relative" 
+                        hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
+                        hx-vals='{"template_name": "message_window_modal", "lead_pk": "{{lead.pk}}"}'
+                        hx-get="{% url 'messaging-get-modal-content' %}" 
                         hx-push-url="false"
-                        hx-swap="outerHTML" hx-trigger="click"  
-                        data-whatsapp-number="{{lead.whatsapp_number}}">
-                            Chat
-                            <span id="chat_notification_{{lead.whatsapp_number}}">
-                            </span>
-                    </button> {% endcomment %}
+                        hx-swap="innerHTML" hx-trigger="click"
+                        onclick="$('#chat_card_{{lead.whatsapp_number}}').remove()"
+                            data-whatsapp-number="{{lead.whatsapp_number}}">
+                                Chat
+                                <span id="chat_notification_{{lead.whatsapp_number}}">
+                                </span>
+                        </button>
                     {%endif%}
                 </div>
             </div>

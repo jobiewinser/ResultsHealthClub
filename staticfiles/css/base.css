@@ -326,7 +326,7 @@
         .primary_td_layer,
         .primary_td_layer>* {
             font-size: 16px;
-            color: #000000;
+            /* color: #000000; */
         }
         
         .secondary_td_layer,

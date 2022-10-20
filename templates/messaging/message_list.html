@@ -11,7 +11,7 @@
         </span> 
     </div>
     <div class="card-body message_list_body collapse show p-0" id="messageCollapse_{{whatsappnumber.pk}}">
-        {%for message in whatsappnumber.get_fresh_messages%}
+        {%for message in whatsappnumber.get_latest_messages%}
         {%include 'messaging/htmx/message_list_row.html' %}
         {%endfor%}
     </div>
