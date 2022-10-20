@@ -65,7 +65,6 @@ class Webhooks(View):
                                 message = message.get('text').get('body',''),
                                 datetime = datetime_from_request,
                                 customer_number = from_number,
-                                system_user_number = to_number,
                                 inbound=True,
                                 site=site,
                                 lead=lead,

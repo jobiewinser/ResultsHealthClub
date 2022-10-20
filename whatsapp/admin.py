@@ -15,7 +15,6 @@ admin.site.register(WhatsAppWebhookRequest, WhatsAppWebhookRequestAdmin)
 
 class WhatsAppMessageAdmin(admin.ModelAdmin):
     list_display = [
-        'system_user_number',  
         'customer_number', 
         'inbound',     
         'datetime',  

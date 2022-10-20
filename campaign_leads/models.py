@@ -222,7 +222,7 @@ class Campaignlead(models.Model):
                         lead=self,
                         message=whole_text,
                         site=self.campaign.site,
-                        system_user_number=self.whatsapp_number,
+                        whatsappnumber=self.campaign.site.default_number,
                         customer_number=self.whatsapp_number,
                         template=template,
                         inbound=False

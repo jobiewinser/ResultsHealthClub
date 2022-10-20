@@ -94,7 +94,6 @@ class WhatsappNumber(PhoneNumber):
                             lead=lead,
                             site=self.site,
                             user=user,
-                            system_user_number=self.number,
                             customer_number=customer_number,
                             template=template_used,
                             inbound=False,
