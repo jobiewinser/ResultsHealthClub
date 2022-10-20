@@ -10,13 +10,13 @@
     function renderTemplate(){
         let content = ""
         if ($('#template_header').val() != "") {
-            content = "<b>"+$('#template_header').val()+"</b> <br><br>  "
+            content = replaceVariables("<b>"+$('#template_header').val()+"</b> <br><br>  ")
         }
         if ($('#template_body').val() != "") {
             content = content + replaceVariables("<p>"+$('#template_body').val().replace(/\r\n|\r|\n/g,"<br />")+"</p>")
         }
         if ($('#template_footer').val() != "") {
-            content = content + "<small>"+$('#template_footer').val()+"</small>"
+            content = content + replaceVariables("<small>"+$('#template_footer').val()+"</small>")     
         }
         
         $('#template_render').html(content)
@@ -131,8 +131,13 @@
                     
                     <h5>Header</h5>
                     <div class="row">
-                        <div class="col-md-3">
-                            
+                        <div class="col-md-auto">
+                            <select id="variable_choice"  onclick="$('#template_header').val($('#template_header').val()+$(this).val()).trigger('input'); $(this).val('');" name="variable_choice" class="form-select form-select-sm align-self-center m-1">
+                                {%for k,v in variables.items%}
+                                <option value="{{k}}">{{v.0}}</option>
+                                {%endfor%}     
+                                <option selected value="">Insert a variable</option>     
+                            </select>
                         </div>
                         <div class="col">
                             <input type="text" style="width:300px;" 
@@ -145,7 +150,7 @@
 
                     <h5>Body</h5>
                     <div class="row">
-                        <div class="col-md-3">
+                        <div class="col-md-auto">
                             <select id="variable_choice"  onclick="$('#template_body').val($('#template_body').val()+$(this).val()).trigger('input'); $(this).val('');" name="variable_choice" class="form-select form-select-sm align-self-center m-1">
                                 {%for k,v in variables.items%}
                                 <option value="{{k}}">{{v.0}}</option>
@@ -164,8 +169,13 @@
 
                     <h5>Footer</h5>
                     <div class="row">
-                        <div class="col-md-3">
-
+                        <div class="col-md-auto">
+                            <select id="variable_choice"  onclick="$('#template_footer').val($('#template_footer').val()+$(this).val()).trigger('input'); $(this).val('');" name="variable_choice" class="form-select form-select-sm align-self-center m-1">
+                                {%for k,v in variables.items%}
+                                <option value="{{k}}">{{v.0}}</option>
+                                {%endfor%}     
+                                <option selected value="">Insert a variable</option>     
+                            </select>
                         </div>
                         <div class="col">
                             <input type="text" style="width:300px;" 

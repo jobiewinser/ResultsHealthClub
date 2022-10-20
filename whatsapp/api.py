@@ -157,11 +157,11 @@ class Whatsapp():
         url = f"{self.whatsapp_url}{template_object.site.whatsapp_business_account_id}/message_templates"
         headers = self._get_headers()
         pending_components = template_object.pending_components
-        counter = 1
         for component in pending_components:
+            counter = 1
             text = component.get('text', '')
             if '[[1]]' in text:
-                text.replace('[[1]]','{{'+str(counter)+'}}')
+                text = text.replace('[[1]]','{{'+str(counter)+'}}')
                 counter = counter + 1
             component['text'] = text
             
@@ -193,11 +193,11 @@ class Whatsapp():
             url = f"{self.whatsapp_url}{template_object.message_template_id}"
             headers = self._get_headers()
             pending_components = template_object.pending_components
-            counter = 1
             for component in pending_components:
+                counter = 1
                 text = component.get('text', '')
                 if '[[1]]' in text:
-                    text.replace('[[1]]','{{'+str(counter)+'}}')
+                    text = text.replace('[[1]]','{{'+str(counter)+'}}')
                     counter = counter + 1
                 component['text'] = text
             body = { 
