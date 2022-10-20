@@ -145,16 +145,16 @@ class Campaignlead(models.Model):
                             component_type = component.get('type', "").lower()
                             # if component_type == 'header':
                             text = component.get('text', '')
-                            # if component_type in ['header', 'body']:
-                            if '[[1]]' in text:
-                                params.append(              
-                                    {
-                                        "type": "text",
-                                        "text":  self.first_name
-                                    }
-                                )
-                                text.replace('[[1]]',self.first_name)
-                                counter = counter + 1
+                            if component_type in ['header', 'body']:
+                                if '[[1]]' in text:
+                                    params.append(              
+                                        {
+                                            "type": "text",
+                                            "text":  self.first_name
+                                        }
+                                    )
+                                    text.replace('[[1]]',self.first_name)
+                                    counter = counter + 1
                             # if '{{3}}' in text:
                             #     params.append(           
                             #         {
