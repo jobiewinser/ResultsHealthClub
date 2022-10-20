@@ -6,6 +6,12 @@ body {
     margin: 0;
 }
 
+.elipses-overflow {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .cartoon-background::after {
     background: #efe7dd url(/static/img/background2.png) repeat;
     background-size: 90px !important;
