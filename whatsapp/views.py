@@ -86,7 +86,7 @@ class Webhooks(View):
                             <span id='latest_message_row_{from_number}' hx-swap-oob='delete'></span>
                             <span id='messageCollapse_{whatsappnumber.pk}' hx-swap-oob='afterbegin'>{rendered_message_list_row}</span>
 
-                            <span id='messageWindowCollapse_{from_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>
+                            <span id='messageWindowInnerBody_{from_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>
                             """
                             async_to_sync(channel_layer.group_send)(
                                 f"messaging_{whatsappnumber.pk}",
@@ -288,8 +288,8 @@ def whatsapp_clear_changes_htmx(request):
         template.pending_language = None
         template.pending_name = None
         template.save()
-        return render(request, 'whatsapp/whatsapp_templates_row.html', {'template':template, 'site_list': get_available_sites_for_user(request.user), 'WHATSAPP_ORDER_CHOICES': WHATSAPP_ORDER_CHOICES})
-
+        return render(request, 'whatsapp/whatsapp_templates_row.html', {'template':template, 'WHATSAPP_ORDER_CHOICES': WHATSAPP_ORDER_CHOICES})
+                                                                            # 'site_list': get_available_sites_for_user(request.user), 
 
 def whatsapp_number_change_alias(request):
     whatsappnumber = WhatsappNumber.objects.get(pk=request.POST.get('whatsappnumber_pk'))
@@ -306,7 +306,8 @@ def whatsapp_number_make_default(request):
         site = whatsappnumber.site
         site.default_number = whatsappnumber
         site.save()
-        return render(request, 'core/htmx/site_configuration_htmx.html', {'whatsapp_numbers':site.get_live_whatsapp_phone_numbers(), 'site': site, 'site_list': get_available_sites_for_user(request.user)})
+        return render(request, 'core/htmx/site_configuration_htmx.html', {'whatsapp_numbers':site.get_live_whatsapp_phone_numbers(), 'site': site, })
+        # 'site_list': get_available_sites_for_user(request.user)})
     return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
     
 

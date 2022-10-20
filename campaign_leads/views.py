@@ -263,8 +263,8 @@ def campaign_assign_auto_send_template_htmx(request):
     if third_template_pk:
         campaign.third_send_template = WhatsappTemplate.objects.get(pk=third_template_pk)
     campaign.save()
-    return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign,
-                                                                            'site_list': get_available_sites_for_user(request.user)})
+    return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign,})
+                                                                            # 'site_list': get_available_sites_for_user(request.user)})
 
 @login_required
 def campaign_assign_product_cost_htmx(request):
@@ -273,6 +273,6 @@ def campaign_assign_product_cost_htmx(request):
     if product_cost:
         campaign.product_cost = product_cost
         campaign.save()
-    return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign,
-                                                                            'site_list': get_available_sites_for_user(request.user)})
+    return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign,})
+                                                                            # 'site_list': get_available_sites_for_user(request.user)})
 

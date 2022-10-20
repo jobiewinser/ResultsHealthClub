@@ -7,7 +7,7 @@
             <div class="form-group">
                 <label class="form-label" for="site_pk">Default Site: </label>
                 <select class="form-select add_user_input" name="site_pk" id="site_pk">
-                    {%for site in site_list%}
+                    {%for site in request.user.profile.sites_allowed.all%}
                     <option value="{{site.pk}}">{{site.name}}</option>
                     {%endfor%}
                 </select>   

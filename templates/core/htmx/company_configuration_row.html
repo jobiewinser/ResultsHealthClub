@@ -9,7 +9,7 @@
             data-value="" onfocus="this.setAttribute('data-value', this.value);"
             hx-indicator="#htmx_indicator_site_{{user.profile.pk}}"  hx-trigger="change" hx-target="#company_configuration_row_{{user.profile.pk}}"
             hx-vals='{"user_pk": "{{user.profile.pk}}"}'>  
-                {%for site in site_list%}
+                {%for site in request.user.profile.sites_allowed.all%}
                     <option value="{{site.pk}}" {%if user.profile.site == site%}selected{%endif%}>{{site.name}}</option>
                 {%endfor%}
             </select>

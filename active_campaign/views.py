@@ -102,8 +102,8 @@ def set_campaign_site(request, **kwargs):
         else:
             campaign.site = None
         campaign.save()
-        return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign,
-                                                                                'site_list': get_available_sites_for_user(request.user)})
+        return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign,})
+                                                                                # 'site_list': get_available_sites_for_user(request.user)})
     except Exception as e:        
         logger.error(f"set_campaign_site {str(e)}")
         return HttpResponse("Couldn't set Campaign Site", status=500)

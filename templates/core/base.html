@@ -206,19 +206,19 @@
             $(document).ready(function() {
                 document.body.addEventListener('htmx:afterSwap', function(evt) {
                     if (evt.detail.pathInfo.requestPath.includes("message-window")){
+                        let element = $(evt.target.lastElementChild).find(".chat_card_body");
                         try{
-                            $(evt.target.lastElementChild).scrollTop($(evt.target.lastElementChild)[0].scrollHeight - $(evt.target.lastElementChild)[0].clientHeight);
-                        }catch{}
+                            element.scrollTop(element[0].scrollHeight - element[0].clientHeight);
+                        }catch(e){console.log(e)}
                         
                     
                     }
                 });
                 document.body.addEventListener('htmx:oobAfterSwap', function(evt) { 
-                    console.log(evt)
                     if ($(evt.detail.target).hasClass('chat_card_body')){                        
                         $(evt.detail.target).animate({
                             scrollTop: $(evt.detail.target)[0].scrollHeight - $(evt.detail.target)[0].clientHeight
-                          }, 1000);
+                        }, 1000);
                     }
                 });
                 document.body.addEventListener('htmx:oobBeforeSwap', function(evt) { 

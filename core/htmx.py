@@ -41,7 +41,7 @@ def get_modal_content(request, **kwargs):
             request.GET['site_pk'] = site_pk
         if request.user.is_authenticated:
             template_name = request.GET.get('template_name', '')
-            context = {'site_list':get_available_sites_for_user(request.user)}
+            # context = {'site_list':get_available_sites_for_user(request.user)}
             # if template_name == 'switch_user':
             #     context['users'] = User.objects.filter(is_authenticated=True).order_by('first_name')
             if template_name == 'edit_user':

@@ -2,7 +2,7 @@
     <div class="row">
         <div class="col">
             <select class="form-select" name="site_pk" id="site_pk_{{template.pk}}" onchange="if(this.value.toString() == '{{template.site.pk}}'){$('#assign_site_{{template.pk}}').attr('disabled', true)}else{$('#assign_site_{{template.pk}}').attr('disabled', false)}">
-                {%for site in site_list%}
+                {%for site in request.user.profile.sites_allowed.all%}
                 <option {%if template.site.pk == site.pk %}selected{%endif%} value="{{site.pk}}">{{site.name}}</option>
                 {%endfor%}
             </select>

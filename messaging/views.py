@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.http import HttpResponse
 from django.shortcuts import render
 
@@ -23,7 +24,7 @@ def message_list(request, **kwargs):
 @login_required
 def message_window(request, **kwargs):
     whatsappnumber = WhatsappNumber.objects.get(pk=kwargs.get('whatsappnumber_pk'))
-    messages = WhatsAppMessage.objects.filter(customer_number=kwargs.get('customer_number'), whatsappnumber=whatsappnumber).order_by('datetime')
+    messages = WhatsAppMessage.objects.filter(customer_number=kwargs.get('customer_number'), whatsappnumber=whatsappnumber).order_by('datetime')[:20:-1]
     context = {}
     context["messages"] = messages
     context["lead"] = Campaignlead.objects.filter(whatsapp_number=kwargs.get('customer_number')).first()
@@ -95,7 +96,7 @@ def get_modal_content(request, **kwargs):
                 customer_number = lead.whatsapp_number
                 context['customer_number'] = customer_number
                 context['whatsappnumber'] = whatsappnumber
-                context['messages'] = WhatsAppMessage.objects.filter(customer_number=customer_number, whatsappnumber=whatsappnumber).order_by('datetime')
+                context['messages'] = WhatsAppMessage.objects.filter(customer_number=customer_number, whatsappnumber=whatsappnumber).order_by('-datetime')[:20:-1]
         
         if request.user.is_authenticated:
             template_name = request.GET.get('template_name', '')
@@ -107,4 +108,22 @@ def get_modal_content(request, **kwargs):
             return render(request, f"messaging/htmx/{template_name}.html", context)   
     except Exception as e:
         logger.debug("get_modal_content Error "+str(e))
+        return HttpResponse(e, status=500)
+
+@login_required
+def get_more_messages(request, **kwargs):
+    try:
+        context = {}
+        rendered_html = ""
+        whatsappnumber = WhatsappNumber.objects.get(pk=request.GET.get('whatsappnumber_pk'))
+        customer_number = request.GET.get('customer_number')
+        created_before_date = datetime.fromtimestamp(float(request.GET.get('created_before_date')))
+        context['customer_number'] = customer_number
+        context['whatsappnumber'] = whatsappnumber
+        context['created_before_date'] = created_before_date
+        
+        context['messages'] = WhatsAppMessage.objects.filter(customer_number=customer_number, whatsappnumber=whatsappnumber, datetime__lt=created_before_date).order_by('-datetime')[:10:-1]   
+        return render(request, "messaging/message_window_message_rows.html", context)   
+    except Exception as e:
+        logger.debug("get_more_messages Error "+str(e))
         return HttpResponse(e, status=500)

@@ -2,7 +2,7 @@
     <span style="display:none"> {{campaign.site.name}}</span>
     <select id="site_pk_{{campaign.pk}}" class="form-select" name="site_pk"onchange="$('#submit_site_pk_{{campaign.pk}}').click()" {%if campaign.is_manual%}disabled{%endif%}>
     <option value="">None</option>
-    {%for site in site_list%}
+    {%for site in request.user.profile.sites_allowed.all%}
     <option value="{{site.pk}}" {%if campaign.site == site%}selected{%endif%}>{{site.name}}</option>
     {%endfor%}
     </select>

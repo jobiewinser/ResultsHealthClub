@@ -88,7 +88,7 @@ def get_rendered_html(message, message_context, messaging_customer_number, whats
     rendered_html = f"""
     <span id='message_list_row_{messaging_customer_number}_{whatsappnumber.pk}' hx-swap-oob='delete'></span>
     <span id='messageCollapse_{whatsappnumber.pk}' hx-swap-oob='afterbegin '>{rendered_message_list_row}</span>
-    <span id='messageWindowCollapse_{messaging_customer_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>                
+    <span id='messageWindowInnerBody_{messaging_customer_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>                
     """
 
     if message.inbound:
