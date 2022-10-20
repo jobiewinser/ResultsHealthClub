@@ -189,7 +189,7 @@ class WhatsappTemplatesView(TemplateView):
                 site = Site.objects.filter(company=self.request.user.profile.company.first()).first()
         refresh_template_data(site)
         context['templates'] = WhatsappTemplate.objects.filter(site=site).exclude(archived=True)
-        context['site_list'] = get_available_sites_for_user(self.request.user)
+        # context['site_list'] = get_available_sites_for_user(self.request.user)
         context['site'] = site
         context['WHATSAPP_ORDER_CHOICES'] = WHATSAPP_ORDER_CHOICES
         return context

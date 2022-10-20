@@ -27,6 +27,6 @@ class AnalyticsOverviewView(TemplateView):
             context['site'] = Site.objects.get(pk=site_pk)
 
 
-        context['site_list'] = get_available_sites_for_user(self.request.user)
+        # context['site_list'] = get_available_sites_for_user(self.request.user)
         return context
 

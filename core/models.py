@@ -128,7 +128,8 @@ class Site(models.Model):
     calendly_organization = models.TextField(blank=True, null=True)   
     calendly_webhook_created = models.BooleanField(default=False)  
     guid = models.TextField(null=True, blank=True) 
-
+    def __str__(self):
+        return f"({self.pk}) {self.name}"
     def get_live_whatsapp_phone_numbers(self):
         whatsapp = Whatsapp(self.whatsapp_access_token)  
         phone_numbers = whatsapp.get_phone_numbers(self.whatsapp_business_account_id)  

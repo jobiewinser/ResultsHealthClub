@@ -36,7 +36,7 @@ def get_modal_content(request, **kwargs):
 
         if request.user.is_authenticated:
             template_name = request.GET.get('template_name', '')
-            context['site_list'] = get_available_sites_for_user(request.user)
+            # context['site_list'] = get_available_sites_for_user(request.user)
             param1 = kwargs.get('param1', '')
             if param1:
                 context['lead'] = Campaignlead.objects.get(pk=param1)

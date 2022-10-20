@@ -26,7 +26,7 @@ urlpatterns = [
 
 
 
-    path('configuration/campaign-configuration/', campaignleadsviews.LeadConfigurationView.as_view(), name='campaign-configuration'),
+    path('configuration/campaign-configuration/', campaignleadsviews.CampaignConfigurationView.as_view(), name='campaign-configuration'),
     
 
     

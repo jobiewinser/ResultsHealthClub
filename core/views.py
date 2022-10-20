@@ -69,7 +69,7 @@ class SiteConfigurationView(TemplateView):
         context = super(SiteConfigurationView, self).get_context_data(**kwargs)
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'core/htmx/site_configuration_htmx.html'
-        context['site_list'] = get_available_sites_for_user(self.request.user)
+        # context['site_list'] = get_available_sites_for_user(self.request.user)
         site_pk = get_site_pk_from_request(self.request)
         if site_pk:
             self.request.GET['site_pk'] = site_pk      
@@ -95,12 +95,12 @@ class CompanyConfigurationView(TemplateView):
         context = super(CompanyConfigurationView, self).get_context_data(**kwargs)
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'core/htmx/company_configuration_htmx.html'
-        context['site_list'] = get_available_sites_for_user(self.request.user)
+        # context['site_list'] = get_available_sites_for_user(self.request.user)
         site_pk = get_site_pk_from_request(self.request)
         if site_pk:
             self.request.GET['site_pk'] = site_pk    
         context['role_choices'] = ROLE_CHOICES
-        context['site_list'] = get_available_sites_for_user(self.request.user)
+        # context['site_list'] = get_available_sites_for_user(self.request.user)
         return context
 def change_profile_role(request):
     user = User.objects.get(pk=request.POST.get('user_pk'))
@@ -112,7 +112,7 @@ def change_profile_role(request):
             user.profile.save()
             context['user'] = user
             context['role_choices'] = ROLE_CHOICES
-            context['site_list'] = get_available_sites_for_user(request.user)
+            # context['site_list'] = get_available_sites_for_user(request.user)
             return render(request, 'core/htmx/company_configuration_row.html', context)
     return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
 def change_profile_site(request):
@@ -125,7 +125,7 @@ def change_profile_site(request):
             user.profile.save()
             context['user'] = user
             context['role_choices'] = ROLE_CHOICES
-            context['site_list'] = get_available_sites_for_user(request.user)
+            # context['site_list'] = get_available_sites_for_user(request.user)
             return render(request, 'core/htmx/company_configuration_row.html', context)
     return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
 
@@ -153,7 +153,7 @@ class FreeTasterOverviewView(TemplateView):
         context = super(FreeTasterOverviewView, self).get_context_data(**kwargs)
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'core/htmx/free_taster_table_htmx.html'
-        context['site_list'] = get_available_sites_for_user(self.request.user)
+        # context['site_list'] = get_available_sites_for_user(self.request.user)
         free_taster_links = FreeTasterLink.objects.all()
 
         site_pk = get_site_pk_from_request(self.request)

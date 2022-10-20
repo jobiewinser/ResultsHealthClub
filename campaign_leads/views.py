@@ -80,7 +80,7 @@ class CampaignleadsOverviewView(TemplateView):
             except:
                 pass
         
-        context['site_list'] = get_available_sites_for_user(self.request.user)
+        # context['site_list'] = get_available_sites_for_user(self.request.user)
         leads = leads.annotate(calls=Count('call')).order_by('-last_dragged')
         # leads = leads.annotate(calls=Count('call'), cost=F('campaign__product_cost'))
         
@@ -142,18 +142,21 @@ class CampaignBookingsOverviewView(TemplateView):
 
 
 
-        context['site_list'] = get_available_sites_for_user(self.request.user)
+        # context['site_list'] = get_available_sites_for_user(self.request.user)
         context['leads'] = leads
         # whatsapp = Whatsapp()
         return context
         
 @method_decorator(campaign_leads_enabled_required, name='dispatch')
 @method_decorator(login_required, name='dispatch')
-class LeadConfigurationView(TemplateView):
+class CampaignConfigurationView(TemplateView):
     template_name='campaign_leads/campaign_configuration.html'
 
     def get_context_data(self, **kwargs):
-        context = super(LeadConfigurationView, self).get_context_data(**kwargs)
+        self.request.GET._mutable = True
+        context = super(CampaignConfigurationView, self).get_context_data(**kwargs)
+        if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+            self.template_name = 'campaign_leads/campaign_configuration_htmx.html'  
         company = self.request.user.profile.company
         for campaign_dict in ActiveCampaignApi(company.active_campaign_api_key, company.active_campaign_url).get_lists(company.active_campaign_url).get('lists',[]):
             campaign, created = ActiveCampaign.objects.get_or_create(
@@ -163,10 +166,20 @@ class LeadConfigurationView(TemplateView):
             )
             campaign.json_data = campaign_dict
             campaign.save()
-        context['campaigns'] = []
         if company:
-            context['campaigns'] = company.get_and_generate_campaign_objects()
-        context['site_list'] = get_available_sites_for_user(self.request.user)
+            campaigns = company.get_and_generate_campaign_objects()
+
+        site_pk = get_site_pk_from_request(self.request)
+        if site_pk and not site_pk == 'all':
+            try:
+                campaigns = campaigns.filter(site__pk=site_pk)
+                self.request.GET['site_pk'] = site_pk    
+                context['site'] = Site.objects.get(pk=site_pk)
+            except Exception as e:
+                pass
+
+        context['campaigns'] = campaigns
+        # context['site_list'] = get_available_sites_for_user(self.request.user)
         return context
 
         

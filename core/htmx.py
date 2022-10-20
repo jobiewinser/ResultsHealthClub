@@ -99,7 +99,7 @@ class ModifyUser(View):
             context = {}
             context['user'] = user
             context['role_choices'] = ROLE_CHOICES
-            context['site_list'] = get_available_sites_for_user(request.user)
+            # context['site_list'] = get_available_sites_for_user(request.user)
             return render(request, "core/htmx/company_configuration_row.html", context)   
         except Exception as e:
             logger.debug("ModifyUser Post Error "+str(e))
