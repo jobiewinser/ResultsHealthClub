@@ -55,32 +55,41 @@ align-items: flex-start;"
         {%if whatsappnumber%}
         {%include 'messaging/message_list.html'%}
         {%endif%}
-        <div class="accordion accordion-flush" id="accordionFlushExample" style="margin-top: auto;">
-            {%for site in request.user|get_allowed_site_chats_for_user_tag%}   
-                <div class="accordion-item">
-                <h2 class="accordion-header" id="flush-headingOne">
-                    <button class="accordion-button collapsed chat_bottom_header" type="button" data-bs-toggle="collapse" data-bs-target="#site_collapse_{{site.pk}}" aria-expanded="false" aria-controls="site_collapse_{{site.pk}}" style="text-overflow: ellipsis; width:250px; white-space: nowrap; overflow: hidden;">
-                        <i class="fa fa-whatsapp"></i> {{site.name}}
-                    </button>
-                </h2>
-                <div id="site_collapse_{{site.pk}}" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
-                    <div class="accordion-body" style="text-overflow: ellipsis; width:250px; white-space: nowrap; overflow: hidden;">
-                        {%for chat_whatsappnumber in site.return_phone_numbers%}
-                            <button class="btn btn-sm btn-primary"
-                            hx-get="{%url 'message-list'%}"
-                            hx-target="#chat_bottom"
-                            hx-swap="#outerHTML"
-                            hx-indicator=".htmx-indicator"                 
-                            hx-vals='{"site_pk": "{{site.pk}}", "whatsappnumber_pk": "{{chat_whatsappnumber.pk}}"}'
-                            hx-trigger="click"
-                            
-                            >Open {%if chat_whatsappnumber.alias%}{{chat_whatsappnumber.alias}}{%else%}{{chat_whatsappnumber.number}}{%endif%}</button>
-                            <br>
-                        {%endfor%}
-                    </div>
+        <div class="card p-0" id="" style="margin-top: auto;">
+            <div class="card-header chat_bottom_header" data-bs-toggle="collapse" data-bs-target="#siteCollapse" aria-expanded="false" aria-controls="siteCollapse">
+                <span class="primary_td_layer text-white">
+                    Messaging Sites
+                </span>
+            </div>
+            <div class="card-body collapse show p-0" id="siteCollapse">
+                <div class="accordion accordion-flush" id="accordionFlushExample" style="margin-top: auto;">
+                    {%for site in request.user|get_allowed_site_chats_for_user_tag%}   
+                        <div class="accordion-item">
+                        <h2 class="accordion-header" id="flush-headingOne">
+                            <button class="accordion-button no-chevron-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#site_collapse_{{site.pk}}" aria-expanded="false" aria-controls="site_collapse_{{site.pk}}" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
+                                <i class="fa fa-whatsapp"></i> {{site.name}}
+                            </button>
+                        </h2>
+                        <div id="site_collapse_{{site.pk}}" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+                            <div class="accordion-body" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
+                                {%for chat_whatsappnumber in site.return_phone_numbers%}
+                                    <button class="btn btn-sm btn-primary btn-xs"
+                                    hx-get="{%url 'message-list'%}"
+                                    hx-target="#chat_bottom"
+                                    hx-swap="#outerHTML"
+                                    hx-indicator=".htmx-indicator"                 
+                                    hx-vals='{"site_pk": "{{site.pk}}", "whatsappnumber_pk": "{{chat_whatsappnumber.pk}}"}'
+                                    hx-trigger="click"
+                                    
+                                    ><i class="fa-solid fa-arrow-left"></i> {%if chat_whatsappnumber.alias%}{{chat_whatsappnumber.alias}}{%else%}{{chat_whatsappnumber.number}}{%endif%}</button>
+                                    <br>
+                                {%endfor%}
+                            </div>
+                        </div>
+                        </div>
+                    {%endfor%}
                 </div>
-                </div>
-            {%endfor%}
+            </div>
         </div>
 </span>
 
