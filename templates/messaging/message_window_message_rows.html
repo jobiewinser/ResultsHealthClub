@@ -1,5 +1,5 @@
 {%load static core_tags tz%}
-{%if messages|length > 0%}
+{%if messages|length > 0 and messages|length < 10%}
 <span hx-get="{%url 'get-more-messages'%}" hx-vals='{"customer_number":"{{customer_number}}","whatsappnumber_pk":"{{whatsappnumber.pk}}","created_before_date":"{{messages.0.datetime|timestamp}}"}' hx-indicator=".htmx-indicator" hx-swap="outerHTML" hx-trigger="intersect once">
 </span>
 {%else%}
