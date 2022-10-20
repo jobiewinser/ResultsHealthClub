@@ -24,7 +24,7 @@ def message_list(request, **kwargs):
 @login_required
 def message_window(request, **kwargs):
     whatsappnumber = WhatsappNumber.objects.get(pk=kwargs.get('whatsappnumber_pk'))
-    messages = WhatsAppMessage.objects.filter(customer_number=kwargs.get('customer_number'), whatsappnumber=whatsappnumber).order_by('datetime')[:20:-1]
+    messages = WhatsAppMessage.objects.filter(customer_number=kwargs.get('customer_number'), whatsappnumber=whatsappnumber).order_by('-datetime')[:20:-1]
     context = {}
     context["messages"] = messages
     context["lead"] = Campaignlead.objects.filter(whatsapp_number=kwargs.get('customer_number')).first()
@@ -66,7 +66,7 @@ def send_first_template_whatsapp_htmx(request, **kwargs):
         lead = Campaignlead.objects.get(pk=kwargs.get('lead_pk'))
         if not lead.message_set.all():
             lead.send_template_whatsapp_message(1, communication_method='a')
-        messages = WhatsAppMessage.objects.filter(customer_number=kwargs.get('customer_number'), whatsappnumber__number=kwargs.get('messaging_phone_number')).order_by('datetime')
+        messages = WhatsAppMessage.objects.filter(customer_number=kwargs.get('customer_number'), whatsappnumber__number=kwargs.get('messaging_phone_number')).order_by('-datetime')
         context = {}
         context["messages"] = messages
         context["lead"] = lead
