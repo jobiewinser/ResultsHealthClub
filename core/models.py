@@ -83,7 +83,7 @@ class WhatsappNumber(PhoneNumber):
                 whatsapp = Whatsapp(self.site.whatsapp_access_token)
                 if '+' in self.number:
                     customer_number = f"{self.number.split('+')[-1]}"
-                response = whatsapp.send_free_text_message(customer_number, message, self.whatsapp_business_phone_number_id)
+                response = whatsapp.send_free_text_message(customer_number, message, self)
                 reponse_messages = response.get('messages',[])
                 if reponse_messages:
                     for response_message in reponse_messages:
