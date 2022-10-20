@@ -143,31 +143,19 @@ class Campaignlead(models.Model):
                         for component in template.components:
                             params = []
                             component_type = component.get('type', "").lower()
-                            # if component_type == 'header':
+                            
                             text = component.get('text', '')
-                            if '[[1]]' in text:
-                                params.append(              
-                                    {
-                                        "type": "text",
-                                        "text":  self.first_name
-                                    }
-                                )
-                                # text.replace('[[1]]','{{'+counter+'}}')
-                                counter = counter + 1
-                            # if '{{3}}' in text:
-                            #     params.append(           
-                            #         {
-                            #             "type": "text",
-                            #             "text":  self.campaign.company.company_name
-                            #         }
-                            #     )
-                            # if '{{4}}' in text:
-                            #     params.append(                   
-                            #         {
-                            #             "type": "text",
-                            #             "text":  self.campaign.site.whatsapp_number
-                            #         }
-                            #     )
+                            if component_type in ['header', 'body']:
+                                if '[[1]]' in text:
+                                    params.append(              
+                                        {
+                                            "type": "text",
+                                            "text":  self.first_name
+                                        }
+                                    )
+                                    text.replace('[[1]]',self.first_name)
+                                    counter = counter + 1
+
                             whole_text = f"{whole_text} <br> {text}"
                             if params:
                                 components.append(
