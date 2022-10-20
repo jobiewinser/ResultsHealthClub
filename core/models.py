@@ -21,11 +21,18 @@ from whatsapp.models import WhatsAppMessage
 class AttachedError(models.Model): 
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     ERROR_TYPES = (
-                        ('1', 'You can only edit an active template once every 24 hours'),
+                        ('101', "You can only edit an active template once every 24 hours"),
+                        ('201', "Whatsapp Template not found Whatsapp's system"),
+                        ('202', "There is no Whatsapp Business linked to this Lead's assosciated Site"),
+                        ('203', "There is no 1st Whatsapp Template linked to this Lead's assosciated Site"),
+                        ('204', "There is no 2nd Whatsapp Template linked to this Lead's assosciated Site"),
+                        ('205', "There is no 3rd Whatsapp Template linked to this Lead's assosciated Site"),
                     )
     type = models.CharField(choices=ERROR_TYPES, default='c', max_length=5)
     attached_field = models.CharField(null=True, blank=True, max_length=50)
-    whatsapp_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="errors", on_delete=models.CASCADE)
+    whatsapp_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="errors", on_delete=models.SET_NULL, null=True, blank=True)
+    campaign_lead = models.ForeignKey("campaign_leads.Campaignlead", related_name="errors", on_delete=models.SET_NULL, null=True, blank=True)
+    
     archived = models.BooleanField(default=False)
     archived_time = models.DateTimeField(null=True, blank=True)
 

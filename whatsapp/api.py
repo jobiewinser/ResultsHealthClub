@@ -145,16 +145,16 @@ class Whatsapp():
                 code = potential_error.get('code')
                 if str(code) == '100':
                     AttachedError.objects.create(
-                        type = '1',
+                        type = '101',
                         attached_field = "whatsapp_template",
                         whatsapp_template = template_object,
                     )
             else:
                 AttachedError.objects.filter(
-                    type = '1',
+                    type = '101',
                     whatsapp_template = template_object,
-                    archived = True,
-                ).update(archived = False)
+                    archived = False,
+                ).update(archived = True)
 
             print("edit_template", str(response_body))
             return response_body

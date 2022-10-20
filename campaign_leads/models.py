@@ -92,16 +92,35 @@ class Campaignlead(models.Model):
         return "Never"  
 
     def send_template_whatsapp_message(self, send_order, communication_method = 'a'):
+        from core.models import AttachedError
         if communication_method == 'a':
             if send_order == 1:
                 template = self.campaign.first_send_template
+                type = '203'
             elif send_order == 2:
                 template = self.campaign.second_send_template
+                type = '204'
             elif send_order == 3:
                 template = self.campaign.third_send_template
-            if template:
+                type = '205'
+            if template:                
+                AttachedError.objects.filter(
+                    type = type,
+                    campaign_lead = self,
+                    archived = False,
+                ).update(archived = True)
                 if template.site.whatsapp_business_account_id:
+                    AttachedError.objects.filter(
+                        type = '202',
+                        campaign_lead = self,
+                        archived = False,
+                    ).update(archived = True)
                     if template.message_template_id:
+                        AttachedError.objects.filter(
+                            type = '201',
+                            campaign_lead = self,
+                            archived = False,
+                        ).update(archived = True)
                         whatsapp = Whatsapp(self.campaign.site.whatsapp_access_token)
                         template_live = whatsapp.get_template(template.site.whatsapp_business_account_id, template.message_template_id)
                         template.name = template_live['name']
@@ -153,10 +172,31 @@ class Campaignlead(models.Model):
                                 )
                     else:
                         print("errorhere selected template not found on Whatsapp's system")
+                        AttachedError.objects.create(
+                            type = '201',
+                            attached_field = "campaign_lead",
+                            campaign_lead = self,
+                        )
                 else:
                     print("errorhere no Whatsapp Business Account Linked")
+                    AttachedError.objects.create(
+                        type = '202',
+                        attached_field = "campaign_lead",
+                        campaign_lead = self,
+                    )
             else:
+                if send_order == 1:
+                    type = '203'
+                elif send_order == 2:
+                    type = '204'
+                elif send_order == 3:
+                    type = '205'
                 print("errorhere no suitable template found")
+                AttachedError.objects.create(
+                    type = type,
+                    attached_field = "campaign_lead",
+                    campaign_lead = self,
+                )
             
             
 
