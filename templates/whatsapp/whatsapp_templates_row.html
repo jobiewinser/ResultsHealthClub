@@ -44,7 +44,7 @@
     <span class="primary_td_layer">
         {%if template.status%}{{template.status}}{%endif%} 
         {%if template.active_errors%}
-        <div 
+        <span 
         data-bs-toggle="popover" 
         data-bs-trigger="hover" 
         data-bs-html="true" 
@@ -58,8 +58,8 @@
             {%endfor%}
         </ul>
         ">
-            <i class="fa-solid fa-triangle-exclamation"></i> <small>hover</small>
-        </div>
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </span>
         {%endif%}    
     </span>   
     {%if template.pending_components%}

@@ -8,6 +8,7 @@ from whatsapp.models import WhatsAppMessage, WhatsappTemplate
 from django.dispatch import receiver
 from polymorphic.models import PolymorphicModel
 import logging
+from django.db.models import Q, Count
 logger = logging.getLogger(__name__)
 
 BOOKING_CHOICES = (
@@ -71,6 +72,11 @@ class Campaignlead(models.Model):
     possible_duplicate = models.BooleanField(default=False)
     last_dragged = models.DateTimeField(null=True, blank=True)
     
+    @property
+    def active_errors(self):        
+        from core.models import AttachedError
+        return AttachedError.objects.filter(Q(campaign_lead=self)|Q(recipient_number=self.whatsapp_number)).filter(archived=False)
+
     @property
     def name(self):
         if self.last_name:
