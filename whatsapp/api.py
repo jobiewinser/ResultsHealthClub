@@ -112,6 +112,11 @@ class Whatsapp():
                     "components": components
                     })
             }
+            print("")
+            print("")
+            print(str(body))
+            print("")
+            print("")
             response = requests.post(url=url, json=body, headers=headers)
             response_body = response.json()
             
