@@ -52,7 +52,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     {
                         'type': 'messsages_count_update',
                         'data':{
-                            'rendered_html':f"""<span hx-swap-oob="innerHTML:.company_message_count"><span hx-trigger="load" hx-swap="innerHTML" hx-get="/update-message-counts/">_</span>""",
+                            'rendered_html':f"""<span hx-swap-oob="afterbegin:.company_message_count"><span hx-trigger="load" hx-swap="none" hx-get="/update-message-counts/"></span>""",
                         }
                     }
                 )

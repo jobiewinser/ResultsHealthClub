@@ -178,22 +178,3 @@
     </div>
 </div>
 {%endblock content%}
-
-{%block snackbar%}
-{{block.super}}
-<span id="chat_bottom" class="" style=" 
-display: flex;
-flex-wrap: wrap;
-align-items: flex-start;">
-
-
-<span
-hx-get="{%url 'get-messaging-window'%}"
-hx-target="#chat_bottom"
-hx-swap="#outerHTML"
-hx-indicator=".htmx-indicator"                 
-hx-vals='{"site_pk": "{{site.pk}}"}'
-hx-trigger="load"></span>
-
-</span>
-{%endblock snackbar%}

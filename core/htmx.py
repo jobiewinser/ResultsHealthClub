@@ -36,6 +36,7 @@ logger = logging.getLogger(__name__)
 def get_modal_content(request, **kwargs):
     try:
         request.GET._mutable = True
+        context = {}
         site_pk = get_site_pk_from_request(request)
         if site_pk:
             request.GET['site_pk'] = site_pk
