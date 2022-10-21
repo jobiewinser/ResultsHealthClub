@@ -110,6 +110,11 @@ def get_modal_content(request, **kwargs):
         logger.debug("get_modal_content Error "+str(e))
         return HttpResponse(e, status=500)
 
+
+@login_required
+def update_message_counts(request, **kwargs):
+    return render(request, "messaging/htmx/update_message_counts.html", {})
+
 @login_required
 def get_more_messages(request, **kwargs):
     try:

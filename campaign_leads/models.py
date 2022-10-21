@@ -257,11 +257,25 @@ class Campaignlead(models.Model):
 
                         <span id='messageWindowInnerBody_{customer_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>
                         """
+                        
+                        from channels.layers import get_channel_layer
+                        from asgiref.sync import async_to_sync
                         async_to_sync(channel_layer.group_send)(
                             f"messaging_{whatsappnumber.pk}",
                             {
                                 'type': 'chatbox_message',
                                 "message": rendered_html,
+                            }
+                        )
+                        channel_layer = get_channel_layer()   
+                        
+                        async_to_sync(channel_layer.group_send)(
+                            f"message_count_{whatsappnumber.site.company.pk}",
+                            {
+                                'type': 'messsages_count_update',
+                                'data':{
+                                    'rendered_html':f"""<span hx-swap-oob="innerHTML:.company_message_count"><span hx-trigger="load" hx-swap="innerHTML" hx-get="/update-message-counts/">_</span>""",
+                                }
                             }
                         )
                 logger.debug("site.send_template_whatsapp_message success") 

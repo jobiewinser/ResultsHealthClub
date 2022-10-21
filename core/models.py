@@ -152,6 +152,16 @@ class Site(models.Model):
     guid = models.TextField(null=True, blank=True) 
     def __str__(self):
         return f"({self.pk}) {self.name}"
+        
+    def outstanding_whatsapp_messages(self, user):
+        # Readdress this, I can't find a good way to get latest message for each conversation, then filter based on the last message being inbound...
+        count = 0
+        if self in user.profile.sites_allowed.all():
+            for whatsappnumber in self.return_phone_numbers():
+                for message in WhatsAppMessage.objects.filter(whatsappnumber=whatsappnumber).order_by('customer_number', '-datetime').distinct('customer_number'):
+                    if message.inbound:
+                        count = count + 1
+        return count
     def get_live_whatsapp_phone_numbers(self):
         whatsapp = Whatsapp(self.whatsapp_access_token)  
         phone_numbers = whatsapp.get_phone_numbers(self.whatsapp_business_account_id)  
@@ -230,6 +240,17 @@ class Company(models.Model):
     active_campaign_enabled = models.BooleanField(default=False)
     active_campaign_url = models.TextField(null=True, blank=True)
     active_campaign_api_key = models.TextField(null=True, blank=True)
+    
+    def outstanding_whatsapp_messages(self, user):
+        # Readdress this, I can't find a good way to get latest message for each conversation, then filter based on the last message being inbound...
+        count = 0
+        for site in self.site_set.all():
+            if site in user.profile.sites_allowed.all():
+                for whatsappnumber in site.return_phone_numbers():
+                    for message in  WhatsAppMessage.objects.filter(whatsappnumber=whatsappnumber).order_by('customer_number', '-datetime').distinct('customer_number'):
+                        if message.inbound:
+                            count = count + 1
+        return count
     @property
     def users(self):
         return User.objects.filter(profile__company=self).order_by('profile__site', 'profile__role')

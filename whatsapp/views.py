@@ -16,7 +16,6 @@ logger = logging.getLogger(__name__)
 from django.views import View 
 from django.utils.decorators import method_decorator
 from core.models import ErrorModel, Site, WhatsappNumber
-from asgiref.sync import async_to_sync, sync_to_async
 @method_decorator(csrf_exempt, name="dispatch")
 class Webhooks(View):
     def get(self, request, *args, **kwargs):
@@ -88,6 +87,9 @@ class Webhooks(View):
 
                             <span id='messageWindowInnerBody_{from_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>
                             """
+                            from channels.layers import get_channel_layer
+                            from asgiref.sync import async_to_sync
+                            channel_layer = get_channel_layer()  
                             async_to_sync(channel_layer.group_send)(
                                 f"messaging_{whatsappnumber.pk}",
                                 {
@@ -95,7 +97,17 @@ class Webhooks(View):
                                     "message": rendered_html,
                                 }
                             )
+                         
                             
+                            async_to_sync(channel_layer.group_send)(
+                                f"message_count_{whatsappnumber.site.company.pk}",
+                                {
+                                    'type': 'messsages_count_update',
+                                    'data':{
+                                        'rendered_html':f"""<span hx-swap-oob="afterbegin:.company_message_count"><span hx-trigger="load" hx-swap="none" hx-get="/update-message-counts/"></span>""",
+                                    }
+                                }
+                            )
                             logger.debug("webhook sending to chat end")                     
 
                 elif field == 'statuses':
@@ -136,6 +148,8 @@ class Webhooks(View):
 
                             template.components = template.pending_components
                             template.pending_components = []
+
+                            template.last_approval = datetime.now()
                         template.save()
         response = HttpResponse("")
         response.status_code = 200     

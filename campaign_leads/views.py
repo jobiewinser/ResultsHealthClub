@@ -221,7 +221,7 @@ def new_call(request, **kwargs):
 
             
             from channels.layers import get_channel_layer
-            from asgiref.sync import async_to_sync, sync_to_async
+            from asgiref.sync import async_to_sync
             channel_layer = get_channel_layer()   
             
             async_to_sync(channel_layer.group_send)(

@@ -18,8 +18,8 @@ from django.template import loader
 logger = logging.getLogger(__name__)
 from django.views import View 
 from django.utils.decorators import method_decorator
-from core.models import ErrorModel, Site
-from asgiref.sync import async_to_sync, sync_to_async
+from core.models import ErrorModel
+from asgiref.sync import async_to_sync
 from django.core.exceptions import ObjectDoesNotExist
 @method_decorator(csrf_exempt, name="dispatch")
 class Webhooks(View):

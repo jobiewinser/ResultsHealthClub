@@ -157,15 +157,21 @@ def multiplication(num1, num2):
         return 0
 
 @register.filter
-def add_year(date, x):  
+def add_years(date, x):  
     try:
         return date + relativedelta.relativedelta(years=x)
     except Exception as e:
         return "Error"
 @register.filter
-def add_month(date, x):  
+def add_months(date, x):  
     try:
         return date + relativedelta.relativedelta(months=x)
+    except Exception as e:
+        return "Error"
+@register.filter
+def add_days(date, x):  
+    try:
+        return date + relativedelta.relativedelta(days=x)
     except Exception as e:
         return "Error"
 
@@ -189,3 +195,13 @@ def get_key_in_get_or_post(request, key):
     if request.method == 'POST':
         return request.POST.get(key, None)
     return None
+
+
+@register.filter
+def company_outstanding_whatsapp_messages_tag(user):
+    return user.profile.company.outstanding_whatsapp_messages(user)
+@register.filter
+def site_outstanding_whatsapp_messages_tag(site, user):
+    if site in user.profile.sites_allowed.all():
+        return site.outstanding_whatsapp_messages(user)
+    return 0

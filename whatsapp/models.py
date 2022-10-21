@@ -59,6 +59,7 @@ template_variables = {
 }
 class WhatsappTemplate(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    
     # send_order = models.IntegerField(choices=WHATSAPP_ORDER_CHOICES, null=True, blank=True, default=0)
     edited_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     edited = models.DateTimeField(null=True, blank=True) 
@@ -76,6 +77,8 @@ class WhatsappTemplate(models.Model):
 
     language = models.TextField(null=True, blank=True)
     pending_language = models.TextField(null=True, blank=True)
+    
+    last_approval = models.DateTimeField(null=True, blank=True)
 
     components = ArrayField(
         JSONField(default=dict),

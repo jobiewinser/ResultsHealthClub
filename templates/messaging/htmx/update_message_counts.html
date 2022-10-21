@@ -1,0 +1,9 @@
+{%load core_tags%}
+<span hx-swap-oob='innerHTML:.company_message_count'>
+    {{request.user|company_outstanding_whatsapp_messages_tag}}
+</span>
+{%for site in request.user.profile.sites_allowed.all%}
+<span hx-swap-oob='innerHTML:.site_message_count_{{site.pk}}'>
+    {{site|site_outstanding_whatsapp_messages_tag:request.user}}
+</span>
+{%endfor%}

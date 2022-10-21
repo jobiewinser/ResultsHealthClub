@@ -18,6 +18,14 @@
             content: unset;
         }
         
+        .badge-sm{            
+            padding-top: 0.175em;
+            padding-right: 0.325em;
+            padding-bottom: 0.175em;
+            padding-left: 0.325em;
+            font-size: 12px !important;
+        }
+
         .elipses-overflow {
             white-space: nowrap;
             overflow: hidden;

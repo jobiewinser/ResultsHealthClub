@@ -16,4 +16,6 @@ urlpatterns = [
     
     path('get-more-messages/', get_more_messages, name='get-more-messages' ),
     path('messaging-get-modal-content/', get_modal_content, name='messaging-get-modal-content' ),
+    path('update-message-counts/', update_message_counts, name='update-message-counts' ),
+    
 ]

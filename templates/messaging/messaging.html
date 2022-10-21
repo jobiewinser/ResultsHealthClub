@@ -55,10 +55,10 @@ align-items: flex-start;"
         {%if whatsappnumber%}
         {%include 'messaging/message_list.html'%}
         {%endif%}
-        <div class="card p-0" id="" style="margin-top: auto;">
-            <div class="card-header chat_bottom_header" data-bs-toggle="collapse" data-bs-target="#siteCollapse" aria-expanded="false" aria-controls="siteCollapse">
+        <div class="card p-0" id="" style="margin-top: auto;" hx-ws="connect:/ws/message_count/{{request.user.profile.company.pk}}/">
+            <div class="card-header chat_bottom_header ps-2" data-bs-toggle="collapse" data-bs-target="#siteCollapse" aria-expanded="false" aria-controls="siteCollapse">
                 <span class="primary_td_layer text-white">
-                    Messaging Sites
+                    <span class="badge bg-light badge-sm me-1"><i class="fa fa-whatsapp me-1"></i><span class="company_message_count">{{request.user|company_outstanding_whatsapp_messages_tag}}</span></span>Messaging Sites 
                 </span>
             </div>
             <div class="card-body collapse show p-0" id="siteCollapse">
@@ -66,14 +66,14 @@ align-items: flex-start;"
                     {%for site in request.user|get_allowed_site_chats_for_user_tag%}   
                         <div class="accordion-item">
                         <h2 class="accordion-header" id="flush-headingOne">
-                            <button class="accordion-button no-chevron-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#site_collapse_{{site.pk}}" aria-expanded="false" aria-controls="site_collapse_{{site.pk}}" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
-                                <i class="fa fa-whatsapp"></i> {{site.name}}
+                            <button class="accordion-button no-chevron-button ps-2 {%if chat_site == site%} active{%else%} collapsed{%endif%}" type="button" data-bs-toggle="collapse" data-bs-target="#site_collapse_{{site.pk}}" aria-expanded="false" aria-controls="site_collapse_{{site.pk}}" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
+                                <span class="badge bg-dark badge-sm me-1"><i class="fa fa-whatsapp me-1"></i><span class="site_message_count_{{site.pk}}">{{site|site_outstanding_whatsapp_messages_tag:request.user}}</span></span>  <b>{{site.name}}</b>
                             </button>
                         </h2>
-                        <div id="site_collapse_{{site.pk}}" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+                        <div id="site_collapse_{{site.pk}}" class="accordion-collapse collapse {%if chat_site == site%} show{%endif%}" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
                             <div class="accordion-body" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
                                 {%for chat_whatsappnumber in site.return_phone_numbers%}
-                                    <button class="btn btn-sm btn-primary btn-xs"
+                                    <button class="btn btn-sm btn-{%if chat_site == site%}success{%else%}secondary{%endif%} btn-xs"
                                     hx-get="{%url 'message-list'%}"
                                     hx-target="#chat_bottom"
                                     hx-swap="#outerHTML"

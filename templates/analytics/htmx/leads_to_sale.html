@@ -16,7 +16,7 @@
                 hx-swap="innerHTML"
                 onclick="$('#htmx-indicator-leads-and-sales').addClass('htmx-request')">refresh</button>
             <div class="col-md-auto right">
-                <input id="leads_to_sales_start_date" value="{{''|today_date_tag|add_year:-1|add_month:1|date_to_date_input_prefill}}" class="form-control form-control-sm" type="date" name="start_date"
+                <input id="leads_to_sales_start_date" value="{{''|today_date_tag|add_years:-1|add_months:1|date_to_date_input_prefill}}" class="form-control form-control-sm" type="date" name="start_date"
                 onchange="$('#refresh_lead_to_sales').click()"/>
             </div>
             <div class="col-md-auto">

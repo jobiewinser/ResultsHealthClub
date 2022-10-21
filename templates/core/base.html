@@ -212,10 +212,9 @@
                         try{
                             element.scrollTop(element[0].scrollHeight - element[0].clientHeight);
                         }catch(e){console.log(e)}
-                        
-                    
                     }
                 });
+                
                 document.body.addEventListener('htmx:oobAfterSwap', function(evt) { 
                     if ($(evt.detail.target).hasClass('chat_card_body')){                        
                         $(evt.detail.target).animate({
@@ -224,11 +223,11 @@
                     }
                 });
                 document.body.addEventListener('htmx:oobBeforeSwap', function(evt) { 
-                    {% comment %} console.log("oobBeforeSwap", evt) {% endcomment %}
-                    if ($(evt.target).hasClass('message_list_body')){
+                    console.log("oobBeforeSwap", evt)
+                    {% comment %} if ($(evt.target).hasClass('message_list_body')){
                         document.getElementById('notification1').play();
-                    }
-                    
+                        htmx.ajax('GET', "{%url 'update-message-counts'%}", {swap:'none'})
+                    } {% endcomment %}
                 });
                 
                 document.body.addEventListener('htmx', function(evt) { 

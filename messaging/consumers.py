@@ -43,7 +43,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     self.group_name,
                     {
                         'type': 'chatbox_message',
-                        "message": rendered_html,
+                        "message": rendered_html,                       
+                    }
+                )
+                company_pk = await get_user_company_pk(user)
+                await self.channel_layer.group_send(
+                    f"message_count_{company_pk}",
+                    {
+                        'type': 'messsages_count_update',
+                        'data':{
+                            'rendered_html':f"""<span hx-swap-oob="innerHTML:.company_message_count"><span hx-trigger="load" hx-swap="innerHTML" hx-get="/update-message-counts/">_</span>""",
+                        }
                     }
                 )
     # Receive message from room group.    
@@ -51,7 +61,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send(
             text_data=event['message']
         )
-from asgiref.sync import async_to_sync, sync_to_async
+        
+        
+from asgiref.sync import sync_to_async
 @sync_to_async
 def send_whatsapp_message_to_number(message, customer_number, user, whatsappnumber_pk):  
     if settings.ENABLE_WHATSAPP_MESSAGING:
@@ -78,6 +90,10 @@ def message_details_user(user):
 @sync_to_async
 def get_whatsappnumber(whatsappnumber_pk):   
     return WhatsappNumber.objects.get(pk=whatsappnumber_pk)
+@sync_to_async
+def get_user_company_pk(user):   
+    print(user.profile.company.pk)
+    return user.profile.company.pk
 # @sync_to_async
 # def get_lead(lead_pk):   
 #     return Campaignlead.objects.get(pk=lead_pk)
@@ -146,3 +162,35 @@ class LeadsConsumer(AsyncWebsocketConsumer):
             })
         )
 
+    
+class CompanyMessageCountConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.company_pk = self.scope["url_route"]["kwargs"]["company_pk"]
+        self.group_name = f"message_count_{self.company_pk}"
+        self.user = self.scope["user"]
+        await self.channel_layer.group_add(self.group_name, self.channel_name)
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard(self.group_name, self.channel_name)
+
+    # This function receive messages from WebSocket.
+    # async def receive(self, text_data):        
+    #     text_data_json = json.loads(text_data)
+    #     user = self.scope["user"]
+    #     if(user.is_authenticated):
+    #         await self.channel_layer.group_send(
+    #             self.group_name,
+    #             {
+    #                 'type': 'messages_count_update',
+    #                 "message": text_data_json["rendered_html"],
+    #             }
+    #         )
+
+    # Receive message from room group.    
+    async def messsages_count_update(self, event):
+        print(event['data']['rendered_html'])
+        await self.send(
+            text_data=event['data']['rendered_html']
+        )
+        
