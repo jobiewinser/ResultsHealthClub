@@ -256,12 +256,12 @@ def campaign_assign_auto_send_template_htmx(request):
     first_template_pk = request.POST.get('first_template_pk')
     second_template_pk = request.POST.get('second_template_pk')
     third_template_pk = request.POST.get('third_template_pk')
-    if first_template_pk:
-        campaign.first_send_template = WhatsappTemplate.objects.get(pk=first_template_pk)
-    if second_template_pk:
-        campaign.second_send_template = WhatsappTemplate.objects.get(pk=second_template_pk)
-    if third_template_pk:
-        campaign.third_send_template = WhatsappTemplate.objects.get(pk=third_template_pk)
+    if not first_template_pk == None:
+        campaign.first_send_template = WhatsappTemplate.objects.filter(pk=(first_template_pk or 0)).first()
+    if not second_template_pk == None:
+        campaign.second_send_template = WhatsappTemplate.objects.filter(pk=(second_template_pk or 0)).first()
+    if not third_template_pk == None:
+        campaign.third_send_template = WhatsappTemplate.objects.filter(pk=(third_template_pk or 0)).first()
     campaign.save()
     return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign,})
                                                                             # 'site_list': get_available_sites_for_user(request.user)})

@@ -60,7 +60,7 @@ class Whatsapp():
                 code = potential_error.get('code')
                 if str(code) == '132000':
                     AttachedError.objects.create(
-                        type = '103',
+                        type = '1103',
                         attached_field = "whatsapp_number",
                         whatsapp_number = whatsapp_number,
                         recipient_number = recipient_number,
@@ -68,7 +68,7 @@ class Whatsapp():
                     )
             else:
                 AttachedError.objects.filter(
-                    type = '103',
+                    type = '1103',
                     whatsapp_number = whatsapp_number,
                     archived = False,
                     recipient_number = recipient_number,
@@ -94,7 +94,7 @@ class Whatsapp():
             recipient_number = settings.WHATSAPP_PHONE_OVERRIDE1
         if template_name:  
             AttachedError.objects.filter(
-                type = '102',
+                type = '1102',
                 whatsapp_template = template_object,
                 recipient_number = recipient_number,
                 whatsapp_number = whatsapp_number,
@@ -126,7 +126,7 @@ class Whatsapp():
                 code = potential_error.get('code')
                 if str(code) == '132000':
                     AttachedError.objects.create(
-                        type = '103',
+                        type = '1103',
                         attached_field = "whatsapp_template",
                         whatsapp_template = template_object,
                         recipient_number = recipient_number,
@@ -135,7 +135,7 @@ class Whatsapp():
                     )
             else:
                 AttachedError.objects.filter(
-                    type = '103',
+                    type = '1103',
                     whatsapp_template = template_object,
                     archived = False,
                     whatsapp_number = whatsapp_number,
@@ -146,7 +146,7 @@ class Whatsapp():
             return response_body
         else:
             AttachedError.objects.create(
-                type = '102',
+                type = '1102',
                 attached_field = "whatsapp_template",
                 whatsapp_template = template_object,
                 whatsapp_number = whatsapp_number,
@@ -211,13 +211,13 @@ class Whatsapp():
                 code = potential_error.get('code')
                 if str(code) == '100':
                     AttachedError.objects.create(
-                        type = '101',
+                        type = '1101',
                         attached_field = "whatsapp_template",
                         whatsapp_template = template_object,
                     )
             else:
                 AttachedError.objects.filter(
-                    type = '101',
+                    type = '1101',
                     whatsapp_template = template_object,
                     archived = False,
                 ).update(archived = True)

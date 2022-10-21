@@ -1,7 +1,30 @@
 
 {%load static tz core_tags%}
 <td>
-    {{campaign.name}}
+    <div class="row">
+        <div class="col p-0">
+            {{campaign.name}}
+        </div>
+        <div class="col-md-auto p-0">
+            {%if campaign.warnings %}
+                <span 
+                data-bs-toggle="popover" 
+                data-bs-trigger="hover" 
+                data-bs-html="true" 
+                data-bs-placement="top"
+                data-bs-title="Warnings"
+                data-bs-content="
+                <ul>
+                    {%for k,v in campaign.warnings.items%}
+                    <li>{{v}}</li>
+                    {%endfor%}
+                </ul>
+                ">
+                    <i class="fa-solid fa-triangle-exclamation" style="color:orange"></i>
+                </span>
+            {%endif%}
+        </div>
+    </div>
 </td>
 <td
 data-bs-toggle="popover" 
@@ -56,7 +79,7 @@ id="submit_site_pk_{{campaign.pk}}"></button>
         </p>
         '>
         <option value=""></option>
-        {%for template in campaign.get_site_templates%}
+        {%for template in campaign.site_templates%}
         {%if not 'sample_' in template.name%}
         <option {%if campaign.first_send_template.pk == template.pk %}selected{%endif%} value="{{template.pk}}">{{template.name}}</option>
         {%endif%}
@@ -85,7 +108,7 @@ id="submit_site_pk_{{campaign.pk}}"></button>
         </p>
         '>
         <option value=""></option>
-        {%for template in campaign.get_site_templates%}
+        {%for template in campaign.site_templates%}
         {%if not 'sample_' in template.name%}
         <option {%if campaign.second_send_template.pk == template.pk %}selected{%endif%} value="{{template.pk}}">{{template.name}}</option>
         {%endif%}
@@ -113,7 +136,7 @@ id="submit_site_pk_{{campaign.pk}}"></button>
         </p>
         '>
         <option value=""></option>
-        {%for template in campaign.get_site_templates%}
+        {%for template in campaign.site_templates%}
         {%if not 'sample_' in template.name%}
         <option {%if campaign.third_send_template.pk == template.pk %}selected{%endif%} value="{{template.pk}}">{{template.name}}</option>
         {%endif%}

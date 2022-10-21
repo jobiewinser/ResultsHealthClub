@@ -9,6 +9,8 @@ from django.dispatch import receiver
 from polymorphic.models import PolymorphicModel
 import logging
 from django.db.models import Q, Count
+from django.template import loader
+from asgiref.sync import async_to_sync, sync_to_async
 logger = logging.getLogger(__name__)
 
 BOOKING_CHOICES = (
@@ -40,8 +42,14 @@ class Campaign(PolymorphicModel):
     def is_manual(self):
         return False
     @property
-    def get_site_templates(self):
+    def site_templates(self):
         return WhatsappTemplate.objects.filter(site=self.site)
+    @property
+    def warnings(self):
+        warnings = {}
+        if not self.first_send_template:
+            warnings["first_send_template_missing"] = "This campaign doesn't have a 1st Auto-Send Template, it won't automatically send a message to the customer"
+        return warnings
 @receiver(models.signals.post_save, sender=Campaign)
 def execute_after_save(sender, instance, created, *args, **kwargs):
     if created:
@@ -102,13 +110,13 @@ class Campaignlead(models.Model):
         if communication_method == 'a':
             if send_order == 1:
                 template = self.campaign.first_send_template
-                type = '203'
+                type = '1203'
             elif send_order == 2:
                 template = self.campaign.second_send_template
-                type = '204'
+                type = '1204'
             elif send_order == 3:
                 template = self.campaign.third_send_template
-                type = '205'
+                type = '1205'
             if template:                
                 AttachedError.objects.filter(
                     type = type,
@@ -117,13 +125,13 @@ class Campaignlead(models.Model):
                 ).update(archived = True)
                 if template.site.whatsapp_business_account_id:
                     AttachedError.objects.filter(
-                        type = '202',
+                        type = '1202',
                         campaign_lead = self,
                         archived = False,
                     ).update(archived = True)
                     if template.message_template_id:
                         AttachedError.objects.filter(
-                            type = '201',
+                            type = '1201',
                             campaign_lead = self,
                             archived = False,
                         ).update(archived = True)
@@ -183,24 +191,24 @@ class Campaignlead(models.Model):
                     else:
                         print("errorhere selected template not found on Whatsapp's system")
                         AttachedError.objects.create(
-                            type = '201',
+                            type = '1201',
                             attached_field = "campaign_lead",
                             campaign_lead = self,
                         )
                 else:
                     print("errorhere no Whatsapp Business Account Linked")
                     AttachedError.objects.create(
-                        type = '202',
+                        type = '1202',
                         attached_field = "campaign_lead",
                         campaign_lead = self,
                     )
             else:
                 if send_order == 1:
-                    type = '203'
+                    type = '1203'
                 elif send_order == 2:
-                    type = '204'
+                    type = '1204'
                 elif send_order == 3:
-                    type = '205'
+                    type = '1205'
                 print("errorhere no suitable template found")
                 AttachedError.objects.create(
                     type = type,
@@ -214,22 +222,48 @@ class Campaignlead(models.Model):
                 "policy":"deterministic",
                 "code":template.language
             }
-
-            response = whatsapp.send_template_message(self.whatsapp_number, self.campaign.site.default_number, template, language, components)
+            site = self.campaign.site
+            whatsappnumber = site.default_number
+            customer_number = self.whatsapp_number
+            response = whatsapp.send_template_message(self.whatsapp_number, whatsappnumber, template, language, components)
             reponse_messages = response.get('messages',[])
             if reponse_messages:
                 for response_message in reponse_messages:
-                    WhatsAppMessage.objects.get_or_create(
+                    whatsapp_message, created = WhatsAppMessage.objects.get_or_create(
                         wamid=response_message.get('id'),
                         datetime=datetime.now(),
                         lead=self,
                         message=whole_text,
-                        site=self.campaign.site,
-                        whatsappnumber=self.campaign.site.default_number,
-                        customer_number=self.whatsapp_number,
+                        site=site,
+                        whatsappnumber=whatsappnumber,
+                        customer_number=customer_number,
                         template=template,
                         inbound=False
                     )
+                    if created:                        
+                        from channels.layers import get_channel_layer
+                        channel_layer = get_channel_layer()                            
+                        message_context = {
+                            "message": whatsapp_message,
+                            "site": site,
+                            "whatsappnumber": whatsappnumber,
+                        }
+                        rendered_message_list_row = loader.render_to_string('messaging/htmx/message_list_row.html', message_context)
+                        rendered_message_chat_row = loader.render_to_string('messaging/htmx/message_chat_row.html', message_context)
+                        rendered_html = f"""
+
+                        <span id='latest_message_row_{customer_number}' hx-swap-oob='delete'></span>
+                        <span id='messageCollapse_{whatsappnumber.pk}' hx-swap-oob='afterbegin'>{rendered_message_list_row}</span>
+
+                        <span id='messageWindowInnerBody_{customer_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>
+                        """
+                        async_to_sync(channel_layer.group_send)(
+                            f"messaging_{whatsappnumber.pk}",
+                            {
+                                'type': 'chatbox_message',
+                                "message": rendered_html,
+                            }
+                        )
                 logger.debug("site.send_template_whatsapp_message success") 
                 return True
         return HttpResponse("No Communication method specified", status=500)

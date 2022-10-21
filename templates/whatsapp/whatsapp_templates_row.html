@@ -51,7 +51,6 @@
         data-bs-placement="top"
         data-bs-title="Errors"
         data-bs-content="
-        <b>Errors:</b>
         <ul>
             {%for error in template.active_errors%}
             <li>{{error.created}} - {{error.get_type_display}}</li>
