@@ -9,7 +9,7 @@
 </script>
 {%endblock scripts%}
 {%block content%}
-
+{%if user.is_authenticated%}
 <div class="row">
     <div class="col-md center">
         <h3>Apps</h3>
@@ -35,13 +35,33 @@
                     <h1><i class="fa fa-whatsapp"></i></h1>
                 </div>
             </div>
+        </div> 
+        <div class="col-md-2">
+            <div class="card pointer" onclick="window.location.replace('{%url 'company-configuration'%}')">
+                <div class="card-header center">
+                    <a>Company Configuration</a>
+                </div>
+                <div class="card-body center">
+                    <h1><i class="fa-regular fa-gear"></i></h1>
+                </div>
+            </div>
+        </div>  
+        <div class="col-md-2">
+            <div class="card pointer" onclick="window.location.replace('{%url 'site-configuration'%}')">
+                <div class="card-header center">
+                    <a>Site Configuration</a>
+                </div>
+                <div class="card-body center">
+                    <h1><i class="fa-regular fa-gear"></i></h1>
+                </div>
+            </div>
         </div>  
         <div class="col">
         </div>      
     </div>
 </div>
 
-<div class="row card m-4 p-3">
+<div class="row card ms-4 p-3">
     <div class="row">
         <div class="col-md center m-3">
             <h4>Leads Management</h4>
@@ -84,9 +104,9 @@
         </div>
         
         <div class="col-md-2">
-            <div class="card pointer" onclick="window.location.replace('{%url 'lead-configuration'%}')">
+            <div class="card pointer" onclick="window.location.replace('{%url 'campaign-configuration'%}')">
                 <div class="card-header center">
-                    <a>Lead Configuration</a>
+                    <a>Company Configuration</a>
                 </div>
                 <div class="card-body center">
                     <h1><i class="fa-regular fa-gear"></i></h1>
@@ -97,4 +117,30 @@
         </div>
     </div>
 </div>
+{%else%}
+<div class="row">
+    <div class="col">
+    </div>
+    <div class="card col-md-auto">
+        <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+            <h1 class="display-4">Winser Systems</h1>
+            <p class="lead">If you do not yet have an account, please visit <a href="https://winser.uk/">https://winser.uk/</a></p>  
+        </div>
+        <div class="card-deck p-3 text-center row">
+            <div class="col-md">
+            </div>
+            <div class="card col-md-auto m-2 p-0 box-shadow">
+                <a href="#" class="btn btn-lg btn-block btn-primary "
+                hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" hx-vals='{"template_name": "login"}'
+                hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
+                hx-swap="innerHTML" hx-trigger="click">Login</a>
+            </div>
+            <div class="col-md">
+            </div>
+        </div>
+    </div>
+    <div class="col">
+    </div>
+</div>
+{%endif%}
 {%endblock content%}

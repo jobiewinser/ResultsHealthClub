@@ -7,10 +7,19 @@
 <script>
     $(document).ready(function() {
         $("[data-bs-toggle=popover]").popover();
-        initDataTable();
+        document.body.addEventListener('htmx:afterRequest', function(evt) {  
+            if (evt.detail.xhr.status == 200){
+                if (evt.detail.pathInfo.requestPath.includes('whatsapp-change-template-site')){
+                    $('#generic_modal').modal('hide');
+                    snackbarShow('Successfully transferred template', 'success')
+                }
+                
+            }
+        });
+        {% comment %} initDataTable(); {% endcomment %}
         document.body.addEventListener('htmx:afterSwap', function(evt) {  
             $("[data-bs-toggle=popover]").popover();
-            initDataTable();
+            {% comment %} initDataTable(); {% endcomment %}
         });  
     });
     let SearchTerm = ""
@@ -19,7 +28,7 @@
 
         dt = $('#overview_table').DataTable(          
             {  
-                order: [[5, 'desc' ]],
+                order: [[0, 'desc' ]],
                 iDisplayLength: 10,
                 search: {
                    search: SearchTerm
@@ -34,8 +43,23 @@
 </script>
 {%endblock scripts%}
 
-{%block overide_content%}       
-<div class="col d-flex flex-column h-sm-100 p-0" style="overflow-x:hidden" id="whatsapp_templates_content">  
+{%block extra_top_left_buttons %}
+<div class="col-md-auto">
+    <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>             
+</div>
+{%with True as hide_show_all%}
+{%include 'core/htmx/site_selection.html'%}
+<button hidden hx-get="" hx-push-url="false" hx-swap="innerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator=".htmx-indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
+{%endwith%}    
+{%endblock extra_top_left_buttons %}
+{%block extra_top_right_buttons %}
+<div class="col-md-auto">
+    <span class="badge bg-dark text-white"><h6 class="m-1">Whatsapp Templates</h6></span>          
+</div>     
+{%endblock extra_top_right_buttons %}
+
+{%block content%}       
+<div id="content">
 {%include 'whatsapp/whatsapp_templates_content.html'%}
 </div>
-{%endblock overide_content%}
+{%endblock content%}

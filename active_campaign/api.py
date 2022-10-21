@@ -15,7 +15,7 @@ from django.template import loader
 logger = logging.getLogger(__name__)
 
 # https://developers.activecampaign.com/reference
-class ActiveCampaign:
+class ActiveCampaignApi:
     
     # active_campaign_api_key = os.getenv("ACTIVE_CAMPAIGN_API_KEY")
     # active_campaign_url = os.getenv("ACTIVE_CAMPAIGN_URL")
@@ -31,28 +31,29 @@ class ActiveCampaign:
                    }
         return headers
     #POST
-    def create_webhook(self, name, guid, list_id):        
-        url = f"{self.active_campaign_url}api/3/webhooks"
-        headers = self._get_headers()
-        body = {
-            "webhook": {
-                "name": f"{name} (Campaign Lead System)",
-                "url": f"{self.site_url}/active-campaign-webhooks/{guid}/",
-                "listid": list_id,                
-                "events": [
-                    "subscribe",                    
-                    "update"
-                ],
-                "sources": [
-                    "public",
-                    "admin",
-                    "api",
-                    "system"
-                ]
+    def create_webhook(self, name, guid, list_id):     
+        if not settings.DEBUG:   
+            url = f"{self.active_campaign_url}api/3/webhooks"
+            headers = self._get_headers()
+            body = {
+                "webhook": {
+                    "name": f"{name} (Campaign Lead System)",
+                    "url": f"{self.site_url}/active-campaign-webhooks/{guid}/",
+                    "listid": list_id,                
+                    "events": [
+                        "subscribe",                    
+                        "update"
+                    ],
+                    "sources": [
+                        "public",
+                        "admin",
+                        "api",
+                        "system"
+                    ]
+                }
             }
-        }
-        response = requests.post(url=url, json=body, headers=headers)
-        return response
+            response = requests.post(url=url, json=body, headers=headers)
+            return response
     # Get
     # def get_campaigns(self):        
     #     url = f"{self.active_campaign_url}api/3/campaigns"

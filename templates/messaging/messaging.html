@@ -1,8 +1,11 @@
-{%load static core_tags%}
-<span id="chat_bottom" class="" style=" 
+{%load static core_tags user_permission_tags%}
+<span id="chat_bottom" class="" {%if whatsappnumber%}hx-ws="connect:/ws/messaging/{{whatsappnumber.pk}}/"{%endif%}
+style="  
 display: flex;
 flex-wrap: wrap;
-align-items: flex-start;" hx-ws="connect:/ws/messaging/{{site.pk}}/">
+align-items: flex-start;" 
+{% comment %} hx-ws="connect:/ws/messaging/{{site.pk}}/" {% endcomment %}
+>
     <script>
         $(document).ready(function() {   
             {% if site%}      
@@ -20,7 +23,7 @@ align-items: flex-start;" hx-ws="connect:/ws/messaging/{{site.pk}}/">
             });
             
         })
-        function clear_chat_from_session(whatsapp_number){
+        function clear_chat_from_session(whatsapp_number){chat_bottom
             var respStatus = $.ajax({
                 type:'POST',
                 url:'{%url "clear-chat-from-session"%}',
@@ -49,28 +52,49 @@ align-items: flex-start;" hx-ws="connect:/ws/messaging/{{site.pk}}/">
     </script>
     <link href="{% static 'css/chat.css' %}" rel="stylesheet" />
         <span id="next_chat_window"></span>
-        {%if site%}
-        <div class="card chat_bottom_window p-0">
-            <div class="card-header chat_bottom_header center " data-bs-toggle="collapse" data-bs-target="#messageCollapse_{{site.pk}}" aria-expanded="false" aria-controls="messageCollapse_{{site.pk}}">
-                <b>Chats for {{site.name}}</b>
-            </div>
-            <div class="card-body message_list_body collapse show p-0" id="messageCollapse_{{site.pk}}">
-                {%for message in site.get_fresh_messages%}
-                {%include 'messaging/htmx/message_list_row.html' %}
-                {%endfor%}
-            </div>
-        </div>
-        {%else%}
-        <div class="card card-body chat_bottom_window">
-            <div class="card-header chat_bottom_header" >
-                Select a site to chat
-            </div>
-        </div>
+        {%if whatsappnumber%}
+        {%include 'messaging/message_list.html'%}
         {%endif%}
+        <div class="card p-0" id="" style="margin-top: auto;" hx-ws="connect:/ws/message_count/{{request.user.profile.company.pk}}/">
+            <div class="card-header chat_bottom_header ps-2" data-bs-toggle="collapse" data-bs-target="#siteCollapse" aria-expanded="false" aria-controls="siteCollapse">
+                <span class="primary_td_layer text-white">
+                    <span class="badge bg-light badge-sm me-1"><i class="fa fa-whatsapp me-1"></i><span class="company_message_count">{{request.user|company_outstanding_whatsapp_messages_tag}}</span></span>Messaging Sites 
+                </span>
+            </div>
+            <div class="card-body collapse show p-0" id="siteCollapse">
+                <div class="accordion accordion-flush" id="accordionFlushExample" style="margin-top: auto;">
+                    {%for site in request.user|get_allowed_site_chats_for_user_tag%}   
+                        <div class="accordion-item">
+                        <h2 class="accordion-header" id="flush-headingOne">
+                            <button class="accordion-button no-chevron-button ps-2 {%if chat_site == site%} active{%else%} collapsed{%endif%}" type="button" data-bs-toggle="collapse" data-bs-target="#site_collapse_{{site.pk}}" aria-expanded="false" aria-controls="site_collapse_{{site.pk}}" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
+                                <span class="badge bg-dark badge-sm me-1"><i class="fa fa-whatsapp me-1"></i><span class="site_message_count_{{site.pk}}">{{site|site_outstanding_whatsapp_messages_tag:request.user}}</span></span>  <b>{{site.name}}</b>
+                            </button>
+                        </h2>
+                        <div id="site_collapse_{{site.pk}}" class="accordion-collapse collapse {%if chat_site == site%} show{%endif%}" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+                            <div class="accordion-body" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
+                                {%for chat_whatsappnumber in site.return_phone_numbers%}
+                                    <button class="btn btn-sm btn-{%if chat_site == site%}success{%else%}secondary{%endif%} btn-xs"
+                                    hx-get="{%url 'message-list'%}"
+                                    hx-target="#chat_bottom"
+                                    hx-swap="#outerHTML"
+                                    hx-indicator=".htmx-indicator"                 
+                                    hx-vals='{"site_pk": "{{site.pk}}", "whatsappnumber_pk": "{{chat_whatsappnumber.pk}}"}'
+                                    hx-trigger="click"
+                                    
+                                    ><i class="fa-solid fa-arrow-left"></i> {%if chat_whatsappnumber.alias%}{{chat_whatsappnumber.alias}}{%else%}{{chat_whatsappnumber.number}}{%endif%}</button>
+                                    <br>
+                                {%endfor%}
+                            </div>
+                        </div>
+                        </div>
+                    {%endfor%}
+                </div>
+            </div>
+        </div>
 </span>
 
-{%if site%}
-{%for message in site.get_fresh_messages%}
+{% comment %} {%if chat_site%}
+{%for message in site.get_latest_messages%}
 {%if message.inbound%}
 <span hx-swap-oob="true" id="chat_notification_{{message.customer_number}}">
     <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
@@ -82,4 +106,4 @@ align-items: flex-start;" hx-ws="connect:/ws/messaging/{{site.pk}}/">
 </span>
 {%endif%}
 {%endfor%}
-{%endif%}
+{%endif%} {% endcomment %}

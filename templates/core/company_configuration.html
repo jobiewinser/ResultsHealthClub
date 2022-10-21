@@ -1,0 +1,40 @@
+{% extends 'core/base.html' %}
+{%load static tz core_tags%}
+
+{%block scripts%}
+{{block.super}}
+<script>
+    $(document).ready(function() {
+        document.body.addEventListener('htmx:afterRequest', function(evt) {  
+            if (evt.detail.xhr.status == 500){
+                $('.reset_on_error').each(function() {
+                    if (![undefined, ''].includes((this).data('value'))){
+                        $(this).data('value')
+                        $(this).val($(this).data('value'));
+                    }
+                });
+            };
+            
+        });
+        document.body.addEventListener('htmx:afterSwap', function(evt) {              
+        });
+    });
+</script>
+{%endblock scripts%}
+
+
+{%block extra_top_left_buttons %}
+<div class="col-md-auto">
+    <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>             
+</div>
+{%endblock extra_top_left_buttons %}
+
+{%block extra_top_right_buttons %}
+<div class="col-md-auto">
+<span class="badge bg-dark text-white"><h6 class="m-1">Company Configuration</h6></span>           
+</div>
+{%endblock extra_top_right_buttons %}
+
+{%block content%}   
+        {%include 'core/htmx/company_configuration_htmx.html'%}
+{%endblock content%}

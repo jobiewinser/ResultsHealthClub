@@ -7,9 +7,12 @@ from django.contrib.auth.decorators import login_required
 import logging
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.models import User
-from core.models import Company, FreeTasterLink, FreeTasterLinkClick, Profile, Site  
+from core.models import ROLE_CHOICES, Company, FreeTasterLink, FreeTasterLinkClick, Profile, Site  
 from django.contrib.auth import authenticate
 from django.contrib.auth import login
+
+from core.user_permission_functions import get_available_sites_for_user, get_user_allowed_to_edit_other_user
+from whatsapp.api import Whatsapp
 logger = logging.getLogger(__name__)
 try:
     super_users = User.objects.filter(email="jobiewinser@gmail.com")
@@ -52,15 +55,87 @@ except:
     pass
 
 
-@method_decorator(login_required, name='dispatch')
+# @method_decorator(login_required, name='dispatch')
 class CustomerHomeView(TemplateView):
     template_name='core/customer_home.html'
+    
+
+@method_decorator(login_required, name='dispatch')
+class SiteConfigurationView(TemplateView):
+    template_name='core/site_configuration.html'
+
+    def get_context_data(self, **kwargs):
+        self.request.GET._mutable = True       
+        context = super(SiteConfigurationView, self).get_context_data(**kwargs)
+        if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+            self.template_name = 'core/htmx/site_configuration_htmx.html'
+        # context['site_list'] = get_available_sites_for_user(self.request.user)
+        site_pk = get_site_pk_from_request(self.request)
+        if site_pk:
+            self.request.GET['site_pk'] = site_pk      
+            context['site'] = Site.objects.get(pk=site_pk)     
+        context['whatsapp_numbers'] = context['site'].get_live_whatsapp_phone_numbers()  
+        return context
+    def post(self, request):
+        self.request.POST._mutable = True 
+        site = Site.objects.get(pk=request.POST.get('site_pk'))   
+        response_text = ""     
+        if 'name' in request.POST:
+            site.name = request.POST['name']
+            response_text = f"{site.name}"
+        site.save()
+        return HttpResponse(response_text, status=200)
+
+@method_decorator(login_required, name='dispatch')
+class CompanyConfigurationView(TemplateView):
+    template_name='core/company_configuration.html'
+
+    def get_context_data(self, **kwargs):
+        self.request.GET._mutable = True       
+        context = super(CompanyConfigurationView, self).get_context_data(**kwargs)
+        if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+            self.template_name = 'core/htmx/company_configuration_htmx.html'
+        # context['site_list'] = get_available_sites_for_user(self.request.user)
+        site_pk = get_site_pk_from_request(self.request)
+        if site_pk:
+            self.request.GET['site_pk'] = site_pk    
+        context['role_choices'] = ROLE_CHOICES
+        # context['site_list'] = get_available_sites_for_user(self.request.user)
+        return context
+def change_profile_role(request):
+    user = User.objects.get(pk=request.POST.get('user_pk'))
+    if get_user_allowed_to_edit_other_user(request.user, user):
+        role = request.POST.get('role', None)
+        if role in ['b','c']:
+            context = {}
+            user.profile.role = role
+            user.profile.save()
+            context['user'] = user
+            context['role_choices'] = ROLE_CHOICES
+            # context['site_list'] = get_available_sites_for_user(request.user)
+            return render(request, 'core/htmx/company_configuration_row.html', context)
+    return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
+def change_profile_site(request):
+    user = User.objects.get(pk=request.POST.get('user_pk'))
+    if get_user_allowed_to_edit_other_user(request.user, user):
+        site_pk = request.POST.get('site_pk', None)
+        if site_pk:
+            context = {}
+            user.profile.site = Site.objects.get(pk=site_pk)
+            user.profile.save()
+            context['user'] = user
+            context['role_choices'] = ROLE_CHOICES
+            # context['site_list'] = get_available_sites_for_user(request.user)
+            return render(request, 'core/htmx/company_configuration_row.html', context)
+    return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
 
 
 class HomeView(TemplateView):
     template_name='core/home.html'
 class CampaignLeadsProductPageView(TemplateView):
     template_name='core/campaign_leads_product_page.html'
+
+
 
 def custom_login_post(request):    
     user = authenticate(username=request.POST.get('username', ''), email=request.POST.get('email', ''), password=request.POST.get('password', ''))
@@ -78,7 +153,7 @@ class FreeTasterOverviewView(TemplateView):
         context = super(FreeTasterOverviewView, self).get_context_data(**kwargs)
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'core/htmx/free_taster_table_htmx.html'
-        context['site_list'] = Site.objects.all()
+        # context['site_list'] = get_available_sites_for_user(self.request.user)
         free_taster_links = FreeTasterLink.objects.all()
 
         site_pk = get_site_pk_from_request(self.request)
@@ -105,8 +180,12 @@ def free_taster_redirect(request, **kwargs):
         pass
     return HttpResponseRedirect("https://WinserSystemss.co.uk/book-free-taster-sessions-abingdon/")
 
-def get_site_pk_from_request(request):    
-    site_pk = request.GET.get('site_pk', None)
+def get_site_pk_from_request(request):  
+    if request.method == 'GET':
+        request_dict = request.GET
+    elif request.method == 'POST':
+        request_dict = request.POST
+    site_pk = request_dict.get('site_pk', None)
     if site_pk:
         return site_pk
     profiles = Profile.objects.filter(user=request.user)

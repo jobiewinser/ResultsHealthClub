@@ -27,6 +27,7 @@ class WhatsAppMessage(Message):
     wamid = models.TextField(null=True, blank=True)   
     raw_webhook = models.ForeignKey("whatsapp.WhatsAppWebhookRequest", null=True, blank=True, on_delete=models.SET_NULL)
     conversationid = models.TextField(null=True, blank=True)  
+    whatsappnumber = models.ForeignKey("core.WhatsappNumber", null=True, blank=True, on_delete=models.SET_NULL)
 # class WhatsAppMessage(models.Model):
 #     pass 
     
@@ -54,18 +55,16 @@ WHATSAPP_ORDER_CHOICES = (
     (3, 'Send 48 Hrs after Lead Creation')
 )
 template_variables = {
-    '{{1}}': ["First Name", "Jobie"],
-    # '{{2}}': ["Last Name", "Winser"],
-    '{{3}}': ["Company Name", "Winser Systems"],
-    '{{4}}': ["Site Number", "+44 7872 000364"],
+    '[[1]]': ["First Name", "Jobie"],    
 }
 class WhatsappTemplate(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    send_order = models.IntegerField(choices=WHATSAPP_ORDER_CHOICES, null=True, blank=True, default=0)
+    
+    # send_order = models.IntegerField(choices=WHATSAPP_ORDER_CHOICES, null=True, blank=True, default=0)
     edited_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     edited = models.DateTimeField(null=True, blank=True) 
 
-    latest_reason = models.TextField(null=True, blank=True)
+    # latest_reason = models.TextField(null=True, blank=True)
     status = models.TextField(null=True, blank=True)
 
     message_template_id = models.TextField(null=True, blank=True)
@@ -78,6 +77,8 @@ class WhatsappTemplate(models.Model):
 
     language = models.TextField(null=True, blank=True)
     pending_language = models.TextField(null=True, blank=True)
+    
+    last_approval = models.DateTimeField(null=True, blank=True)
 
     components = ArrayField(
         JSONField(default=dict),
@@ -131,6 +132,17 @@ class WhatsappTemplate(models.Model):
     #     elif self.components:
     #         for component in self.components
     #     return edit_components
+    
+    @property
+    def active_errors(self):
+        return self.errors.filter(archived=False)
+    @property
+    def company_sites_with_same_whatsapp_business_details(self):
+        try:
+            from core.models import Site
+            return Site.objects.filter(company=self.site.company, whatsapp_business_account_id=self.site.whatsapp_business_account_id).exclude(pk=self.site.pk)
+        except Exception as e:
+            return Site.objects.none()
     @property
     def site_name(self):
         if self.site:

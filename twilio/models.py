@@ -30,7 +30,7 @@ class TwilioMessage(models.Model):
 
     Body = models.TextField(null=True, blank=True)
     ProfileName = models.TextField(null=True, blank=True)
-    system_user_number = models.CharField(max_length=50, null=True, blank=True)
+    # system_user_number = models.CharField(max_length=50, null=True, blank=True)
     customer_number = models.CharField(max_length=50, null=True, blank=True)
     SmsSid = models.CharField(max_length=50, null=True, blank=True)
     MessageSid = models.CharField(max_length=50, null=True, blank=True)

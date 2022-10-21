@@ -1,36 +1,36 @@
 
 {%load static%}
-<span id="overview_table_wrapper">
-<table id="overview_table" class="table"> 
-    <thead> 
-        <tr>
-            <th>
-                Name
-            </th>
-            <th>
-                Status
-            </th>
-            {% comment %} <th>
-                Lead Date
-            </th> {% endcomment %}
-            <th>
-                Ad Campaign
-            </th>
-            <th>
-                Booked
-            </th>
-            {% comment %} <th>
-                Next Auto Whatsapp
-            </th> {% endcomment %}
-            <th>
-                Actions
-            </th>
-        </tr>
-    </thead>
-    <tbody> 
-        {%for lead in leads%}
-        {%include 'campaign_leads/htmx/campaign_booking_row.html'%}
-        {%endfor%}
-    </tbody>
-</table>
-</span>
+<div id="overview_table_wrapper" class="mt-2 card p-2">
+    <table id="overview_table" class="table"> 
+        <thead> 
+            <tr>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Status
+                </th>
+                {% comment %} <th>
+                    Lead Date
+                </th> {% endcomment %}
+                <th>
+                    Ad Campaign
+                </th>
+                <th>
+                    Booked
+                </th>
+                {% comment %} <th>
+                    Next Auto Whatsapp
+                </th> {% endcomment %}
+                <th>
+                    Actions
+                </th>
+            </tr>
+        </thead>
+        <tbody> 
+            {%for lead in leads%}
+            {%include 'campaign_leads/htmx/campaign_booking_row.html'%}
+            {%endfor%}
+        </tbody>
+    </table>
+</div>

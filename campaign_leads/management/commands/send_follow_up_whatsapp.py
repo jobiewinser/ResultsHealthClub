@@ -6,10 +6,10 @@ class Command(BaseCommand):
     help = 'help text'
 
     def handle(self, *args, **options):
-        for campaign_lead in Campaignlead.objects.filter(booking=None).exclude(sold=True).exclude(complete=True).exclude(whatsappmessage__template__send_order=3):
-            if not campaign_lead.whatsappmessage_set.filter(whatsappmessage__template__send_order=1):
-                campaign_lead.send_template_whatsapp_message(1, communication_method='a')
-            elif not campaign_lead.whatsappmessage_set.filter(whatsappmessage__template__send_order=2):
-                campaign_lead.send_template_whatsapp_message(2, communication_method='a')
-            else:
-                campaign_lead.send_template_whatsapp_message(3, communication_method='a')
+        # for campaign_lead in Campaignlead.objects.filter(booking=None).exclude(sold=True).exclude(complete=True).exclude(whatsappmessage__template__send_order=3):
+        #     if not campaign_lead.whatsappmessage_set.filter(whatsappmessage__template__send_order=1):
+        #         campaign_lead.send_template_whatsapp_message(1, communication_method='a')
+        #     elif not campaign_lead.whatsappmessage_set.filter(whatsappmessage__template__send_order=2):
+        #         campaign_lead.send_template_whatsapp_message(2, communication_method='a')
+        #     else:
+        #         campaign_lead.send_template_whatsapp_message(3, communication_method='a')

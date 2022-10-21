@@ -1,0 +1,145 @@
+
+{%load static tz core_tags%}
+<td>
+    <div class="row">
+        <div class="col p-0">
+            {{campaign.name}}
+        </div>
+        <div class="col-md-auto p-0">
+            {%if campaign.warnings %}
+                <span 
+                data-bs-toggle="popover" 
+                data-bs-trigger="hover" 
+                data-bs-html="true" 
+                data-bs-placement="top"
+                data-bs-title="Warnings"
+                data-bs-content="
+                <ul>
+                    {%for k,v in campaign.warnings.items%}
+                    <li>{{v}}</li>
+                    {%endfor%}
+                </ul>
+                ">
+                    <i class="fa-solid fa-triangle-exclamation" style="color:orange"></i>
+                </span>
+            {%endif%}
+        </div>
+    </div>
+</td>
+<td
+data-bs-toggle="popover" 
+data-bs-trigger="hover" 
+data-bs-html="true" 
+data-bs-placement="top"
+data-bs-title="What does this do?"
+data-bs-content="
+<p>
+    You can assign your lead campaign to any site under your company here. The templates available to auto send will depend on which site the lead campaign belongs to.
+</p>
+{%if campaign.is_manual%}
+<p>
+    This is disabled as it was automatically created by Winser Systems for manually created leads.
+</p>
+{%endif%}
+"> 
+    {%include 'campaign_leads/htmx/campaign_configuration_select.html'%}
+<button hidden 
+hx-post="{% url 'set-campaign-site' campaign_pk=campaign.pk %}" 
+hx-swap="outerHTML" hx-include="#site_pk_{{campaign.pk}}" 
+id="submit_site_pk_{{campaign.pk}}"></button>
+</td>
+<td>
+    <input type="number" min="0.00" max="10000.00" step="0.01" value="{{campaign.product_cost|floatformat:2}}" name="product_cost"
+        class="form-control"
+        hx-post="{% url 'campaign-assign-product_cost' %}" hx-swap="innerHTML" 
+        hx-trigger="change"
+        hx-indicator=".top-htmx-indicator" 
+        hx-vals='{"campaign_pk": "{{campaign.pk}}"}'
+        hx-target="#row_{{campaign.pk}}"/>
+</td>
+<td>              
+    <span hidden>{{campaign.first_send_template.name}}</span>                   
+    <select class="form-select" name="first_template_pk" id="first_template_{{campaign.pk}}" 
+        hx-post="{% url 'campaign-assign-auto-send-template' %}" hx-swap="innerHTML" 
+        hx-trigger="change"
+        hx-indicator=".top-htmx-indicator" 
+        hx-vals='{"campaign_pk": "{{campaign.pk}}"}'
+        hx-target="#row_{{campaign.pk}}"   
+        data-bs-toggle="popover" 
+        data-bs-trigger="hover" 
+        data-bs-html="true" 
+        data-bs-placement="top"
+        data-bs-title="What does this do?"
+        data-bs-content='
+        <p>
+            You can assign your lead campaign a template to send through your chosen messaging service automatically (Whatsapp by default).
+        </p>
+        <p>
+            For example, when Winser Systems is notified by your lead campaign about a new lead, they will receive the "1st Auto-Send Template" you have chosen.
+        </p>
+        '>
+        <option value=""></option>
+        {%for template in campaign.site_templates%}
+        {%if not 'sample_' in template.name%}
+        <option {%if campaign.first_send_template.pk == template.pk %}selected{%endif%} value="{{template.pk}}">{{template.name}}</option>
+        {%endif%}
+        {%endfor%}
+    </select>
+    
+</td>
+<td>          
+    <span hidden>{{campaign.second_send_template.name}}</span>                           
+    <select class="form-select" name="second_template_pk" id="second_template_{{campaign.pk}}" 
+        hx-post="{% url 'campaign-assign-auto-send-template' %}" hx-swap="innerHTML" 
+        hx-indicator=".top-htmx-indicator" hx-trigger="change"
+        hx-vals='{"campaign_pk": "{{campaign.pk}}"}'
+        hx-target="#row_{{campaign.pk}}"
+        data-bs-toggle="popover" 
+        data-bs-trigger="hover" 
+        data-bs-html="true" 
+        data-bs-placement="top"
+        data-bs-title="What does this do?"
+        data-bs-content='
+        <p>
+            You can assign your lead campaign a template to send through your chosen messaging service automatically (Whatsapp by default).
+        </p>
+        <p>
+            For example, if the lead has not responded to the first notification, they will receive the "2nd Auto-Send Template" 24 hours after the first.
+        </p>
+        '>
+        <option value=""></option>
+        {%for template in campaign.site_templates%}
+        {%if not 'sample_' in template.name%}
+        <option {%if campaign.second_send_template.pk == template.pk %}selected{%endif%} value="{{template.pk}}">{{template.name}}</option>
+        {%endif%}
+        {%endfor%}
+    </select>                           
+</td>
+<td>          
+    <span hidden>{{campaign.third_send_template.name}}</span>                         
+    <select class="form-select" name="third_template_pk" id="third_template_{{campaign.pk}}" 
+        hx-post="{% url 'campaign-assign-auto-send-template' %}" hx-swap="innerHTML" 
+        hx-indicator=".top-htmx-indicator" hx-trigger="change"
+        hx-vals='{"campaign_pk": "{{campaign.pk}}"}'
+        hx-target="#row_{{campaign.pk}}"
+        data-bs-toggle="popover" 
+        data-bs-trigger="hover" 
+        data-bs-html="true" 
+        data-bs-placement="top"
+        data-bs-title="What does this do?"
+        data-bs-content='
+        <p>
+            You can assign your lead campaign a template to send through your chosen messaging service automatically (Whatsapp by default).
+        </p>
+        <p>
+            For example, if the lead has not responded to the first notification, they will receive the "3rd Auto-Send Template" 24 hours after the second.
+        </p>
+        '>
+        <option value=""></option>
+        {%for template in campaign.site_templates%}
+        {%if not 'sample_' in template.name%}
+        <option {%if campaign.third_send_template.pk == template.pk %}selected{%endif%} value="{{template.pk}}">{{template.name}}</option>
+        {%endif%}
+        {%endfor%}
+    </select>                             
+</td>

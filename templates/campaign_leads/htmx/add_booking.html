@@ -4,7 +4,7 @@
         $(document).ready(function() {
             
             Calendly.initInlineWidget({
-                url: 'https://calendly.com/winsersystems/test-2',
+                url: '{{request.user.profile.calendly_org_page}}',
                 parentElement: document.getElementById('calendly_id'),
                 prefill: {
                     name: "{{lead.name}}",
@@ -16,7 +16,7 @@
         });
     </script>
     <div class="row">
-        <div class="col center" id="calendly_id" style="min-width:380px;height:580px;">
+        <div class="col center" id="calendly_id" style="min-width:580px;min-height:580px;">
             <img id="calendly_loading" src="{% static 'gif/loading.gif' %}" alt="" width="200">
         </div>
     </div>

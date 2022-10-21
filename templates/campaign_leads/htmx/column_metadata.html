@@ -1,4 +1,5 @@
 {%load core_tags%}
-<span {% if hx_swap_oob %}hx-swap-oob="true"{%endif%} id="column_metadata_{{ call_count }}">
-    <span class="secondary_td_layer m-0">{{queryset.count}} Leads</span> <span style="color:rgb(96, 248, 61y)" class="secondary_td_layer">£{{queryset|sum_cost_tag|floatformat:2}}</span>
+<span {% if hx_swap_oob %}hx-swap-oob="true"{%endif%} id="column_metadata_{{ call_count }}" class="column_metadata">
+    <!-- <span class="secondary_td_layer m-0">{{queryset.count}} Leads</span> <span style="color:rgb(96, 248, 61y)" class="secondary_td_layer">£{{queryset|sum_cost_tag|floatformat:2}}</span> -->
+    <span class="secondary_td_layer m-0">{{queryset.count}} Leads</span> <span style="color:rgb(96, 248, 61y)" class="secondary_td_layer">£<span id="total_cost_{{ call_count }}" class="total_cost"></span></span>
 </span>

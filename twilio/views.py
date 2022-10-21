@@ -40,7 +40,7 @@ class MessageWebhooks(View):
             Type = 'a',
             raw_webhook = webhook,
             customer_number = post_dict.get('From', ''),
-            system_user_number = post_dict.get('To', ''),
+            # system_user_number = post_dict.get('To', ''),
         )
 
         for key in [

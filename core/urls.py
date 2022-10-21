@@ -18,13 +18,16 @@ import core.views as coreviews
 import core.htmx as corehtmx
 urlpatterns = [
     # Public Facing
-    path('', coreviews.HomeView.as_view(), name='home' ),
     path('products/campaign-leads-product-page', coreviews.CampaignLeadsProductPageView.as_view(), name='campaign-leads-product-page' ),
     path('login-htmx', coreviews.custom_login_post, name='login-htmx' ),
 
-    path('customer-home/', coreviews.CustomerHomeView.as_view(), name='customer-home'),
+    path('', coreviews.CustomerHomeView.as_view(), name='customer-home'),
+    path('company-configuration/', coreviews.CompanyConfigurationView.as_view(), name='company-configuration'),
+    path('site-configuration/', coreviews.SiteConfigurationView.as_view(), name='site-configuration'),
 
 
+    path('configuration/change-profile-role/', coreviews.change_profile_role, name='change-profile-role'),
+    path('configuration/change-profile-site/', coreviews.change_profile_site, name='change-profile-site'),
 
     # path('switch-user/', corehtmx.switch_user, name='switch-user' ),
     path('get-modal-content/', corehtmx.get_modal_content, name='get-modal-content' ),

@@ -8,32 +8,20 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from calendly.api import Calendly
 from campaign_leads.models import Call, Campaign, Campaignlead
-from active_campaign.api import ActiveCampaign
-from active_campaign.models import ActiveCampaignList
+from active_campaign.api import ActiveCampaignApi
+from active_campaign.models import ActiveCampaign
 from core.core_decorators import campaign_leads_enabled_required
 from core.models import Profile, Site
+from core.user_permission_functions import get_available_sites_for_user
 from core.views import get_site_pk_from_request
 from django.db.models import Q, Count
 from django.db.models import OuterRef, Subquery, Count
 from django.db.models import F
 from whatsapp.api import Whatsapp
+from whatsapp.models import WhatsappTemplate
+from django.template import loader
 logger = logging.getLogger(__name__)
 
-    
-
-# try:
-#     for site in Site.objects.all():
-#         WhatsappTemplate.objects.get_or_create(site=site, send_order=1)
-#         WhatsappTemplate.objects.get_or_create(site=site, send_order=2)
-#         WhatsappTemplate.objects.get_or_create(site=site, send_order=3)
-#         if not ActiveCampaignList.objects.filter(site=site, manual=True):
-#             ActiveCampaignList.objects.create(
-#                 name=f"Manually Created ({site.name})",
-#                 site=site,
-#                 manual=True,
-#             )
-# except Exception as e:
-#     pass
 
 def get_campaign_qs(request):
     first_model_query = (Campaignlead.objects
@@ -72,7 +60,7 @@ class CampaignleadsOverviewView(TemplateView):
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'campaign_leads/htmx/leads_board_htmx.html'   
             context['campaigns'] = get_campaign_qs(self.request)
-        leads = Campaignlead.objects.filter(complete=False, booking=None)
+        leads = Campaignlead.objects.filter(complete=False, booking__datetime=None)
         # leads = Campaignlead.objects.filter()
         campaign_pk = self.request.GET.get('campaign_pk', None)
         if campaign_pk:
@@ -92,8 +80,9 @@ class CampaignleadsOverviewView(TemplateView):
             except:
                 pass
         
-        context['site_list'] = Site.objects.all()
-        leads = leads.annotate(calls=Count('call'), cost=F('campaign__product_cost'))
+        # context['site_list'] = get_available_sites_for_user(self.request.user)
+        leads = leads.annotate(calls=Count('call')).order_by('-last_dragged')
+        # leads = leads.annotate(calls=Count('call'), cost=F('campaign__product_cost'))
         
         context['querysets'] = [
             ('Fresh', leads.filter(calls=0), 0)
@@ -113,7 +102,7 @@ class CampaignleadsOverviewView(TemplateView):
                 (f"Call 1", leads.none(), 1)
             )
         context['max_call_count'] = index
-        context['company'] = self.request.user.profile.company.all()[0]
+        context['company'] = self.request.user.profile.company
             
         # whatsapp = Whatsapp()
         return context
@@ -153,35 +142,57 @@ class CampaignBookingsOverviewView(TemplateView):
 
 
 
-        context['site_list'] = Site.objects.all()
+        # context['site_list'] = get_available_sites_for_user(self.request.user)
         context['leads'] = leads
         # whatsapp = Whatsapp()
         return context
         
 @method_decorator(campaign_leads_enabled_required, name='dispatch')
 @method_decorator(login_required, name='dispatch')
-class LeadConfigurationView(TemplateView):
-    template_name='campaign_leads/leads_configuration.html'
+class CampaignConfigurationView(TemplateView):
+    template_name='campaign_leads/campaign_configuration.html'
 
     def get_context_data(self, **kwargs):
-        context = super(LeadConfigurationView, self).get_context_data(**kwargs)
-        context['campaigns'] = []
-        if self.request.user.profile.company.all():
-            context['campaigns'] = self.request.user.profile.company.all().first().get_and_generate_campaign_objects()
-        context['site_list'] = Site.objects.all()
+        self.request.GET._mutable = True
+        context = super(CampaignConfigurationView, self).get_context_data(**kwargs)
+        if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+            self.template_name = 'campaign_leads/campaign_configuration_htmx.html'  
+        company = self.request.user.profile.company
+        for campaign_dict in ActiveCampaignApi(company.active_campaign_api_key, company.active_campaign_url).get_lists(company.active_campaign_url).get('lists',[]):
+            campaign, created = ActiveCampaign.objects.get_or_create(
+                active_campaign_id = campaign_dict.pop('id'),
+                name = campaign_dict.pop('name'),
+                company = company,
+            )
+            campaign.json_data = campaign_dict
+            campaign.save()
+        if company:
+            campaigns = company.get_and_generate_campaign_objects()
+
+        site_pk = get_site_pk_from_request(self.request)
+        if site_pk and not site_pk == 'all':
+            try:
+                campaigns = campaigns.filter(site__pk=site_pk)
+                self.request.GET['site_pk'] = site_pk    
+                context['site'] = Site.objects.get(pk=site_pk)
+            except Exception as e:
+                pass
+
+        context['campaigns'] = campaigns
+        # context['site_list'] = get_available_sites_for_user(self.request.user)
         return context
 
         
 @login_required
 def get_campaigns(request, **kwargs):
-    try:
-        if request.user.profile.company.all():
-            request.user.profile.company.all().first().get_and_generate_campaign_objects()
-        return render(request, f"campaign_leads/htmx/campaign_select.html", 
-        {'campaigns':get_campaign_qs(request)})
-    except Exception as e:        
-        logger.error(f"get_campaigns {str(e)}")
-        return HttpResponse("Couldn't get Campaigns", status=500)
+    # try:
+    if request.user.profile.company:
+        request.user.profile.company.get_and_generate_campaign_objects()
+    return render(request, f"campaign_leads/htmx/campaign_select.html", 
+    {'campaigns':get_campaign_qs(request)})
+    # except Exception as e:        
+    #     logger.error(f"get_campaigns {str(e)}")
+    #     return HttpResponse("Couldn't get Campaigns", status=500)
 
 @login_required
 def new_call(request, **kwargs):
@@ -205,10 +216,63 @@ def new_call(request, **kwargs):
                         lead = lead,
                     ).order_by('-datetime').first().delete()
                     lead = Campaignlead.objects.filter(pk=kwargs.get('lead_pk')).annotate(calls=Count('call')).first()
-           
+            lead.last_dragged = datetime.now()
             lead.save()
+
+            
+            from channels.layers import get_channel_layer
+            from asgiref.sync import async_to_sync
+            channel_layer = get_channel_layer()   
+            
+            async_to_sync(channel_layer.group_send)(
+                    f"lead_{lead.campaign.site.company.pk}",
+                    {
+                        'type': 'lead_move',
+                        'data':{
+                            'rendered_html':get_leads_html(lead, new_position=Call.objects.filter(lead=lead).count()),
+                        }
+                    }
+            )
+            
             return HttpResponse("", status="200")
             # return render(request, 'campaign_leads/htmx/lead_article.html', {'lead':lead,'max_call_count':kwargs.get('max_call_count', 1), 'call_count':call_count})
     except Exception as e:
         logger.debug("new_call Error "+str(e))
         return HttpResponse(e, status=500)
+
+def get_leads_html(lead, new_position=None):
+    delete_htmx = f"<span hx-swap-oob='delete' id='lead-{lead.pk}'></span>"
+    if lead:
+        if new_position == None:    
+            return delete_htmx
+        else:
+            rendered_html = f"<span hx-swap-oob='afterbegin:.campaign_column_{lead.campaign.pk}_calls_{new_position},.site_column_{lead.campaign.site.pk}_calls_{new_position},.company_column_{lead.campaign.site.company.pk}_calls_{new_position}'><a hx-get='/campaign-leads/refresh-lead-article/{lead.pk}/' hx-swap='outerHTML' hx-indicator='.htmx-indicator' hx-trigger='load' href='#'></a> </span>"
+            from django.utils.safestring import mark_safe
+            return mark_safe(f"{rendered_html} {delete_htmx}")
+
+@login_required
+def campaign_assign_auto_send_template_htmx(request):
+    campaign = Campaign.objects.get(pk=request.POST.get('campaign_pk'))
+    first_template_pk = request.POST.get('first_template_pk')
+    second_template_pk = request.POST.get('second_template_pk')
+    third_template_pk = request.POST.get('third_template_pk')
+    if not first_template_pk == None:
+        campaign.first_send_template = WhatsappTemplate.objects.filter(pk=(first_template_pk or 0)).first()
+    if not second_template_pk == None:
+        campaign.second_send_template = WhatsappTemplate.objects.filter(pk=(second_template_pk or 0)).first()
+    if not third_template_pk == None:
+        campaign.third_send_template = WhatsappTemplate.objects.filter(pk=(third_template_pk or 0)).first()
+    campaign.save()
+    return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign,})
+                                                                            # 'site_list': get_available_sites_for_user(request.user)})
+
+@login_required
+def campaign_assign_product_cost_htmx(request):
+    campaign = Campaign.objects.get(pk=request.POST.get('campaign_pk'))
+    product_cost = request.POST.get('product_cost')
+    if product_cost:
+        campaign.product_cost = product_cost
+        campaign.save()
+    return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign,})
+                                                                            # 'site_list': get_available_sites_for_user(request.user)})
+

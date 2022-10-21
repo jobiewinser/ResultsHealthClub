@@ -1,0 +1,42 @@
+{%load core_tags%}
+{%load static tz core_tags%}
+{%with request.user.profile.company as company%}
+<span id="content">
+    <div class="row mt-2">
+        <div class="col">
+        </div>
+        <div class="col-md-auto card p-2">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            User
+                        </th>
+                        <th>
+                            Main Site
+                        </th>
+                        <th>
+                            Role
+                        </th>
+                        <th>
+                            
+                        </th>
+                        <th>
+                            
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {%for user in company.users%}
+                    <tr id="company_configuration_row_{{user.profile.pk}}">
+                        {%include 'core/htmx/company_configuration_row.html'%}
+                    </tr>
+                    {%endfor%}
+                </tbody>
+            </table>
+        </div>
+        <div class="col">
+        </div>
+    </div>
+</span>
+{%endwith%}

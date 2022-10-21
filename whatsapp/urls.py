@@ -20,12 +20,16 @@ urlpatterns = [
     path('ajax-clear-chat-from-session/', whatsappviews.clear_chat_from_session, name='clear-chat-from-session' ),
     path('ajax-add-chat-to-session/', whatsappviews.add_chat_to_session, name='add-chat-to-session' ),
     path('configuration/whatsapp-templates/', whatsappviews.WhatsappTemplatesView.as_view(), name='whatsapp-templates'),
-    path('configuration/whatsapp-template/<str:template_pk>/<str:site_pk>/', whatsappviews.WhatsappTemplatesEditView.as_view(), name='whatsapp-template'),
+    path('configuration/whatsapp-template/<str:template_pk>/', whatsappviews.WhatsappTemplatesEditView.as_view(), name='whatsapp-template'),
     path('configuration/whatsapp-template/', whatsappviews.WhatsappTemplatesCreateView.as_view(), name='whatsapp-template'),
-    path('configuration/whatsapp-template/delete/', whatsappviews.delete_whatsapp_template_htmx, name='whatsapp-template-delete'),
-    path('configuration/whatsapp-templates/save/', whatsappviews.save_whatsapp_template_ajax, name='whatsapp-template-save'),
-    path('configuration/whatsapp-templates/approval/', whatsappviews.whatsapp_approval_htmx, name='whatsapp-approval'),
-    path('configuration/whatsapp-templates/assign-send-order/', whatsappviews.whatsapp_assign_send_order_htmx, name='whatsapp-assign-send-order'),
-    path('configuration/whatsapp-templates/clear-changes/', whatsappviews.whatsapp_clear_changes_htmx, name='whatsapp-clear-changes'),
+    path('configuration/whatsapp-template-delete/', whatsappviews.delete_whatsapp_template_htmx, name='whatsapp-template-delete'),
+    path('configuration/whatsapp-templates-save/', whatsappviews.save_whatsapp_template_ajax, name='whatsapp-template-save'),
+    path('configuration/whatsapp-templates-approval/', whatsappviews.whatsapp_approval_htmx, name='whatsapp-approval'),   
+    path('configuration/whatsapp-templates/clear-changes/', whatsappviews.whatsapp_clear_changes_htmx, name='whatsapp-clear-changes'),    
+    path('configuration/whatsapp-change-number-alias/', whatsappviews.whatsapp_number_change_alias, name='whatsapp-change-number-alias'),
     
-]
+    path('configuration/whatsapp-number-make-default  /', whatsappviews.whatsapp_number_make_default, name='whatsapp-number-make-default'),
+      
+    path('configuration/whatsapp-change-template-site/', whatsappviews.whatsapp_template_change_site, name='whatsapp-change-template-site'),    
+    path('configuration/whatsapp-change-number-site/', whatsappviews.whatsapp_number_change_site, name='whatsapp-change-number-site'),    
+]    

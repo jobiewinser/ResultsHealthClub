@@ -1,0 +1,34 @@
+{% extends 'core/base.html' %}
+{%load static tz core_tags%}
+
+{%block scripts%}
+{{block.super}}
+<script>
+    $(document).ready(function() {
+        document.body.addEventListener('htmx:beforeRequest', function(evt) {  
+        });
+        document.body.addEventListener('htmx:afterSwap', function(evt) {              
+        });
+    });
+</script>
+{%endblock scripts%}
+
+{%block extra_top_left_buttons %}
+<div class="col-md-auto">
+    <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>             
+</div>
+{%with True as hide_show_all%}
+{%include 'core/htmx/site_selection.html'%}
+{%endwith%}
+<button hidden hx-get="" hx-push-url="false" hx-swap="outerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator=".top-htmx-indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
+{%endblock extra_top_left_buttons %}
+
+{%block extra_top_right_buttons %}
+<div class="col-md-auto">
+<span class="badge bg-dark text-white"><h6 class="m-1">Site Configuration</h6></span>           
+</div>
+{%endblock extra_top_right_buttons %}
+
+{%block content%}   
+    {%include 'core/htmx/site_configuration_htmx.html'%}
+{%endblock content%}

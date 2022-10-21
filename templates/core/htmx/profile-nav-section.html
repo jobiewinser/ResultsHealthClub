@@ -1,34 +1,37 @@
 {%load static%}
-{%if request.user.is_authenticated%} 
-<input type="text" style="display:None" id="edit_user" name="template_name" value="edit_user"/>
-{% comment %} <input type="text" style="display:None" id="switch_user" name="template_name" value="switch_user"/> {% endcomment %}
-<input type="text" style="display:None" id="user-select-{{user.pk}}" name="user_pk" value="{{user.pk}}"/>
-<a href="#" class="align-items-center text-white text-decoration-none" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-    <img src="{%if user.profile.avatar%}/media/{{user.profile.avatar}}{%else%}{% static 'img/blank-profile-picture.png' %}{%endif%}" alt="" width="55" height="55" class="rounded-circle me-2">
-    <span class="hide_small"><strong>{{user.profile}}</strong></span>
-    {% comment %} {%if user.profile.site.company.all.first.company_logo_black.url%}<img src="{{user.profile.site.company.all.first.company_logo_black.url}}" alt="" width="55" height="55" class="rounded-circle me-2">{%endif%} {% endcomment %}
-</a>
-<ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-    {% comment %} <li><a class="dropdown-item" href="#"hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" hx-include="#switch_user"
+<ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+    {%if request.user.is_authenticated%} 
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="{%if user.profile.avatar%}/media/{{user.profile.avatar}}{%else%}{% static 'img/blank-profile-picture.png' %}{%endif%}" alt="" width="55" height="55" class="rounded-circle me-2">
+            <strong>{{user.profile}}</strong>
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li><a class="dropdown-item" href="#"
+                hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
+                hx-vals='{"template_name": "edit_user", "user_pk":"{{request.user.pk}}"}'
+                hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
+                hx-swap="innerHTML" hx-trigger="click">Edit Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item " href="/accounts/logout/">Sign out</a></li>
+        </ul>
+    </li>
+    {%else%}
+    {% comment %} <a href="#" class="d-flex align-items-center text-white text-decoration-none"
+        hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" hx-vals='{"template_name": "login"}'
         hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
-        hx-swap="innerHTML" hx-trigger="click">Switch Profile</a>
-    </li> {% endcomment %}
-    <li><a class="dropdown-item" href="#"
-        hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" hx-include="#user-select-{{user.pk}}"
-        hx-vals='{"template_name": "edit_user"}'
-        hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
-        hx-swap="innerHTML" hx-trigger="click">Edit Profile</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><a class="dropdown-item" href="/accounts/logout/">Sign out</a></li>
+        hx-swap="innerHTML" hx-trigger="click"><strong>Login<span class="hide_small">/Register</span></strong>    
+    </a> {% endcomment %}
+    <li class="nav-item ">
+        <a class="nav-link text-white" href="#" 
+            hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" hx-vals='{"template_name": "login"}'
+            hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
+            hx-swap="innerHTML" hx-trigger="click">
+            Login
+        </a>
+    </li>
+    {%endif%}
 </ul>
-{%else%}
-<a href="#" class="d-flex align-items-center text-white text-decoration-none"
-    hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" hx-vals='{"template_name": "login"}'
-    hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
-    hx-swap="innerHTML" hx-trigger="click"><strong>Login<span class="hide_small">/Register</span></strong>    
-</a>
-{%endif%}
-
-<span id="csrf_token_div">
+{% comment %} <span id="csrf_token_div">
     <input type="text" style="display:None" id="csrf_token" name="csrf_token" value="{{csrf_token}}"/>
-</span>
+</span> {% endcomment %}

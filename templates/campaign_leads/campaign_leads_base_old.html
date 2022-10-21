@@ -39,7 +39,7 @@
       <div class="collapse {%if 'campaign-leads' in request.path or request.path == '/'%} active show{%endif%}" id="home-collapse">
         <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
           <li><a href="{%url 'campaign-leads-overview'%}" class="link-light rounded {%if 'campaign-leads/leads-and-calls' in request.path or request.path == '/'%} active{%endif%}">Leads & Calls</a></li>
-          <li><a href="{%url 'campaign-booking-overview'%}" class="link-light rounded {%if 'campaign-leads/booking-and-calender' in request.path%} active{%endif%}">Booking & Calender</a></li>
+          <li><a href="{%url 'campaign-booking-overview'%}" class="link-light rounded {%if 'campaign-leads/booking' in request.path%} active{%endif%}">Booking & Calender</a></li>
         </ul>
       </div>
     </li>
@@ -61,7 +61,7 @@
       <div class="collapse {%if 'configuration' in request.path%} active show{%endif%}" id="account-collapse">
         <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
           <li><a href="{% url 'whatsapp-templates' %}" class="link-light rounded {%if 'configuration/whatsapp-templates' in request.path%} active{%endif%}">Whatsapp Templates</a></li>
-          <li><a href="{% url 'lead-configuration' %}" class="link-light rounded {%if 'configuration/lead-configuration' in request.path%} active{%endif%}">Lead Configuration</a></li>
+          <li><a href="{% url 'campaign-configuration' %}" class="link-light rounded {%if 'configuration/campaign-configuration' in request.path%} active{%endif%}">Lead Configuration</a></li>
         </ul>
       </div>
     </li>

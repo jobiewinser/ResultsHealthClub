@@ -1,31 +1,25 @@
 {%load static core_tags%}
 
 
-<div class="card chat_bottom_window p-0" id="chat_card_{{customer_number}}" data-whatsapp-number="{{customer_number}}">
-    <div class="card-header chat_bottom_header center" >
+<div class="card chat_bottom_window customer_chat_bottom_window p-0" id="chat_card_{{customer_number}}" data-whatsapp-number="{{customer_number}}">
+    <div class="card-header chat_bottom_header" >
         <div class="row">
-            <div class="col p-0" data-bs-toggle="collapse" data-bs-target="#messageWindowCollapse_{{customer_number}}" aria-expanded="true" aria-controls="messageWindowCollapse_{{customer_number}}">
-                {%if lead.name%}{{lead.name}}{%else%}{{customer_number}}{%endif%}
+            <div class="col p-0 left text-white" data-bs-toggle="collapse" data-bs-target="#messageWindowInnerBody_{{customer_number}}" aria-expanded="true" aria-controls="messageWindowInnerBody_{{customer_number}}">
+                {%include 'messaging/message_window_header.html'%}
             </div>
             <div class="col-auto p-0">
                 <i class="fa-sharp fa-solid fa-circle-xmark" onclick="$('#chat_card_{{customer_number}}').remove(); clear_chat_from_session('{{customer_number}}')"></i>
             </div>
         </div>
     </div>
-    <div class="card-body chat_card_body collapse show p-0" id="messageWindowCollapse_{{customer_number}}">
-        {%for message in messages%}
-            {%include 'messaging/htmx/message_chat_row.html'%}
-        {%endfor%}
-        <form id="message_form_{{customer_number}}" hx-ws="send:submit">
-            <div style="position: absolute; right:0; bottom: 0; width:100%" class="row" id="message_input_div_{{customer_number}}"> 
-                    <div class="col"> 
-                        <input class="form-control message_input_text" id="message_input_{{customer_number}}"  name="message"  type="text"/>
-                        <input hidden class="form-control" value="{{customer_number}}"  name="messaging_whatsapp_number"  type="text"/>
-                    </div>
-                    <div class="col-auto"> 
-                        <button onclick="setTimeout(function (){$('#message_input_{{customer_number}}').val('')}, 10);" class="badge bg-primary message_submit" id="message_submit_{{customer_number}}"><i class="fa-solid fa-paper-plane-top"></i></button>
-                    </div>
-            </div>
-        </form>
-    </div>
+    {%include 'messaging/message_window_body.html'%}    
 </div>
+
+<script>
+    $(document).ready(function() {
+        document.body.addEventListener('htmx:beforeRequest', function(evt) {  
+        });
+        document.body.addEventListener('htmx:afterSwap', function(evt) {              
+        });
+    });
+</script>

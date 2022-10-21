@@ -20,13 +20,13 @@ urlpatterns = [
     
 
 
-    path('booking-and-calender/', campaignleadsviews.CampaignBookingsOverviewView.as_view(), name='campaign-booking-overview'),
+    path('booking/', campaignleadsviews.CampaignBookingsOverviewView.as_view(), name='campaign-booking-overview'),
     path('leads-and-calls/', campaignleadsviews.CampaignleadsOverviewView.as_view(), name='campaign-leads-overview'),    
 
 
 
 
-    path('configuration/lead-configuration/', campaignleadsviews.LeadConfigurationView.as_view(), name='lead-configuration'),
+    path('configuration/campaign-configuration/', campaignleadsviews.CampaignConfigurationView.as_view(), name='campaign-configuration'),
     
 
     
@@ -35,6 +35,7 @@ urlpatterns = [
     path('new-leads-column/', campaignleadshtmx.new_leads_column, name='new-leads-column' ),
     path('delete-lead/', campaignleadshtmx.delete_lead, name='delete-lead' ),
     
+    path('refresh-lead-article/<str:lead_pk>/', campaignleadshtmx.refresh_lead_article, name='refresh-lead-article' ),
     path('get-leads-column-meta-data/', campaignleadshtmx.get_leads_column_meta_data, name='get-leads-column-meta-data' ),
     path('create-campaign-lead/', campaignleadshtmx.create_campaign_lead, name='create-campaign-lead' ),
     
@@ -53,5 +54,9 @@ urlpatterns = [
 
     path('new-call/', campaignleadsviews.new_call, name='new-call' ),
     path('new-call/<int:lead_pk>/<int:call_count>/<int:max_call_count>/', campaignleadsviews.new_call, name='new-call' ),
+
+    
+    path('configuration/campaign-assign-auto-send-template/', campaignleadsviews.campaign_assign_auto_send_template_htmx, name='campaign-assign-auto-send-template'), 
+    path('configuration/campaign-assign-product_cost/', campaignleadsviews.campaign_assign_product_cost_htmx, name='campaign-assign-product_cost'), 
     
 ]

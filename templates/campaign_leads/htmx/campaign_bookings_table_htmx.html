@@ -1,10 +1,11 @@
+{%load core_tags%}
 {%include 'campaign_leads/htmx/campaign_bookings_table.html'%}
 
 {%include 'campaign_leads/htmx/campaign_bookings_table_status_toggle_div.html'%}
 {% comment %} {%include 'campaign_leads/htmx/campaign_bookings_table_booking_needed_toggle_div.html'%} {% endcomment %}
 
 <span hx-swap-oob="true" id="site_pk_span">   
-    <input type="text" style="display:None" id="site_pk" name="site_pk" value="{{request.GET.site_pk}}"/>
+    <input type="text" style="display:None" id="site_pk" name="site_pk" value="{{request|get_key_in_get_or_post:'site_pk'}}"/>
 </span>
 <span hx-swap-oob="true" id="campaign_list_span">    
     {%include 'campaign_leads/htmx/campaign_select.html'%}
@@ -13,8 +14,4 @@
     <div class="progress">  
         <div id="pb" class="progress-bar top-htmx-indicator" style="width:100%"></div>
     </div>
-</span>
-
-<span hx-swap-oob="true" id="chat_bottom">
-    {%include 'messaging/messaging.html'%}
 </span>

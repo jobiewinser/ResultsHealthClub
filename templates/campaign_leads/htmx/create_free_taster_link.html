@@ -3,8 +3,8 @@
     <div class="row">
         <div class="col center">     
             <select class="form-select free_taster_input" name="site_pk">
-                {%for site in site_list%}
-                <option {%if site.pk == request.GET.site_pk|str_to_int %}selected{%endif%} value="{{site.pk}}">{{site.name}}</option>
+                {%for site in request.user.profile.sites_allowed.all%}
+                <option {%if site.pk == request|get_key_in_get_or_post:'site_pk'|str_to_int %}selected{%endif%} value="{{site.pk}}">{{site.name}}</option>
                 {%endfor%}
             </select>
             <br>       

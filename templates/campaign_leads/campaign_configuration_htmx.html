@@ -1,0 +1,43 @@
+<span id="content">
+    <div class="">
+        <div class="col m-3 alert alert-info">
+            <p>From this page you can assign all of your campaigns to the various sites you may have attached to your company.</p>
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col">
+            <table id="overview_table" class="table"> 
+                <thead> 
+                    <tr>
+                        <th>
+                            Name
+                        </th>
+                        <th>
+                            Site
+                        </th>
+                        <th>
+                            Price (£)
+                        </th>
+                        <th>
+                            1st Auto-Send Template
+                        </th>
+                        <th>
+                            2nd Auto-Send Template
+                        </th>
+                        <th>
+                            3rd Auto-Send Template
+                        </th>
+                    </tr>
+                </thead>
+                <tbody> 
+                    {%for campaign in campaigns%}
+                    <tr id="row_{{campaign.pk}}">
+                        {%include 'campaign_leads/campaign_configuration_row.html'%}
+                    </tr>
+                    {%endfor%}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</span>

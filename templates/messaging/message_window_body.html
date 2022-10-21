@@ -1,0 +1,16 @@
+<div class="card-body collapse show p-0" id="messageWindowCollapse_{{customer_number}}">
+    <div class="chat_card_body  p-0" id="messageWindowInnerBody_{{customer_number}}">
+        {%include 'messaging/message_window_message_rows.html'%}
+        <form id="message_form_{{customer_number}}" hx-ws="send:submit">
+            <div style="position: absolute; right:0; bottom: 0; width:100%;" class="row mb-2" id="message_input_div_{{customer_number}}"> 
+                <div class="col"> 
+                    <input class="form-control message_input_text" id="message_input_{{customer_number}}"  name="message"  type="text"/>
+                    <input hidden class="form-control" value="{{customer_number}}"  name="messaging_customer_number"  type="text"/>
+                </div>
+                <div class="col-auto"> 
+                    <button onclick="setTimeout(function (){$('#message_input_{{customer_number}}').val('')}, 10);" class="badge bg-primary message_submit" id="message_submit_{{customer_number}}"><i class="fa-solid fa-paper-plane-top"></i></button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

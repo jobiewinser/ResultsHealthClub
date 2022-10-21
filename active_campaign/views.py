@@ -3,9 +3,10 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from campaign_leads.models import Campaign, Campaignlead
 from campaign_leads.views import get_campaign_qs
+from core.user_permission_functions import get_available_sites_for_user
 from core.views import get_site_pk_from_request
-from active_campaign.api import ActiveCampaign
-from active_campaign.models import ActiveCampaignWebhookRequest, ActiveCampaignList
+from active_campaign.api import ActiveCampaignApi
+from active_campaign.models import ActiveCampaignWebhookRequest, ActiveCampaign
 from core.models import Site
 logger = logging.getLogger(__name__)
 from django.views import View 
@@ -20,15 +21,15 @@ class Webhooks(View):
         return HttpResponse("", "text", 200)
 
     def post(self, request, *args, **kwargs): 
-        try:
+        # try:
             logger.debug(str(request.POST))     
             data = request.POST  
             guid = kwargs.get('guid')
             ActiveCampaignWebhookRequest.objects.create(json_data = data, guid=guid)       
             if data.get('type') in ['subscribe','update']:
                 if guid:
-                    active_campaign_list = ActiveCampaignList.objects.get(guid=guid)
-                    if active_campaign_list.site:
+                    campaign = ActiveCampaign.objects.get(guid=guid)
+                    if campaign.site:
                         phone_number_whole = str(data.get('contact[phone]', "")).replace(' ','')
                         # phone_number_whole = str(data.get('contact[phone]', "")).replace('+','').replace(' ','')
                         # if phone_number_whole:
@@ -46,7 +47,7 @@ class Webhooks(View):
                         #     country_code = "None"
                         possible_duplicate  = False
                         if Campaignlead.objects.filter(
-                                active_campaign_list=active_campaign_list,
+                                campaign=campaign,
                                 active_campaign_contact_id=data.get('contact[id]')
                             ): 
                             possible_duplicate  = True
@@ -55,15 +56,15 @@ class Webhooks(View):
                                 active_campaign_contact_id=data.get('contact[id]'),
                                 first_name=data.get('contact[first_name]', "None"),
                                 whatsapp_number=phone_number_whole,
-                                active_campaign_list=active_campaign_list,
+                                campaign=campaign,
                                 active_campaign_form_id=data.get('form[id]', None),
                                 possible_duplicate = possible_duplicate,
                                 email = data.get('contact[email]', "")
                             )
             return HttpResponse("", "text", 200)
-        except Exception as e:     
-            logger.error(f"Webhooks POST {str(e)}")     
-            return HttpResponse(str(e), "text", 500)
+        # except Exception as e:     
+        #     logger.error(f"Webhooks POST {str(e)}")     
+        #     return HttpResponse(str(e), "text", 500)
 
 
 # @login_required
@@ -91,13 +92,18 @@ def set_campaign_site(request, **kwargs):
     try:
         campaign = Campaign.objects.get(pk=kwargs.get('campaign_pk'))
         site_pk = request.POST.get('site_pk',None)
+        campaign.first_send_template = None
+        campaign.second_send_template = None
+        campaign.third_send_template = None
+
         if site_pk:
             site = Site.objects.get(pk=site_pk)
             campaign.site = site
         else:
             campaign.site = None
         campaign.save()
-        return render(request, 'campaign_leads/htmx/leads_configuration_select.html', {'campaign':campaign, 'site_list':Site.objects.all()})
+        return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign,})
+                                                                                # 'site_list': get_available_sites_for_user(request.user)})
     except Exception as e:        
         logger.error(f"set_campaign_site {str(e)}")
         return HttpResponse("Couldn't set Campaign Site", status=500)

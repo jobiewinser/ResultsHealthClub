@@ -5,7 +5,9 @@ from django.http import HttpResponse, QueryDict
 import json
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from campaign_leads.models import Campaignlead, Call
+from campaign_leads.models import Campaign, Campaignlead, Call
+from core.user_permission_functions import get_available_sites_for_user, get_user_allowed_to_edit_template, get_user_allowed_to_edit_whatsappnumber
+from messaging.models import Message
 from whatsapp.api import Whatsapp
 from django.views.generic import TemplateView
 from whatsapp.models import WHATSAPP_ORDER_CHOICES, WhatsAppMessage, WhatsAppMessageStatus, WhatsAppWebhookRequest, WhatsappTemplate, template_variables
@@ -13,8 +15,7 @@ from django.template import loader
 logger = logging.getLogger(__name__)
 from django.views import View 
 from django.utils.decorators import method_decorator
-from core.models import ErrorModel, Site
-from asgiref.sync import async_to_sync, sync_to_async
+from core.models import ErrorModel, Site, WhatsappNumber
 @method_decorator(csrf_exempt, name="dispatch")
 class Webhooks(View):
     def get(self, request, *args, **kwargs):
@@ -56,17 +57,18 @@ class Webhooks(View):
                                 lead = None
                             # Likely a message from a customer     
                             lead = Campaignlead.objects.filter(whatsapp_number=from_number).last()
-                            site = Site.objects.get(whatsapp_number=to_number)
+                            whatsappnumber = WhatsappNumber.objects.get(number=to_number)
+                            site = Site.objects.get(phonenumber=whatsappnumber)
                             whatsapp_message = WhatsAppMessage.objects.create(
                                 wamid=wamid,
                                 message = message.get('text').get('body',''),
                                 datetime = datetime_from_request,
                                 customer_number = from_number,
-                                system_user_number = to_number,
                                 inbound=True,
                                 site=site,
                                 lead=lead,
                                 raw_webhook=webhook,
+                                whatsappnumber=whatsappnumber,
                             )
                             whatsapp_message.save()
                             from channels.layers import get_channel_layer
@@ -74,25 +76,38 @@ class Webhooks(View):
                             message_context = {
                                 "message": whatsapp_message,
                                 "site": site,
+                                "whatsappnumber": whatsappnumber,
                             }
                             rendered_message_list_row = loader.render_to_string('messaging/htmx/message_list_row.html', message_context)
                             rendered_message_chat_row = loader.render_to_string('messaging/htmx/message_chat_row.html', message_context)
-                            rendered_htmx = f"""
+                            rendered_html = f"""
 
-                            
-                            <span id='message_list_row_{from_number}_{site.pk}' hx-swap-oob='delete'></span>
-                            <span id='messageCollapse_{site.pk}' hx-swap-oob='afterbegin'>{rendered_message_list_row}</span>
+                            <span id='latest_message_row_{from_number}' hx-swap-oob='delete'></span>
+                            <span id='messageCollapse_{whatsappnumber.pk}' hx-swap-oob='afterbegin'>{rendered_message_list_row}</span>
 
-                            <span id='messageWindowCollapse_{from_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>
+                            <span id='messageWindowInnerBody_{from_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>
                             """
+                            from channels.layers import get_channel_layer
+                            from asgiref.sync import async_to_sync
+                            channel_layer = get_channel_layer()  
                             async_to_sync(channel_layer.group_send)(
-                                f"messaging_{site.pk}",
+                                f"messaging_{whatsappnumber.pk}",
                                 {
                                     'type': 'chatbox_message',
-                                    "message": rendered_htmx,
+                                    "message": rendered_html,
                                 }
                             )
+                         
                             
+                            async_to_sync(channel_layer.group_send)(
+                                f"message_count_{whatsappnumber.site.company.pk}",
+                                {
+                                    'type': 'messsages_count_update',
+                                    'data':{
+                                        'rendered_html':f"""<span hx-swap-oob="afterbegin:.company_message_count"><span hx-trigger="load" hx-swap="none" hx-get="/update-message-counts/"></span>""",
+                                    }
+                                }
+                            )
                             logger.debug("webhook sending to chat end")                     
 
                 elif field == 'statuses':
@@ -113,10 +128,10 @@ class Webhooks(View):
                         template = templates[0]
                         template.status=value.get('event')
                         reason = value.get('reason', None)
-                        if reason and not reason.lower() == 'none':
-                            template.latest_reason=value.get('reason')
-                        else:
-                            template.latest_reason=None
+                        # if reason and not reason.lower() == 'none':
+                        #     template.latest_reason=value.get('reason')
+                        # else:
+                        #     template.latest_reason=None
                         template.name=value.get('message_template_name')
                         template.language=value.get('message_template_language')
                         whatsapp = Whatsapp(template.site.whatsapp_access_token)
@@ -131,8 +146,10 @@ class Webhooks(View):
                             template.language = template_live.get('language')
                             template.pending_language = ""
 
-                            template.components = template_live.get('components')
+                            template.components = template.pending_components
                             template.pending_components = []
+
+                            template.last_approval = datetime.now()
                         template.save()
         response = HttpResponse("")
         response.status_code = 200     
@@ -186,7 +203,7 @@ class WhatsappTemplatesView(TemplateView):
                 site = Site.objects.filter(company=self.request.user.profile.company.first()).first()
         refresh_template_data(site)
         context['templates'] = WhatsappTemplate.objects.filter(site=site).exclude(archived=True)
-        context['site_list'] = Site.objects.all()
+        # context['site_list'] = get_available_sites_for_user(self.request.user)
         context['site'] = site
         context['WHATSAPP_ORDER_CHOICES'] = WHATSAPP_ORDER_CHOICES
         return context
@@ -201,19 +218,20 @@ def refresh_template_data(site):
                 )                
                 if created:
                     template.site = site
-                template.company = site.get_company
+                template.company = site.company
                 template.status = api_template.get('status')
                 template.name = api_template.get('name')
                 template.language = api_template.get('language')
                 template.category = api_template.get('category')
-                components = []
-                for dict in api_template.get('components', []):
-                    json_dict = {}
-                    for k,v in dict.items():
-                        json_dict[k] = str(v)
-                    components.append(json_dict)
-                
-                template.components = components
+                if not template.components and not template.pending_components:
+                    components = []
+                    for dict in api_template.get('components', []):
+                        json_dict = {}
+                        for k,v in dict.items():
+                            json_dict[k] = str(v)
+                        components.append(json_dict)
+                    
+                    template.components = components
                 try:
                     template.save()
                 except Exception as e:
@@ -228,7 +246,7 @@ class WhatsappTemplatesEditView(TemplateView):
         self.request.GET._mutable = True     
         context = super(WhatsappTemplatesEditView, self).get_context_data(**kwargs)
         template = WhatsappTemplate.objects.get(pk=kwargs.get('template_pk'))
-        if self.request.user.profile.get_company == template.company:
+        if self.request.user.profile.company == template.company:
             context['template'] = template
             context['variables'] = template_variables
             context['categories'] = {
@@ -251,6 +269,18 @@ class WhatsappTemplatesCreateView(TemplateView):
         return context
 
     
+@login_required
+def whatsapp_approval_htmx(request):
+    template = WhatsappTemplate.objects.get(pk=request.POST.get('template_pk'))
+    if request.user.profile.company == template.company:
+        whatsapp = Whatsapp(template.site.whatsapp_access_token)
+        if template.message_template_id:
+            whatsapp.edit_template(template)
+        else:
+            whatsapp.create_template(template)
+        return render(request, 'whatsapp/whatsapp_templates_row.html', {'template':WhatsappTemplate.objects.get(pk=request.POST.get('template_pk')), 'site':template.site, 'WHATSAPP_ORDER_CHOICES': WHATSAPP_ORDER_CHOICES})
+
+@login_required
 def delete_whatsapp_template_htmx(request):
     body = QueryDict(request.body)
     site = Site.objects.get(pk=body.get('site_pk'))
@@ -258,42 +288,72 @@ def delete_whatsapp_template_htmx(request):
     template = WhatsappTemplate.objects.get(pk=body.get('template_pk'))
     if template.message_template_id:
         whatsapp.delete_template(site.whatsapp_business_account_id, template.name)
-    # template.delete()
+    template.delete()
     template.archived = True
+    template.save()
     return HttpResponse("", status=200)
-def whatsapp_approval_htmx(request):
-    template = WhatsappTemplate.objects.get(pk=request.POST.get('template_pk'))
-    if request.user.profile.get_company == template.company:
-        whatsapp = Whatsapp(template.site.whatsapp_access_token)
-        if template.message_template_id:
-            whatsapp.edit_template(template)
-        else:
-            whatsapp.create_template(template)
-        return render(request, 'whatsapp/whatsapp_templates_row.html', {'template':template, 'site':template.site, 'WHATSAPP_ORDER_CHOICES': WHATSAPP_ORDER_CHOICES})
 
-def whatsapp_assign_send_order_htmx(request):
-    template = WhatsappTemplate.objects.get(pk=request.POST.get('template_pk'))
-    if request.user.profile.get_company == template.company:
-        send_order = request.POST.get('send_order')
-        templates_with_send_order_already = WhatsappTemplate.objects.filter(send_order = send_order)
-        if templates_with_send_order_already:
-            templates_with_send_order_already.update(send_order=0)
-        template.send_order = send_order
-        template.save()
-        return render(request, 'whatsapp/whatsapp_templates_row.html', {'template':template, 
-                                                                        'site':template.site,
-                                                                        'templates_with_send_order_already':templates_with_send_order_already, 
-                                                                        'WHATSAPP_ORDER_CHOICES': WHATSAPP_ORDER_CHOICES})
-
+         
 def whatsapp_clear_changes_htmx(request):
     template = WhatsappTemplate.objects.get(pk=request.POST.get('template_pk'))
-    if request.user.profile.get_company == template.company:
+    if request.user.profile.company == template.company:
         template.pending_category = None
         template.pending_components = None
         template.pending_language = None
         template.pending_name = None
         template.save()
-        return render(request, 'whatsapp/whatsapp_templates_row.html', {'template':template, 'site':template.site, 'WHATSAPP_ORDER_CHOICES': WHATSAPP_ORDER_CHOICES})
+        return render(request, 'whatsapp/whatsapp_templates_row.html', {'template':template, 'WHATSAPP_ORDER_CHOICES': WHATSAPP_ORDER_CHOICES})
+                                                                            # 'site_list': get_available_sites_for_user(request.user), 
+
+def whatsapp_number_change_alias(request):
+    whatsappnumber = WhatsappNumber.objects.get(pk=request.POST.get('whatsappnumber_pk'))
+    if get_user_allowed_to_edit_whatsappnumber(request.user, whatsappnumber):
+        alias = request.POST.get('alias', None)
+        if alias:
+            whatsappnumber.alias = alias
+            whatsappnumber.save()
+            return HttpResponse("",status=200)
+    return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
+def whatsapp_number_make_default(request):
+    whatsappnumber = WhatsappNumber.objects.get(pk=request.POST.get('whatsappnumber_pk'))
+    if get_user_allowed_to_edit_whatsappnumber(request.user, whatsappnumber):
+        site = whatsappnumber.site
+        site.default_number = whatsappnumber
+        site.save()
+        return render(request, 'core/htmx/site_configuration_htmx.html', {'whatsapp_numbers':site.get_live_whatsapp_phone_numbers(), 'site': site, })
+        # 'site_list': get_available_sites_for_user(request.user)})
+    return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
+    
+
+def whatsapp_template_change_site(request):
+    template = WhatsappTemplate.objects.get(pk=request.POST.get('template_pk'))
+    if get_user_allowed_to_edit_template(request.user, template):
+        site_pk = request.POST.get('site_pk', None)
+        if site_pk:
+            site = Site.objects.get(pk=site_pk)
+            if site.company == template.site.company and site.whatsapp_business_account_id == template.site.whatsapp_business_account_id:
+                template.site = site
+                template.save()
+                Campaign.objects.filter(first_send_template=template).update(first_send_template=None)
+                Campaign.objects.filter(second_send_template=template).update(second_send_template=None)
+                Campaign.objects.filter(third_send_template=template).update(third_send_template=None)
+                return HttpResponse("",status=200)
+    return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
+
+def whatsapp_number_change_site(request):
+    whatsappnumber = WhatsappNumber.objects.get(pk=request.POST.get('whatsappnumber_pk'))
+    if get_user_allowed_to_edit_whatsappnumber(request.user, whatsappnumber):
+        site_pk = request.POST.get('site_pk', None)
+        if site_pk:
+            site = Site.objects.get(pk=site_pk)
+            if site.company == whatsappnumber.site.company and site.whatsapp_business_account_id == whatsappnumber.site.whatsapp_business_account_id:
+                whatsappnumber.site = site
+                whatsappnumber.save()
+                Site.objects.filter(default_number=whatsappnumber).update(default_number=None)
+                WhatsAppMessage.objects.filter(whatsappnumber=whatsappnumber).update(site=site)
+                return HttpResponse("",status=200)
+    return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
+
 
 def save_whatsapp_template_ajax(request):
     if request.POST.get('created', False):
@@ -303,11 +363,11 @@ def save_whatsapp_template_ajax(request):
         if request.user.profile.site:
             template.site = request.user.profile.site
         else:
-            template.site = request.user.profile.get_company.site_set.first()
-        template.company = request.user.profile.get_company
+            template.site = request.user.profile.company.site_set.first()
+        template.company = request.user.profile.company
     else:
         template = WhatsappTemplate.objects.get(pk=request.POST.get('template_pk'))
-    if request.user.profile.get_company == template.company:
+    if request.user.profile.company == template.company:
         new_components = [
                 {'type': 'HEADER', 'format': 'TEXT', 'text': request.POST.get('header')},
                 {'type': 'BODY', 'text': request.POST.get('body')},
@@ -327,6 +387,7 @@ def save_whatsapp_template_ajax(request):
                 {'type': 'BODY', 'text': request.POST.get('body')},
                 {'type': 'FOOTER', 'text': request.POST.get('footer')},
             ]
+            
             template.edited_by = request.user
             template.edited = datetime.now()
             template.save()

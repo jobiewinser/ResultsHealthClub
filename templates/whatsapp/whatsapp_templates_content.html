@@ -1,22 +1,5 @@
-<div class="fixed_top_buttons">
-    {%block extra_top_left_buttons %}
-    <button hidden hx-get="{% url 'whatsapp-templates' %}" hx-push-url="false" hx-swap="innerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator=".top-htmx-indicator" hx-target="#whatsapp_templates_content" id="change_site" class="btn btn-primary btn-sm"></button>
-    <div class="col-md-auto me-2">
-        <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>             
-    </div>
-    {%with True as hide_show_all%}
-    {%include 'core/htmx/site_selection.html'%}
-    {%endwith%}
-    {%endblock extra_top_left_buttons %}
-    <div class="col">
-    </div>
-    <div class="col-md-auto">
-        <span class="badge bg-dark text-white"><h6 class="m-1">Whatsapp Templates</h6></span>      
-    </div>
-</div>
 
-<main class="row overflow-auto below_fixed_top_buttons">    
-    <div class="row m-3">
+    <div class="">
         <div class="col m-3 alert alert-warning">
             <p>Message templates in an Aproved state can be edited up to 10 times in a 30 day window, or 1 time in a 24 hour window.</p>
             <p class="m-0">Messages in Rejected or Paused states can be edited an unlimited number of times.</p>
@@ -35,35 +18,32 @@
             </button>            
         </div>
     </div>
-    <div class="row mt-2">
+    <div class="row mt-2 card p-2">
         <div class="col">
-            {% comment %} <ul class="nav nav-pills">
-                <div class="row m-3" id="template_area">
-                </div>
-            </ul> {% endcomment %}
             <table id="overview_table" class="table"> 
                 <thead> 
                     <tr>
                         <th>
                             Name
                         </th>
-                        <th>
+                        {% comment %} <th>
                             Category
-                        </th>
-                        <th>
+                        </th> {% endcomment %}
+                        {% comment %} <th>
                             Language
-                        </th>
+                        </th> {% endcomment %}
                         <th>
                             ID
                         </th>
                         <th>
                             Status
                         </th>
-                        {%if site%}
                         <th>
-                            Auto send
+                            Site
                         </th>
-                        {%endif%}
+                        {% comment %} <th>
+                            Auto send
+                        </th> {% endcomment %}
                         <th>  
                         </th>
                     </tr>
@@ -80,8 +60,3 @@
             </table>
         </div>
     </div>
-</main>
-
-<span hx-swap-oob="true" id="chat_bottom">
-    {%include 'messaging/messaging.html'%}
-</span>
