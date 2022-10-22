@@ -9,13 +9,13 @@ from dateutil import relativedelta
 
 from core.templatetags.core_tags import short_month_name
 
-def get_sales_to_leads_between_dates_with_timeframe_differences(start_date, end_date, timeframe, timeframe_label_string='month', site=None):
+def get_sales_to_leads_between_dates_with_timeframe_differences(start_date, end_date, timeframe, user, timeframe_label_string='month', site=None):
     if start_date + relativedelta.relativedelta(years=3) > end_date:
         index_date = start_date
         time_label_set = []
         data_set = []
         while index_date < end_date + timeframe:
-            qs = Campaignlead.objects.filter(created__gte=index_date, created__lt=index_date + timeframe)
+            qs = Campaignlead.objects.filter(created__gte=index_date, created__lt=index_date + timeframe, campaign__site__in=user.profile.sites_allowed.all())
             if site:
                 qs = qs.filter(campaign__site=site)
             leads = qs.count()
@@ -41,13 +41,13 @@ def get_sales_to_leads_between_dates_with_timeframe_differences(start_date, end_
         return data_set, time_label_set    
     return [],[]
     
-def get_bookings_to_leads_between_dates_with_timeframe_differences(start_date, end_date, timeframe, timeframe_label_string='month', site=None):
+def get_bookings_to_leads_between_dates_with_timeframe_differences(start_date, end_date, timeframe, user, timeframe_label_string='month', site=None):
     if start_date + relativedelta.relativedelta(years=3) > end_date:
         index_date = start_date
         time_label_set = []
         data_set = []
         while index_date < end_date + timeframe:
-            qs = Campaignlead.objects.filter(created__gte=index_date, created__lt=index_date + timeframe)
+            qs = Campaignlead.objects.filter(created__gte=index_date, created__lt=index_date + timeframe, campaign__site__in=user.profile.sites_allowed.all())
             if site:
                 qs = qs.filter(campaign__site=site)
             leads = qs.count()
@@ -87,16 +87,16 @@ def get_leads_to_sales(request):
     date_diff = end_date - start_date
     if date_diff > timedelta(days=364):
         # 3 month chunks, 
-        data_set, time_label_set = get_sales_to_leads_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(months=3), timeframe_label_string='months', site=site)
+        data_set, time_label_set = get_sales_to_leads_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(months=3), request.user, timeframe_label_string='months', site=site)
     elif date_diff > timedelta(days=83):
         # 1 month chunks, 
-        data_set, time_label_set = get_sales_to_leads_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(months=1), timeframe_label_string='month', site=site)
+        data_set, time_label_set = get_sales_to_leads_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(months=1), request.user, timeframe_label_string='month', site=site)
     elif date_diff > timedelta(days=13):
         # 1 week chunks, 
-        data_set, time_label_set = get_sales_to_leads_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(weeks=1), timeframe_label_string='week', site=site)
+        data_set, time_label_set = get_sales_to_leads_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(weeks=1), request.user, timeframe_label_string='week', site=site)
     else:
         # 1 day chunks,
-        data_set, time_label_set = get_sales_to_leads_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(days=1), timeframe_label_string='day', site=site)
+        data_set, time_label_set = get_sales_to_leads_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(days=1), request.user, timeframe_label_string='day', site=site)
         
     context['data_set'] = data_set
     context['time_label_set'] = time_label_set
@@ -121,16 +121,16 @@ def get_leads_to_bookings(request):
     date_diff = end_date - start_date
     if date_diff > timedelta(days=364):
         # 3 month chunks, 
-        data_set, time_label_set = get_bookings_to_leads_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(months=3), timeframe_label_string='months', site=site)
+        data_set, time_label_set = get_bookings_to_leads_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(months=3), request.user, timeframe_label_string='months', site=site)
     elif date_diff > timedelta(days=83):
         # 1 month chunks, 
-        data_set, time_label_set = get_bookings_to_leads_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(months=1), timeframe_label_string='month', site=site)
+        data_set, time_label_set = get_bookings_to_leads_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(months=1), request.user, timeframe_label_string='month', site=site)
     elif date_diff > timedelta(days=13):
         # 1 week chunks, 
-        data_set, time_label_set = get_bookings_to_leads_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(weeks=1), timeframe_label_string='week', site=site)
+        data_set, time_label_set = get_bookings_to_leads_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(weeks=1), request.user, timeframe_label_string='week', site=site)
     else:
         # 1 day chunks,
-        data_set, time_label_set = get_bookings_to_leads_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(days=1), timeframe_label_string='day', site=site)
+        data_set, time_label_set = get_bookings_to_leads_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(days=1), request.user, timeframe_label_string='day', site=site)
         
     context['data_set'] = data_set
     context['time_label_set'] = time_label_set

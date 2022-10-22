@@ -27,17 +27,20 @@ def message_window(request, **kwargs):
     messages = WhatsAppMessage.objects.filter(customer_number=kwargs.get('customer_number'), whatsappnumber=whatsappnumber).order_by('-datetime')[:20:-1]
     context = {}
     context["messages"] = messages
-    context["lead"] = Campaignlead.objects.filter(whatsapp_number=kwargs.get('customer_number')).first()
-    context["customer_number"] = kwargs.get('customer_number')
-    context['whatsappnumber'] = whatsappnumber
-    # messaging_phone_number = kwargs.get('messaging_phone_number')
-    # if messaging_phone_number:
-    #     context["system_phone_number"] = messaging_phone_number
-    # else:
-    #     numbers = request.user.profile.site.watsappnumber_set.all().value_list('number')
-    #     latest_message = WhatsAppMessage.objects.filter
+    lead = Campaignlead.objects.filter(whatsapp_number=kwargs.get('customer_number')).first()
+    if get_user_allowed_to_use_site_messaging(request.user, lead.campaign.site):
+        context["lead"] = lead
+        context["customer_number"] = kwargs.get('customer_number')
+        context['whatsappnumber'] = whatsappnumber
+        # messaging_phone_number = kwargs.get('messaging_phone_number')
+        # if messaging_phone_number:
+        #     context["system_phone_number"] = messaging_phone_number
+        # else:
+        #     numbers = request.user.profile.site.watsappnumber_set.all().value_list('number')
+        #     latest_message = WhatsAppMessage.objects.filter
 
-    return render(request, "messaging/message_window_htmx.html", context)
+        return render(request, "messaging/message_window_htmx.html", context)
+    return HttpResponse("", status=500)
 
 @login_required
 def get_messaging_section(request, **kwargs):

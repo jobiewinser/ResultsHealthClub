@@ -3,7 +3,7 @@
         <div class="col center">
             
             <div class="btn-group btn-space">
-                <button class="btn btn-sm btn-secondary" type="button"
+                {% comment %} <button class="btn btn-sm btn-secondary" type="button"
                     data-bs-toggle="popover" 
                     data-bs-trigger="hover" 
                     data-bs-placement="top"
@@ -17,7 +17,7 @@
                         <span class="badge bg-info" style="font-size:10px">
                             {{lead.call_set.all.count}}                
                         </span>
-                </button>
+                </button> {% endcomment %}
                 <button class="btn btn-sm btn-success"
                     data-bs-toggle="popover" 
                     data-bs-trigger="hover" 
@@ -33,7 +33,7 @@
                             {{lead.booking_set.all.count}}                
                         </span>
                 </button>   
-                <button class="btn btn-sm btn-secondary"
+                {% comment %} <button class="btn btn-sm btn-secondary"
                     data-bs-toggle="popover" 
                     data-bs-trigger="hover" 
                     data-bs-placement="top"
@@ -47,7 +47,7 @@
                         <span class="badge bg-info" style="font-size:10px">
                             {{lead.note_set.all.count}}                
                         </span>
-                </button>   
+                </button>    {% endcomment %}
             </div> 
         </div>
     </div>

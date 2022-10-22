@@ -68,7 +68,7 @@
         <span class="primary_td_layer">     
 
             
-            <div class="btn-group btn-space btn-space-with-history mb-1">
+            {% comment %} <div class="btn-group btn-space btn-space-with-history mb-1">
                 <a class="btn btn-secondary btn-sm" type="button"
                     data-bs-toggle="popover" 
                     data-bs-trigger="hover" 
@@ -85,10 +85,10 @@
                     hx-get="{% url 'campaign-lead-get-modal-content' param1=lead.pk %}" 
                     hx-push-url="false"
                     hx-swap="innerHTML" hx-trigger="click"><i class="fa-regular fa-clock-rotate-left" ></i> <span style="color:Silver">{{lead.call_set.all.count}}</span></button>
-            </div>
+            </div> {% endcomment %}
 
             
-            <div class="btn-group btn-space btn-space-with-history mb-1">
+            {% comment %} <div class="btn-group btn-space btn-space-with-history mb-1">
                 <button class="btn btn-secondary btn-sm" type="button"
                     data-bs-toggle="popover" 
                     data-bs-trigger="hover" 
@@ -99,6 +99,19 @@
                     hx-get="{% url 'campaign-lead-get-modal-content' param1=lead.pk %}" 
                     hx-push-url="false"
                     hx-swap="innerHTML" hx-trigger="click"><i class="fa-regular fa-clock-rotate-left" ></i> <span style="color:Silver">{{lead.call_set.all.count}}</span></button>
+            </div> {% endcomment %}
+
+            <div class="btn-group btn-space btn-space-with-history mb-1">
+                <button class="btn btn-secondary btn-sm" type="button"
+                    data-bs-toggle="popover" 
+                    data-bs-trigger="hover" 
+                    data-bs-placement="top"
+                    data-bs-content="See booking history for this lead."
+                    hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
+                    hx-vals='{"template_name": "booking_history"}'
+                    hx-get="{% url 'campaign-lead-get-modal-content' param1=lead.pk %}" 
+                    hx-push-url="false"
+                    hx-swap="innerHTML" hx-trigger="click"><i class="fa-regular fa-clock-rotate-left" ></i> <span style="color:Silver">{{lead.booking_set.all.count}}</span></button>
             </div>
         </span>
         <br>

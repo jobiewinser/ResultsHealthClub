@@ -205,14 +205,14 @@ class Site(models.Model):
             return lead
 
 
-    def get_leads_created_in_month_and_year(self, date):
-        return Campaignlead.objects.filter(campaign__site=self, created__month=date.month, created__year=date.year)
+    # def get_leads_created_in_month_and_year(self, date):
+    #     return Campaignlead.objects.filter(campaign__site=self, created__month=date.month, created__year=date.year)
 
-    def get_leads_created_between_dates(self, start_date, end_date):
-        return Campaignlead.objects.filter(campaign__site=self, created__gte=start_date, created__lte=end_date)
+    # def get_leads_created_between_dates(self, start_date, end_date):
+    #     return Campaignlead.objects.filter(campaign__site=self, created__gte=start_date, created__lte=end_date)
 
-    def get_(self, date):
-        return Campaignlead.objects.filter(campaign__site=self, created__month=date.month, created__year=date.year)
+    # def get_(self, date):
+    #     return Campaignlead.objects.filter(campaign__site=self, created__month=date.month, created__year=date.year)
  
 
 @receiver(models.signals.post_save, sender=Site)

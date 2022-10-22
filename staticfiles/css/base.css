@@ -98,14 +98,17 @@
             /* padding-top: 5px; */
         }
         
-        .topnav {
-            width: 100%;
-            left: 0;
-            position: fixed;
-            top: 0;
-            z-index: 10000;
+        #topnav {
+            padding:0px;
+            height:7vh;
         }
         
+        .app_picture{
+            image-rendering:auto; 
+            object-fit: cover; 
+            height:auto; 
+            width:100%;
+        }
         .nowrap {
             white-space: nowrap;
         }
@@ -583,7 +586,7 @@
         
         #leads_board {
             justify-content: unset;
-            max-height: 85vh;
+            /* max-height: 85vh; */
             overflow-y: scroll;
         }
         
