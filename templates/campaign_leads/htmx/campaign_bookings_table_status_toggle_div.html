@@ -3,7 +3,7 @@
 {%if request.GET.complete == 'true' or request.GET.complete == True%}
 <div hx-swap-oob="true" class="col-md-auto me-2" id="swap_status_button">
     <button class="btn btn-success btn-sm"
-        hx-indicator=".top-htmx-indicator" hx-target="#overview_table" 
+        hx-indicator=".top-htmx-indicator" hx-target="#overview_table_wrapper" 
         hx-get="{% url 'campaign-booking-overview' %}" 
         hx-push-url="false"
         {% comment %} hx-swap="outerHTML" hx-include=".overview_table_filters:not(#current_status),#change_status" hx-trigger="click"><i class="fa-regular fa-wave-pulse"></i> Show Active</button>       {% endcomment %}
@@ -16,7 +16,7 @@
 {%else%}
 <div hx-swap-oob="true" class="col-md-auto me-2" id="swap_status_button">
     <button class="btn btn-light bg-light-border btn-sm" style=""
-        hx-indicator=".top-htmx-indicator" hx-target="#overview_table" 
+        hx-indicator=".top-htmx-indicator" hx-target="#overview_table_wrapper" 
         hx-get="{% url 'campaign-booking-overview' %}" 
         hx-push-url="false"
         hx-swap="outerHTML" hx-include=".overview_table_filters:not(#current_status),#change_status" hx-trigger="click"><i class="fa-regular fa-box-archive"></i> Show Archived & Complete 
