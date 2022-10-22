@@ -69,21 +69,21 @@ class ModifyUser(View):
                 first_name = request.POST.get('first_name', '')
                 last_name = request.POST.get('last_name', '')
                 site_pk = request.POST.get('site_pk', '')
-                user = User.objects.create(username=f"{first_name}{last_name}", 
-                                            first_name=first_name,
-                                            last_name=last_name,
-                                            password=os.getenv("DEFAULT_USER_PASSWORD"), 
-                                            is_authenticated=True)
-                Profile.objects.create(user = user, 
-                                        avatar = request.FILES['profile_picture'], 
-                                        site=Site.objects.get(pk=site_pk))
+                # user = User.objects.create(username=f"{first_name}{last_name}", 
+                #                             first_name=first_name,
+                #                             last_name=last_name,
+                #                             password=os.getenv("DEFAULT_USER_PASSWORD"), 
+                #                             is_authenticated=True)
+                # Profile.objects.create(user = user, 
+                #                         avatar = request.FILES['profile_picture'], 
+                #                         site=Site.objects.get(pk=site_pk))
             elif action == 'edit':       
                 user = User.objects.get(pk=request.POST['user_pk'])         
                 if get_user_allowed_to_edit_other_user(request.user, user):
                     first_name = request.POST.get('first_name', '')
                     last_name = request.POST.get('last_name', '')
                     site_pk = request.POST.get('site_pk', '')
-                    user.username=f"{first_name}{last_name}" 
+                    # user.username=f"{first_name}{last_name}" 
                     user.first_name=first_name
                     user.last_name=last_name
                     user.save()

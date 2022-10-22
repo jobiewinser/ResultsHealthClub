@@ -85,7 +85,7 @@ def create_campaign_lead(request, **kwargs):
 def get_leads_column_meta_data(request, **kwargs):
     logger.debug(str(request.user))
     try:
-        leads = Campaignlead.objects.filter(complete=False, booking=None)
+        leads = Campaignlead.objects.filter(complete=False, booking=None, campaign__site__in=request.user.profile.sites_allowed.all())
         campaign_pk = request.GET.get('campaign_pk', None)
         if campaign_pk:
             leads = leads.filter(campaign=Campaign.objects.get(pk=campaign_pk))

@@ -139,23 +139,23 @@
     </head>
 
     <body class="cartoon-background" style="height:100vh">
-        <nav class="navbar navbar-expand-lg navbar-light bg-dark">
+        <nav class="navbar navbar-expand-lg navbar-light bg-dark" id="topnav">
             <div class="container-fluid ">
-                <a class="navbar-brand" href="{%url 'customer-home'%}">
-                    <img class="side_nav_logo" src="{% static 'img/logo-dark-back-img.png' %}" style="height:50px" alt="winser systems logo">
+                <a class="navbar-brand p-0" href="{%url 'customer-home'%}">
+                    <img class="side_nav_logo" src="{% static 'img/logo-dark-back-img.png' %}" style="height:5vh" alt="winser systems logo">
                 </a>
-                <a class="navbar-brand" href="{%url 'customer-home'%}">
-                <img class="side_nav_logo" src="{% static 'img/logo-dark-back-text.png' %}" style="height:25px" alt="winser systems logo">
+                <a class="navbar-brand p-0" href="{%url 'customer-home'%}">
+                <img class="side_nav_logo" src="{% static 'img/logo-dark-back-text.png' %}" style="height:2.25vh" alt="winser systems logo">
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    {% comment %} <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item ">
                         <a class="nav-link active text-white" aria-current="page" href="{%url 'customer-home'%}">Home</a>
                     </li>
-                    </ul>
+                    </ul> {% endcomment %}
 
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item ">
@@ -223,11 +223,12 @@
                     }
                 });
                 document.body.addEventListener('htmx:oobBeforeSwap', function(evt) { 
-                    console.log("oobBeforeSwap", evt)
-                    {% comment %} if ($(evt.target).hasClass('message_list_body')){
+                    {% comment %} console.log("oobBeforeSwap", evt) {% endcomment %}
+                    if ($(evt.target).hasClass('message_list_body')){
+                        console.log(2)
                         document.getElementById('notification1').play();
                         htmx.ajax('GET', "{%url 'update-message-counts'%}", {swap:'none'})
-                    } {% endcomment %}
+                    }
                 });
                 
                 document.body.addEventListener('htmx', function(evt) { 
@@ -240,6 +241,7 @@
             });
             </script>
         {%endblock chat_bottom%}
+        {%if request.user.is_authenticated%}
         <span id="chat_bottom" class="" style=" 
             display: flex;
             flex-wrap: wrap;
@@ -251,6 +253,7 @@
             hx-indicator=".htmx-indicator"        
             hx-trigger="load"></span>
         </span>
+        {%endif%}
 
         {%endblock snackbar%}
         

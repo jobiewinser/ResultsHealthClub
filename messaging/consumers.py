@@ -6,6 +6,7 @@ from campaign_leads.models import Campaignlead
 from core.models import Site, WhatsappNumber
 from core.templatetags.core_tags import nice_datetime_tag
 from django.template import loader
+from core.user_permission_functions import get_user_allowed_to_use_site_messaging
 
 from whatsapp.api import Whatsapp
 from whatsapp.models import WhatsAppMessage
@@ -70,16 +71,16 @@ def send_whatsapp_message_to_number(message, customer_number, user, whatsappnumb
         whatsappnumber = WhatsappNumber.objects.get(pk=whatsappnumber_pk)
         logger.debug("send_whatsapp_message_to_number start") 
         lead = Campaignlead.objects.filter(whatsapp_number=customer_number).first()  
-        if lead:     
-            if lead.campaign.site.company == user.profile.company: 
-                logger.debug("send_whatsapp_message_to_number success lead true") 
-                return whatsappnumber.send_whatsapp_message(customer_number=customer_number, message=message, user=user, lead=lead)
+        if get_user_allowed_to_use_site_messaging(user, lead.campaign.site):
+            if lead:     
+                if lead.campaign.site.company == user.profile.company: 
+                    logger.debug("send_whatsapp_message_to_number success lead true") 
+                    return whatsappnumber.send_whatsapp_message(customer_number=customer_number, message=message, user=user, lead=lead)
 
-        if WhatsAppMessage.objects.filter(whatsappnumber=whatsappnumber, customer_number=customer_number):
-            logger.debug("send_whatsapp_message_to_number success lead false") 
-            return whatsappnumber.send_whatsapp_message(customer_number=customer_number, message=message, user=user)
-        logger.debug("send_whatsapp_message_to_number fail") 
-        return None
+            if WhatsAppMessage.objects.filter(whatsappnumber=whatsappnumber, customer_number=customer_number):
+                logger.debug("send_whatsapp_message_to_number success lead false") 
+                return whatsappnumber.send_whatsapp_message(customer_number=customer_number, message=message, user=user)
+            logger.debug("send_whatsapp_message_to_number fail") 
     return None
 @sync_to_async
 def message_details_user(user):   

@@ -46,3 +46,7 @@ def get_user_allowed_to_edit_other_user(request_user, other_user):
                 return True
     return False
 
+
+def get_user_allowed_to_add_call(request_user, lead):
+    return True
+

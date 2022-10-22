@@ -12,7 +12,7 @@ from active_campaign.api import ActiveCampaignApi
 from active_campaign.models import ActiveCampaign
 from core.core_decorators import campaign_leads_enabled_required
 from core.models import Profile, Site
-from core.user_permission_functions import get_available_sites_for_user
+from core.user_permission_functions import get_available_sites_for_user, get_user_allowed_to_add_call
 from core.views import get_site_pk_from_request
 from django.db.models import Q, Count
 from django.db.models import OuterRef, Subquery, Count
@@ -60,7 +60,7 @@ class CampaignleadsOverviewView(TemplateView):
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'campaign_leads/htmx/leads_board_htmx.html'   
             context['campaigns'] = get_campaign_qs(self.request)
-        leads = Campaignlead.objects.filter(complete=False, booking__datetime=None)
+        leads = Campaignlead.objects.filter(complete=False, booking__datetime=None, campaign__site__in=self.request.user.profile.sites_allowed.all())
         # leads = Campaignlead.objects.filter()
         campaign_pk = self.request.GET.get('campaign_pk', None)
         if campaign_pk:
@@ -202,39 +202,41 @@ def new_call(request, **kwargs):
             log_datetime = datetime.now()
             call_count = int(kwargs.get('call_count'))
             lead = Campaignlead.objects.filter(pk=kwargs.get('lead_pk')).annotate(calls=Count('call')).first()
-            if lead.calls < call_count:
-                while lead.calls < call_count:
-                    call = Call.objects.create(
-                        datetime=log_datetime,
-                        lead = lead,                        
-                        user=request.user
-                    )
-                    lead = Campaignlead.objects.filter(pk=kwargs.get('lead_pk')).annotate(calls=Count('call')).first()
-            elif lead.calls > call_count:
-                while lead.calls > call_count:
-                    Call.objects.filter(
-                        lead = lead,
-                    ).order_by('-datetime').first().delete()
-                    lead = Campaignlead.objects.filter(pk=kwargs.get('lead_pk')).annotate(calls=Count('call')).first()
-            lead.last_dragged = datetime.now()
-            lead.save()
+            if get_user_allowed_to_add_call(request.user, lead):
+                if lead.calls < call_count:
+                    while lead.calls < call_count:
+                        call = Call.objects.create(
+                            datetime=log_datetime,
+                            lead = lead,                        
+                            user=request.user
+                        )
+                        lead = Campaignlead.objects.filter(pk=kwargs.get('lead_pk')).annotate(calls=Count('call')).first()
+                elif lead.calls > call_count:
+                    while lead.calls > call_count:
+                        Call.objects.filter(
+                            lead = lead,
+                        ).order_by('-datetime').first().delete()
+                        lead = Campaignlead.objects.filter(pk=kwargs.get('lead_pk')).annotate(calls=Count('call')).first()
+                lead.last_dragged = datetime.now()
+                lead.save()
 
-            
-            from channels.layers import get_channel_layer
-            from asgiref.sync import async_to_sync
-            channel_layer = get_channel_layer()   
-            
-            async_to_sync(channel_layer.group_send)(
-                    f"lead_{lead.campaign.site.company.pk}",
-                    {
-                        'type': 'lead_move',
-                        'data':{
-                            'rendered_html':get_leads_html(lead, new_position=Call.objects.filter(lead=lead).count()),
+                
+                from channels.layers import get_channel_layer
+                from asgiref.sync import async_to_sync
+                channel_layer = get_channel_layer()   
+                
+                async_to_sync(channel_layer.group_send)(
+                        f"lead_{lead.campaign.site.company.pk}",
+                        {
+                            'type': 'lead_move',
+                            'data':{
+                                'rendered_html':get_leads_html(lead, new_position=Call.objects.filter(lead=lead).count()),
+                            }
                         }
-                    }
-            )
-            
-            return HttpResponse("", status="200")
+                )
+                
+                return HttpResponse("", status=200)
+            return HttpResponse("", status=500)
             # return render(request, 'campaign_leads/htmx/lead_article.html', {'lead':lead,'max_call_count':kwargs.get('max_call_count', 1), 'call_count':call_count})
     except Exception as e:
         logger.debug("new_call Error "+str(e))
