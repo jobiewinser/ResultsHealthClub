@@ -293,7 +293,7 @@ class Profile(models.Model):
     site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
     company = models.ForeignKey("core.Company", on_delete=models.SET_NULL, null=True, blank=True)
     sites_allowed = models.ManyToManyField("core.Site", related_name="profile_sites_allowed", null=True, blank=True)
-    calendly_org_page = models.TextField(blank=True, null=True)
+    calendly_event_page_url = models.TextField(blank=True, null=True)
     @property
     def name(self):
         if self.user.last_name:

@@ -106,6 +106,16 @@
                     data-bs-toggle="popover" 
                     data-bs-trigger="hover" 
                     data-bs-placement="top"
+                    data-bs-content="Add new booking for this lead."
+                    hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
+                    hx-vals='{"template_name": "add_booking"}'
+                    hx-get="{% url 'campaign-lead-get-modal-content' param1=lead.pk %}" 
+                    hx-push-url="false"
+                    hx-swap="innerHTML" hx-trigger="click"><i class="fa-regular fa-plus" ></i> New</button>
+                <button class="btn btn-secondary btn-sm" type="button"
+                    data-bs-toggle="popover" 
+                    data-bs-trigger="hover" 
+                    data-bs-placement="top"
                     data-bs-content="See booking history for this lead."
                     hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
                     hx-vals='{"template_name": "booking_history"}'
@@ -113,6 +123,10 @@
                     hx-push-url="false"
                     hx-swap="innerHTML" hx-trigger="click"><i class="fa-regular fa-clock-rotate-left" ></i> <span style="color:Silver">{{lead.booking_set.all.count}}</span></button>
             </div>
+
+            
+
+
         </span>
         <br>
         <span class="secondary_td_layer">     

@@ -31,6 +31,10 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
+
+        .cartoon-background{
+            margin-bottom:45px; /* For Make sure chat doesn't block view */
+        }
         
         .cartoon-background::after {
             background: #efe7dd url(/static/img/background2.png) repeat;
@@ -43,14 +47,14 @@
             right: 0;
             position: absolute;
             z-index: -1;
-            min-height: 100%;
+            min-height: 100vh;
         }
         
-        .side_nav {
+        /* .side_nav {
             min-height: 100vh;
             /* width: 250px; */
             font-size: 1.5vh
-        }
+        } */
         
         .nav-link {
             color: white
@@ -587,7 +591,7 @@
         #leads_board {
             justify-content: unset;
             /* max-height: 85vh; */
-            overflow-y: scroll;
+            /* overflow-y: scroll; */
         }
         
         #add_booking_area {
@@ -598,7 +602,7 @@
             width: 20vw;
             height: 20vh;
             z-index: 1000;
-            background-color: rgba(25, 135, 84, 0.9);
+            background-color: rgba(11, 102, 59, 0.9);
             border-radius: 10px
         }
         
