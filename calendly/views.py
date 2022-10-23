@@ -75,6 +75,8 @@ class Webhooks(View):
                 webhook.errors.add(error)
                 webhook.save()
                 # raise Exception
+            response.status_code = 200
+            return response
             
         except ObjectDoesNotExist:
             response = HttpResponse()
