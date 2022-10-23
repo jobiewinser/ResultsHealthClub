@@ -106,7 +106,7 @@
                         data-bs-placement="top"
                         data-bs-title="Why is this input disabled?"
                         data-bs-content="This input can't be changed for template edits. Please only make small changes, otherwise create a new template.">
-                            <input class="form-control" disabled id="template_name" value="{{template.name}}" name="template_name">
+                            <input {%if readonly%}disabled{%endif%} class="form-control" disabled id="template_name" value="{{template.name}}" name="template_name">
                         </div>
                     </div>
                     {%endblock template_name%}
@@ -120,7 +120,7 @@
                         data-bs-placement="top"
                         data-bs-title="Why is this input disabled?"
                         data-bs-content="This input can't be changed for template edits. Please only make small changes, otherwise create a new template.">
-                            <select id="template_category" disabled name="template_category" class="form-select form-select-sm align-self-center m-1">
+                            <select {%if readonly%}disabled{%endif%} id="template_category" disabled name="template_category" class="form-select form-select-sm align-self-center m-1">
                                 {%for k,v in categories.items%}
                                 <option {%if template.category == k%}selected {%endif%}value="{{k}}">{{k}}</option>
                                 {%endfor%}        
@@ -132,7 +132,7 @@
                     <h5>Header</h5>
                     <div class="row">
                         <div class="col-md-3">
-                            <select id="variable_choice"  onclick="$('#template_header').val($('#template_header').val()+$(this).val()).trigger('input'); $(this).val('');" name="variable_choice" class="form-select form-select-sm align-self-center m-1">
+                            <select {%if readonly%}disabled{%endif%} {%if readonly%}disabled{%endif%} id="variable_choice"  onclick="$('#template_header').val($('#template_header').val()+$(this).val()).trigger('input'); $(this).val('');" name="variable_choice" class="form-select form-select-sm align-self-center m-1">
                                 {%for k,v in variables.items%}
                                 <option value="{{k}}">{{v.0}}</option>
                                 {%endfor%}     
@@ -140,7 +140,7 @@
                             </select>
                         </div>
                         <div class="col">
-                            <input type="text" style="width:300px;" 
+                            <input {%if readonly%}disabled{%endif%} type="text" style="width:300px;" 
                             id="template_header" 
                             name="template_header" 
                             class="template_editor_input form-control" 
@@ -151,7 +151,7 @@
                     <h5>Body</h5>
                     <div class="row">
                         <div class="col-md-3">
-                            <select id="variable_choice"  onclick="$('#template_body').val($('#template_body').val()+$(this).val()).trigger('input'); $(this).val('');" name="variable_choice" class="form-select form-select-sm align-self-center m-1">
+                            <select {%if readonly%}disabled{%endif%} id="variable_choice"  onclick="$('#template_body').val($('#template_body').val()+$(this).val()).trigger('input'); $(this).val('');" name="variable_choice" class="form-select form-select-sm align-self-center m-1">
                                 {%for k,v in variables.items%}
                                 <option value="{{k}}">{{v.0}}</option>
                                 {%endfor%}     
@@ -159,7 +159,7 @@
                             </select>
                         </div>
                         <div class="col">
-                            <textarea style="width:300px; height:340px;" 
+                            <textarea {%if readonly%}disabled{%endif%} style="width:300px; height:340px;" 
                                 id="template_body" 
                                 name="template_body" 
                                 class="template_editor_input form-control" 
@@ -172,7 +172,7 @@
                         <div class="col-md-3">
                         </div>
                         <div class="col">
-                            <input type="text" style="width:300px;" 
+                            <input {%if readonly%}disabled{%endif%} type="text" style="width:300px;" 
                             id="template_footer" 
                             name="template_footer" 
                             class="template_editor_input form-control" 
@@ -186,7 +186,7 @@
                 </div>
                 <div class="col center">                    
                     {%block submit_button%}
-                    <button class="btn template_save_button btn-success m-3"
+                    <button {%if readonly%}disabled{%endif%} class="btn template_save_button btn-success m-3"
                         onclick="saveTemplate()"
                         data-bs-toggle="popover" 
                         data-bs-trigger="hover" 

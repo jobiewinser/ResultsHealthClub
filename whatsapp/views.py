@@ -269,6 +269,14 @@ class WhatsappTemplatesEditView(TemplateView):
             }
             return context
 @method_decorator(login_required, name='dispatch')
+class WhatsappTemplatesReadOnlyView(WhatsappTemplatesEditView):
+    def get_context_data(self, **kwargs):  
+        context = super(WhatsappTemplatesReadOnlyView, self).get_context_data(**kwargs)
+        template = WhatsappTemplate.objects.get(pk=kwargs.get('template_pk'))
+        if self.request.user.profile.company == template.company:
+            context['readonly'] = True
+            return context
+@method_decorator(login_required, name='dispatch')
 class WhatsappTemplatesCreateView(TemplateView):
     template_name='whatsapp/whatsapp_template_create.html'
 
