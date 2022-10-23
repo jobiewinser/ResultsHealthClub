@@ -30,7 +30,7 @@ def message_window(request, **kwargs):
     context["messages"] = messages
     lead = Campaignlead.objects.filter(whatsapp_number=kwargs.get('customer_number')).last()
     print()
-    if get_user_allowed_to_use_site_messaging(request.user, lead.campaign.site):
+    if get_user_allowed_to_use_site_messaging(request.user, whatsappnumber.site):
         context["lead"] = lead
         context["customer_number"] = kwargs.get('customer_number')
         context['whatsappnumber'] = whatsappnumber
