@@ -104,28 +104,28 @@ class CompanyConfigurationView(TemplateView):
         return context
 @login_required
 def change_profile_role(request):
-    user = User.objects.get(pk=request.POST.get('user_pk'))
-    if get_user_allowed_to_edit_other_user(request.user, user):
+    profile = Profile.objects.get(pk=request.POST.get('profile_pk'))
+    if get_user_allowed_to_edit_other_user(request.user, profile.user):
         role = request.POST.get('role', None)
         if role in ['b','c']:
             context = {}
-            user.profile.role = role
-            user.profile.save()
-            context['user'] = user
+            profile.role = role
+            profile.save()
+            context['profile'] = profile
             context['role_choices'] = ROLE_CHOICES
             # context['site_list'] = get_available_sites_for_user(request.user)
             return render(request, 'core/htmx/company_configuration_row.html', context)
     return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
 @login_required
 def change_profile_site(request):
-    user = User.objects.get(pk=request.POST.get('user_pk'))
-    if get_user_allowed_to_edit_other_user(request.user, user):
+    profile = Profile.objects.get(pk=request.POST.get('profile_pk'))
+    if get_user_allowed_to_edit_other_user(request.user, profile.user):
         site_pk = request.POST.get('site_pk', None)
         if site_pk:
             context = {}
-            user.profile.site = Site.objects.get(pk=site_pk)
-            user.profile.save()
-            context['user'] = user
+            profile.site = Site.objects.get(pk=site_pk)
+            profile.save()
+            context['profile'] = profile
             context['role_choices'] = ROLE_CHOICES
             # context['site_list'] = get_available_sites_for_user(request.user)
             return render(request, 'core/htmx/company_configuration_row.html', context)
