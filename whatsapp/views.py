@@ -159,7 +159,7 @@ class Webhooks(View):
 
                         template.language = template_live.get('language')
                         template.pending_language = ""
-
+                        print("template.pending_components", str(template.pending_components))
                         template.components = template.pending_components
                         template.pending_components = []
 
@@ -237,7 +237,8 @@ def refresh_template_data(site):
                 template.name = api_template.get('name')
                 template.language = api_template.get('language')
                 template.category = api_template.get('category')
-                if not template.components and not template.pending_components:
+                if created:
+                # if not template.components and not template.pending_components:
                     components = []
                     for dict in api_template.get('components', []):
                         json_dict = {}
