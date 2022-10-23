@@ -128,33 +128,9 @@
             
             $('[data-bs-toggle=popover]').popover();
         });
-        
-        window.addEventListener("message", function(e) {
-            if(isCalendlyEvent(e)) {
-                $('#calendly_loading').remove()
-                /* Example to get the name of the event */
-                console.log("Event name:", e.data.event);
-                console.log("Event details:", e.data.payload);
-                if (e.data.event == "calendly.event_scheduled") {               
-                    var respStatus = $.ajax({
-                        type:'POST',
-                        url:'{%url "calendly-booking-success"%}',
-                        data:{'lead_pk':$('#modal_lead_pk').val(), 'uri':e.data.payload.event.uri, 'csrfmiddlewaretoken':'{{ csrf_token }}'},
-                        success: function (data) {
-                        },
-                        error: function(XMLHttpRequest, textStatus, errorThrown) {
-                        }
-                    })
-                }
-            }
-        });
 
         set_total_costs();
     });
-        
-    function isCalendlyEvent(e) {
-        return e.origin === "https://calendly.com" && e.data.event && e.data.event.indexOf("calendly.") === 0;
-    };
     
     function handleDraggedItem(dragged_elem_id, drag_target){
         dragged_elem = $('#'+dragged_elem_id)

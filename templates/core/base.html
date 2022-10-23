@@ -254,7 +254,28 @@
                 $('#generic_modal').on('hidden.bs.modal', function () {
                     $('#generic_modal_body').html("")
                 })
+        
+                window.addEventListener("message", function(e) {
+                    if(isCalendlyEvent(e)) {
+                        $('#calendly_loading').remove()
+                        if (e.data.event == "calendly.event_scheduled") {               
+                            var respStatus = $.ajax({
+                                type:'POST',
+                                url:'{%url "calendly-booking-success"%}',
+                                data:{'lead_pk':$('#modal_lead_pk').val(), 'uri':e.data.payload.event.uri, 'csrfmiddlewaretoken':'{{ csrf_token }}'},
+                                success: function (data) {
+                                },
+                                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                                }
+                            })
+                        }
+                    }
+                });
             });
+        
+            function isCalendlyEvent(e) {
+                return e.origin === "https://calendly.com" && e.data.event && e.data.event.indexOf("calendly.") === 0;
+            };
             </script>
         {%endblock chat_bottom%}
         {%if request.user.is_authenticated%}
