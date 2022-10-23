@@ -221,19 +221,7 @@ def new_call(request, **kwargs):
                 lead.save()
 
                 
-                from channels.layers import get_channel_layer
-                from asgiref.sync import async_to_sync
-                channel_layer = get_channel_layer()   
-                
-                async_to_sync(channel_layer.group_send)(
-                        f"lead_{lead.campaign.site.company.pk}",
-                        {
-                            'type': 'lead_move',
-                            'data':{
-                                'rendered_html':get_leads_html(lead, new_position=Call.objects.filter(lead=lead).count()),
-                            }
-                        }
-                )
+                lead.trigger_refresh_webhook()
                 
                 return HttpResponse("", status=200)
             return HttpResponse("", status=500)
@@ -242,15 +230,7 @@ def new_call(request, **kwargs):
         logger.debug("new_call Error "+str(e))
         return HttpResponse(e, status=500)
 
-def get_leads_html(lead, new_position=None):
-    delete_htmx = f"<span hx-swap-oob='delete' id='lead-{lead.pk}'></span>"
-    if lead:
-        if new_position == None:    
-            return delete_htmx
-        else:
-            rendered_html = f"<span hx-swap-oob='afterbegin:.campaign_column_{lead.campaign.pk}_calls_{new_position},.site_column_{lead.campaign.site.pk}_calls_{new_position},.company_column_{lead.campaign.site.company.pk}_calls_{new_position}'><a hx-get='/campaign-leads/refresh-lead-article/{lead.pk}/' hx-swap='outerHTML' hx-indicator='.htmx-indicator' hx-trigger='load' href='#'></a> </span>"
-            from django.utils.safestring import mark_safe
-            return mark_safe(f"{rendered_html} {delete_htmx}")
+
 
 @login_required
 def campaign_assign_auto_send_template_htmx(request):
@@ -278,3 +258,22 @@ def campaign_assign_product_cost_htmx(request):
     return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign,})
                                                                             # 'site_list': get_available_sites_for_user(request.user)})
 
+@login_required
+def toggle_claim_lead(request, **kwargs):
+    logger.debug(str(request.user))
+    try:
+        lead = Campaignlead.objects.get(pk=kwargs.get('lead_pk'))
+        if get_user_allowed_to_add_call(request.user, lead):
+            if lead.assigned_user == request.user:
+                lead.assigned_user = None
+            else:
+                lead.assigned_user = request.user
+            lead.save()
+            lead.trigger_refresh_webhook()
+        
+            return HttpResponse("", status=200)
+            # return render(request, 'campaign_leads/htmx/lead_article.html', {'lead':lead, 'max_call_count':0})
+        return HttpResponse("", status=500)
+    except Exception as e:
+        logger.debug("get_leads_column_meta_data Error "+str(e))
+        return HttpResponse(e, status=500)

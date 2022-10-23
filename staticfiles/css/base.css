@@ -668,3 +668,9 @@
             padding: 4px;
             border-radius: 5px;
         }
+
+        .lead_claimed_img {            
+            position: absolute;
+            bottom: 45%;
+            right: 2%;
+        }

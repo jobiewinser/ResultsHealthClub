@@ -22,7 +22,9 @@
 .chat_card_body {
     height: 350px;
     overflow-y: scroll;
-    margin-bottom: 50px
+    margin-bottom: 50px;
+    /* scroll-behavior: smooth; */
+    overflow-anchor: none;
 }
 
 .message_list_body {

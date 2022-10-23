@@ -288,7 +288,7 @@ ROLE_CHOICES = (
 class Profile(models.Model):
     role = models.CharField(choices=ROLE_CHOICES, default='c', max_length=1)
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True)
     avatar = models.ImageField(default='default.png', upload_to='profile_images')
     site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
     company = models.ForeignKey("core.Company", on_delete=models.SET_NULL, null=True, blank=True)
@@ -316,7 +316,7 @@ class FreeTasterLink(models.Model):
 
 class FreeTasterLinkClick(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    link = models.ForeignKey(FreeTasterLink, on_delete=models.CASCADE)
+    link = models.ForeignKey(FreeTasterLink, on_delete=models.SET_NULL, null=True, blank=True)
     class Meta:
         ordering = ['-created']
 

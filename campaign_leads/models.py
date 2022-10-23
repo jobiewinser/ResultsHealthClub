@@ -11,6 +11,8 @@ import logging
 from django.db.models import Q, Count
 from django.template import loader
 from asgiref.sync import async_to_sync, sync_to_async
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 logger = logging.getLogger(__name__)
 
 BOOKING_CHOICES = (
@@ -70,7 +72,7 @@ class Campaignlead(models.Model):
     
     whatsapp_number = models.TextField(null=True, blank=True)
     # country_code = models.TextField(null=True, blank=True)
-    campaign = models.ForeignKey("campaign_leads.Campaign", on_delete=models.CASCADE, null=True, blank=True)
+    campaign = models.ForeignKey("campaign_leads.Campaign", on_delete=models.SET_NULL, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     arrived = models.BooleanField(default=False)
     sold = models.BooleanField(default=False)
@@ -79,7 +81,7 @@ class Campaignlead(models.Model):
     active_campaign_form_id = models.TextField(null=True, blank=True)
     possible_duplicate = models.BooleanField(default=False)
     last_dragged = models.DateTimeField(null=True, blank=True)
-    
+    assigned_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     @property
     def active_errors(self):        
         from core.models import AttachedError
@@ -104,6 +106,28 @@ class Campaignlead(models.Model):
         if last_whatsapp:
             return last_whatsapp.datetime.replace(hour=9).replace(minute=30).replace(second=0) + timedelta(days=1)
         return "Never"  
+
+    def trigger_refresh_webhook(self):
+        channel_layer = get_channel_layer()   
+        
+        async_to_sync(channel_layer.group_send)(
+                f"lead_{self.campaign.site.company.pk}",
+                {
+                    'type': 'lead_move',
+                    'data':{
+                        'rendered_html':self.get_leads_html(new_position=Call.objects.filter(lead=self).count()),
+                    }
+                }
+        )
+    def get_leads_html(self, new_position=None):
+        delete_htmx = f"<span hx-swap-oob='delete' id='lead-{self.pk}'></span>"
+        if self:
+            if new_position == None:    
+                return delete_htmx
+            else:
+                rendered_html = f"<span hx-swap-oob='afterbegin:.campaign_column_{self.campaign.pk}_calls_{new_position},.site_column_{self.campaign.site.pk}_calls_{new_position},.company_column_{self.campaign.site.company.pk}_calls_{new_position}'><a hx-get='/campaign-leads/refresh-lead-article/{self.pk}/' hx-swap='outerHTML' hx-indicator='.htmx-indicator' hx-trigger='load' href='#'></a> </span>"
+                from django.utils.safestring import mark_safe
+                return mark_safe(f"{rendered_html} {delete_htmx}")
 
     def send_template_whatsapp_message(self, send_order, communication_method = 'a'):
         from core.models import AttachedError
@@ -241,7 +265,6 @@ class Campaignlead(models.Model):
                         inbound=False
                     )
                     if created:                        
-                        from channels.layers import get_channel_layer
                         channel_layer = get_channel_layer()                            
                         message_context = {
                             "message": whatsapp_message,
@@ -258,8 +281,6 @@ class Campaignlead(models.Model):
                         <span id='messageWindowInnerBody_{customer_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>
                         """
                         
-                        from channels.layers import get_channel_layer
-                        from asgiref.sync import async_to_sync
                         async_to_sync(channel_layer.group_send)(
                             f"messaging_{whatsappnumber.pk}",
                             {
@@ -293,8 +314,8 @@ def execute_after_save(sender, instance, created, *args, **kwargs):
 class Call(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     datetime = models.DateTimeField(null=False, blank=False)
-    lead = models.ForeignKey(Campaignlead, on_delete=models.CASCADE, null=True, blank=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    lead = models.ForeignKey(Campaignlead, on_delete=models.SET_NULL, null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     error_json = models.JSONField(default=dict)
     class Meta:
         ordering = ['-datetime']
@@ -302,19 +323,19 @@ class Call(models.Model):
 class Booking(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     datetime = models.DateTimeField(null=True, blank=True)
-    lead = models.ForeignKey(Campaignlead, on_delete=models.CASCADE)
+    lead = models.ForeignKey(Campaignlead, on_delete=models.SET_NULL, null=True, blank=True)
     type = models.CharField(choices=BOOKING_CHOICES, max_length=2, null=False, blank=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     calendly_event_uri = models.TextField(null=True, blank=True)
     class Meta:
         ordering = ['-datetime']
 
 class Note(models.Model):
     text = models.TextField(null=False, blank=False)
-    lead = models.ForeignKey(Campaignlead, on_delete=models.CASCADE, null=True, blank=True)
-    call = models.ForeignKey('campaign_leads.Call', on_delete=models.CASCADE, null=True, blank=True)
-    booking = models.ForeignKey(Booking, on_delete=models.CASCADE, null=True, blank=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    lead = models.ForeignKey(Campaignlead, on_delete=models.SET_NULL, null=True, blank=True)
+    call = models.ForeignKey('campaign_leads.Call', on_delete=models.SET_NULL, null=True, blank=True)
+    booking = models.ForeignKey(Booking, on_delete=models.SET_NULL, null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     #This referes to the date it was created unless it's attached to a call/booking, then it's set to the related datetime
     datetime = models.DateTimeField(null=True, blank=True) 
     class Meta:

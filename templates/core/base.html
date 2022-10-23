@@ -90,6 +90,12 @@
                         }
                         $('.popover').remove()
                         $('[data-bs-toggle=popover]').popover();
+                        $('[data-bs-toggle=popover_delay]').popover({
+                            delay: { 
+                               show: "350", 
+                               hide: "100"
+                            }
+                        });
                     });     
                     
                     document.body.addEventListener('htmx:afterRequest', function(evt) {                          
@@ -204,7 +210,8 @@
         <div id="snackbar"></div>
 
         {%block chat_bottom%}
-            <script>            
+            <script>  
+
             $(document).ready(function() {
                 document.body.addEventListener('htmx:afterSwap', function(evt) {
                     if (evt.detail.pathInfo.requestPath.includes("message-window")){
@@ -215,11 +222,20 @@
                     }
                 });
                 
+                document.body.addEventListener('htmx:beforeRequest', function(evt) {
+                    if (evt.detail.pathInfo.requestPath.includes("get-more-messages")){
+                    }
+                });
+                document.body.addEventListener('htmx:afterRequest', function(evt) {
+                    if (evt.detail.pathInfo.requestPath.includes("get-more-messages")){
+                    }
+                });
+                
                 document.body.addEventListener('htmx:oobAfterSwap', function(evt) { 
                     if ($(evt.detail.target).hasClass('chat_card_body')){                        
                         $(evt.detail.target).animate({
                             scrollTop: $(evt.detail.target)[0].scrollHeight - $(evt.detail.target)[0].clientHeight
-                        }, 1000);
+                        }, 100);
                     }
                 });
                 document.body.addEventListener('htmx:oobBeforeSwap', function(evt) { 

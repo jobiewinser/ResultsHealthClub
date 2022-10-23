@@ -2,10 +2,10 @@
 {%if message.inbound%}
     <div class="row"
         id="message_chat_row_{{message.customer_number}}_{{whatsappnumber.pk}}"
-        data-bs-toggle="popover" 
+        data-bs-toggle="popover_delay" 
         data-bs-trigger="hover" 
         data-bs-html="true" 
-        data-bs-placement="top"
+        data-bs-placement="right"
         data-bs-title="Message Details"
         data-bs-content="
         Sent at <b>{{message.datetime|nice_datetime_tag}}</b><br>
@@ -21,10 +21,10 @@
 {%else%}
     <div class="row"
         id="message_chat_row_{{message.customer_number}}_{{whatsappnumber.pk}}"
-        data-bs-toggle="popover" 
+        data-bs-toggle="popover_delay" 
         data-bs-trigger="hover" 
         data-bs-html="true" 
-        data-bs-placement="top"
+        data-bs-placement="right"
         data-bs-title="Message Details"
         data-bs-content="
         Sent at <b>{{message.datetime|nice_datetime_tag}}</b><br>

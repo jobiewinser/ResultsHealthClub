@@ -10,7 +10,7 @@ from django.contrib.auth.decorators import login_required
 from campaign_leads.models import Campaign, Campaignlead, Booking, Call, Note
 from campaign_leads.views import CampaignBookingsOverviewView
 from core.models import Site, WhatsappNumber
-from core.user_permission_functions import get_available_sites_for_user
+from core.user_permission_functions import get_available_sites_for_user, get_user_allowed_to_add_call
 from core.views import get_site_pk_from_request
 from django.db.models import Q, Count
 from django.contrib import messages
@@ -124,6 +124,7 @@ def refresh_lead_article(request, **kwargs):
     except Exception as e:
         logger.debug("get_leads_column_meta_data Error "+str(e))
         return HttpResponse(e, status=500)
+
 
 @login_required
 def add_booking(request, **kwargs):

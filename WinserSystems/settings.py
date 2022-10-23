@@ -267,14 +267,6 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
-TIME_ZONE = 'Europe/London'
-
-USE_I18N = True
-
-USE_L10N = True
-
-USE_TZ = True
-
 ASGI_APPLICATION = "WinserSystems.routing.application" #routing.py will be created later
 CHANNEL_LAYERS = {
     'default': {

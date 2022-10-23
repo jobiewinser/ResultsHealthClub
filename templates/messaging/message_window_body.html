@@ -1,5 +1,5 @@
 <div class="card-body collapse show p-0" id="messageWindowCollapse_{{customer_number}}">
-    <div class="chat_card_body  p-0" id="messageWindowInnerBody_{{customer_number}}">
+    <div class="chat_card_body  p-0" id="messageWindowInnerBody_{{customer_number}}" style="overflow-anchor: none">
         {%include 'messaging/message_window_message_rows.html'%}
         <form id="message_form_{{customer_number}}" hx-ws="send:submit">
             <div style="position: absolute; right:0; bottom: 0; width:100%;" class="row mb-2" id="message_input_div_{{customer_number}}"> 

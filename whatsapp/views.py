@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 from django.conf import settings
 from django.http import HttpResponse, QueryDict
@@ -16,6 +16,19 @@ logger = logging.getLogger(__name__)
 from django.views import View 
 from django.utils.decorators import method_decorator
 from core.models import ErrorModel, Site, WhatsappNumber
+from random import randrange
+
+def random_date(start,l):
+    current = start
+    while l >= 0:
+        current = current + timedelta(minutes=randrange(10))
+        l-=1
+    return current
+
+startDate = datetime(2013, 9, 20,13,00)
+temp1 = random_date(startDate,10)
+
+
 @method_decorator(csrf_exempt, name="dispatch")
 class Webhooks(View):
     def get(self, request, *args, **kwargs):

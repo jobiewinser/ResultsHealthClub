@@ -32,7 +32,7 @@ class WhatsAppMessage(Message):
 #     pass 
     
 class WhatsAppMessageStatus(models.Model):
-    whatsapp_message = models.ForeignKey(WhatsAppMessage, on_delete=models.CASCADE, null=True, blank=True)    
+    whatsapp_message = models.ForeignKey(WhatsAppMessage, on_delete=models.SET_NULL, null=True, blank=True)    
     datetime = models.DateTimeField(null=True, blank=True)
     status = models.TextField(null=True, blank=True)   
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)

@@ -9,6 +9,28 @@
 <script src="{% static 'js/datatables.js' %}"></script> 
 <script>
     $(document).ready(function() {  
+        window.onkeydown = function(e) { 
+            return !(e.keyCode == 32 && e.target == document.body);
+        }; 
+        document.body.onkeyup = function(e) {
+            if (e.key == " " ||
+                e.code == "Space" ||      
+                e.keyCode == 32      
+            ) {
+                e.preventDefault();
+                let drag_elem = null;
+                let hover_elem = $(':hover').last();
+                if (hover_elem.hasClass('.column-drag')){
+                    drag_elem = hover_elem;
+                } else{                    
+                    drag_elem = hover_elem.closest('.column-drag');
+                }    
+                if (drag_elem.length != 0)  {  
+                    
+                    htmx.ajax('GET', '/campaign-leads/toggle-claim-lead/'+drag_elem.data('id')+'/', {swap:"none"})
+                }
+            }
+          }
 
         document.body.addEventListener('htmx:beforeRequest', function(evt) {  
             if (![undefined, ''].includes(evt.detail.pathInfo.path) && ![undefined, ''].includes(evt.detail.target.id)){

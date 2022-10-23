@@ -1,10 +1,23 @@
 {%load static core_tags tz%}
-{%if messages|length > 0%}
-<span hx-get="{%url 'get-more-messages'%}" hx-vals='{"customer_number":"{{customer_number}}","whatsappnumber_pk":"{{whatsappnumber.pk}}","created_before_date":"{{messages.0.datetime|timestamp}}"}' hx-indicator=".htmx-indicator" hx-swap="outerHTML" hx-trigger="intersect once">
-</span>
-{% comment %} {%else%}
-*End of chat history* {% endcomment %}
-{%endif%}
+
 {%for message in messages%}
+    {% comment %} {% if forloop.counter  == 5 %}
+        {%if messages|length > 0%}
+            <span hx-get="{%url 'get-more-messages'%}" hx-vals='{"customer_number":"{{customer_number}}","whatsappnumber_pk":"{{whatsappnumber.pk}}","created_before_date":"{{messages.0.datetime|timestamp}}"}' hx-indicator=".htmx-indicator" hx-swap="outerHTML" hx-trigger="intersect once">
+            </span>
+        {%endif%}
+    {%endif%} {% endcomment %}
     {%include 'messaging/htmx/message_chat_row.html'%}
 {%endfor%}
+
+{% comment %} {%load static core_tags tz%}
+{%for message in messages%}
+    {% if forloop.counter  == 20 %}
+        {%if messages|length > 39%}test
+        <span hx-get="{%url 'get-more-messages'%}" hx-vals='{"customer_number":"{{customer_number}}","whatsappnumber_pk":"{{whatsappnumber.pk}}","created_before_date":"{{messages.0.datetime|timestamp}}"}' 
+        hx-indicator=".htmx-indicator" hx-swap="beforebegin" hx-trigger="intersect once" style="overflow-anchor: auto;">
+        </span>
+        {%endif%}
+    {%endif%}
+    {%include 'messaging/htmx/message_chat_row.html'%}
+{%endfor%} {% endcomment %}

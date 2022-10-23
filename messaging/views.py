@@ -24,7 +24,8 @@ def message_list(request, **kwargs):
 @login_required
 def message_window(request, **kwargs):
     whatsappnumber = WhatsappNumber.objects.get(pk=kwargs.get('whatsappnumber_pk'))
-    messages = WhatsAppMessage.objects.filter(customer_number=kwargs.get('customer_number'), whatsappnumber=whatsappnumber).order_by('-datetime')[:20:-1]
+    messages = WhatsAppMessage.objects.filter(customer_number=kwargs.get('customer_number'), whatsappnumber=whatsappnumber).order_by('datetime')
+    # messages = WhatsAppMessage.objects.filter(customer_number=kwargs.get('customer_number'), whatsappnumber=whatsappnumber).order_by('-datetime')[:20:-1]
     context = {}
     context["messages"] = messages
     lead = Campaignlead.objects.filter(whatsapp_number=kwargs.get('customer_number')).first()
@@ -99,7 +100,8 @@ def get_modal_content(request, **kwargs):
                 customer_number = lead.whatsapp_number
                 context['customer_number'] = customer_number
                 context['whatsappnumber'] = whatsappnumber
-                context['messages'] = WhatsAppMessage.objects.filter(customer_number=customer_number, whatsappnumber=whatsappnumber).order_by('-datetime')[:20:-1]
+                context['messages'] = WhatsAppMessage.objects.filter(customer_number=customer_number, whatsappnumber=whatsappnumber).order_by('datetime')
+                # context['messages'] = WhatsAppMessage.objects.filter(customer_number=customer_number, whatsappnumber=whatsappnumber).order_by('-datetime')[:20:-1]
         
         if request.user.is_authenticated:
             template_name = request.GET.get('template_name', '')
@@ -121,6 +123,7 @@ def update_message_counts(request, **kwargs):
 @login_required
 def get_more_messages(request, **kwargs):
     try:
+        print("DFSBAHUKJDBSAUJKDBSAUJKDBSAJKDBHSAJKDBHSAJKD")
         context = {}
         rendered_html = ""
         whatsappnumber = WhatsappNumber.objects.get(pk=request.GET.get('whatsappnumber_pk'))
