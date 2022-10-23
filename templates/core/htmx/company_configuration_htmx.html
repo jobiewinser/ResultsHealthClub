@@ -27,10 +27,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {%for user in company.users%}
+                    {%for temp_user in company.users%}
+                    {%with temp_user.profile as profile%}
                     <tr id="company_configuration_row_{{user.profile.pk}}">
                         {%include 'core/htmx/company_configuration_row.html'%}
                     </tr>
+                    {%endwith%}
                     {%endfor%}
                 </tbody>
             </table>
