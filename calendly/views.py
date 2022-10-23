@@ -66,22 +66,16 @@ class Webhooks(View):
                     }
                 )
                 
-
-                response = HttpResponse()
-                response.status_code = 200
-                return response
+                return HttpResponse("", status=200)
             except Exception as e:            
                 error = ErrorModel.objects.create(json_data={'error':str(e)})
                 webhook.errors.add(error)
                 webhook.save()
-                # raise Exception
-            response.status_code = 200
-            return response
+                # raise Exception                
+            return HttpResponse("", status=200)
             
-        except ObjectDoesNotExist:
-            response = HttpResponse()
-            response.status_code = 200
-            return response
+        except ObjectDoesNotExist:                
+            return HttpResponse("", status=200)
 
 def calendly_booking_success(request):
     lead = Campaignlead.objects.get(pk = request.POST['lead_pk'])
