@@ -18,15 +18,15 @@ from django.utils.decorators import method_decorator
 from core.models import ErrorModel, Site, WhatsappNumber
 from random import randrange
 
-def random_date(start,l):
-    current = start
-    while l >= 0:
-        current = current + timedelta(minutes=randrange(10))
-        l-=1
-    return current
+# def random_date(start,l):
+#     current = start
+#     while l >= 0:
+#         current = current + timedelta(minutes=randrange(10))
+#         l-=1
+#     return current
 
-startDate = datetime(2013, 9, 20,13,00)
-temp1 = random_date(startDate,10)
+# startDate = datetime(2013, 9, 20,13,00)
+# temp1 = random_date(startDate,10)
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -296,9 +296,9 @@ def whatsapp_approval_htmx(request):
 @login_required
 def delete_whatsapp_template_htmx(request):
     body = QueryDict(request.body)
-    site = Site.objects.get(pk=body.get('site_pk'))
-    whatsapp = Whatsapp(site.whatsapp_access_token)
     template = WhatsappTemplate.objects.get(pk=body.get('template_pk'))
+    site = template.site
+    whatsapp = Whatsapp(site.whatsapp_access_token)
     if template.message_template_id:
         whatsapp.delete_template(site.whatsapp_business_account_id, template.name)
     template.delete()
@@ -307,6 +307,7 @@ def delete_whatsapp_template_htmx(request):
     return HttpResponse("", status=200)
 
          
+@login_required
 def whatsapp_clear_changes_htmx(request):
     template = WhatsappTemplate.objects.get(pk=request.POST.get('template_pk'))
     if request.user.profile.company == template.company:
@@ -318,6 +319,7 @@ def whatsapp_clear_changes_htmx(request):
         return render(request, 'whatsapp/whatsapp_templates_row.html', {'template':template, 'WHATSAPP_ORDER_CHOICES': WHATSAPP_ORDER_CHOICES})
                                                                             # 'site_list': get_available_sites_for_user(request.user), 
 
+@login_required
 def whatsapp_number_change_alias(request):
     whatsappnumber = WhatsappNumber.objects.get(pk=request.POST.get('whatsappnumber_pk'))
     if get_user_allowed_to_edit_whatsappnumber(request.user, whatsappnumber):
@@ -327,6 +329,7 @@ def whatsapp_number_change_alias(request):
             whatsappnumber.save()
             return HttpResponse("",status=200)
     return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
+@login_required
 def whatsapp_number_make_default(request):
     whatsappnumber = WhatsappNumber.objects.get(pk=request.POST.get('whatsappnumber_pk'))
     if get_user_allowed_to_edit_whatsappnumber(request.user, whatsappnumber):
@@ -338,6 +341,7 @@ def whatsapp_number_make_default(request):
     return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
     
 
+@login_required
 def whatsapp_template_change_site(request):
     template = WhatsappTemplate.objects.get(pk=request.POST.get('template_pk'))
     if get_user_allowed_to_edit_template(request.user, template):
@@ -353,6 +357,7 @@ def whatsapp_template_change_site(request):
                 return HttpResponse("",status=200)
     return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
 
+@login_required
 def whatsapp_number_change_site(request):
     whatsappnumber = WhatsappNumber.objects.get(pk=request.POST.get('whatsappnumber_pk'))
     if get_user_allowed_to_edit_whatsappnumber(request.user, whatsappnumber):
@@ -368,6 +373,7 @@ def whatsapp_number_change_site(request):
     return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
 
 
+@login_required
 def save_whatsapp_template_ajax(request):
     if request.POST.get('created', False):
         template = WhatsappTemplate()
