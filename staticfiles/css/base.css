@@ -674,3 +674,10 @@
             bottom: 45%;
             right: 2%;
         }
+
+        #leadsSearchBar{
+            position:fixed;
+            top:50%;
+            right:50%;
+            display: none;
+        }
