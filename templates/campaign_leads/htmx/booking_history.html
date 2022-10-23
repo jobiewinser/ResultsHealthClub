@@ -84,9 +84,9 @@
                         " class="double_layer_td">                         
                             <div class="row">   
                                 <div class="col p-0">                            
-                                    <span class="primary_td_layer"><i class="fa-solid fa-{%if booking.type == 'a'%}person{%elif booking.type == 'b'%}phone{%endif%}"></i> - {{booking.datetime}}</span>
+                                    <span class="primary_td_layer">{{booking.datetime}}</span>
                                     <br>
-                                    <span class="secondary_td_layer">{{booking.user.first_name}} {{booking.user.last_name}}</span>  
+                                    <span class="secondary_td_layer">Booked by: {{booking.user.first_name}} {{booking.user.last_name}}</span>  
                                 </div>
                                 <div class="col-md-auto  p-0">
                                     {%if booking.note_set.all%}
@@ -103,6 +103,6 @@
     </div>
 </span>
 <span hx-swap-oob="true" id="generic_modal_title">
-    Booking History - {{lead.name}}
+    Booking History - {{lead.name}} - <i class="fa fa-whatsapp"></i> {{lead.whatsapp_number}}
     <input type="text" style="display:None" id="modal_lead_pk" name="lead_pk" value="{{lead.pk}}"/>
 </span>

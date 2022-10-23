@@ -22,10 +22,10 @@
                     </div>
                 </div>
             </div>
-            <div class="m-3 form-check">
+            {% comment %} <div class="m-3 form-check">
                 <input type="checkbox" onClick="this.checked=!this.checked" class="form-check-input" id="calendly_configured" {%if site.calendly_token and site.calendly_organization %}checked{%endif%}>
                 <label class="form-check-label" for="exampleCheck1">Calendly Enabled? <small><i>(configured by Winser Systems)</i></small></label>
-            </div>
+            </div> {% endcomment %}
 
             <div class="m-3">
                 <table id="overview_table" class="table"> 
