@@ -141,6 +141,7 @@ class Webhooks(View):
                         template = templates[0]
                         template.status=value.get('event')
                         reason = value.get('reason', None)
+                        print("TEMPLATE REASON", str(reason))
                         # if reason and not reason.lower() == 'none':
                         #     template.latest_reason=value.get('reason')
                         # else:
