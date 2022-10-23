@@ -100,8 +100,11 @@
         ><i class="fa fa-whatsapp" aria-hidden="true"></i> Submit to Whatsapp</button>
     </span>
     {%endif%}
-
-    <button class="btn btn-warning btn-sm m-1" onclick="window.location.href = '{%url 'whatsapp-template' template_pk=template.pk %}'"
+    {%if not template.status or template.status == 'REJECTED'%}
+    <span>
+        <button
+    {%else%}
+    <span
         data-bs-toggle="popover" 
         data-bs-trigger="hover" 
         data-bs-html="true" 
@@ -109,10 +112,23 @@
         data-bs-title="What does this do?"
         data-bs-content="
         <p>
-            Clicking edit will allow you to make changes to this template. These changes are not submitted to whatsapp until you choose to do so.
+            You can't edit live tempaltes, please create a new template instead.
         </p>
-        "><i class="fa fa-pencil" aria-hidden="true"></i> Edit
-    </button>
+        "
+    ><button disabled
+        {%endif%} class="btn btn-warning btn-sm m-1" onclick="window.location.href = '{%url 'whatsapp-template' template_pk=template.pk %}'"
+                data-bs-toggle="popover" 
+                data-bs-trigger="hover" 
+                data-bs-html="true" 
+                data-bs-placement="top"
+                data-bs-title="What does this do?"
+                data-bs-content="
+                <p>
+                    Clicking edit will allow you to make changes to this template. These changes are not submitted to whatsapp until you choose to do so.
+                </p>
+                "><i class="fa fa-pencil" aria-hidden="true"></i> Edit
+            </button>
+        </span>
     
     <button class="btn btn-dark btn-sm m-1" 
         hx-post="{%url 'whatsapp-template-delete'%}"
