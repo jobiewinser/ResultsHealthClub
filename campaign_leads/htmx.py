@@ -101,7 +101,7 @@ def get_leads_column_meta_data(request, **kwargs):
         ]
         index = 0
         if leads.filter(calls__gt=index):
-            while leads.filter(calls__gt=index):
+            while leads.filter(calls__gt=index) or index < 21:
                 index = index + 1
                 querysets.append(
                     (f"Call {index}", leads.filter(calls=index), index)
