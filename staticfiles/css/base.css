@@ -591,7 +591,8 @@
         #leads_board {
             justify-content: unset;
             /* max-height: 85vh; */
-            /* overflow-y: scroll; */
+            overflow-x: scroll;
+            overflow-y: hidden;
         }
         
         #add_booking_area {
