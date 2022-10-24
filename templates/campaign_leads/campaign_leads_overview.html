@@ -122,9 +122,6 @@
                     } else if (evt.detail.pathInfo.requestPath.includes("refresh-lead-article") || evt.detail.pathInfo.requestPath.includes("leads-and-calls")){
                         document.getElementById('notification2').play();
                         set_total_costs();
-                    } else if (evt.detail.pathInfo.path.includes("campaign-booking-overview")){
-                        $('#refresh_campaign_list_span').click(); 
-                        snackbarShow('Successfully refreshed table', 'success')
                     }
                 }             
             }
