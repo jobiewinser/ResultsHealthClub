@@ -59,7 +59,7 @@ class CampaignleadsOverviewView(TemplateView):
         context = super(CampaignleadsOverviewView, self).get_context_data(**kwargs)  
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'campaign_leads/htmx/leads_board_htmx.html'   
-            context['campaigns'] = get_campaign_qs(self.request)
+        context['campaigns'] = get_campaign_qs(self.request)
         leads = Campaignlead.objects.filter(complete=False, booking__datetime=None, campaign__site__in=self.request.user.profile.sites_allowed.all())
         # leads = Campaignlead.objects.filter()
         campaign_pk = self.request.GET.get('campaign_pk', None)

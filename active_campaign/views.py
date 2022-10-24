@@ -52,7 +52,7 @@ class Webhooks(View):
                             ): 
                             possible_duplicate  = True
                         if not possible_duplicate:
-                            Campaignlead.objects.create(
+                            lead = Campaignlead.objects.create(
                                 active_campaign_contact_id=data.get('contact[id]'),
                                 first_name=data.get('contact[first_name]', "None"),
                                 whatsapp_number=phone_number_whole,
@@ -61,6 +61,7 @@ class Webhooks(View):
                                 possible_duplicate = possible_duplicate,
                                 email = data.get('contact[email]', "")
                             )
+                            lead.trigger_refresh_webhook()
             return HttpResponse("", "text", 200)
         # except Exception as e:     
         #     logger.error(f"Webhooks POST {str(e)}")     

@@ -1,5 +1,16 @@
 {%load static%}
 <div id="content">
+    <button hidden id="refresh_base_analytics" hx-trigger="load, click delay:0.5s"
+        hx-get="{%url 'get-base-analytics' %}"
+        hx-include="#start_date, #end_date, #site_pk, #campaign_pk"
+        hx-target="#base_analytics_wrapper"
+        hx-indicator=".htmx-indicator-base-analytics"
+        hx-swap="innerHTML"
+        onclick="$('.htmx-indicator-base-analytics').addClass('htmx-request')">refresh</button>
+    <span id="base_analytics_wrapper">
+        {%include 'analytics/htmx/base_analytics.html'%}
+    </span>
+
     <div class="row my-3">
         <div class="col">
             <div class="card p-2">
@@ -14,6 +25,13 @@
                 </div>
 
                 <div class="col">
+                    <button hidden id="refresh_lead_to_sales" hx-trigger="load, click delay:0.5s"
+                        hx-get="{%url 'get-leads-to-sales' %}"
+                        hx-include="#start_date, #end_date, #site_pk, #campaign_pk, #graph_type_leads_to_sale"
+                        hx-target="#lead_to_sales_chart_wrapper"
+                        hx-indicator="#htmx-indicator-leads-and-sales"
+                        hx-swap="innerHTML"
+                        onclick="$('#htmx-indicator-leads-and-sales').addClass('htmx-request')">refresh</button>
                     {%include 'analytics/htmx/leads_to_sale.html'%}
                 </div>
             </div>
@@ -33,6 +51,13 @@
                 </div>
 
                 <div class="col">
+                    <button hidden id="refresh_lead_to_bookings" hx-trigger="load, click delay:0.5s"
+                        hx-get="{%url 'get-leads-to-bookings' %}"
+                        hx-include="#start_date, #end_date, #site_pk, #campaign_pk, #graph_type_leads_to_booking"
+                        hx-target="#lead_to_bookings_chart_wrapper"
+                        hx-indicator="#htmx-indicator-leads-and-bookings"
+                        hx-swap="innerHTML"
+                        onclick="$('#htmx-indicator-leads-and-bookings').addClass('htmx-request')">refresh</button>
                     {%include 'analytics/htmx/leads_to_booking.html'%}
                 </div>
             </div>

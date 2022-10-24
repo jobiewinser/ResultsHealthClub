@@ -26,6 +26,10 @@ def get_user_allowed_to_use_site_messaging(user, site):
     #TODO
     return True
 
+def get_user_allowed_to_use_site_analytics(user, site):
+    #TODO
+    return True
+
 def get_allowed_site_chats_for_user(user):
     #TODO
     # return Site.objects.filter(pk__in=[user.profile.site.pk])

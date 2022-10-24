@@ -4,6 +4,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 import logging
 from django.http import HttpResponseRedirect
+from campaign_leads.views import get_campaign_qs
 from core.models import FreeTasterLink, FreeTasterLinkClick, Profile, Site
 from core.user_permission_functions import get_available_sites_for_user
 from core.views import get_site_pk_from_request  
@@ -18,7 +19,8 @@ class AnalyticsOverviewView(TemplateView):
 
     def get_context_data(self, **kwargs):
         self.request.GET._mutable = True     
-        context = super(AnalyticsOverviewView, self).get_context_data(**kwargs)    
+        context = super(AnalyticsOverviewView, self).get_context_data(**kwargs)       
+        context['campaigns'] = get_campaign_qs(self.request)
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'analytics/htmx/analytics_overview_content.html'
         site_pk = get_site_pk_from_request(self.request)
