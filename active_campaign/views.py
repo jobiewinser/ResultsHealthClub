@@ -30,7 +30,7 @@ class Webhooks(View):
                 if guid:
                     campaign = ActiveCampaign.objects.get(guid=guid)
                     if campaign.site:
-                        phone_number_whole = str(data.get('contact[phone]', "")).replace(' ','')
+                        phone_number_whole = str(data.get('contact[phone]', "")).replace(' ','').replace('+','')
                         # phone_number_whole = str(data.get('contact[phone]', "")).replace('+','').replace(' ','')
                         # if phone_number_whole:
                         #     if phone_number_whole[0] == "0":
