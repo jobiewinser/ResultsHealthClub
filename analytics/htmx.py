@@ -92,7 +92,7 @@ def get_leads_to_sales(request):
         else:
             site = None
     start_date = datetime.strptime(request.GET.get('start_date'), '%Y-%m-%d')
-    end_date = datetime.strptime(request.GET.get('end_date'), '%Y-%m-%d')   
+    end_date = datetime.strptime(request.GET.get('end_date'), '%Y-%m-%d') + relativedelta.relativedelta(days=1) 
      
     date_diff = end_date - start_date
     if date_diff > timedelta(days=364):
@@ -131,7 +131,7 @@ def get_leads_to_bookings(request):
         else:
             site = None
     start_date = datetime.strptime(request.GET.get('start_date'), '%Y-%m-%d')
-    end_date = datetime.strptime(request.GET.get('end_date'), '%Y-%m-%d')   
+    end_date = datetime.strptime(request.GET.get('end_date'), '%Y-%m-%d') + relativedelta.relativedelta(days=1)   
      
     date_diff = end_date - start_date
     if date_diff > timedelta(days=364):
@@ -171,19 +171,13 @@ def get_base_analytics(request):
             else:
                 site = None
         start_date = datetime.strptime(request.GET.get('start_date'), '%Y-%m-%d')
-        end_date = datetime.strptime(request.GET.get('end_date'), '%Y-%m-%d')   
+        end_date = datetime.strptime(request.GET.get('end_date'), '%Y-%m-%d') + relativedelta.relativedelta(days=1)   
         if campaign:
             opportunities = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, campaign=campaign, created__gte=start_date, created__lt=end_date, campaign__site__in=request.user.profile.sites_allowed.all()).annotate(calls=Count('call'))
         elif site:
             opportunities = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, campaign__site=site, created__gte=start_date, created__lt=end_date, campaign__site__in=request.user.profile.sites_allowed.all()).annotate(calls=Count('call'))
         else:
             opportunities = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, created__gte=start_date, created__lt=end_date, campaign__site__in=request.user.profile.sites_allowed.all()).annotate(calls=Count('call'))
-        temp1 = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, campaign__site=site, created__gte=start_date, created__lt=end_date, campaign__site__in=request.user.profile.sites_allowed.all())
-        temp2 = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, campaign__site=site, created__gte=start_date, created__lt=end_date)
-        temp3 = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, campaign__site=site, created__gte=start_date)
-        temp4 = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, campaign__site=site)
-        temp5 = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company)
-        temp6 = Campaignlead.objects.filter()
         live_opportunities = opportunities.filter(complete=False, sold=False)
         closed_opportunities = opportunities.filter(complete=True, sold=True)
         lost_opportunities = opportunities.filter(complete=True, sold=False)
