@@ -165,7 +165,6 @@ class Campaignlead(models.Model):
 
                         template.category = template_live['category']
                         template.language = template_live['language']
-                        # template.components = template_live['components']
                         template.save()
 
                         components =   [] 

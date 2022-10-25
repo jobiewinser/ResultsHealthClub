@@ -9,13 +9,15 @@
     data-bs-content="
     Last edited by: <b>{%if template.edited_by.profile.name%}{{template.edited_by.profile.name}}{%else%}Unknown{%endif%}</b>     
     at <b>{%if template.edited.profile.name%}{{template.edited|nice_date_tag}}{%else%}Unknown{%endif%}</b>">
-    <small>({%if template.language%}{{template.language}}{%endif%})</small>
-    <span class="primary_td_layer">{{template.name}}</span> 
-    {%if template.name == 'hello_world'%}
-    <span class="badge bg-secondary">Example</span>
+    {%if template.name%}
+        <small>({%if template.language%}{{template.language}}{%endif%})</small>
+        <span class="primary_td_layer">{{template.name}}</span> 
+        {%if template.name == 'hello_world'%}
+        <span class="badge bg-secondary">Example</span>
+        {%endif%}
+        <br>
     {%endif%}
     {%if template.pending_name%}
-    <br>
     <span class="secondary_td_layer nowrap">
         Draft: {{template.pending_name}}          
     </span>   
@@ -45,24 +47,26 @@
         {%if template.status%}{{template.status}}{%endif%} 
         {%if template.active_errors%}
         <span 
-        data-bs-toggle="popover" 
-        data-bs-trigger="hover" 
-        data-bs-html="true" 
-        data-bs-placement="top"
-        data-bs-title="Errors"
-        data-bs-content="
-        <ul>
-            {%for error in template.active_errors%}
-            <li>{{error.created}} - {{error.get_type_display}}</li>
-            {%endfor%}
-        </ul>
-        ">
+            data-bs-toggle="popover" 
+            data-bs-trigger="hover" 
+            data-bs-html="true" 
+            data-bs-placement="top"
+            data-bs-title="Errors"
+            data-bs-content="
+            <ul>
+                {%for error in template.active_errors%}
+                <li>{{error.created}} - {{error.get_type_display}}</li>
+                {%endfor%}
+            </ul>
+            ">
             <i class="fa-solid fa-triangle-exclamation" style="color:red"></i>
-        </span>
-        {%endif%}    
-    </span>   
-    {%if template.pending_components%}
+        </span> 
+        </span>   
+        {%endif%}
+    {%if template.status%}
     <br>
+    {%endif%}
+    {%if template.pending_components%}
     <span class="secondary_td_layer nowrap">
             {%if not template.status == 'AWAITING_APPROVAL'%}Draft awaiting submission <i class="fa-solid fa-arrow-right"></i>{%else%}Waiting for Whatsapp approval{%endif%}          
     </span>   

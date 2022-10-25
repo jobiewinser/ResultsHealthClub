@@ -41,13 +41,13 @@
                     data-whatsapp-number="{{lead.whatsapp_number}}">
                         1st <i class="fa fa-whatsapp"></i>
                 </button>
-                {%elif site%}
+                {%else%}
                 <button class="btn btn-sm btn-success text-white position-relative"                     
                     hx-get="{%url 'message-list'%}"
                     hx-target="#chat_bottom"
                     hx-swap="#outerHTML"
                     hx-indicator=".htmx-indicator"                 
-                    hx-vals='{"site_pk": "{{site.pk}}", "customer_number": "{{lead.whatsapp_number}}"}'
+                    hx-vals='{"site_pk": "{{lead.campaign.site.pk}}", "customer_number": "{{lead.whatsapp_number}}"}'
                     hx-trigger="click"
                     {% comment %} hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
                     hx-vals='{"template_name": "message_window_modal", "lead_pk": "{{lead.pk}}"}'

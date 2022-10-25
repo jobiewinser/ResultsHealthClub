@@ -237,16 +237,16 @@ def refresh_template_data(site):
                 template.name = api_template.get('name')
                 template.language = api_template.get('language')
                 template.category = api_template.get('category')
-                if created:
-                # if not template.components and not template.pending_components:
-                    components = []
-                    for dict in api_template.get('components', []):
-                        json_dict = {}
-                        for k,v in dict.items():
-                            json_dict[k] = str(v)
-                        components.append(json_dict)
+                # if created:
+                # # if not template.components and not template.pending_components:
+                #     components = []
+                #     for dict in api_template.get('components', []):
+                #         json_dict = {}
+                #         for k,v in dict.items():
+                #             json_dict[k] = str(v)
+                #         components.append(json_dict)
                     
-                    template.components = components
+                #     template.components = components
                 try:
                     template.save()
                 except Exception as e:

@@ -60,11 +60,9 @@ template_variables = {
 class WhatsappTemplate(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     
-    # send_order = models.IntegerField(choices=WHATSAPP_ORDER_CHOICES, null=True, blank=True, default=0)
     edited_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     edited = models.DateTimeField(null=True, blank=True) 
 
-    # latest_reason = models.TextField(null=True, blank=True)
     status = models.TextField(null=True, blank=True)
 
     message_template_id = models.TextField(null=True, blank=True)
@@ -86,12 +84,6 @@ class WhatsappTemplate(models.Model):
         blank=True,
         default=[]
     )
-    # parameters = ArrayField(
-    #     models.TextField(null=True, blank=True),
-    #     null=True,
-    #     blank=True,
-    #     default=[]
-    # )
     
     pending_components = ArrayField(
         JSONField(default=dict),
@@ -99,39 +91,14 @@ class WhatsappTemplate(models.Model):
         blank=True,
         default=[]
     )
-    # pending_parameters = ArrayField(
-    #     models.TextField(null=True, blank=True),
-    #     null=True,
-    #     blank=True,
-    #     default=[]
-    # )
 
     hidden = models.BooleanField(default=False)
     archived = models.BooleanField(default=False)
     site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
     company = models.ForeignKey("core.Company", on_delete=models.SET_NULL, null=True, blank=True)
-    # objects = WhatsappTemplateManager()
+
     class Meta:
         ordering = ['pk']
-    # def delete(self):
-    #     self.save()
-    # def get_edit_components(self):
-    #     edit_components = {}
-    #     if self.pending_components:
-    #         for component in self.pending_components:
-    #             component_type = component.get('type', None)
-    #             component_text = component.get('text', "")
-    #             component_format = component.get('format', "")
-    #             if component_type:
-    #                 edit_components[component_type] = ""
-
-    #     elif self.components:
-    #         for component in self.components
-    #     return edit_components
-
-    #     elif self.components:
-    #         for component in self.components
-    #     return edit_components
     
     @property
     def active_errors(self):
