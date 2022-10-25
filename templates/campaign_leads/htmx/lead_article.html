@@ -3,7 +3,7 @@
     draggable="true" ondragstart="drag(event)" data-id="{{lead.pk}}" id="lead-{{lead.pk}}">
     {%with call_count|division_percentage_max_100:max_call_count as call_percentage%}
     <article style="margin-right:50px"  class="card draggable-card top-highlight-{{call_percentage|roundup_tag:20}} lead_card">
-        <div class="row">
+        <div class="row" style="height:30px">
             <div class="col p-0 elipses-overflow">
                 <span class="primary_td_layer">
                     
@@ -29,46 +29,59 @@
                 </span>
             </div>
             <div class="col-md-auto p-0">
+                
+                {%if not lead.message_set.all%}
+                <button class="btn btn-sm btn-success text-white position-relative" 
+                    hx-get="{%url 'send-first-template-whatsapp' lead_pk=lead.pk%}"
+                    hx-indicator=".htmx-indicator" 
+                    hx-include="#max_call_count"
+                    hx-target="#lead-{{lead.pk}}"
+                    hx-push-url="false"
+                    hx-swap="outerHTML" hx-trigger="click"  
+                    data-whatsapp-number="{{lead.whatsapp_number}}">
+                        1st <i class="fa fa-whatsapp"></i>
+                </button>
+                {%elif site%}
+                <button class="btn btn-sm btn-success text-white position-relative"                     
+                    hx-get="{%url 'message-list'%}"
+                    hx-target="#chat_bottom"
+                    hx-swap="#outerHTML"
+                    hx-indicator=".htmx-indicator"                 
+                    hx-vals='{"site_pk": "{{site.pk}}", "customer_number": "{{lead.whatsapp_number}}"}'
+                    hx-trigger="click"
+                    {% comment %} hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
+                    hx-vals='{"template_name": "message_window_modal", "lead_pk": "{{lead.pk}}"}'
+                    hx-get="{% url 'messaging-get-modal-content' %}" 
+                    hx-push-url="false"
+                    hx-swap="innerHTML" hx-trigger="click" {% endcomment %}
+                    onclick="$('#chat_card_{{lead.whatsapp_number}}').remove(); $('#chat_list_bottom_window').remove();"
+                        data-whatsapp-number="{{lead.whatsapp_number}}">
+                            Chat
+                            <span id="chat_notification_{{lead.whatsapp_number}}">
+                            </span>
+                    </button>
+                {%endif%}
                 <!-- <span style="color:rgb(96, 248, 61y)" class="secondary_td_layer">£{{lead.campaign.product_cost|floatformat:2}}</span> -->
-                <span style="color:rgb(96, 248, 61y)" class="secondary_td_layer">£<span class="lead_cost" id="lead_cost_{{lead.pk}}" data-cost="{{lead.campaign.product_cost|floatformat:2}}">{{lead.campaign.product_cost|floatformat:2}}</span></span>
             </div>
         </div>
-
-        <span class="secondary_td_layer elipses-overflow campaign_name" style="max-width:150px">{{lead.campaign.name}}</span><br>
-        <span class="secondary_td_layer">
-            <div class="row">
-                <div class="col p-0 elipses-overflow">
-                    <i class="fa fa-whatsapp" aria-hidden="true"></i> <span class="phone_number">{{lead.whatsapp_number}}</span>
+        <div class="row">
+            <span class="secondary_td_layer elipses-overflow campaign_name p-0 ps-1" style="max-width:150px">{{lead.campaign.name}}</span>
+        </div>
+        <div class="row">
+            <span class="secondary_td_layer elipses-overflow site_name p-0 ps-1" style="max-width:150px">{{lead.campaign.site.name}}</span>
+        </div>
+        <div class="row mt-3">
+            <span class="secondary_td_layer p-0" >
+                <div class="row">
+                    <div class="col p-0 elipses-overflow">
+                        <i class="fa fa-whatsapp" aria-hidden="true"></i> <span class="phone_number">{{lead.whatsapp_number}}</span>
+                    </div>
+                    <div class="col-md-auto p-0" style="text-align:right"> 
+                        <span style="color:rgb(96, 248, 61y)" class="secondary_td_layer">£<span class="lead_cost" id="lead_cost_{{lead.pk}}" data-cost="{{lead.campaign.product_cost|floatformat:2}}">{{lead.campaign.product_cost|floatformat:2}}</span></span>
+                    </div>
                 </div>
-                <div class="col-md-auto p-0" style="text-align:right"> 
-                    {%if not lead.message_set.all%}
-                    <button class="btn btn-sm btn-success text-white position-relative" 
-                        hx-get="{%url 'send-first-template-whatsapp' lead_pk=lead.pk%}"
-                        hx-indicator=".htmx-indicator" 
-                        hx-include="#max_call_count"
-                        hx-target="#lead-{{lead.pk}}"
-                        hx-push-url="false"
-                        hx-swap="outerHTML" hx-trigger="click"  
-                        data-whatsapp-number="{{lead.whatsapp_number}}">
-                            1st <i class="fa fa-whatsapp"></i>
-                    </button>
-                    {%else%}
-                    <button class="btn btn-sm btn-success text-white position-relative" 
-                        hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
-                        hx-vals='{"template_name": "message_window_modal", "lead_pk": "{{lead.pk}}"}'
-                        hx-get="{% url 'messaging-get-modal-content' %}" 
-                        hx-push-url="false"
-                        hx-swap="innerHTML" hx-trigger="click"
-                        onclick="$('#chat_card_{{lead.whatsapp_number}}').remove(); $('#chat_list_bottom_window').remove();"
-                            data-whatsapp-number="{{lead.whatsapp_number}}">
-                                Chat
-                                <span id="chat_notification_{{lead.whatsapp_number}}">
-                                </span>
-                        </button>
-                    {%endif%}
-                </div>
-            </div>
-        </span>
+            </span>
+        </div>
         {%if lead.assigned_user%}
         <span class="lead_claimed_img" 
             data-bs-toggle="popover" 

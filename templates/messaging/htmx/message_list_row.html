@@ -4,7 +4,7 @@
     hx-indicator=".htmx-indicator" 
     hx-target="#next_chat_window"
     hx-push-url="false"
-    hx-swap="outerHTML" hx-trigger="click"  
+    hx-swap="outerHTML" {%if customer_number == message.customer_number%}hx-trigger="load,click"{%endif%}  
     
     data-bs-toggle="popover_delay" 
     data-bs-trigger="hover" 

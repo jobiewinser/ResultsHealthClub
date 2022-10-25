@@ -9,7 +9,7 @@
     border-radius: 6px;
     cursor: pointer;
     width: 220px;
-    height: 120px;
+    /* height: 140px; */
     cursor: grab;
     transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
 }

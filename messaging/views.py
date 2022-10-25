@@ -15,11 +15,22 @@ logger = logging.getLogger(__name__)
 
 @login_required
 def message_list(request, **kwargs):
+    whatsappnumber = None
+    customer_number = None
     site = Site.objects.get(pk=request.GET.get('site_pk'))
-    whatsappnumber = WhatsappNumber.objects.get(pk=request.GET.get('whatsappnumber_pk'))
-    if get_user_allowed_to_use_site_messaging(request.user, site):
-        context = {'chat_site':site, "whatsappnumber":whatsappnumber}
-        return render(request, "messaging/messaging.html", context)
+    whatsappnumber_pk = request.GET.get('whatsappnumber_pk')
+    if whatsappnumber_pk:
+        whatsappnumber = WhatsappNumber.objects.get(pk=whatsappnumber_pk)
+    else:
+        customer_number = request.GET.get('customer_number')
+        whatsappnumbers = site.phonenumber_set.all()
+        latest_message = WhatsAppMessage.objects.filter(customer_number=customer_number, whatsappnumber__in=whatsappnumbers).order_by('datetime').last()
+        if latest_message:
+            whatsappnumber = latest_message.whatsappnumber
+    if whatsappnumber:
+        if get_user_allowed_to_use_site_messaging(request.user, site):
+            context = {'chat_site':site, "whatsappnumber":whatsappnumber, "customer_number": customer_number}
+            return render(request, "messaging/messaging.html", context)
 
 @login_required
 def message_window(request, **kwargs):
