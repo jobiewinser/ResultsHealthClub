@@ -224,9 +224,9 @@ def get_base_analytics(request):
         index = 0
         call_counts_tuples = []
         if opportunities.filter(calls__gt=index):
-            while opportunities.filter(calls__gt=index):
+            while opportunities.filter(calls__gte=index):
                 if opportunities.exclude(calls=index).count():
-                    queryset_conversion_rate = (opportunities.filter(calls=index).count() / opportunities.exclude(calls=index).count())*100
+                    queryset_conversion_rate = (opportunities.filter(calls=index).count() / opportunities.count())*100
                 elif opportunities.filter(calls=index).count():
                     queryset_conversion_rate = 100
                 else:
