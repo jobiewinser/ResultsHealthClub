@@ -225,7 +225,6 @@ def get_base_analytics(request):
         call_counts_tuples = []
         if opportunities.filter(calls__gt=index):
             while opportunities.filter(calls__gt=index):
-                index = index + 1
                 if opportunities.exclude(calls=index).count():
                     queryset_conversion_rate = (opportunities.filter(calls=index).count() / opportunities.exclude(calls=index).count())*100
                 elif opportunities.filter(calls=index).count():
@@ -233,6 +232,7 @@ def get_base_analytics(request):
                 else:
                     queryset_conversion_rate = 0
                 call_counts_tuples.append((index, opportunities.filter(calls=index).count(), live_opportunities.filter(calls=index).aggregate(Sum('campaign__product_cost')), queryset_conversion_rate))
+                index = index + 1
         else:
             pass
         context['call_counts_tuples'] = call_counts_tuples
