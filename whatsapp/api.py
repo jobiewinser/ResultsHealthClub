@@ -184,6 +184,7 @@ class Whatsapp():
             from_email='jobiewinser@gmail.com',
             recipient_list=['jobiewinser@gmail.com'])
         print(response_body)
+        template_object = WhatsappTemplate.objects.get(pk=template_object.pk)
         template_object.message_template_id = response_body['id']
         template_object.save()
         return response_body
