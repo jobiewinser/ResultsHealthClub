@@ -59,7 +59,7 @@
                         hx-get="{% url 'messaging-get-modal-content' %}" 
                         hx-push-url="false"
                         hx-swap="innerHTML" hx-trigger="click"
-                        onclick="$('#chat_card_{{lead.whatsapp_number}}').remove()"
+                        onclick="$('#chat_card_{{lead.whatsapp_number}}').remove(); $('#chat_list_bottom_window').remove();"
                             data-whatsapp-number="{{lead.whatsapp_number}}">
                                 Chat
                                 <span id="chat_notification_{{lead.whatsapp_number}}">
