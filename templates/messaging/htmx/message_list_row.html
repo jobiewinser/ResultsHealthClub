@@ -31,7 +31,7 @@
             </div>
         </div>
         <div class="row chat_message_row">
-            <div class="col p-0" id="latest_message_content_{{message.customer_number}}">
+            <div class="col p-0" id="message_list_row_{{message.customer_number}}_{{whatsappnumber.pk}}">
                 {%if message.inbound%}Them{%else%}You{%endif%}: {{message.message}}
             </div>
         </div>
