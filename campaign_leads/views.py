@@ -43,11 +43,6 @@ def get_campaign_qs(request):
 class CampaignleadsOverviewView(TemplateView):
     template_name='campaign_leads/campaign_leads_overview.html'
     def get(self, request, *args, **kwargs):
-        
-        calendly = Calendly(request.user.profile.site.calendly_token)
-        # temp = calendly.list_webhook_subscriptions(request.user.profile.site.calendly_organization)
-        # calendly.delete_webhook_subscriptions("e40ccc51-fbd2-49a3-8722-21d3c4e24bce")
-
         try:
             return super().get(request, *args, **kwargs)
         except Exception as e:        
@@ -88,19 +83,19 @@ class CampaignleadsOverviewView(TemplateView):
             ('Fresh', leads.filter(calls=0), 0)
         ]
         index = 0
-        if leads.filter(calls__gt=index):
-            while leads.filter(calls__gt=index) or index < 21:
-                index = index + 1
-                context['querysets'].append(
-                    (f"Call {index}", leads.filter(calls=index), index)
-                )
+        # if leads.filter(calls__gt=index):
+        while leads.filter(calls__gt=index) or index < 21:
+            index = index + 1
             context['querysets'].append(
-                (f"Call {index+1}", leads.none(), index+1)
+                (f"Call {index}", leads.filter(calls=index), index)
             )
-        else:
-            context['querysets'].append(
-                (f"Call 1", leads.none(), 1)
-            )
+        context['querysets'].append(
+            (f"Call {index+1}", leads.none(), index+1)
+        )
+        # else:
+        #     context['querysets'].append(
+        #         (f"Call 1", leads.none(), 1)
+        #     )
         context['max_call_count'] = index
         context['company'] = self.request.user.profile.company
             

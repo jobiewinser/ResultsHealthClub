@@ -309,7 +309,7 @@ def delete_whatsapp_template_htmx(request):
     template = WhatsappTemplate.objects.get(pk=body.get('template_pk'))
     site = template.site
     whatsapp = Whatsapp(site.whatsapp_access_token)
-    if template.message_template_id:
+    if template.message_template_id and not template.status == 'PENDING_DELETEION':
         whatsapp.delete_template(site.whatsapp_business_account_id, template.name)
     template.delete()
     template.archived = True

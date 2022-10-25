@@ -100,16 +100,16 @@ def get_leads_column_meta_data(request, **kwargs):
             ('Fresh', leads.filter(calls=0), 0)
         ]
         index = 0
-        if leads.filter(calls__gt=index):
-            while leads.filter(calls__gt=index) or index < 21:
-                index = index + 1
-                querysets.append(
-                    (f"Call {index}", leads.filter(calls=index), index)
-                )
-        else:
+        # if leads.filter(calls__gt=index):
+        while leads.filter(calls__gt=index) or index < 21:
+            index = index + 1
             querysets.append(
-                (f"Call 1", leads.none(), 1)
+                (f"Call {index}", leads.filter(calls=index), index)
             )
+        # else:
+        #     querysets.append(
+        #         (f"Call 1", leads.none(), 1)
+        #     )
         return render(request, 'campaign_leads/htmx/column_metadata_htmx.html', {'querysets':querysets})
     except Exception as e:
         logger.debug("get_leads_column_meta_data Error "+str(e))
