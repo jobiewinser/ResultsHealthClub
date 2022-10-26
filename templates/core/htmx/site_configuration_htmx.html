@@ -9,33 +9,33 @@
             <div class="row m-3">
                 <div class="col-md p-0">   
                     <div class="row ">
-                        <form class="form-floating m-1">
-                            <div class="col-md-auto p-0">        
-                                    <input value="{{site.name}}" type="text" name="name" class="form-control site_configuration_input" id="site_name" 
-                                        hx-post="" hx-swap="none" hx-indicator="htmx_indicator_site_form" hx-vals='{"site_pk": "{{site.pk}}"}' hx-trigger='input'>
-                                    <label for="site_name">Name of this site</label>
-                            </div>
-                            <div class="col-md-auto p-0">        
-                                <form class="form-floating m-1">
-                                    <input value="{{site.guid}}" id="guid" type="text" disabled class="form-control">
-                                    <label for="guid">Site Unique ID</label>
-                                </form>
-                            </div>
-                            <div class="col-md-auto p-0">        
-                                <form class="form-floating m-1">
-                                    <input value="{{site.calendly_organization}}" id="calendly_organization" type="text" class="form-control"
-                                        hx-post="" hx-swap="none" hx-indicator="htmx_indicator_site_form" hx-vals='{"site_pk": "{{site.pk}}"}' hx-trigger='input'>
-                                    <label for="calendly_organization">Site Calendly Organtisation</label>
-                                </form>
-                            </div>
-                            <div class="col-md-auto pe-0">
-                                <img  class="htmx-indicator" id="htmx_indicator_site_form" src="https://htmx.org/img/bars.svg"/>
-                                {% comment %} <button hidden hx-post="" hx-swap="none"
-                                    hx-include="#site_name" hx-indicator="#htmx_indicator_site_form" 
-                                    hx-vals='{"site_pk": "{{site.pk}}"}' id="change_name" 
-                                    class="btn btn-primary btn-sm"></button> {% endcomment %}
-                            </div>
-                        </form>
+                        <div class="col-md-auto p-0">      
+                            <form class="form-floating m-1">  
+                                <input value="{{site.name}}" type="text" name="name" class="form-control site_configuration_input" id="site_name" 
+                                    hx-post="" hx-swap="none" hx-indicator="#htmx_indicator_site_form" hx-vals='{"site_pk": "{{site.pk}}"}' hx-trigger='input'>
+                                <label for="site_name">Name of this site</label>
+                            </form>
+                        </div>
+                        <div class="col-md-auto p-0">        
+                            <form class="form-floating m-1">
+                                <input value="{{site.guid}}" id="guid" type="text" disabled class="form-control">
+                                <label for="guid">Site Unique ID</label>
+                            </form>
+                        </div>
+                        <div class="col-md-auto p-0">        
+                            <form class="form-floating m-1">
+                                <input value="{{site.calendly_organization}}" id="calendly_organization" type="text" class="form-control" name="calendly_organization"
+                                    hx-post="" hx-swap="none" hx-indicator="#htmx_indicator_site_form" hx-vals='{"site_pk": "{{site.pk}}"}' hx-trigger='input'>
+                                <label for="calendly_organization">Site Calendly Organtisation</label>
+                            </form>
+                        </div>
+                        <div class="col-md-auto pe-0">
+                            <img  class="htmx-indicator" id="htmx_indicator_site_form" src="https://htmx.org/img/bars.svg"/>
+                            {% comment %} <button hidden hx-post="" hx-swap="none"
+                                hx-include="#site_name" hx-indicator="#htmx_indicator_site_form" 
+                                hx-vals='{"site_pk": "{{site.pk}}"}' id="change_name" 
+                                class="btn btn-primary btn-sm"></button> {% endcomment %}
+                        </div>
                     </div>
                 </div>
                 <div class="col-md p-0">   

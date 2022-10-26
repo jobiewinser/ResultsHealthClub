@@ -104,8 +104,7 @@ class SiteConfigurationView(TemplateView):
         if 'calendly_organization' in request.POST:
             site.calendly_organization = request.POST['calendly_organization']
             response_text = f"""{response_text} 
-                <span hx-swap-oob='innerHTML:.name_display_{site.pk}'>{site.name}</span> 
-                <span hx-swap-oob='innerHTML:#calendly_webhook_status_wrapper'>Organization changed, please refresh page</span>"""
+                <span hx-swap-oob='innerHTML:#calendly_webhook_status_wrapper'><b>Organization changed, please refresh page</b></span>"""
             
         site.save()
         return HttpResponse(response_text, status=200)
