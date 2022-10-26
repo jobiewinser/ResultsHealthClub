@@ -83,6 +83,7 @@ class SiteConfigurationView(TemplateView):
                 print("")
                 print(webhook.get('state'))
                 print(webhook.get('callback_url'))
+                print(webhook.get('uri'))
                 print(f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/")
                 print("")
                 if webhook.get('state') == 'active' and webhook.get('callback_url') == f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/":
