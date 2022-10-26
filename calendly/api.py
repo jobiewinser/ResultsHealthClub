@@ -62,7 +62,7 @@ class Calendly():
         return response_body
     #GET
     def list_webhook_subscriptions(self, organization = None, user = None):   
-        url = f"{self.calendly_url}/webhook_subscriptions?organization={os.getenv('CALENDLY_URL')}organizations/{organization}&scope=organization"
+        url = f"{self.calendly_url}/webhook_subscriptions?organization={os.getenv('CALENDLY_URL')}/organizations/{organization}&scope=organization"
         headers = self._get_headers()
         
         response = requests.get(url=url, headers=headers)
