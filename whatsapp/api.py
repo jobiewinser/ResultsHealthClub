@@ -36,47 +36,90 @@ class Whatsapp():
                    }
         return headers
     #POST
-    def send_free_text_message(self, recipient_number, message, whatsapp_number, preview_url = False):   
+    def send_free_text_message(self, customer_number, message, whatsapp_number, preview_url = False):   
         from core.models import AttachedError
         if message:  
             if settings.WHATSAPP_PHONE_OVERRIDE1:
-                recipient_number = settings.WHATSAPP_PHONE_OVERRIDE1
+                overridden_number = customer_number
+                customer_number = settings.WHATSAPP_PHONE_OVERRIDE1
             url = f"{self.whatsapp_url}{whatsapp_number.whatsapp_business_phone_number_id}/messages"
             headers = self._get_headers()
             body = { 
                 "messaging_product": "whatsapp", 
-                "to": f"{recipient_number}", 
+                "to": f"{customer_number}", 
                 "type": "text",
                 "text": json.dumps({
                     "body": f"{message}",
                     "preview_url": preview_url,
                     })
             }
-            response = requests.post(url=url, json=body, headers=headers)
-            response_body = response.json()
-
-            potential_error = response_body.get('error', None)
-            if potential_error:
-                code = potential_error.get('code')
-                if str(code) == '132000':
-                    AttachedError.objects.create(
-                        type = '1103',
-                        attached_field = "whatsapp_number",
-                        whatsapp_number = whatsapp_number,
-                        recipient_number = recipient_number,
-                        admin_action_required = True,
-                    )
-            else:
+            # response = requests.post(url=url, json=body, headers=headers)
+            # response_body = response.json()
+            attached_errors = []
+            response_body = {
+                "object": "whatsapp_business_account",
+                "entry": [
+                    {
+                        "id": "104128642479500",
+                        "changes": [
+                            {
+                                "value": {
+                                    "messaging_product": "whatsapp",
+                                    "metadata": {
+                                        "display_phone_number": "447872000364",
+                                        "phone_number_id": "108208485398311"
+                                    },
+                                    "statuses": [
+                                        {
+                                            "id": "wamid.HBgMNDQ3ODI3Nzc3OTQwFQIAERgSNjgxNDQ4MjVENUM5NkY3NTc2AA==",
+                                            "status": "failed",
+                                            "timestamp": "1666789627",
+                                            "recipient_id": "447827777940",
+                                            "errors": [
+                                                {
+                                                    "code": 131047,
+                                                    "title": "Message failed to send because more than 24 hours have passed since the customer last replied to this number.",
+                                                    "href": "https://developers.facebook.com/docs/whatsapp/cloud-api/support/error-codes/"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                "field": "messages"
+                            }
+                        ]
+                    }
+                ]
+            }
+            for entry in response_body.get('entry'):
+                for change in entry.get('changes'):
+                    value = change.get('value')
+                    for status in value.get('statuses'):
+                        potential_errors = status.get('errors', None)
+                        if potential_errors:
+                            for error in potential_errors:
+                                code = error.get('code')
+                                if str(code) == '131047':
+                                    attached_errors.append(
+                                        AttachedError.objects.create(
+                                            type = '1104',
+                                            attached_field = "whatsapp_number",
+                                            whatsapp_number = whatsapp_number,
+                                            customer_number = overridden_number,
+                                            admin_action_required = True,
+                                        )
+                                    )
+            if not attached_errors:
                 AttachedError.objects.filter(
-                    type = '1103',
-                    whatsapp_number = whatsapp_number,
+                    type = '1104',
                     archived = False,
-                    recipient_number = recipient_number,
+                    whatsapp_number = whatsapp_number,
+                    customer_number = overridden_number,
                 ).update(archived = True)
 
-            print(response_body)
-            return response_body
-    def send_template_message(self, recipient_number, whatsapp_number, template_object, language, components):  
+            print("send_free_text_message response_body", response_body)
+            return response_body, attached_errors
+    def send_template_message(self, customer_number, whatsapp_number, template_object, language, components):  
         from core.models import AttachedError
         template_name = template_object.name
         #  "components": [{
@@ -91,12 +134,12 @@ class Whatsapp():
         #                 }]
         #         }] 
         if settings.WHATSAPP_PHONE_OVERRIDE1:
-            recipient_number = settings.WHATSAPP_PHONE_OVERRIDE1
+            customer_number = settings.WHATSAPP_PHONE_OVERRIDE1
         if template_name:  
             AttachedError.objects.filter(
                 type = '1102',
                 whatsapp_template = template_object,
-                recipient_number = recipient_number,
+                customer_number = customer_number,
                 whatsapp_number = whatsapp_number,
                 archived = False,
             ).update(archived = True)
@@ -104,7 +147,7 @@ class Whatsapp():
             headers = self._get_headers()
             body = { 
                 "messaging_product": "whatsapp", 
-                "to": f"{recipient_number}", 
+                "to": f"{customer_number}", 
                 "type": "template",
                 "template": json.dumps({
                     "name": template_name,
@@ -129,7 +172,7 @@ class Whatsapp():
                         type = '1103',
                         attached_field = "whatsapp_template",
                         whatsapp_template = template_object,
-                        recipient_number = recipient_number,
+                        customer_number = customer_number,
                         whatsapp_number = whatsapp_number,
                         admin_action_required = True,
                     )
@@ -139,7 +182,7 @@ class Whatsapp():
                     whatsapp_template = template_object,
                     archived = False,
                     whatsapp_number = whatsapp_number,
-                    recipient_number = recipient_number,
+                    customer_number = customer_number,
                 ).update(archived = True)
 
             print(response_body)
@@ -150,7 +193,7 @@ class Whatsapp():
                 attached_field = "whatsapp_template",
                 whatsapp_template = template_object,
                 whatsapp_number = whatsapp_number,
-                recipient_number = recipient_number,
+                customer_number = customer_number,
             )
     #POST
     def create_template(self, template_object):   

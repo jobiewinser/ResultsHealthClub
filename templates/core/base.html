@@ -237,6 +237,7 @@
                             scrollTop: $(evt.detail.target)[0].scrollHeight - $(evt.detail.target)[0].clientHeight
                         }, 100);
                     }
+                    $("[data-bs-toggle=popover]").popover();
                 });
                 document.body.addEventListener('htmx:oobBeforeSwap', function(evt) { 
                     {% comment %} console.log("oobBeforeSwap", evt) {% endcomment %}
@@ -245,6 +246,7 @@
                         document.getElementById('notification1').play();
                         htmx.ajax('GET', "{%url 'update-message-counts'%}", {swap:'none'})
                     }
+                    $("[data-bs-toggle=popover]").popover();
                 });
                 
                 document.body.addEventListener('htmx', function(evt) { 

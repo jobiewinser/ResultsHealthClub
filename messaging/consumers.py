@@ -32,8 +32,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
         user = self.scope["user"]
         if(user.is_authenticated):
             message = await send_whatsapp_message_to_number(input_message, messaging_customer_number, user, self.scope["url_route"]["kwargs"]["whatsappnumber_pk"])
+
+            whatsappnumber = await get_whatsappnumber(self.scope["url_route"]["kwargs"]["whatsappnumber_pk"])
             if message:
-                whatsappnumber = await get_whatsappnumber(self.scope["url_route"]["kwargs"]["whatsappnumber_pk"])
                 message_context = {
                     "message": message,
                     "whatsappnumber": whatsappnumber,
@@ -55,6 +56,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         'data':{
                             'rendered_html':f"""<span hx-swap-oob="afterbegin:.company_message_count"><span hx-trigger="load" hx-swap="none" hx-get="/update-message-counts/"></span>""",
                         }
+                    }
+                )
+            else:
+                
+                rendered_html = await get_rendered_html_failed(messaging_customer_number, whatsappnumber)
+                await self.channel_layer.group_send(
+                    self.group_name,
+                    {
+                        'type': 'chatbox_message',
+                        "message": rendered_html,                       
                     }
                 )
     # Receive message from room group.    
@@ -121,6 +132,19 @@ def get_rendered_html(message, message_context, messaging_customer_number, whats
         <span hx-swap-oob="true" id="chat_notification_{message.customer_number}">
         </span>
         """
+    return rendered_html
+@sync_to_async
+def get_rendered_html_failed(messaging_customer_number, whatsappnumber):
+    message_context = {
+        "customer_number":messaging_customer_number,
+        "whatsappnumber":whatsappnumber,
+    }
+    rendered_message_chat_row = loader.render_to_string('messaging/htmx/message_chat_row_failed.html', message_context)
+    rendered_html = f"""
+    <span id='messageWindowInnerBody_{messaging_customer_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>                
+    """
+
+    rendered_html = f"""{rendered_html}"""
     return rendered_html
 
     

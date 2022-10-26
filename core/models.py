@@ -24,6 +24,7 @@ class AttachedError(models.Model):
                         ('1101', "You can only edit an active template once every 24 hours"),
                         ('1102', "The system can not send Whatsapp Templates without a template name"),
                         ('1103', "The number of parameters submitted does not match the Whatsapp Template (contact Winser Systems)"),
+                        ('1104', "Message failed to send because more than 24 hours have passed since the customer last replied to this number"),
                         ('1201', "Whatsapp Template not found Whatsapp's system"),
                         ('1202', "There is no Whatsapp Business linked to this Lead's assosciated Site"),
                         ('1203', "There is no 1st Whatsapp Template linked to this Lead's assosciated Site"),
@@ -36,7 +37,7 @@ class AttachedError(models.Model):
     campaign_lead = models.ForeignKey("campaign_leads.Campaignlead", related_name="errors", on_delete=models.SET_NULL, null=True, blank=True)
     whatsapp_number = models.ForeignKey("core.WhatsappNumber", related_name="errors", on_delete=models.SET_NULL, null=True, blank=True)
     site = models.ForeignKey("core.Site", related_name="errors", on_delete=models.SET_NULL, null=True, blank=True)
-    recipient_number = models.TextField(blank=True, null=True)    
+    customer_number = models.TextField(blank=True, null=True)    
     admin_action_required = models.BooleanField(default=False)
     archived = models.BooleanField(default=False)
     archived_time = models.DateTimeField(null=True, blank=True)
@@ -58,7 +59,7 @@ class AttachedError(models.Model):
 #     whatsapp_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="warnings", on_delete=models.SET_NULL, null=True, blank=True)
 #     campaign_lead = models.ForeignKey("campaign_leads.Campaignlead", related_name="warnings", on_delete=models.SET_NULL, null=True, blank=True)
 #     whatsapp_number = models.ForeignKey("core.WhatsappNumber", related_name="warnings", on_delete=models.SET_NULL, null=True, blank=True)
-#     recipient_number = models.TextField(blank=True, null=True)    
+#     customer_number = models.TextField(blank=True, null=True)    
 #     admin_action_required = models.BooleanField(default=False)
 #     archived = models.BooleanField(default=False)
 #     archived_time = models.DateTimeField(null=True, blank=True)
@@ -77,6 +78,16 @@ class WhatsappNumber(PhoneNumber):
     quality_rating = models.CharField(max_length=50, null=True, blank=True)
     code_verification_status = models.CharField(max_length=50, null=True, blank=True)
     verified_name = models.CharField(max_length=50, null=True, blank=True)
+
+    @property
+    def active_errors(self):        
+        from core.models import AttachedError
+        return AttachedError.objects.filter(whatsapp_number=self).filter(archived=False)
+        
+    def active_errors_for_customer_number(self, customer_number):        
+        from core.models import AttachedError
+        return AttachedError.objects.filter(whatsapp_number=self, customer_number=customer_number).filter(archived=False)
+
     @property
     def is_whatsapp(self):
         return True
@@ -113,24 +124,25 @@ class WhatsappNumber(PhoneNumber):
                 whatsapp = Whatsapp(self.site.whatsapp_access_token)
                 if '+' in self.number:
                     customer_number = f"{self.number.split('+')[-1]}"
-                response = whatsapp.send_free_text_message(customer_number, message, self)
-                reponse_messages = response.get('messages',[])
-                if reponse_messages:
-                    for response_message in reponse_messages:
-                        message, created = WhatsAppMessage.objects.get_or_create(
-                            wamid=response_message.get('id'),
-                            message=message,
-                            datetime=datetime.now(),
-                            lead=lead,
-                            site=self.site,
-                            user=user,
-                            customer_number=customer_number,
-                            template=template_used,
-                            inbound=False,
-                            whatsappnumber=self,
-                        )
-                    logger.debug("site.send_whatsapp_message success") 
-                    return message
+                response_body, attached_errors = whatsapp.send_free_text_message(customer_number, message, self)
+                if not attached_errors:
+                    reponse_messages = response_body.get('messages',[])
+                    if reponse_messages:
+                        for response_message in reponse_messages:
+                            message, created = WhatsAppMessage.objects.get_or_create(
+                                wamid=response_message.get('id'),
+                                message=message,
+                                datetime=datetime.now(),
+                                lead=lead,
+                                site=self.site,
+                                user=user,
+                                customer_number=customer_number,
+                                template=template_used,
+                                inbound=False,
+                                whatsappnumber=self,
+                            )
+                        logger.debug("site.send_whatsapp_message success") 
+                        return message
                 
                 logger.debug("site.send_whatsapp_message fail") 
                 return None

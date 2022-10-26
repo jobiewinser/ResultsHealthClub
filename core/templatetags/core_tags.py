@@ -215,3 +215,7 @@ def site_outstanding_whatsapp_messages_tag(site, user):
     if site in user.profile.sites_allowed.all():
         return site.outstanding_whatsapp_messages(user)
     return 0
+
+@register.filter
+def active_errors_for_customer_number_tag(whatsappnumber, customer_number):
+    return whatsappnumber.active_errors_for_customer_number(customer_number)

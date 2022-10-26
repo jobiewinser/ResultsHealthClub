@@ -1,0 +1,23 @@
+{%load static core_tags%}
+{%with whatsappnumber|active_errors_for_customer_number_tag:customer_number as errors%}
+<div class="row"
+id="message_chat_row_{{customer_number}}_{{whatsappnumber.pk}}"
+    {%if errors%}
+    data-bs-toggle="popover" 
+    data-bs-trigger="hover" 
+    data-bs-html="true" 
+    data-bs-placement="top"
+    data-bs-title="Errors"
+    data-bs-content="
+    <b>Errors:</b>
+    <ul>
+        {%for error in errors%}
+        <li>{{error.created}} - {{error.get_type_display}}</li>
+        {%endfor%}
+    </ul>"
+    {%endif%}>
+    <div class="col p-0 ps-1 m-1 card chat_row_{{customer_number}}">
+        Message Failed To Send!
+    </div>
+</div>
+{%endwith%}
