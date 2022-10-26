@@ -122,7 +122,7 @@ def create_calendly_webhook_subscription(request, **kwargs):
                 active_webhook_uuid = webhook.get('uri').replace(f"{os.getenv('CALENDLY_URL')}webhook_subscriptions/", "")
                 calendly.delete_webhook_subscriptions(webhook_guuid = active_webhook_uuid)
                 response = calendly.create_webhook_subscription(site.guid, organization = site.calendly_organization)
-                print(response)
+                print("create_calendly_webhook_subscription response", response)
                 break
     return render(request, "core/htmx/calendly_webhook_status_wrapper.html", {'site':site})
     
