@@ -115,15 +115,13 @@ def create_calendly_webhook_subscription(request, **kwargs):
     if get_user_allowed_to_edit_site(request.user, site): 
         calendly = Calendly(site.calendly_token)
         calendly_webhooks = calendly.list_webhook_subscriptions(organization = site.calendly_organization).get('collection')
-        site_webhook_active = False
         for webhook in calendly_webhooks:
             if webhook.get('state') == 'active' and webhook.get('callback_url') == f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/":
-                site_webhook_active = True
+                active_webhook_uuid = webhook.get('uri').replace(f"{os.getenv('CALENDLY_URL')}webhook_subscriptions/", "")
+                calendly.delete_webhook_subscriptions(webhook_guuid = active_webhook_uuid)
+                response = calendly.create_webhook_subscription(site.guid, organization = site.calendly_organization)
+                print(response)
                 break
-        if not site_webhook_active:
-            calendly.delete_webhook_subscriptions(webhook_guuid = f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/")
-            response = calendly.create_webhook_subscription(site.guid, organization = site.calendly_organization)
-            print(response)
     return render(request, "core/htmx/calendly_webhook_status_wrapper.html", {'site':site})
     
 @login_required
@@ -131,7 +129,12 @@ def delete_calendly_webhook_subscription(request, **kwargs):
     site = Site.objects.get(pk=request.POST.get('site_pk'))    
     if get_user_allowed_to_edit_site(request.user, site): 
         calendly = Calendly(site.calendly_token)
-        response = calendly.delete_webhook_subscriptions(webhook_guuid = f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/")
+        calendly_webhooks = calendly.list_webhook_subscriptions(organization = site.calendly_organization).get('collection')
+        for webhook in calendly_webhooks:
+            if webhook.get('state') == 'active' and webhook.get('callback_url') == f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/":
+                active_webhook_uuid = webhook.get('uri').replace(f"{os.getenv('CALENDLY_URL')}webhook_subscriptions/", "")
+                response = calendly.delete_webhook_subscriptions(webhook_guuid = active_webhook_uuid)
+                break
     return render(request, "core/htmx/calendly_webhook_status_wrapper.html", {'site':site})
 
 @login_required
