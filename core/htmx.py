@@ -122,6 +122,7 @@ def create_calendly_webhook_subscription(request, **kwargs):
                 break
         if not site_webhook_active:
             response = calendly.create_webhook_subscription(site.guid, organization = site.calendly_organization)
+            print(response)
     return render(request, "core/htmx/calendly_webhook_status_wrapper.html", {'site':site})
     
 @login_required

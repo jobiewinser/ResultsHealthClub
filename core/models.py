@@ -156,7 +156,7 @@ class Site(models.Model):
     calendly_token = models.TextField(blank=True, null=True)
     calendly_user = models.TextField(blank=True, null=True)
     calendly_organization = models.TextField(blank=True, null=True)   
-    calendly_webhook_created = models.BooleanField(default=False)  
+    # calendly_webhook_created = models.BooleanField(default=False)  
     guid = models.TextField(null=True, blank=True) 
     def __str__(self):
         return f"({self.pk}) {self.name}"
@@ -192,12 +192,12 @@ class Site(models.Model):
         return self.return_phone_numbers()
     def return_phone_numbers(self):
         return WhatsappNumber.objects.filter(site=self, archived=False)
-    def create_calendly_webhook(self):
-        calendly = Calendly(self.calendly_token)
-        if self.calendly_user:
-            calendly.create_webhook_subscription(self.guid, user = self.calendly_user)
-        elif self.calendly_organization:
-            calendly.create_webhook_subscription(self.guid, organization = self.calendly_organization)
+    # def create_calendly_webhook(self):
+    #     calendly = Calendly(self.calendly_token)
+    #     if self.calendly_user:
+    #         calendly.create_webhook_subscription(self.guid, user = self.calendly_user)
+    #     elif self.calendly_organization:
+    #         calendly.create_webhook_subscription(self.guid, organization = self.calendly_organization)
 
     def generate_lead(self, first_name, email, phone_number, lead_generation_app='a', request=None):
         if lead_generation_app == 'b' and not self.company.active_campaign_enabled:
@@ -228,13 +228,13 @@ def execute_after_save(sender, instance, created, *args, **kwargs):
     if not instance.guid:
         instance.guid = str(uuid.uuid4())[:16]
         instance.save()
-    if not settings.DEBUG and instance.calendly_token and instance.guid and instance.company.calendly_enabled and not instance.calendly_webhook_created:
-        try:
-            instance.create_calendly_webhook()  
-        except:
-            pass
-        instance.calendly_webhook_created = True 
-        instance.save()
+    # if not settings.DEBUG and instance.calendly_token and instance.guid and instance.company.calendly_enabled and not instance.calendly_webhook_created:
+    #     try:
+    #         instance.create_calendly_webhook()  
+    #     except:
+    #         pass
+    #     instance.calendly_webhook_created = True 
+    #     instance.save()
 # Extending User Model Using a One-To-One Link
 class Company(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
