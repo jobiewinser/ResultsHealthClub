@@ -5,20 +5,32 @@
     <div class="row mt-2">
         <div class="col">
         </div>
-        <div class="col-md-auto card p-2">
-            <div class="m-3">
-                <div class="row">
-                    <div class="col p-0">
-                        <label for="site_name" class="form-label">Name</label>
-                        <input value="{{site.name}}" type="text" name="name" class="form-control site_configuration_input" id="site_name" aria-describedby="emailHelp" oninput="$('#change_name').click();">
-                        <div id="emailHelp" class="form-text">The name of this site.</div>
+        <div class="col-md-auto card p-2"> 
+            <div class="row m-3">
+                <div class="col-md p-0">   
+                    <div class="row ">
+                        <div class="col-md-auto p-0">        
+                            <form class="form-floating m-1">
+                                <input value="{{site.name}}" type="text" name="name" class="form-control site_configuration_input" id="site_name" aria-describedby="emailHelp" oninput="$('#change_name').click();">
+                                <label for="site_name">Name of this site</label>
+                            </form>
+                        </div>
+                        <div class="col-md-auto pe-0">
+                            <img  class="htmx-indicator" id="htmx_indicator_name" src="https://htmx.org/img/bars.svg"/>
+                            <button hidden hx-post="" hx-swap="none"
+                                hx-include="#site_name" hx-indicator="#htmx_indicator_name" 
+                                hx-vals='{"site_pk": "{{site.pk}}"}' id="change_name" 
+                                class="btn btn-primary btn-sm"></button>
+                        </div>
                     </div>
-                    <div class="col-md-auto pe-0">
-                        <img  class="htmx-indicator" id="htmx_indicator_name" src="https://htmx.org/img/bars.svg"/>
-                        <button hidden hx-post="" hx-swap="innerHTML"  hx-target=".name_display_{{site.pk}}"
-                            hx-include="#site_name" hx-indicator="#htmx_indicator_name" 
-                            hx-vals='{"site_pk": "{{site.pk}}"}' id="change_name" 
-                            class="btn btn-primary btn-sm"></button>
+                </div>
+                <div class="col-md p-0">   
+                    <div class="row">
+                        <div class="col-md-auto p-0">        
+                            Calendly Webhook for <span class="name_display_{{site.pk}}">{{site.name}}</span>: 
+                            {%include 'core/htmx/calendly_webhook_status_wrapper.html'%}
+                            
+                        </div>
                     </div>
                 </div>
             </div>

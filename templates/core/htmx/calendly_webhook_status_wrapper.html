@@ -1,0 +1,23 @@
+<span id="calendly_webhook_status_wrapper">
+    {%if site_webhook_active%}
+        <b style="color:green">Active</b>
+        <button class="btn btn-danger ms-3"
+            hx-indicator=".top-htmx-indicator" hx-target="#calendly_webhook_status_wrapper" 
+            hx-vals='{"site_pk": "{{site.pk}}"}'
+            hx-post="{% url 'delete-calendly-webhook-subscription' %}" 
+            hx-push-url="false"
+            hx-swap="outerHTML" hx-trigger="click">
+                <i class="fa-solid fa-trash" aria-hidden="true"></i> Delete Calendly Webhook
+        </button>
+    {%else%}
+        <b style="color:red">Inactive</b>
+        <button class="btn btn-secondary ms-3"
+            hx-indicator=".top-htmx-indicator" hx-target="#calendly_webhook_status_wrapper" 
+            hx-vals='{"site_pk": "{{site.pk}}"}'
+            hx-post="{% url 'create-calendly-webhook-subscription' %}" 
+            hx-push-url="false"
+            hx-swap="outerHTML" hx-trigger="click">
+                <i class="fa-solid fa-link" aria-hidden="true"></i> Create Calendly Webhook
+        </button>
+    {%endif%}
+</span>

@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 import logging
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.models import User
+from calendly.api import Calendly
 from core.models import ROLE_CHOICES, Company, FreeTasterLink, FreeTasterLinkClick, Profile, Site  
 from django.contrib.auth import authenticate
 from django.contrib.auth import login
@@ -73,16 +74,25 @@ class SiteConfigurationView(TemplateView):
         site_pk = get_site_pk_from_request(self.request)
         if site_pk:
             self.request.GET['site_pk'] = site_pk      
-            context['site'] = Site.objects.get(pk=site_pk)     
-        context['whatsapp_numbers'] = context['site'].get_live_whatsapp_phone_numbers()  
-        return context
+            site = Site.objects.get(pk=site_pk)     
+            context['whatsapp_numbers'] = site.get_live_whatsapp_phone_numbers()          
+            calendly = Calendly(site.calendly_token)
+            calendly_webhooks = calendly.list_webhook_subscriptions(organization = site.calendly_organization).get('collection')
+            site_webhook_active = False
+            for webhook in calendly_webhooks:
+                if webhook.get('state') == 'active' and webhook.get('callback_url') == f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/":
+                    site_webhook_active = True
+                    break
+            context['site'] = site
+            context['site_webhook_active'] = site_webhook_active
+            return context
     def post(self, request):
         self.request.POST._mutable = True 
         site = Site.objects.get(pk=request.POST.get('site_pk'))   
         response_text = ""     
         if 'name' in request.POST:
             site.name = request.POST['name']
-            response_text = f"{site.name}"
+            response_text = f"<span hx-swap-oob='innerHTML:.name_display_{site.pk}'>{site.name}</span>"
         site.save()
         return HttpResponse(response_text, status=200)
 

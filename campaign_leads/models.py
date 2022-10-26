@@ -107,7 +107,7 @@ class Campaignlead(models.Model):
             return last_whatsapp.datetime.replace(hour=9).replace(minute=30).replace(second=0) + timedelta(days=1)
         return "Never"  
 
-    def trigger_refresh_webhook(self):
+    def trigger_refresh_websocket(self):
         channel_layer = get_channel_layer()   
         
         async_to_sync(channel_layer.group_send)(

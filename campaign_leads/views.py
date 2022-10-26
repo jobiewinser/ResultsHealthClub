@@ -216,7 +216,7 @@ def new_call(request, **kwargs):
                 lead.save()
 
                 
-                lead.trigger_refresh_webhook()
+                lead.trigger_refresh_websocket()
                 
                 return HttpResponse("", status=200)
             return HttpResponse("", status=500)
@@ -264,7 +264,7 @@ def toggle_claim_lead(request, **kwargs):
             else:
                 lead.assigned_user = request.user
             lead.save()
-            lead.trigger_refresh_webhook()
+            lead.trigger_refresh_websocket()
         
             return HttpResponse("", status=200)
             # return render(request, 'campaign_leads/htmx/lead_article.html', {'lead':lead, 'max_call_count':0})

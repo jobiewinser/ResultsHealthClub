@@ -1,6 +1,7 @@
 import json
 import os
 import uuid
+from calendly.api import Calendly
 from core.models import ROLE_CHOICES, FreeTasterLink, Profile, Site
 from django.http import HttpResponse
 from django.contrib.auth.models import User
@@ -11,7 +12,7 @@ from django.middleware.csrf import get_token
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views import View
-from core.user_permission_functions import get_available_sites_for_user, get_user_allowed_to_edit_other_user 
+from core.user_permission_functions import get_available_sites_for_user, get_user_allowed_to_edit_other_user, get_user_allowed_to_edit_site 
 from core.views import get_site_pk_from_request
 from django.http import QueryDict
 
@@ -69,6 +70,7 @@ class ModifyUser(View):
                 first_name = request.POST.get('first_name', '')
                 last_name = request.POST.get('last_name', '')
                 site_pk = request.POST.get('site_pk', '')
+                calendly_event_page_url = request.POST.get('calendly_event_page_url', '')
                 # user = User.objects.create(username=f"{first_name}{last_name}", 
                 #                             first_name=first_name,
                 #                             last_name=last_name,
@@ -83,6 +85,7 @@ class ModifyUser(View):
                     first_name = request.POST.get('first_name', '')
                     last_name = request.POST.get('last_name', '')
                     site_pk = request.POST.get('site_pk', '')
+                    calendly_event_page_url = request.POST.get('calendly_event_page_url', '')
                     # user.username=f"{first_name}{last_name}" 
                     user.first_name=first_name
                     user.last_name=last_name
@@ -94,6 +97,7 @@ class ModifyUser(View):
                         profile.avatar = profile_picture
                     if site_pk:
                         profile.site=Site.objects.get(pk=site_pk)
+                    profile.calendly_event_page_url = calendly_event_page_url
                     profile.save()   
                 else:
                     return HttpResponse("You do not have permission to do this", status=500)
@@ -105,7 +109,28 @@ class ModifyUser(View):
         except Exception as e:
             logger.debug("ModifyUser Post Error "+str(e))
             return HttpResponse(e, status=500)
-
+@login_required
+def create_calendly_webhook_subscription(request, **kwargs):
+    site = Site.objects.get(pk=request.POST.get('site_pk'))    
+    if get_user_allowed_to_edit_site(request.user, site): 
+        calendly = Calendly(site.calendly_token)
+        calendly_webhooks = calendly.list_webhook_subscriptions(organization = site.calendly_organization).get('collection')
+        site_webhook_active = False
+        for webhook in calendly_webhooks:
+            if webhook.get('state') == 'active' and webhook.get('callback_url') == f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/":
+                site_webhook_active = True
+                break
+        if not site_webhook_active:
+            response = calendly.create_webhook_subscription(site.guid, organization = site.calendly_organization)
+    return render(request, "core/htmx/calendly_webhook_status_wrapper.html", {'site':site})
+    
+@login_required
+def delete_calendly_webhook_subscription(request, **kwargs):
+    site = Site.objects.get(pk=request.POST.get('site_pk'))    
+    if get_user_allowed_to_edit_site(request.user, site): 
+        calendly = Calendly(site.calendly_token)
+        response = calendly.delete_webhook_subscriptions(site.guid, webhook_guuid = f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/")
+    return render(request, "core/htmx/calendly_webhook_status_wrapper.html", {'site':site})
 
 @login_required
 def generate_free_taster_link(request, **kwargs):

@@ -1,18 +1,22 @@
 {%load static%}
 <span>
+    {%if request.user.profile.calendly_event_page_url%}
     <script>
         $(document).ready(function() {
-            
-            Calendly.initInlineWidget({
-                url: '{{request.user.profile.calendly_event_page_url}}',
-                parentElement: document.getElementById('calendly_id'),
-                prefill: {
-                    name: "{{lead.name}}",
-                    email: "{{lead.email}}",
-                    customAnswers: "",
-                },
-                utm: {}
-               });
+            try {
+                Calendly.initInlineWidget({
+                    url: '{{request.user.profile.calendly_event_page_url}}',
+                    parentElement: document.getElementById('calendly_id'),
+                    prefill: {
+                        name: "{{lead.name}}",
+                        email: "{{lead.email}}",
+                        customAnswers: "",
+                    },
+                    utm: {}
+                });
+            } catch(e){
+                console.log(e)
+            }
         });
     </script>
     <div class="row">
@@ -20,6 +24,23 @@
             <img id="calendly_loading" src="{% static 'gif/loading.gif' %}" alt="" width="200">
         </div>
     </div>
+    {%else%}
+    <div class="row m-2">
+        <div class="col center" id="calendly_id" style="">
+            <p>Calendly not configured for your profile!</p> 
+            <p>Please edit your profile using the "Edit Profile" button below.</p>
+        </div>
+    </div>
+    <div class="row m-2">
+        <div class="col center" id="calendly_id" style="">
+            <a class="btn btn-primary" href="#"
+                        hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
+                        hx-vals='{"template_name": "edit_user", "user_pk":"{{request.user.pk}}"}'
+                        hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
+                        hx-swap="innerHTML" hx-trigger="click">Edit Profile</a>
+        </div>
+    </div>
+    {%endif%}
     {% comment %} <div class="row">
         <div class="col">
             <div class="m-3">

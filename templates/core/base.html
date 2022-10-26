@@ -257,6 +257,7 @@
         
                 window.addEventListener("message", function(e) {
                     if(isCalendlyEvent(e)) {
+                        console.log(e);
                         $('#calendly_loading').remove()
                         if (e.data.event == "calendly.event_scheduled") {               
                             var respStatus = $.ajax({

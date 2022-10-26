@@ -61,7 +61,7 @@ class Webhooks(View):
                                 possible_duplicate = possible_duplicate,
                                 email = data.get('contact[email]', "")
                             )
-                            lead.trigger_refresh_webhook()
+                            lead.trigger_refresh_websocket()
             return HttpResponse("", "text", 200)
         # except Exception as e:     
         #     logger.error(f"Webhooks POST {str(e)}")     

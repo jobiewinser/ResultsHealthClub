@@ -4,32 +4,26 @@
         <div class="col center">
             
             {%if user.profile.company%}
-            <div class="form-group">
-                <h4>Company: <b> {{user.profile.company.company_name}}</b></h4>
-            </div>
-            {% comment %} <div class="form-group">
-                <label class="form-label" for="site_pk">Default Site: </label>
-                <select class="form-select edit_user_input" name="site_pk" id="site_pk">
-                    {%if not edit_user.profile.site%}<option value="">Show All Sites</option>{%endif%}
-                    {%for site in request.user.profile.sites_allowed.all%}
-                    <option {%if edit_user.profile.site == site%}selected{%endif%} value="{{site.pk}}">{{site.name}}</option>
-                    {%endfor%}
-                </select>   
-            </div> {% endcomment %}
+            <form class="form-floating m-1">
+                <input disabled name="company" value="{%if user.profile.company%}{{user.profile.company.company_name}}{%else%}Company not configured{%endif%}" class="form-control" id="company"/>
+                <label for="company">Company</label>
+            </form>
             {%endif%}
-                    
-            <br>
-            <br>
-            <div class="form-group">
-                <label class="form-label" for="first_name">First Name: </label>
-                <input name="first_name" value="{{edit_user.first_name}}" class="form-control edit_user_input" placeholder="First Name" id="first_name"/>
-            </div>
-                    
-            <br>
-            <div class="form-group">
-                <label class="form-label" for="last_name">Last Name: </label>
-                <input name="last_name" value="{{edit_user.last_name}}" class="form-control edit_user_input" placeholder="Last Name" id="last_name"/>
-            </div>
+            
+            <form class="form-floating m-1">
+                <input name="first_name" value="{{edit_user.first_name}}" class="form-control edit_user_input" id="first_name"/>
+                <label for="first_name">First Name</label>
+            </form>
+            
+            <form class="form-floating m-1">
+                <input name="last_name" value="{{edit_user.last_name}}" class="form-control edit_user_input" id="last_name"/>
+                <label for="last_name">Last Name</label>
+            </form>
+            
+            <form class="form-floating m-1">
+                <input name="calendly_event_page_url" value="{{edit_user.profile.calendly_event_page_url}}" class="form-control edit_user_input" id="calendly_event_page_url"/>
+                <label for="calendly_event_page_url">Calendly Event Page Url</label>
+            </form>
                     
             <br>
             <div class="form-group">
@@ -40,8 +34,8 @@
             <input type="text" style="display:None" id="user_modify_action" class="edit_user_input" name="action" value="edit"/>
         </div>
     </div>
-    <br>
-    <div class="row">
+    
+    <div class="row m-1">
         <div class="col center" >
             <button class="btn btn-light" type="button"
             hx-encoding="multipart/form-data"
