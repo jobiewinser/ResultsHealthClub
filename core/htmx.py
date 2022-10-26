@@ -121,7 +121,7 @@ def create_calendly_webhook_subscription(request, **kwargs):
                 site_webhook_active = True
                 break
         if not site_webhook_active:
-            calendly.delete_webhook_subscriptions(site.guid, webhook_guuid = f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/")
+            calendly.delete_webhook_subscriptions(webhook_guuid = f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/")
             response = calendly.create_webhook_subscription(site.guid, organization = site.calendly_organization)
             print(response)
     return render(request, "core/htmx/calendly_webhook_status_wrapper.html", {'site':site})
@@ -131,7 +131,7 @@ def delete_calendly_webhook_subscription(request, **kwargs):
     site = Site.objects.get(pk=request.POST.get('site_pk'))    
     if get_user_allowed_to_edit_site(request.user, site): 
         calendly = Calendly(site.calendly_token)
-        response = calendly.delete_webhook_subscriptions(site.guid, webhook_guuid = f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/")
+        response = calendly.delete_webhook_subscriptions(webhook_guuid = f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/")
     return render(request, "core/htmx/calendly_webhook_status_wrapper.html", {'site':site})
 
 @login_required
