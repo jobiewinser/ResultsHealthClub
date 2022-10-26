@@ -91,10 +91,17 @@ class WhatsappNumber(PhoneNumber):
 
     @property
     def get_latest_messages(self):
-        return WhatsAppMessage.objects.filter(whatsappnumber=self).order_by('customer_number', '-datetime').distinct('customer_number')
-    @property
-    def get_latest_inbound_messages(self):
-        return WhatsAppMessage.objects.filter(whatsappnumber=self, inbound=True).order_by('customer_number', '-datetime').distinct('customer_number')
+        message_pk_list = []
+        for dict in WhatsAppMessage.objects.filter(whatsappnumber=self).order_by('customer_number','-datetime').distinct('customer_number').values('pk'):
+            message_pk_list.append(dict.get('pk'))
+        return WhatsAppMessage.objects.filter(pk__in=message_pk_list).order_by('-datetime')
+
+    # @property
+    # def get_latest_messages(self):
+    #     message_pk_list = []
+    #     for dict in WhatsAppMessage.objects.filter(whatsappnumber=self).order_by('customer_number').distinct('customer_number').values('pk'):
+    #         message_pk_list.append(dict.get('pk'))
+    #     return WhatsAppMessage.objects.filter(pk__in=message_pk_list).order_by('-inbound', '-datetime')
 
     def send_whatsapp_message(self, customer_number=None, lead=None, message="", user=None, template_used=None):  
         try:

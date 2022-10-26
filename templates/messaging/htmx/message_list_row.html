@@ -29,6 +29,11 @@
             <div class="col p-0" id="latest_message_name_{{message.customer_number}}">
                 {%if message.lead.name%}{{message.lead.name}}{%else%}{{message.customer_number}}{%endif%}
             </div>
+            <div class="col">
+            </div>
+            <div class="col p-0" id="latest_message_name_{{message.customer_number}}">
+                <i>{{message.datetime|nice_message_datetime_tag}}</i>
+            </div>
         </div>
         <div class="row chat_message_row">
             <div class="col p-0" id="message_list_row_{{message.customer_number}}_{{whatsappnumber.pk}}">
