@@ -138,7 +138,7 @@ def delete_calendly_webhook_subscription(request, **kwargs):
                 active_webhook_uuid = webhook.get('uri').replace(f"{os.getenv('CALENDLY_URL')}/webhook_subscriptions/", "")
                 response = calendly.delete_webhook_subscriptions(webhook_guuid = active_webhook_uuid)
                 break
-    return render(request, "core/htmx/calendly_webhook_status_wrapper.html", {'site':site})
+    return render(request, "core/htmx/calendly_webhook_status_wrapper.html", {'site':site, 'site_webhook_active':False})
 
 @login_required
 def generate_free_taster_link(request, **kwargs):
