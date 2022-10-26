@@ -75,8 +75,9 @@ class Calendly():
         headers = self._get_headers()
         
         response = requests.delete(url=url, headers=headers)
-        response_body = response.json()
-        print("response_body", response_body)
-        return response_body
+        return response
+        # response_body = response.json()
+        # print("response_body", response_body)
+        # return response_body
 
     

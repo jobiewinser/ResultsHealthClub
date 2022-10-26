@@ -123,7 +123,7 @@ def create_calendly_webhook_subscription(request, **kwargs):
                 calendly.delete_webhook_subscriptions(webhook_guuid = active_webhook_uuid)
         response = calendly.create_webhook_subscription(site.guid, organization = site.calendly_organization)
         print("create_calendly_webhook_subscription response", response)
-    return render(request, "core/htmx/calendly_webhook_status_wrapper.html", {'site':site})
+    return render(request, "core/htmx/calendly_webhook_status_wrapper.html", {'site':site, 'site_webhook_active':(response.get('state')=='active')})
     
 @login_required
 def delete_calendly_webhook_subscription(request, **kwargs):
