@@ -11,8 +11,14 @@
                     <div class="row ">
                         <div class="col-md-auto p-0">        
                             <form class="form-floating m-1">
-                                <input value="{{site.name}}" type="text" name="name" class="form-control site_configuration_input" id="site_name" aria-describedby="emailHelp" oninput="$('#change_name').click();">
+                                <input value="{{site.name}}" type="text" name="name" class="form-control site_configuration_input" id="site_name" oninput="$('#change_name').click();">
                                 <label for="site_name">Name of this site</label>
+                            </form>
+                        </div>
+                        <div class="col-md-auto p-0">        
+                            <form class="form-floating m-1">
+                                <input value="{{site.guid}}" type="text" disabled class="form-control">
+                                <label for="site_name">Site Unique ID</label>
                             </form>
                         </div>
                         <div class="col-md-auto pe-0">
