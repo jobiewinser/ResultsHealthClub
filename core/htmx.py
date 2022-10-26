@@ -119,7 +119,7 @@ def create_calendly_webhook_subscription(request, **kwargs):
             if webhook.get('state') == 'active' \
             and webhook.get('callback_url') == f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/" \
             and webhook.get('organization') == f"{os.getenv('CALENDLY_URL')}/organizations/{site.calendly_organization}":
-                active_webhook_uuid = webhook.get('uri').replace(f"{os.getenv('CALENDLY_URL')}webhook_subscriptions/", "")
+                active_webhook_uuid = webhook.get('uri').replace(f"{os.getenv('CALENDLY_URL')}/webhook_subscriptions/", "")
                 calendly.delete_webhook_subscriptions(webhook_guuid = active_webhook_uuid)
         response = calendly.create_webhook_subscription(site.guid, organization = site.calendly_organization)
         print("create_calendly_webhook_subscription response", response)
@@ -135,7 +135,7 @@ def delete_calendly_webhook_subscription(request, **kwargs):
             if webhook.get('state') == 'active' \
             and webhook.get('callback_url') == f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/" \
             and webhook.get('organization') == f"{os.getenv('CALENDLY_URL')}/organizations/{site.calendly_organization}":
-                active_webhook_uuid = webhook.get('uri').replace(f"{os.getenv('CALENDLY_URL')}webhook_subscriptions/", "")
+                active_webhook_uuid = webhook.get('uri').replace(f"{os.getenv('CALENDLY_URL')}/webhook_subscriptions/", "")
                 response = calendly.delete_webhook_subscriptions(webhook_guuid = active_webhook_uuid)
                 break
     return render(request, "core/htmx/calendly_webhook_status_wrapper.html", {'site':site})

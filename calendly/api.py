@@ -32,7 +32,7 @@ class Calendly():
         return headers
     #POST
     def create_webhook_subscription(self, guid, organization = None, user = None):   
-        url = f"{self.calendly_url}webhook_subscriptions"
+        url = f"{self.calendly_url}/webhook_subscriptions"
         headers = self._get_headers()
         body = { 
             "url": f"{self.site_url}/calendly-webhooks/{guid}/",
@@ -43,9 +43,9 @@ class Calendly():
         }
         if user or organization:
             if user:
-                body.update({'user':f"{os.getenv('CALENDLY_URL')}organizations/{user}", 'scope':'user'})
+                body.update({'user':f"{os.getenv('CALENDLY_URL')}/organizations/{user}", 'scope':'user'})
             else:
-                body.update({'organization':f"{os.getenv('CALENDLY_URL')}users/{organization}", 'scope':'organization'})
+                body.update({'organization':f"{os.getenv('CALENDLY_URL')}/users/{organization}", 'scope':'organization'})
             response = requests.post(url=url, json=body, headers=headers)
             response_body = response.json()
             print("create_webhook_subscription response_body", response_body)
@@ -62,7 +62,7 @@ class Calendly():
         return response_body
     #GET
     def list_webhook_subscriptions(self, organization = None, user = None):   
-        url = f"{self.calendly_url}webhook_subscriptions?organization={os.getenv('CALENDLY_URL')}organizations/{organization}&scope=organization"
+        url = f"{self.calendly_url}/webhook_subscriptions?organization={os.getenv('CALENDLY_URL')}organizations/{organization}&scope=organization"
         headers = self._get_headers()
         
         response = requests.get(url=url, headers=headers)
@@ -71,7 +71,7 @@ class Calendly():
         return response_body
     #DELETE
     def delete_webhook_subscriptions(self, webhook_guuid):   
-        url = f"{self.calendly_url}webhook_subscriptions/{webhook_guuid}"
+        url = f"{self.calendly_url}/webhook_subscriptions/{webhook_guuid}"
         headers = self._get_headers()
         
         response = requests.delete(url=url, headers=headers)
