@@ -86,7 +86,9 @@ class SiteConfigurationView(TemplateView):
                 print(webhook.get('uri'))
                 print(f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/")
                 print("")
-                if webhook.get('state') == 'active' and webhook.get('callback_url') == f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/":
+                if webhook.get('state') == 'active' \
+                and webhook.get('callback_url') == f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/" \
+                and webhook.get('organization') == f"{os.getenv('SITE_URL')}/organizations/{site.calendly_organization}/":
                     site_webhook_active = True
                     break
             context['site'] = site
@@ -98,7 +100,13 @@ class SiteConfigurationView(TemplateView):
         response_text = ""     
         if 'name' in request.POST:
             site.name = request.POST['name']
-            response_text = f"<span hx-swap-oob='innerHTML:.name_display_{site.pk}'>{site.name}</span>"
+            response_text = f"{response_text} <span hx-swap-oob='innerHTML:.name_display_{site.pk}'>{site.name}</span>"
+        if 'calendly_organization' in request.POST:
+            site.calendly_organization = request.POST['calendly_organization']
+            response_text = f"""{response_text} 
+                <span hx-swap-oob='innerHTML:.name_display_{site.pk}'>{site.name}</span> 
+                <span hx-swap-oob='innerHTML:#calendly_webhook_status_wrapper'>Organization changed, please refresh page</span>"""
+            
         site.save()
         return HttpResponse(response_text, status=200)
 

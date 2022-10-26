@@ -51,6 +51,7 @@ class Calendly():
             print("create_webhook_subscription response_body", response_body)
             print("create_webhook_subscription body", body)
             return response_body
+        print("create_webhook_subscription no organization or user")
     #GET
     def get_from_uri(self, uri):   
         headers = self._get_headers()
