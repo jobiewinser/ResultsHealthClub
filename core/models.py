@@ -19,7 +19,7 @@ from polymorphic.models import PolymorphicModel
 from whatsapp.models import WhatsAppMessage
 
 class AttachedError(models.Model): 
-    created = models.DateTimeField(auto_now=True, null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     ERROR_TYPES = (
                         ('1101', "You can only edit an active template once every 24 hours"),
                         ('1102', "The system can not send Whatsapp Templates without a template name"),
