@@ -63,8 +63,10 @@ def get_messaging_section(request, **kwargs):
         # site = Site.objects.get(pk=request.GET.get('site_pk'))
         whatsappnumber_pk = request.session.get('open_chat_whatsapp_number', '') 
         if whatsappnumber_pk:
-            context['whatsappnumber'] = WhatsappNumber.objects.get(pk=whatsappnumber_pk)
-            context['customer_numbers'] = request.session.get('open_chat_conversation_customer_number', []) 
+            whatsappnumber = WhatsappNumber.objects.get(pk=whatsappnumber_pk)
+            if whatsappnumber in request.user.profile.sites_allowed.all():
+                context['whatsappnumber'] = whatsappnumber
+                context['customer_numbers'] = request.session.get('open_chat_conversation_customer_number', []) 
 
         return render(request, f"messaging/messaging.html", context)   
     except Exception as e:
