@@ -184,24 +184,26 @@ class Site(models.Model):
         return count
     def get_live_whatsapp_phone_numbers(self):
         whatsapp = Whatsapp(self.whatsapp_access_token)  
-        phone_numbers = whatsapp.get_phone_numbers(self.whatsapp_business_account_id)  
+        phone_numbers = whatsapp.get_phone_numbers(self.whatsapp_business_account_id).get('data',[])  
         whatsapp_number_ids = []
-        for number in phone_numbers['data']:
-            whatsappnumber, created = WhatsappNumber.objects.get_or_create(whatsapp_business_phone_number_id=number['id'])
-            if not whatsappnumber.company or whatsappnumber.company == self.company and created:
-                whatsappnumber.number = number['display_phone_number'].replace("+", "").replace(" ", "")
-                whatsappnumber.quality_rating = number['quality_rating']
-                whatsappnumber.code_verification_status = number['code_verification_status']
-                whatsappnumber.verified_name = number['verified_name']
-                whatsappnumber.company = self.company
-                whatsappnumber.site = self
-                whatsappnumber.save()
-            whatsapp_number_ids.append(number['id'])
-        if settings.DEBUG:
-            WhatsappNumber.objects.filter(site=self).exclude(whatsapp_business_phone_number_id__in=whatsapp_number_ids)
-        else:
-            WhatsappNumber.objects.filter(site=self).exclude(whatsapp_business_phone_number_id__in=whatsapp_number_ids).update(archived=True)
-        return self.return_phone_numbers()
+        if phone_numbers:
+            for number in phone_numbers:
+                whatsappnumber, created = WhatsappNumber.objects.get_or_create(whatsapp_business_phone_number_id=number['id'])
+                if not whatsappnumber.company or whatsappnumber.company == self.company and created:
+                    whatsappnumber.number = number['display_phone_number'].replace("+", "").replace(" ", "")
+                    whatsappnumber.quality_rating = number['quality_rating']
+                    whatsappnumber.code_verification_status = number['code_verification_status']
+                    whatsappnumber.verified_name = number['verified_name']
+                    whatsappnumber.company = self.company
+                    whatsappnumber.site = self
+                    whatsappnumber.save()
+                whatsapp_number_ids.append(number['id'])
+            if settings.DEBUG:
+                WhatsappNumber.objects.filter(site=self).exclude(whatsapp_business_phone_number_id__in=whatsapp_number_ids)
+            else:
+                WhatsappNumber.objects.filter(site=self).exclude(whatsapp_business_phone_number_id__in=whatsapp_number_ids).update(archived=True)
+            return self.return_phone_numbers()
+        return WhatsappNumber.objects.none()
     def return_phone_numbers(self):
         return WhatsappNumber.objects.filter(site=self, archived=False)
     # def create_calendly_webhook(self):

@@ -11,7 +11,7 @@
                     <div class="row ">
                         <div class="col-md-auto p-0">      
                             <form class="form-floating m-1">  
-                                <input value="{{site.name}}" type="text" name="name" class="form-control site_configuration_input" id="site_name" 
+                                <input value="{{site.name}}" type="text" name="name" class="form-control site_configuration_input" id="site_name"  {%if not request.user.profile.role == 'a'%}disabled{%endif%}
                                     hx-post="" hx-swap="none" hx-indicator="#htmx_indicator_site_form" hx-vals='{"site_pk": "{{site.pk}}"}' hx-trigger='input'>
                                 <label for="site_name">Name of this site</label>
                             </form>
@@ -24,7 +24,7 @@
                         </div>
                         <div class="col-md-auto p-0">        
                             <form class="form-floating m-1">
-                                <input value="{{site.calendly_organization}}" id="calendly_organization" type="text" class="form-control" name="calendly_organization"
+                                <input value="{{site.calendly_organization}}" id="calendly_organization" type="text" class="form-control" name="calendly_organization" {%if not request.user.profile.role == 'a'%}disabled{%endif%}
                                     hx-post="" hx-swap="none" hx-indicator="#htmx_indicator_site_form" hx-vals='{"site_pk": "{{site.pk}}"}' hx-trigger='input'>
                                 <label for="calendly_organization">Site Calendly Organtisation</label>
                             </form>
@@ -53,6 +53,19 @@
                 <label class="form-check-label" for="exampleCheck1">Calendly Enabled? <small><i>(configured by Winser Systems)</i></small></label>
             </div> {% endcomment %}
 
+            <div class="row mt-2">
+                <div class="col">
+                </div>
+                <div class="col-md-auto">
+                    <a href="#" class="nowrap btn btn-success btn-sm" type="button" 
+                        hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
+                        hx-vals='{"template_name": "add_user"}'
+                        hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
+                        hx-swap="innerHTML" hx-trigger="click"><i class="fa-light fa-plus"></i> Add Phone Number to {{site.name}}</a>
+                </div>
+                <div class="col">
+                </div>
+            </div>
             <div class="m-3">
                 <table id="overview_table" class="table"> 
                     <thead> 
