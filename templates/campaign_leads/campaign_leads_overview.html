@@ -156,30 +156,7 @@
             $('#add_column').click();
         }
     }
-    function clear_chat_from_session(whatsapp_number){
-        var respStatus = $.ajax({
-            type:'POST',
-            url:'{%url "clear-chat-from-session"%}',
-            data:{'whatsapp_number':whatsapp_number, 'csrfmiddlewaretoken':'{{ csrf_token }}'},
-            success: function (data) {
-            },
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-            }
-        })
-    }
-    function add_chat_to_session(whatsapp_number){
-        if ($('#chat_card_'+whatsapp_number).length === 0){
-            var respStatus = $.ajax({
-                type:'POST',
-                url:'{%url "add-chat-to-session"%}',
-                data:{'whatsapp_number':whatsapp_number, 'csrfmiddlewaretoken':'{{ csrf_token }}'},
-                success: function (data) {
-                },
-                error: function(XMLHttpRequest, textStatus, errorThrown) {
-                }
-            })
-        }
-    }
+    
     function set_total_costs(){   
         $('.total_cost').each(function () {
             let total_cost = 0.00;

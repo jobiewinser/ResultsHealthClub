@@ -17,6 +17,7 @@ from django.views import View
 from django.utils.decorators import method_decorator
 from core.models import ErrorModel, Site, WhatsappNumber
 from random import randrange
+from django.contrib.auth.decorators import login_required
 
 # def random_date(start,l):
 #     current = start
@@ -170,27 +171,6 @@ class Webhooks(View):
         
         return response
         
-from django.contrib.auth.decorators import login_required
-@login_required
-def clear_chat_from_session(request):
-    try:
-        request.session['open_chats'].remove(request.POST.get('whatsapp_number'))
-    except Exception as e:
-        pass
-    return HttpResponse("", "text", 200)
-        
-from django.contrib.auth.decorators import login_required
-@login_required
-def add_chat_to_session(request):
-    try:
-        temp = request.session['open_chats']
-        if not 'open_chats' in request.session:
-            request.session['open_chats'] = [request.POST.get('whatsapp_number')]
-        elif not request.POST.get('whatsapp_number') in request.session['open_chats']:
-            request.session['open_chats'].append(request.POST.get('whatsapp_number'))
-    except Exception as e:
-        pass
-    return HttpResponse("", "text", 200)
 
 
         

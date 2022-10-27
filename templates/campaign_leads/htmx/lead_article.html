@@ -38,7 +38,7 @@
                     hx-target="#lead-{{lead.pk}}"
                     hx-push-url="false"
                     hx-swap="outerHTML" hx-trigger="click"  
-                    data-whatsapp-number="{{lead.whatsapp_number}}">
+                    data-customer-number="{{lead.whatsapp_number}}">
                         1st <i class="fa fa-whatsapp"></i>
                 </button>
                 {%else%}
@@ -49,13 +49,9 @@
                     hx-indicator=".htmx-indicator"                 
                     hx-vals='{"site_pk": "{{lead.campaign.site.pk}}", "customer_number": "{{lead.whatsapp_number}}"}'
                     hx-trigger="click"
-                    {% comment %} hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
-                    hx-vals='{"template_name": "message_window_modal", "lead_pk": "{{lead.pk}}"}'
-                    hx-get="{% url 'messaging-get-modal-content' %}" 
-                    hx-push-url="false"
-                    hx-swap="innerHTML" hx-trigger="click" {% endcomment %}
+                    
                     onclick="$('#chat_card_{{lead.whatsapp_number}}').remove(); $('#chat_list_bottom_window').remove();"
-                        data-whatsapp-number="{{lead.whatsapp_number}}">
+                        data-customer-number="{{lead.whatsapp_number}}">
                             Chat
                             <span id="chat_notification_{{lead.whatsapp_number}}">
                             </span>

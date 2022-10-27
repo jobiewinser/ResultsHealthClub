@@ -22,7 +22,7 @@
             });
             
         })
-        function clear_chat_from_session(whatsapp_number){
+        {% comment %} function clear_chat_from_session(whatsapp_number){
             var respStatus = $.ajax({
                 type:'POST',
                 url:'{%url "clear-chat-from-session"%}',
@@ -45,7 +45,7 @@
                     }
                 })
             }
-        }
+        } {% endcomment %}
         
         
     </script>

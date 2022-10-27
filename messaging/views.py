@@ -29,7 +29,7 @@ def message_list(request, **kwargs):
             whatsappnumber = latest_message.whatsappnumber
     if whatsappnumber:
         if get_user_allowed_to_use_site_messaging(request.user, site):
-            context = {'chat_site':site, "whatsappnumber":whatsappnumber, "customer_number": customer_number}
+            context = {'chat_site':site, "whatsappnumber":whatsappnumber, "customer_numbers": [customer_number]}
             return render(request, "messaging/messaging.html", context)
 
 @login_required
@@ -58,9 +58,15 @@ def message_window(request, **kwargs):
 @login_required
 def get_messaging_section(request, **kwargs):
     try:
+        context = {}
         # request.GET._mutable = True
         # site = Site.objects.get(pk=request.GET.get('site_pk'))
-        return render(request, f"messaging/messaging.html", {})   
+        whatsappnumber_pk = request.session.get('open_chat_whatsapp_number', '') 
+        if whatsappnumber_pk:
+            context['whatsappnumber'] = WhatsappNumber.objects.get(pk=whatsappnumber_pk)
+            context['customer_numbers'] = request.session.get('open_chat_conversation_customer_number', []) 
+
+        return render(request, f"messaging/messaging.html", context)   
     except Exception as e:
         logger.debug("get_messaging_section Error "+str(e))
         return HttpResponse(e, status=500)
@@ -150,3 +156,32 @@ def get_more_messages(request, **kwargs):
     except Exception as e:
         logger.debug("get_more_messages Error "+str(e))
         return HttpResponse(e, status=500)
+
+@login_required
+def clear_chat_from_session(request):
+    try:
+        request.session['open_chat_conversation_customer_number'] = request.session.get('open_chat_conversation_customer_number', []).remove(request.POST.get('customer_number'))
+    except Exception as e:
+        pass
+    return HttpResponse("", "text", 200)
+        
+from django.contrib.auth.decorators import login_required
+@login_required
+def add_chat_whatsapp_number_to_session(request):
+    try:
+        request.session['open_chat_whatsapp_number'] = request.POST.get('whatsappnumber_pk')
+    except Exception as e:
+        pass
+    return HttpResponse("", "text", 200)
+from django.contrib.auth.decorators import login_required
+@login_required
+def add_chat_conversation_to_session(request):
+    try:
+        request.session['open_chat_whatsapp_number'] = request.POST.get('whatsappnumber_pk')
+        if not request.session.get('open_chat_conversation_customer_number', []):
+            request.session['open_chat_conversation_customer_number'] = [request.POST.get('customer_number')]
+        elif not request.POST.get('customer_number') in request.session.get('open_chat_conversation_customer_number', []):
+            request.session['open_chat_conversation_customer_number'].append(request.POST.get('customer_number'))
+    except Exception as e:
+        pass
+    return HttpResponse("", "text", 200)

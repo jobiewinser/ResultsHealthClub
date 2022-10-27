@@ -5,7 +5,7 @@
         hx-indicator=".htmx-indicator" 
         hx-target="#next_chat_window"
         hx-push-url="false"
-        hx-swap="outerHTML" {%if customer_number == message.customer_number%}hx-trigger="load,click"{%endif%}  
+        hx-swap="outerHTML" {%if message.customer_number in customer_numbers%}hx-trigger="load,click"{%endif%}  
     {%endif%}
     data-bs-toggle="popover_delay" 
     data-bs-trigger="hover" 
@@ -19,7 +19,8 @@
     {%else%}
         By <b>{%if message.user.profile.name%}{{message.user.profile.name}}{%else%}Winser Systems{%endif%}</b>
     {%endif%}"
-    data-whatsapp-number="{{message.customer_number}}"
+    data-customer-number="{{message.customer_number}}"
+    data-whatsappnumber-pk="{{message.whatsappnumber.pk}}"
     id="latest_message_row_{{message.customer_number}}"
     >
     <div class="col-auto p-0">

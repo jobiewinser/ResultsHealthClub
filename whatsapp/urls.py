@@ -17,8 +17,7 @@ from django.urls import path
 import whatsapp.views as whatsappviews
 urlpatterns = [
     path('whatsapp-webhooks/', whatsappviews.Webhooks.as_view(), name='whatsapp-webhooks' ),
-    path('ajax-clear-chat-from-session/', whatsappviews.clear_chat_from_session, name='clear-chat-from-session' ),
-    path('ajax-add-chat-to-session/', whatsappviews.add_chat_to_session, name='add-chat-to-session' ),
+    
     path('configuration/whatsapp-templates/', whatsappviews.WhatsappTemplatesView.as_view(), name='whatsapp-templates'),
     path('configuration/whatsapp-template/<str:template_pk>/', whatsappviews.WhatsappTemplatesEditView.as_view(), name='whatsapp-template'),
     path('configuration/whatsapp-template-readonly/<str:template_pk>/', whatsappviews.WhatsappTemplatesReadOnlyView.as_view(), name='whatsapp-template-readonly'),
