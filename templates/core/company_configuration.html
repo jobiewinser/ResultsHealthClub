@@ -5,6 +5,7 @@
 {{block.super}}
 <script>
     $(document).ready(function() {
+        document.title = "Company Config";
         document.body.addEventListener('htmx:afterRequest', function(evt) {  
             if (evt.detail.xhr.status == 500){
                 $('.reset_on_error').each(function() {

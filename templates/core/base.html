@@ -3,6 +3,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <html>
     <head>
+        <link rel="shortcut icon" type="image/png" href="{% static 'img/logo-dark-back-img.png' %}"/>
         {%block cdn%}
             <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" />
 
@@ -25,6 +26,24 @@
         <audio id="notification1" src="{% static 'audio/notification1.wav' %}" preload="auto"></audio>
         <audio id="notification2" src="{% static 'audio/notification2.mp3' %}" preload="auto"></audio>
         <script>
+            var PageTitleNotification = {
+                Vars:{
+                    OriginalTitle: document.title,
+                    Interval: null
+                },    
+                On: function(notification, intervalSpeed){
+                    var _this = this;
+                    _this.Vars.Interval = setInterval(function(){
+                         document.title = (_this.Vars.OriginalTitle == document.title)
+                                             ? notification
+                                             : _this.Vars.OriginalTitle;
+                    }, (intervalSpeed) ? intervalSpeed : 1000);
+                },
+                Off: function(){
+                    clearInterval(this.Vars.Interval);
+                    document.title = this.Vars.OriginalTitle;   
+                }
+            }
             
             function fallbackCopyTextToClipboard(text) {
                 var textArea = document.createElement("textarea");

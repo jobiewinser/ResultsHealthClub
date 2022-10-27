@@ -6,6 +6,7 @@
 <script src="{% static 'js/datatables.js' %}"></script> 
 <script>
     $(document).ready(function() {
+        document.title = "Whatsapp Templates";
         $("[data-bs-toggle=popover]").popover();
         document.body.addEventListener('htmx:afterRequest', function(evt) {  
             if (evt.detail.xhr.status == 200){

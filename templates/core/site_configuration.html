@@ -4,6 +4,7 @@
 {%block scripts%}
 {{block.super}}
 <script>
+    document.title = "Site Config";
     $(document).ready(function() {
         document.body.addEventListener('htmx:beforeRequest', function(evt) {  
         });

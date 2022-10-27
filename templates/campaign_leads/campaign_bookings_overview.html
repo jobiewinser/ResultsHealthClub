@@ -6,6 +6,7 @@
 <link href="{% static 'css/datatables.css' %}" rel="stylesheet" />
 <script src="{% static 'js/datatables.js' %}"></script> 
 <script>
+    document.title = "Booking Table";
     $(document).ready(function() {  
         initDataTable();
         document.body.addEventListener('htmx:beforeRequest', function(evt) {  
