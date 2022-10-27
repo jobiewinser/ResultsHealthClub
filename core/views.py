@@ -221,7 +221,7 @@ def custom_login_post(request):
     if user:
         login(request, user)
         return HttpResponse(status=200)
-    return HttpResponse(status=404)
+    return HttpResponse("Account not found", status=404)
 
 @method_decorator(login_required, name='dispatch')
 class FreeTasterOverviewView(TemplateView):

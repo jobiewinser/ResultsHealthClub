@@ -48,23 +48,7 @@ class Webhooks(View):
                 start_time = timezone.localize(start_time)
 
                 booking.datetime = start_time
-                booking.save()
-
-                from channels.layers import get_channel_layer
-                channel_layer = get_channel_layer()          
-                lead = booking.lead
-                print(lead.campaign.site.company.pk)
-                campaign_pk = lead.campaign.site.company.pk
-                async_to_sync(channel_layer.group_send)(
-                    f"lead_{campaign_pk}",
-                    {
-                        'type': 'lead_update',
-                        'data':{
-                            # 'company_pk':campaign_pk,
-                            'rendered_html': f"<span hx-swap-oob='delete' id='lead-{lead.pk}'></span>",
-                        }
-                    }
-                )
+                booking.save()            
                 
                 return HttpResponse("", status=200)
             except Exception as e:            
@@ -81,5 +65,20 @@ def calendly_booking_success(request):
     lead = Campaignlead.objects.get(pk = request.POST['lead_pk'])
     uri = request.POST['uri']
     # if lead.campaign.site.company == request.user.profile.company:
-    Booking.objects.get_or_create(user=request.user, calendly_event_uri=uri, lead=lead)
+    booking, created = Booking.objects.get_or_create(user=request.user, calendly_event_uri=uri, lead=lead)
+    from channels.layers import get_channel_layer
+    channel_layer = get_channel_layer()          
+    lead = booking.lead
+    print(lead.campaign.site.company.pk)
+    campaign_pk = lead.campaign.site.company.pk   
+    async_to_sync(channel_layer.group_send)(
+        f"lead_{campaign_pk}",
+        {
+            'type': 'lead_update',
+            'data':{
+                # 'company_pk':campaign_pk,
+                'rendered_html': f"<span hx-swap-oob='delete' id='lead-{lead.pk}'></span>",
+            }
+        }
+    )
     return HttpResponse("", status=200)
