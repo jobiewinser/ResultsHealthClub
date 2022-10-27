@@ -30,6 +30,7 @@ urlpatterns = [
     path('', include('calendly.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('twilio/', include('twilio.urls')),
+    url(r'^hijack/', include('hijack.urls', namespace='hijack')),
 ]
 from django.conf import settings
 from django.conf.urls.static import static

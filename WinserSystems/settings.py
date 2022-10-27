@@ -124,6 +124,8 @@ INSTALLED_APPS = [
     'import_export',
     'rest_framework',
     'channels',
+    'hijack',
+    'hijack.contrib.admin',
 ]
 
 MIDDLEWARE = [
@@ -135,6 +137,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'hijack.middleware.HijackUserMiddleware',
 ]
 
 ROOT_URLCONF = 'WinserSystems.urls'
@@ -274,3 +277,17 @@ CHANNEL_LAYERS = {
         'BACKEND': "channels_redis.core.RedisChannelLayer"
         }
 }
+
+
+LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = '/customer-login/'
+LOGOUT_REDIRECT_URL = '/customer-login/'
+
+# django login as other https://django-hijack.readthedocs.io/en/stable/
+# Where admins are redirected to after hijacking a user
+HIJACK_LOGIN_REDIRECT_URL = '/customer-login/'
+# Where admins are redirected to after releasing a user
+HIJACK_LOGOUT_REDIRECT_URL = '/customer-login/'
+HIJACK_USE_BOOTSTRAP = True
+HIJACK_ALLOW_GET_REQUESTS = True
+HIJACK_PERMISSION_CHECK = "core.hijack.permissions.superusers_hijack"

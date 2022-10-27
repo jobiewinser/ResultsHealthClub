@@ -319,6 +319,21 @@ class Profile(models.Model):
         if self.user.last_name:
             return f"{self.user.first_name} {self.user.last_name}"
         return self.user.first_name
+    @property
+    def warnings(self):
+        warnings = {}
+        if not self.company:
+            warnings["no_company_warning"] = "This profile has no company assigned to it"
+        else:
+            if not self.sites_allowed.all():
+                warnings["no_company_warning"] = "This profile has no sites that they are allowed to access"
+            if not self.site:
+                warnings["no_site_warning"] = "This profile has no main site assigned to it"
+            if not self.avatar:
+                warnings["no_avatar_warning"] = "This profile has no profile picture"
+            if not self.calendly_event_page_url:
+                warnings["no_calendly_event_page_url_warning"] = "This profile has no calendly event page (calendly won't work for this user)"
+        return warnings
         
     def __str__(self):
         if self.user.first_name or self.user.last_name:

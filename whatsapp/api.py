@@ -53,45 +53,45 @@ class Whatsapp():
                     "preview_url": preview_url,
                     })
             }
-            # response = requests.post(url=url, json=body, headers=headers)
-            # response_body = response.json()
+            response = requests.post(url=url, json=body, headers=headers)
+            response_body = response.json()
             attached_errors = []
-            response_body = {
-                "object": "whatsapp_business_account",
-                "entry": [
-                    {
-                        "id": "104128642479500",
-                        "changes": [
-                            {
-                                "value": {
-                                    "messaging_product": "whatsapp",
-                                    "metadata": {
-                                        "display_phone_number": "447872000364",
-                                        "phone_number_id": "108208485398311"
-                                    },
-                                    "statuses": [
-                                        {
-                                            "id": "wamid.HBgMNDQ3ODI3Nzc3OTQwFQIAERgSNjgxNDQ4MjVENUM5NkY3NTc2AA==",
-                                            "status": "failed",
-                                            "timestamp": "1666789627",
-                                            "recipient_id": "447827777940",
-                                            "errors": [
-                                                {
-                                                    "code": 131047,
-                                                    "title": "Message failed to send because more than 24 hours have passed since the customer last replied to this number.",
-                                                    "href": "https://developers.facebook.com/docs/whatsapp/cloud-api/support/error-codes/"
-                                                }
-                                            ]
-                                        }
-                                    ]
-                                },
-                                "field": "messages"
-                            }
-                        ]
-                    }
-                ]
-            }
-            for entry in response_body.get('entry'):
+            # response_body = {
+            #     "object": "whatsapp_business_account",
+            #     "entry": [
+            #         {
+            #             "id": "104128642479500",
+            #             "changes": [
+            #                 {
+            #                     "value": {
+            #                         "messaging_product": "whatsapp",
+            #                         "metadata": {
+            #                             "display_phone_number": "447872000364",
+            #                             "phone_number_id": "108208485398311"
+            #                         },
+            #                         "statuses": [
+            #                             {
+            #                                 "id": "wamid.HBgMNDQ3ODI3Nzc3OTQwFQIAERgSNjgxNDQ4MjVENUM5NkY3NTc2AA==",
+            #                                 "status": "failed",
+            #                                 "timestamp": "1666789627",
+            #                                 "recipient_id": "447827777940",
+            #                                 "errors": [
+            #                                     {
+            #                                         "code": 131047,
+            #                                         "title": "Message failed to send because more than 24 hours have passed since the customer last replied to this number.",
+            #                                         "href": "https://developers.facebook.com/docs/whatsapp/cloud-api/support/error-codes/"
+            #                                     }
+            #                                 ]
+            #                             }
+            #                         ]
+            #                     },
+            #                     "field": "messages"
+            #                 }
+            #             ]
+            #         }
+            #     ]
+            # }
+            for entry in response_body.get('entry', []):
                 for change in entry.get('changes'):
                     value = change.get('value')
                     for status in value.get('statuses'):

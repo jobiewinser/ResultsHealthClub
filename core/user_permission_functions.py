@@ -45,7 +45,9 @@ def get_allowed_number_chats_for_user(site, user):
     return WhatsappNumber.objects.filter(site=site, archived=False)
 
 def get_user_allowed_to_edit_other_user(request_user, other_user):
-    if request_user.profile.role == 'a':
+    if request_user == other_user:
+        return True
+    if request_user.profile.role == 'a' and not other_user.profile.role == 'a':
         if request_user.profile.company == other_user.profile.company:
             return True
     elif request_user.profile.role == 'b':

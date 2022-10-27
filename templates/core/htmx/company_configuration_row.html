@@ -1,6 +1,31 @@
 {%load static%}
 <td>
-    <img src="{%if profile.avatar%}/media/{{profile.avatar}}{%else%}{% static 'img/blank-profile-picture.png' %}{%endif%}" alt="" width="45" height="45" class="rounded-circle me-2"> {{profile.name}}
+    
+    <div class="row">
+        <div class="col p-0">
+            <img src="{%if profile.avatar%}/media/{{profile.avatar}}{%else%}{% static 'img/blank-profile-picture.png' %}{%endif%}" alt="" width="45" height="45" class="rounded-circle me-2"> 
+            {{profile.name}}
+        </div>
+        <div class="col-md-auto p-0" >
+            {%if profile.warnings %}
+                <span 
+                data-bs-toggle="popover" 
+                data-bs-trigger="hover" 
+                data-bs-html="true" 
+                data-bs-placement="top"
+                data-bs-title="Warnings"
+                data-bs-content="
+                <ul>
+                    {%for k,v in profile.warnings.items%}
+                    <li>{{v}}</li>
+                    {%endfor%}
+                </ul>
+                ">
+                    <i class="fa-solid fa-triangle-exclamation" style="color:orange; margin-top:12px; margin-left:6px;"></i>
+                </span>
+            {%endif%}
+        </div>
+    </div>
 </td>
 <td>
     <div class="row">
@@ -9,7 +34,8 @@
             data-value="" onfocus="this.setAttribute('data-value', this.value);"
             hx-indicator="#htmx_indicator_site_{{profile.pk}}"  hx-trigger="change" hx-target="#company_configuration_row_{{profile.pk}}"
             hx-vals='{"profile_pk": "{{profile.pk}}"}'>  
-                {%for site in request.user.profile.sites_allowed.all%}
+                {%if not profile.site%}<option value="" selected>None</option>{%endif%}
+                {%for site in profile.company.site_set.all%}
                     <option value="{{site.pk}}" {%if profile.site == site%}selected{%endif%}>{{site.name}}</option>
                 {%endfor%}
             </select>
@@ -26,7 +52,7 @@
             data-value="" onfocus="this.setAttribute('data-value', this.value);"
             hx-indicator="#htmx_indicator_role_{{profile.pk}}"  hx-trigger="change" hx-target="#company_configuration_row_{{profile.pk}}"
             hx-vals='{"profile_pk": "{{profile.pk}}"}'>  
-                {%if profile.role == 'a'%}disabled
+                {%if profile.role == 'a'%}
                 <option selected>Owner</option>
                 {%else%}
                 {%for role_choice in role_choices%}
@@ -43,15 +69,18 @@
     </div>
 </td>
 <td>   
+    {%if not profile.role == 'a' or profile == request.user.profile%}
+        <a href="#" class="nowrap btn btn-light" type="button" 
+            hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
+            hx-vals='{"template_name": "edit_user", "user_pk": "{{profile.user.pk}}"}'
+            hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
+            hx-swap="innerHTML" hx-trigger="click"><i class="fa-light fa-gear"></i> Config</a>
+    {%endif%}
+    {%if not profile.role == 'a'%}
     <a href="#" class="nowrap btn btn-light" type="button"
         hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
-        hx-vals='{"template_name": "edit_user", "user_pk": "{{profile.user.pk}}"}'
-        hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
-        hx-swap="innerHTML" hx-trigger="click"><i class="fa-light fa-gear"></i> Config</a>
-
-    <a href="#" class="nowrap btn btn-light" type="button"
-        hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
-        hx-vals='{"template_name": "edit_permissions", "user_pk": "{{profile.user.pk}}"}'
+        hx-vals='{"template_name": "edit_permissions", "profile_pk": "{{profile.pk}}"}'
         hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
         hx-swap="innerHTML" hx-trigger="click"><i class="fa-light fa-ballot-check"></i> Edit Permissions</a>
+    {%endif%}
 </td>

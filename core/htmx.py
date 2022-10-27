@@ -50,10 +50,10 @@ def get_modal_content(request, **kwargs):
                 user_pk = request.GET.get('user_pk', None)
                 if user_pk:
                     context["edit_user"] = User.objects.get(pk=user_pk)
-            if template_name == 'edit_permissions':
-                user_pk = request.GET.get('user_pk', None)
-                if user_pk:
-                    context["edit_permissions"] = User.objects.get(pk=user_pk)
+            elif template_name == 'edit_permissions':
+                profile_pk = request.GET.get('profile_pk', None)
+                if profile_pk:
+                    context["profile"] = Profile.objects.get(pk=profile_pk)
             
             return render(request, f"campaign_leads/htmx/{template_name}.html", context)   
     except Exception as e:
@@ -69,18 +69,26 @@ class ModifyUser(View):
             if action == 'add':
                 first_name = request.POST.get('first_name', '')
                 last_name = request.POST.get('last_name', '')
-                site_pk = request.POST.get('site_pk', '')
-                calendly_event_page_url = request.POST.get('calendly_event_page_url', '')
-                # user = User.objects.create(username=f"{first_name}{last_name}", 
-                #                             first_name=first_name,
-                #                             last_name=last_name,
-                #                             password=os.getenv("DEFAULT_USER_PASSWORD"), 
-                #                             is_authenticated=True)
-                # Profile.objects.create(user = user, 
-                #                         avatar = request.FILES['profile_picture'], 
-                #                         site=Site.objects.get(pk=site_pk))
+                password = request.POST.get('password', '')
+                profile_picture = request.FILES.get('profile_picture')
+                # site_pk = request.POST.get('site_pk', '')
+                # calendly_event_page_url = request.POST.get('calendly_event_page_url', '')
+                username = f"{first_name}{last_name}"
+                index = 0
+                while User.objects.filter(username=username):
+                    index = index + 1
+                    username = f"{first_name}{last_name}_{index}"
+                user = User.objects.create(username=username, 
+                                            first_name=first_name,
+                                            last_name=last_name,
+                                            password=password)
+                Profile.objects.create(user = user, 
+                                        avatar = profile_picture, 
+                                        company = request.user.profile.company)
             elif action == 'edit':       
-                user = User.objects.get(pk=request.POST['user_pk'])         
+                user = User.objects.get(pk=request.POST['user_pk'])   
+                profile = Profile.objects.get_or_create(user = user)[0] 
+                user.profile = profile     
                 if get_user_allowed_to_edit_other_user(request.user, user):
                     first_name = request.POST.get('first_name', '')
                     last_name = request.POST.get('last_name', '')
@@ -91,7 +99,6 @@ class ModifyUser(View):
                     user.last_name=last_name
                     user.save()
 
-                    profile = Profile.objects.get_or_create(user = user)[0]
                     profile_picture = request.FILES.get('profile_picture', None)
                     if profile_picture:
                         profile.avatar = profile_picture

@@ -8,6 +8,7 @@ import logging
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.models import User
 from calendly.api import Calendly
+from core.core_decorators import check_core_profile_requirements_fulfilled
 from core.models import ROLE_CHOICES, Company, FreeTasterLink, FreeTasterLinkClick, Profile, Site  
 from django.contrib.auth import authenticate
 from django.contrib.auth import login
@@ -56,10 +57,50 @@ except:
     pass
 
 
-# @method_decorator(login_required, name='dispatch')
+@method_decorator(login_required, name='dispatch')
+@method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
 class CustomerHomeView(TemplateView):
     template_name='core/customer_home.html'
     
+class CustomerLoginView(TemplateView):
+    template_name='core/customer_login.html'
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect('/')
+        return super(CustomerLoginView, self).get(request, args, kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(CustomerLoginView, self).get_context_data(**kwargs)
+        if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+            self.template_name = 'registration/login.html'
+        return context
+    
+PROFILE_ERROR_OPTIONS = {
+    '1':"No profile set up for your user account.",
+    '2':"No company assigned to your profile (please contact: <a href='mailto:jobiewinser@gmail.com'>jobiewinser@gmail.com</a> or <a href='tel:+447872000364'>+44 7872 000364</a>).",
+    '3':"You have not been granted permission to access any sites.",
+    '4':"You have not been allocated a main site.",
+}
+class ProfileIncorrectlyConfiguredView(TemplateView):
+    template_name='profile_incorrectly_configured.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ProfileIncorrectlyConfiguredView, self).get_context_data(**kwargs)       
+        errors = []
+        if not self.request.user.profile:
+            errors.append(PROFILE_ERROR_OPTIONS['1'])
+            errors.append(PROFILE_ERROR_OPTIONS['2'])
+            errors.append(PROFILE_ERROR_OPTIONS['3'])
+            errors.append(PROFILE_ERROR_OPTIONS['4'])
+        else:
+            if not self.request.user.profile.company:
+                errors.append(PROFILE_ERROR_OPTIONS['2'])
+            if not self.request.user.profile.sites_allowed.all():
+                errors.append(PROFILE_ERROR_OPTIONS['3'])
+            if not self.request.user.profile.site:
+                errors.append(PROFILE_ERROR_OPTIONS['4'])
+        context['errors'] = errors
+        return context
 
 @method_decorator(login_required, name='dispatch')
 class SiteConfigurationView(TemplateView):
@@ -79,17 +120,18 @@ class SiteConfigurationView(TemplateView):
             calendly = Calendly(site.calendly_token)
             calendly_webhooks = calendly.list_webhook_subscriptions(organization = site.calendly_organization).get('collection')
             site_webhook_active = False
-            for webhook in calendly_webhooks:
-                print("for webhook in calendly_webhooks:")
-                print(webhook.get('state'), 'active')
-                print(webhook.get('callback_url'), f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/")
-                print(webhook.get('organization'), f"{os.getenv('SITE_URL')}/organizations/{site.calendly_organization}")
-                
-                if webhook.get('state') == 'active' \
-                and webhook.get('callback_url') == f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/" \
-                and webhook.get('organization') == f"{os.getenv('CALENDLY_URL')}/organizations/{site.calendly_organization}":
-                    site_webhook_active = True
-                    break
+            if calendly_webhooks:
+                for webhook in calendly_webhooks:
+                    print("for webhook in calendly_webhooks:")
+                    print(webhook.get('state'), 'active')
+                    print(webhook.get('callback_url'), f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/")
+                    print(webhook.get('organization'), f"{os.getenv('SITE_URL')}/organizations/{site.calendly_organization}")
+                    
+                    if webhook.get('state') == 'active' \
+                    and webhook.get('callback_url') == f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/" \
+                    and webhook.get('organization') == f"{os.getenv('CALENDLY_URL')}/organizations/{site.calendly_organization}":
+                        site_webhook_active = True
+                        break
             context['site'] = site
             context['site_webhook_active'] = site_webhook_active
             return context
@@ -127,7 +169,7 @@ class CompanyConfigurationView(TemplateView):
 @login_required
 def change_profile_role(request):
     profile = Profile.objects.get(pk=request.POST.get('profile_pk'))
-    if get_user_allowed_to_edit_other_user(request.user, profile.user):
+    if (not request.user == profile.user and get_user_allowed_to_edit_other_user(request.user, profile.user)):
         role = request.POST.get('role', None)
         if role in ['b','c']:
             context = {}
@@ -151,6 +193,19 @@ def change_profile_site(request):
             context['role_choices'] = ROLE_CHOICES
             # context['site_list'] = get_available_sites_for_user(request.user)
             return render(request, 'core/htmx/company_configuration_row.html', context)
+    return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
+@login_required
+def change_profile_sites_allowed(request):
+    profile = Profile.objects.get(pk=request.POST.get('profile_pk'))
+    if get_user_allowed_to_edit_other_user(request.user, profile.user):
+        sites_allowed = request.POST.getlist('sites_allowed', None)
+        if sites_allowed:
+            context = {}
+            profile.sites_allowed.set(Site.objects.filter(pk__in=sites_allowed))
+            profile.save()
+            context['profile'] = profile
+            context['role_choices'] = ROLE_CHOICES
+        return render(request, 'core/htmx/company_configuration_row.html', context)
     return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
 
 
@@ -188,6 +243,7 @@ class FreeTasterOverviewView(TemplateView):
 
         return context
         
+        
 @method_decorator(login_required, name='dispatch')
 class ConfigurationView(TemplateView):
     template_name='core/configuration.html'
@@ -220,7 +276,7 @@ def get_site_pk_from_request(request):
     
 
 from django.core.mail import send_mail
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 def handler500(request):
     known_errors = []
     try:

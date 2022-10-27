@@ -26,3 +26,5 @@ shortuuid
 channels==3.0.5
 django-polymorphic==3.0.0
 channels-redis==3.4.1
+django-hijack==3.1.2
+django-hijack-admin==2.1.10
