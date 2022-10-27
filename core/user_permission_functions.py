@@ -37,7 +37,8 @@ def get_user_allowed_to_edit_site(user, site):
 def get_allowed_site_chats_for_user(user):
     #TODO
     # return Site.objects.filter(pk__in=[user.profile.site.pk])
-    return Site.objects.filter(company=user.profile.site.company)
+    # return Site.objects.filter(company=user.profile.site.company)
+    return user.profile.sites_allowed.all()
 
 def get_allowed_number_chats_for_user(site, user):
     #TODO

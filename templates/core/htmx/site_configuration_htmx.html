@@ -112,7 +112,7 @@
                             <td >
                                 <div class="row">
                                     <div class="col p-0">
-                                        <input class="form-control form-control-sm" value="{%if number.alias%}{{number.alias}}{%endif%}" name="alias" id="alias_change_{{number.pk}}" hx-post="{% url 'whatsapp-change-number-alias' %}" hx-swap="none" 
+                                        <input class="form-control form-control-sm" value="{%if number.alias%}{{number.alias}}{%endif%}" name="alias" id="alias_change_{{number.pk}}" hx-post="{% url 'whatsapp-change-number-alias' %}" hx-swap="none" {%if not request.user.profile.role == 'a'%}disabled{%endif%} 
                                             hx-include="#alias_change_{{number.pk}}" hx-indicator="#htmx_indicator_alias_{{number.pk}}"  hx-trigger="input"
                                             hx-vals='{"whatsappnumber_pk": "{{number.pk}}"}'/>
                                     </div>
@@ -142,7 +142,7 @@
                                 {{number.code_verification_status}}
                             </td>
                             <td>
-                                <input type="checkbox" class="form-check-input" name="default_number" {%if site.default_number == number %}disabled checked{%endif%}
+                                <input type="checkbox" class="form-check-input" name="default_number" {%if site.default_number == number %}checked{%endif%} {%if site.default_number == number or not request.user.profile.role == 'a'%}disabled{%endif%}
                                     hx-post="{% url 'whatsapp-number-make-default' %}" hx-swap="outerHTML" 
                                     hx-include="this" hx-indicator="#htmx_indicator_default_number_{{number.pk}}" 
                                     hx-vals='{"whatsappnumber_pk": "{{number.pk}}"}' hx-target="#content">
@@ -166,7 +166,7 @@
                                         </p>
                                     {%endif%}
                                     ">
-                                    <button class="btn btn-primary btn-sm m-1" 
+                                    <button class="btn btn-primary btn-sm m-1"   {%if not request.user.profile.role == 'a'%}disabled{%endif%}
                                         {%if not company_sites_with_same_whatsapp_business_details%}disabled{%endif%}
                                         hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
                                         hx-vals='{"template_name": "transfer_number", "whatsappnumber_pk": "{{number.pk}}"}'
