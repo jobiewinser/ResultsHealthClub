@@ -14,7 +14,7 @@ from django.http.response import HttpResponseRedirect
 from django.template import loader
 
 
-from whatsapp.models import WhatsappTemplate
+from whatsapp.models import WhatsappMessageImage, WhatsappTemplate
 logger = logging.getLogger(__name__)
 # https://developers.facebook.com/docs/whatsapp/cloud-api/reference
 # https://business.facebook.com/settings/people/100085397745468?business_id=851701125750291
@@ -42,7 +42,7 @@ class Whatsapp():
             if settings.WHATSAPP_PHONE_OVERRIDE1:
                 non_overwritten_customer_number = customer_number
                 customer_number = settings.WHATSAPP_PHONE_OVERRIDE1
-            url = f"{self.whatsapp_url}{whatsapp_number.whatsapp_business_phone_number_id}/messages"
+            url = f"{self.whatsapp_url}/{whatsapp_number.whatsapp_business_phone_number_id}/messages"
             headers = self._get_headers()
             body = { 
                 "messaging_product": "whatsapp", 
@@ -143,7 +143,7 @@ class Whatsapp():
                 whatsapp_number = whatsapp_number,
                 archived = False,
             ).update(archived = True)
-            url = f"{self.whatsapp_url}{whatsapp_number.whatsapp_business_phone_number_id}/messages"
+            url = f"{self.whatsapp_url}/{whatsapp_number.whatsapp_business_phone_number_id}/messages"
             headers = self._get_headers()
             body = { 
                 "messaging_product": "whatsapp", 
@@ -211,7 +211,7 @@ class Whatsapp():
             )
     #POST
     def create_template(self, template_object):   
-        url = f"{self.whatsapp_url}{template_object.site.whatsapp_business_account_id}/message_templates"
+        url = f"{self.whatsapp_url}/{template_object.site.whatsapp_business_account_id}/message_templates"
         headers = self._get_headers()
         pending_components = template_object.pending_components
         for component in pending_components:
@@ -248,7 +248,7 @@ class Whatsapp():
     #POST
     def edit_template(self, template_object):   
         if template_object.status in ["APPROVED", "REJECTED", "PAUSED"]:
-            url = f"{self.whatsapp_url}{template_object.message_template_id}"
+            url = f"{self.whatsapp_url}/{template_object.message_template_id}"
             headers = self._get_headers()
             pending_components = template_object.pending_components
             for component in pending_components:
@@ -285,7 +285,7 @@ class Whatsapp():
     #GET
     def get_templates(self, whatsapp_business_account_id):   
         if whatsapp_business_account_id:  
-            url = f"{self.whatsapp_url}{whatsapp_business_account_id}/message_templates"
+            url = f"{self.whatsapp_url}/{whatsapp_business_account_id}/message_templates"
             headers = self._get_headers()
             response = requests.get(url=url, headers=headers)
             response_body = response.json()
@@ -294,7 +294,7 @@ class Whatsapp():
     #GET
     def get_template(self, whatsapp_business_account_id, message_template_id):   
         if whatsapp_business_account_id:  
-            url = f"{self.whatsapp_url}{message_template_id}"
+            url = f"{self.whatsapp_url}/{message_template_id}"
             headers = self._get_headers()
             response = requests.get(url=url, headers=headers)
             response_body = response.json()
@@ -302,7 +302,7 @@ class Whatsapp():
     #DELETE
     def delete_template(self, whatsapp_business_account_id, template_name):   
         if whatsapp_business_account_id:  
-            url = f"{self.whatsapp_url}{whatsapp_business_account_id}/message_templates"
+            url = f"{self.whatsapp_url}/{whatsapp_business_account_id}/message_templates"
             headers = self._get_headers()
             body = { 
                 "name": template_name,
@@ -312,9 +312,47 @@ class Whatsapp():
             return response_body
             
     def get_phone_numbers(self, whatsapp_business_account_id):        
-        url = f"{self.whatsapp_url}{whatsapp_business_account_id}/phone_numbers?access_token={self.whatsapp_access_token}"
+        url = f"{self.whatsapp_url}/{whatsapp_business_account_id}/phone_numbers?access_token={self.whatsapp_access_token}"
         # headers = self._get_headers()
         response = requests.get(url=url)
         response_body = response.json()
+        return response_body        
+            
+    def get_media_url(self, media_id):        
+        url = f"{self.whatsapp_url}/{media_id}"
+        headers = self._get_headers()
+        response = requests.get(url=url, headers=headers)
+        response_body = response.json()
         return response_body
+            
+    def get_media_file(self, media_url):        
+        url = f"{media_url}"
+        headers = self._get_headers()
+        response = requests.get(url=url, headers=headers)
         
+        return response
+            
+    def get_media_file_from_media_id(self, media_id):        
+        media_url = self.get_media_url(media_id).get('url') 
+        response = self.get_media_file(media_url)
+        filename = get_filename_from_cd(response.headers.get('content-disposition'))
+        # file = open(filename, "wb")
+        # file.write(response.content)
+        # file.close()
+        import io
+        from django.core.files.images import ImageFile
+        image = ImageFile(io.BytesIO(response.content), name=filename)  # << the answer!
+        return image
+
+
+import re
+def get_filename_from_cd(cd):
+    """
+    Get filename from content-disposition
+    """
+    if not cd:
+        return None
+    fname = re.findall('filename=(.+)', cd)
+    if len(fname) == 0:
+        return None
+    return fname[0]

@@ -26,39 +26,7 @@ align-items: flex-start;"
             });
             
         })
-        function clear_chat_from_session(customer_number){
-            var respStatus = $.ajax({
-                type:'POST',
-                url:'{%url "clear-chat-from-session"%}',
-                data:{'customer_number':customer_number, 'csrfmiddlewaretoken':'{{ csrf_token }}'},
-                success: function (data) {
-                },
-                error: function(XMLHttpRequest, textStatus, errorThrown) {
-                }
-            })
-        }
-        function add_chat_conversation_to_session(whatsappnumber_pk, customer_number){
-                var respStatus = $.ajax({
-                    type:'POST',
-                    url:'{%url "add-chat-conversation-to-session"%}',
-                    data:{'whatsappnumber_pk':whatsappnumber_pk, 'customer_number':customer_number, 'csrfmiddlewaretoken':'{{ csrf_token }}'},
-                    success: function (data) {
-                    },
-                    error: function(XMLHttpRequest, textStatus, errorThrown) {
-                    }
-                })
-        }
-        function add_chat_whatsapp_number_to_session(whatsapp_number){
-            var respStatus = $.ajax({
-                type:'POST',
-                url:'{%url "add-chat-whatsapp-number-to-session"%}',
-                data:{'whatsapp_number':whatsapp_number, 'csrfmiddlewaretoken':'{{ csrf_token }}'},
-                success: function (data) {
-                },
-                error: function(XMLHttpRequest, textStatus, errorThrown) {
-                }
-            })
-        }
+        
         
         
         
@@ -66,6 +34,16 @@ align-items: flex-start;"
     </script>
     <link href="{% static 'css/chat.css' %}" rel="stylesheet" />
         <span id="next_chat_window"></span>
+
+        {%for customer_number in customer_numbers%}
+        {%if customer_number and whatsappnumber%}
+        <span hx-get="{%url 'message-window' customer_number=customer_number whatsappnumber_pk=whatsappnumber.pk%}"
+            hx-indicator=".htmx-indicator" 
+            hx-push-url="false"
+            hx-swap="outerHTML" hx-trigger="load"></span>
+        {%endif%}
+        {%endfor%}
+
         {%if whatsappnumber%}
         {%include 'messaging/message_list.html'%}
         {%endif%}
@@ -81,14 +59,14 @@ align-items: flex-start;"
                     {%for site in chat_sites%}   
                         <div class="accordion-item">
                         <h2 class="accordion-header" id="flush-headingOne">
-                            <button class="accordion-button no-chevron-button ps-2 {%if chat_site == site%} active{%else%} collapsed{%endif%}" type="button" data-bs-toggle="collapse" data-bs-target="#site_collapse_{{site.pk}}" aria-expanded="false" aria-controls="site_collapse_{{site.pk}}" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
+                            <button class="accordion-button no-chevron-button ps-2 {%if chat_site == site or whatsappnumber.site == site%} active{%else%} collapsed{%endif%}" type="button" data-bs-toggle="collapse" data-bs-target="#site_collapse_{{site.pk}}" aria-expanded="false" aria-controls="site_collapse_{{site.pk}}" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
                                 <span class="badge bg-dark badge-sm me-1"><i class="fa fa-whatsapp me-1"></i><span class="site_message_count_{{site.pk}}">{{site|site_outstanding_whatsapp_messages_tag:request.user}}</span></span>  <b>{{site.name}}</b>
                             </button>
                         </h2>
                         <div id="site_collapse_{{site.pk}}" class="accordion-collapse collapse {%if chat_site == site or chat_sites.count == 1%} show{%endif%}" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
                             <div class="accordion-body" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
                                 {%for chat_whatsappnumber in site.return_phone_numbers%}
-                                    <button class="btn btn-sm btn-{%if chat_site == site%}success{%else%}secondary{%endif%} btn-xs"
+                                    <button class="btn btn-sm btn-{%if chat_site == site or whatsappnumber.site == site%}success{%else%}secondary{%endif%} btn-xs"
                                     hx-get="{%url 'message-list'%}"
                                     hx-target="#chat_bottom"
                                     hx-swap="#outerHTML"

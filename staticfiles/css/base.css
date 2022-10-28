@@ -42,6 +42,11 @@
             text-overflow: ellipsis;
         }
 
+        .hidden-overflow {
+            overflow: hidden;
+            text-overflow: hidden;
+        }
+
         .cartoon-background{
             margin-bottom:45px; /* For Make sure chat doesn't block view */
         }

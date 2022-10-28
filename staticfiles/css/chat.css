@@ -1,7 +1,7 @@
 #chat_bottom {
     position: fixed;
     bottom: 0;
-    right: 5%;
+    right: 0.2%;
     /* text-align:right; */
     width: unset;
     overflow-x: hidden;
@@ -36,7 +36,7 @@
     white-space: nowrap;
     overflow: hidden;
     width: 100%;
-    padding: 2px;
+    padding-top: 2px;
 }
 
 .chat_bottom_header {

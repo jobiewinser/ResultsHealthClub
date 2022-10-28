@@ -3,7 +3,7 @@
         
         
         <span class="primary_td_layer text-white">
-            Site: {{chat_site.name}}
+            Site: {%if chat_Site%}{{chat_site.name}}{%else%}{{whatsappnumber.site.name}}{%endif%}
         </span>
         <br>
         <span class="secondary_td_layer">

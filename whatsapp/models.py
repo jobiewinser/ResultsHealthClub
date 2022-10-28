@@ -4,8 +4,13 @@ from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
 from django.db.models import JSONField
 
-from messaging.models import Message
-
+from messaging.models import Message, MessageImage
+from django.dispatch import receiver
+from PIL import Image
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from io import StringIO, BytesIO
+from django.core.files.uploadedfile import SimpleUploadedFile
+import os
 
 GYM_CHOICES = (
                     ('a', 'Abingdon'),
@@ -23,11 +28,50 @@ class WhatsAppWebhookRequest(models.Model):
     errors = models.ManyToManyField("core.ErrorModel", null=True, blank=True)
     request_type = models.CharField(choices=REQUEST_TYPE_CHOICES, default='a', max_length=1)
 
+
+class WhatsappMessageImage(MessageImage): 
+    media_id = models.TextField(blank=True, null=True)
+    def create_thumbnail(self):            
+        
+        THUMBNAIL_SIZE = (99, 66)
+
+        if self.image.name.endswith(".jpg"):
+            PIL_TYPE = 'jpeg'
+            FILE_EXTENSION = 'jpg'
+            DJANGO_TYPE = 'image/jpeg'
+
+        elif self.image.name.endswith(".png"):
+            PIL_TYPE = 'png'
+            FILE_EXTENSION = 'png'
+            DJANGO_TYPE = 'image/png'
+
+        image = Image.open(BytesIO(self.image.read()))
+        
+        image.thumbnail(THUMBNAIL_SIZE, Image.ANTIALIAS)
+        
+        temp_handle = BytesIO()
+        image.save(temp_handle, PIL_TYPE)
+        temp_handle.seek(0)
+        
+        suf = SimpleUploadedFile(os.path.split(self.image.name)[-1],
+                temp_handle.read(), content_type=DJANGO_TYPE)
+                
+        self.thumbnail = image
+        self.save()
+
+
+@receiver(models.signals.post_save, sender=WhatsappMessageImage)
+def execute_after_save(sender, instance, created, *args, **kwargs):  
+    if instance.image:
+        instance.create_thumbnail()
+    
 class WhatsAppMessage(Message):
     wamid = models.TextField(null=True, blank=True)   
+    type = models.TextField(null=True, blank=True)   
     raw_webhook = models.ForeignKey("whatsapp.WhatsAppWebhookRequest", null=True, blank=True, on_delete=models.SET_NULL)
     conversationid = models.TextField(null=True, blank=True)  
     whatsappnumber = models.ForeignKey("core.WhatsappNumber", null=True, blank=True, on_delete=models.SET_NULL)
+    image = models.ManyToManyField("whatsapp.WhatsappMessageImage")
 # class WhatsAppMessage(models.Model):
 #     pass 
     

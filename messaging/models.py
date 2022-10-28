@@ -18,3 +18,7 @@ class Message(PolymorphicModel):
     # company = models.ForeignKey("core.Company", on_delete=models.SET_NULL, null=True, blank=True)
     class Meta:
         ordering = ['-datetime']
+
+class MessageImage(PolymorphicModel):  
+    image = models.ImageField(upload_to="secure/message_images", null=True, blank=True)    
+    thumbnail = models.ImageField(upload_to="secure/message_image_thumnails", null=True, blank=True)

@@ -5,7 +5,7 @@
         hx-indicator=".htmx-indicator" 
         hx-target="#next_chat_window"
         hx-push-url="false"
-        hx-swap="outerHTML" {%if message.customer_number in customer_numbers%}hx-trigger="load,click"{%endif%}  
+        hx-swap="outerHTML" hx-trigger="click"
     {%endif%}
     data-bs-toggle="popover_delay" 
     data-bs-trigger="hover" 
@@ -26,13 +26,14 @@
     <div class="col-auto p-0">
         <img id="latest_message_avatar_{{message.customer_number}}" src="{%if message.inbound%}{% static 'img/blank-profile-picture.png' %}{%else%}{%if message.user.profile.avatar.url%}{{message.user.profile.avatar.url}}{%else%}{{message.site.company.company_logo_black.url}}{%endif%}{%endif%}" alt="" width="38" height="38" class="rounded-circle">
     </div>
-    <div class="col p-0 ps-1">
+    <div class="col p-0 ps-1 hidden-overflow">
         <div class="row chat_lead_name_row">
-            <div class="col p-0 elipses-overflow" id="latest_message_name_{{message.customer_number}}">
-                {%if message.lead.name%}{{message.lead.name}}{%else%}{{message.customer_number}}{%endif%}
+            <div class="col p-0 elipses-overflow me-2" id="latest_message_name_{{message.customer_number}}">
+                <span>{%if message.lead.name%}{{message.lead.name}}{%else%}{{message.customer_number}}{%endif%}
+                {%if message.lead.name%}{{message.lead.name}}{%else%}{{message.customer_number}}{%endif%} </span>
             </div>
             
-            <div class="col p-0 right elipses-overflow" id="latest_message_name_{{message.customer_number}}">
+            <div class="col p-0 right pe-1">
                 <i>{{message.datetime|nice_message_datetime_tag}}</i>
             </div>
         </div>

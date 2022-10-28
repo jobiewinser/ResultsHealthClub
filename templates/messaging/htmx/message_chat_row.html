@@ -15,7 +15,7 @@
             <img src="{% static 'img/blank-profile-picture.png' %}" alt="" width="22" height="22" class="rounded-circle">
         </div>
         <div class="col p-0 ps-1 m-1 card chat_row_{{customer_number}}">
-            {{message.message}}
+            {%if message.message%}{{message.message}}{%elif message.image.all%}IMAGE (COMING SOON){%endif%}
         </div>
     </div>
 {%else%}
