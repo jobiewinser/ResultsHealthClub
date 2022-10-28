@@ -37,27 +37,42 @@ class Webhooks(View):
                 json_data=body,
                 request_type='a',
             )
-            try:
-                event_url = body.get('payload').get('event')
-                booking = Booking.objects.get(calendly_event_uri=event_url)
-                calendly = Calendly(booking.lead.campaign.site.calendly_token)
-                updated_booking_details = calendly.get_from_uri(event_url)
-                print("CALENDLY Webhooks updated_booking_details", str(updated_booking_details))
-                start_time = datetime.strptime(updated_booking_details['resource']['start_time'], '%Y-%m-%dT%H:%M:%S.%fZ')
-                
-                # timezone = pytz.timezone("GMT")
-                # start_time = timezone.localize(start_time)
+            if body.get('event') == "invitee.created":
+                try:
+                    event_url = body.get('payload').get('event')
+                    booking = Booking.objects.get(calendly_event_uri=event_url)
+                    calendly = Calendly(booking.lead.campaign.site.calendly_token)
+                    updated_booking_details = calendly.get_from_uri(event_url)
+                    print("CALENDLY Webhooks updated_booking_details", str(updated_booking_details))
+                    start_time = datetime.strptime(updated_booking_details['resource']['start_time'], '%Y-%m-%dT%H:%M:%S.%fZ')
+                    
+                    timezone = pytz.timezone('Europe/London')
+                    start_time = timezone.localize(start_time)
 
-                booking.datetime = start_time
-                booking.save()            
-                
-                return HttpResponse("", status=200)
-            except Exception as e:            
-                print("CALENDLY Webhooks post except Exception as e", str(e)) 
-                error = ErrorModel.objects.create(json_data={'error':str(e)})
-                webhook.errors.add(error)
-                webhook.save()
-                # raise Exception                
+                    booking.datetime = start_time
+                    booking.save()            
+                    
+                    return HttpResponse("", status=200)
+                except Exception as e:            
+                    print("CALENDLY Webhooks post except Exception as e", str(e)) 
+                    error = ErrorModel.objects.create(json_data={'error':str(e)})
+                    webhook.errors.add(error)
+                    webhook.save()
+                    # raise Exception     
+            elif body.get('event') == "invitee.canceled":
+                try:
+                    event_url = body.get('payload').get('event')
+                    booking = Booking.objects.get(calendly_event_uri=event_url)                    
+                    booking.archived = True
+                    booking.save()     
+                    # TODO Notification here                           
+                    return HttpResponse("", status=200)
+                except Exception as e:            
+                    print("CALENDLY Webhooks post except Exception as e", str(e)) 
+                    error = ErrorModel.objects.create(json_data={'error':str(e)})
+                    webhook.errors.add(error)
+                    webhook.save()
+                    # raise Exception                
             return HttpResponse("", status=200)
             
         except ObjectDoesNotExist:               

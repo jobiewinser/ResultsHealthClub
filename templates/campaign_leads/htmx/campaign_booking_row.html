@@ -63,17 +63,17 @@
         <span class="secondary_td_layer">{{lead.campaign.site.name}}</span>
     </td>
     <td>                 
-        {%with lead.booking_set.all.0.datetime|timezone:'Europe/London' as latest_booking%}
+        {%with lead.active_bookings.0.datetime as latest_booking%}
         <span hidden>{%if latest_booking%}{{latest_booking|timestamp}}{%else%}9999999999{%endif%}</span>
         <span class="primary_td_layer">
             {{latest_booking.date}} 
-            {%if lead.booking_set.all.0.type == 'a'%}
+            {%if lead.active_bookings.0.type == 'a'%}
                 <i class="fa-solid fa-person"
                 data-bs-toggle="popover" 
                 data-bs-trigger="hover" 
                 data-bs-placement="top"
                 data-bs-content="This appointment is in person"></i>
-            {%elif lead.booking_set.all.0.type == 'b'%}
+            {%elif lead.active_bookings.0.type == 'b'%}
                 <i class="fa-solid fa-phone"
                 data-bs-toggle="popover" 
                 data-bs-trigger="hover" 

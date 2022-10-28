@@ -84,7 +84,7 @@
                         " class="double_layer_td">                         
                             <div class="row">   
                                 <div class="col p-0">                            
-                                    <span class="primary_td_layer">{{booking.datetime}}</span>
+                                    <span class="primary_td_layer">{%if booking.archived%}<b>Archived</b> {%endif%}{{booking.datetime}}</span>
                                     <br>
                                     <span class="secondary_td_layer">Booked by: {{booking.user.first_name}} {{booking.user.last_name}}</span>  
                                 </div>

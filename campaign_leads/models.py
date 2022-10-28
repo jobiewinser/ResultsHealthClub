@@ -86,6 +86,9 @@ class Campaignlead(models.Model):
     def active_errors(self):        
         from core.models import AttachedError
         return AttachedError.objects.filter(Q(campaign_lead=self)|Q(customer_number=self.whatsapp_number, whatsapp_number__site=self.campaign.site)).filter(archived=False)
+    @property
+    def active_bookings(self):        
+        return self.booking_set.exclude(archived=True)
 
     @property
     def name(self):
@@ -316,6 +319,7 @@ class Call(models.Model):
     lead = models.ForeignKey(Campaignlead, on_delete=models.SET_NULL, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     error_json = models.JSONField(default=dict)
+    archived = models.BooleanField(default=False)
     class Meta:
         ordering = ['-datetime']
 
@@ -326,6 +330,7 @@ class Booking(models.Model):
     type = models.CharField(choices=BOOKING_CHOICES, max_length=2, null=False, blank=False)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     calendly_event_uri = models.TextField(null=True, blank=True)
+    archived = models.BooleanField(default=False)
     class Meta:
         ordering = ['-datetime']
 
