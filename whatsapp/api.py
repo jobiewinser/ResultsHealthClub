@@ -12,6 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
 from django.http.response import HttpResponseRedirect
 from django.template import loader
+from campaign_leads.models import Campaignlead
 
 
 from whatsapp.models import WhatsappTemplate
@@ -166,11 +167,13 @@ class Whatsapp():
             potential_error = response_body.get('error', None)
             if potential_error:
                 code = potential_error.get('code')
+                campaign_lead = Campaignlead.objects.filter(whatsapp_number=customer_number).last()
                 if str(code) == '132000':
                     AttachedError.objects.create(
                         type = '1103',
                         attached_field = "whatsapp_template",
                         whatsapp_template = template_object,
+                        campaign_lead=campaign_lead,
                         customer_number = customer_number,
                         whatsapp_number = whatsapp_number,
                         admin_action_required = True,
@@ -180,13 +183,14 @@ class Whatsapp():
                         type = '1105',
                         attached_field = "whatsapp_template",
                         whatsapp_template = template_object,
+                        campaign_lead=campaign_lead,
                         customer_number = customer_number,
                         whatsapp_number = whatsapp_number,
                         admin_action_required = True,
                     )
             else:
                 AttachedError.objects.filter(
-                    type = '1103',
+                    type__in = ['1103','1105'],
                     whatsapp_template = template_object,
                     archived = False,
                     whatsapp_number = whatsapp_number,
@@ -196,10 +200,12 @@ class Whatsapp():
             print("send_template_message response_body", response_body)
             return response_body
         else:
+            campaign_lead = Campaignlead.objects.filter(whatsapp_number=customer_number).last()
             AttachedError.objects.create(
                 type = '1102',
                 attached_field = "whatsapp_template",
                 whatsapp_template = template_object,
+                        campaign_lead=campaign_lead,
                 whatsapp_number = whatsapp_number,
                 customer_number = customer_number,
             )
