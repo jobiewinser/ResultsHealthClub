@@ -53,13 +53,15 @@ class Webhooks(View):
                 
                 return HttpResponse("", status=200)
             except Exception as e:            
+                print("CALENDLY Webhooks post except Exception as e", str(e)) 
                 error = ErrorModel.objects.create(json_data={'error':str(e)})
                 webhook.errors.add(error)
                 webhook.save()
                 # raise Exception                
             return HttpResponse("", status=200)
             
-        except ObjectDoesNotExist:                
+        except ObjectDoesNotExist:               
+            print("CALENDLY Webhooks post ObjectDoesNotExist body", str(body)) 
             return HttpResponse("", status=200)
 
 def calendly_booking_success(request):
