@@ -69,7 +69,6 @@ def calendly_booking_success(request):
     from channels.layers import get_channel_layer
     channel_layer = get_channel_layer()          
     lead = booking.lead
-    print(lead.campaign.site.company.pk)
     campaign_pk = lead.campaign.site.company.pk   
     async_to_sync(channel_layer.group_send)(
         f"lead_{campaign_pk}",

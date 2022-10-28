@@ -14,6 +14,12 @@ class AttachedErrorAdmin(admin.ModelAdmin):
     list_display = ['pk', 'created', 'attached_field']
     search_fields = ['pk', 'created', 'attached_field']
 admin.site.register(AttachedError, AttachedErrorAdmin)
+class ErrorModelAdmin(admin.ModelAdmin):
+    readonly_fields = ('created',) 
+    list_display = ['pk', 'created']
+    search_fields = ['pk', 'created']
+admin.site.register(ErrorModel, ErrorModelAdmin)
+
 for model in models:
     try:
         admin.site.register(model) #Register all models that aren't already registered
