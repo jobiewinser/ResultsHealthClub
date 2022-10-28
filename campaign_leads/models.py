@@ -84,7 +84,7 @@ class Campaignlead(models.Model):
     assigned_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     @property
     def is_last_whatsapp_message_inbound(self):        
-        message = WhatsAppMessage.objects.filter(customer_number=self.whatsapp_number, whatsappnumber__site=self.campiagn.site).last()
+        message = WhatsAppMessage.objects.filter(customer_number=self.whatsapp_number, whatsappnumber__site=self.campaign.site).last()
         if message:
             return message.inbound
         return False
