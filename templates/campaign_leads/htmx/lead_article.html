@@ -1,5 +1,5 @@
 {%load core_tags static%}
-<span class="column-drag fade-me-out"
+<span class="column-drag fade-me-out lead-{{lead.pk}}"
     draggable="true" ondragstart="drag(event)" data-id="{{lead.pk}}" id="lead-{{lead.pk}}">
     {%with call_count|division_percentage_max_100:max_call_count as call_percentage%}
     <article style="margin-right:50px"  class="card draggable-card top-highlight-{{call_percentage|roundup_tag:20}} lead_card">
@@ -54,6 +54,11 @@
                         data-customer-number="{{lead.whatsapp_number}}">
                             Chat
                             <span id="chat_notification_{{lead.whatsapp_number}}">
+                                {%if is_last_whatsapp_message_inbound%}
+                                <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
+                                    <span class="visually-hidden">New alerts</span>
+                                </span>
+                                {%endif%}
                             </span>
                     </button>
                 {%endif%}

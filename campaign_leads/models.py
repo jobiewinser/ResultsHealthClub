@@ -83,6 +83,12 @@ class Campaignlead(models.Model):
     last_dragged = models.DateTimeField(null=True, blank=True)
     assigned_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     @property
+    def is_last_whatsapp_message_inbound(self):        
+        message = WhatsAppMessage.objects.filter(customer_number=self.whatsapp_number, whatsappnumber__site=self.campiagn.site).last()
+        if message:
+            return message.inbound
+        return False
+    @property
     def active_errors(self):        
         from core.models import AttachedError
         return AttachedError.objects.filter(Q(campaign_lead=self)|Q(customer_number=self.whatsapp_number, whatsapp_number__site=self.campaign.site)).filter(archived=False)
@@ -95,39 +101,29 @@ class Campaignlead(models.Model):
         if self.last_name:
             return f"{self.first_name} {self.last_name}"
         return self.first_name
-    @property
-    def last_whatsapp(self):
-        whatsapps = self.call_set.all()
-        if whatsapps:
-            return whatsapps.first()
-        return None
-    
-    @property
-    def time_until_next_whatsapp(self):
-        last_whatsapp = self.last_whatsapp
-        print(last_whatsapp)
-        if last_whatsapp:
-            return last_whatsapp.datetime.replace(hour=9).replace(minute=30).replace(second=0) + timedelta(days=1)
-        return "Never"  
 
-    def trigger_refresh_websocket(self):
+    def trigger_refresh_websocket(self, refresh_position=False):
         channel_layer = get_channel_layer()   
-        
+        if refresh_position:
+            rendered_html = self.get_leads_html(new_position=Call.objects.filter(lead=self).count())
+        else:
+            rendered_html = self.get_leads_html()
         async_to_sync(channel_layer.group_send)(
-                f"lead_{self.campaign.site.company.pk}",
-                {
-                    'type': 'lead_move',
-                    'data':{
-                        'rendered_html':self.get_leads_html(new_position=Call.objects.filter(lead=self).count()),
-                    }
+            f"lead_{self.campaign.site.company.pk}",
+            {
+                'type': 'lead_move',
+                'data':{
+                    'rendered_html':rendered_html,
                 }
+            }
         )
     def get_leads_html(self, new_position=None):
-        delete_htmx = f"<span hx-swap-oob='delete' id='lead-{self.pk}'></span>"
         if self:
             if new_position == None:    
-                return delete_htmx
+                rendered_html = f"<span hx-swap-oob='outerHTML:.lead-{self.pk}' hx-get='/campaign-leads/refresh-lead-article/{self.pk}/' hx-swap='outerHTML' hx-indicator='.htmx-indicator' hx-trigger='load' ></span>"
+                return rendered_html
             else:
+                delete_htmx = f"<span hx-swap-oob='delete' id='lead-{self.pk}'></span>"
                 rendered_html = f"<span hx-swap-oob='afterbegin:.campaign_column_{self.campaign.pk}_calls_{new_position},.site_column_{self.campaign.site.pk}_calls_{new_position},.company_column_{self.campaign.site.company.pk}_calls_{new_position}'><a hx-get='/campaign-leads/refresh-lead-article/{self.pk}/' hx-swap='outerHTML' hx-indicator='.htmx-indicator' hx-trigger='load' href='#'></a> </span>"
                 from django.utils.safestring import mark_safe
                 return mark_safe(f"{rendered_html} {delete_htmx}")

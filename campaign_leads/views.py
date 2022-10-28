@@ -216,7 +216,7 @@ def new_call(request, **kwargs):
                 lead.save()
 
                 
-                lead.trigger_refresh_websocket()
+                lead.trigger_refresh_websocket(refresh_position=True)
                 
                 return HttpResponse("", status=200)
             return HttpResponse("", status=500)
