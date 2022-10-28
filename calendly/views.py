@@ -41,11 +41,12 @@ class Webhooks(View):
                 event_url = body.get('payload').get('event')
                 booking = Booking.objects.get(calendly_event_uri=event_url)
                 calendly = Calendly(booking.lead.campaign.site.calendly_token)
-                updated_booking_details_1 = calendly.get_from_uri(event_url)
-                start_time = datetime.strptime(updated_booking_details_1['resource']['start_time'], '%Y-%m-%dT%H:%M:%S.%fZ')
+                updated_booking_details = calendly.get_from_uri(event_url)
+                print("CALENDLY Webhooks updated_booking_details", str(updated_booking_details))
+                start_time = datetime.strptime(updated_booking_details['resource']['start_time'], '%Y-%m-%dT%H:%M:%S.%fZ')
                 
-                timezone = pytz.timezone("GMT")
-                start_time = timezone.localize(start_time)
+                # timezone = pytz.timezone("GMT")
+                # start_time = timezone.localize(start_time)
 
                 booking.datetime = start_time
                 booking.save()            
