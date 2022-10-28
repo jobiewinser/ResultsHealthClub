@@ -106,12 +106,21 @@ class Whatsapp():
                                             attached_field = "whatsapp_number",
                                             whatsapp_number = whatsapp_number,
                                             customer_number = overridden_number,
+                                        )
+                                    )
+                                elif str(code) == '133010':
+                                    attached_errors.append(
+                                        AttachedError.objects.create(
+                                            type = '1105',
+                                            attached_field = "whatsapp_number",
+                                            whatsapp_number = whatsapp_number,
+                                            customer_number = overridden_number,
                                             admin_action_required = True,
                                         )
                                     )
             if not attached_errors:
                 AttachedError.objects.filter(
-                    type = '1104',
+                    type__in = ['1104','1105'],
                     archived = False,
                     whatsapp_number = whatsapp_number,
                     customer_number = overridden_number,
