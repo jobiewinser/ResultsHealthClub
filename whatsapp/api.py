@@ -107,20 +107,10 @@ class Whatsapp():
                                             whatsapp_number = whatsapp_number,
                                             customer_number = overridden_number,
                                         )
-                                    )
-                                elif str(code) == '133010':
-                                    attached_errors.append(
-                                        AttachedError.objects.create(
-                                            type = '1105',
-                                            attached_field = "whatsapp_number",
-                                            whatsapp_number = whatsapp_number,
-                                            customer_number = overridden_number,
-                                            admin_action_required = True,
-                                        )
-                                    )
+                                    )                                
             if not attached_errors:
                 AttachedError.objects.filter(
-                    type__in = ['1104','1105'],
+                    type__in = ['1104'],
                     archived = False,
                     whatsapp_number = whatsapp_number,
                     customer_number = overridden_number,
@@ -166,7 +156,7 @@ class Whatsapp():
             }
             print("")
             print("")
-            print(str(body))
+            print("send_template_message body", str(body))
             print("")
             print("")
             response = requests.post(url=url, json=body, headers=headers)
@@ -185,6 +175,15 @@ class Whatsapp():
                         whatsapp_number = whatsapp_number,
                         admin_action_required = True,
                     )
+                elif str(code) == '133010':
+                    AttachedError.objects.create(
+                        type = '1105',
+                        attached_field = "whatsapp_template",
+                        whatsapp_template = template_object,
+                        customer_number = customer_number,
+                        whatsapp_number = whatsapp_number,
+                        admin_action_required = True,
+                    )
             else:
                 AttachedError.objects.filter(
                     type = '1103',
@@ -194,7 +193,7 @@ class Whatsapp():
                     customer_number = customer_number,
                 ).update(archived = True)
 
-            print(response_body)
+            print("send_template_message response_body", response_body)
             return response_body
         else:
             AttachedError.objects.create(
