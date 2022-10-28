@@ -100,6 +100,12 @@ class Webhooks(View):
                             <span id='messageCollapse_{whatsappnumber.pk}' hx-swap-oob='afterbegin'>{rendered_message_list_row}</span>
 
                             <span id='messageWindowInnerBody_{from_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>
+                            
+                            <span id="chat_notification_{lead.whatsapp_number}" hx-swap-oob='innerHTML'>
+                                <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
+                                        <span class="visually-hidden">New alerts</span>
+                                </span>
+                            </span>
                             """
                             from channels.layers import get_channel_layer
                             from asgiref.sync import async_to_sync
