@@ -110,7 +110,7 @@ class Whatsapp():
                                     )                                
             if not attached_errors:
                 AttachedError.objects.filter(
-                    type__in = ['1104'],
+                    type__in = ['1104','1105'],
                     archived = False,
                     whatsapp_number = whatsapp_number,
                     customer_number = non_overwritten_customer_number,
