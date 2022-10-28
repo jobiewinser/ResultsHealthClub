@@ -68,7 +68,7 @@ def calendly_booking_success(request):
     lead = Campaignlead.objects.get(pk = request.POST['lead_pk'])
     uri = request.POST['uri']
     # if lead.campaign.site.company == request.user.profile.company:
-    booking, created = Booking.objects.get_or_create(user=request.user, calendly_event_uri=uri, lead=lead)
+    booking = Booking.objects.create(user=request.user, calendly_event_uri=uri, lead=lead)
     from channels.layers import get_channel_layer
     channel_layer = get_channel_layer()          
     lead = booking.lead
