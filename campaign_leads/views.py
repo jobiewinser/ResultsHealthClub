@@ -55,7 +55,7 @@ class CampaignleadsOverviewView(TemplateView):
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'campaign_leads/htmx/leads_board_htmx.html'   
         context['campaigns'] = get_campaign_qs(self.request)
-        leads = Campaignlead.objects.filter(complete=False, booking__datetime=None, campaign__site__in=self.request.user.profile.sites_allowed.all())
+        leads = Campaignlead.objects.filter(complete=False, campaign__site__in=self.request.user.profile.sites_allowed.all()).exclude(booking__archived=False)
         # leads = Campaignlead.objects.filter()
         campaign_pk = self.request.GET.get('campaign_pk', None)
         if campaign_pk:
@@ -114,10 +114,9 @@ class CampaignBookingsOverviewView(TemplateView):
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'campaign_leads/htmx/campaign_bookings_table_htmx.html'   
             context['campaigns'] = get_campaign_qs(self.request)
-        leads = Campaignlead.objects.exclude(booking=None)
+        leads = Campaignlead.objects.exclude(booking__created=None)
         campaign_pk = self.request.GET.get('campaign_pk', None)
         if campaign_pk:
-
             leads = leads.filter(campaign=Campaign.objects.get(pk=campaign_pk))
             self.request.GET['campaign_pk'] = campaign_pk
         site_pk = get_site_pk_from_request(self.request)
