@@ -12,7 +12,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
 from django.http.response import HttpResponseRedirect
 from django.template import loader
-from campaign_leads.models import Campaignlead
 
 
 from whatsapp.models import WhatsappTemplate
@@ -163,7 +162,7 @@ class Whatsapp():
             response = requests.post(url=url, json=body, headers=headers)
             response_body = response.json()
             
-            
+            from campaign_leads.models import Campaignlead            
             potential_error = response_body.get('error', None)
             if potential_error:
                 code = potential_error.get('code')
