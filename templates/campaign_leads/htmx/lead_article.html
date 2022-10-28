@@ -42,15 +42,15 @@
                         1st <i class="fa fa-whatsapp"></i>
                 </button>
                 {%else%}
-                <button class="btn btn-sm btn-success text-white position-relative"                     
-                    hx-get="{%url 'message-list'%}"
-                    hx-target="#chat_bottom"
-                    hx-swap="#outerHTML"
-                    hx-indicator=".htmx-indicator"                 
-                    hx-vals='{"site_pk": "{{lead.campaign.site.pk}}", "customer_number": "{{lead.whatsapp_number}}"}'
-                    hx-trigger="click"
-                    
-                    onclick="$('#chat_card_{{lead.whatsapp_number}}').remove(); $('#chat_list_bottom_window').remove();"
+                    <button class="btn btn-sm btn-success text-white position-relative"                     
+                        hx-get="{%url 'message-list'%}"
+                        hx-target="#chat_bottom"
+                        hx-swap="#outerHTML"
+                        hx-indicator=".htmx-indicator"                 
+                        hx-vals='{"site_pk": "{{lead.campaign.site.pk}}", "customer_number": "{{lead.whatsapp_number}}"}'
+                        hx-trigger="click"
+                        
+                        onclick="$('#chat_card_{{lead.whatsapp_number}}').remove(); $('#chat_list_bottom_window').remove();"
                         data-customer-number="{{lead.whatsapp_number}}">
                             Chat
                             <span id="chat_notification_{{lead.whatsapp_number}}">

@@ -8,12 +8,36 @@
             data-bs-placement="top"
             data-bs-content="This is a possible duplicate"></i>{%endif%}</span>
         <br>
-        <span class="secondary_td_layer"><a 
-            data-bs-toggle="popover" 
-            data-bs-trigger="hover" 
-            data-bs-placement="top"
-            data-bs-content="Click to open this number in whatsapp"
-            style="text-decoration: none; color: #25d366" class="nowrap" target="_blank" href="#"><i class="fa fa-whatsapp" aria-hidden="true"></i> {{lead.whatsapp_number}}</a></span>        
+        <span class="secondary_td_layer">
+        {%if not lead.message_set.all%}
+                <button class="btn btn-sm btn-success text-white position-relative" 
+                    hx-get="{%url 'send-first-template-whatsapp' lead_pk=lead.pk%}"
+                    hx-indicator=".htmx-indicator" 
+                    hx-include="#max_call_count"
+                    hx-target="#lead-{{lead.pk}}"
+                    hx-push-url="false"
+                    hx-swap="outerHTML" hx-trigger="click"  
+                    data-customer-number="{{lead.whatsapp_number}}">
+                        1st <i class="fa fa-whatsapp"></i>
+                </button>
+                {%else%}
+                    <button class="btn btn-sm btn-success text-white position-relative"                     
+                        hx-get="{%url 'message-list'%}"
+                        hx-target="#chat_bottom"
+                        hx-swap="#outerHTML"
+                        hx-indicator=".htmx-indicator"                 
+                        hx-vals='{"site_pk": "{{lead.campaign.site.pk}}", "customer_number": "{{lead.whatsapp_number}}"}'
+                        hx-trigger="click"
+                        
+                        onclick="$('#chat_card_{{lead.whatsapp_number}}').remove(); $('#chat_list_bottom_window').remove();"
+                        data-customer-number="{{lead.whatsapp_number}}">
+                            Chat
+                            <span id="chat_notification_{{lead.whatsapp_number}}">
+                            </span>
+                    </button>
+                {%endif%}
+                <span style="text-decoration: none; color: #25d366" class="nowrap" target="_blank" href="#"><i class="fa fa-whatsapp" aria-hidden="true"></i> {{lead.whatsapp_number}}</span>
+        </span>        
     </td>
     <td class="nowrap">
         {%if lead.complete and not lead.sold%}
