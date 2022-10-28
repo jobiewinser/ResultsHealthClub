@@ -40,7 +40,7 @@ class Whatsapp():
         from core.models import AttachedError
         if message:  
             if settings.WHATSAPP_PHONE_OVERRIDE1:
-                overridden_number = customer_number
+                non_overwritten_customer_number = customer_number
                 customer_number = settings.WHATSAPP_PHONE_OVERRIDE1
             url = f"{self.whatsapp_url}{whatsapp_number.whatsapp_business_phone_number_id}/messages"
             headers = self._get_headers()
@@ -105,7 +105,7 @@ class Whatsapp():
                                             type = '1104',
                                             attached_field = "whatsapp_number",
                                             whatsapp_number = whatsapp_number,
-                                            customer_number = overridden_number,
+                                            customer_number = non_overwritten_customer_number,
                                         )
                                     )                                
             if not attached_errors:
@@ -113,7 +113,7 @@ class Whatsapp():
                     type__in = ['1104'],
                     archived = False,
                     whatsapp_number = whatsapp_number,
-                    customer_number = overridden_number,
+                    customer_number = non_overwritten_customer_number,
                 ).update(archived = True)
 
             print("send_free_text_message response_body", response_body)
@@ -132,13 +132,14 @@ class Whatsapp():
         #                 "text": "Hi there"
         #                 }]
         #         }] 
+        non_overwritten_customer_number = customer_number
         if settings.WHATSAPP_PHONE_OVERRIDE1:
             customer_number = settings.WHATSAPP_PHONE_OVERRIDE1
         if template_name:  
             AttachedError.objects.filter(
                 type = '1102',
                 whatsapp_template = template_object,
-                customer_number = customer_number,
+                customer_number = non_overwritten_customer_number,
                 whatsapp_number = whatsapp_number,
                 archived = False,
             ).update(archived = True)
@@ -166,14 +167,14 @@ class Whatsapp():
             potential_error = response_body.get('error', None)
             if potential_error:
                 code = potential_error.get('code')
-                campaign_lead = Campaignlead.objects.filter(whatsapp_number=customer_number).last()
+                campaign_lead = Campaignlead.objects.filter(whatsapp_number=non_overwritten_customer_number).last()
                 if str(code) == '132000':
                     AttachedError.objects.create(
                         type = '1103',
                         attached_field = "whatsapp_template",
                         whatsapp_template = template_object,
                         campaign_lead=campaign_lead,
-                        customer_number = customer_number,
+                        customer_number = non_overwritten_customer_number,
                         whatsapp_number = whatsapp_number,
                         admin_action_required = True,
                     )
@@ -183,7 +184,7 @@ class Whatsapp():
                         attached_field = "whatsapp_template",
                         whatsapp_template = template_object,
                         campaign_lead=campaign_lead,
-                        customer_number = customer_number,
+                        customer_number = non_overwritten_customer_number,
                         whatsapp_number = whatsapp_number,
                         admin_action_required = True,
                     )
@@ -193,20 +194,20 @@ class Whatsapp():
                     whatsapp_template = template_object,
                     archived = False,
                     whatsapp_number = whatsapp_number,
-                    customer_number = customer_number,
+                    customer_number = non_overwritten_customer_number,
                 ).update(archived = True)
 
             print("send_template_message response_body", response_body)
             return response_body
         else:
-            campaign_lead = Campaignlead.objects.filter(whatsapp_number=customer_number).last()
+            campaign_lead = Campaignlead.objects.filter(whatsapp_number=non_overwritten_customer_number).last()
             AttachedError.objects.create(
                 type = '1102',
                 attached_field = "whatsapp_template",
                 whatsapp_template = template_object,
                         campaign_lead=campaign_lead,
                 whatsapp_number = whatsapp_number,
-                customer_number = customer_number,
+                customer_number = non_overwritten_customer_number,
             )
     #POST
     def create_template(self, template_object):   
