@@ -54,7 +54,7 @@
                         data-customer-number="{{lead.whatsapp_number}}">
                             Chat
                             <span id="chat_notification_{{lead.whatsapp_number}}">
-                                {%if is_last_whatsapp_message_inbound%}
+                                {%if lead.is_last_whatsapp_message_inbound%}
                                 <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
                                     <span class="visually-hidden">New alerts</span>
                                 </span>
