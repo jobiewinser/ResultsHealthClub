@@ -186,6 +186,7 @@ class Site(models.Model):
     def get_live_whatsapp_phone_numbers(self):
         whatsapp = Whatsapp(self.whatsapp_access_token)  
         phone_numbers = whatsapp.get_phone_numbers(self.whatsapp_business_account_id).get('data',[])  
+        print("get_live_whatsapp_phone_numbers phone_numbers", str(phone_numbers))
         whatsapp_number_ids = []
         if phone_numbers:
             for number in phone_numbers:
