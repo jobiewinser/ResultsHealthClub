@@ -1,4 +1,6 @@
+import base64
 import json
+from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
@@ -7,9 +9,9 @@ from django.db.models import JSONField
 from messaging.models import Message, MessageImage
 from django.dispatch import receiver
 from PIL import Image
-from django.core.files.uploadedfile import InMemoryUploadedFile
 from io import StringIO, BytesIO
-from django.core.files.uploadedfile import SimpleUploadedFile
+            
+from django.core.files.images import ImageFile
 import os
 
 GYM_CHOICES = (
@@ -31,39 +33,34 @@ class WhatsAppWebhookRequest(models.Model):
 
 class WhatsappMessageImage(MessageImage): 
     media_id = models.TextField(blank=True, null=True)
-    def create_thumbnail(self):            
-        
-        THUMBNAIL_SIZE = (99, 66)
+    
+    @property
+    def image_base64(self):
+        if self.image:
+            base = str(settings.BASE_DIR)
+            path = base+self.image.url
+            with open(path, "rb") as image_file:
+                image_data = base64.b64encode(image_file.read()).decode('utf-8')
+            return image_data
 
-        if self.image.name.endswith(".jpg"):
-            PIL_TYPE = 'jpeg'
-            FILE_EXTENSION = 'jpg'
-            DJANGO_TYPE = 'image/jpeg'
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        if not self.image:
+            self.thumbnail = None
+        else:
+            thumbnail_size = 100, 100
+            data_img = BytesIO()
+            tiny_img = Image.open(self.image)
+            tiny_img.thumbnail(thumbnail_size)
+            tiny_img.save(data_img, format="BMP")
+            tiny_img.close()
+            try:
+                self.thumbnail = "data:image/jpg;base64,{}".format(
+                    base64.b64encode(data_img.getvalue()).decode("utf-8")
+                )
+            except UnicodeDecodeError:
+                self.blurred_image = None
 
-        elif self.image.name.endswith(".png"):
-            PIL_TYPE = 'png'
-            FILE_EXTENSION = 'png'
-            DJANGO_TYPE = 'image/png'
-
-        image = Image.open(BytesIO(self.image.read()))
-        
-        image.thumbnail(THUMBNAIL_SIZE, Image.ANTIALIAS)
-        
-        temp_handle = BytesIO()
-        image.save(temp_handle, PIL_TYPE)
-        temp_handle.seek(0)
-        
-        suf = SimpleUploadedFile(os.path.split(self.image.name)[-1],
-                temp_handle.read(), content_type=DJANGO_TYPE)
-                
-        self.thumbnail = image
-        self.save()
-
-
-@receiver(models.signals.post_save, sender=WhatsappMessageImage)
-def execute_after_save(sender, instance, created, *args, **kwargs):  
-    if instance.image:
-        instance.create_thumbnail()
+        super(WhatsappMessageImage, self).save(force_insert, force_update, using, update_fields)
     
 class WhatsAppMessage(Message):
     wamid = models.TextField(null=True, blank=True)   

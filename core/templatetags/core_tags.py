@@ -219,3 +219,4 @@ def site_outstanding_whatsapp_messages_tag(site, user):
 @register.filter
 def active_errors_for_customer_number_tag(whatsappnumber, customer_number):
     return whatsappnumber.active_errors_for_customer_number(customer_number)
+    

@@ -6,7 +6,7 @@ from campaign_leads.models import Campaignlead
 from core.models import Site, WhatsappNumber
 from core.user_permission_functions import get_allowed_site_chats_for_user, get_user_allowed_to_use_site_messaging
 from core.views import get_site_pk_from_request
-from whatsapp.models import WhatsAppMessage
+from whatsapp.models import WhatsAppMessage, WhatsappMessageImage
 from django.contrib.auth.decorators import login_required
 
 import logging
@@ -109,10 +109,15 @@ def send_first_template_whatsapp_htmx(request, **kwargs):
 def get_modal_content(request, **kwargs):
     try:
         request.GET._mutable = True
-        site_pk = get_site_pk_from_request(request)
         context = {}
+        site_pk = get_site_pk_from_request(request)
         if site_pk:
             request.GET['site_pk'] = site_pk
+
+
+        whatsapp_message_image_pk = request.GET.get('whatsapp_message_image_pk')
+        if whatsapp_message_image_pk:
+            context['whatsapp_message_image'] = WhatsappMessageImage.objects.get(pk=whatsapp_message_image_pk)
 
         lead_pk = request.GET.get('lead_pk')
         if lead_pk:

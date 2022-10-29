@@ -35,7 +35,8 @@
 .chat_row {
     white-space: nowrap;
     overflow: hidden;
-    width: 100%;
+    max-width: 100%;
+    width: auto;
     padding-top: 2px;
 }
 

@@ -281,11 +281,15 @@
             font-size: .9em;
             font-weight: 400;
         }
-        
+        .borderless{
+            border: unset !important;
+        }
         .bg-success-trans {
             background-color: rgba(25, 135, 84, 0.6) !important;
         }
-        
+        .bg-secondary-trans {
+            background-color: rgba(108, 117, 125, 0.6) !important;
+        }
         .complete-tr>* {
             background-color: rgba(25, 135, 84, 0.1) !important;
         }

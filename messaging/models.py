@@ -21,4 +21,4 @@ class Message(PolymorphicModel):
 
 class MessageImage(PolymorphicModel):  
     image = models.ImageField(upload_to="secure/message_images", null=True, blank=True)    
-    thumbnail = models.ImageField(upload_to="secure/message_image_thumnails", null=True, blank=True)
+    thumbnail = models.TextField(null=True, blank=True)
