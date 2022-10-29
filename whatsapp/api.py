@@ -316,7 +316,19 @@ class Whatsapp():
         # headers = self._get_headers()
         response = requests.get(url=url)
         response_body = response.json()
-        return response_body        
+        return response_body     
+            
+    # def create_phone_number(self, whatsapp_business_account_id, cc, phone_number, migrate_phone_number=False):        
+    #     url = f"{self.whatsapp_url}/{whatsapp_business_account_id}/phone_numbers"
+    #     headers = self._get_headers()
+    #     body = { 
+    #         "cc": cc, 
+    #         "phone_number": phone_number,
+    #         "migrate_phone_number": str(migrate_phone_number).lower(), 
+    #     }
+    #     response = requests.post(url=url, json=body, headers=headers)
+    #     response_body = response.json()
+    #     return response_body        
             
     def get_media_url(self, media_id):        
         url = f"{self.whatsapp_url}/{media_id}"

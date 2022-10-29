@@ -24,7 +24,7 @@
                     hx-vals='{"template_name": "view_message_image", "whatsapp_message_image_pk": "{{image.pk}}"}'
                     hx-get="{% url 'messaging-get-modal-content' %}" hx-push-url="false"
                     hx-swap="innerHTML" hx-trigger="click"
-                width="100" height="100" src="{{image.thumbnail}}" alt="Image Message" />
+                height="100" src="{{image.thumbnail}}" alt="Image Message" />
                 {%endfor%}
             {%endif%}
         </div>
@@ -50,7 +50,7 @@
                         hx-vals='{"template_name": "view_message_image", "whatsapp_message_image_pk": "{{image.pk}}"}'
                         hx-get="{% url 'messaging-get-modal-content' %}" hx-push-url="false"
                         hx-swap="innerHTML" hx-trigger="click"
-                    width="100" height="100" src="{{image.thumbnail}}" alt="Image Message" />
+                    height="100" src="{{image.thumbnail}}" alt="Image Message" />
                     {%endfor%}
                 {%endif%}
             </div>
