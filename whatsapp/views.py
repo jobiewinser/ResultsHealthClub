@@ -152,7 +152,7 @@ def handle_received_whatsapp_image_message(message_json, metadata, webhook_objec
     from channels.layers import get_channel_layer
     channel_layer = get_channel_layer()                            
     message_context = {
-        "image": whatsapp_message,
+        "message": whatsapp_message,
         "site": site,
         "whatsappnumber": whatsappnumber,
     }
@@ -192,7 +192,7 @@ def handle_received_whatsapp_image_message(message_json, metadata, webhook_objec
             }
         }
     )
-    logger.debug("webhook sending image to chat end")  
+    logger.debug("webhook sending image to chat end")     
 
 
 def handle_received_whatsapp_text_message(message_json, metadata, webhook_object):
