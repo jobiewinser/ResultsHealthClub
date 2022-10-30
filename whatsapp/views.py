@@ -479,23 +479,26 @@ def add_phone_number(request):
 
 @login_required
 def add_whatsapp_business_account(request):
-    try:
+    try: 
         site_pk = request.POST.get('site_pk', None)
         whatsapp_business_account_id = request.POST.get('whatsapp_business_account_id', None)
         if site_pk and whatsapp_business_account_id:
             site = Site.objects.get(pk=site_pk)
-            if get_user_allowed_to_edit_site(request.user, site):         
-                whatsapp_business_account = WhatsappBusinessAccount.objects.filter(whatsapp_business_account_id=whatsapp_business_account_id).first()
-                if whatsapp_business_account:
-                    if whatsapp_business_account.site == site:
-                        return HttpResponse(f"This Whatsapp Business Account already belongs to this Site: {site.name}.",status=500)
-                    elif whatsapp_business_account.site:
-                        return HttpResponse(f"This Whatsapp Business Account already belongs to another Site, please contact Winser Systems.",status=500)
-                    else:
-                        whatsapp_business_account.delete()
-                WhatsappBusinessAccount.objects.create(site=site, whatsapp_business_account_id=whatsapp_business_account_id)
-                whatsapp_numbers = site.get_live_whatsapp_phone_numbers() 
-                return HttpResponse("",status=200,headers={'HX-Refresh':True})
+            whatsapp = Whatsapp(site.whatsapp_access_token) 
+            if get_user_allowed_to_edit_site(request.user, site):      
+                if whatsapp.get_phone_numbers(whatsapp_business_account_id).get('data',[]):   
+                    whatsapp_business_account = WhatsappBusinessAccount.objects.filter(whatsapp_business_account_id=whatsapp_business_account_id).first()
+                    if whatsapp_business_account:
+                        if whatsapp_business_account.site == site:
+                            return HttpResponse(f"This Whatsapp Business Account already belongs to this Site: {site.name}.",status=500)
+                        elif whatsapp_business_account.site:
+                            return HttpResponse(f"This Whatsapp Business Account already belongs to another Site, please contact Winser Systems.",status=500)
+                        else:
+                            whatsapp_business_account.delete()
+                    WhatsappBusinessAccount.objects.create(site=site, whatsapp_business_account_id=whatsapp_business_account_id)
+                    return HttpResponse("",status=200,headers={'HX-Refresh':True})
+                else:
+                    return HttpResponse("There are no phone numbers assosciated with that Whatsapp Business Account ID.",status=500)
             return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
         return HttpResponse("Please enter a whatsapp_business_account_id.",status=500)
     except Exception as e:
