@@ -194,26 +194,29 @@ class Site(models.Model):
     def get_live_whatsapp_phone_numbers(self):
         whatsapp = Whatsapp(self.whatsapp_access_token)  
         for whatsapp_business_account in self.whatsappbusinessaccount_set.all():
-            phone_numbers = whatsapp.get_phone_numbers(whatsapp_business_account.whatsapp_business_account_id).get('data',[])  
-            print("get_live_whatsapp_phone_numbers phone_numbers", str(phone_numbers))
-            whatsapp_number_ids = []
-            if phone_numbers:
-                for number in phone_numbers:
-                    whatsappnumber, created = WhatsappNumber.objects.get_or_create(whatsapp_business_phone_number_id=number['id'])
-                    if not whatsappnumber.company or whatsappnumber.company == self.company and created:
-                        whatsappnumber.number = number['display_phone_number'].replace("+", "").replace(" ", "")
-                        whatsappnumber.quality_rating = number['quality_rating']
-                        whatsappnumber.code_verification_status = number['code_verification_status']
-                        whatsappnumber.verified_name = number['verified_name']
-                        whatsappnumber.company = self.company
-                        # whatsappnumber.site = self
-                        whatsappnumber.whatsapp_business_account = whatsapp_business_account                        
-                        whatsappnumber.save()
-                    whatsapp_number_ids.append(number['id'])
-                if settings.DEBUG:
-                    WhatsappNumber.objects.filter(whatsapp_business_account__site=self).exclude(whatsapp_business_phone_number_id__in=whatsapp_number_ids)
-                else:
-                    WhatsappNumber.objects.filter(whatsapp_business_account__site=self).exclude(whatsapp_business_phone_number_id__in=whatsapp_number_ids).update(archived=True)
+            try:
+                phone_numbers = whatsapp.get_phone_numbers(whatsapp_business_account.whatsapp_business_account_id).get('data',[])  
+                print("get_live_whatsapp_phone_numbers phone_numbers", str(phone_numbers))
+                whatsapp_number_ids = []
+                if phone_numbers:
+                    for number in phone_numbers:
+                        whatsappnumber, created = WhatsappNumber.objects.get_or_create(whatsapp_business_phone_number_id=number['id'])
+                        if not whatsappnumber.company or whatsappnumber.company == self.company and created:
+                            whatsappnumber.number = number['display_phone_number'].replace("+", "").replace(" ", "")
+                            whatsappnumber.quality_rating = number['quality_rating']
+                            whatsappnumber.code_verification_status = number['code_verification_status']
+                            whatsappnumber.verified_name = number['verified_name']
+                            whatsappnumber.company = self.company
+                            # whatsappnumber.site = self
+                            whatsappnumber.whatsapp_business_account = whatsapp_business_account                        
+                            whatsappnumber.save()
+                        whatsapp_number_ids.append(number['id'])
+                    if settings.DEBUG:
+                        WhatsappNumber.objects.filter(whatsapp_business_account__site=self).exclude(whatsapp_business_phone_number_id__in=whatsapp_number_ids)
+                    # else:
+                    #     WhatsappNumber.objects.filter(whatsapp_business_account__site=self).exclude(whatsapp_business_phone_number_id__in=whatsapp_number_ids).update(archived=True)
+            except Exception as e:
+                print("get_live_whatsapp_phone_numbers ERROR: ", str(e))
         return self.return_phone_numbers()
     def return_phone_numbers(self):
         return WhatsappNumber.objects.filter(whatsapp_business_account__site=self, archived=False)
