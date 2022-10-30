@@ -14,7 +14,7 @@
         <div class="col-auto p-0 ps-1 m-1">
             <img src="{% static 'img/blank-profile-picture.png' %}" alt="" width="22" height="22" class="rounded-circle">
         </div>
-        <div class="col p-0 ps-1 m-1 card borderless chat_row_{{message.customer_number}} bg-secondary text-white">
+        <div class="col p-0 ps-1 m-1 card borderless chat_row_{{message.customer_number}} bg-secondary-trans-80 text-white">
             {%if message.message%}
                 {{message.message}}
             {%elif message.image.all%}
@@ -40,7 +40,7 @@
         data-bs-content="
         Sent at <b>{{message.datetime|nice_datetime_tag}}</b><br>
         By <b>{%if message.user.profile.name%}{{message.user.profile.name}}{%else%}Winser Systems{%endif%}</b>">
-            <div class="col p-1 m-1 card borderless chat_row_{{message.customer_number}} right bg-success text-white">
+            <div class="col p-1 m-1 card borderless chat_row_{{message.customer_number}} right bg-success-trans-80 text-white">
                 {%if message.message%}
                     {{message.message}}
                 {%elif message.image.all%}

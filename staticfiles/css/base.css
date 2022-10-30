@@ -290,6 +290,14 @@
         .bg-secondary-trans {
             background-color: rgba(108, 117, 125, 0.6) !important;
         }
+        
+        .bg-success-trans-80 {
+            background-color: rgba(25, 135, 84, 0.8) !important;
+        }
+        .bg-secondary-trans-80 {
+            background-color: rgba(108, 117, 125, 0.8) !important;
+        }
+
         .complete-tr>* {
             background-color: rgba(25, 135, 84, 0.1) !important;
         }
