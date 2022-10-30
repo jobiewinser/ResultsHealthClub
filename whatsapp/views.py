@@ -409,7 +409,7 @@ def whatsapp_number_change_alias(request):
     whatsappnumber = WhatsappNumber.objects.get(pk=request.POST.get('whatsappnumber_pk'))
     if get_user_allowed_to_edit_whatsappnumber(request.user, whatsappnumber):
         alias = request.POST.get('alias', None)
-        if alias or alias = '':
+        if alias or alias == '':
             whatsappnumber.alias = alias
             whatsappnumber.save()
             return HttpResponse("",status=200)
