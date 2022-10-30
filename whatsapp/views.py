@@ -409,11 +409,11 @@ def whatsapp_number_change_alias(request):
     whatsappnumber = WhatsappNumber.objects.get(pk=request.POST.get('whatsappnumber_pk'))
     if get_user_allowed_to_edit_whatsappnumber(request.user, whatsappnumber):
         alias = request.POST.get('alias', None)
-        if alias:
+        if alias or alias = '':
             whatsappnumber.alias = alias
             whatsappnumber.save()
             return HttpResponse("",status=200)
-    return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
+    return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
 @login_required
 def whatsapp_number_make_default(request):
     whatsappnumber = WhatsappNumber.objects.get(pk=request.POST.get('whatsappnumber_pk'))
@@ -423,7 +423,7 @@ def whatsapp_number_make_default(request):
         site.save()
         return render(request, 'core/htmx/site_configuration_htmx.html', {'whatsapp_numbers':site.get_live_whatsapp_phone_numbers(), 'site': site, })
         # 'site_list': get_available_sites_for_user(request.user)})
-    return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
+    return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
     
 
 @login_required
@@ -440,7 +440,7 @@ def whatsapp_template_change_site(request):
                 Campaign.objects.filter(second_send_template=template).update(second_send_template=None)
                 Campaign.objects.filter(third_send_template=template).update(third_send_template=None)
                 return HttpResponse("",status=200)
-    return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
+    return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
 
 @login_required
 def whatsapp_number_change_site(request):
@@ -455,7 +455,7 @@ def whatsapp_number_change_site(request):
                 Site.objects.filter(default_number=whatsappnumber).update(default_number=None)
                 WhatsAppMessage.objects.filter(whatsappnumber=whatsappnumber).update(site=site)
                 return HttpResponse("",status=200)
-    return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
+    return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
 
 @login_required
 def add_phone_number(request):
@@ -468,7 +468,7 @@ def add_phone_number(request):
             whatsapp = Whatsapp(site.whatsapp_access_token)
             whatsapp.create_phone_number(site.whatsapp_business_account_id, country_code, phone_number)
             return HttpResponse("",status=200,headers={'HX-Refresh':True})
-        return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
+        return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
     return HttpResponse("Incorrect values entered, please try again.",status=500)
 
 @login_required
@@ -490,7 +490,7 @@ def add_whatsapp_business_account(request):
                 WhatsappBusinessAccount.objects.create(site=site, whatsapp_business_account_id=whatsapp_business_account_id)
                 whatsapp_numbers = site.get_live_whatsapp_phone_numbers() 
                 return HttpResponse("",status=200,headers={'HX-Refresh':True})
-            return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
+            return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
         return HttpResponse("Please enter a whatsapp_business_account_id.",status=500)
     except Exception as e:
         return HttpResponse("Server Error, please try again later.",status=500)
