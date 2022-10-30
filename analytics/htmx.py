@@ -178,9 +178,19 @@ def get_base_analytics(request):
             opportunities = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, campaign__site=site, created__gte=start_date, created__lt=end_date, campaign__site__in=request.user.profile.sites_allowed.all()).annotate(calls=Count('call'))
         else:
             opportunities = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, created__gte=start_date, created__lt=end_date, campaign__site__in=request.user.profile.sites_allowed.all()).annotate(calls=Count('call'))
+
         live_opportunities = opportunities.filter(complete=False, sold=False)
         closed_opportunities = opportunities.filter(complete=True, sold=True)
         lost_opportunities = opportunities.filter(complete=True, sold=False)
+
+        if campaign:
+            non_time_filtered_opportunities = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, booking = None, campaign=campaign, complete = False, sold = False, campaign__site__in=request.user.profile.sites_allowed.all()).annotate(calls=Count('call'))
+        elif site:
+            non_time_filtered_opportunities = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, booking = None, campaign__site=site, complete = False, sold = False, campaign__site__in=request.user.profile.sites_allowed.all()).annotate(calls=Count('call'))
+        else:
+            non_time_filtered_opportunities = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, booking = None, complete = False, sold = False, campaign__site__in=request.user.profile.sites_allowed.all()).annotate(calls=Count('call'))
+
+        non_time_filtered_live_opportunities = non_time_filtered_opportunities.filter(complete=False, sold=False)
 
         context['opportunities_count'] = opportunities.count()
         context['live_opportunities_count'] = live_opportunities.count()
@@ -217,15 +227,15 @@ def get_base_analytics(request):
         # context['call_distribution'] = 
         index = 0
         call_counts_tuples = []
-        if opportunities.filter(calls__gt=index):
-            while opportunities.filter(calls__gte=index):
-                if opportunities.exclude(calls=index).count():
-                    queryset_conversion_rate = (opportunities.filter(calls=index).count() / opportunities.count())*100
-                elif opportunities.filter(calls=index).count():
+        if non_time_filtered_opportunities.filter(calls__gt=index):
+            while non_time_filtered_opportunities.filter(calls__gte=index):
+                if non_time_filtered_opportunities.exclude(calls=index).count():
+                    queryset_conversion_rate = (non_time_filtered_opportunities.filter(calls=index).count() / non_time_filtered_opportunities.count())*100
+                elif non_time_filtered_opportunities.filter(calls=index).count():
                     queryset_conversion_rate = 100
                 else:
                     queryset_conversion_rate = 0
-                call_counts_tuples.append((index, opportunities.filter(calls=index).count(), live_opportunities.filter(calls=index).aggregate(Sum('campaign__product_cost')), queryset_conversion_rate))
+                call_counts_tuples.append((index, non_time_filtered_opportunities.filter(calls=index).count(), non_time_filtered_live_opportunities.filter(calls=index).aggregate(Sum('campaign__product_cost')), queryset_conversion_rate))
                 index = index + 1
         else:
             pass

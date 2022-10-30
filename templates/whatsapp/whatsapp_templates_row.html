@@ -153,7 +153,7 @@
         "> 
             <i class="fa fa-trash" aria-hidden="true"></i> Delete
     </button>
-    {% comment %} <span
+    <span
         data-bs-toggle="popover" 
         data-bs-trigger="hover" 
         data-bs-html="true" 
@@ -165,7 +165,7 @@
         </p>
         {%if not company_sites_with_same_whatsapp_business_details%}
             <p>
-                This button is disabled because you do not have another site linked to your whatsapp business account.
+                This button is disabled because you do not have another site linked to your Whatsapp Account.
             </p>
         {%endif%}
         ">
@@ -179,6 +179,6 @@
             hx-swap="innerHTML" hx-trigger="click" id="transfer_template_{{template.pk}}"> 
                 <i class="fa fa-arrow-right" aria-hidden="true"></i> Transfer
         </button>
-    </span> {% endcomment %}
+    </span>
 </td>
 {%endwith%}
