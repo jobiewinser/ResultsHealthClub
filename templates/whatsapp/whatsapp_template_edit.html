@@ -43,7 +43,7 @@
                 url:'{%url "whatsapp-template-save"%}',
                 data:{
                     {%block ajax_data%}
-                    'template_pk':{{template.pk}},
+                    'template_pk':'{{template.pk}}',
                     'header':header, 
                     'body':body, 
                     'footer':footer, 

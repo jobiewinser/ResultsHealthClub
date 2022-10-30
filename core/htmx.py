@@ -54,6 +54,10 @@ def get_modal_content(request, **kwargs):
                 profile_pk = request.GET.get('profile_pk', None)
                 if profile_pk:
                     context["profile"] = Profile.objects.get(pk=profile_pk)
+            elif template_name == 'add_phone_number':
+                site_pk = request.GET.get('site_pk', None)
+                if site_pk:
+                    context["site"] = Site.objects.get(pk=site_pk)
             
             return render(request, f"campaign_leads/htmx/{template_name}.html", context)   
     except Exception as e:

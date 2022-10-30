@@ -169,6 +169,7 @@
             </p>
         {%endif%}
         ">
+        {%endif%}
         <button class="btn btn-primary btn-sm m-1" 
             {%if not company_sites_with_same_whatsapp_business_details%}disabled{%endif%}
             hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
@@ -179,6 +180,5 @@
                 <i class="fa fa-arrow-right" aria-hidden="true"></i> Transfer
         </button>
     </span>
-    {%endif%}
 </td>
 {%endwith%}

@@ -64,7 +64,7 @@ def create_campaign_lead(request, **kwargs):
         if not phone:
             return HttpResponse("Please provide a valid Phone Number", status=500)
         
-        country_code = request.POST.get('countryCode')
+        country_code = request.POST.get('country_code')
         if not country_code:
             return HttpResponse("Please provide a Country Code", status=500)
         

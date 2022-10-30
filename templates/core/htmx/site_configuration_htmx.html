@@ -57,11 +57,25 @@
                 <div class="col">
                 </div>
                 <div class="col-md-auto">
+                    {% comment %} <a href="#" class="nowrap btn btn-success btn-sm" type="button" 
+                        hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
+                        hx-vals='{"template_name": "add_phone_number", "site_pk": "{{site.pk}}"}'
+                        hx-get="{% url 'whatsapp-get-modal-content' %}" hx-push-url="false"
+                        hx-swap="innerHTML" hx-trigger="click"><i class="fa-light fa-plus"></i> Add Phone Number to {{site.name}}</a> {% endcomment %}
                     <a href="#" class="nowrap btn btn-success btn-sm" type="button" 
                         hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
-                        hx-vals='{"template_name": "add_user"}'
-                        hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
-                        hx-swap="innerHTML" hx-trigger="click"><i class="fa-light fa-plus"></i> Add Phone Number to {{site.name}}</a>
+                        hx-vals='{"template_name": "add_whatsapp_business_account", "site_pk": "{{site.pk}}"}'
+                        hx-get="{% url 'whatsapp-get-modal-content' %}" hx-push-url="false"
+                        
+                        data-bs-toggle="popover" 
+                        data-bs-trigger="hover" 
+                        data-bs-html="true" 
+                        data-bs-placement="top"
+                        data-bs-title="Errors"
+                        data-bs-content="
+                        You may need to contact Winser Systems about this function
+                        "
+                        hx-swap="innerHTML" hx-trigger="click"><i class="fa-light fa-plus"></i> Add Phone Number to {{site.name}} already on Whatsapp Business Account</a>
                 </div>
                 <div class="col">
                 </div>

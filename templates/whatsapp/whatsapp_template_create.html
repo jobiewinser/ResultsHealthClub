@@ -8,6 +8,7 @@
 'category':$('#template_category').val(), 
 'header':$('#template_header').val(), 
 'body':$('#template_body').val(), 
+'site_pk':'{{site.pk}}', 
 'footer':$('#template_footer').val(), 
 'csrfmiddlewaretoken':'{{ csrf_token }}'
 {%endblock ajax_data%}
