@@ -6,7 +6,8 @@ import json
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from campaign_leads.models import Campaign, Campaignlead, Call
-from core.user_permission_functions import get_available_sites_for_user, get_user_allowed_to_edit_template, get_user_allowed_to_edit_whatsappnumber
+from core.user_permission_functions import get_available_sites_for_user, get_user_allowed_to_edit_site, get_user_allowed_to_edit_template, get_user_allowed_to_edit_whatsappnumber
+from core.views import get_site_pk_from_request
 from messaging.models import Message
 from whatsapp.api import Whatsapp
 from django.views.generic import TemplateView
@@ -357,6 +358,7 @@ class WhatsappTemplatesCreateView(TemplateView):
     def get_context_data(self, **kwargs):
         self.request.GET._mutable = True     
         context = super(WhatsappTemplatesCreateView, self).get_context_data(**kwargs)
+        context['site'] = Site.objects.get(pk=kwargs.get('site_pk'))
         context['variables'] = template_variables
         context['categories'] = {
             "TRANSACTIONAL":"Transactional",
@@ -455,6 +457,33 @@ def whatsapp_number_change_site(request):
                 return HttpResponse("",status=200)
     return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
 
+# @login_required
+# def add_phone_number(request):
+#     site_pk = request.POST.get('site_pk', None)
+#     country_code = request.POST.get('country_code', None)
+#     phone_number = request.POST.get('phone_number', None)
+#     if site_pk and country_code and phone_number:
+#         site = Site.objects.get(pk=site_pk)
+#         if get_user_allowed_to_edit_site(request.user, site):            
+#             whatsapp = Whatsapp(site.whatsapp_access_token)
+#             whatsapp.create_phone_number(site.whatsapp_business_account_id, country_code, phone_number)
+#             return HttpResponse("",status=200,headers={'HX-Refresh':True})
+#         return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
+#     return HttpResponse("Incorrect values entered, please try again.",status=500)
+
+@login_required
+def add_whatsapp_business_account(request):
+    site_pk = request.POST.get('site_pk', None)
+    whatsapp_business_acount_id = request.POST.get('whatsapp_business_acount_id', None)
+    if site_pk and whatsapp_business_acount_id:
+        site = Site.objects.get(pk=site_pk)
+        if get_user_allowed_to_edit_site(request.user, site):            
+            whatsapp = Whatsapp(site.whatsapp_access_token)
+            whatsapp.create_phone_number(site.whatsapp_business_account_id, country_code, phone_number)
+            return HttpResponse("",status=200,headers={'HX-Refresh':True})
+        return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
+    return HttpResponse("Incorrect values entered, please try again.",status=500)
+
 
 @login_required
 def save_whatsapp_template_ajax(request):
@@ -462,10 +491,7 @@ def save_whatsapp_template_ajax(request):
         template = WhatsappTemplate()
         template.pending_name = request.POST.get('name')
         template.pending_category = request.POST.get('category')
-        if request.user.profile.site:
-            template.site = request.user.profile.site
-        else:
-            template.site = request.user.profile.company.site_set.first()
+        template.site = Site.objects.get(pk=request.POST.get('site_pk'))
         template.company = request.user.profile.company
     else:
         template = WhatsappTemplate.objects.get(pk=request.POST.get('template_pk'))
@@ -494,4 +520,3 @@ def save_whatsapp_template_ajax(request):
             template.edited = datetime.now()
             template.save()
     return HttpResponse("", status=200)
-
