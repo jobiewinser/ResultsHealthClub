@@ -179,7 +179,7 @@ def change_profile_role(request):
             context['role_choices'] = ROLE_CHOICES
             # context['site_list'] = get_available_sites_for_user(request.user)
             return render(request, 'core/htmx/company_configuration_row.html', context)
-    return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
+    return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
 @login_required
 def change_profile_site(request):
     profile = Profile.objects.get(pk=request.POST.get('profile_pk'))
@@ -193,7 +193,7 @@ def change_profile_site(request):
             context['role_choices'] = ROLE_CHOICES
             # context['site_list'] = get_available_sites_for_user(request.user)
             return render(request, 'core/htmx/company_configuration_row.html', context)
-    return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
+    return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
 @login_required
 def change_profile_sites_allowed(request):
     profile = Profile.objects.get(pk=request.POST.get('profile_pk'))
@@ -206,7 +206,7 @@ def change_profile_sites_allowed(request):
             context['profile'] = profile
             context['role_choices'] = ROLE_CHOICES
         return render(request, 'core/htmx/company_configuration_row.html', context)
-    return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
+    return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
 
 
 class HomeView(TemplateView):
