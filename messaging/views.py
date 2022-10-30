@@ -66,11 +66,12 @@ def get_messaging_section(request, **kwargs):
         if whatsappnumber_pk:
             if request.user.profile.sites_allowed.filter(pk=whatsappnumber_pk):
                 print("get_messaging_section request.user.profile.sites_allowed.filter(pk=whatsappnumber_pk)", str(request.user.profile.sites_allowed.filter(pk=whatsappnumber_pk)))
-                whatsappnumber = WhatsappNumber.objects.get(pk=whatsappnumber_pk)
-                context['whatsappnumber'] = whatsappnumber
-                context['customer_numbers'] = request.session.get('open_chat_conversation_customer_number', []) 
-                print("get_messaging_section whatsappnumber.pk", str(whatsappnumber.pk))
-                print("get_messaging_section customer_numbers", str(request.session.get('open_chat_conversation_customer_number', []) ))
+                whatsappnumber = WhatsappNumber.objects.filter(pk=whatsappnumber_pk).first()
+                if whatsappnumber:
+                    context['whatsappnumber'] = whatsappnumber
+                    context['customer_numbers'] = request.session.get('open_chat_conversation_customer_number', []) 
+                    print("get_messaging_section whatsappnumber.pk", str(whatsappnumber.pk))
+                    print("get_messaging_section customer_numbers", str(request.session.get('open_chat_conversation_customer_number', []) ))
         return render(request, f"messaging/messaging.html", context)   
     except Exception as e:
         logger.debug("get_messaging_section Error "+str(e))
