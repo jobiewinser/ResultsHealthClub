@@ -211,8 +211,8 @@ class Site(models.Model):
                             whatsappnumber.whatsapp_business_account = whatsapp_business_account                        
                             whatsappnumber.save()
                         whatsapp_number_ids.append(number['id'])
-                    if settings.DEBUG:
-                        WhatsappNumber.objects.filter(whatsapp_business_account__site=self).exclude(whatsapp_business_phone_number_id__in=whatsapp_number_ids)
+                    # if settings.DEBUG:
+                    #     WhatsappNumber.objects.filter(whatsapp_business_account__site=self).exclude(whatsapp_business_phone_number_id__in=whatsapp_number_ids)
                     # else:
                     #     WhatsappNumber.objects.filter(whatsapp_business_account__site=self).exclude(whatsapp_business_phone_number_id__in=whatsapp_number_ids).update(archived=True)
             except Exception as e:
