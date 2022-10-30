@@ -129,6 +129,8 @@ def handle_received_whatsapp_image_message(message_json, metadata, webhook_objec
     site = whatsappnumber.whatsapp_business_account.site
     # site = Site.objects.get(phonenumber=whatsappnumber)
     datetime_from_request = datetime.fromtimestamp(int(message_json.get('timestamp')))
+    if settings.DEBUG:
+        datetime_from_request = datetime.now()
     whatsapp = Whatsapp(site.whatsapp_access_token)
     media_id = message_json.get('image').get('id')
     from django.core.files import File
@@ -212,6 +214,8 @@ def handle_received_whatsapp_text_message(message_json, metadata, webhook_object
     site = whatsappnumber.whatsapp_business_account.site
     # site = Site.objects.get(phonenumber=whatsappnumber)
     datetime_from_request = datetime.fromtimestamp(int(message_json.get('timestamp')))
+    if settings.DEBUG:
+        datetime_from_request = datetime.now()
     whatsapp_message = WhatsAppMessage.objects.create(
         wamid=wamid,
         type='text',
