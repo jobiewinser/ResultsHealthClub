@@ -96,6 +96,15 @@ class WhatsappNumber(PhoneNumber):
     def active_errors_for_customer_number(self, customer_number):        
         from core.models import AttachedError
         return AttachedError.objects.filter(whatsapp_number=self, customer_number=customer_number).filter(archived=False)
+    
+    def outstanding_whatsapp_messages(self, user):
+        # Readdress this, I can't find a good way to get latest message for each conversation, then filter based on the last message being inbound...
+        count = 0
+        if self.whatsapp_business_account.site in user.profile.sites_allowed.all():
+            for message in  WhatsAppMessage.objects.filter(whatsappnumber=self).order_by('customer_number', '-datetime').distinct('customer_number'):
+                if message.inbound:
+                    count = count + 1
+        return count
 
     @property
     def is_whatsapp(self):

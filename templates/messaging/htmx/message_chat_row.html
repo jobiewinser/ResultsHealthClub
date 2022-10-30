@@ -19,12 +19,12 @@
                 {{message.message}}
             {%elif message.image.all%}
                 {% for image in message.image.all%}
-                <img type="button" class="pointer"
+                <img type="button" class="pointer m-1"
                     hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
                     hx-vals='{"template_name": "view_message_image", "whatsapp_message_image_pk": "{{image.pk}}"}'
                     hx-get="{% url 'messaging-get-modal-content' %}" hx-push-url="false"
-                    hx-swap="innerHTML" hx-trigger="click"
-                height="100" src="{{image.thumbnail}}" alt="Image Message" />
+                    hx-swap="innerHTML" hx-trigger="click" style="height:100px;width:100px;"
+                    src="{{image.thumbnail}}" alt="Image Message" />
                 {%endfor%}
             {%endif%}
         </div>
@@ -45,12 +45,12 @@
                     {{message.message}}
                 {%elif message.image.all%}
                     {% for image in message.image.all%}
-                    <img type="button" class="pointer"
+                    <img type="button" class="pointer m-1"
                         hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
                         hx-vals='{"template_name": "view_message_image", "whatsapp_message_image_pk": "{{image.pk}}"}'
                         hx-get="{% url 'messaging-get-modal-content' %}" hx-push-url="false"
-                        hx-swap="innerHTML" hx-trigger="click"
-                    height="100" src="{{image.thumbnail}}" alt="Image Message" />
+                        hx-swap="innerHTML" hx-trigger="click" style="height:100px;width:100px;"
+                        src="{{image.thumbnail}}" alt="Image Message" />
                     {%endfor%}
                 {%endif%}
             </div>
