@@ -43,7 +43,7 @@ def get_allowed_site_chats_for_user(user):
 def get_allowed_number_chats_for_user(site, user):
     #TODO
     # return Site.objects.filter(pk__in=[user.profile.site.pk])
-    return WhatsappNumber.objects.filter(site=site, archived=False)
+    return WhatsappNumber.objects.filter(whatsapp_business_account__site=site, archived=False)
 
 def get_user_allowed_to_edit_other_user(request_user, other_user):
     if request_user == other_user:

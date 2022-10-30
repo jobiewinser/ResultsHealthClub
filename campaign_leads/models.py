@@ -84,14 +84,14 @@ class Campaignlead(models.Model):
     assigned_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     @property
     def is_last_whatsapp_message_inbound(self):        
-        message = WhatsAppMessage.objects.filter(customer_number=self.whatsapp_number, whatsappnumber__site=self.campaign.site).last()
+        message = WhatsAppMessage.objects.filter(customer_number=self.whatsapp_number, whatsappnumber__whatsapp_business_account__site=self.campaign.site).last()
         if message:
             return message.inbound
         return False
     @property
     def active_errors(self):        
         from core.models import AttachedError
-        return AttachedError.objects.filter(Q(campaign_lead=self)|Q(customer_number=self.whatsapp_number, whatsapp_number__site=self.campaign.site)).filter(archived=False)
+        return AttachedError.objects.filter(Q(campaign_lead=self)|Q(customer_number=self.whatsapp_number, whatsapp_number__whatsapp_business_account__site=self.campaign.site)).filter(archived=False)
     @property
     def active_bookings(self):        
         return self.booking_set.exclude(archived=True)

@@ -16,7 +16,7 @@ from django.template import loader
 logger = logging.getLogger(__name__)
 from django.views import View 
 from django.utils.decorators import method_decorator
-from core.models import ErrorModel, Site, WhatsappNumber
+from core.models import ErrorModel, Site, WhatsappBusinessAccount, WhatsappNumber
 from random import randrange
 from django.contrib.auth.decorators import login_required
 
@@ -457,25 +457,12 @@ def whatsapp_number_change_site(request):
                 return HttpResponse("",status=200)
     return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
 
-# @login_required
-# def add_phone_number(request):
-#     site_pk = request.POST.get('site_pk', None)
-#     country_code = request.POST.get('country_code', None)
-#     phone_number = request.POST.get('phone_number', None)
-#     if site_pk and country_code and phone_number:
-#         site = Site.objects.get(pk=site_pk)
-#         if get_user_allowed_to_edit_site(request.user, site):            
-#             whatsapp = Whatsapp(site.whatsapp_access_token)
-#             whatsapp.create_phone_number(site.whatsapp_business_account_id, country_code, phone_number)
-#             return HttpResponse("",status=200,headers={'HX-Refresh':True})
-#         return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
-#     return HttpResponse("Incorrect values entered, please try again.",status=500)
-
 @login_required
-def add_whatsapp_business_account(request):
+def add_phone_number(request):
     site_pk = request.POST.get('site_pk', None)
-    whatsapp_business_acount_id = request.POST.get('whatsapp_business_acount_id', None)
-    if site_pk and whatsapp_business_acount_id:
+    country_code = request.POST.get('country_code', None)
+    phone_number = request.POST.get('phone_number', None)
+    if site_pk and country_code and phone_number:
         site = Site.objects.get(pk=site_pk)
         if get_user_allowed_to_edit_site(request.user, site):            
             whatsapp = Whatsapp(site.whatsapp_access_token)
@@ -484,6 +471,29 @@ def add_whatsapp_business_account(request):
         return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
     return HttpResponse("Incorrect values entered, please try again.",status=500)
 
+@login_required
+def add_whatsapp_business_account(request):
+    try:
+        site_pk = request.POST.get('site_pk', None)
+        whatsapp_business_account_id = request.POST.get('whatsapp_business_account_id', None)
+        if site_pk and whatsapp_business_account_id:
+            site = Site.objects.get(pk=site_pk)
+            if get_user_allowed_to_edit_site(request.user, site):         
+                whatsapp_business_account = WhatsappBusinessAccount.objects.filter(whatsapp_business_account_id=whatsapp_business_account_id).first()
+                if whatsapp_business_account:
+                    if whatsapp_business_account.site == site:
+                        return HttpResponse(f"This Whatsapp Business Account already belongs to this Site: {site.name}.",status=500)
+                    elif whatsapp_business_account.site:
+                        return HttpResponse(f"This Whatsapp Business Account already belongs to another Site, please contact Winser Systems.",status=500)
+                    else:
+                        whatsapp_business_account.delete()
+                WhatsappBusinessAccount.objects.create(site=site, whatsapp_business_account_id=whatsapp_business_account_id)
+                whatsapp_numbers = site.get_live_whatsapp_phone_numbers() 
+                return HttpResponse("",status=200,headers={'HX-Refresh':True})
+            return HttpResponse("You are not ellowed to edit this, please contact your manager.",status=500)
+        return HttpResponse("Please enter a whatsapp_business_account_id.",status=500)
+    except Exception as e:
+        return HttpResponse("Server Error, please try again later.",status=500)
 
 @login_required
 def save_whatsapp_template_ajax(request):

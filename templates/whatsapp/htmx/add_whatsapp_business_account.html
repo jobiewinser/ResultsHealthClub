@@ -2,7 +2,7 @@
 <span>
     <div class="row">
         <div class="col">
-            <input name="whatsapp_business_acount_id" id="whatsapp_business_acount_id" class="form-control whatsapp_business_acount_input" placeholder="Whatapp Business Account ID"/>
+            <input name="whatsapp_business_account_id" id="whatsapp_business_account_id" class="form-control whatsapp_business_account_input" placeholder="Whatapp Business Account ID"/>
         </div>
     </div> 
     <br>
@@ -10,13 +10,13 @@
         <div class="col center" >
             <button class="btn btn-primary" type="button"
                 hx-encoding="multipart/form-data" hx-vals='{"site_pk":"{{site.pk}}"}'
-                hx-post="{% url 'add-whatsapp-business-account' %}" hx-include=".whatsapp_business_acount_input" hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
+                hx-post="{% url 'add-whatsapp-business-account' %}" hx-include=".whatsapp_business_account_input" hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
                 hx-swap="innerHTML">
-                Add Phone Number
+                Add Whatsapp Business Account ID
             </button>
         </div>
     </div>
 </span>
 <span hx-swap-oob="true" id="generic_modal_title">
-    Add Phone Number to {{site.name}}
+    Add Phone Whatsapp Business Account ID {{site.name}}
 </span>

@@ -144,13 +144,13 @@ class WhatsappTemplate(models.Model):
     @property
     def active_errors(self):
         return self.errors.filter(archived=False)
-    @property
-    def company_sites_with_same_whatsapp_business_details(self):
-        try:
-            from core.models import Site
-            return Site.objects.filter(company=self.site.company, whatsapp_business_account_id=self.site.whatsapp_business_account_id).exclude(pk=self.site.pk)
-        except Exception as e:
-            return Site.objects.none()
+    # @property
+    # def company_sites_with_same_whatsapp_business_details(self):
+    #     try:
+    #         from core.models import Site
+    #         return Site.objects.filter(company=self.site.company, whatsapp_business_account_id=self.site.whatsapp_business_account_id).exclude(pk=self.site.pk)
+    #     except Exception as e:
+    #         return Site.objects.none()
     @property
     def site_name(self):
         if self.site:

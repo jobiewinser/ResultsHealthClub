@@ -36,7 +36,7 @@ urlpatterns = [
       
     path('configuration/whatsapp-change-template-site/', whatsappviews.whatsapp_template_change_site, name='whatsapp-change-template-site'),    
     path('configuration/whatsapp-change-number-site/', whatsappviews.whatsapp_number_change_site, name='whatsapp-change-number-site'),      
-    # path('configuration/add-phone-number/', whatsappviews.add_phone_number, name='add-phone-number'),      
+    path('configuration/add-phone-number/', whatsappviews.add_phone_number, name='add-phone-number'),      
     path('configuration/add-whatsapp-business-account/', whatsappviews.add_whatsapp_business_account, name='add-whatsapp-business-account'),    
 
     path('whatsapp-get-modal-content/', whatsapphtmx.get_modal_content, name='whatsapp-get-modal-content' ),

@@ -329,6 +329,7 @@ class Whatsapp():
             "cc": cc, 
             "phone_number": filtered_number,
             "migrate_phone_number": str(migrate_phone_number).lower(), 
+            "access_token": self.whatsapp_access_token, 
         }
         response = requests.post(url=url, json=body, headers=headers)
         response_body = response.json()

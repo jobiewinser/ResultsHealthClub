@@ -32,8 +32,8 @@ def get_modal_content(request, **kwargs):
             template_name = request.GET.get('template_name', '')
             if template_name == 'add_phone_number':
                 site_pk = request.GET.get('site_pk', None)
-                if site_pk:
-                    context["site"] = Site.objects.get(pk=site_pk)
+            if site_pk:
+                context["site"] = Site.objects.get(pk=site_pk)
             
             return render(request, f"whatsapp/htmx/{template_name}.html", context)   
     except Exception as e:
