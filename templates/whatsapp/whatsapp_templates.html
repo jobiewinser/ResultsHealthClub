@@ -2,8 +2,6 @@
 {%load static%}
 {%block scripts%}
 {{block.super}}
-<link href="{% static 'css/datatables.css' %}" rel="stylesheet" />
-<script src="{% static 'js/datatables.js' %}"></script> 
 <script>
     $(document).ready(function() {
         document.title = "Whatsapp Templates";
@@ -60,8 +58,6 @@
 </div>     
 {%endblock extra_top_right_buttons %}
 
-{%block content%}       
-<div id="content">
+{%block content%}  
 {%include 'whatsapp/whatsapp_templates_content.html'%}
-</div>
 {%endblock content%}

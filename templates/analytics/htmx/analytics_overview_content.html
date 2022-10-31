@@ -1,5 +1,4 @@
 {%load static%}
-<div id="content">
     <button hidden id="refresh_base_analytics" hx-trigger="load, click delay:0.5s"
         hx-get="{%url 'get-base-analytics' %}"
         hx-include="#start_date, #end_date, #site_pk, #campaign_pk"
@@ -63,4 +62,3 @@
             </div>
         </div>
     </div> 
-</div> 

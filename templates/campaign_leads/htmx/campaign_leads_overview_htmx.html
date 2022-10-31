@@ -1,0 +1,62 @@
+{%load static core_tags%}
+<span>    
+    <div class="row  mt-2">
+        {%block extra_top_left_buttons %}
+        <div class="col-md-auto">
+            <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>          
+        </div>
+        {%include 'core/htmx/site_selection.html'%}
+        <button hidden hx-get="{{request.path}}" hx-push-url="false" hx-swap="outerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator=".htmx-indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
+        <button hidden
+            hx-get="{{request.path}}" 
+            hx-swap="outerHTML" hx-push-url="false" hx-include=".overview_table_filters" hx-indicator=".htmx-indicator" hx-target="#content" id="filter_campaign" class="btn btn-primary btn-sm"></button>
+        {% comment %} <button hidden hx-get="{% url 'get-campaign'%}" hx-include=".overview_table_filters" id="refresh_campaign_list_span" hx-indicator=".htmx-indicator" hx-target="#campaign_list_span" hx-trigger="click" hx-swap="outerHTML"></button> {% endcomment %}
+        <div class="col-md-auto me-2" hx-get="{% url 'get-campaign'%}" hx-include=".overview_table_filters" hx-trigger="load" hx-indicator=".htmx-indicator" hx-target="#campaign_list_span" hx-swap="outerHTML">
+            <span id="campaign_list_span">   
+                <select class="form-select">
+                    <option>Loading</option>
+                </select>    
+            </span>
+        </div>
+            
+        <input type="text" style="display:None" id="add_booking" name="template_name" value="add_booking"/>
+        <div class="col-md-auto me-2">
+            <button class="btn btn-primary btn-sm" 
+                data-bs-toggle="popover" 
+                data-bs-trigger="hover" 
+                data-bs-placement="top"
+                data-bs-content="Manually create a campaign lead."
+                hx-indicator=".htmx-indicator" hx-target="#generic_modal_body" 
+                hx-include="#site_pk"
+                hx-get="{% url 'campaign-lead-get-modal-content' %}" 
+                hx-push-url="false"
+                hx-vals='{"template_name": "create_campaign_lead"}'
+                hx-swap="innerHTML" hx-trigger="click">
+                    <i class="fa fa-plus" aria-hidden="true"></i> Manually Add Campaign Lead
+            </button>
+        </div>
+        {%endblock extra_top_left_buttons %}
+
+        <div class="col">
+        </div>
+
+        {%block extra_top_right_buttons %}
+        <div class="col-md-auto">
+            <span class="badge bg-dark text-white"><h6 class="m-1">Campaign Leads</h6></span>               
+        </div>
+        {%endblock extra_top_right_buttons %}
+    </div>
+    <div class="row ">
+        <div class="col" style=""> 
+        {%include 'campaign_leads/htmx/leads_board.html' %}
+        </div>
+    </div>
+    <div id="add_booking_area" class="" ondrop="drop_booking(event)" ondragover="allowDrop(event)">
+        
+        <div class="card-body center text-white">
+            <h3>Add Booking
+                <i class="fa-duotone fa-calendar-days"></i>
+            </h3>
+        </div>
+    </div>
+<span>

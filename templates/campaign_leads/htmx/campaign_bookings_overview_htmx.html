@@ -1,0 +1,45 @@
+{%load static core_tags%}
+<span>    
+    <div class="row  mt-2">
+        {%block extra_top_left_buttons %}
+        <div class="col-md-auto me-2">
+            <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>             
+        </div>
+        {%include 'core/htmx/site_selection.html'%}
+        <div class="col-md-auto me-2" id="campaign_list_div">
+            <span id="campaign_list_span" hx-get="{% url 'get-campaign'%}" hx-include=".overview_table_filters" hx-trigger="load" hx-indicator=".top-htmx-indicator" hx-target="#campaign_list_span" hx-swap="outerHTML">   
+                <select class="form-select">
+                    <option>Loading</option>
+                </select>    
+            </span>
+        </div>
+        <button hidden hx-get="{% url 'get-campaign'%}" hx-include=".overview_table_filters" id="refresh_campaign_list_span" hx-indicator=".top-htmx-indicator" hx-target="#campaign_list_div" hx-trigger="click" hx-swap="innerHTML"></button>
+        <button hidden hx-get="{% url 'campaign-booking-overview'%}" hx-include=".overview_table_filters" id="refresh_overview_table" hx-indicator=".top-htmx-indicator" hx-target="#overview_table_wrapper" hx-trigger="click" hx-swap="outerHTML"></button>
+        <button hidden hx-get="{% url 'campaign-booking-overview' %}" hx-push-url="false" hx-swap="outerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator=".top-htmx-indicator" hx-target="#overview_table_wrapper" id="change_site" class="btn btn-primary btn-sm"></button>
+        <button hidden
+            hx-get="{{request.path}}" 
+            hx-swap="outerHTML" hx-push-url="false" hx-include=".overview_table_filters" hx-indicator=".top-htmx-indicator" hx-target="#overview_table_wrapper" id="filter_campaign" class="btn btn-primary btn-sm"></button>
+        {%endblock extra_top_left_buttons %}
+
+        <div class="col">
+        </div>
+
+        {%block extra_top_right_buttons %}
+        {%include 'campaign_leads/htmx/campaign_bookings_table_status_toggle_div.html'%}
+        <div class="col-md-auto">
+        <span class="badge bg-dark text-white"><h6 class="m-1">Booking Table</h6></span>           
+        </div>
+        {%endblock extra_top_right_buttons %}
+    </div>
+    <span hx-swap-oob="true" id="site_pk_span">   
+        <input type="text" style="display:None" id="site_pk" name="site_pk" value="{{request|get_key_in_get_or_post:'site_pk'}}"/>
+    </span>
+    <input type="text" style="display:None" id="call_history" name="template_name" value="call_history"/>
+    <input type="text" style="display:None" id="booking_history" name="template_name" value="booking_history"/>
+    <input type="text" style="display:None" id="note_history" name="template_name" value="note_history"/>
+
+    <input type="text" style="display:None" id="add_booking" name="template_name" value="add_booking"/>
+    <input type="text" style="display:None" id="pause_whatsapp" name="template_name" value="pause_whatsapp"/>
+
+    {% include 'campaign_leads/htmx/campaign_bookings_table.html' %}
+<span>

@@ -3,8 +3,6 @@
 {%block scripts%}
 {{block.super}}
 <link href="{% static 'css/phone.css' %}" rel="stylesheet" />
-<link href="{% static 'css/datatables.css' %}" rel="stylesheet" />
-<script src="{% static 'js/datatables.js' %}"></script> 
 <script>
     let variables = {{variables|safe}}
     function renderTemplate(){
