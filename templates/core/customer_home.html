@@ -13,112 +13,25 @@
 {%if user.is_authenticated%}
 <div class="row">
     <div class="col-md center">
-        <h3>Apps</h3>
+        <h3>Home</h3>
     </div>
 </div>
 
-<div class="row card mt-4 pb-4">
-    <div class="col p-0">
-        <div class="row">
-            <div class="col-md center m-3">
-                <h4>Core</h4>
-            </div>
-        </div>
-        
-        <div class="row">
+<div class="row mt-4 pb-4">
             <div class="col">
             </div>
-            <div class="col-md-2">
+            <div class="col-md-2 card p-2 m-2">
                 <div class="card pointer" onclick="window.location.replace('{%url 'whatsapp-templates'%}')">
                     <div class="card-header center">
-                        <a>Whatsapp Templates</a>
+                        <p>I will add some stuff here</p>
                     </div>
                     <div class="card-body center p-0">
-                        <img src="{% static 'img/app_pictures/whatsapp_templates_2.png' %}" class="app_picture">
+                        <h1><i class="fa-regular fa-dumbbell"></i></h1>
                     </div>
                 </div>
             </div> 
-            <div class="col-md-2">
-                <div class="card pointer" onclick="window.location.replace('{%url 'company-configuration'%}')">
-                    <div class="card-header center">
-                        <a>Company Configuration</a>
-                    </div>
-                    <div class="card-body center">
-                        <h1><i class="fa-regular fa-gear"></i></h1>
-                    </div>
-                </div>
-            </div>  
-            <div class="col-md-2">
-                <div class="card pointer" onclick="window.location.replace('{%url 'site-configuration'%}')">
-                    <div class="card-header center">
-                        <a>Site Configuration</a>
-                    </div>
-                    <div class="card-body center">
-                        <h1><i class="fa-regular fa-gear"></i></h1>
-                    </div>
-                </div>
-            </div>  
             <div class="col">
-            </div>      
-        </div>
-    </div>
-</div>
-
-<div class="row card mt-4 pb-4">
-    <div class="row">
-        <div class="col-md center m-3">
-            <h4>Campaign Leads Management</h4>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col">
-        </div>
-        <div class="col-md-2">
-            <div class="card pointer" onclick="window.location.replace('{%url 'campaign-leads-overview'%}')">
-                <div class="card-header center">
-                    <a>Campaign leads</a>
-                </div>
-                <div class="card-body center p-0">
-                    <img src="{% static 'img/app_pictures/campaign_leads_2.png' %}" class="app_picture">
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-2">
-            <div class="card pointer" onclick="window.location.replace('{%url 'campaign-booking-overview'%}')">
-                <div class="card-header center">
-                    <a>Booking Table</a>
-                </div>
-                <div class="card-body center">
-                    <h1><i class="fa-regular fa-table"></i></h1>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-2">
-            <div class="card pointer" onclick="window.location.replace('{%url 'analytics-overview'%}')">
-                <div class="card-header center">
-                    <a>Analytics</a>
-                </div>
-                <div class="card-body center">
-                    <h1><i class="fa-regular fa-chart-line-up"></i></h1>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-2">
-            <div class="card pointer" onclick="window.location.replace('{%url 'campaign-configuration'%}')">
-                <div class="card-header center">
-                    <a>Campaign Configuration</a>
-                </div>
-                <div class="card-body center">
-                    <h1><i class="fa-regular fa-gear"></i></h1>
-                </div>
-            </div>
-        </div>
-        <div class="col">
-        </div>
-    </div>
+            </div> 
 </div>
 {%else%}
 <div class="row">
