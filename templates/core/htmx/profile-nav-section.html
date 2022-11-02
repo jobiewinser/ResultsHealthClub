@@ -2,28 +2,23 @@
 <ul class="navbar-nav ms-auto mb-2 mb-lg-0"  style="height:5vh">
     {%if request.user.is_authenticated%} 
     <li class="nav-item dropstart bg-dark">
-        <a class="nav-link dropdown-toggle text-white p-0" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <a class="nav-link dropdown-toggle text-white p-0 pointer" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             <img src="{%if user.profile.avatar%}/media/{{user.profile.avatar}}{%else%}{% static 'img/blank-profile-picture.png' %}{%endif%}" alt="" style="width:5vh; height:5vh;" class="rounded-circle me-2">
             <strong style="font-size:1.5vh">{{user.profile}}</strong>
         </a>
         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <li><a class="dropdown-item" href="#"
+            <li><a class="dropdown-item pointer"
                 hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
                 hx-vals='{"template_name": "edit_user", "user_pk":"{{request.user.pk}}"}'
                 hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
                 hx-swap="innerHTML" hx-trigger="click">Edit Profile</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item " href="/accounts/logout/">Sign out</a></li>
+            <li><a class="dropdown-item" href="/accounts/logout/">Sign out</a></li>
         </ul>
     </li>
     {%else%}
-    {% comment %} <a href="#" class="d-flex align-items-center text-white text-decoration-none"
-        hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" hx-vals='{"template_name": "login"}'
-        hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
-        hx-swap="innerHTML" hx-trigger="click"><strong>Login<span class="hide_small">/Register</span></strong>    
-    </a> {% endcomment %}
     <li class="nav-item ">
-        <a class="nav-link text-white" href="#" 
+        <a class="nav-link text-white pointer"
             hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" hx-vals='{"template_name": "login"}'
             hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
             hx-swap="innerHTML" hx-trigger="click">
@@ -32,6 +27,3 @@
     </li>
     {%endif%}
 </ul>
-{% comment %} <span id="csrf_token_div">
-    <input type="text" style="display:None" id="csrf_token" name="csrf_token" value="{{csrf_token}}"/>
-</span> {% endcomment %}

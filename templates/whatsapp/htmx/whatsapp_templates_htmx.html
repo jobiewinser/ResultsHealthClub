@@ -1,5 +1,23 @@
-
-    <div class="">
+<span>
+    <div class="row mt-2">
+        {%block extra_top_left_buttons %}
+        <div class="col-md-auto">
+            {% comment %} <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>              {% endcomment %}
+        </div>
+        {%with True as hide_show_all%}
+        {%include 'core/htmx/site_selection.html'%}
+        <button hidden hx-get="" hx-push-url="false" hx-swap="innerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator=".htmx-indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
+        {%endwith%}    
+        {%endblock extra_top_left_buttons %}
+        <div class="col">
+        </div>
+        {%block extra_top_right_buttons %}
+        <div class="col-md-auto">
+            <span class="badge bg-dark text-white"><h6 class="m-1">Whatsapp Templates</h6></span>          
+        </div>     
+        {%endblock extra_top_right_buttons %}    
+    </div>   
+    <div class="row mt-2">
         <div class="col m-3 alert alert-warning">
             <p>Message templates in an Aproved state can be edited up to 10 times in a 30 day window, or 1 time in a 24 hour window.</p>
             <p class="m-0">Messages in Rejected or Paused states can be edited an unlimited number of times.</p>
@@ -60,3 +78,4 @@
             </table>
         </div>
     </div>
+</span>

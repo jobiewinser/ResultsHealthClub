@@ -1,15 +1,73 @@
 {%load static%}
+<span id="analytics_span_wrapper">
     <button hidden id="refresh_base_analytics" hx-trigger="load, click delay:0.5s"
-        hx-get="{%url 'get-base-analytics' %}"
-        hx-include="#start_date, #end_date, #site_pk, #campaign_pk"
-        hx-target="#base_analytics_wrapper"
-        hx-indicator=".htmx-indicator-base-analytics"
-        hx-swap="innerHTML"
-        onclick="$('.htmx-indicator-base-analytics').addClass('htmx-request')">refresh</button>
-    <span id="base_analytics_wrapper">
-        {%include 'analytics/htmx/base_analytics.html'%}
-    </span>
-
+            hx-get="{%url 'get-base-analytics' %}"
+            hx-include="#start_date, #end_date, #site_pk, #campaign_pk"
+            hx-target="#base_analytics_span_wrapper"
+            hx-indicator=".htmx-indicator-base-analytics"
+            hx-swap="innerHTML"
+            onclick="$('.htmx-indicator-base-analytics').addClass('htmx-request')">refresh</button>
+    {%include 'analytics/htmx/base_analytics.html'%}    
+    
+    <div class="row my-3">
+        <div class="col">
+            <div class="card p-2">
+                <div class="row">
+                    <div class="col-md-auto">
+                        <h5 data-bs-toggle="popover" 
+                        data-bs-trigger="hover" 
+                        data-bs-placement="top"
+                        data-bs-html="true"
+                        data-bs-content="This shows ...">Conversion Rate <i class="fa-solid fa-circle-info"></i></h5> 
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-auto">
+                        <span class="secondary_td_layer">{{start_date}} - {{end_date}}</span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col center">
+                        <h1>{{conversion_rate|floatformat:2}}%</h1>
+                    </div>
+                </div>            
+            </div> 
+        </div>
+                
+        <div class="col-md-auto center">
+            <img  class="htmx-indicator htmx-indicator-base-analytics" id="" src="https://htmx.org/img/bars.svg"/>
+        </div>
+        <div class="col">
+            <div class="card p-2">
+                <div class="row">
+                    <div class="col-md-auto">
+                        <h5 data-bs-toggle="popover" 
+                        data-bs-trigger="hover" 
+                        data-bs-placement="top"
+                        data-bs-html="true"
+                        data-bs-content="This shows ...">Current Call Count Distribution <i class="fa-solid fa-circle-info"></i></h5> 
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col">
+                    </div>
+                    <div class="col-md-auto" style="text-align:left">
+                        {%for call_count_tuple in call_counts_tuples%}
+                        <div class="row">
+                            <div class="col-md-auto" style="text-align:left">
+                                <small>Call {{call_count_tuple.0}} ({{call_count_tuple.1}}) - £{{call_count_tuple.2.campaign__product_cost__sum|floatformat:2}} ({{call_count_tuple.3|floatformat:2}}%)</small>
+                            </div>
+                        </div>
+                        {%endfor%}
+                    </div>
+                    <div class="col">
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div> 
     <div class="row my-3">
         <div class="col">
             <div class="card p-2">
@@ -62,3 +120,4 @@
             </div>
         </div>
     </div> 
+</span>

@@ -19,16 +19,21 @@ class AnalyticsOverviewView(TemplateView):
 
     def get_context_data(self, **kwargs):
         self.request.GET._mutable = True     
-        context = super(AnalyticsOverviewView, self).get_context_data(**kwargs)       
-        context['campaigns'] = get_campaign_qs(self.request)
+        context = super(AnalyticsOverviewView, self).get_context_data(**kwargs)     
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
-            self.template_name = 'analytics/htmx/analytics_overview_content.html'
-        site_pk = get_site_pk_from_request(self.request)
-        if site_pk and not site_pk == 'all':
-            self.request.GET['site_pk'] = site_pk 
-            context['site'] = Site.objects.get(pk=site_pk)
-
-
-        # context['site_list'] = get_available_sites_for_user(self.request.user)
+            self.template_name = 'analytics/htmx/analytics_overview_htmx.html'
+        context.update(get_analytics_context(self.request))
         return context
 
+def get_analytics_context(request):
+    request.GET._mutable = True 
+    context = {}     
+    context['campaigns'] = get_campaign_qs(request)
+    site_pk = get_site_pk_from_request(request)
+    if site_pk and not site_pk == 'all':
+        request.GET['site_pk'] = site_pk 
+        context['site'] = Site.objects.get(pk=site_pk)
+    return context
+
+def refresh_analytics(request):
+    return render(request, 'analytics/htmx/analytics_content.html', get_analytics_context(request))

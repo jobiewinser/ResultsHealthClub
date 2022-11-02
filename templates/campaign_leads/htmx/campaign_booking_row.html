@@ -36,7 +36,7 @@
                             </span>
                     </button>
                 {%endif%}
-                <span style="text-decoration: none; color: #25d366" class="nowrap" target="_blank" href="#"><i class="fa fa-whatsapp" aria-hidden="true"></i> {{lead.whatsapp_number}}</span>
+                <span style="text-decoration: none; color: #25d366" class="nowrap pointer" target="_blank"><i class="fa fa-whatsapp" aria-hidden="true"></i> {{lead.whatsapp_number}}</span>
         </span>        
     </td>
     <td class="nowrap">
@@ -89,42 +89,7 @@
     </td>
     
     <td class="double_layer_td">       
-        <span class="primary_td_layer">     
-
-            
-            {% comment %} <div class="btn-group btn-space btn-space-with-history mb-1">
-                <a class="btn btn-secondary btn-sm" type="button"
-                    data-bs-toggle="popover" 
-                    data-bs-trigger="hover" 
-                    data-bs-placement="top"
-                    data-bs-content="Open Whatsapp for this lead"
-                    target="_blank" href="#"><i class="fa fa-whatsapp" aria-hidden="true"></i></a>
-                <button class="btn btn-secondary btn-sm" type="button"
-                    data-bs-toggle="popover" 
-                    data-bs-trigger="hover" 
-                    data-bs-placement="top"
-                    data-bs-content="See call history for this lead."
-                    hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
-                    hx-vals='{"template_name": "call_history"}'
-                    hx-get="{% url 'campaign-lead-get-modal-content' param1=lead.pk %}" 
-                    hx-push-url="false"
-                    hx-swap="innerHTML" hx-trigger="click"><i class="fa-regular fa-clock-rotate-left" ></i> <span style="color:Silver">{{lead.call_set.all.count}}</span></button>
-            </div> {% endcomment %}
-
-            
-            {% comment %} <div class="btn-group btn-space btn-space-with-history mb-1">
-                <button class="btn btn-secondary btn-sm" type="button"
-                    data-bs-toggle="popover" 
-                    data-bs-trigger="hover" 
-                    data-bs-placement="top"
-                    data-bs-content="See call history for this lead."
-                    hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
-                    hx-vals='{"template_name": "call_history"}'
-                    hx-get="{% url 'campaign-lead-get-modal-content' param1=lead.pk %}" 
-                    hx-push-url="false"
-                    hx-swap="innerHTML" hx-trigger="click"><i class="fa-regular fa-clock-rotate-left" ></i> <span style="color:Silver">{{lead.call_set.all.count}}</span></button>
-            </div> {% endcomment %}
-
+        <span class="primary_td_layer">  
             <div class="btn-group btn-space btn-space-with-history mb-1">
                 <button class="btn btn-secondary btn-sm" type="button"
                     data-bs-toggle="popover" 
@@ -147,10 +112,6 @@
                     hx-push-url="false"
                     hx-swap="innerHTML" hx-trigger="click"><i class="fa-regular fa-clock-rotate-left" ></i> <span style="color:Silver">{{lead.booking_set.all.count}}</span></button>
             </div>
-
-            
-
-
         </span>
         <br>
         <span class="secondary_td_layer">     

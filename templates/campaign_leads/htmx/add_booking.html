@@ -33,7 +33,7 @@
     </div>
     <div class="row m-2">
         <div class="col center" id="calendly_id" style="">
-            <a class="btn btn-primary" href="#"
+            <a class="btn btn-primary pointer"
                         hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
                         hx-vals='{"template_name": "edit_user", "user_pk":"{{request.user.pk}}"}'
                         hx-get="{% url 'get-modal-content' %}" hx-push-url="false"

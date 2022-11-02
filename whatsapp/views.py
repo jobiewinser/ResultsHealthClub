@@ -283,7 +283,7 @@ class WhatsappTemplatesView(TemplateView):
         self.request.GET._mutable = True     
         context = super(WhatsappTemplatesView, self).get_context_data(**kwargs)
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
-            self.template_name = 'whatsapp/whatsapp_templates_content.html'   
+            self.template_name = 'whatsapp/htmx/whatsapp_templates_htmx.html'   
         site_pk = self.request.GET.get('site_pk')
         site = None
         if site_pk:

@@ -12,7 +12,7 @@
             }
         });
         document.body.addEventListener('htmx:afterSwap', function(evt) {   
-            if (evt.detail.target.id == 'overview_table_wrapper'){
+            if (evt.detail.target.id == 'overview_table_span_wrapper'){
                 initDataTable(); 
             }
                         

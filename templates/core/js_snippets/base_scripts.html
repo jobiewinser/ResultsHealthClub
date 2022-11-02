@@ -1,0 +1,65 @@
+{%load static core_tags%}
+<script>
+    let dt = null;
+    $(document).ready(function() {
+        $("[data-bs-toggle=popover]").popover();
+        document.body.addEventListener('htmx:afterRequest', function(evt) {   
+            if (evt.detail.target.id == 'generic_modal_body'){
+                $('#generic_modal').modal('show');
+            }
+            if (![undefined, ''].includes(evt.detail.pathInfo.path)){
+                if (evt.detail.pathInfo.path.includes("modify-user")){
+                    $('#generic_modal').modal('hide');
+                    snackbarShow('Successfully modifed/added user', 'success')
+                }
+            }
+            if (evt.detail.xhr.status == 200){
+            } else {
+                snackbarShow(evt.detail.xhr.responseText, 'danger')
+            }
+            $('.popover').remove()
+            $('[data-bs-toggle=popover]').popover();
+            $('[data-bs-toggle=popover_delay]').popover({
+                delay: { 
+                   show: "350", 
+                   hide: "100"
+                }
+            });
+        });     
+        
+        document.body.addEventListener('htmx:afterRequest', function(evt) {                          
+            let status = evt.detail.xhr.status;
+            let srcElement = $(evt.srcElement);
+            let src_id = srcElement.attr('id');
+            if(status == 200) {
+                if (![undefined, ''].includes(evt.detail.pathInfo.path)){
+                    if (evt.detail.pathInfo.path.includes("login")){
+                        window.location.replace("/");
+                    }
+                }
+                if (![undefined, ''].includes(evt.detail.pathInfo.requestPath)){
+                    if (evt.detail.pathInfo.requestPath.includes("login-htmx")){
+                        snackbarShow('Successfully logged in', 'success');
+                        location.reload();
+                    }else if (evt.detail.pathInfo.requestPath.includes("modify-user")){
+                        snackbarShow('Successfully logged in', 'success');
+                        location.reload();
+                    }
+                }
+            } else if (status == 404) {
+                if ($('#'+src_id+"_error").length == 0){                                
+                    $("#"+src_id).after("<div id='"+src_id+"_error' style='color:red'>Not Found</div>");
+                } else {                                
+                    $('#'+src_id+"_error").html("<div id='"+src_id+"_error' style='color:red'>Not Found</div>");
+                }
+            }else if (status == 500){
+                snackbarShow('Error: '+evt.detail.xhr.response, 'danger')           
+            }
+        });                    
+        
+
+        document.body.addEventListener('htmx:configRequest', function(evt) {    
+            evt.detail.headers['x-csrftoken'] = '{{csrf_token}}';
+        });
+    });
+</script>

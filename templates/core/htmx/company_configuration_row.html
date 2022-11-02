@@ -70,14 +70,14 @@
 </td>
 <td>   
     {%if not profile.role == 'a' or profile == request.user.profile%}
-        <a href="#" class="nowrap btn btn-light" type="button" 
+        <a class="nowrap btn btn-light pointer" type="button" 
             hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
             hx-vals='{"template_name": "edit_user", "user_pk": "{{profile.user.pk}}"}'
             hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
             hx-swap="innerHTML" hx-trigger="click"><i class="fa-light fa-gear"></i> Config</a>
     {%endif%}
     {%if not profile.role == 'a'%}
-    <a href="#" class="nowrap btn btn-light" type="button"
+    <a class="nowrap btn btn-light pointer" type="button"
         hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
         hx-vals='{"template_name": "edit_permissions", "profile_pk": "{{profile.pk}}"}'
         hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
