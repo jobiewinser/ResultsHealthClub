@@ -20,18 +20,13 @@ align-items: flex-start;"
                     if ($('#chat_card_'+phone_number).length > 0){
                         evt.preventDefault()
                     } else {
-                        add_chat_conversation_to_session(whatsappnumber_pk, phone_number)
+                        {% comment %} add_chat_conversation_to_session(whatsappnumber_pk, phone_number) {% endcomment %}
                     }
                 }
             });
-            
         })
-        
-        
-        
-        
-        
     </script>
+
     <link href="{% static 'css/chat.css' %}" rel="stylesheet" />
         <span id="next_chat_window"></span>
 

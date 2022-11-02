@@ -27,11 +27,15 @@
             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.0/font/bootstrap-icons.css" />
            {%endblock cdn%}
         {%include 'core/js_snippets/base_scripts.html'%}
-        {%include 'core/js_snippets/leads_scripts.html'%}
-        {%include 'core/js_snippets/booking_scripts.html'%}
-        {%include 'core/js_snippets/analytics_scripts.html'%}
-        {%include 'core/js_snippets/company_configuration_scripts.html'%}
-        {%include 'core/js_snippets/whatsapp_templates_scripts.html'%}
+        
+        <link href="{% static 'css/drag_drop.css' %}" rel="stylesheet" />
+        <script src="{% static 'js/drag_drop.js' %}"></script> 
+
+        <script src="{% static 'js/modules/leads.js' %}"></script>
+        <script src="{% static 'js/modules/booking.js' %}"></script>
+        <script src="{% static 'js/modules/analytics.js' %}"></script>
+        <script src="{% static 'js/modules/company_configuration.js' %}"></script>
+        <script src="{% static 'js/modules/whatsapp_templates.js' %}"></script>
         <script src="{% static 'js/modules/whatsapp_template_edit.js' %}"></script>
         
         <audio id="notification1" src="{% static 'audio/notification1.wav' %}" preload="auto"></audio>

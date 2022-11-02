@@ -2,6 +2,25 @@
 {%load static tz core_tags%}
 
 <span>    
+    <script>
+        $(document).ready(function() {
+            document.title = "Company Config";
+            document.body.addEventListener('htmx:afterRequest', function(evt) {  
+                if (evt.detail.xhr.status == 500){
+                    $('.reset_on_error').each(function() {
+                        if (![undefined, ''].includes((this).data('value'))){
+                            $(this).data('value')
+                            $(this).val($(this).data('value'));
+                        }
+                    });
+                };
+                
+            });
+            document.body.addEventListener('htmx:afterSwap', function(evt) {              
+            });
+        });
+    </script>
+    
     <div class="row mt-0">
         {%block extra_top_left_buttons %}
         <div class="col-md-auto">

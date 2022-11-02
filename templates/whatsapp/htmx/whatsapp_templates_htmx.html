@@ -1,4 +1,27 @@
 <span>
+    <script>
+        $(document).ready(function() {
+            document.title = "Whatsapp Templates";
+            $("[data-bs-toggle=popover]").popover();
+            document.body.addEventListener('htmx:afterRequest', function(evt) {  
+                if (evt.detail.xhr.status == 200){
+                    if (evt.detail.pathInfo.requestPath.includes('whatsapp-change-template-site')){
+                        $('#generic_modal').modal('hide');
+                        snackbarShow('Successfully transferred template', 'success')
+                    }else if (evt.detail.pathInfo.requestPath.includes('whatsapp-approval')){
+                        location.reload();
+                    }
+                }
+            });
+            {% comment %} initDataTable(); {% endcomment %}
+            document.body.addEventListener('htmx:afterSwap', function(evt) {  
+                $("[data-bs-toggle=popover]").popover();
+                {% comment %} initDataTable(); {% endcomment %}
+            });  
+        });
+        let SearchTerm = ""
+    </script>
+    
     <div class="row mt-0">
         {%block extra_top_left_buttons %}
         {% comment %} <div class="col-md-auto">

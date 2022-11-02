@@ -21,7 +21,7 @@ function clear_chat_from_session(customer_number){
     var respStatus = $.ajax({
         type:'POST',
         url:'{%url "clear-chat-from-session"%}',
-        data:{'customer_number':customer_number, 'csrfmiddlewaretoken':'{{ csrf_token }}'},
+        data:{'customer_number':customer_number, 'csrfmiddlewaretoken':csrftoken},
         success: function (data) {
         },
         error: function(XMLHttpRequest, textStatus, errorThrown) {
@@ -33,7 +33,7 @@ function add_chat_conversation_to_session(whatsappnumber_pk, customer_number){
         var respStatus = $.ajax({
             type:'POST',
             url:'{%url "add-chat-conversation-to-session"%}',
-            data:{'whatsappnumber_pk':whatsappnumber_pk, 'customer_number':customer_number, 'csrfmiddlewaretoken':'{{ csrf_token }}'},
+            data:{'whatsappnumber_pk':whatsappnumber_pk, 'customer_number':customer_number, 'csrfmiddlewaretoken':csrftoken},
             success: function (data) {
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
@@ -45,7 +45,7 @@ function add_chat_whatsapp_number_to_session(whatsapp_number){
     var respStatus = $.ajax({
         type:'POST',
         url:'{%url "add-chat-whatsapp-number-to-session"%}',
-        data:{'whatsapp_number':whatsapp_number, 'csrfmiddlewaretoken':'{{ csrf_token }}'},
+        data:{'whatsapp_number':whatsapp_number, 'csrfmiddlewaretoken':csrftoken},
         success: function (data) {
         },
         error: function(XMLHttpRequest, textStatus, errorThrown) {

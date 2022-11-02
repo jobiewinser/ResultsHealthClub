@@ -1,5 +1,57 @@
 {%load static core_tags%}
 <span>    
+    <script>
+        document.title = "Booking Table";
+        $(document).ready(function() {  
+            initDataTable();
+            document.body.addEventListener('htmx:beforeRequest', function(evt) {  
+                if (![undefined, ''].includes(evt.detail.pathInfo.path) && ![undefined, ''].includes(evt.detail.target.id)){
+                    if (evt.detail.target.id == 'overview_table' || evt.detail.pathInfo.path.includes("campaign-booking-overview")){
+                        $("#overview_table").dataTable().fnDestroy();
+                    }
+                }
+            });
+            document.body.addEventListener('htmx:afterSwap', function(evt) {   
+                if (evt.detail.target.id == 'overview_table_span_wrapper'){
+                    initDataTable(); 
+                }
+                            
+                {% comment %} if (evt.detail.target.classList.contains('campaign_booking_row')) {
+                    $('#refresh_overview_table').click(); 
+                } {% endcomment %}
+    
+    
+                if (evt.detail.xhr.status == 200){
+                    if (![undefined, ''].includes(evt.detail.pathInfo.path)){
+                        if (evt.detail.pathInfo.path.includes("mark-done")){
+                            snackbarShow('Successfully marked lead as done', 'success')
+                        } else if (evt.detail.pathInfo.path.includes("add-booking")){
+                            $('#generic_modal').modal('hide');
+                            snackbarShow('Successfully added a booking', 'success')
+                        } else if (evt.detail.pathInfo.path.includes("create-campaign-lead")){
+                            $('#refresh_overview_table').click(); 
+                            $('#generic_modal').modal('hide');
+                            snackbarShow('Successfully manually created a campaign lead', 'success')
+                        } else if (evt.detail.pathInfo.path.includes("mark-arrived")){
+                            $('#generic_modal').modal('hide');
+                            snackbarShow('Successfully marked that the customer arrived as booking', 'success')
+                        } else if (evt.detail.pathInfo.path.includes("mark-sold")){
+                            $('#generic_modal').modal('hide');
+                            snackbarShow('Successfully sold to customer', 'success')
+                        } else if (evt.detail.pathInfo.path.includes("campaign-booking-overview")){
+                            $('#refresh_campaign_list_span').click(); 
+                            snackbarShow('Successfully refreshed table', 'success')
+                        }                
+                    }                
+                }
+                if ($('#noteTable')){
+                    
+                }
+                $('[data-bs-toggle=popover]').popover();
+            });
+        });        
+    </script>
+    
     <div class="row mt-0">
         {%block extra_top_left_buttons %}
         {% comment %} <div class="col-md-auto me-2">
