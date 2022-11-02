@@ -3,6 +3,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <html>
     <head>
+        <script>
+            var csrftoken = '{{ csrf_token }}';
+        </script>
         <link rel="shortcut icon" type="image/png" href="{% static 'img/logo-dark-back-img.png' %}"/>
         {%block cdn%}
             <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" />
@@ -29,7 +32,8 @@
         {%include 'core/js_snippets/analytics_scripts.html'%}
         {%include 'core/js_snippets/company_configuration_scripts.html'%}
         {%include 'core/js_snippets/whatsapp_templates_scripts.html'%}
-        {%include 'core/js_snippets/whatsapp_template_edit_scripts.html'%}
+        <script src="{% static 'js/modules/whatsapp_template_edit.js' %}"></script>
+        
         <audio id="notification1" src="{% static 'audio/notification1.wav' %}" preload="auto"></audio>
         <audio id="notification2" src="{% static 'audio/notification2.mp3' %}" preload="auto"></audio>
 

@@ -1,6 +1,13 @@
 {%load core_tags%}
 {%load static tz core_tags%}
 <span>    
+    <script>
+        $(document).ready(function() {  
+            console.log("$(document).ready")
+            $("[data-bs-toggle=popover]").popover();
+            {% comment %} renderTemplate() {% endcomment %}
+        });
+    </script>
     <div class="row mt-2">
         {%block extra_top_left_buttons %}
         <div class="col-md-auto">

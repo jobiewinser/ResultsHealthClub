@@ -12,8 +12,13 @@ body {
 }
 
 .htmx-indicator {
+    visibility: hidden;
     opacity: 0;
     transition: opacity 500ms ease-in;
+}
+
+.htmx-indicator.htmx-request {
+    visibility: visible;
 }
 
 #page_load_indicator {

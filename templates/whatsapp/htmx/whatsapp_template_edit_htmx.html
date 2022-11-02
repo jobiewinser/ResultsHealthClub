@@ -1,5 +1,14 @@
 {%load static%}
 <span>
+    <script>
+        let variables = {{variables|safe}}  
+        $(document).ready(function() {  
+            $("[data-bs-toggle=popover]").popover();
+            renderTemplate()
+        });
+    </script>
+    <link href="{% static 'css/phone.css' %}" rel="stylesheet" />
+
     <div class="row mt-2">
         {%block extra_top_left_buttons %}
         <div class="col-md-auto">
@@ -120,7 +129,7 @@
                 <div class="col center">                    
                     {%block submit_button%}
                     <button {%if readonly%}disabled{%endif%} class="btn template_save_button btn-success m-3"
-                        onclick="saveTemplate()"
+                        onclick="saveTemplate('{{site.pk}}', '{{template.pk}}')"
                         data-bs-toggle="popover" 
                         data-bs-trigger="hover" 
                         data-bs-placement="top"

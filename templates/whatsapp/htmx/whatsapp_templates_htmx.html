@@ -30,10 +30,11 @@
 
     <div class="row mt-2">
         <div class="col-md-auto">
-            <button class="btn btn-success btn-sm me-2"
-            onclick="window.location.href = '{%url 'whatsapp-template-create' site_pk=site.pk%}'">
+            <a class="btn btn-success btn-sm me-2 pointer" 
+            hx-indicator="#page_load_indicator"
+            hx-get="{%url 'whatsapp-template-create' site_pk=site.pk%}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML">
                 <i class="fa fa-plus" aria-hidden="true"></i> Add Template
-            </button>            
+            </a>            
         </div>
     </div>
     <div class="row mt-2 card p-2">

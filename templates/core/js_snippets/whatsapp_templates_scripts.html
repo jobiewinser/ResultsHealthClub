@@ -20,7 +20,7 @@
         });  
     });
     let SearchTerm = ""
-    function initDataTable() {
+    {% comment %} function initDataTable() {
         try{$("#overview_table").dataTable().fnDestroy();}catch{}
 
         dt = $('#overview_table').DataTable(          
@@ -36,5 +36,5 @@
         searchInput.on('input', function (e) {
             SearchTerm = searchInput.val()
         });
-    }
+    } {% endcomment %}
 </script>
