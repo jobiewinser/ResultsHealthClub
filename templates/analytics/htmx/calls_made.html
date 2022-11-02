@@ -3,14 +3,14 @@
 
 <div class="row">
     <div class="col">
-        <div class="" id="lead_to_sales_chart_wrapper">
+        <div class="" id="calls_made_chart_wrapper">
         </div>
     </div>
     <div class="col">
         <div class="row">
             
             <div class="col center">
-                <img  class="htmx-indicator invert" id="htmx-indicator-leads-and-sales" src="https://htmx.org/img/bars.svg"/>
+                <img  class="htmx-indicator invert" id="htmx-indicator-calls-made" src="https://htmx.org/img/bars.svg"/>
             </div>
 
             <div class="col-md-auto right">
@@ -21,7 +21,7 @@
     
                     <div class="col-md-auto p-0">
                         <div class="form-check form-switch">
-                            <input class="form-check-input" name="graph_type" checked type="checkbox" id="graph_type_leads_to_sale" onchange="$('#refresh_lead_to_sales').click()">
+                            <input class="form-check-input" name="graph_type" checked type="checkbox" id="graph_type_calls_made" onchange="$('#refresh_calls_made').click()">
                         </div>
                     </div>
     
@@ -31,7 +31,7 @@
                 </div>
             </div>
         </div>
-        {% comment %} <span id="lead_to_sales_table_wrapper">            
+        {% comment %} <span id="calls_made_table_wrapper">            
         </span> {% endcomment %}
     </div>
 </div>

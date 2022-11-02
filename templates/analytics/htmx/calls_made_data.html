@@ -1,27 +1,20 @@
 {%load core_tags%}
 <span>
-<canvas height="100" width="100%" id="leads_to_sales_chart" ></canvas>
+<canvas height="100" width="100%" id="calls_made_chart" ></canvas>
 </span>
 
 <script>
     $(document).ready(function() {
-        leads_to_sales_chart_var = document.getElementById('leads_to_sales_chart');
-        leads_to_sales_chart = new Chart(leads_to_sales_chart_var, {
+        calls_made_chart_var = document.getElementById('calls_made_chart');
+        calls_made_chart = new Chart(calls_made_chart_var, {
             type: '{%if graph_type%}{{graph_type}}{%else%}bar{%endif%}',
             data: {
                 labels: [{%for label in time_label_set%}'{{label    }}'{% if not forloop.last %},{%endif%}{%endfor%}],
                 datasets: [{
-                    label: 'Leads',
-                    data: [{%for data_entry in data_set%}{{data_entry.leads}}{% if not forloop.last %},{%endif%}{%endfor%}],
+                    label: 'Calls',
+                    data: [{%for data_entry in data_set%}{{data_entry.total_calls}}{% if not forloop.last %},{%endif%}{%endfor%}],
                     backgroundColor: 'rgba(180, 180, 180, 0.35)',
                     borderColor: 'rgba(180, 180, 180, 0.7)',
-                    fill: true,
-                    borderWidth: 1
-                }, {
-                    label: 'Sales',
-                    data: [{%for data_entry in data_set%}{{data_entry.sales}}{% if not forloop.last %},{%endif%}{%endfor%}],
-                    backgroundColor: [{%for data_entry in data_set%}'{{data_entry.percentage|percentage_to_colour:0.35}}'{% if not forloop.last %},{%endif%}{%endfor%}],
-                    borderColor: [{%for data_entry in data_set%}'{{data_entry.percentage|percentage_to_colour:0.7}}'{% if not forloop.last %},{%endif%}{%endfor%}],
                     fill: true,
                     borderWidth: 1
                 }]

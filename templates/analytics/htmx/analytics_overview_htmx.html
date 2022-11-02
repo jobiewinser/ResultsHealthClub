@@ -3,13 +3,21 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
         document.title = "Analytics";
-        
-        let leads_to_sales_chart_var = null;
-        let leads_to_sales_chart = null;
-
-        let leads_to_booking_chart_var = null;
-        let leads_to_bookings_chart = null;
         $(document).ready(function() {
+        
+            var leads_to_sales_chart_var = null;
+            var leads_to_sales_chart = null;
+    
+            var leads_to_booking_chart_var = null;
+            var leads_to_bookings_chart = null;
+    
+            var calls_made_chart_var = null;
+            var calls_made_chart = null;
+            try{
+                leads_to_sales_chart.destroy();
+                leads_to_bookings_chart.destroy();
+                calls_made_chart.destroy();
+            }catch{}
             document.body.addEventListener('htmx:afterSwap', function(evt) {
                 if (![undefined, ''].includes(evt.detail.pathInfo.requestPath) && ![undefined, ''].includes(evt.detail.target.id)){
                     if (evt.detail.pathInfo.requestPath.includes("refresh-analytics")){
@@ -49,7 +57,7 @@
         </div>
         
         <div class="col center">
-            <img  class="htmx-indicator" id="htmx-indicator-leads-and-bookings" src="https://htmx.org/img/bars.svg"/>
+            <img  class="htmx-indicator invert" id="htmx-indicator-leads-and-bookings" src="https://htmx.org/img/bars.svg"/>
         </div>
         <button hidden
             hx-get="{% url 'refresh-analytics' %}" 

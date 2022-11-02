@@ -22,9 +22,8 @@ def message_list(request, **kwargs):
     if whatsappnumber_pk:
         whatsappnumber = WhatsappNumber.objects.get(pk=whatsappnumber_pk)
     else:
-        customer_number = request.GET.get('customer_number')
-        whatsappnumbers = site.phonenumber_set.all()
-        latest_message = WhatsAppMessage.objects.filter(customer_number=customer_number, whatsappnumber__in=whatsappnumbers).order_by('datetime').last()
+        customer_number = request.GET.get('customer_number')        
+        latest_message = WhatsAppMessage.objects.filter(customer_number=customer_number, whatsappnumber__whatsapp_business_account__site=site).order_by('datetime').last()
         if latest_message:
             whatsappnumber = latest_message.whatsappnumber
     if whatsappnumber:

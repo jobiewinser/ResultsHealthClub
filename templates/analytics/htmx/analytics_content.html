@@ -16,26 +16,25 @@
                     <div class="col-md-auto">
                         <h5 data-bs-toggle="popover" 
                         data-bs-trigger="hover" 
-                        data-bs-placement="top"
+                        data-bs-placement="right"
                         data-bs-html="true"
-                        data-bs-content="This shows ...">Conversion Rate <i class="fa-solid fa-circle-info"></i></h5> 
+                        data-bs-content="This shows the amount of calls made today since midnight (filtered by site and campaign above).">Calls Today <i class="fa-solid fa-circle-info"></i></h5> 
+                        <img  class="htmx-indicator invert htmx-indicator-base-analytics" id="" src="https://htmx.org/img/bars.svg"/>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-auto">
-                        <span class="secondary_td_layer">{{start_date}} - {{end_date}}</span>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col center">
-                        <h1>{{conversion_rate|floatformat:2}}%</h1>
-                    </div>
-                </div>            
-            </div> 
-        </div>
                 
-        <div class="col-md-auto center">
-            <img  class="htmx-indicator htmx-indicator-base-analytics" id="" src="https://htmx.org/img/bars.svg"/>
+                <div class="row">
+                    <div class="col">
+                    </div>
+                    <div class="col-md-auto" style="text-align:left">
+                        <span id="lead_to_bookings_table_wrapper">            
+                        </span>
+                    </div>
+                    <div class="col">
+                    </div>
+                </div>
+                
+            </div>
         </div>
         <div class="col">
             <div class="card p-2">
@@ -43,9 +42,10 @@
                     <div class="col-md-auto">
                         <h5 data-bs-toggle="popover" 
                         data-bs-trigger="hover" 
-                        data-bs-placement="top"
+                        data-bs-placement="right"
                         data-bs-html="true"
-                        data-bs-content="This shows ...">Current Call Count Distribution <i class="fa-solid fa-circle-info"></i></h5> 
+                        data-bs-content="This shows the <b>current</b> distribution of leads in each call count column on the <b>Leads</b> page (filtered by site and campaign above).">Current Call Count Distribution <i class="fa-solid fa-circle-info"></i></h5> 
+                        <img  class="htmx-indicator invert htmx-indicator-base-analytics" id="" src="https://htmx.org/img/bars.svg"/>
                     </div>
                 </div>
                 
@@ -75,9 +75,9 @@
                     <div class="col-md-auto">
                         <h5 data-bs-toggle="popover" 
                         data-bs-trigger="hover" 
-                        data-bs-placement="top"
+                        data-bs-placement="right"
                         data-bs-html="true"
-                        data-bs-content="This shows the analytics for Leads and Sales for the chosen site (top left), between the times chosen (right).<br><br><small> (Jobie Note: Need to add gradient on percentage and time scale based table i.e 3 months shows individual weeks instead) </small>">Leads & Sales <i class="fa-solid fa-circle-info"></i></h5> 
+                        data-bs-content="This shows the analytics for Leads and Sales for the chosen site and/or campaign (top left), between the times chosen (right).">Leads & Sales Per Day <i class="fa-solid fa-circle-info"></i></h5> 
                     </div>
                 </div>
 
@@ -93,17 +93,16 @@
                 </div>
             </div>
         </div>
-    </div> 
-    <div class="row my-3">
+        
         <div class="col">
             <div class="card p-2">
                 <div class="row">
                     <div class="col-md-auto">
                         <h5 data-bs-toggle="popover" 
                         data-bs-trigger="hover" 
-                        data-bs-placement="top"
+                        data-bs-placement="right"
                         data-bs-html="true"
-                        data-bs-content="This shows the analytics for Leads and Bookings for the chosen site (top left), between the times chosen (right).<br><br><small> (Jobie Note: Need to add gradient on percentage and time scale based table i.e 3 months shows individual weeks instead) </small>">Leads & Bookings <i class="fa-solid fa-circle-info"></i></h5> 
+                        data-bs-content="This shows the analytics for Leads and Bookings for the chosen site (top left), between the times chosen (right).">Leads & Bookings <i class="fa-solid fa-circle-info"></i></h5> 
                     </div>
                 </div>
 
@@ -116,6 +115,31 @@
                         hx-swap="innerHTML"
                         onclick="$('#htmx-indicator-leads-and-bookings').addClass('htmx-request')">refresh</button>
                     {%include 'analytics/htmx/leads_to_booking.html'%}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col">
+            <div class="card p-2">
+                <div class="row">
+                    <div class="col-md-auto">
+                        <h5 data-bs-toggle="popover" 
+                        data-bs-trigger="hover" 
+                        data-bs-placement="right"
+                        data-bs-html="true"
+                        data-bs-content="This shows the number of calls made per day for the chosen site and/or campaign (top left), between the times chosen (right).">Calls Made Per Day <i class="fa-solid fa-circle-info"></i></h5> 
+                    </div>
+                </div>
+
+                <div class="col">
+                    <button hidden id="refresh_calls_made" hx-trigger="load, click delay:0.5s"
+                        hx-get="{%url 'get-calls-made' %}"
+                        hx-include="#start_date, #end_date, #site_pk, #campaign_pk, #graph_type_calls_made"
+                        hx-target="#calls_made_chart_wrapper"
+                        hx-indicator="#htmx-indicator-calls-made"
+                        hx-swap="innerHTML"
+                        onclick="$('#htmx-indicator-calls-made').addClass('htmx-request')">refresh</button>
+                    {%include 'analytics/htmx/calls_made.html'%}
                 </div>
             </div>
         </div>

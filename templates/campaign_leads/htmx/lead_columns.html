@@ -3,7 +3,7 @@
 {%with call_count|division_percentage_max_100:max_call_count as call_percentage%}
 <div class="column-done">
     <div class="m-2 manually_add_lead_div">
-    <h2 class="m-0">{{queryset_title}} <img  class="htmx-indicator column-htmx-indicator" src="https://htmx.org/img/bars.svg"/></h2> 
+    <h2 class="m-0">{{queryset_title}} <img  class="htmx-indicator invert column-htmx-indicator" src="https://htmx.org/img/bars.svg"/></h2> 
     {%with call_count as counter%}
     {%include 'campaign_leads/htmx/column_metadata.html'%}
     {%endwith%}

@@ -8,9 +8,10 @@
                     <div class="col-md-auto">
                         <h5 data-bs-toggle="popover" 
                         data-bs-trigger="hover" 
-                        data-bs-placement="top"
+                        data-bs-placement="right"
                         data-bs-html="true"
-                        data-bs-content="This shows ...">Opportunities <i class="fa-solid fa-circle-info"></i></h5> 
+                        data-bs-content="This shows the number of leads <b>created</b> between the shown dates that were successfully marked as sold, still live or closed without being sold (filtered by site and campaign above).">Opportunities <i class="fa-solid fa-circle-info"></i></h5> 
+                        <img  class="htmx-indicator invert htmx-indicator-base-analytics" src="https://htmx.org/img/bars.svg"/>
                     </div>
                 </div>
                 <div class="row">
@@ -48,19 +49,17 @@
                     </div>
                 </div>
             </div> 
-        </div>            
-        <div class="col-md-auto center">
-            <img  class="htmx-indicator htmx-indicator-base-analytics" src="https://htmx.org/img/bars.svg"/>
-        </div>
+        </div>  
         <div class="col">
             <div class="card p-2">
                 <div class="row">
                     <div class="col-md-auto">
                         <h5 data-bs-toggle="popover" 
                         data-bs-trigger="hover" 
-                        data-bs-placement="top"
+                        data-bs-placement="right"
                         data-bs-html="true"
-                        data-bs-content="This shows ...">Pipeline Value <i class="fa-solid fa-circle-info"></i></h5> 
+                        data-bs-content="This shows the potential monetary value of leads <b>created</b> between the shown dates that were successfully marked as sold, still live or closed without being sold (filtered by site and campaign above).">Pipeline Value <i class="fa-solid fa-circle-info"></i></h5> 
+                        <img  class="htmx-indicator invert htmx-indicator-base-analytics" src="https://htmx.org/img/bars.svg"/>
                     </div>
                 </div>
                 <div class="row">
@@ -97,6 +96,30 @@
                         £{{lost_value|floatformat:2}}
                     </div>
                 </div>
+            </div> 
+        </div>
+        <div class="col">
+            <div class="card p-2">
+                <div class="row">
+                    <div class="col-md-auto">
+                        <h5 data-bs-toggle="popover" 
+                        data-bs-trigger="hover" 
+                        data-bs-placement="right"
+                        data-bs-html="true"
+                        data-bs-content="This shows the percentage of leads <b>created</b> between the shown dates that were successfully marked as sold (filtered by site and campaign above).">Conversion Rate <i class="fa-solid fa-circle-info"></i></h5> 
+                        <img  class="htmx-indicator invert htmx-indicator-base-analytics" src="https://htmx.org/img/bars.svg"/>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-auto">
+                        <span class="secondary_td_layer">{{start_date}} - {{end_date}}</span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col center">
+                        <h1>{{conversion_rate|floatformat:2}}%</h1>
+                    </div>
+                </div>            
             </div> 
         </div>
     </div> 

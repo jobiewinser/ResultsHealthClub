@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 
-from campaign_leads.models import Campaign, Campaignlead
+from campaign_leads.models import Call, Campaign, Campaignlead
 from core.models import Site
 from dateutil import relativedelta
 
@@ -16,7 +16,7 @@ def get_sales_to_leads_between_dates_with_timeframe_differences(start_date, end_
         time_label_set = []
         data_set = []
         while index_date < end_date + timeframe:
-            qs = Campaignlead.objects.filter(campaign__site__company=user.profile.company, created__gte=index_date, created__lt=index_date + timeframe, campaign__site__in=user.profile.sites_allowed.all())
+            qs = Campaignlead.objects.filter(created__gte=index_date, created__lt=index_date + timeframe)
             if campaign:
                 qs = qs.filter(campaign=campaign)
             elif site:
@@ -50,7 +50,7 @@ def get_bookings_to_leads_between_dates_with_timeframe_differences(start_date, e
         time_label_set = []
         data_set = []
         while index_date < end_date + timeframe:
-            qs = Campaignlead.objects.filter(campaign__site__company=user.profile.company, created__gte=index_date, created__lt=index_date + timeframe, campaign__site__in=user.profile.sites_allowed.all())
+            qs = Campaignlead.objects.filter(created__gte=index_date, created__lt=index_date + timeframe)
             if campaign:
                 qs = qs.filter(campaign=campaign)
             elif site:
@@ -77,6 +77,41 @@ def get_bookings_to_leads_between_dates_with_timeframe_differences(start_date, e
             index_date = index_date + timeframe
         return data_set, time_label_set    
     return [],[]
+    
+def get_calls_made_per_day(start_date, end_date, user, campaign=None, site=None, get_user_totals=False):
+    if start_date + relativedelta.relativedelta(years=3) > end_date:
+        index_date = start_date
+        time_label_set = []
+        data_set = []
+        
+        while index_date < end_date + relativedelta.relativedelta(days=1):
+            qs = Call.objects.filter(created__gte=index_date, created__lt=index_date + relativedelta.relativedelta(days=1))
+            if campaign:
+                qs = qs.filter(lead__campaign=campaign)
+            elif site:
+                qs = qs.filter(lead__campaign__site=site)
+                
+            unique_callers = qs.order_by('user').values('user').distinct()
+            if get_user_totals:
+                user_calls_list = []
+                for user in unique_callers:
+                    user_calls_list.append({
+                        'user':user,
+                        'calls':qs.filter(user=user).count()
+                    })
+                data_set.append({
+                    'total_calls':qs.count(),
+                    'user_calls_list':user_calls_list
+                })
+            else:
+                data_set.append({
+                    'total_calls':qs.count(),
+                })
+            time_label_set.append(f"{index_date}")
+            index_date = index_date + relativedelta.relativedelta(days=1)
+        return data_set, time_label_set    
+    return [],[]
+
 @login_required
 def get_leads_to_sales(request):
     context = {}
@@ -154,6 +189,33 @@ def get_leads_to_bookings(request):
     else:
         context['graph_type'] = 'line'
     return render(request, 'analytics/htmx/leads_to_booking_data.html', context)
+
+@login_required
+def get_calls_made(request):
+    context = {}
+    campaign_pk = request.GET.get('campaign_pk', None)
+    if campaign_pk:
+        campaign = Campaign.objects.get(pk=campaign_pk)
+        site = campaign.site
+    else:
+        site_pk = request.GET.get('site_pk', 'all')
+        campaign = None
+        if not site_pk == 'all':
+            site = Site.objects.get(pk=site_pk)
+        else:
+            site = None
+    start_date = datetime.strptime(request.GET.get('start_date'), '%Y-%m-%d')
+    end_date = datetime.strptime(request.GET.get('end_date'), '%Y-%m-%d') + relativedelta.relativedelta(days=1)   
+    
+    data_set, time_label_set = get_calls_made_per_day(start_date, end_date, request.user, campaign=campaign, site=site)
+        
+    context['data_set'] = data_set
+    context['time_label_set'] = time_label_set
+    if request.GET.get('graph_type', 'off') == 'on':
+        context['graph_type'] = 'bar'
+    else:
+        context['graph_type'] = 'line'
+    return render(request, 'analytics/htmx/calls_made_data.html', context)
 
 @login_required
 def get_base_analytics(request):

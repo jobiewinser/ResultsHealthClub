@@ -21,6 +21,7 @@ urlpatterns = [
     path('refresh-analytics/', analyticviews.refresh_analytics, name='refresh-analytics'),
     path('get-leads-to-sales/', analyticshtmx.get_leads_to_sales, name='get-leads-to-sales' ),
     path('get-leads-to-bookings/', analyticshtmx.get_leads_to_bookings, name='get-leads-to-bookings' ),
+    path('get-calls-made/', analyticshtmx.get_calls_made, name='get-calls-made' ),
     path('get-base-analytics/', analyticshtmx.get_base_analytics, name='get-base-analytics' ),
     
 ]
