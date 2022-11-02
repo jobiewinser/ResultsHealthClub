@@ -1,9 +1,9 @@
 <span>
-    <div class="row mt-2">
+    <div class="row mt-0">
         {%block extra_top_left_buttons %}
-        <div class="col-md-auto">
-            {% comment %} <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>              {% endcomment %}
-        </div>
+        {% comment %} <div class="col-md-auto">
+            <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
+        </div> {% endcomment %}
         {%with True as hide_show_all%}
         {%include 'core/htmx/site_selection.html'%}
         <button hidden hx-get="" hx-push-url="false" hx-swap="innerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator=".htmx-indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>

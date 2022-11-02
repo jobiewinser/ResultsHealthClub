@@ -1,10 +1,10 @@
 {%load static core_tags%}
 <span>    
-    <div class="row mt-2">
+    <div class="row mt-0">
         {%block extra_top_left_buttons %}
-        <div class="col-md-auto me-2">
-            {% comment %} <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>           {% endcomment %}
-        </div>
+        {% comment %} <div class="col-md-auto me-2">
+            <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
+        </div> {% endcomment %}
         {%include 'core/htmx/site_selection.html'%}
         <button hidden hx-get="{%url 'refresh-leads-board'%}" hx-push-url="false" hx-swap="outerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator=".htmx-indicator" hx-target="#leads_board_span_wrapper" id="change_site" class="btn btn-primary btn-sm"></button>
         <button hidden

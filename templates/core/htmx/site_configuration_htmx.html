@@ -8,11 +8,11 @@
             {% comment %} renderTemplate() {% endcomment %}
         });
     </script>
-    <div class="row mt-2">
+    <div class="row mt-0">
         {%block extra_top_left_buttons %}
-        <div class="col-md-auto">
-            {% comment %} <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>              {% endcomment %}
-        </div>
+        {% comment %} <div class="col-md-auto">
+            <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
+        </div> {% endcomment %}
         {%with True as hide_show_all%}
         {%include 'core/htmx/site_selection.html'%}
         {%endwith%}
@@ -182,7 +182,7 @@
                             </td>
                             <td>
                                 <input type="checkbox" class="form-check-input" name="default_number" {%if site.default_number == number %}checked{%endif%} {%if site.default_number == number or not request.user.profile.role == 'a'%}disabled{%endif%}
-                                    hx-post="{% url 'whatsapp-number-make-default' %}" hx-swap="outerHTML" 
+                                    hx-post="{% url 'whatsapp-number-make-default' %}" hx-swap="innerHTML" 
                                     hx-include="this" hx-indicator="#htmx_indicator_default_number_{{number.pk}}" 
                                     hx-vals='{"whatsappnumber_pk": "{{number.pk}}"}' hx-target="#content">
                                 <img  class="htmx-indicator" id="htmx_indicator_default_number_{{number.pk}}" src="https://htmx.org/img/bars.svg"/>

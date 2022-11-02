@@ -16,7 +16,7 @@
                     if ($('#chat_card_'+phone_number).length > 0){
                         evt.preventDefault()
                     } else {
-                        add_chat_to_session(phone_number)
+                        {% comment %} add_chat_to_session(phone_number) {% endcomment %}
                     }
                 }
             });
