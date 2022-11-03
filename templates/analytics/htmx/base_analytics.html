@@ -3,123 +3,126 @@
 <span id="base_analytics_span_wrapper">
     <div class="row my-3">
         <div class="col">
-            <div class="card p-2">
-                <div class="row">
-                    <div class="col-md-auto">
-                        <h5 data-bs-toggle="popover" 
+            <div class="card">
+                <div class="card-header">
+                    <h5 data-bs-toggle="popover" 
                         data-bs-trigger="hover" 
                         data-bs-placement="right"
                         data-bs-html="true"
-                        data-bs-content="This shows the number of leads <b>created</b> between the shown dates that were successfully marked as sold, still live or closed without being sold (filtered by site and campaign above).">Opportunities <i class="fa-solid fa-circle-info"></i></h5> 
+                        data-bs-content="This shows the number of leads <b>created</b> between the shown dates that were successfully marked as sold, still live or closed without being sold (filtered by site and campaign above).">Opportunities <i class="fa-solid fa-circle-info"></i>
                         <img  class="htmx-indicator invert htmx-indicator-base-analytics" src="https://htmx.org/img/bars.svg"/>
-                    </div>
+                    </h5> 
                 </div>
-                <div class="row">
-                    <div class="col-md-auto">
-                        <span class="secondary_td_layer">{{start_date}} - {{end_date}}</span>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-auto">
+                            <span class="secondary_td_layer">{{start_date}} - {{end_date}}</span>
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col center">
-                        <h1>{{opportunities_count}}</h1>
+                    <div class="row">
+                        <div class="col center">
+                            <h1>{{opportunities_count}}</h1>
+                        </div>
                     </div>
-                </div>
-                <div class="row" style="color:green">
-                    <div class="col center">
-                        Closed
+                    <div class="row" style="color:green">
+                        <div class="col center">
+                            Closed
+                        </div>
+                        <div class="col center">
+                            {{closed_opportunities_count}}
+                        </div>
                     </div>
-                    <div class="col center">
-                        {{closed_opportunities_count}}
+                    <div class="row" style="color:grey">
+                        <div class="col center">
+                            Live
+                        </div>
+                        <div class="col center">
+                            {{live_opportunities_count}}
+                        </div>
                     </div>
-                </div>
-                <div class="row" style="color:grey">
-                    <div class="col center">
-                        Live
-                    </div>
-                    <div class="col center">
-                        {{live_opportunities_count}}
-                    </div>
-                </div>
-                <div class="row" style="color:red">
-                    <div class="col center">
-                        Lost
-                    </div>
-                    <div class="col center">
-                        {{lost_opportunities_count}}
+                    <div class="row" style="color:red">
+                        <div class="col center">
+                            Lost
+                        </div>
+                        <div class="col center">
+                            {{lost_opportunities_count}}
+                        </div>
                     </div>
                 </div>
             </div> 
         </div>  
         <div class="col">
-            <div class="card p-2">
-                <div class="row">
-                    <div class="col-md-auto">
-                        <h5 data-bs-toggle="popover" 
+            <div class="card">
+                <div class="card-header">
+                    <h5 data-bs-toggle="popover" 
                         data-bs-trigger="hover" 
                         data-bs-placement="right"
                         data-bs-html="true"
-                        data-bs-content="This shows the potential monetary value of leads <b>created</b> between the shown dates that were successfully marked as sold, still live or closed without being sold (filtered by site and campaign above).">Pipeline Value <i class="fa-solid fa-circle-info"></i></h5> 
+                        data-bs-content="This shows the potential monetary value of leads <b>created</b> between the shown dates that were successfully marked as sold, still live or closed without being sold (filtered by site and campaign above).">Pipeline Value <i class="fa-solid fa-circle-info"></i>
                         <img  class="htmx-indicator invert htmx-indicator-base-analytics" src="https://htmx.org/img/bars.svg"/>
-                    </div>
+                    </h5> 
                 </div>
-                <div class="row">
-                    <div class="col-md-auto">
-                        <span class="secondary_td_layer">{{start_date}} - {{end_date}}</span>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-auto">
+                            <span class="secondary_td_layer">{{start_date}} - {{end_date}}</span>
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col center">
-                        <h1>£{{opportunities_value|floatformat:2}}</h1>
+                    <div class="row">
+                        <div class="col center">
+                            <h1>£{{opportunities_value|floatformat:2}}</h1>
+                        </div>
                     </div>
-                </div>
-                <div class="row" style="color:green">
-                    <div class="col center">
-                        Closed
+                    <div class="row" style="color:green">
+                        <div class="col center">
+                            Closed
+                        </div>
+                        <div class="col center">
+                            £{{closed_value|floatformat:2}}
+                        </div>
                     </div>
-                    <div class="col center">
-                        £{{closed_value|floatformat:2}}
+                    <div class="row" style="color:grey">
+                        <div class="col center">
+                            Live
+                        </div>
+                        <div class="col center">
+                            £{{live_value|floatformat:2}}
+                        </div>
                     </div>
-                </div>
-                <div class="row" style="color:grey">
-                    <div class="col center">
-                        Live
-                    </div>
-                    <div class="col center">
-                        £{{live_value|floatformat:2}}
-                    </div>
-                </div>
-                <div class="row" style="color:red">
-                    <div class="col center">
-                        Lost
-                    </div>
-                    <div class="col center">
-                        £{{lost_value|floatformat:2}}
+                    <div class="row" style="color:red">
+                        <div class="col center">
+                            Lost
+                        </div>
+                        <div class="col center">
+                            £{{lost_value|floatformat:2}}
+                        </div>
                     </div>
                 </div>
             </div> 
         </div>
         <div class="col">
-            <div class="card p-2">
-                <div class="row">
-                    <div class="col-md-auto">
-                        <h5 data-bs-toggle="popover" 
+            <div class="card">
+                <div class="card-header">
+                    <h5 data-bs-toggle="popover" 
                         data-bs-trigger="hover" 
                         data-bs-placement="right"
                         data-bs-html="true"
-                        data-bs-content="This shows the percentage of leads <b>created</b> between the shown dates that were successfully marked as sold (filtered by site and campaign above).">Conversion Rate <i class="fa-solid fa-circle-info"></i></h5> 
+                        data-bs-content="This shows the percentage of leads <b>created</b> between the shown dates that were successfully marked as sold (filtered by site and campaign above).">Conversion Rate <i class="fa-solid fa-circle-info"></i>
                         <img  class="htmx-indicator invert htmx-indicator-base-analytics" src="https://htmx.org/img/bars.svg"/>
-                    </div>
+                    </h5> 
                 </div>
-                <div class="row">
-                    <div class="col-md-auto">
-                        <span class="secondary_td_layer">{{start_date}} - {{end_date}}</span>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-auto">
+                            <span class="secondary_td_layer">{{start_date}} - {{end_date}}</span>
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col center">
-                        <h1>{{conversion_rate|floatformat:2}}%</h1>
-                    </div>
-                </div>            
+                    <div class="row">
+                        <div class="col center">
+                            <h1>{{conversion_rate|floatformat:2}}%</h1>
+                        </div>
+                    </div> 
+                </div>     
             </div> 
         </div>
     </div> 

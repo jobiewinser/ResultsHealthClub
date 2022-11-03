@@ -32,14 +32,15 @@ def get_sales_to_leads_between_dates_with_timeframe_differences(start_date, end_
                 'sales':sales,
                 'percentage':percentage,
             })
-            if timeframe_label_string == 'months':
-                time_label_set.append(f"{short_month_name(index_date.month)} {str(index_date.year)[2:]} - {short_month_name((index_date + timeframe).month)} {str((index_date + timeframe).year)[2:]}")
-            elif timeframe_label_string == 'month':
-                time_label_set.append(f"{short_month_name(index_date.month)} {str(index_date.year)[2:]}")
-            elif timeframe_label_string == 'week':
-                time_label_set.append(f"{index_date} - {index_date + timeframe}")
-            elif timeframe_label_string == 'day':
-                time_label_set.append(f"{index_date}")
+            # if timeframe_label_string == 'months':
+            #     time_label_set.append(f"{short_month_name(index_date.month)} {str(index_date.year)[2:]} - {short_month_name((index_date + timeframe).month)} {str((index_date + timeframe).year)[2:]}")
+            # elif timeframe_label_string == 'month':
+            #     time_label_set.append(f"{short_month_name(index_date.month)} {str(index_date.year)[2:]}")
+            # elif timeframe_label_string == 'week':
+            #     time_label_set.append(f"{index_date} - {index_date + timeframe}")
+            # elif timeframe_label_string == 'day':
+            #     time_label_set.append(f"{index_date}")
+            time_label_set.append(f"{index_date}")
             index_date = index_date + timeframe
         return data_set, time_label_set    
     return [],[]
@@ -66,14 +67,15 @@ def get_bookings_to_leads_between_dates_with_timeframe_differences(start_date, e
                 'bookings':booked_leads_count,
                 'percentage':percentage,
             })
-            if timeframe_label_string == 'months':
-                time_label_set.append(f"{short_month_name(index_date.month)} {str(index_date.year)[2:]} - {short_month_name((index_date + timeframe).month)} {str((index_date + timeframe).year)[2:]}")
-            elif timeframe_label_string == 'month':
-                time_label_set.append(f"{short_month_name(index_date.month)} {str(index_date.year)[2:]}")
-            elif timeframe_label_string == 'week':
-                time_label_set.append(f"{index_date} - {index_date + timeframe}")
-            elif timeframe_label_string == 'day':
-                time_label_set.append(f"{index_date}")
+            # if timeframe_label_string == 'months':
+            #     time_label_set.append(f"{short_month_name(index_date.month)} {str(index_date.year)[2:]} - {short_month_name((index_date + timeframe).month)} {str((index_date + timeframe).year)[2:]}")
+            # elif timeframe_label_string == 'month':
+            #     time_label_set.append(f"{short_month_name(index_date.month)} {str(index_date.year)[2:]}")
+            # elif timeframe_label_string == 'week':
+            #     time_label_set.append(f"{index_date} - {index_date + timeframe}")
+            # elif timeframe_label_string == 'day':
+            #     time_label_set.append(f"{index_date}")
+            time_label_set.append(f"{index_date}")
             index_date = index_date + timeframe
         return data_set, time_label_set    
     return [],[]
@@ -145,10 +147,12 @@ def get_leads_to_sales(request):
         
     context['data_set'] = data_set
     context['time_label_set'] = time_label_set
+    context['start_date'] = start_date
+    context['end_date'] = end_date
     if request.GET.get('graph_type', 'off') == 'on':
-        context['graph_type'] = 'bar'
-    else:
         context['graph_type'] = 'line'
+    else:
+        context['graph_type'] = 'bar'
     return render(request, 'analytics/htmx/leads_to_sale_data.html', context)
 
 @login_required
@@ -184,10 +188,12 @@ def get_leads_to_bookings(request):
         
     context['data_set'] = data_set
     context['time_label_set'] = time_label_set
+    context['start_date'] = start_date
+    context['end_date'] = end_date
     if request.GET.get('graph_type', 'off') == 'on':
-        context['graph_type'] = 'bar'
-    else:
         context['graph_type'] = 'line'
+    else:
+        context['graph_type'] = 'bar'
     return render(request, 'analytics/htmx/leads_to_booking_data.html', context)
 
 @login_required
@@ -211,11 +217,16 @@ def get_calls_made(request):
         
     context['data_set'] = data_set
     context['time_label_set'] = time_label_set
+    context['start_date'] = start_date
+    context['end_date'] = end_date
     if request.GET.get('graph_type', 'off') == 'on':
-        context['graph_type'] = 'bar'
-    else:
         context['graph_type'] = 'line'
+    else:
+        context['graph_type'] = 'bar'
     return render(request, 'analytics/htmx/calls_made_data.html', context)
+
+@login_required
+def get_current_call_count_distribution(request):
 
 @login_required
 def get_base_analytics(request):
@@ -232,6 +243,8 @@ def get_base_analytics(request):
                 site = Site.objects.get(pk=site_pk)
             else:
                 site = None
+        context['start_date'] = request.GET.get('start_date')
+        context['end_date'] = request.GET.get('end_date')
         start_date = datetime.strptime(request.GET.get('start_date'), '%Y-%m-%d')
         end_date = datetime.strptime(request.GET.get('end_date'), '%Y-%m-%d') + relativedelta.relativedelta(days=1)   
         if campaign:
@@ -302,12 +315,6 @@ def get_base_analytics(request):
         else:
             pass
         context['call_counts_tuples'] = call_counts_tuples
-        # context['data_set'] = data_set
-        # context['time_label_set'] = time_label_set
-        # if request.GET.get('graph_type', 'off') == 'on':
-        #     context['graph_type'] = 'bar'
-        # else:
-        #     context['graph_type'] = 'line'
         return render(request, 'analytics/htmx/base_analytics.html', context)
     except Exception as e:
         pass

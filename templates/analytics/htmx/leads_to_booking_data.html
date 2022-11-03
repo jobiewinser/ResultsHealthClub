@@ -1,7 +1,38 @@
 {%load core_tags%}
-<span>
-<canvas height="100" width="100%" id="leads_to_bookings_chart" ></canvas>
-</span>
+<div class="row">
+    <div class="col-md-auto">
+        <span class="secondary_td_layer">{{start_date}} - {{end_date}}</span>
+    </div>
+    <div class="col p-0">
+    </div>
+    <div class="col-md-auto right">
+        <div class="row" style="margin-left:0px !important;">
+            <div class="col right">
+                <small>Bar</small>
+            </div>
+
+            <div class="col-md-auto p-0">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" name="graph_type" {%if graph_type == 'line'%}checked{%endif%} type="checkbox" id="graph_type_leads_to_booking" onchange="$('#refresh_lead_to_bookings').click()">
+                </div>
+            </div>
+
+            <div class="col-md-auto" style="text-align:left; padding-left:5px">
+                <small>Line</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <div class="" id="lead_to_bookings_chart_wrapper">
+            <canvas style="width:100%;height:100%;" id="leads_to_bookings_chart" ></canvas>
+        </div>
+    </div>
+</div>
+
+
 
 <script>
     $(document).ready(function() {
@@ -13,8 +44,8 @@
                 datasets: [{
                     label: 'Leads',
                     data: [{%for data_entry in data_set%}{{data_entry.leads}}{% if not forloop.last %},{%endif%}{%endfor%}],
-                    backgroundColor: 'rgba(180, 180, 180, 0.35)',
-                    borderColor: 'rgba(180, 180, 180, 0.7)',
+                    backgroundColor: 'rgba(180, 180, 180, 0.4)',
+                    borderColor: 'rgba(180, 180, 180, 0.85)',
                     fill: true,
                     borderWidth: 1
                 }, {
@@ -27,16 +58,29 @@
                 }]
             },
             options: {
-                scales: {
+                scales: {      
                     y: {
                         beginAtZero: true,
                         ticks: {
                         beginAtZero: true,
-                        callback: function(value) {if (value % 1 === 0) {return value;}}
+                        callback: function(value) {if (value % 1 === 0) {return value;} }
                         }
+                    },
+                    xAxis: {
+                        type: "time",
+                        time: {
+                            displayFormats: {
+                                hour: "hA"
+                            }
+                        },
+                        display: true,
+                        ticks: {
+                            reverse: true
+                        },
+                        gridLines: { display: false }
                     }
                 },
-                responsive: false
+                responsive: true
             }
         });
     });

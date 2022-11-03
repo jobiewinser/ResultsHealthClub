@@ -148,11 +148,13 @@
         {%endblock chat_bottom%}
         {%if request.user.is_authenticated%}
         <span id="chat_bottom_wrapper">
+            
+            <img  class="htmx-indicator invert" id="chat_bottom_htmx_indicator" src="https://htmx.org/img/bars.svg"/>
             <span
             hx-get="{%url 'get-messaging-window'%}"
             hx-target="#chat_bottom_wrapper"
             hx-swap="#outerHTML"
-            hx-indicator=".htmx-indicator"        
+            hx-indicator="#chat_bottom_htmx_indicator"        
             hx-trigger="load"></span>
         </span>
         {%endif%}

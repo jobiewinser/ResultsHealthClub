@@ -1,0 +1,15 @@
+<div class="row">
+    <div class="col">
+    </div>
+    <div class="col-md-auto" style="text-align:left">
+        {%for call_count_tuple in call_counts_tuples%}
+        <div class="row">
+            <div class="col-md-auto" style="text-align:left">
+                <small>Call {{call_count_tuple.0}} ({{call_count_tuple.1}}) - £{{call_count_tuple.2.campaign__product_cost__sum|floatformat:2}} ({{call_count_tuple.3|floatformat:2}}%)</small>
+            </div>
+        </div>
+        {%endfor%}
+    </div>
+    <div class="col">
+    </div>
+</div>
