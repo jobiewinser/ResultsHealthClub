@@ -130,7 +130,7 @@
 
     <div class="row mt-0">
         {%block extra_top_left_buttons %}
-        {% comment %} <div class="col-md-auto me-2">
+        {% comment %} <div class="col-md-auto m-1">
             <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
         </div> {% endcomment %}
         {%include 'core/htmx/site_selection.html'%}
@@ -139,7 +139,7 @@
             hx-get="{%url 'refresh-leads-board'%}"
             hx-swap="outerHTML" hx-push-url="false" hx-include=".overview_table_filters" hx-indicator=".htmx-indicator" hx-target="#leads_board_span_wrapper" id="filter_campaign" class="btn btn-primary btn-sm"></button>
         {% comment %} <button hidden hx-get="{% url 'get-campaign'%}" hx-include=".overview_table_filters" id="refresh_campaign_list_span" hx-indicator=".htmx-indicator" hx-target="#campaign_list_span" hx-trigger="click" hx-swap="outerHTML"></button> {% endcomment %}
-        <div class="col-md-auto me-2" hx-get="{% url 'get-campaign'%}" hx-include=".overview_table_filters" hx-trigger="load" hx-indicator=".htmx-indicator" hx-target="#campaign_list_span" hx-swap="outerHTML">
+        <div class="col-md-auto m-1" hx-get="{% url 'get-campaign'%}" hx-include=".overview_table_filters" hx-trigger="load" hx-indicator=".htmx-indicator" hx-target="#campaign_list_span" hx-swap="outerHTML">
             <span id="campaign_list_span">   
                 <select class="form-select">
                     <option>Loading</option>
@@ -147,7 +147,7 @@
             </span>
         </div>
         
-        <div class="col-md-auto me-2">
+        <div class="col-md-auto m-1">
             <button class="btn btn-primary btn-sm" 
                 data-bs-toggle="popover" 
                 data-bs-trigger="hover" 

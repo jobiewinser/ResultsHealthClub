@@ -35,11 +35,11 @@
 
     <div class="row mt-0">
         {%block extra_top_left_buttons %}
-        {% comment %} <div class="col-md-auto me-2">
+        {% comment %} <div class="col-md-auto m-1">
             <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
         </div> {% endcomment %}
         {%include 'core/htmx/site_selection.html'%}
-        <div class="col-md-auto me-2" id="campaign_list_div">
+        <div class="col-md-auto m-1" id="campaign_list_div">
             <span id="campaign_list_span" hx-get="{% url 'get-campaign'%}" hx-include=".overview_table_filters" hx-trigger="load" hx-indicator=".top-htmx-indicator" hx-target="#campaign_list_span" hx-swap="outerHTML">   
                 <select class="form-select">
                     <option>Loading</option>
