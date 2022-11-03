@@ -1,7 +1,7 @@
 
 
 {%if request.GET.complete == 'true' or request.GET.complete == True%}
-<div hx-swap-oob="true" class="col-md-auto me-2" id="swap_status_button">
+<div hx-swap-oob="true" class="col-md-auto m-1" id="swap_status_button">
     <button class="btn btn-success btn-sm"
         hx-indicator=".top-htmx-indicator" hx-target="#overview_table_span_wrapper" 
         hx-get="{% url 'refresh-booking-table' %}"
@@ -13,7 +13,7 @@
         <input type="text" style="display:None" id="change_status" name="complete" value="false"/>
 </div>
 {%else%}
-<div hx-swap-oob="true" class="col-md-auto me-2" id="swap_status_button">
+<div hx-swap-oob="true" class="col-md-auto m-1" id="swap_status_button">
     <button class="btn btn-light bg-light-border btn-sm" style=""
         hx-indicator=".top-htmx-indicator" hx-target="#overview_table_span_wrapper" 
         hx-get="{% url 'refresh-booking-table' %}"
