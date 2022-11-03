@@ -1,7 +1,7 @@
 #chat_bottom {
     position: fixed;
     bottom: 0;
-    right: 0.2%;
+    right: 2vh;
     /* text-align:right; */
     width: unset;
     overflow-x: hidden;
