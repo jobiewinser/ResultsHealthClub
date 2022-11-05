@@ -14,6 +14,7 @@ from core.user_permission_functions import get_available_sites_for_user, get_use
 from core.views import get_site_pk_from_request
 from django.db.models import Q, Count
 from django.contrib import messages
+from asgiref.sync import async_to_sync
 
 from whatsapp.models import WhatsappTemplate
 logger = logging.getLogger(__name__) 
@@ -124,10 +125,20 @@ def refresh_lead_article(request, **kwargs):
     except Exception as e:
         logger.debug("get_leads_column_meta_data Error "+str(e))
         return HttpResponse(e, status=500)
+@login_required
+def refresh_booking_row(request, **kwargs):
+    logger.debug(str(request.user))
+    try:
+        lead = Campaignlead.objects.get(pk=kwargs.get('lead_pk'))
+       
+        return render(request, 'campaign_leads/htmx/campaign_booking_row_htmx.html', {'lead':lead})
+    except Exception as e:
+        logger.debug("get_leads_column_meta_data Error "+str(e))
+        return HttpResponse(e, status=500)
 
 
 @login_required
-def add_booking(request, **kwargs):
+def add_manual_booking(request, **kwargs):
     logger.debug(str(request.user))
     try:        
         lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'))
@@ -155,13 +166,24 @@ def add_booking(request, **kwargs):
                 datetime=booking_datetime
                 )
                 
-        context = {
-            'lead': lead,
-        }
-        
-        return HttpResponse("<span></span>", status=200) 
+        from channels.layers import get_channel_layer
+        channel_layer = get_channel_layer()          
+        lead = booking.lead
+        company_pk = lead.campaign.site.company.pk   
+        rendered_html = f"<span hx-swap-oob='delete' id='lead-{lead.pk}'></span> <span hx-swap-oob='outerHTML:.booking-lead-{lead.pk}'><span hx-get='/campaign-leads/refresh-booking-row/{lead.pk}/' hx-swap='innerHTML' hx-target='#row_{lead.pk}' hx-indicator='.htmx-indicator' hx-trigger='load'></span></span>"
+        async_to_sync(channel_layer.group_send)(
+            f"lead_{company_pk}",
+            {
+                'type': 'lead_update',
+                'data':{
+                    # 'company_pk':campaign_pk,
+                    'rendered_html': rendered_html,
+                }
+            }
+        )
+        return HttpResponse("", status=200)
     except Exception as e:
-        logger.debug("add_booking Error "+str(e))
+        logger.debug("add_manual_booking Error "+str(e))
         return HttpResponse(e, status=500)
 
 

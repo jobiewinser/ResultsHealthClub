@@ -16,3 +16,16 @@
 //         SearchTerm = searchInput.val()
 //     });
 // }
+function whatsapptemplateshandlehtmxafterSwap(evt){
+}
+
+function whatsapptemplateshandlehtmxafterRequest(evt){
+    if (evt.detail.xhr.status == 200){
+        if (evt.detail.pathInfo.requestPath.includes('whatsapp-change-template-site')){
+            $('#generic_modal').modal('hide');
+            snackbarShow('Successfully transferred template', 'success')
+        }else if (evt.detail.pathInfo.requestPath.includes('whatsapp-approval')){
+            location.reload();
+        }
+    }
+}

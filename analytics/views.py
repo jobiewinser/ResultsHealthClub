@@ -12,6 +12,7 @@ from core.views import get_site_pk_from_request
 logger = logging.getLogger(__name__)
 
 
+from campaign_leads.models import Call, Campaign, Campaignlead
         
 @method_decorator(login_required, name='dispatch')
 class AnalyticsOverviewView(TemplateView):
@@ -29,11 +30,25 @@ def get_analytics_context(request):
     request.GET._mutable = True 
     context = {}     
     context['campaigns'] = get_campaign_qs(request)
+    campaign_pk = request.GET.get('campaign_pk', None)
+    if campaign_pk:
+        try:
+            request.GET['campaign_pk'] = campaign_pk
+            context['campaign'] = Campaign.objects.get(pk=campaign_pk)
+            request.GET['site_pk'] = context['campaign'].site.pk
+        except:
+            pass
     site_pk = get_site_pk_from_request(request)
     if site_pk and not site_pk == 'all':
-        request.GET['site_pk'] = site_pk 
-        context['site'] = Site.objects.get(pk=site_pk)
+        try:
+            request.GET['site_pk'] = site_pk    
+            context['site'] = Site.objects.get(pk=site_pk)
+        except:
+            pass
+    context['start_date'] = request.GET.get('start_date', None)
+    context['end_date'] = request.GET.get('end_date', None)
     return context
+    
 
 def refresh_analytics(request):
     return render(request, 'analytics/htmx/analytics_content.html', get_analytics_context(request))

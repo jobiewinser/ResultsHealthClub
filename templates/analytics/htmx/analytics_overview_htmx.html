@@ -7,7 +7,6 @@
     <script>
         document.title = "Analytics";
         $(document).ready(function() {
-        
             var leads_to_sales_chart_var = null;
             var leads_to_sales_chart = null;
     
@@ -21,14 +20,6 @@
                 leads_to_bookings_chart.destroy();
                 calls_today_chart.destroy();
             }catch{}
-            document.body.addEventListener('htmx:afterSwap', function(evt) {
-                if (![undefined, ''].includes(evt.detail.pathInfo.requestPath) && ![undefined, ''].includes(evt.detail.target.id)){
-                    if (evt.detail.pathInfo.requestPath.includes("refresh-analytics")){
-                        $('#refresh_campaign_list_span').click(); 
-                        snackbarShow('Successfully refreshed', 'success')
-                    }
-                }
-            });
         });
     </script>
 
@@ -39,23 +30,26 @@
             <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
         </div> {% endcomment %}
         {%include 'core/htmx/site_selection.html'%}
-        <div class="col-md-auto m-1" id="campaign_list_div">
-            <span id="campaign_list_span" hx-get="{% url 'get-campaign'%}" hx-include=".overview_table_filters" hx-trigger="load" hx-indicator=".top-htmx-indicator" hx-target="#campaign_list_span" hx-swap="outerHTML">   
+
+        <button hidden hx-get="{% url 'analytics-overview' %}" hx-push-url="false" hx-swap="innerHTML" hx-include=".non_site_dependant_analytics_filters" hx-indicator=".top-htmx-indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
+        <button hidden
+            hx-get="{%url 'refresh-analytics'%}"
+            hx-swap="outerHTML" hx-push-url="false" hx-include=".non_site_dependant_analytics_filters" hx-indicator=".htmx-indicator" hx-target="#analytics_span_wrapper" id="filter_campaign"></button>
+
+            <div class="col-md-auto m-1" hx-get="{% url 'get-campaign'%}" hx-include=".non_site_dependant_analytics_filters" hx-trigger="load" hx-indicator=".htmx-indicator" hx-target="#campaign_list_span" hx-swap="outerHTML">
+            <span id="campaign_list_span">   
                 <select class="form-select">
                     <option>Loading</option>
                 </select>    
             </span>
         </div>
-        <button hidden hx-get="{% url 'get-campaign'%}" hx-include=".overview_table_filters" id="refresh_campaign_list_span" hx-indicator=".top-htmx-indicator" hx-target="#campaign_list_div" hx-trigger="click" hx-swap="innerHTML"></button>
         
+
         <div class="col center">
-            <img  class="htmx-indicator invert" id="htmx-indicator-leads-and-bookings" src="https://htmx.org/img/bars.svg"/>
+            
         </div>
-        <button hidden
-            hx-get="{% url 'refresh-analytics' %}" 
-            hx-swap="outerHTML" hx-push-url="false" hx-include=".overview_table_filters" hx-indicator=".htmx-indicator" hx-target="#analytics_span_wrapper" id="filter_campaign" class="btn btn-primary btn-sm"></button>    
+            
         
-        <button hidden hx-get="{% url 'refresh-analytics' %}" hx-push-url="false" hx-swap="outerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator=".top-htmx-indicator" hx-target="#analytics_span_wrapper" id="change_site" class="btn btn-primary btn-sm"></button>
         {%endblock extra_top_left_buttons %}
 
         <div class="col">
@@ -63,7 +57,7 @@
 
         {%block extra_top_right_buttons %}
         <div class="col-md-auto">
-            <span class="badge bg-dark text-white"><h6 class="m-1">Analytics</h6></span>      
+            <span class="badge bg-dark text-white"><h6 class="m-1">Analytics</h6><input id="current_page" hidden value="analytics_overview"></input></span>      
         </div>
         {%endblock extra_top_right_buttons %}
     </div>

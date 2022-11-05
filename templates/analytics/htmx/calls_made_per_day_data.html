@@ -1,11 +1,6 @@
 {%load core_tags%}
 <div class="row">
-    <div class="col-md-auto">
-        <span class="secondary_td_layer">{{start_date}} - {{end_date}}</span>
-    </div>
-    <div class="col p-0">
-    </div>
-    <div class="col-md-auto right">
+    <div class="col-md-auto p-0">
         <div class="row" style="margin-left:0px !important;">
             <div class="col right">
                 <small>Bar</small>
@@ -21,6 +16,11 @@
                 <small>Line</small>
             </div>
         </div>
+    </div>
+    <div class="col p-0">
+    </div>
+    <div class="col-md-auto p-0">
+        <span class="secondary_td_layer">{{start_date}} - {{end_date}}</span>
     </div>
 </div>
 
@@ -63,7 +63,8 @@
                         time: {
                             displayFormats: {
                                 hour: "hA"
-                            }
+                            },
+                            unit: "day",
                         },
                         display: true,
                         ticks: {

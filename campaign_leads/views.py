@@ -132,8 +132,10 @@ def get_booking_table_context(request):
     context['complete_count'] = leads.filter(complete=True).count()
     complete_filter = (request.GET.get('complete', '').lower() =='true')
     leads = leads.filter(complete=complete_filter)   
+    context['complete'] = complete_filter
     context['booking_needed_count'] = leads.filter(booking=None).count()
     context['leads'] = leads
+    context['company'] = request.user.profile.company
     return context
 def refresh_booking_table_htmx(request):
     return render(request, 'campaign_leads/htmx/campaign_bookings_table.html', get_booking_table_context(request))

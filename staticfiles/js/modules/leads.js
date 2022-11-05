@@ -1,13 +1,30 @@
-// function initDataTable() {
-//     try{dt.fnDestroy();}catch{}
-    
-//     dt = $('#overview_table').DataTable(            
-//     {  
-//         order: [[ 4, 'asc' ],[ 2, 'asc' ]],
-//         iDisplayLength: 10
-//     }
-//     );
-// }
+function leadshandlehtmxbeforeRequest(evt){
+    if (![undefined, ''].includes(evt.detail.pathInfo.path) && ![undefined, ''].includes(evt.detail.target.id)){
+        if (evt.detail.target.id == 'overview_table' || evt.detail.pathInfo.path.includes("academy-booking-overview")){
+            $("#overview_table").dataTable().fnDestroy();
+        } else if (evt.detail.pathInfo.requestPath.includes("message-list")) {
+
+        }
+    }
+}
+
+function leadshandlehtmxafterSwap(evt){
+    if (evt.detail.xhr.status == 200){
+        if (![undefined, ''].includes(evt.detail.pathInfo.requestPath)){
+            if (evt.detail.pathInfo.requestPath.includes("create-campaign-lead")){
+                $('#generic_modal').modal('hide');
+                // $('#refresh_column_metadata').click()
+                snackbarShow('Successfully manually created a campaign lead', 'success')
+            } else if (evt.detail.pathInfo.requestPath.includes("add-manual-booking")){
+                $('#generic_modal').modal('hide');
+                snackbarShow('Successfully added a booking', 'success')
+            } else if (evt.detail.pathInfo.requestPath.includes("refresh-lead-article") || evt.detail.pathInfo.requestPath.includes("leads-and-calls")){
+                document.getElementById('notification2').play();
+                set_total_costs();
+            }
+        }             
+    }
+}
 
 function handleDraggedItem(dragged_elem_id, drag_target){
     dragged_elem = $('#'+dragged_elem_id)
@@ -29,7 +46,7 @@ function handleDraggedItem(dragged_elem_id, drag_target){
     }
 }
 
-function set_total_costs(){   
+function set_total_costs(){  
     $('.total_cost').each(function () {
         let total_cost = 0.00;
         $(this).closest('.column-done').find(".lead_cost").each(function() {

@@ -5,19 +5,6 @@
     <script>
         $(document).ready(function() {
             document.title = "Company Config";
-            document.body.addEventListener('htmx:afterRequest', function(evt) {  
-                if (evt.detail.xhr.status == 500){
-                    $('.reset_on_error').each(function() {
-                        if (![undefined, ''].includes((this).data('value'))){
-                            $(this).data('value')
-                            $(this).val($(this).data('value'));
-                        }
-                    });
-                };
-                
-            });
-            document.body.addEventListener('htmx:afterSwap', function(evt) {              
-            });
         });
     </script>
     
@@ -31,7 +18,7 @@
         </div>
         {%block extra_top_right_buttons %}
         <div class="col-md-auto">
-        <span class="badge bg-dark text-white"><h6 class="m-1">Company Configuration</h6></span>           
+        <span class="badge bg-dark text-white"><h6 class="m-1">Company Configuration</h6><input id="current_page" hidden value="company_configuration"></input></span>           
         </div>
         {%endblock extra_top_right_buttons %}
     </div>

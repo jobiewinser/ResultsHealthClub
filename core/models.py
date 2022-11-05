@@ -239,7 +239,7 @@ class Site(models.Model):
         if lead_generation_app == 'b' and not self.company.active_campaign_enabled:
             return HttpResponse(f"Active Campaign is not enabled for {self.company.company_name}", status=500)
         if lead_generation_app == 'a':
-            manually_created_campaign, created = ManualCampaign.objects.get_or_create(site=self, name=f"Manually Created")
+            manually_created_campaign, created = ManualCampaign.objects.get_or_create(site=self, name=f"Manually Created ({self.name})")
             lead = Campaignlead.objects.create(
                 first_name=first_name,
                 email=email,

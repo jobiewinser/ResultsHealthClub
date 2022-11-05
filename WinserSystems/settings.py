@@ -84,6 +84,7 @@ if os.getenv('ENVIRONMENT') == 'development':
     STATICFILES_DIRS = (
         os.path.join(BASE_DIR, "staticfiles"),
     )
+    INTERNAL_IPS = ['127.0.0.1',]
 
 else:
     ALLOWED_HOSTS = [os.getenv('ALLOWED_HOSTS'), '*']

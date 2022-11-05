@@ -106,17 +106,26 @@ class Campaignlead(models.Model):
         channel_layer = get_channel_layer()   
         if refresh_position:
             rendered_html = self.get_leads_html(new_position=Call.objects.filter(lead=self).count())
+            async_to_sync(channel_layer.group_send)(
+                f"lead_{self.campaign.site.company.pk}",
+                {
+                    'type': 'lead_update',
+                    'data':{
+                        'rendered_html':rendered_html,
+                    }
+                }
+            )
         else:
             rendered_html = self.get_leads_html()
-        async_to_sync(channel_layer.group_send)(
-            f"lead_{self.campaign.site.company.pk}",
-            {
-                'type': 'lead_move',
-                'data':{
-                    'rendered_html':rendered_html,
+            async_to_sync(channel_layer.group_send)(
+                f"lead_{self.campaign.site.company.pk}",
+                {
+                    'type': 'lead_update',
+                    'data':{
+                        'rendered_html':rendered_html,
+                    }
                 }
-            }
-        )
+            )
     def get_leads_html(self, new_position=None):
         if self:
             if new_position == None:    

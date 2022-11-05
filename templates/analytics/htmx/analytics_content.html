@@ -1,6 +1,6 @@
 {%load static core_tags%}
 <span id="analytics_span_wrapper">
-    <button hidden id="refresh_base_analytics" hx-trigger="load, click delay:0.5s"
+    <button hidden id="refresh_base_analytics" class="refresh_date_specific_analytic" hx-trigger="load, click delay:0.5s"
             hx-get="{%url 'get-base-analytics' %}"
             hx-include="#start_date, #end_date, #site_pk, #campaign_pk"
             hx-target="#base_analytics_span_wrapper"
@@ -10,7 +10,7 @@
 
     <div class="row my-3">
         <div class="col">
-            <div class="card">
+            <div class="card analytics-card">
                 <div class="card-header">
                     <h5 data-bs-toggle="popover" 
                         data-bs-trigger="hover" 
@@ -21,36 +21,42 @@
                 </div>
                 <div class="card-body" id="filters_card_body">
                     <div class="row">
-                        <div class="col p-0">
+                        <div class="col p-0 m-1 ">
+                            <button
+                                hx-include=".non_site_dependant_analytics_filters, .site_dependant_analytics_filters" hx-indicator="#page_load_indicator" id="refresh_analytics"
+                                hx-get="{%url 'refresh-analytics'%}" hx-target="#analytics_span_wrapper" hx-push-url="true" hx-swap="innerHTML" class="btn btn-success btn-sm"><i class="fa-solid fa-arrows-rotate"></i> Refresh</button>
                         </div>
                         <div class="col-md-auto m-1 right p-0">
-                            <input id="start_date" value="{{''|today_date_tag|add_years:-1|date_to_date_input_prefill}}" class="form-control form-control-sm" type="date" name="start_date"
-                            onchange="$('#refresh_leads_to_bookings').click(); $('#refresh_leads_to_sales').click(); $('#refresh_calls_today').click(); $('#refresh_base_analytics').click();"/>
+                            <input id="start_date" value="{%if start_date%}{{start_date}}{%else%}{{''|today_date_tag|add_years:-1|date_to_date_input_prefill}}{%endif%}" class="form-control form-control-sm non_site_dependant_analytics_filters" type="date" name="start_date"
+                            onchange="$('#refresh_analytics').click();"/>
                         </div>
                         <div class="col-md-auto m-1 p-0">
                             <small>To</small>
                         </div>
                         <div class="col-md-auto m-1 left p-0">
-                            <input id="end_date" value="{{''|today_date_input_tag}}" class="form-control form-control-sm" type="date" name="end_date"
-                            onchange="$('#refresh_leads_to_bookings').click(); $('#refresh_leads_to_sales').click(); $('#refresh_calls_today').click(); $('#refresh_base_analytics').click();"/>
+                            <input id="end_date" value="{%if end_date%}{{end_date}}{%else%}{{''|today_date_input_tag}}{%endif%}" class="form-control form-control-sm non_site_dependant_analytics_filters" type="date" name="end_date"
+                            onchange="$('#refresh_analytics').click();"/>
                         </div>
-                        <div class="col p-0">
+                        <div class="col p-0 m-1 ">
+                            <button             
+                                hx-include="" hx-indicator="#page_load_indicator"
+                                hx-get="{%url 'refresh-analytics'%}" hx-target="#analytics_span_wrapper" hx-push-url="true" hx-swap="innerHTML" class="btn btn-warning btn-sm"><i class="fa-solid fa-ban"></i> Reset</button>
                         </div>
                     </div>
                     <hr>
                     Quick Filters
                     <div class="row">
                         <div class="col m-1 p-0">
-                            <button class="btn btn-secondary btn-sm nowrap">{{''|today_date_input_tag}} (day)</button>
+                            <button class="btn btn-secondary btn-sm nowrap {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_input_tag%}active{%elif not end_date and not start_date%}active{%endif%}" onclick="$('#start_date').val('{{''|today_date_tag|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change');">{{''|today_date_tag|nice_date_tag}} (day)</button>
                         </div>
                         <div class="col m-1 p-0">
-                            <button class="btn btn-secondary btn-sm nowrap" onclick="">{{''|today_date_tag|add_days:-7|date_to_date_input_prefill}} (week)</button>
+                            <button class="btn btn-secondary btn-sm nowrap {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_tag|add_days:-7|date_to_date_input_prefill%}active{%endif%}" onclick="$('#start_date').val('{{''|today_date_tag|add_days:-7|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change');">{{''|today_date_tag|add_days:-7|nice_date_tag}} (week)</button>
                         </div>
                         <div class="col m-1 p-0">
-                            <button class="btn btn-secondary btn-sm nowrap">{{''|today_date_tag|add_months:-1|date_to_date_input_prefill}} (month)</button>
+                            <button class="btn btn-secondary btn-sm nowrap {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_tag|add_months:-1|date_to_date_input_prefill%}active{%endif%}" onclick="$('#start_date').val('{{''|today_date_tag|add_months:-1|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change');">{{''|today_date_tag|add_months:-1|nice_date_tag}} (month)</button>
                         </div>
                         <div class="col m-1 p-0">
-                            <button class="btn btn-secondary btn-sm nowrap">{{''|today_date_tag|add_years:-1|date_to_date_input_prefill}} (year)</button>
+                            <button class="btn btn-secondary btn-sm nowrap {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_tag|add_years:-1|date_to_date_input_prefill%}active{%endif%}" onclick="$('#start_date').val('{{''|today_date_tag|add_years:-1|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change');">{{''|today_date_tag|add_years:-1|nice_date_tag}} (year)</button>
                         </div>
                     </div>
                 </div>
@@ -64,7 +70,7 @@
                 hx-indicator="#htmx-indicator-calls-today"
                 hx-swap="innerHTML"
                 onclick="$('#htmx-indicator-calls-today').addClass('htmx-request')">refresh</button>
-            <div class="card">
+            <div class="card analytics-card">
                 <div class="card-header">
                     <h5 data-bs-toggle="popover" 
                         data-bs-trigger="hover" 
@@ -86,7 +92,7 @@
                 hx-indicator="#htmx-indicator-current-call-count-distribution"
                 hx-swap="innerHTML"
                 onclick="$('#htmx-indicator-current-call-count-distribution').addClass('htmx-request')">refresh</button>
-            <div class="card">
+            <div class="card analytics-card">
                 <div class="card-header">
                     <h5 data-bs-toggle="popover" 
                         data-bs-trigger="hover" 
@@ -106,14 +112,14 @@
     
     <div class="row my-3">
         <div class="col">
-            <button hidden id="refresh_leads_to_sales" hx-trigger="load, click delay:0.5s"
+            <button hidden id="refresh_leads_to_sales" class="refresh_date_specific_analytic" hx-trigger="load, click delay:0.5s"
                 hx-get="{%url 'get-leads-to-sales' %}"
                 hx-include="#start_date, #end_date, #site_pk, #campaign_pk, #graph_type_leads_to_sales"
                 hx-target="#leads_to_sales_card_body"
                 hx-indicator="#htmx-indicator-leads-and-sales"
                 hx-swap="innerHTML"
                 onclick="$('#htmx-indicator-leads-and-sales').addClass('htmx-request')">refresh</button>
-            <div class="card">
+            <div class="card analytics-card">
                 <div class="card-header">
                     <h5 data-bs-toggle="popover" 
                         data-bs-trigger="hover" 
@@ -129,14 +135,14 @@
         </div>
         
         <div class="col">
-            <button hidden id="refresh_leads_to_bookings" hx-trigger="load, click delay:0.5s"
+            <button hidden id="refresh_leads_to_bookings" class="refresh_date_specific_analytic" hx-trigger="load, click delay:0.5s"
                 hx-get="{%url 'get-leads-to-bookings' %}"
                 hx-include="#start_date, #end_date, #site_pk, #campaign_pk, #graph_type_leads_to_bookings"
                 hx-target="#leads_to_bookings_card_body"
                 hx-indicator="#htmx-indicator-leads-and-bookings"
                 hx-swap="innerHTML"
                 onclick="$('#htmx-indicator-leads-and-bookings').addClass('htmx-request')">refresh</button>
-            <div class="card">
+            <div class="card analytics-card">
                 <div class="card-header">
                     <h5 data-bs-toggle="popover" 
                         data-bs-trigger="hover" 
@@ -153,14 +159,14 @@
         </div>
         
         <div class="col">
-            <button hidden id="refresh_calls_made_per_day" hx-trigger="load, click delay:0.5s"
+            <button hidden id="refresh_calls_made_per_day" class="refresh_date_specific_analytic" hx-trigger="load, click delay:0.5s"
                 hx-get="{%url 'get-calls-made-per-day' %}"
                 hx-include="#start_date, #end_date, #site_pk, #campaign_pk, #graph_type_calls_made_per_day"
                 hx-target="#calls_made_per_day_card_body"
                 hx-indicator="#htmx-indicator-calls-made-per-day"
                 hx-swap="innerHTML"
                 onclick="$('#htmx-indicator-calls-made-per-day').addClass('htmx-request')">refresh</button>
-            <div class="card">
+            <div class="card analytics-card">
                 <div class="card-header">
                     <h5 data-bs-toggle="popover" 
                         data-bs-trigger="hover" 

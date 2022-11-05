@@ -1,8 +1,6 @@
 {%load core_tags%}
 <div class="row">
-    <div class="col p-0">
-    </div>
-    <div class="col-md-auto right">
+    <div class="col-md-auto p-0">
         <div class="row" style="margin-left:0px !important;">
             <div class="col right">
                 <small>Pie</small>
@@ -19,11 +17,18 @@
             </div>
         </div>
     </div>
+    <div class="col p-0">
+    </div>
 </div>
 
 <div class="row">
     {%if data_set%}
-    <div class="col">
+    <div class="col-md-auto center m-3 pe-0">
+        <br>
+        <br>
+        <h5>{{raw_qs.count}} Calls</h5>
+    </div>
+    <div class="col ps-0">
         <div class="" id="calls_today_chart_wrapper">
             <canvas style="width:100%;height:200px;" id="calls_today_chart" ></canvas>
         </div>

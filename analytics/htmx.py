@@ -125,7 +125,7 @@ def get_calls_today_dataset(campaign=None, site=None):
     for user_pk in unique_users:
         user = User.objects.get(pk=user_pk)
         data_set.append((user.profile.name, qs.filter(user=user).count()))
-    return data_set
+    return data_set, qs
 
 @login_required
 def get_leads_to_sales(request):
@@ -224,9 +224,10 @@ def get_calls_today(request):
         else:
             site = None
 
-    data_set = get_calls_today_dataset(campaign=campaign, site=site)
+    data_set, raw_qs = get_calls_today_dataset(campaign=campaign, site=site)
         
     context['data_set'] = data_set
+    context['raw_qs'] = raw_qs
     if request.GET.get('graph_type', 'off') == 'on':
         context['graph_type'] = 'doughnut'
     else:
@@ -290,12 +291,12 @@ def get_current_call_count_distribution(request):
     if non_time_filtered_opportunities.filter(calls__gt=index):
         while non_time_filtered_opportunities.filter(calls__gte=index):
             if non_time_filtered_opportunities.exclude(calls=index).count():
-                queryset_conversion_rate = (non_time_filtered_opportunities.filter(calls=index).count() / non_time_filtered_opportunities.count())*100
+                queryset_percentage_portion = (non_time_filtered_opportunities.filter(calls=index).count() / non_time_filtered_opportunities.count())*100
             elif non_time_filtered_opportunities.filter(calls=index).count():
-                queryset_conversion_rate = 100
+                queryset_percentage_portion = 100
             else:
-                queryset_conversion_rate = 0
-            call_counts_tuples.append((index, non_time_filtered_opportunities.filter(calls=index).count(), non_time_filtered_live_opportunities.filter(calls=index).aggregate(Sum('campaign__product_cost')), queryset_conversion_rate))
+                queryset_percentage_portion = 0
+            call_counts_tuples.append((index, non_time_filtered_opportunities.filter(calls=index).count(), non_time_filtered_live_opportunities.filter(calls=index).aggregate(Sum('campaign__product_cost')), queryset_percentage_portion))
             index = index + 1
     else:
         pass
@@ -327,14 +328,15 @@ def get_base_analytics(request):
         else:
             opportunities = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, created__gte=start_date, created__lt=end_date, campaign__site__in=request.user.profile.sites_allowed.all()).annotate(calls=Count('call'))
 
-        live_opportunities = opportunities.filter(complete=False, sold=False)
-        closed_opportunities = opportunities.filter(complete=True, sold=True)
-        lost_opportunities = opportunities.filter(complete=True, sold=False)
+        live_opportunities = opportunities.exclude(complete=True).exclude(sold=True)
+        closed_opportunities = opportunities.filter(sold=True)
+        lost_opportunities = opportunities.filter(complete=True).exclude(sold=True)
 
         context['opportunities_count'] = opportunities.count()
         context['live_opportunities_count'] = live_opportunities.count()
         context['closed_opportunities_count'] = closed_opportunities.count()
         context['lost_opportunities_count'] = lost_opportunities.count()
+        
         if live_opportunities:
             context['live_value'] = float(live_opportunities.aggregate(Sum('campaign__product_cost')).get('campaign__product_cost__sum', 0))
         else:
