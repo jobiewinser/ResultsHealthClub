@@ -87,14 +87,15 @@ def calendly_booking_success(request):
     from channels.layers import get_channel_layer
     channel_layer = get_channel_layer()          
     lead = booking.lead
-    campaign_pk = lead.campaign.site.company.pk   
+    company_pk = lead.campaign.site.company.pk   
+    rendered_html = f"<span hx-swap-oob='delete' id='lead-{lead.pk}'></span> <span hx-swap-oob='outerHTML:.booking-lead-{lead.pk}'><span hx-get='/campaign-leads/refresh-booking-row/{lead.pk}/' hx-swap='innerHTML' hx-target='#row_{lead.pk}' hx-indicator='.htmx-indicator' hx-trigger='load'></span></span>"
     async_to_sync(channel_layer.group_send)(
-        f"lead_{campaign_pk}",
+        f"lead_{company_pk}",
         {
             'type': 'lead_update',
             'data':{
                 # 'company_pk':campaign_pk,
-                'rendered_html': f"<span hx-swap-oob='delete' id='lead-{lead.pk}'></span>",
+                'rendered_html': rendered_html,
             }
         }
     )

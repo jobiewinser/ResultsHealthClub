@@ -1,0 +1,65 @@
+{% extends 'whatsapp/htmx/whatsapp_template_edit_htmx.html' %}
+{%load static%}
+
+
+{%block template_name%}
+<h5>Template Name</h5>
+<div class="row"
+data-bs-toggle="popover" 
+data-bs-trigger="hover" 
+data-bs-html="true" 
+data-bs-placement="top"
+data-bs-title="What does this do?"
+data-bs-content="
+<p>
+    The template name does not appear for recipients, it's for your/Whatsapp's reference.
+</p>
+">
+    <div class="col">
+        <input class="form-control" id="template_name" value="{{template.name}}" name="template_name">
+    </div>
+</div>
+{%endblock template_name%}
+
+{%block template_category%}
+<h5>Category</h5>
+<div class="row"
+data-bs-toggle="popover" 
+data-bs-trigger="hover" 
+data-bs-html="true" 
+data-bs-placement="top"
+data-bs-title="What do these categories mean?"
+data-bs-content="
+<b>Transactional</b>
+<p>
+    Send account updates, order updates, alerts and more to share important information.
+</p>
+<br>
+<b>Marketing</b>
+<p>
+    Send promotional offers, product announcements and more to increase awareness.
+</p>
+<br>
+">
+    <div class="col">
+        <select id="template_category" name="template_category" class="form-select form-select-sm align-self-center m-1">
+            {%for k,v in categories.items%}
+            <option {%if template.category == k%}selected {%endif%}value="{{k}}">{{k}}</option>
+            {%endfor%}        
+        </select>
+    </div>
+</div>
+{%endblock template_category%}
+
+{%block submit_button%}
+<button class="btn btn-success m-3"
+    onclick="saveTemplate('{{site.pk}}', '{{template.pk}}', create=true)"
+    data-bs-toggle="popover" 
+    data-bs-trigger="hover" 
+    data-bs-placement="top"
+    data-bs-title="What does this do?"
+    data-bs-content="This saves your changes to this system, but does not push it to Whatsapp to review. You must request a review from the template table. You may save your work then come back to it later here before requesting approval from Whatsapp.">
+    <i class="fa fa-save" aria-hidden="true"></i> 
+    Create Template
+</button>
+{%endblock submit_button%}

@@ -175,25 +175,25 @@ def clear_chat_from_session(request):
         print("clear_chat_from_session error", str(e))
     return HttpResponse("", "text", 200)
         
-from django.contrib.auth.decorators import login_required
-@login_required
-def add_chat_whatsapp_number_to_session(request):
-    try:
-        request.session['open_chat_whatsapp_number'] = request.POST.get('whatsappnumber_pk')
-    except Exception as e:
-        print("add_chat_whatsapp_number_to_session error", str(e))
-    return HttpResponse("", "text", 200)
-from django.contrib.auth.decorators import login_required
-@login_required
-def add_chat_conversation_to_session(request):
-    try:
-        request.session['open_chat_whatsapp_number'] = request.POST.get('whatsappnumber_pk')
-        if not request.session.get('open_chat_conversation_customer_number', []):
-            request.session['open_chat_conversation_customer_number'] = [request.POST.get('customer_number')]
-        elif not request.POST.get('customer_number') in request.session.get('open_chat_conversation_customer_number', []):
-            request.session['open_chat_conversation_customer_number'].append(request.POST.get('customer_number'))
-        print("add_chat_conversation_to_session current open_chat_whatsapp_number", str(request.session['open_chat_whatsapp_number']) )
-        print("add_chat_conversation_to_session current open_chat_conversation_customer_number", str(request.session['open_chat_conversation_customer_number']) )
-    except Exception as e:
-        print("add_chat_conversation_to_session error", str(e))
-    return HttpResponse("", "text", 200)
+# from django.contrib.auth.decorators import login_required
+# @login_required
+# def add_chat_whatsapp_number_to_session(request):
+#     try:
+#         request.session['open_chat_whatsapp_number'] = request.POST.get('whatsappnumber_pk')
+#     except Exception as e:
+#         print("add_chat_whatsapp_number_to_session error", str(e))
+#     return HttpResponse("", "text", 200)
+# from django.contrib.auth.decorators import login_required
+# @login_required
+# def add_chat_conversation_to_session(request):
+#     try:
+#         request.session['open_chat_whatsapp_number'] = request.POST.get('whatsappnumber_pk')
+#         if not request.session.get('open_chat_conversation_customer_number', []):
+#             request.session['open_chat_conversation_customer_number'] = [request.POST.get('customer_number')]
+#         elif not request.POST.get('customer_number') in request.session.get('open_chat_conversation_customer_number', []):
+#             request.session['open_chat_conversation_customer_number'].append(request.POST.get('customer_number'))
+#         print("add_chat_conversation_to_session current open_chat_whatsapp_number", str(request.session['open_chat_whatsapp_number']) )
+#         print("add_chat_conversation_to_session current open_chat_conversation_customer_number", str(request.session['open_chat_conversation_customer_number']) )
+#     except Exception as e:
+#         print("add_chat_conversation_to_session error", str(e))
+#     return HttpResponse("", "text", 200)

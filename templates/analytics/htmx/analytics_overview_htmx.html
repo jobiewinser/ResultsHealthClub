@@ -1,0 +1,70 @@
+{%load static core_tags%}
+<span>    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        
+    <script src="https://cdn.jsdelivr.net/npm/moment@^2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@^1"></script>
+    <script>
+        document.title = "Analytics";
+        $(document).ready(function() {
+            var leads_to_sales_chart_var = null;
+            var leads_to_sales_chart = null;
+    
+            var leads_to_bookings_chart_var = null;
+            var leads_to_bookings_chart = null;
+    
+            var calls_today_chart_var = null;
+            var calls_today_chart = null;
+            try{
+                leads_to_sales_chart.destroy();
+                leads_to_bookings_chart.destroy();
+                calls_today_chart.destroy();
+            }catch{}
+        });
+    </script>
+
+
+    <div class="row mt-0">
+        {%block extra_top_left_buttons %}
+        {% comment %} <div class="col-md-auto m-1">
+            <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
+        </div> {% endcomment %}
+        {%include 'core/htmx/site_selection.html'%}
+
+        <button hidden hx-get="{% url 'analytics-overview' %}" hx-push-url="false" hx-swap="innerHTML" hx-include=".non_site_dependant_analytics_filters" hx-indicator=".top-htmx-indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
+        <button hidden
+            hx-get="{%url 'refresh-analytics'%}"
+            hx-swap="outerHTML" hx-push-url="false" hx-include=".non_site_dependant_analytics_filters" hx-indicator=".htmx-indicator" hx-target="#analytics_span_wrapper" id="filter_campaign"></button>
+
+            <div class="col-md-auto m-1" hx-get="{% url 'get-campaign'%}" hx-include=".non_site_dependant_analytics_filters" hx-trigger="load" hx-indicator=".htmx-indicator" hx-target="#campaign_list_span" hx-swap="outerHTML">
+            <span id="campaign_list_span">   
+                <select class="form-select">
+                    <option>Loading</option>
+                </select>    
+            </span>
+        </div>
+        
+
+        <div class="col center">
+            
+        </div>
+            
+        
+        {%endblock extra_top_left_buttons %}
+
+        <div class="col">
+        </div>
+
+        {%block extra_top_right_buttons %}
+        <div class="col-md-auto">
+            <span class="badge bg-dark text-white"><h6 class="m-1">Analytics</h6><input id="current_page" hidden value="analytics_overview"></input></span>      
+        </div>
+        {%endblock extra_top_right_buttons %}
+    </div>
+
+    <div class="row">
+        <div class="col" style=""> 
+        {%include 'analytics/htmx/analytics_content.html' %}
+        </div>
+    </div>
+<span>

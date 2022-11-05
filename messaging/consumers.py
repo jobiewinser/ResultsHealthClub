@@ -97,7 +97,7 @@ def send_whatsapp_message_to_number(message, customer_number, user, whatsappnumb
 def message_details_user(user):   
     logger.debug("message_details_user start")
     avatar = user.profile.avatar.url
-    name = user.profile.name()
+    name = user.profile.name
     return avatar, name
 @sync_to_async
 def get_whatsappnumber(whatsappnumber_pk):   
@@ -165,7 +165,7 @@ class LeadsConsumer(AsyncWebsocketConsumer):
         user = self.scope["user"]
         if(user.is_authenticated):
             await self.channel_layer.group_send(
-                self.group_name,
+                self.group_name,    
                 {
                     'type': 'lead_update',
                     "message": text_data_json["rendered_html"],
@@ -176,16 +176,16 @@ class LeadsConsumer(AsyncWebsocketConsumer):
     async def lead_update(self, event):
         await self.send(
             text_data=json.dumps({
-                'message':event['data']['rendered_html'].replace("\n", "").lstrip().rstrip()
-            })
-        )
-    async def lead_move(self, event):
-        await self.send(
-            text_data=json.dumps({
                 'message':event['data']['rendered_html']
-                # 'message':"<span hx-swap-oob='afterbegin:.column'>TEST</span>"
             })
         )
+    # async def lead_move(self, event):
+    #     await self.send(
+    #         text_data=json.dumps({
+    #             'message':event['data']['rendered_html']
+    #             # 'message':"<span hx-swap-oob='afterbegin:.column'>TEST</span>"
+    #         })
+    #     )
 
     
 class CompanyMessageCountConsumer(AsyncWebsocketConsumer):

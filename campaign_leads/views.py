@@ -49,98 +49,96 @@ class CampaignleadsOverviewView(TemplateView):
             logger.error(f"get_campaigns {str(e)}")
             return HttpResponse("Couldn't complete Campaign Leads Overview request", status=500)
 
-    def get_context_data(self, **kwargs):
-        self.request.GET._mutable = True       
+    def get_context_data(self, **kwargs):    
         context = super(CampaignleadsOverviewView, self).get_context_data(**kwargs)  
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
-            self.template_name = 'campaign_leads/htmx/leads_board_htmx.html'   
-        context['campaigns'] = get_campaign_qs(self.request)
-        leads = Campaignlead.objects.filter(complete=False, campaign__site__in=self.request.user.profile.sites_allowed.all()).exclude(booking__archived=False)
-        # leads = Campaignlead.objects.filter()
-        campaign_pk = self.request.GET.get('campaign_pk', None)
-        if campaign_pk:
-            try:
-                leads = leads.filter(campaign=Campaign.objects.get(pk=campaign_pk))
-                self.request.GET['campaign_pk'] = campaign_pk
-                context['campaign'] = Campaign.objects.get(pk=campaign_pk)
-                self.request.GET['site_pk'] = context['campaign'].site.pk
-            except:
-                pass
-        site_pk = get_site_pk_from_request(self.request)
-        if site_pk and not site_pk == 'all':
-            try:
-                leads = leads.filter(campaign__site__pk=site_pk)
-                self.request.GET['site_pk'] = site_pk    
-                context['site'] = Site.objects.get(pk=site_pk)
-            except:
-                pass
-        
-        # context['site_list'] = get_available_sites_for_user(self.request.user)
-        leads = leads.annotate(calls=Count('call')).order_by('-last_dragged')
-        # leads = leads.annotate(calls=Count('call'), cost=F('campaign__product_cost'))
-        
-        context['querysets'] = [
-            ('Fresh', leads.filter(calls=0), 0)
-        ]
-        index = 0
-        # if leads.filter(calls__gt=index):
-        while leads.filter(calls__gt=index) or index < 21:
-            index = index + 1
-            context['querysets'].append(
-                (f"Call {index}", leads.filter(calls=index), index)
-            )
-        context['querysets'].append(
-            (f"Call {index+1}", leads.none(), index+1)
-        )
-        # else:
-        #     context['querysets'].append(
-        #         (f"Call 1", leads.none(), 1)
-        #     )
-        context['max_call_count'] = index
-        context['company'] = self.request.user.profile.company
+            self.template_name = 'campaign_leads/htmx/campaign_leads_overview_htmx.html'   
+        context.update(get_leads_board_context(self.request))
             
         # whatsapp = Whatsapp()
         return context
         
+def get_leads_board_context(request):
+    request.GET._mutable = True 
+    context = {}   
+    context['campaigns'] = get_campaign_qs(request)
+    leads = Campaignlead.objects.filter(complete=False, campaign__site__in=request.user.profile.sites_allowed.all()).exclude(booking__archived=False)
+    campaign_pk = request.GET.get('campaign_pk', None)
+    if campaign_pk:
+        try:
+            leads = leads.filter(campaign=Campaign.objects.get(pk=campaign_pk))
+            request.GET['campaign_pk'] = campaign_pk
+            context['campaign'] = Campaign.objects.get(pk=campaign_pk)
+            request.GET['site_pk'] = context['campaign'].site.pk
+        except:
+            pass
+    site_pk = get_site_pk_from_request(request)
+    if site_pk and not site_pk == 'all':
+        try:
+            leads = leads.filter(campaign__site__pk=site_pk)
+            request.GET['site_pk'] = site_pk    
+            context['site'] = Site.objects.get(pk=site_pk)
+        except:
+            pass
+    leads = leads.annotate(calls=Count('call')).order_by('-last_dragged')
+    
+    context['querysets'] = [
+        ('Fresh', leads.filter(calls=0), 0)
+    ]
+    index = 0
+    # if leads.filter(calls__gt=index):
+    while leads.filter(calls__gt=index) or index < 21:
+        index = index + 1
+        context['querysets'].append(
+            (f"Call {index}", leads.filter(calls=index), index)
+        )
+    context['querysets'].append(
+        (f"Call {index+1}", leads.none(), index+1)
+    )
+    # else:
+    #     context['querysets'].append(
+    #         (f"Call 1", leads.none(), 1)
+    #     )
+    context['max_call_count'] = index
+    context['company'] = request.user.profile.company
+    return context
 
+def refresh_leads_board(request):
+    return render(request, 'campaign_leads/htmx/leads_board.html', get_leads_board_context(request))
 @method_decorator(campaign_leads_enabled_required, name='dispatch')
 @method_decorator(login_required, name='dispatch')
 class CampaignBookingsOverviewView(TemplateView):
     template_name='campaign_leads/campaign_bookings_overview.html'
-
     def get_context_data(self, **kwargs):
-        self.request.GET._mutable = True     
         context = super(CampaignBookingsOverviewView, self).get_context_data(**kwargs)    
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
-            self.template_name = 'campaign_leads/htmx/campaign_bookings_table_htmx.html'   
+            self.template_name = 'campaign_leads/htmx/campaign_bookings_overview_htmx.html'   
             context['campaigns'] = get_campaign_qs(self.request)
-        leads = Campaignlead.objects.exclude(booking__created=None)
-        campaign_pk = self.request.GET.get('campaign_pk', None)
-        if campaign_pk:
-            leads = leads.filter(campaign=Campaign.objects.get(pk=campaign_pk))
-            self.request.GET['campaign_pk'] = campaign_pk
-        site_pk = get_site_pk_from_request(self.request)
-        if site_pk and not site_pk == 'all':
-            leads = leads.filter(campaign__site__pk=site_pk)
-            self.request.GET['site_pk'] = site_pk 
-            context['site'] = Site.objects.get(pk=site_pk)
-            
-        context['complete_count'] = leads.filter(complete=True).count()
-        complete_filter = (self.request.GET.get('complete', '').lower() =='true')
-        leads = leads.filter(complete=complete_filter)   
-        # booking_needed_filter = (self.request.GET.get('booking_needed', '').lower() =='true')
-        # if booking_needed_filter:
-        #     leads = leads.filter(booking=None)
-        context['booking_needed_count'] = leads.filter(booking=None).count()
-
-
-
-
-        # context['site_list'] = get_available_sites_for_user(self.request.user)
-        context['leads'] = leads
-        # whatsapp = Whatsapp()
+        context.update(get_booking_table_context(self.request))
         return context
-        
+def get_booking_table_context(request):
+    request.GET._mutable = True     
+    context = {}
+    leads = Campaignlead.objects.exclude(booking__created=None)
+    campaign_pk = request.GET.get('campaign_pk', None)
+    if campaign_pk:
+        leads = leads.filter(campaign=Campaign.objects.get(pk=campaign_pk))
+        request.GET['campaign_pk'] = campaign_pk
+    site_pk = get_site_pk_from_request(request)
+    if site_pk and not site_pk == 'all':
+        leads = leads.filter(campaign__site__pk=site_pk)
+        request.GET['site_pk'] = site_pk 
+        context['site'] = Site.objects.get(pk=site_pk)            
+    context['complete_count'] = leads.filter(complete=True).count()
+    complete_filter = (request.GET.get('complete', '').lower() =='true')
+    leads = leads.filter(complete=complete_filter)   
+    context['complete'] = complete_filter
+    context['booking_needed_count'] = leads.filter(booking=None).count()
+    context['leads'] = leads
+    context['company'] = request.user.profile.company
+    return context
+def refresh_booking_table_htmx(request):
+    return render(request, 'campaign_leads/htmx/campaign_bookings_table.html', get_booking_table_context(request))
 @method_decorator(campaign_leads_enabled_required, name='dispatch')
 @method_decorator(login_required, name='dispatch')
 class CampaignConfigurationView(TemplateView):

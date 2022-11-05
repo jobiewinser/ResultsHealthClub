@@ -133,7 +133,7 @@ class WhatsappNumber(PhoneNumber):
     #         message_pk_list.append(dict.get('pk'))
     #     return WhatsAppMessage.objects.filter(pk__in=message_pk_list).order_by('-inbound', '-datetime')
 
-    def send_whatsapp_message(self, customer_number=None, lead=None, message="", user=None, template_used=None):  
+    def send_whatsapp_message(self, customer_number=None, lead=None, message="", user=None):  
         try:
             logger.debug("site.send_whatsapp_message start") 
             if lead:
@@ -155,7 +155,6 @@ class WhatsappNumber(PhoneNumber):
                                 site=self.site,
                                 user=user,
                                 customer_number=customer_number,
-                                template=template_used,
                                 inbound=False,
                                 whatsappnumber=self,
                             )
@@ -240,7 +239,7 @@ class Site(models.Model):
         if lead_generation_app == 'b' and not self.company.active_campaign_enabled:
             return HttpResponse(f"Active Campaign is not enabled for {self.company.company_name}", status=500)
         if lead_generation_app == 'a':
-            manually_created_campaign, created = ManualCampaign.objects.get_or_create(site=self, name=f"Manually Created")
+            manually_created_campaign, created = ManualCampaign.objects.get_or_create(site=self, name=f"Manually Created ({self.name})")
             lead = Campaignlead.objects.create(
                 first_name=first_name,
                 email=email,
@@ -365,6 +364,7 @@ class Profile(models.Model):
             return f"{self.user.first_name} {self.user.last_name}"
         else:
             return str(self.pk)
+    @property
     def name(self):
         return f"{self.user.first_name} {self.user.last_name}"
 class FreeTasterLink(models.Model):

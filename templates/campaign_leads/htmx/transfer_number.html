@@ -1,4 +1,4 @@
-<span>
+<div class="generic_modal_contents">
     <div class="row">
         <div class="col">
             <select class="form-select" name="site_pk" id="site_pk_{{whatsappnumber.pk}}" onchange="console.log(this.value.toString(), '{{whatsappnumber.site.pk}}'); if(this.value.toString() == '{{whatsappnumber.site.pk}}'){$('#assign_site_{{whatsappnumber.pk}}').attr('disabled', true)}else{$('#assign_site_{{whatsappnumber.pk}}').attr('disabled', false)}">
@@ -14,7 +14,7 @@
                 class="btn btn-primary btn-sm">Transfer</button>
         </div>
     </div>
-</span>
+</div>
 <span hx-swap-oob="true" id="generic_modal_title">
     Transfer Whatsapp Number - {{whatsappnumber.alias}}
     <input type="text" style="display:None" id="modal_lead_pk" name="lead_pk" value="{{lead.pk}}"/>

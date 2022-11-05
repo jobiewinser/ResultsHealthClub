@@ -3,6 +3,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <html>
     <head>
+        <script>
+            var csrftoken = '{{ csrf_token }}';
+        </script>
         <link rel="shortcut icon" type="image/png" href="{% static 'img/logo-dark-back-img.png' %}"/>
         {%block cdn%}
             <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" />
@@ -16,242 +19,137 @@
             <link href="{% static 'css/snackbar.css' %}" rel="stylesheet" />
             <script src="{% static 'js/snackbar.js' %}"></script> 
             <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js"></script>
+            <link href="{% static 'css/datatables.css' %}" rel="stylesheet" />
+            <script src="{% static 'js/datatables.js' %}"></script> 
             
             <link rel="stylesheet" type="text/css"  href="{% static 'css/side_bar.css' %}">
             <link rel="stylesheet" type="text/css"  href="{% static 'css/base.css' %}">
             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.0/font/bootstrap-icons.css" />
            {%endblock cdn%}
+        
+        <link href="{% static 'css/drag_drop.css' %}" rel="stylesheet" />
+        <script src="{% static 'js/drag_drop.js' %}"></script> 
 
-        {%block scripts%}
+        <script src="{% static 'js/base.js' %}"></script>
+        <script src="{% static 'js/modules/leads.js' %}"></script>
+        <script src="{% static 'js/modules/booking.js' %}"></script>
+        <script src="{% static 'js/modules/analytics.js' %}"></script>
+        <script src="{% static 'js/modules/free_tasters.js' %}"></script>
+        <script src="{% static 'js/modules/company_configuration.js' %}"></script>
+        <script src="{% static 'js/modules/whatsapp_templates.js' %}"></script>
+        <script src="{% static 'js/modules/whatsapp_template_edit.js' %}"></script>
+        
         <audio id="notification1" src="{% static 'audio/notification1.wav' %}" preload="auto"></audio>
         <audio id="notification2" src="{% static 'audio/notification2.mp3' %}" preload="auto"></audio>
-        <script>
-            var PageTitleNotification = {
-                Vars:{
-                    OriginalTitle: document.title,
-                    Interval: null
-                },    
-                On: function(notification, intervalSpeed){
-                    var _this = this;
-                    _this.Vars.Interval = setInterval(function(){
-                         document.title = (_this.Vars.OriginalTitle == document.title)
-                                             ? notification
-                                             : _this.Vars.OriginalTitle;
-                    }, (intervalSpeed) ? intervalSpeed : 1000);
-                },
-                Off: function(){
-                    clearInterval(this.Vars.Interval);
-                    document.title = this.Vars.OriginalTitle;   
-                }
-            }
-            
-            function clear_chat_from_session(customer_number){
-                var respStatus = $.ajax({
-                    type:'POST',
-                    url:'{%url "clear-chat-from-session"%}',
-                    data:{'customer_number':customer_number, 'csrfmiddlewaretoken':'{{ csrf_token }}'},
-                    success: function (data) {
-                    },
-                    error: function(XMLHttpRequest, textStatus, errorThrown) {
-                    }
-                })
-            }
-            function add_chat_conversation_to_session(whatsappnumber_pk, customer_number){
-                    var respStatus = $.ajax({
-                        type:'POST',
-                        url:'{%url "add-chat-conversation-to-session"%}',
-                        data:{'whatsappnumber_pk':whatsappnumber_pk, 'customer_number':customer_number, 'csrfmiddlewaretoken':'{{ csrf_token }}'},
-                        success: function (data) {
-                        },
-                        error: function(XMLHttpRequest, textStatus, errorThrown) {
-                        }
-                    })
-            }
-            function add_chat_whatsapp_number_to_session(whatsapp_number){
-                var respStatus = $.ajax({
-                    type:'POST',
-                    url:'{%url "add-chat-whatsapp-number-to-session"%}',
-                    data:{'whatsapp_number':whatsapp_number, 'csrfmiddlewaretoken':'{{ csrf_token }}'},
-                    success: function (data) {
-                    },
-                    error: function(XMLHttpRequest, textStatus, errorThrown) {
-                    }
-                })
-            }
-            
-            function fallbackCopyTextToClipboard(text) {
-                var textArea = document.createElement("textarea");
-                textArea.value = text;
-                
-                // Avoid scrolling to bottom
-                textArea.style.top = "0";
-                textArea.style.left = "0";
-                textArea.style.position = "fixed";
+        
+        {%block styles%}
+        <style>
               
-                document.body.appendChild(textArea);
-                textArea.focus();
-                textArea.select();
-              
-                try {
-                  var successful = document.execCommand('copy');
-                  var msg = successful ? 'successful' : 'unsuccessful';
-                  if (msg == 'successful') {
-                    snackbarShow('Successfully copied free taster link', 'success')
-                  } else {
-                    snackbarShow('Failed to copy free taster link', 'danger')
-                  }
-                } catch (err) {
-                }
-              
-                document.body.removeChild(textArea);
-              }
-
-              function inlinePreventDefault(e) {
-                  e.preventDefault();
-              }
-              
-              function copyTextToClipboard(text) {
-                if (!navigator.clipboard) {
-                  fallbackCopyTextToClipboard(text);
-                  return;
-                }
-                navigator.clipboard.writeText(text).then(function() {
-                    snackbarShow('Successfully copied free taster link', 'success')
-                }, function(err) {
-                    snackbarShow('Failed to copy free taster link', 'danger')
-                });
-              }
-            </script>
-            
-            <script>
-                let dt = null;
-                $(document).ready(function() {
-                    $("[data-bs-toggle=popover]").popover();
-                    document.body.addEventListener('htmx:afterRequest', function(evt) {   
-                        if (evt.detail.target.id == 'generic_modal_body'){
-                            $('#generic_modal').modal('show');
-                        }
-                        if (![undefined, ''].includes(evt.detail.pathInfo.path)){
-                            if (evt.detail.pathInfo.path.includes("modify-user")){
-                                $('#generic_modal').modal('hide');
-                                snackbarShow('Successfully modifed/added user', 'success')
-                            }
-                        }
-                        if (evt.detail.xhr.status == 200){
-                        } else {
-                            snackbarShow(evt.detail.xhr.responseText, 'danger')
-                        }
-                        $('.popover').remove()
-                        $('[data-bs-toggle=popover]').popover();
-                        $('[data-bs-toggle=popover_delay]').popover({
-                            delay: { 
-                               show: "350", 
-                               hide: "100"
-                            }
-                        });
-                    });     
-                    
-                    document.body.addEventListener('htmx:afterRequest', function(evt) {                          
-                        let status = evt.detail.xhr.status;
-                        let srcElement = $(evt.srcElement);
-                        let src_id = srcElement.attr('id');
-                        if(status == 200) {
-                            if (![undefined, ''].includes(evt.detail.pathInfo.path)){
-                                if (evt.detail.pathInfo.path.includes("login")){
-                                    window.location.replace("/");
-                                }
-                            }
-                            if (![undefined, ''].includes(evt.detail.pathInfo.requestPath)){
-                                if (evt.detail.pathInfo.requestPath.includes("login-htmx")){
-                                    snackbarShow('Successfully logged in', 'success');
-                                    location.reload();;
-                                }else if (evt.detail.pathInfo.requestPath.includes("modify-user")){
-                                    snackbarShow('Successfully logged in', 'success');
-                                    location.reload();;
-                                }
-                            }
-                        } else if (status == 404) {
-                            if ($('#'+src_id+"_error").length == 0){                                
-                                $("#"+src_id).after("<div id='"+src_id+"_error' style='color:red'>Not Found</div>");
-                            } else {                                
-                                $('#'+src_id+"_error").html("<div id='"+src_id+"_error' style='color:red'>Not Found</div>");
-                            }
-                        }else if (status == 500){
-                            snackbarShow('Error: '+evt.detail.xhr.response, 'danger')           
-                        }
-                    });                    
-                    
-
-                    document.body.addEventListener('htmx:configRequest', function(evt) {    
-                        evt.detail.headers['x-csrftoken'] = '{{csrf_token}}';
-                    });
-                });
-            </script>
-        {%endblock scripts%}     
+        </style>
+        {%endblock styles%}
+        
     </head>
+    
+    <script>  
+            
+        function basehandlehtmxafterSwap(evt){
+            if (evt.detail.pathInfo.requestPath.includes("message-window")){
+                let element = $(evt.target.lastElementChild).find(".chat_card_body");
+                try{
+                    element.scrollTop(element[0].scrollHeight - element[0].clientHeight);
+                }catch(e){}
+            }
+        }
 
-    <body class="cartoon-background" style="height:auto">
-        <nav class="navbar navbar-expand-lg bg-dark navbar-dark" id="topnav">
-            <div class="container-fluid ">
-                <a class="navbar-brand p-0" href="{%url 'customer-home'%}">
-                    <img class="side_nav_logo" src="{% static 'img/logo-dark-back-img.png' %}" style="height:5vh" alt="winser systems logo">
-                </a>
-                <a class="navbar-brand p-0" href="{%url 'customer-home'%}">
-                <img class="side_nav_logo" src="{% static 'img/logo-dark-back-text.png' %}" style="height:2.25vh" alt="winser systems logo">
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                  <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                  <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                      <a class="nav-link" href="{%url 'campaign-leads-overview'%}"><i class="fa-light fa-magnifying-glass"></i> Leads</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="{%url 'campaign-booking-overview'%}"><i class="fa-light fa-table"></i> Bookings</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="{%url 'analytics-overview'%}"><i class="fa-light fa-chart-line-up"></i> Analytics</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                      <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fa-light fa-gear"></i> Configuration
-                      </a>
-                      <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{%url 'company-configuration'%}">Company Configuration</a></li>
-                        <li><a class="dropdown-item" href="{%url 'site-configuration'%}">Site Configuration</a></li>
-                        <li><a class="dropdown-item" href="{%url 'campaign-configuration'%}">Campaign Configuration</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="{%url 'whatsapp-templates'%}">Whatsapp Templates</a></li>
-                      </ul>
-                    </li>
-                    
-                    <li class="nav-item ">
-                        <img  class="top-htmx-indicator htmx-indicator" id="top-htmx-indicator" src="https://htmx.org/img/bars.svg"/>
-                    </li>
-                  </ul>
-                  {%include 'core/htmx/profile-nav-section.html'%}
-                </div>
-            </div>
-        </nav>
-        <div class="container-fluid  p-0">
-            <div class="row  mt-2">
-                {%block extra_top_left_buttons %}
-                {%endblock extra_top_left_buttons %}
+        $(document).ready(function() {
+            
+            function handlehtmxafterSwap(evt){
+                var current_module = $('#current_page').val()
+                if (current_module == 'analytics_overview'){
+                    analyticshandlehtmxafterSwap(evt);                    
+                } else if (current_module == 'campaign_booking_overview'){
+                    bookinghandlehtmxafterSwap(evt);                    
+                } else if (current_module == 'free_tasters'){
+                    freetastershandlehtmxafterSwap(evt);                    
+                } else if (current_module == 'whatsapp_templates'){
+                    whatsapptemplateshandlehtmxafterSwap(evt);                    
+                }
+                
+            }
+            document.body.addEventListener('htmx:afterSwap', handlehtmxafterSwap);
+            
+            function handlehtmxafterRequest(evt){
+                var current_module = $('#current_page').val()
+                if (current_module == 'analytics_overview'){
+                    companyconfigurationhandlehtmxafterRequest(evt);
+                } else if (current_module == 'campaign_leads_overview'){
+                    leadshandlehtmxafterSwap(evt);
+                } else if (current_module == 'whatsapp_templates'){
+                    whatsapptemplateshandlehtmxafterRequest(evt);                    
+                }
+                basehandlehtmxafterRequest(evt);
+            }
+            document.body.addEventListener('htmx:afterRequest', handlehtmxafterRequest);
 
-                <div class="col">
-                </div>
+            function handlehtmxbeforeRequest(evt){
+                var current_module = $('#current_page').val()
+                if (current_module == 'campaign_leads_overview'){
+                    leadshandlehtmxbeforeRequest(evt);
+                } else if (current_module == 'free_tasters'){
+                    freetastershandlehtmxbeforeRequest(evt);                    
+                }
+                basehandlehtmxafterSwap(evt);
+            }
+            document.body.addEventListener('htmx:beforeRequest', handlehtmxbeforeRequest);
+            
+            function handlehtmxoobAfterSwap(evt){
+                var current_module = $('#current_page').val()
+                basehandlehtmxoobAfterSwap(evt);
+            }
+            document.body.addEventListener('htmx:oobAfterSwap', handlehtmxoobAfterSwap);
+            
+            function handlehtmxoobBeforeSwap(evt){
+                var current_module = $('#current_page').val()
+                basehandlehtmxoobBeforeSwap(evt);
+            }
+            document.body.addEventListener('htmx:oobBeforeSwap', handlehtmxoobBeforeSwap);
+            
+            function handlehtmxconfigRequest(evt){ 
+                evt.detail.headers['x-csrftoken'] = '{{csrf_token}}';
+            }
+            document.body.addEventListener('htmx:configRequest', handlehtmxconfigRequest);
+            
+            
 
-                {%block extra_top_right_buttons %}                    
-                {%endblock extra_top_right_buttons %}
-            </div>
-            <div class="row ">
-                <div class="col" style=""> 
-                    {%block content%} 
-                    {%endblock content%}
-                </div>
-            </div>
+            $('#generic_modal').on('hidden.bs.modal', function () {
+                $('#generic_modal_body').html("")
+            })
+    
+            window.addEventListener("message", function(e) {
+                if(isCalendlyEvent(e)) {
+                    $('#calendly_loading').remove()
+                    if (e.data.event == "calendly.event_scheduled") {               
+                        var respStatus = $.ajax({
+                            type:'POST',
+                            url:'{%url "calendly-booking-success"%}',
+                            data:{'lead_pk':$('#modal_lead_pk').val(), 'uri':e.data.payload.event.uri, 'csrfmiddlewaretoken':'{{ csrf_token }}'},
+                            success: function (data) {
+                            },
+                            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                            }
+                        })
+                    }
+                }
+            });
+        });
+    </script>
+    <body class="cartoon-background">
+        {%include 'core/nav.html'%}
+        <div class="container-fluid pb-5" id="content" style="">  
+            {%block content%} 
+            {%endblock content%}
         </div>
+        <img class="htmx-indicator" id="page_load_indicator" src="https://htmx.org/img/bars.svg"/>
 
         <div class="modal fade" id="generic_modal" role="dialog" style="overflow:hidden;display: none;">
             <div class="modal-dialog modal-lg">
@@ -271,84 +169,16 @@
         <div id="snackbar"></div>
 
         {%block chat_bottom%}
-            <script>  
-
-            $(document).ready(function() {
-                document.body.addEventListener('htmx:afterSwap', function(evt) {
-                    if (evt.detail.pathInfo.requestPath.includes("message-window")){
-                        let element = $(evt.target.lastElementChild).find(".chat_card_body");
-                        try{
-                            element.scrollTop(element[0].scrollHeight - element[0].clientHeight);
-                        }catch(e){console.log(e)}
-                    }
-                });
-                
-                document.body.addEventListener('htmx:beforeRequest', function(evt) {
-                    if (evt.detail.pathInfo.requestPath.includes("get-more-messages")){
-                    }
-                });
-                document.body.addEventListener('htmx:afterRequest', function(evt) {
-                    if (evt.detail.pathInfo.requestPath.includes("get-more-messages")){
-                    }
-                });
-                
-                document.body.addEventListener('htmx:oobAfterSwap', function(evt) { 
-                    if ($(evt.detail.target).hasClass('chat_card_body')){                        
-                        $(evt.detail.target).animate({
-                            scrollTop: $(evt.detail.target)[0].scrollHeight - $(evt.detail.target)[0].clientHeight
-                        }, 100);
-                    }
-                    $("[data-bs-toggle=popover]").popover();
-                });
-                document.body.addEventListener('htmx:oobBeforeSwap', function(evt) { 
-                    {% comment %} console.log("oobBeforeSwap", evt) {% endcomment %}
-                    if ($(evt.target).hasClass('message_list_body')){
-                        console.log(2)
-                        document.getElementById('notification1').play();
-                        htmx.ajax('GET', "{%url 'update-message-counts'%}", {swap:'none'})
-                    }
-                    $("[data-bs-toggle=popover]").popover();
-                });
-                
-                document.body.addEventListener('htmx', function(evt) { 
-                    
-                });
-
-                $('#generic_modal').on('hidden.bs.modal', function () {
-                    $('#generic_modal_body').html("")
-                })
-        
-                window.addEventListener("message", function(e) {
-                    if(isCalendlyEvent(e)) {
-                        console.log(e);
-                        $('#calendly_loading').remove()
-                        if (e.data.event == "calendly.event_scheduled") {               
-                            var respStatus = $.ajax({
-                                type:'POST',
-                                url:'{%url "calendly-booking-success"%}',
-                                data:{'lead_pk':$('#modal_lead_pk').val(), 'uri':e.data.payload.event.uri, 'csrfmiddlewaretoken':'{{ csrf_token }}'},
-                                success: function (data) {
-                                },
-                                error: function(XMLHttpRequest, textStatus, errorThrown) {
-                                }
-                            })
-                        }
-                    }
-                });
-            });
-        
-            function isCalendlyEvent(e) {
-                return e.origin === "https://calendly.com" && e.data.event && e.data.event.indexOf("calendly.") === 0;
-            };
-            </script>
         {%endblock chat_bottom%}
         {%if request.user.is_authenticated%}
         <span id="chat_bottom_wrapper">
+            
+            <img  class="htmx-indicator invert" id="chat_bottom_htmx_indicator" src="https://htmx.org/img/bars.svg"/>
             <span
             hx-get="{%url 'get-messaging-window'%}"
             hx-target="#chat_bottom_wrapper"
             hx-swap="#outerHTML"
-            hx-indicator=".htmx-indicator"        
+            hx-indicator="#chat_bottom_htmx_indicator"        
             hx-trigger="load"></span>
         </span>
         {%endif%}

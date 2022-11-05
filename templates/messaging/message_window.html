@@ -8,7 +8,8 @@
                 {%include 'messaging/message_window_header.html'%}
             </div>
             <div class="col-auto p-0">
-                <i class="fa-sharp fa-solid fa-circle-xmark" onclick="$('#chat_card_{{customer_number}}').remove(); clear_chat_from_session('{{customer_number}}')"></i>
+                {% comment %} <i class="fa-sharp fa-solid fa-circle-xmark" onclick="$('#chat_card_{{customer_number}}').remove(); clear_chat_from_session('{{customer_number}}')"></i> {% endcomment %}
+                <i class="fa-sharp fa-solid fa-circle-xmark" onclick="$('#chat_card_{{customer_number}}').remove();"></i>
             </div>
         </div>
     </div>
@@ -16,10 +17,5 @@
 </div>
 
 <script>
-    $(document).ready(function() {
-        document.body.addEventListener('htmx:beforeRequest', function(evt) {  
-        });
-        document.body.addEventListener('htmx:afterSwap', function(evt) {              
-        });
-    });
+    
 </script>

@@ -1,0 +1,48 @@
+{%load core_tags%}
+<div class="row">
+    <div class="col">
+        <div class="m-3">
+            <label class="form-label custom-badge-label" for="booking_date">Date of Booking</label>
+            <input type="date" id="booking_date" name="booking_date" class="form-control booking_input" {%if debug%}value="{{''|prefill_date_input_with_now}}"{%endif%}>
+        </div>
+        <div class="m-3">
+            <label class="form-label custom-badge-label" for="booking_time">Time of Booking</label>
+            <input type="time" id="booking_time" name="booking_time" class="form-control booking_input" {%if debug%}value="{{''|prefill_time_input_with_now}}"{%endif%}>
+        </div>
+
+        <div class="m-3 row" style="text-align:left; margin-left:0px !important; min-width:300px;">
+            <div class="col right">
+                <span id="booking-type-span-one">Phone</span>
+            </div>
+
+            <div class="col-md-auto p-0">
+                <div class="form-check form-switch">
+                    <input class="form-check-input booking_input" name="booking_type" checked type="checkbox" id="booking-type">
+                </div>
+            </div>
+
+            <div class="col" style="text-align:left; padding-left:5px">
+                In Person
+            </div>
+        </div>
+        <div class="m-3">
+            <label class="form-label custom-badge-label" for="time_occurred">Notes</label>
+            <textarea rows=5 type="time" style="min-width:500px" id="time_occurred" 
+            name="note" class="form-control booking_input"></textarea>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <div class="m-3">
+            <button class="btn btn-primary"
+            hx-indicator=".htmx-indicator"
+            hx-include=".booking_input"
+            hx-post="{% url 'add-manual-booking' %}" 
+            hx-push-url="false"
+            hx-swap="none" hx-trigger="click">
+                Submit Booking
+            </button>
+        </div>
+    </div>
+</div>

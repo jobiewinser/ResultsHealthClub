@@ -1,0 +1,76 @@
+{%load core_tags%}
+<div class="row">
+    <div class="col-md-auto p-0">
+        <div class="row" style="margin-left:0px !important;">
+            <div class="col right">
+                <small>Pie</small>
+            </div>
+
+            <div class="col-md-auto p-0">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" name="graph_type" {%if graph_type == 'doughnut'%}checked{%endif%} type="checkbox" id="graph_type_calls_today" onchange="$('#refresh_calls_today').click()">
+                </div> 
+            </div>
+
+            <div class="col-md-auto" style="text-align:left; padding-left:5px">
+                <small>Doughnut</small>
+            </div>
+        </div>
+    </div>
+    <div class="col p-0">
+    </div>
+</div>
+
+<div class="row">
+    {%if data_set%}
+    <div class="col-md-auto center m-3 pe-0">
+        <br>
+        <br>
+        <h5>{{raw_qs.count}} Calls</h5>
+    </div>
+    <div class="col ps-0">
+        <div class="" id="calls_today_chart_wrapper">
+            <canvas style="width:100%;height:200px;" id="calls_today_chart" ></canvas>
+        </div>
+    </div>
+    {%else%}
+    No Data!
+    {%endif%}
+</div>
+
+
+
+<script>
+    {%if data_set%}
+    var dynamicColors = function() {
+        var r = Math.floor(Math.random() * 255);
+        var g = Math.floor(Math.random() * 255);
+        var b = Math.floor(Math.random() * 255);
+        return "rgb(" + r + "," + g + "," + b + ")";
+    };
+    var color_random_list = []
+    {%for data_set_tuple in data_set%}
+    color_random_list.push(dynamicColors());
+    {%endfor%}
+    $(document).ready(function() {
+        leads_to_sale_chart_var = document.getElementById('calls_today_chart');
+        calls_today_chart = new Chart(leads_to_sale_chart_var, {
+            type: '{%if graph_type%}{{graph_type}}{%else%}pie{%endif%}',
+            data: {
+                labels: [{%for data_set_tuple in data_set%}'{{data_set_tuple.0}}'{% if not forloop.last %},{%endif%}{%endfor%}],
+                datasets: [{
+                    label: 'Calls',
+                    data: [{%for data_set_tuple in data_set%}'{{data_set_tuple.1}}'{% if not forloop.last %},{%endif%}{%endfor%}],
+                    backgroundColor: color_random_list,
+                    borderColor: color_random_list,
+                    fill: true,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: false
+            }
+        });
+    });
+    {%endif%}
+</script>

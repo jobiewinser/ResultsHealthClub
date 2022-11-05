@@ -1,0 +1,58 @@
+{%load static core_tags%}
+<span>    
+    <script>
+        document.title = "Booking Table";
+        $(document).ready(function() {  
+
+            initBookingDataTable();
+            
+            function handlehtmxbeforeRequest(evt){
+                if (![undefined, ''].includes(evt.detail.pathInfo.path) && ![undefined, ''].includes(evt.detail.target.id)){
+                    if (evt.detail.target.id == 'overview_table' || evt.detail.pathInfo.path.includes("campaign-booking-overview")){
+                        $("#overview_table").dataTable().fnDestroy();
+                    }
+                }
+            }
+
+
+            
+        });        
+    </script>
+    
+    <div class="row mt-0">
+        {%block extra_top_left_buttons %}
+        {% comment %} <div class="col-md-auto m-1">
+            <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
+        </div> {% endcomment %}
+        {%include 'core/htmx/site_selection.html'%}
+        <div class="col-md-auto m-1" id="campaign_list_div">
+            <span id="campaign_list_span" hx-get="{% url 'get-campaign'%}" hx-include=".overview_table_filters" hx-trigger="load" hx-indicator=".top-htmx-indicator" hx-target="#campaign_list_span" hx-swap="outerHTML">   
+                <select class="form-select">
+                    <option>Loading</option>
+                </select>    
+            </span>
+        </div>
+        <button hidden hx-get="{% url 'get-campaign'%}" hx-include=".overview_table_filters" id="refresh_campaign_list_span" hx-indicator=".top-htmx-indicator" hx-target="#campaign_list_div" hx-trigger="click" hx-swap="innerHTML"></button>
+        <button hidden hx-get="{% url 'refresh-booking-table'%}" hx-push-url="false" hx-swap="outerHTML" hx-include=".overview_table_filters" hx-indicator=".top-htmx-indicator" hx-target="#overview_table_span_wrapper" hx-trigger="click" id="refresh_overview_table" ></button>
+        <button hidden hx-get="{% url 'campaign-booking-overview' %}" hx-push-url="false" hx-swap="innerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator=".top-htmx-indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
+        <button hidden hx-get="{% url 'refresh-booking-table' %}" hx-push-url="false" hx-swap="outerHTML" hx-include=".overview_table_filters" hx-indicator=".top-htmx-indicator" hx-target="#overview_table_span_wrapper" id="filter_campaign"></button>
+        {%endblock extra_top_left_buttons %}
+
+        <div class="col">
+        </div>
+
+        {%block extra_top_right_buttons %}
+        {%include 'campaign_leads/htmx/campaign_bookings_table_status_toggle_div.html'%}
+        <div class="col-md-auto">
+        <span class="badge bg-dark text-white"><h6 class="m-1">Booking Table</h6><input id="current_page" hidden value="campaign_booking_overview"></input></span>           
+        </div>
+        {%endblock extra_top_right_buttons %}
+    </div>
+    <span hx-swap-oob="true" id="site_pk_span">   
+        <input type="text" style="display:None" id="site_pk" name="site_pk" value="{{request|get_key_in_get_or_post:'site_pk'}}"/>
+    </span>
+    
+    <span hx-ws="connect:/ws/lead/{{company.pk}}/">
+    {% include 'campaign_leads/htmx/campaign_bookings_table.html' %}
+    </span>
+<span>

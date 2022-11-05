@@ -1,11 +1,11 @@
 
 {%load core_tags%}
-<div class="col-md-auto me-2">
+<div class="col-md-auto m-1 ps-0">
     <span id="site_list_span">  
-        <select class="form-select overview_table_filters non_site_dependant_overview_table_filters" name="site_pk" id="site_pk" onchange="$('#change_site').click();">
+        <select class="form-select overview_table_filters non_site_dependant_overview_table_filters non_site_dependant_analytics_filters" name="site_pk" id="site_pk" onchange="$('#change_site').click();">
             {%if not hide_show_all%}<option value="all">Show All Sites</option>{%endif%}
             {%for site in request.user.profile.sites_allowed.all%}
-            <option {%if site.pk == request|get_key_in_get_or_post:'site_pk'|str_to_int %}selected{%endif%} value="{{site.pk}}">{{site.name}} {{request.DATA}}</option>
+            <option {%if site.pk == request|get_key_in_get_or_post:'site_pk'|str_to_int %}selected{%endif%} value="{{site.pk}}">{{site.name}}</option>
             {%endfor%}
         </select>
     </span>

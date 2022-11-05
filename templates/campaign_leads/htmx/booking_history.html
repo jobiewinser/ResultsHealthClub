@@ -1,4 +1,4 @@
-<span>
+<div class="generic_modal_contents">
     <div class="row">
         <div class="col center">
             
@@ -71,7 +71,7 @@
                         data-bs-trigger="hover" 
                         data-bs-placement="right"
                         data-bs-content="
-                        <p>{%if booking.type == 'a'%}This appointment is in person{%elif booking.type == 'b'%}This appointment is over the phone{%endif%}</p>
+                        {% comment %} <p>{%if booking.type == 'a'%}This appointment is in person{%elif booking.type == 'b'%}This appointment is over the phone{%endif%}</p> {% endcomment %}
                         {%if booking.note_set.all%}
                         <br>
                         <b>Notes:</b>
@@ -101,7 +101,7 @@
               </table>
         </div>
     </div>
-</span>
+</div>
 <span hx-swap-oob="true" id="generic_modal_title">
     Booking History - {{lead.name}} - <i class="fa fa-whatsapp"></i> {{lead.whatsapp_number}}
     <input type="text" style="display:None" id="modal_lead_pk" name="lead_pk" value="{{lead.pk}}"/>

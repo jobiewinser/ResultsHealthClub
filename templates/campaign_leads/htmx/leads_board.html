@@ -1,10 +1,10 @@
-<span id="leads_board_wrapper">    
-<div class="col-md-auto me-2 secondary_td_layer ">
+<span id="leads_board_span_wrapper">    
+<div class="col-md-auto m-1 secondary_td_layer ">
     <b>Filtering:</b> "<u><span class="elipses-overflow" id="leadSearchValue"></span></u>" (Type to filter, Backspace to clear)
 </div>
 <span id="leads_board" class="board" hx-ws="connect:/ws/lead/{{company.pk}}/">
     <!-- <button hidden hx-get="{% url 'get-leads-column-meta-data'%}" hx-include=".overview_table_filters" id="refresh_column_metadata" hx-indicator=".column-htmx-indicator" hx-target="#column_metadata_0" hx-trigger="click" hx-swap="outerHTML"></button> -->
-    <button hidden hx-get="{% url "new-leads-column" %}" hx-include="#max_call_count" id="add_column" hx-indicator=".column-htmx-indicator" hx-target="#leads_board_wrapper" hx-trigger="click" hx-swap="beforeend"></button>
+    <button hidden hx-get="{% url 'new-leads-column' %}" hx-include="#max_call_count" id="add_column" hx-indicator=".column-htmx-indicator" hx-target="#leads_board_span_wrapper" hx-trigger="click" hx-swap="beforeend"></button>
     {%include 'campaign_leads/htmx/lead_columns.html' %}
 </span>
 </span>

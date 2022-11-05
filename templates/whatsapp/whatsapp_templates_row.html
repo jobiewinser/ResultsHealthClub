@@ -106,7 +106,9 @@
     {%endif%}
     
         <span>
-            <button class="btn btn-warning btn-sm m-1" onclick="window.location.href = '{%url 'whatsapp-template' template_pk=template.pk %}'"
+            <a class="btn btn-warning btn-sm m-1 pointer" 
+                    hx-indicator="#page_load_indicator"
+                    hx-get="{%url 'whatsapp-template' template_pk=template.pk %}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML"
                     data-bs-toggle="popover" 
                     data-bs-trigger="hover" 
                     data-bs-html="true" 
@@ -117,11 +119,13 @@
                         Clicking edit will allow you to make changes to this template. These changes are not submitted to whatsapp until you choose to do so.
                     </p>
                     "><i class="fa fa-pencil" aria-hidden="true"></i> Edit
-            </button>
+                </a>
         </span>
         <span>
             <button
-                class="btn btn-secondary btn-sm m-1" onclick="window.location.href = '{%url 'whatsapp-template-readonly' template_pk=template.pk %}'"
+                class="btn btn-secondary btn-sm m-1 pointer" 
+                hx-indicator="#page_load_indicator"
+                hx-get="{%url 'whatsapp-template-readonly' template_pk=template.pk %}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML"
                 data-bs-toggle="popover" 
                 data-bs-trigger="hover" 
                 data-bs-html="true" 

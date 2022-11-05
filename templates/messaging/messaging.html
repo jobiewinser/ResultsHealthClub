@@ -13,25 +13,18 @@ align-items: flex-start;"
             {%endif%}
             document.body.addEventListener('htmx:beforeRequest', function(evt) {  
                 if (evt.detail.target.id == 'next_chat_window'){
-                    console.log(evt)
                     let src = $(evt.srcElement)
                     let phone_number = src.data('customer-number');         
                     let whatsappnumber_pk = src.data('whatsappnumber-pk');            
                     if ($('#chat_card_'+phone_number).length > 0){
                         evt.preventDefault()
                     } else {
-                        add_chat_conversation_to_session(whatsappnumber_pk, phone_number)
                     }
                 }
             });
-            
         })
-        
-        
-        
-        
-        
     </script>
+
     <link href="{% static 'css/chat.css' %}" rel="stylesheet" />
         <span id="next_chat_window"></span>
 

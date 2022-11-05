@@ -1,5 +1,31 @@
-
-    <div class="">
+<span>
+    <script>
+        $(document).ready(function() {
+            document.title = "Whatsapp Templates";
+            $("[data-bs-toggle=popover]").popover();
+        });
+        let SearchTerm = ""
+    </script>
+    
+    <div class="row mt-0">
+        {%block extra_top_left_buttons %}
+        {% comment %} <div class="col-md-auto">
+            <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
+        </div> {% endcomment %}
+        {%with True as hide_show_all%}
+        {%include 'core/htmx/site_selection.html'%}
+        <button hidden hx-get="" hx-push-url="false" hx-swap="innerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator=".htmx-indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
+        {%endwith%}    
+        {%endblock extra_top_left_buttons %}
+        <div class="col">
+        </div>
+        {%block extra_top_right_buttons %}
+        <div class="col-md-auto">
+            <span class="badge bg-dark text-white"><h6 class="m-1">Whatsapp Templates</h6><input id="current_page" hidden value="whatsapp_templates"></input></span>          
+        </div>     
+        {%endblock extra_top_right_buttons %}    
+    </div>   
+    <div class="row mt-2">
         <div class="col m-3 alert alert-warning">
             <p>Message templates in an Aproved state can be edited up to 10 times in a 30 day window, or 1 time in a 24 hour window.</p>
             <p class="m-0">Messages in Rejected or Paused states can be edited an unlimited number of times.</p>
@@ -12,10 +38,11 @@
 
     <div class="row mt-2">
         <div class="col-md-auto">
-            <button class="btn btn-success btn-sm me-2"
-            onclick="window.location.href = '{%url 'whatsapp-template-create' site_pk=site.pk%}'">
+            <a class="btn btn-success btn-sm m-1 pointer" 
+            hx-indicator="#page_load_indicator"
+            hx-get="{%url 'whatsapp-template-create' site_pk=site.pk%}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML">
                 <i class="fa fa-plus" aria-hidden="true"></i> Add Template
-            </button>            
+            </a>            
         </div>
     </div>
     <div class="row mt-2 card p-2">
@@ -60,3 +87,4 @@
             </table>
         </div>
     </div>
+</span>

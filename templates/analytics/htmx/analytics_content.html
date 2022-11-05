@@ -1,0 +1,184 @@
+{%load static core_tags%}
+<span id="analytics_span_wrapper">
+    <button hidden id="refresh_base_analytics" class="refresh_date_specific_analytic" hx-trigger="load, click delay:0.5s"
+            hx-get="{%url 'get-base-analytics' %}"
+            hx-include="#start_date, #end_date, #site_pk, #campaign_pk"
+            hx-target="#base_analytics_span_wrapper"
+            hx-indicator=".htmx-indicator-base-analytics"
+            hx-swap="innerHTML"
+            onclick="$('.htmx-indicator-base-analytics').addClass('htmx-request')">refresh</button>
+
+    <div class="row my-3">
+        <div class="col">
+            <div class="card analytics-card">
+                <div class="card-header">
+                    <h5 data-bs-toggle="popover" 
+                        data-bs-trigger="hover" 
+                        data-bs-placement="right"
+                        data-bs-html="true"
+                        data-bs-content="These inputs filter the graphs below by time."><b>Filters</b> <i class="fa-solid fa-circle-info"></i>
+                    </h5> 
+                </div>
+                <div class="card-body" id="filters_card_body">
+                    <div class="row">
+                        <div class="col p-0 m-1 ">
+                            <button
+                                hx-include=".non_site_dependant_analytics_filters, .site_dependant_analytics_filters" hx-indicator="#page_load_indicator" id="refresh_analytics"
+                                hx-get="{%url 'refresh-analytics'%}" hx-target="#analytics_span_wrapper" hx-push-url="true" hx-swap="innerHTML" class="btn btn-success btn-sm"><i class="fa-solid fa-arrows-rotate"></i> Refresh</button>
+                        </div>
+                        <div class="col-md-auto m-1 right p-0">
+                            <input id="start_date" value="{%if start_date%}{{start_date}}{%else%}{{''|today_date_tag|add_years:-1|date_to_date_input_prefill}}{%endif%}" class="form-control form-control-sm non_site_dependant_analytics_filters" type="date" name="start_date"
+                            onchange="$('#refresh_analytics').click();"/>
+                        </div>
+                        <div class="col-md-auto m-1 p-0">
+                            <small>To</small>
+                        </div>
+                        <div class="col-md-auto m-1 left p-0">
+                            <input id="end_date" value="{%if end_date%}{{end_date}}{%else%}{{''|today_date_input_tag}}{%endif%}" class="form-control form-control-sm non_site_dependant_analytics_filters" type="date" name="end_date"
+                            onchange="$('#refresh_analytics').click();"/>
+                        </div>
+                        <div class="col p-0 m-1 ">
+                            <button             
+                                hx-include="" hx-indicator="#page_load_indicator"
+                                hx-get="{%url 'refresh-analytics'%}" hx-target="#analytics_span_wrapper" hx-push-url="true" hx-swap="innerHTML" class="btn btn-warning btn-sm"><i class="fa-solid fa-ban"></i> Reset</button>
+                        </div>
+                    </div>
+                    <hr>
+                    Quick Filters
+                    <div class="row">
+                        <div class="col m-1 p-0">
+                            <button class="btn btn-secondary btn-sm nowrap {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_input_tag%}active{%elif not end_date and not start_date%}active{%endif%}" onclick="$('#start_date').val('{{''|today_date_tag|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change');">{{''|today_date_tag|nice_date_tag}} (day)</button>
+                        </div>
+                        <div class="col m-1 p-0">
+                            <button class="btn btn-secondary btn-sm nowrap {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_tag|add_days:-7|date_to_date_input_prefill%}active{%endif%}" onclick="$('#start_date').val('{{''|today_date_tag|add_days:-7|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change');">{{''|today_date_tag|add_days:-7|nice_date_tag}} (week)</button>
+                        </div>
+                        <div class="col m-1 p-0">
+                            <button class="btn btn-secondary btn-sm nowrap {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_tag|add_months:-1|date_to_date_input_prefill%}active{%endif%}" onclick="$('#start_date').val('{{''|today_date_tag|add_months:-1|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change');">{{''|today_date_tag|add_months:-1|nice_date_tag}} (month)</button>
+                        </div>
+                        <div class="col m-1 p-0">
+                            <button class="btn btn-secondary btn-sm nowrap {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_tag|add_years:-1|date_to_date_input_prefill%}active{%endif%}" onclick="$('#start_date').val('{{''|today_date_tag|add_years:-1|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change');">{{''|today_date_tag|add_years:-1|nice_date_tag}} (year)</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <button hidden id="refresh_calls_today" hx-trigger="load, click delay:0.5s"
+                hx-get="{%url 'get-calls-today' %}"
+                hx-include="#start_date, #end_date, #site_pk, #campaign_pk, #graph_type_calls_today"
+                hx-target="#calls_today_card_body"
+                hx-indicator="#htmx-indicator-calls-today"
+                hx-swap="innerHTML"
+                onclick="$('#htmx-indicator-calls-today').addClass('htmx-request')">refresh</button>
+            <div class="card analytics-card">
+                <div class="card-header">
+                    <h5 data-bs-toggle="popover" 
+                        data-bs-trigger="hover" 
+                        data-bs-placement="right"
+                        data-bs-html="true"
+                        data-bs-content="This shows the amount of calls made today since midnight (filtered by site and campaign above).">Calls Today <i class="fa-solid fa-circle-info"></i>
+                        <img  class="htmx-indicator invert" id="htmx-indicator-calls-today" src="https://htmx.org/img/bars.svg"/>
+                    </h5> 
+                </div>
+                <div class="card-body" id="calls_today_card_body">
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <button hidden id="refresh_current_call_count_distribution" hx-trigger="load, click delay:0.5s"
+                hx-get="{%url 'get-current-call-count-distribution' %}"
+                hx-include="#start_date, #end_date, #site_pk, #campaign_pk, #graph_type_current_call_count_distribution"
+                hx-target="#current_call_count_distribution_card_body"
+                hx-indicator="#htmx-indicator-current-call-count-distribution"
+                hx-swap="innerHTML"
+                onclick="$('#htmx-indicator-current-call-count-distribution').addClass('htmx-request')">refresh</button>
+            <div class="card analytics-card">
+                <div class="card-header">
+                    <h5 data-bs-toggle="popover" 
+                        data-bs-trigger="hover" 
+                        data-bs-placement="right"
+                        data-bs-html="true"
+                        data-bs-content="This shows the <b>current</b> distribution of leads in each call count column on the <b>Leads</b> page (filtered by site and campaign above).">Current Call Count Distribution <i class="fa-solid fa-circle-info"></i>
+                        <img class="htmx-indicator invert" id="htmx-indicator-current-call-count-distribution" src="https://htmx.org/img/bars.svg"/>
+                    </h5> 
+                        
+                </div>
+                <div class="card-body" id="current_call_count_distribution_card_body">
+                </div>
+            </div>
+        </div>
+    </div> 
+    {%include 'analytics/htmx/base_analytics.html'%}    
+    
+    <div class="row my-3">
+        <div class="col">
+            <button hidden id="refresh_leads_to_sales" class="refresh_date_specific_analytic" hx-trigger="load, click delay:0.5s"
+                hx-get="{%url 'get-leads-to-sales' %}"
+                hx-include="#start_date, #end_date, #site_pk, #campaign_pk, #graph_type_leads_to_sales"
+                hx-target="#leads_to_sales_card_body"
+                hx-indicator="#htmx-indicator-leads-and-sales"
+                hx-swap="innerHTML"
+                onclick="$('#htmx-indicator-leads-and-sales').addClass('htmx-request')">refresh</button>
+            <div class="card analytics-card">
+                <div class="card-header">
+                    <h5 data-bs-toggle="popover" 
+                        data-bs-trigger="hover" 
+                        data-bs-placement="right"
+                        data-bs-html="true"
+                        data-bs-content="This shows the analytics for Leads and Sales for the chosen site and/or campaign (top left), between the times chosen (right).">Leads & Sales Per Day <i class="fa-solid fa-circle-info"></i>
+                        <img  class="htmx-indicator invert" id="htmx-indicator-leads-and-sales" src="https://htmx.org/img/bars.svg"/>
+                    </h5> 
+                </div>
+                <div class="card-body" id="leads_to_sales_card_body">
+                </div>
+            </div>
+        </div>
+        
+        <div class="col">
+            <button hidden id="refresh_leads_to_bookings" class="refresh_date_specific_analytic" hx-trigger="load, click delay:0.5s"
+                hx-get="{%url 'get-leads-to-bookings' %}"
+                hx-include="#start_date, #end_date, #site_pk, #campaign_pk, #graph_type_leads_to_bookings"
+                hx-target="#leads_to_bookings_card_body"
+                hx-indicator="#htmx-indicator-leads-and-bookings"
+                hx-swap="innerHTML"
+                onclick="$('#htmx-indicator-leads-and-bookings').addClass('htmx-request')">refresh</button>
+            <div class="card analytics-card">
+                <div class="card-header">
+                    <h5 data-bs-toggle="popover" 
+                        data-bs-trigger="hover" 
+                        data-bs-placement="right"
+                        data-bs-html="true"
+                        data-bs-content="This shows the analytics for Leads and Bookings for the chosen site (top left), between the times chosen (right).">Leads & Bookings <i class="fa-solid fa-circle-info"></i>
+                        <img  class="htmx-indicator invert" id="htmx-indicator-leads-and-bookings" src="https://htmx.org/img/bars.svg"/>
+                    </h5> 
+                </div>
+                <div class="card-body" id="leads_to_bookings_card_body">
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="col">
+            <button hidden id="refresh_calls_made_per_day" class="refresh_date_specific_analytic" hx-trigger="load, click delay:0.5s"
+                hx-get="{%url 'get-calls-made-per-day' %}"
+                hx-include="#start_date, #end_date, #site_pk, #campaign_pk, #graph_type_calls_made_per_day"
+                hx-target="#calls_made_per_day_card_body"
+                hx-indicator="#htmx-indicator-calls-made-per-day"
+                hx-swap="innerHTML"
+                onclick="$('#htmx-indicator-calls-made-per-day').addClass('htmx-request')">refresh</button>
+            <div class="card analytics-card">
+                <div class="card-header">
+                    <h5 data-bs-toggle="popover" 
+                        data-bs-trigger="hover" 
+                        data-bs-placement="right"
+                        data-bs-html="true"
+                        data-bs-content="This shows the number of calls made per day for the chosen site and/or campaign (top left), between the times chosen (right).">Calls Made Per Day <i class="fa-solid fa-circle-info"></i>
+                        <img  class="htmx-indicator invert" id="htmx-indicator-calls-made-per-day" src="https://htmx.org/img/bars.svg"/>
+                    </h5> 
+                </div>
+                <div class="card-body" id="calls_made_per_day_card_body">
+                </div>
+            </div>
+        </div>
+    </div> 
+</span>

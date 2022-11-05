@@ -71,14 +71,14 @@ def percentage_to_colour(percentage, opacity=1):
 #9cfa40 for v > 60% and v <= 84%
 #60f83d for v > 84%
     
-@register.simple_tag
+@register.filter
 def prefill_date_input_with_now(nothing):
     try:
         return datetime.now().strftime('%Y-%m-%d')
     except:
         return ""
 
-@register.simple_tag
+@register.filter
 def prefill_time_input_with_now(nothing):
     try:
         return datetime.now().strftime('%H:%M')

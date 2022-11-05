@@ -95,7 +95,7 @@
                 {{lead.assigned_user.profile.name}} has claimed this lead!
             </p>
             ">
-            <img src="{%if lead.assigned_user.profile.avatar%}/media/{{lead.assigned_user.profile.avatar}}{%else%}{% static 'img/blank-profile-picture.png' %}{%endif%}" alt="" style="width:25px; height:25px;" class="rounded-circle me-2">
+            <img src="{%if lead.assigned_user.profile.avatar%}/media/{{lead.assigned_user.profile.avatar}}{%else%}{% static 'img/blank-profile-picture.png' %}{%endif%}" alt="" style="width:25px; height:25px;" class="rounded-circle m-1">
         </span>
         {%endif%}
     </article>

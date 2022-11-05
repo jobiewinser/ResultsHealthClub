@@ -3,33 +3,14 @@
 
 {%block scripts%}
 {{block.super}}
-<link href="{% static 'css/datatables.css' %}" rel="stylesheet" />
-<script src="{% static 'js/datatables.js' %}"></script> 
 <script>
     $(document).ready(function() {
         initDataTable();
-        document.body.addEventListener('htmx:beforeRequest', function(evt) {  
-            if (![undefined, ''].includes(evt.detail.pathInfo.path) && ![undefined, ''].includes(evt.detail.target.id)){
-                if (evt.detail.target.id == 'overview_table' || evt.detail.pathInfo.path.includes("academy-booking-overview")){
-                    $("#overview_table").dataTable().fnDestroy();
-                }
-            }
-        });
-        document.body.addEventListener('htmx:afterSwap', function(evt) {  
-            if (evt.detail.target.id == 'overview_table'){
-                initDataTable(); 
-            }
-                        
-            {% comment %} if (evt.detail.target.classList.contains('academy_booking_row')) {
-                $('#refresh_overview_table').click(); 
-            } {% endcomment %}
-            
-        });
     });
-    function initDataTable() {
+    {% comment %} function initDataTable() {
         dt = $('#overview_table').DataTable(
         );
-    }
+    } {% endcomment %}
 </script>
 {%endblock scripts%}
 
@@ -57,7 +38,6 @@
                         hx-swap="innerHTML" hx-trigger="click">
                             <i class="fa-solid fa-link" aria-hidden="true"></i> Generate Free Taster Link
                     </button>
-                    <input type="text" style="display:None" id="create_free_taster_link" name="template_name" value="create_free_taster_link"/>
                 </div>
             {%endblock%}
         </div>

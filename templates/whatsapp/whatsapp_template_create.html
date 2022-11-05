@@ -2,17 +2,6 @@
 {%load static%}
 
 
-{%block ajax_data%}
-'created':true,
-'name':$('#template_name').val(), 
-'category':$('#template_category').val(), 
-'header':$('#template_header').val(), 
-'body':$('#template_body').val(), 
-'site_pk':'{{site.pk}}', 
-'footer':$('#template_footer').val(), 
-'csrfmiddlewaretoken':'{{ csrf_token }}'
-{%endblock ajax_data%}
-
 {%block template_name%}
 <h5>Template Name</h5>
 <div class="row"
@@ -64,7 +53,7 @@ data-bs-content="
 
 {%block submit_button%}
 <button class="btn btn-success m-3"
-    onclick="saveTemplate()"
+    onclick="saveTemplate('{{site.pk}}', '{{template.pk}}', create=true)"
     data-bs-toggle="popover" 
     data-bs-trigger="hover" 
     data-bs-placement="top"

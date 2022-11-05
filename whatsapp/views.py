@@ -283,7 +283,7 @@ class WhatsappTemplatesView(TemplateView):
         self.request.GET._mutable = True     
         context = super(WhatsappTemplatesView, self).get_context_data(**kwargs)
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
-            self.template_name = 'whatsapp/whatsapp_templates_content.html'   
+            self.template_name = 'whatsapp/htmx/whatsapp_templates_htmx.html'   
         site_pk = self.request.GET.get('site_pk')
         site = None
         if site_pk:
@@ -339,6 +339,8 @@ class WhatsappTemplatesEditView(TemplateView):
 
     def get_context_data(self, **kwargs):
         self.request.GET._mutable = True     
+        if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+            self.template_name = 'whatsapp/htmx/whatsapp_template_edit_htmx.html'   
         context = super(WhatsappTemplatesEditView, self).get_context_data(**kwargs)
         template = WhatsappTemplate.objects.get(pk=kwargs.get('template_pk'))
         if self.request.user.profile.company == template.company:
@@ -363,6 +365,8 @@ class WhatsappTemplatesCreateView(TemplateView):
 
     def get_context_data(self, **kwargs):
         self.request.GET._mutable = True     
+        if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+            self.template_name = 'whatsapp/htmx/whatsapp_template_create_htmx.html'   
         context = super(WhatsappTemplatesCreateView, self).get_context_data(**kwargs)
         context['site'] = Site.objects.get(pk=kwargs.get('site_pk'))
         context['variables'] = template_variables
