@@ -1,87 +1,71 @@
 {%load core_tags%}
 <div class="row">
-    <div class="col-md-auto">
-        <span class="secondary_td_layer">{{start_date}} - {{end_date}}</span>
-    </div>
     <div class="col p-0">
     </div>
     <div class="col-md-auto right">
         <div class="row" style="margin-left:0px !important;">
             <div class="col right">
-                <small>Bar</small>
+                <small>Pie</small>
             </div>
 
             <div class="col-md-auto p-0">
                 <div class="form-check form-switch">
-                    <input class="form-check-input" name="graph_type" {%if graph_type == 'line'%}checked{%endif%} type="checkbox" id="graph_type_leads_to_sale" onchange="$('#refresh_lead_to_sales').click()">
+                    <input class="form-check-input" name="graph_type" {%if graph_type == 'doughnut'%}checked{%endif%} type="checkbox" id="graph_type_calls_today" onchange="$('#refresh_calls_today').click()">
                 </div> 
             </div>
 
             <div class="col-md-auto" style="text-align:left; padding-left:5px">
-                <small>Line</small>
+                <small>Doughnut</small>
             </div>
         </div>
     </div>
 </div>
 
 <div class="row">
+    {%if data_set%}
     <div class="col">
-        <div class="" id="lead_to_sales_chart_wrapper">
-            <canvas style="width:100%;height:100%;" id="leads_to_sales_chart" ></canvas>
+        <div class="" id="calls_today_chart_wrapper">
+            <canvas style="width:100%;height:200px;" id="calls_today_chart" ></canvas>
         </div>
     </div>
+    {%else%}
+    No Data!
+    {%endif%}
 </div>
 
 
 
 <script>
+    {%if data_set%}
+    var dynamicColors = function() {
+        var r = Math.floor(Math.random() * 255);
+        var g = Math.floor(Math.random() * 255);
+        var b = Math.floor(Math.random() * 255);
+        return "rgb(" + r + "," + g + "," + b + ")";
+    };
+    var color_random_list = []
+    {%for data_set_tuple in data_set%}
+    color_random_list.push(dynamicColors());
+    {%endfor%}
     $(document).ready(function() {
-        leads_to_sale_chart_var = document.getElementById('leads_to_sales_chart');
-        leads_to_sales_chart = new Chart(leads_to_sale_chart_var, {
-            type: '{%if graph_type%}{{graph_type}}{%else%}bar{%endif%}',
+        leads_to_sale_chart_var = document.getElementById('calls_today_chart');
+        calls_today_chart = new Chart(leads_to_sale_chart_var, {
+            type: '{%if graph_type%}{{graph_type}}{%else%}pie{%endif%}',
             data: {
-                labels: [{%for label in time_label_set%}'{{label}}'{% if not forloop.last %},{%endif%}{%endfor%}],
+                labels: [{%for data_set_tuple in data_set%}'{{data_set_tuple.0}}'{% if not forloop.last %},{%endif%}{%endfor%}],
                 datasets: [{
-                    label: 'Leads',
-                    data: [{%for data_entry in data_set%}{{data_entry.leads}}{% if not forloop.last %},{%endif%}{%endfor%}],
-                    backgroundColor: 'rgba(180, 180, 180, 0.4)',
-                    borderColor: 'rgba(180, 180, 180, 0.85)',
-                    fill: true,
-                    borderWidth: 1
-                }, {
-                    label: 'Sales',
-                    data: [{%for data_entry in data_set%}{{data_entry.sales}}{% if not forloop.last %},{%endif%}{%endfor%}],
-                    backgroundColor: [{%for data_entry in data_set%}'{{data_entry.percentage|percentage_to_colour:0.35}}'{% if not forloop.last %},{%endif%}{%endfor%}],
-                    borderColor: [{%for data_entry in data_set%}'{{data_entry.percentage|percentage_to_colour:0.7}}'{% if not forloop.last %},{%endif%}{%endfor%}],
+                    label: 'Calls',
+                    data: [{%for data_set_tuple in data_set%}'{{data_set_tuple.1}}'{% if not forloop.last %},{%endif%}{%endfor%}],
+                    backgroundColor: color_random_list,
+                    borderColor: color_random_list,
                     fill: true,
                     borderWidth: 1
                 }]
             },
             options: {
-                scales: {      
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                        beginAtZero: true,
-                        callback: function(value) {if (value % 1 === 0) {return value;} }
-                        }
-                    },
-                    xAxis: {
-                        type: "time",
-                        time: {
-                            displayFormats: {
-                                hour: "hA"
-                            }
-                        },
-                        display: true,
-                        ticks: {
-                            reverse: true
-                        },
-                        gridLines: { display: false }
-                    }
-                },
-                responsive: true
+                responsive: false
             }
         });
     });
+    {%endif%}
 </script>

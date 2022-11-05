@@ -13,8 +13,8 @@
 
             <div class="col-md-auto p-0">
                 <div class="form-check form-switch">
-                    <input class="form-check-input" name="graph_type" {%if graph_type == 'line'%}checked{%endif%} type="checkbox" id="graph_type_leads_to_booking" onchange="$('#refresh_lead_to_bookings').click()">
-                </div>
+                    <input class="form-check-input" name="graph_type" {%if graph_type == 'line'%}checked{%endif%} type="checkbox" id="graph_type_leads_to_sales" onchange="$('#refresh_leads_to_sales').click()">
+                </div> 
             </div>
 
             <div class="col-md-auto" style="text-align:left; padding-left:5px">
@@ -26,8 +26,8 @@
 
 <div class="row">
     <div class="col">
-        <div class="" id="lead_to_bookings_chart_wrapper">
-            <canvas style="width:100%;height:100%;" id="leads_to_bookings_chart" ></canvas>
+        <div class="" id="leads_to_sales_chart_wrapper">
+            <canvas style="width:100%;height:200px;" id="leads_to_sales_chart" ></canvas>
         </div>
     </div>
 </div>
@@ -36,8 +36,8 @@
 
 <script>
     $(document).ready(function() {
-        leads_to_booking_chart_var = document.getElementById('leads_to_bookings_chart');
-        leads_to_bookings_chart = new Chart(leads_to_booking_chart_var, {
+        leads_to_sales_chart_var = document.getElementById('leads_to_sales_chart');
+        leads_to_sales_chart = new Chart(leads_to_sales_chart_var, {
             type: '{%if graph_type%}{{graph_type}}{%else%}bar{%endif%}',
             data: {
                 labels: [{%for label in time_label_set%}'{{label}}'{% if not forloop.last %},{%endif%}{%endfor%}],
@@ -49,8 +49,8 @@
                     fill: true,
                     borderWidth: 1
                 }, {
-                    label: 'Bookings',
-                    data: [{%for data_entry in data_set%}{{data_entry.bookings}}{% if not forloop.last %},{%endif%}{%endfor%}],
+                    label: 'Sales',
+                    data: [{%for data_entry in data_set%}{{data_entry.sales}}{% if not forloop.last %},{%endif%}{%endfor%}],
                     backgroundColor: [{%for data_entry in data_set%}'{{data_entry.percentage|percentage_to_colour:0.35}}'{% if not forloop.last %},{%endif%}{%endfor%}],
                     borderColor: [{%for data_entry in data_set%}'{{data_entry.percentage|percentage_to_colour:0.7}}'{% if not forloop.last %},{%endif%}{%endfor%}],
                     fill: true,
@@ -80,7 +80,7 @@
                         gridLines: { display: false }
                     }
                 },
-                responsive: true
+                responsive: false
             }
         });
     });

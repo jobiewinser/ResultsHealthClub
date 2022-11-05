@@ -1,4 +1,4 @@
-{%load static%}
+{%load static core_tags%}
 <span id="analytics_span_wrapper">
     <button hidden id="refresh_base_analytics" hx-trigger="load, click delay:0.5s"
             hx-get="{%url 'get-base-analytics' %}"
@@ -7,17 +7,63 @@
             hx-indicator=".htmx-indicator-base-analytics"
             hx-swap="innerHTML"
             onclick="$('.htmx-indicator-base-analytics').addClass('htmx-request')">refresh</button>
-    {%include 'analytics/htmx/base_analytics.html'%}    
-    
+
     <div class="row my-3">
         <div class="col">
-            <button hidden id="refresh_lead_to_sales" hx-trigger="load, click delay:0.5s"
-                hx-get="{%url 'get-leads-to-sales' %}"
-                hx-include="#start_date, #end_date, #site_pk, #campaign_pk, #graph_type_leads_to_sale"
-                hx-target="#lead_to_sales_card_body"
-                hx-indicator="#htmx-indicator-leads-and-sales"
+            <div class="card">
+                <div class="card-header">
+                    <h5 data-bs-toggle="popover" 
+                        data-bs-trigger="hover" 
+                        data-bs-placement="right"
+                        data-bs-html="true"
+                        data-bs-content="These inputs filter the graphs below by time."><b>Filters</b> <i class="fa-solid fa-circle-info"></i>
+                    </h5> 
+                </div>
+                <div class="card-body" id="filters_card_body">
+                    <div class="row">
+                        <div class="col p-0">
+                        </div>
+                        <div class="col-md-auto m-1 right p-0">
+                            <input id="start_date" value="{{''|today_date_tag|add_years:-1|date_to_date_input_prefill}}" class="form-control form-control-sm" type="date" name="start_date"
+                            onchange="$('#refresh_leads_to_bookings').click(); $('#refresh_leads_to_sales').click(); $('#refresh_calls_today').click(); $('#refresh_base_analytics').click();"/>
+                        </div>
+                        <div class="col-md-auto m-1 p-0">
+                            <small>To</small>
+                        </div>
+                        <div class="col-md-auto m-1 left p-0">
+                            <input id="end_date" value="{{''|today_date_input_tag}}" class="form-control form-control-sm" type="date" name="end_date"
+                            onchange="$('#refresh_leads_to_bookings').click(); $('#refresh_leads_to_sales').click(); $('#refresh_calls_today').click(); $('#refresh_base_analytics').click();"/>
+                        </div>
+                        <div class="col p-0">
+                        </div>
+                    </div>
+                    <hr>
+                    Quick Filters
+                    <div class="row">
+                        <div class="col m-1 p-0">
+                            <button class="btn btn-secondary btn-sm nowrap">{{''|today_date_input_tag}} (day)</button>
+                        </div>
+                        <div class="col m-1 p-0">
+                            <button class="btn btn-secondary btn-sm nowrap" onclick="">{{''|today_date_tag|add_days:-7|date_to_date_input_prefill}} (week)</button>
+                        </div>
+                        <div class="col m-1 p-0">
+                            <button class="btn btn-secondary btn-sm nowrap">{{''|today_date_tag|add_months:-1|date_to_date_input_prefill}} (month)</button>
+                        </div>
+                        <div class="col m-1 p-0">
+                            <button class="btn btn-secondary btn-sm nowrap">{{''|today_date_tag|add_years:-1|date_to_date_input_prefill}} (year)</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <button hidden id="refresh_calls_today" hx-trigger="load, click delay:0.5s"
+                hx-get="{%url 'get-calls-today' %}"
+                hx-include="#start_date, #end_date, #site_pk, #campaign_pk, #graph_type_calls_today"
+                hx-target="#calls_today_card_body"
+                hx-indicator="#htmx-indicator-calls-today"
                 hx-swap="innerHTML"
-                onclick="$('#htmx-indicator-leads-and-sales').addClass('htmx-request')">refresh</button>
+                onclick="$('#htmx-indicator-calls-today').addClass('htmx-request')">refresh</button>
             <div class="card">
                 <div class="card-header">
                     <h5 data-bs-toggle="popover" 
@@ -25,31 +71,21 @@
                         data-bs-placement="right"
                         data-bs-html="true"
                         data-bs-content="This shows the amount of calls made today since midnight (filtered by site and campaign above).">Calls Today <i class="fa-solid fa-circle-info"></i>
-                        <img  class="htmx-indicator invert htmx-indicator-base-analytics" id="" src="https://htmx.org/img/bars.svg"/>
+                        <img  class="htmx-indicator invert" id="htmx-indicator-calls-today" src="https://htmx.org/img/bars.svg"/>
                     </h5> 
                 </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col">
-                        </div>
-                        <div class="col-md-auto" style="text-align:left">
-                            <span id="calls_todays_table_wrapper">
-                            </span>
-                        </div>
-                        <div class="col">
-                        </div>
-                    </div>
+                <div class="card-body" id="calls_today_card_body">
                 </div>
             </div>
         </div>
         <div class="col">
-            <button hidden id="refresh_lead_to_sales" hx-trigger="load, click delay:0.5s"
-                hx-get="{%url 'get-leads-to-sales' %}"
-                hx-include="#start_date, #end_date, #site_pk, #campaign_pk, #graph_type_leads_to_sale"
-                hx-target="#lead_to_sales_card_body"
-                hx-indicator="#htmx-indicator-leads-and-sales"
+            <button hidden id="refresh_current_call_count_distribution" hx-trigger="load, click delay:0.5s"
+                hx-get="{%url 'get-current-call-count-distribution' %}"
+                hx-include="#start_date, #end_date, #site_pk, #campaign_pk, #graph_type_current_call_count_distribution"
+                hx-target="#current_call_count_distribution_card_body"
+                hx-indicator="#htmx-indicator-current-call-count-distribution"
                 hx-swap="innerHTML"
-                onclick="$('#htmx-indicator-leads-and-sales').addClass('htmx-request')">refresh</button>
+                onclick="$('#htmx-indicator-current-call-count-distribution').addClass('htmx-request')">refresh</button>
             <div class="card">
                 <div class="card-header">
                     <h5 data-bs-toggle="popover" 
@@ -57,21 +93,23 @@
                         data-bs-placement="right"
                         data-bs-html="true"
                         data-bs-content="This shows the <b>current</b> distribution of leads in each call count column on the <b>Leads</b> page (filtered by site and campaign above).">Current Call Count Distribution <i class="fa-solid fa-circle-info"></i>
-                        <img class="htmx-indicator invert htmx-indicator-base-analytics" src="https://htmx.org/img/bars.svg"/>
+                        <img class="htmx-indicator invert" id="htmx-indicator-current-call-count-distribution" src="https://htmx.org/img/bars.svg"/>
                     </h5> 
                         
                 </div>
-                <div class="card-body" id="lead_to_sales_card_body">
+                <div class="card-body" id="current_call_count_distribution_card_body">
                 </div>
             </div>
         </div>
     </div> 
+    {%include 'analytics/htmx/base_analytics.html'%}    
+    
     <div class="row my-3">
         <div class="col">
-            <button hidden id="refresh_lead_to_sales" hx-trigger="load, click delay:0.5s"
+            <button hidden id="refresh_leads_to_sales" hx-trigger="load, click delay:0.5s"
                 hx-get="{%url 'get-leads-to-sales' %}"
-                hx-include="#start_date, #end_date, #site_pk, #campaign_pk, #graph_type_leads_to_sale"
-                hx-target="#lead_to_sales_card_body"
+                hx-include="#start_date, #end_date, #site_pk, #campaign_pk, #graph_type_leads_to_sales"
+                hx-target="#leads_to_sales_card_body"
                 hx-indicator="#htmx-indicator-leads-and-sales"
                 hx-swap="innerHTML"
                 onclick="$('#htmx-indicator-leads-and-sales').addClass('htmx-request')">refresh</button>
@@ -85,16 +123,16 @@
                         <img  class="htmx-indicator invert" id="htmx-indicator-leads-and-sales" src="https://htmx.org/img/bars.svg"/>
                     </h5> 
                 </div>
-                <div class="card-body" id="lead_to_sales_card_body">
+                <div class="card-body" id="leads_to_sales_card_body">
                 </div>
             </div>
         </div>
         
         <div class="col">
-            <button hidden id="refresh_lead_to_bookings" hx-trigger="load, click delay:0.5s"
+            <button hidden id="refresh_leads_to_bookings" hx-trigger="load, click delay:0.5s"
                 hx-get="{%url 'get-leads-to-bookings' %}"
-                hx-include="#start_date, #end_date, #site_pk, #campaign_pk, #graph_type_leads_to_booking"
-                hx-target="#lead_to_bookings_card_body"
+                hx-include="#start_date, #end_date, #site_pk, #campaign_pk, #graph_type_leads_to_bookings"
+                hx-target="#leads_to_bookings_card_body"
                 hx-indicator="#htmx-indicator-leads-and-bookings"
                 hx-swap="innerHTML"
                 onclick="$('#htmx-indicator-leads-and-bookings').addClass('htmx-request')">refresh</button>
@@ -108,20 +146,20 @@
                         <img  class="htmx-indicator invert" id="htmx-indicator-leads-and-bookings" src="https://htmx.org/img/bars.svg"/>
                     </h5> 
                 </div>
-                <div class="card-body" id="lead_to_bookings_card_body">
+                <div class="card-body" id="leads_to_bookings_card_body">
                     
                 </div>
             </div>
         </div>
         
         <div class="col">
-            <button hidden id="refresh_calls_made" hx-trigger="load, click delay:0.5s"
-                hx-get="{%url 'get-calls-made' %}"
-                hx-include="#start_date, #end_date, #site_pk, #campaign_pk, #graph_type_calls_made"
-                hx-target="#calls_made_card_body"
-                hx-indicator="#htmx-indicator-calls-made"
+            <button hidden id="refresh_calls_made_per_day" hx-trigger="load, click delay:0.5s"
+                hx-get="{%url 'get-calls-made-per-day' %}"
+                hx-include="#start_date, #end_date, #site_pk, #campaign_pk, #graph_type_calls_made_per_day"
+                hx-target="#calls_made_per_day_card_body"
+                hx-indicator="#htmx-indicator-calls-made-per-day"
                 hx-swap="innerHTML"
-                onclick="$('#htmx-indicator-calls-made').addClass('htmx-request')">refresh</button>
+                onclick="$('#htmx-indicator-calls-made-per-day').addClass('htmx-request')">refresh</button>
             <div class="card">
                 <div class="card-header">
                     <h5 data-bs-toggle="popover" 
@@ -129,10 +167,10 @@
                         data-bs-placement="right"
                         data-bs-html="true"
                         data-bs-content="This shows the number of calls made per day for the chosen site and/or campaign (top left), between the times chosen (right).">Calls Made Per Day <i class="fa-solid fa-circle-info"></i>
-                        <img  class="htmx-indicator invert" id="htmx-indicator-calls-made" src="https://htmx.org/img/bars.svg"/>
+                        <img  class="htmx-indicator invert" id="htmx-indicator-calls-made-per-day" src="https://htmx.org/img/bars.svg"/>
                     </h5> 
                 </div>
-                <div class="card-body" id="calls_made_card_body">
+                <div class="card-body" id="calls_made_per_day_card_body">
                 </div>
             </div>
         </div>

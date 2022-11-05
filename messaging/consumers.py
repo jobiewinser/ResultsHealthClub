@@ -97,7 +97,7 @@ def send_whatsapp_message_to_number(message, customer_number, user, whatsappnumb
 def message_details_user(user):   
     logger.debug("message_details_user start")
     avatar = user.profile.avatar.url
-    name = user.profile.name()
+    name = user.profile.name
     return avatar, name
 @sync_to_async
 def get_whatsappnumber(whatsappnumber_pk):   

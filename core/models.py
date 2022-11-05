@@ -133,7 +133,7 @@ class WhatsappNumber(PhoneNumber):
     #         message_pk_list.append(dict.get('pk'))
     #     return WhatsAppMessage.objects.filter(pk__in=message_pk_list).order_by('-inbound', '-datetime')
 
-    def send_whatsapp_message(self, customer_number=None, lead=None, message="", user=None, template_used=None):  
+    def send_whatsapp_message(self, customer_number=None, lead=None, message="", user=None):  
         try:
             logger.debug("site.send_whatsapp_message start") 
             if lead:
@@ -155,7 +155,6 @@ class WhatsappNumber(PhoneNumber):
                                 site=self.site,
                                 user=user,
                                 customer_number=customer_number,
-                                template=template_used,
                                 inbound=False,
                                 whatsappnumber=self,
                             )
@@ -365,6 +364,7 @@ class Profile(models.Model):
             return f"{self.user.first_name} {self.user.last_name}"
         else:
             return str(self.pk)
+    @property
     def name(self):
         return f"{self.user.first_name} {self.user.last_name}"
 class FreeTasterLink(models.Model):
