@@ -24,7 +24,7 @@
                         <div class="col p-0 m-1 ">
                             <button
                                 hx-include=".non_site_dependant_analytics_filters, .site_dependant_analytics_filters" hx-indicator="#page_load_indicator" id="refresh_analytics"
-                                hx-get="{%url 'refresh-analytics'%}" hx-target="#analytics_span_wrapper" hx-push-url="true" hx-swap="innerHTML" class="btn btn-success btn-sm"><i class="fa-solid fa-arrows-rotate"></i> Refresh</button>
+                                hx-get="{%url 'refresh-analytics'%}" hx-target="#analytics_span_wrapper" hx-push-url="false" hx-swap="innerHTML" class="btn btn-success btn-sm"><i class="fa-solid fa-arrows-rotate"></i> Refresh</button>
                         </div>
                         <div class="col-md-auto m-1 right p-0">
                             <input id="start_date" value="{%if start_date%}{{start_date}}{%else%}{{''|today_date_tag|add_years:-1|date_to_date_input_prefill}}{%endif%}" class="form-control form-control-sm non_site_dependant_analytics_filters" type="date" name="start_date"
@@ -40,7 +40,7 @@
                         <div class="col p-0 m-1 ">
                             <button             
                                 hx-include="" hx-indicator="#page_load_indicator"
-                                hx-get="{%url 'refresh-analytics'%}" hx-target="#analytics_span_wrapper" hx-push-url="true" hx-swap="innerHTML" class="btn btn-warning btn-sm"><i class="fa-solid fa-ban"></i> Reset</button>
+                                hx-get="{%url 'refresh-analytics'%}" hx-target="#analytics_span_wrapper" hx-push-url="false" hx-swap="innerHTML" class="btn btn-warning btn-sm"><i class="fa-solid fa-ban"></i> Reset</button>
                         </div>
                     </div>
                     <hr>
