@@ -52,14 +52,14 @@ align-items: flex-start;"
                     {%for site in chat_sites%}   
                         <div class="accordion-item">
                         <h2 class="accordion-header" id="flush-headingOne">
-                            <button class="accordion-button no-chevron-button ps-2 {%if chat_site == site or whatsappnumber.site == site%} active{%else%} collapsed{%endif%}" type="button" data-bs-toggle="collapse" data-bs-target="#site_collapse_{{site.pk}}" aria-expanded="false" aria-controls="site_collapse_{{site.pk}}" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
+                            <button class="accordion-button no-chevron-button ps-2 {%if whatsappnumber.site == site%} active{%else%} collapsed{%endif%}" type="button" data-bs-toggle="collapse" data-bs-target="#site_collapse_{{site.pk}}" aria-expanded="false" aria-controls="site_collapse_{{site.pk}}" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
                                 <span class="badge bg-dark badge-sm me-1"><i class="fa fa-whatsapp me-1"></i><span class="site_message_count_{{site.pk}}">{{site|site_outstanding_whatsapp_messages_tag:request.user}}</span></span>  <b>{{site.name}}</b>
                             </button>
                         </h2>
-                        <div id="site_collapse_{{site.pk}}" class="accordion-collapse collapse {%if chat_site == site or chat_sites.count == 1%} show{%endif%}" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+                        <div id="site_collapse_{{site.pk}}" class="accordion-collapse collapse {%if whatsappnumber.site == site%} show{%endif%}" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
                             <div class="accordion-body" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
                                 {%for chat_whatsappnumber in site.return_phone_numbers%}
-                                    <button class="btn btn-sm btn-{%if chat_site == site or whatsappnumber.site == site%}light{%else%}secondary{%endif%} btn-xs"
+                                    <button class="btn btn-sm btn-secondary {%if chat_whatsappnumber == whatsappnumber%}active{%endif%} btn-xs"
                                     hx-get="{%url 'message-list'%}"
                                     hx-target="#chat_bottom"
                                     hx-swap="#outerHTML"

@@ -11,7 +11,7 @@ urlpatterns = [
 
     path("message-window/<str:customer_number>/<str:whatsappnumber_pk>/", message_window, name="message-window"),
     path("message-window/<str:customer_number>/", message_window, name="message-window"),
-    path('get-messaging-window/', get_messaging_section, name='get-messaging-window' ),
+    # path('get-messaging-window/', get_messaging_section, name='get-messaging-window' ),
     path('get-message-list-row/', get_messaging_list_row, name='get-message-list-row' ),
     path('send-first-template-whatsapp-lead-article/<str:lead_pk>/', send_first_template_whatsapp_lead_article_htmx, name='send-first-template-whatsapp-lead-article' ),
     path('send-first-template-whatsapp-booking-row/<str:lead_pk>/', send_first_template_whatsapp_booking_row_htmx, name='send-first-template-whatsapp-booking-row' ),

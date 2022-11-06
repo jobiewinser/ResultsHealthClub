@@ -115,8 +115,8 @@ def get_rendered_html(message, message_context, messaging_customer_number, whats
     rendered_message_list_row = loader.render_to_string('messaging/htmx/message_list_row.html', message_context)
     rendered_message_chat_row = loader.render_to_string('messaging/htmx/message_chat_row.html', message_context)
     rendered_html = f"""
-    <span id='message_list_row_{messaging_customer_number}_{whatsappnumber.pk}' data-customer-number='{messaging_customer_number}' data-whatsappnumber-pk='{whatsappnumber.pk}' hx-swap-oob='delete'></span>
-    <span id='messageCollapse_{whatsappnumber.pk}' hx-swap-oob='afterbegin '>{rendered_message_list_row}</span>
+    <span id='latest_message_row_{messaging_customer_number}' hx-swap-oob='delete'></span>
+    <span id='messageCollapse_{whatsappnumber.pk}' hx-swap-oob='afterbegin'>{rendered_message_list_row}</span> #this line is clearing the whole message list?!
     <span id='messageWindowInnerBody_{messaging_customer_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>                
     """
 

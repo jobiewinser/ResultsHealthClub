@@ -83,7 +83,7 @@ class Webhooks(View):
                                             existing_message.pending = False
                                             existing_message.failed = True
                                             existing_message.save()
-                                            new_message_to_websocket(existing_message)
+                                            new_message_to_websocket(existing_message, existing_message.whatsappnumber)
                             elif status_json.get('status') == 'sent':
                                 AttachedError.objects.filter(
                                     type__in = ['1104','1105'],
@@ -94,7 +94,7 @@ class Webhooks(View):
                                 existing_message.pending = False
                                 existing_message.failed = False
                                 existing_message.save()
-                                new_message_to_websocket(existing_message)
+                                new_message_to_websocket(existing_message, existing_message.whatsappnumber)
                 elif field == 'statuses':
                     for status_dict in value.get('statuses', []):
                         print("STATUS", str(status_dict))
@@ -147,12 +147,6 @@ def handle_received_whatsapp_image_message(message_json, metadata, webhook_objec
     wamid = message_json.get('id')
     to_number = metadata.get('display_phone_number')
     from_number = message_json.get('from')
-    
-                            # try:
-                            #     lead = Campaignlead.objects.get(whatsapp_number__icontains=from_number[-10:])
-                            #     # name = lead.name
-                            # except Exception as e:
-                            #     lead = None
     lead = Campaignlead.objects.filter(whatsapp_number=from_number).last()
     whatsappnumber = WhatsappNumber.objects.get(number=to_number)
     site = whatsappnumber.whatsapp_business_account.site
@@ -181,19 +175,13 @@ def handle_received_whatsapp_image_message(message_json, metadata, webhook_objec
         raw_webhook=webhook_object,
         whatsappnumber=whatsappnumber,
     )    
-    new_message_to_websocket(whatsapp_message)
+    new_message_to_websocket(whatsapp_message, whatsappnumber)
 
 
 def handle_received_whatsapp_text_message(message_json, metadata, webhook_object):
     wamid = message_json.get('id')
     to_number = metadata.get('display_phone_number')
     from_number = message_json.get('from')
-    
-                            # try:
-                            #     lead = Campaignlead.objects.get(whatsapp_number__icontains=from_number[-10:])
-                            #     # name = lead.name
-                            # except Exception as e:
-                            #     lead = None
     lead = Campaignlead.objects.filter(whatsapp_number=from_number).last()
     whatsappnumber = WhatsappNumber.objects.get(number=to_number)
     site = whatsappnumber.whatsapp_business_account.site
@@ -213,9 +201,9 @@ def handle_received_whatsapp_text_message(message_json, metadata, webhook_object
         raw_webhook=webhook_object,
         whatsappnumber=whatsappnumber,
     )
-    new_message_to_websocket(whatsapp_message)
+    new_message_to_websocket(whatsapp_message, from_number)
 
-def new_message_to_websocket(whatsapp_message):
+def new_message_to_websocket(whatsapp_message, whatsapp_number):
     from channels.layers import get_channel_layer
     channel_layer = get_channel_layer()                            
     message_context = {
@@ -233,7 +221,7 @@ def new_message_to_websocket(whatsapp_message):
 
     <span id='messageWindowInnerBody_{whatsapp_message.customer_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>
     
-    <span id="chat_notification_{whatsapp_message.lead.whatsapp_number}" hx-swap-oob='innerHTML'>
+    <span id="chat_notification_{whatsapp_number}" hx-swap-oob='innerHTML'>
         <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
                 <span class="visually-hidden">New alerts</span>
         </span>

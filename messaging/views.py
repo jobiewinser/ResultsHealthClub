@@ -15,21 +15,46 @@ logger = logging.getLogger(__name__)
 
 @login_required
 def message_list(request, **kwargs):
+    context = {}
     whatsappnumber = None
-    customer_number = None
-    site = Site.objects.get(pk=request.GET.get('site_pk'))
+    customer_number = request.GET.get('customer_number') 
+    site = Site.objects.filter(pk=request.GET.get('site_pk')).first()
+    context['chat_site'] = [site]    
     whatsappnumber_pk = request.GET.get('whatsappnumber_pk')
     if whatsappnumber_pk:
         whatsappnumber = WhatsappNumber.objects.get(pk=whatsappnumber_pk)
-    else:
-        customer_number = request.GET.get('customer_number')        
+    elif customer_number and site:
+        context['customer_numbers'] = [customer_number]    
         latest_message = WhatsAppMessage.objects.filter(customer_number=customer_number, whatsappnumber__whatsapp_business_account__site=site).order_by('datetime').last()
         if latest_message:
             whatsappnumber = latest_message.whatsappnumber
     if whatsappnumber:
-        if get_user_allowed_to_use_site_messaging(request.user, site):
-            context = {'chat_site':site, "whatsappnumber":whatsappnumber, "customer_numbers": [customer_number]}
-            return render(request, "messaging/messaging.html", context)
+        context['whatsappnumber'] = whatsappnumber
+    # if get_user_allowed_to_use_site_messaging(request.user, site):
+    return render(request, "messaging/messaging.html", context)
+
+@login_required
+def get_messaging_section(request, **kwargs):
+    try:
+        context = {}
+        # request.GET._mutable = True
+        # site = Site.objects.get(pk=request.GET.get('site_pk'))
+        whatsappnumber_pk = request.session.get('open_chat_whatsapp_number', '') 
+        print("get_messaging_section whatsappnumber_pk", str(whatsappnumber_pk))
+        if whatsappnumber_pk:
+            if request.user.profile.sites_allowed.filter(pk=whatsappnumber_pk):
+                print("get_messaging_section request.user.profile.sites_allowed.filter(pk=whatsappnumber_pk)", str(request.user.profile.sites_allowed.filter(pk=whatsappnumber_pk)))
+                whatsappnumber = WhatsappNumber.objects.filter(pk=whatsappnumber_pk).first()
+                if whatsappnumber:
+                    context['whatsappnumber'] = whatsappnumber
+                    context['customer_numbers'] = request.session.get('open_chat_conversation_customer_number', []) 
+                    print("get_messaging_section whatsappnumber.pk", str(whatsappnumber.pk))
+                    print("get_messaging_section customer_numbers", str(request.session.get('open_chat_conversation_customer_number', []) ))
+        return render(request, "messaging/messaging.html", context)   
+    except Exception as e:
+        logger.debug("get_messaging_section Error "+str(e))
+        return HttpResponse(e, status=500)
+
 
 @login_required
 def message_window(request, **kwargs):
@@ -53,28 +78,6 @@ def message_window(request, **kwargs):
 
         return render(request, "messaging/message_window_htmx.html", context)
     return HttpResponse("", status=500)
-
-@login_required
-def get_messaging_section(request, **kwargs):
-    try:
-        context = {}
-        # request.GET._mutable = True
-        # site = Site.objects.get(pk=request.GET.get('site_pk'))
-        whatsappnumber_pk = request.session.get('open_chat_whatsapp_number', '') 
-        print("get_messaging_section whatsappnumber_pk", str(whatsappnumber_pk))
-        if whatsappnumber_pk:
-            if request.user.profile.sites_allowed.filter(pk=whatsappnumber_pk):
-                print("get_messaging_section request.user.profile.sites_allowed.filter(pk=whatsappnumber_pk)", str(request.user.profile.sites_allowed.filter(pk=whatsappnumber_pk)))
-                whatsappnumber = WhatsappNumber.objects.filter(pk=whatsappnumber_pk).first()
-                if whatsappnumber:
-                    context['whatsappnumber'] = whatsappnumber
-                    context['customer_numbers'] = request.session.get('open_chat_conversation_customer_number', []) 
-                    print("get_messaging_section whatsappnumber.pk", str(whatsappnumber.pk))
-                    print("get_messaging_section customer_numbers", str(request.session.get('open_chat_conversation_customer_number', []) ))
-        return render(request, f"messaging/messaging.html", context)   
-    except Exception as e:
-        logger.debug("get_messaging_section Error "+str(e))
-        return HttpResponse(e, status=500)
 
 @login_required
 def get_messaging_list_row(request, **kwargs):

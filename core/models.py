@@ -123,7 +123,7 @@ class WhatsappNumber(PhoneNumber):
     @property
     def get_latest_messages(self):
         message_pk_list = []
-        for dict in WhatsAppMessage.objects.filter(whatsappnumber=self).order_by('customer_number','-datetime').distinct('customer_number').values('pk'):
+        for dict in WhatsAppMessage.objects.filter(whatsappnumber=self).order_by('customer_number','-datetime').distinct('customer_number').values('pk')[:10]:
             message_pk_list.append(dict.get('pk'))
         return WhatsAppMessage.objects.filter(pk__in=message_pk_list).order_by('-datetime')
 

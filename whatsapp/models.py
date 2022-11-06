@@ -11,6 +11,7 @@ from django.dispatch import receiver
 from PIL import Image
 from io import StringIO, BytesIO
             
+from datetime import datetime, timedelta
 from django.core.files.images import ImageFile
 import os
 
@@ -73,6 +74,19 @@ class WhatsAppMessage(Message):
     def active_errors(self):        
         from core.models import AttachedError
         return AttachedError.objects.filter(whatsapp_message=self).filter(archived=False)
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        unique = None
+        while not unique:
+            qs = WhatsAppMessage.objects.filter(datetime=self.datetime)
+            if self.pk:
+                qs = qs.exclude(pk=self.pk)
+            if qs:
+                self.datetime = self.datetime + datetime.timedelta(seconds=1)
+            else:
+                unique = True
+        super(WhatsAppMessage, self).save(force_insert, force_update, using, update_fields)
+
 # class WhatsAppMessage(models.Model):
 #     pass 
     
