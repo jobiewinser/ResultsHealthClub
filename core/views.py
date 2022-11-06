@@ -126,11 +126,6 @@ class SiteConfigurationView(TemplateView):
             site_webhook_active = False
             if calendly_webhooks:
                 for webhook in calendly_webhooks:
-                    print("for webhook in calendly_webhooks:")
-                    print(webhook.get('state'), 'active')
-                    print(webhook.get('callback_url'), f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/")
-                    print(webhook.get('organization'), f"{os.getenv('SITE_URL')}/organizations/{site.calendly_organization}")
-                    
                     if webhook.get('state') == 'active' \
                     and webhook.get('callback_url') == f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/" \
                     and webhook.get('organization') == f"{os.getenv('CALENDLY_URL')}/organizations/{site.calendly_organization}":
