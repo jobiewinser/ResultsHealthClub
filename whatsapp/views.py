@@ -221,7 +221,7 @@ def new_message_to_websocket(whatsapp_message, whatsapp_number):
 
     <span id='messageWindowInnerBody_{whatsapp_message.customer_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>
     
-    <span id="chat_notification_{whatsapp_number}" hx-swap-oob='innerHTML'>
+    <span id="chat_notification_{whatsapp_number.pk}" hx-swap-oob='innerHTML'>
         <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
                 <span class="visually-hidden">New alerts</span>
         </span>
