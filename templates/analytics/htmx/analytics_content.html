@@ -37,7 +37,7 @@
                             <input id="end_date" value="{%if end_date%}{{end_date}}{%else%}{{''|today_date_input_tag}}{%endif%}" class="form-control form-control-sm non_site_dependant_analytics_filters" type="date" name="end_date"
                             onchange="$('#refresh_analytics').click();"/>
                         </div>
-                        <div class="col p-0 m-1 ">
+                        <div class="col p-0 m-1 right">
                             <button             
                                 hx-include="" hx-indicator="#page_load_indicator"
                                 hx-get="{%url 'refresh-analytics'%}" hx-target="#analytics_span_wrapper" hx-push-url="false" hx-swap="innerHTML" class="btn btn-warning btn-sm"><i class="fa-solid fa-ban"></i> Reset</button>

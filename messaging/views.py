@@ -88,23 +88,33 @@ def get_messaging_list_row(request, **kwargs):
         return HttpResponse(e, status=500)
 
 @login_required
-def send_first_template_whatsapp_htmx(request, **kwargs):
+def send_first_template_whatsapp_lead_article_htmx(request, **kwargs):
     try:
-        lead = Campaignlead.objects.get(pk=kwargs.get('lead_pk'))
-        if not lead.message_set.all():
-            lead.send_template_whatsapp_message(1, communication_method='a')
-        messages = WhatsAppMessage.objects.filter(customer_number=kwargs.get('customer_number'), whatsappnumber__number=kwargs.get('messaging_phone_number')).order_by('-datetime')
-        context = {}
-        context["messages"] = messages
-        context["lead"] = lead
-        context["customer_number"] = lead.whatsapp_number
-        context["site_pk"] = lead.campaign.site
-        context['max_call_count'] = request.POST.get('max_call_count')
-        return render(request, "campaign_leads/htmx/lead_article.html", context)
+        return render(request, "campaign_leads/htmx/lead_article.html", send_first_template_whatsapp(request, kwargs))
     except Exception as e:
         logger.debug("send_first_template_whatsapp_htmx Error "+str(e))
         return HttpResponse(e, status=500)
 
+@login_required
+def send_first_template_whatsapp_booking_row_htmx(request, **kwargs):
+    try:
+        return render(request, "campaign_leads/htmx/campaign_booking_row_htmx.html", send_first_template_whatsapp(request, kwargs))
+    except Exception as e:
+        logger.debug("send_first_template_whatsapp_htmx Error "+str(e))
+        return HttpResponse(e, status=500)
+
+def send_first_template_whatsapp(request, kwargs):
+    lead = Campaignlead.objects.get(pk=kwargs.get('lead_pk'))
+    if not lead.message_set.all():
+        lead.send_template_whatsapp_message(1, communication_method='a')
+    messages = WhatsAppMessage.objects.filter(customer_number=kwargs.get('customer_number'), whatsappnumber__number=kwargs.get('messaging_phone_number')).order_by('-datetime')
+    context = {}
+    context["messages"] = messages
+    context["lead"] = lead
+    context["customer_number"] = lead.whatsapp_number
+    context["site_pk"] = lead.campaign.site
+    context['max_call_count'] = request.POST.get('max_call_count')
+    return context
 @login_required
 def get_modal_content(request, **kwargs):
     try:

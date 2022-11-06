@@ -1,6 +1,25 @@
 <span id="leads_board_span_wrapper">    
-<div class="col-md-auto m-1 secondary_td_layer ">
-    <b>Filtering:</b> "<u><span class="elipses-overflow" id="leadSearchValue"></span></u>" (Type to filter, Backspace to clear)
+<div class="row">
+    <div class="col-md-auto m-1 p-0 secondary_td_layer">
+        <b>Filtering:</b> "<u><span class="elipses-overflow" id="leadSearchValue"></span></u>" (Type to filter, Backspace to clear)
+    </div> 
+    <div class="col m-1 ">
+    </div>
+    <div class="col-md-auto m-1 p-0">
+        <button class="btn btn-primary btn-sm" 
+            data-bs-toggle="popover" 
+            data-bs-trigger="hover" 
+            data-bs-placement="top"
+            data-bs-content="Manually create a campaign lead."
+            hx-indicator=".htmx-indicator" hx-target="#generic_modal_body" 
+            hx-include="#site_pk"
+            hx-get="{% url 'campaign-lead-get-modal-content' %}" 
+            hx-push-url="false"
+            hx-vals='{"template_name": "create_campaign_lead"}'
+            hx-swap="innerHTML" hx-trigger="click">
+                <i class="fa fa-plus" aria-hidden="true"></i> Manually Add Campaign Lead
+        </button>
+    </div>
 </div>
 <span id="leads_board" class="board" hx-ws="connect:/ws/lead/{{company.pk}}/">
     <!-- <button hidden hx-get="{% url 'get-leads-column-meta-data'%}" hx-include=".overview_table_filters" id="refresh_column_metadata" hx-indicator=".column-htmx-indicator" hx-target="#column_metadata_0" hx-trigger="click" hx-swap="outerHTML"></button> -->

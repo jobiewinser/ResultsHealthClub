@@ -4,7 +4,7 @@
         <form id="message_form_{{customer_number}}" hx-ws="send:submit" autocomplete="off">
             <div style="position: absolute; right:0; bottom: 0; width:100%;" class="row mb-2" id="message_input_div_{{customer_number}}"> 
                 <div class="col"> 
-                    <input class="form-control message_input_text" id="message_input_{{customer_number}}"  name="message"  type="text"/>
+                    <input class="form-control message_input_text" id="message_input_{{customer_number}}"  name="message"  type="text" oninput="PageTitleNotification.Off()"/>
                     <input hidden class="form-control" value="{{customer_number}}"  name="messaging_customer_number"  type="text"/>
                 </div>
                 <div class="col-auto"> 

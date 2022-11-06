@@ -2,8 +2,6 @@ function leadshandlehtmxbeforeRequest(evt){
     if (![undefined, ''].includes(evt.detail.pathInfo.path) && ![undefined, ''].includes(evt.detail.target.id)){
         if (evt.detail.target.id == 'overview_table' || evt.detail.pathInfo.path.includes("academy-booking-overview")){
             $("#overview_table").dataTable().fnDestroy();
-        } else if (evt.detail.pathInfo.requestPath.includes("message-list")) {
-
         }
     }
 }

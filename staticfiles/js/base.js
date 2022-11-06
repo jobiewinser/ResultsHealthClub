@@ -1,25 +1,37 @@
+var OriginalTitle = document.title;
 var PageTitleNotification = {
     Vars:{
-        OriginalTitle: document.title,
+        
         Interval: null
     },    
     On: function(notification, intervalSpeed){
+        this.Vars
         var _this = this;
         _this.Vars.Interval = setInterval(function(){
-             document.title = (_this.Vars.OriginalTitle == document.title)
+             document.title = (OriginalTitle == document.title)
                                  ? notification
-                                 : _this.Vars.OriginalTitle;
+                                 : OriginalTitle;
         }, (intervalSpeed) ? intervalSpeed : 1000);
     },
     Off: function(){
         clearInterval(this.Vars.Interval);
-        document.title = this.Vars.OriginalTitle;   
+        document.title = OriginalTitle;   
     }
 }
 
 function basehandlehtmxafterSwap(evt){
     if (evt.detail.target.id == 'generic_modal_body'){
         $('#generic_modal').modal('show');
+    }
+    
+    if (![undefined, ''].includes(evt.detail.pathInfo.requestPath)){
+        if (evt.detail.pathInfo.requestPath.includes("message-window")){
+            let element = $(evt.target.lastElementChild).find(".chat_card_body");
+            try{
+                element.scrollTop(element[0].scrollHeight - element[0].clientHeight);
+            }catch(e){}
+        } 
+    
     }
     if (![undefined, ''].includes(evt.detail.pathInfo.path)){
         if (evt.detail.pathInfo.path.includes("modify-user")){
@@ -41,7 +53,7 @@ function basehandlehtmxafterSwap(evt){
     });
 }
 
-function basehandlehtmxafterRequest(evt){                 
+function basehandlehtmxafterRequest(evt){   
     let status = evt.detail.xhr.status;
     let srcElement = $(evt.srcElement);
     let src_id = srcElement.attr('id');
@@ -58,6 +70,10 @@ function basehandlehtmxafterRequest(evt){
             }else if (evt.detail.pathInfo.requestPath.includes("modify-user")){
                 snackbarShow('Successfully logged in', 'success');
                 location.reload();
+            }else if (evt.detail.pathInfo.requestPath.includes("update-message-counts")){
+                document.getElementById('notification1').play();
+                OriginalTitle = document.title;
+                PageTitleNotification.On("Message Received!", 1000);
             }
         }
     } else if (status == 404) {
@@ -80,10 +96,8 @@ function basehandlehtmxoobAfterSwap(evt){
     $("[data-bs-toggle=popover]").popover();
 }
 
-function basehandlehtmxoobBeforeSwap(evt){
+function basehandlehtmxoobBeforeSwap(evt){    
     if ($(evt.target).hasClass('message_list_body')){
-        console.log(2)
-        document.getElementById('notification1').play();
         htmx.ajax('GET', "/update-message-counts/", {swap:'none'})
     }
     $("[data-bs-toggle=popover]").popover();
@@ -173,3 +187,4 @@ function fallbackCopyTextToClipboard(text) {
   
     document.body.removeChild(textArea);
 }
+

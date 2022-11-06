@@ -20,7 +20,9 @@ body {
 .htmx-indicator.htmx-request {
     visibility: visible;
 }
-
+.navbar-collapse{
+    z-index:1059;
+}
 #page_load_indicator {
     height: 20%;
     width: 20%;
@@ -29,7 +31,9 @@ body {
     left: 40%;
 }
 
-
+.dropdown-menu{
+    z-index: 1070;
+}
 .generic_modal_contents{
     position: relative;
     overflow-y: auto;

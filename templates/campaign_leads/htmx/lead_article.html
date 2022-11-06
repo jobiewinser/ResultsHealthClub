@@ -32,7 +32,7 @@
                 
                 {%if not lead.message_set.all%}
                 <button class="btn btn-sm btn-success text-white position-relative" 
-                    hx-get="{%url 'send-first-template-whatsapp' lead_pk=lead.pk%}"
+                    hx-get="{%url 'send-first-template-whatsapp-lead-article' lead_pk=lead.pk%}"
                     hx-indicator=".htmx-indicator" 
                     hx-include="#max_call_count"
                     hx-target="#lead-{{lead.pk}}"

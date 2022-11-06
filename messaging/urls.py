@@ -13,7 +13,8 @@ urlpatterns = [
     path("message-window/<str:customer_number>/", message_window, name="message-window"),
     path('get-messaging-window/', get_messaging_section, name='get-messaging-window' ),
     path('get-message-list-row/', get_messaging_list_row, name='get-message-list-row' ),
-    path('send-first-template-whatsapp/<str:lead_pk>/', send_first_template_whatsapp_htmx, name='send-first-template-whatsapp' ),
+    path('send-first-template-whatsapp-lead-article/<str:lead_pk>/', send_first_template_whatsapp_lead_article_htmx, name='send-first-template-whatsapp-lead-article' ),
+    path('send-first-template-whatsapp-booking-row/<str:lead_pk>/', send_first_template_whatsapp_booking_row_htmx, name='send-first-template-whatsapp-booking-row' ),
     
     path('get-more-messages/', get_more_messages, name='get-more-messages' ),
     path('messaging-get-modal-content/', get_modal_content, name='messaging-get-modal-content' ),

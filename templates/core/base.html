@@ -2,6 +2,10 @@
 <!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <html>
+    <div id="leadsSearchBar">
+    Search Here: <input type="search" id="searchInput" class="search" />
+    </div>
+    
     <head>
         <script>
             var csrftoken = '{{ csrf_token }}';
@@ -52,14 +56,6 @@
     
     <script>  
             
-        function basehandlehtmxafterSwap(evt){
-            if (evt.detail.pathInfo.requestPath.includes("message-window")){
-                let element = $(evt.target.lastElementChild).find(".chat_card_body");
-                try{
-                    element.scrollTop(element[0].scrollHeight - element[0].clientHeight);
-                }catch(e){}
-            }
-        }
 
         $(document).ready(function() {
             
@@ -73,8 +69,8 @@
                     freetastershandlehtmxafterSwap(evt);                    
                 } else if (current_module == 'whatsapp_templates'){
                     whatsapptemplateshandlehtmxafterSwap(evt);                    
-                }
-                
+                }                
+                basehandlehtmxafterSwap(evt);
             }
             document.body.addEventListener('htmx:afterSwap', handlehtmxafterSwap);
             
@@ -92,13 +88,12 @@
             document.body.addEventListener('htmx:afterRequest', handlehtmxafterRequest);
 
             function handlehtmxbeforeRequest(evt){
-                var current_module = $('#current_page').val()
+                var current_module = $('#current_page').val();
                 if (current_module == 'campaign_leads_overview'){
                     leadshandlehtmxbeforeRequest(evt);
                 } else if (current_module == 'free_tasters'){
                     freetastershandlehtmxbeforeRequest(evt);                    
                 }
-                basehandlehtmxafterSwap(evt);
             }
             document.body.addEventListener('htmx:beforeRequest', handlehtmxbeforeRequest);
             
@@ -141,6 +136,87 @@
                     }
                 }
             });
+        });
+        window.onload = function() {
+            var listen = /^[a-z0-9]+$/i;
+            var searchInput = document.getElementById('searchInput');
+            var searchBar = document.getElementById('leadsSearchBar');
+        
+            if ( window.addEventListener ){
+                window.addEventListener( 'keyup', insertKey, false);
+            }
+            function insertKey( e ) {
+                if (!$('input').is(':focus')) {
+                // Get the character from e.keyCode
+                    var key = String.fromCharCode( e.keyCode ).toLowerCase(); 
+            
+                    // Match the character  
+                    if( key.match(listen)) {
+            
+                        // Change display: none; to display: block;
+                        searchBar.style.display = "block";
+                        $(searchBar).stop( true, true ).fadeIn();
+                        // Append every new character
+                        searchInput.value += key;
+
+                        $(searchBar).stop( true, true ).fadeOut("slow", function () {
+                            $(this).css({display:"none"});
+                        });
+                    } else if(e.keyCode == 8){
+                        searchInput.value = "";
+                    }
+
+                    if (searchInput.value != ""){
+                        jQuery.expr[':'].containsLower = function(elem, i, m) {
+                            let name_elem = $(elem).find('.lead_name');
+                            let campaign_elem = $(elem).find('.campaign_name');
+                            let site_elem = $(elem).find('.site_name');                        
+                            let cost_elem = $(elem).find('.lead_cost');
+                            let phone_elem = $(elem).find('.phone_number');
+                            let search_term = m[3].toLowerCase();
+                            return (
+                                (name_elem.html().toLowerCase()).includes(search_term) ||
+                                (campaign_elem.html().toLowerCase()).includes(search_term) ||
+                                (site_elem.html().toLowerCase()).includes(search_term) ||
+                                (cost_elem.html().toLowerCase()).includes(search_term) ||
+                                (phone_elem.html().toLowerCase()).includes(search_term)
+                            )
+                        };
+
+                        $('.column-drag').hide().filter(':containsLower("'+searchInput.value+'")').show();
+                    } else {
+
+                        $('.column-drag').show();
+                    }
+
+                    $('#leadSearchValue').html(searchInput.value)
+                }
+            }
+        }
+        $(document).ready(function() {
+            window.onkeydown = function(e) { 
+                return !(e.keyCode == 32 && e.target == document.body);
+            }; 
+            document.body.onkeyup = function(e) {
+                if (e.key == " " ||
+                    e.code == "Space" ||      
+                    e.keyCode == 32      
+                ) {
+                    e.preventDefault();
+                    let drag_elem = null;
+                    let hover_elem = $(':hover').last();
+                    if (hover_elem.hasClass('.column-drag')){
+                        drag_elem = hover_elem;
+                    } else{                    
+                        drag_elem = hover_elem.closest('.column-drag');
+                    }    
+                    if (drag_elem.length != 0)  {  
+                        htmx.ajax('GET', '/campaign-leads/toggle-claim-lead/'+drag_elem.data('id')+'/', {swap:"none"})
+                    }
+                }
+            }
+
+            set_total_costs();
         });
     </script>
     <body class="cartoon-background">
