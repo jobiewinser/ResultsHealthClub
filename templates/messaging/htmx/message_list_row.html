@@ -7,7 +7,36 @@
         hx-push-url="false"
         hx-swap="outerHTML" hx-trigger="click"
     {%endif%}
+
+    {%if message.active_errors%}
     data-bs-toggle="popover_delay" 
+    data-bs-trigger="hover" 
+    data-bs-html="true" 
+    data-bs-placement="right"
+    data-bs-title="Message Details"
+    data-bs-content="
+    {%if message.failed%}Attempted{%endif%} Sent at <b>{{message.datetime|nice_datetime_tag}}</b><br>
+    <br> 
+    <ul>
+        {%for error in message.active_errors%}
+        <li>{{error.created}} - {{error.get_type_display}}</li>
+        {%endfor%}
+    </ul> 
+    <br> 
+
+    {%if message.pending%}
+        This message has not sent yet.<br>
+    {%endif%}
+    
+    {%if message.inbound%}
+        By <b>{%if message.lead.name%}{{message.lead.name}}{%else%}{{message.customer_number}}{%endif%}</b>
+    {%else%}
+        By <b>{%if message.user.profile.name%}{{message.user.profile.name}}{%else%}Winser Systems{%endif%}</b>
+    {%endif%}"
+    {%endif%}
+
+
+    {% comment %} data-bs-toggle="popover_delay" 
     data-bs-trigger="hover" 
     data-bs-html="true" 
     data-bs-placement="right"
@@ -32,7 +61,9 @@
         By <b>{%if message.lead.name%}{{message.lead.name}}{%else%}{{message.customer_number}}{%endif%}</b>
     {%else%}
         By <b>{%if message.user.profile.name%}{{message.user.profile.name}}{%else%}Winser Systems{%endif%}</b>
-    {%endif%}"
+    {%endif%}" {% endcomment %}
+
+
     data-customer-number="{{message.customer_number}}"
     data-whatsappnumber-pk="{{message.whatsappnumber.pk}}"
     id="latest_message_row_{{message.customer_number}}"

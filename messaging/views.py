@@ -162,9 +162,21 @@ def update_message_counts(request, **kwargs):
     return render(request, "messaging/htmx/update_message_counts.html", {})
 
 @login_required
+def get_more_message_list_rows(request, **kwargs):
+    try:
+        context = {}
+        whatsappnumber = WhatsappNumber.objects.get(pk=request.GET.get('whatsappnumber_pk'))
+        earliest_datetime_timestamp = request.GET.get('earliest_datetime_timestamp')        
+        context['whatsappnumber'] = whatsappnumber
+        context['messages'] = whatsappnumber.get_latest_messages(after_datetime_timestamp=earliest_datetime_timestamp)
+        return render(request, "messaging/htmx/message_list_htmx.html", context)   
+    except Exception as e:
+        logger.debug("get_more_messages Error "+str(e))
+        return HttpResponse(e, status=500)
+
+@login_required
 def get_more_messages(request, **kwargs):
     try:
-        print("DFSBAHUKJDBSAUJKDBSAUJKDBSAJKDBHSAJKDBHSAJKD")
         context = {}
         rendered_html = ""
         whatsappnumber = WhatsappNumber.objects.get(pk=request.GET.get('whatsappnumber_pk'))
@@ -175,7 +187,7 @@ def get_more_messages(request, **kwargs):
         context['created_before_date'] = created_before_date
         
         context['messages'] = WhatsAppMessage.objects.filter(customer_number=customer_number, whatsappnumber=whatsappnumber, datetime__lt=created_before_date).order_by('-datetime')[:10:-1]   
-        return render(request, "messaging/message_window_message_rows.html", context)   
+        return render(request, "messaging/htmx/message_list_htmx.html", context)   
     except Exception as e:
         logger.debug("get_more_messages Error "+str(e))
         return HttpResponse(e, status=500)

@@ -119,20 +119,16 @@ class WhatsappNumber(PhoneNumber):
     #         return Site.objects.filter(company=self.site.company, whatsapp_business_account_id=self.site.whatsapp_business_account_id).exclude(pk=self.site.pk)
     #     except Exception as e:
     #         return Site.objects.none()
-
-    @property
-    def get_latest_messages(self):
+    def get_latest_messages(self, after_datetime_timestamp=None):
         message_pk_list = []
-        for dict in WhatsAppMessage.objects.filter(whatsappnumber=self).order_by('customer_number','-datetime').distinct('customer_number').values('pk')[:10]:
+        qs = WhatsAppMessage.objects.filter(whatsappnumber=self)
+        if after_datetime_timestamp:
+            after_datetime = datetime.fromtimestamp(int(float(after_datetime_timestamp)))
+            qs = qs.filter(datetime__lt=after_datetime)
+        
+        for dict in qs.order_by('customer_number','-datetime').distinct('customer_number').values('pk'):
             message_pk_list.append(dict.get('pk'))
-        return WhatsAppMessage.objects.filter(pk__in=message_pk_list).order_by('-datetime')
-
-    # @property
-    # def get_latest_messages(self):
-    #     message_pk_list = []
-    #     for dict in WhatsAppMessage.objects.filter(whatsappnumber=self).order_by('customer_number').distinct('customer_number').values('pk'):
-    #         message_pk_list.append(dict.get('pk'))
-    #     return WhatsAppMessage.objects.filter(pk__in=message_pk_list).order_by('-inbound', '-datetime')
+        return WhatsAppMessage.objects.filter(pk__in=message_pk_list).order_by('-datetime')[:10]
 
     def send_whatsapp_message(self, customer_number=None, lead=None, message="", user=None):  
         try:
