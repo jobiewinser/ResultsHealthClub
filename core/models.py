@@ -21,10 +21,10 @@ from whatsapp.models import WhatsAppMessage
 class AttachedError(models.Model): 
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     ERROR_TYPES = (
-                        ('1101', "You can only edit an active template once every 24 hours"),
-                        ('1102', "The system can not send Whatsapp Templates without a template name"),
-                        ('1103', "The number of parameters submitted does not match the Whatsapp Template (contact Winser Systems)"),
-                        ('1104', "Message failed to send because more than 24 hours have passed since the customer last replied to this number"),
+                        ('0101', "You can only edit an active template once every 24 hours"),
+                        ('0102', "The system can not send Whatsapp Templates without a template name"),
+                        ('0103', "The number of parameters submitted does not match the Whatsapp Template (contact Winser Systems)"),
+                        ('1104', "Message failed to send because more than 24 hours have passed since the customer last replied to this number. You can still send a template message at 24 hour intervals instead"),
                         ('1105', "Message failed to send because the Whatsapp account is not yet registered (contact Winser Systems)"),
                         ('1201', "Whatsapp Template not found Whatsapp's system"),
                         ('1202', "There is no Whatsapp Business linked to this Lead's assosciated Site"),
@@ -37,6 +37,7 @@ class AttachedError(models.Model):
     whatsapp_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="errors", on_delete=models.SET_NULL, null=True, blank=True)
     campaign_lead = models.ForeignKey("campaign_leads.Campaignlead", related_name="errors", on_delete=models.SET_NULL, null=True, blank=True)
     whatsapp_number = models.ForeignKey("core.WhatsappNumber", related_name="errors", on_delete=models.SET_NULL, null=True, blank=True)
+    whatsapp_message = models.ForeignKey("whatsapp.WhatsappMessage", related_name="attached_errors", on_delete=models.SET_NULL, null=True, blank=True)
     site = models.ForeignKey("core.Site", related_name="errors", on_delete=models.SET_NULL, null=True, blank=True)
     customer_number = models.TextField(blank=True, null=True)    
     admin_action_required = models.BooleanField(default=False)
@@ -46,9 +47,9 @@ class AttachedError(models.Model):
 # class AttachedWarning(models.Model): 
 #     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 #     ERROR_TYPES = (
-#                         ('1101', "You can only edit an active template once every 24 hours"),
-#                         ('1102', "The system can not send Whatsapp Templates without a template name"),
-#                         ('1103', "The number of parameters submitted does not match the Whatsapp Template (contact Winser Systems)"),
+#                         ('0101', "You can only edit an active template once every 24 hours"),
+#                         ('0102', "The system can not send Whatsapp Templates without a template name"),
+#                         ('0103', "The number of parameters submitted does not match the Whatsapp Template (contact Winser Systems)"),
 #                         ('1201', "Whatsapp Template not found Whatsapp's system"),
 #                         ('1202', "There is no Whatsapp Business linked to this Lead's assosciated Site"),
 #                         ('1203', "There is no 1st Whatsapp Template linked to this Lead's assosciated Site"),
@@ -157,6 +158,7 @@ class WhatsappNumber(PhoneNumber):
                                 customer_number=customer_number,
                                 inbound=False,
                                 whatsappnumber=self,
+                                pending=True,
                             )
                         logger.debug("site.send_whatsapp_message success") 
                         return message

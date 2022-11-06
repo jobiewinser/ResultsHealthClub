@@ -41,6 +41,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 }
                 
                 rendered_html = await get_rendered_html(message, message_context, messaging_customer_number, whatsappnumber)
+                # rendered_html = await get_sending_rendered_html(message, message_context, messaging_customer_number, whatsappnumber)
                 await self.channel_layer.group_send(
                     self.group_name,
                     {
@@ -133,6 +134,29 @@ def get_rendered_html(message, message_context, messaging_customer_number, whats
         </span>
         """
     return rendered_html
+# @sync_to_async
+# def get_sending_rendered_html(message, message_context, messaging_customer_number, whatsappnumber):
+#     # rendered_message_list_row = loader.render_to_string('messaging/htmx/message_list_row.html', message_context)
+#     rendered_message_chat_row = loader.render_to_string('messaging/htmx/message_chat_row.html', message_context)
+#     rendered_html = f"""
+#     <span id='messageWindowInnerBody_{messaging_customer_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>                
+#     """
+
+#     if message.inbound:
+#         rendered_html = f"""{rendered_html}
+#         <span hx-swap-oob="true" id="chat_notification_{message.customer_number}">
+#             <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
+#                 <span class="visually-hidden">New alerts</span>
+#             </span>
+#         </span>
+#         """
+#     else:
+#         rendered_html = f"""{rendered_html}
+#         <span hx-swap-oob="true" id="chat_notification_{message.customer_number}">
+#         </span>
+#         """
+#     return rendered_html
+
 @sync_to_async
 def get_rendered_html_failed(messaging_customer_number, whatsappnumber):
     message_context = {

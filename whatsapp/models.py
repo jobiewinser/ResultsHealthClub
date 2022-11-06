@@ -68,7 +68,11 @@ class WhatsAppMessage(Message):
     raw_webhook = models.ForeignKey("whatsapp.WhatsAppWebhookRequest", null=True, blank=True, on_delete=models.SET_NULL)
     conversationid = models.TextField(null=True, blank=True)  
     whatsappnumber = models.ForeignKey("core.WhatsappNumber", null=True, blank=True, on_delete=models.SET_NULL)
-    image = models.ManyToManyField("whatsapp.WhatsappMessageImage")
+    image = models.ManyToManyField("whatsapp.WhatsappMessageImage", null=True, blank=True)
+    @property
+    def active_errors(self):        
+        from core.models import AttachedError
+        return AttachedError.objects.filter(whatsapp_message=self).filter(archived=False)
 # class WhatsAppMessage(models.Model):
 #     pass 
     

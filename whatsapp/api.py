@@ -99,22 +99,27 @@ class Whatsapp():
                         if potential_errors:
                             for error in potential_errors:
                                 code = error.get('code')
-                                if str(code) == '131047':
-                                    attached_errors.append(
-                                        AttachedError.objects.create(
-                                            type = '1104',
-                                            attached_field = "whatsapp_number",
-                                            whatsapp_number = whatsapp_number,
-                                            customer_number = non_overwritten_customer_number,
-                                        )
-                                    )                                
-            if not attached_errors:
-                AttachedError.objects.filter(
-                    type__in = ['1104','1105'],
-                    archived = False,
-                    whatsapp_number = whatsapp_number,
-                    customer_number = non_overwritten_customer_number,
-                ).update(archived = True)
+                                # I don't think this is useful, but leaving just in case
+
+
+
+
+                                # if str(code) == '131047':
+                                #     attached_errors.append(
+                                #         AttachedError.objects.create(
+                                #             type = '1104',
+                                #             attached_field = "whatsapp_number",
+                                #             whatsapp_number = whatsapp_number,
+                                #             customer_number = non_overwritten_customer_number,
+                                #         )
+                                #     )                                
+            # if not attached_errors:
+            #     AttachedError.objects.filter(
+            #         type__in = ['1104','1105'],
+            #         archived = False,
+            #         whatsapp_number = whatsapp_number,
+            #         customer_number = non_overwritten_customer_number,
+            #     ).update(archived = True)
 
             print("send_free_text_message response_body", response_body)
             return response_body, attached_errors
@@ -137,7 +142,7 @@ class Whatsapp():
             customer_number = settings.WHATSAPP_PHONE_OVERRIDE1
         if template_name:  
             AttachedError.objects.filter(
-                type = '1102',
+                type = '0102',
                 whatsapp_template = template_object,
                 customer_number = non_overwritten_customer_number,
                 whatsapp_number = whatsapp_number,
@@ -170,7 +175,7 @@ class Whatsapp():
                 campaign_lead = Campaignlead.objects.filter(whatsapp_number=non_overwritten_customer_number).last()
                 if str(code) == '132000':
                     AttachedError.objects.create(
-                        type = '1103',
+                        type = '0103',
                         attached_field = "whatsapp_template",
                         whatsapp_template = template_object,
                         campaign_lead=campaign_lead,
@@ -190,7 +195,7 @@ class Whatsapp():
                     )
             else:
                 AttachedError.objects.filter(
-                    type__in = ['1103','1105'],
+                    type__in = ['0103','1105'],
                     whatsapp_template = template_object,
                     archived = False,
                     whatsapp_number = whatsapp_number,
@@ -202,7 +207,7 @@ class Whatsapp():
         else:
             campaign_lead = Campaignlead.objects.filter(whatsapp_number=non_overwritten_customer_number).last()
             AttachedError.objects.create(
-                type = '1102',
+                type = '0102',
                 attached_field = "whatsapp_template",
                 whatsapp_template = template_object,
                         campaign_lead=campaign_lead,
@@ -269,13 +274,13 @@ class Whatsapp():
                 code = potential_error.get('code')
                 if str(code) == '100':
                     AttachedError.objects.create(
-                        type = '1101',
+                        type = '0101',
                         attached_field = "whatsapp_template",
                         whatsapp_template = template_object,
                     )
             else:
                 AttachedError.objects.filter(
-                    type = '1101',
+                    type = '0101',
                     whatsapp_template = template_object,
                     archived = False,
                 ).update(archived = True)

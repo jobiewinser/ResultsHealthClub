@@ -1,5 +1,5 @@
 {%load static core_tags%}
-<div class="row chat_row {%if message.inbound%}active_chat_row{%else%}inactive_chat_row{%endif%}"
+<div class="row chat_row {%if message.inbound%}active_chat_row{%else%}inactive_chat_row{%endif%} {%if message.pending%}pending_message{%endif%} {%if message.failed%}bg-danger-trans-20{%endif%}"
     {%if message.customer_number and whatsappnumber.pk%}
         hx-get="{%url 'message-window' customer_number=message.customer_number whatsappnumber_pk=whatsappnumber.pk%}"
         hx-indicator=".htmx-indicator" 
@@ -13,7 +13,21 @@
     data-bs-placement="right"
     data-bs-title="Message Details"
     data-bs-content="
-        Sent at <b>{{message.datetime|nice_datetime_tag}}</b><br>
+    {%if message.failed%}Attempted{%endif%} Sent at <b>{{message.datetime|nice_datetime_tag}}</b><br>
+    {%if message.active_errors%}
+    <br> 
+    <ul>
+        {%for error in message.active_errors%}
+        <li>{{error.created}} - {{error.get_type_display}}</li>
+        {%endfor%}
+    </ul> 
+    <br> 
+    {%endif%}
+
+    {%if message.pending%}
+        This message has not sent yet.<br>
+    {%endif%}
+    
     {%if message.inbound%}
         By <b>{%if message.lead.name%}{{message.lead.name}}{%else%}{{message.customer_number}}{%endif%}</b>
     {%else%}
@@ -39,7 +53,7 @@
         </div>
         <div class="row chat_message_row">
             <div class="col p-0" id="message_list_row_{{message.customer_number}}_{{whatsappnumber.pk}}">
-                {%if message.inbound%}Them{%else%}You{%endif%}:
+                {%if message.failed%}<i class="fa-solid fa-triangle-exclamation" style="color:red"></i>{%endif%}  {%if message.inbound%}Them{%else%}You{%endif%}:
                 {%if message.message%}
                     {{message.message}}
                 {%elif message.image.all%}
