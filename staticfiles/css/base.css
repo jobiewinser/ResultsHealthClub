@@ -689,6 +689,11 @@ tr.odd td {
     font-size: 11px;
     line-height: 1.2em;
 }
+.form-control-xs {
+    padding: 2px 2px;
+    font-size: 11px;
+    line-height: 1.2em;
+}
 .column_metadata {
     background-color: white;
     margin: 4px;

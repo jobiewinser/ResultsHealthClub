@@ -39,10 +39,10 @@
         <script src="{% static 'js/modules/booking.js' %}"></script>
         <script src="{% static 'js/modules/analytics.js' %}"></script>
         <script src="{% static 'js/modules/free_tasters.js' %}"></script>
+        <script src="{% static 'js/modules/campaign_configuration.js' %}"></script>
         <script src="{% static 'js/modules/company_configuration.js' %}"></script>
         <script src="{% static 'js/modules/whatsapp_templates.js' %}"></script>
         <script src="{% static 'js/modules/whatsapp_template_edit.js' %}"></script>
-        
         <audio id="notification1" src="{% static 'audio/notification1.wav' %}" preload="auto"></audio>
         <audio id="notification2" src="{% static 'audio/notification2.mp3' %}" preload="auto"></audio>
         
@@ -55,8 +55,6 @@
     </head>
     
     <script>  
-            
-
         $(document).ready(function() {
             
             function handlehtmxafterSwap(evt){
@@ -73,7 +71,7 @@
                 basehandlehtmxafterSwap(evt);
             }
             document.body.addEventListener('htmx:afterSwap', handlehtmxafterSwap);
-            
+            htmx:
             function handlehtmxafterRequest(evt){
                 var current_module = $('#current_page').val()
                 if (current_module == 'analytics_overview'){
@@ -86,6 +84,12 @@
                 basehandlehtmxafterRequest(evt);
             }
             document.body.addEventListener('htmx:afterRequest', handlehtmxafterRequest);
+            
+            function handlehtmxhistoryCacheError(evt){
+                var current_module = $('#current_page').val()
+                console.log(evt);
+            }
+            document.body.addEventListener('htmx:historyCacheError', handlehtmxhistoryCacheError);
 
             function handlehtmxbeforeRequest(evt){
                 var current_module = $('#current_page').val();
@@ -93,12 +97,18 @@
                     leadshandlehtmxbeforeRequest(evt);
                 } else if (current_module == 'free_tasters'){
                     freetastershandlehtmxbeforeRequest(evt);                    
+                } else if (current_module == 'campaign_configuration'){
+                    campaignconfigurationhandlehtmxbeforeRequest(evt);                    
                 }
+                
             }
             document.body.addEventListener('htmx:beforeRequest', handlehtmxbeforeRequest);
             
             function handlehtmxoobAfterSwap(evt){
                 var current_module = $('#current_page').val()
+                if (current_module == 'campaign_booking_overview'){
+                    bookinghandlehtmxbeforeRequest(evt);                    
+                }
                 basehandlehtmxoobAfterSwap(evt);
             }
             document.body.addEventListener('htmx:oobAfterSwap', handlehtmxoobAfterSwap);

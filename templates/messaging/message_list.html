@@ -1,14 +1,26 @@
 <div class="card chat_bottom_window p-0" id="chat_list_bottom_window">
-    <div class="card-header chat_bottom_header" data-bs-toggle="collapse" data-bs-target="#messageCollapse_{{whatsappnumber.pk}}" aria-expanded="false" aria-controls="messageCollapse_{{whatsappnumber.pk}}">
-        
-        
-        <span class="primary_td_layer text-white">
-            Site: {%if chat_Site%}{{chat_site.name}}{%else%}{{whatsappnumber.site.name}}{%endif%}
-        </span>
-        <br>
-        <span class="secondary_td_layer">
-            Your Number: {%if whatsappnumber.alias%}{{whatsappnumber.alias}}{%else%}{{whatsappnumber.number}}{%endif%}
-        </span> 
+    <div class="card-header chat_bottom_header">
+        <div class="row">
+            <div class="col-md-auto p-1" 
+            {% comment %} data-bs-toggle="collapse" data-bs-target="#messageCollapse_{{whatsappnumber.pk}}" aria-expanded="false" aria-controls="messageCollapse_{{whatsappnumber.pk}}" {% endcomment %}
+            >
+                <span class="primary_td_layer text-white">
+                    Site: {%if chat_Site%}{{chat_site.name}}{%else%}{{whatsappnumber.site.name}}{%endif%}
+                </span>
+                <br>
+                <span class="secondary_td_layer">
+                    Your Number: {%if whatsappnumber.alias%}{{whatsappnumber.alias}}{%else%}{{whatsappnumber.number}}{%endif%}
+                </span> 
+            </div>
+
+            <div class="col-md-auto p-1">
+                <input class="form-control form-control-xs"/>
+                
+                <div class="form-check form-switch">
+                    <small>Show Received</small> <input class="form-check-input" name="graph_type" {%if graph_type == 'doughnut'%}checked{%endif%} type="checkbox" id="graph_type_calls_today" onchange="$('#refresh_calls_today').click()">
+                </div> 
+            </div>
+        </div>
     </div>
     <div class="card-body message_list_body collapse show p-0" id="messageCollapse_{{whatsappnumber.pk}}">
         {%with whatsappnumber.get_latest_messages as messages%}

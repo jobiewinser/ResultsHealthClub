@@ -38,3 +38,10 @@ function bookinghandlehtmxafterSwap(evt){
         }                
     }
 }
+function bookinghandlehtmxbeforeRequest(evt){
+    if (![undefined, ''].includes(evt.detail.pathInfo.path) && ![undefined, ''].includes(evt.detail.target.id)){
+        if (evt.detail.target.id == 'overview_table'){
+            $("#overview_table").dataTable().fnDestroy();
+        }
+    }
+}

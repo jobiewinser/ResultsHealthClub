@@ -3,19 +3,7 @@
     <script>
         document.title = "Booking Table";
         $(document).ready(function() {  
-
             initBookingDataTable();
-            
-            function handlehtmxbeforeRequest(evt){
-                if (![undefined, ''].includes(evt.detail.pathInfo.path) && ![undefined, ''].includes(evt.detail.target.id)){
-                    if (evt.detail.target.id == 'overview_table' || evt.detail.pathInfo.path.includes("campaign-booking-overview")){
-                        $("#overview_table").dataTable().fnDestroy();
-                    }
-                }
-            }
-
-
-            
         });        
     </script>
     

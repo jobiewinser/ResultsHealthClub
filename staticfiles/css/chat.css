@@ -14,11 +14,15 @@
     opacity: 0.6;
 }
 .chat_bottom_window {
-    width: 300px;
+    min-width: 300px;
     text-align: left;
     margin-left: 4px;
     margin-right: 4px;
     margin-top: auto;
+}
+
+.customer_chat_bottom_window  {
+    width: 300px;
 }
 
 .chat_card_body {

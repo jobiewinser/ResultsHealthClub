@@ -151,6 +151,11 @@ function add_chat_whatsapp_number_to_session(whatsapp_number){
 function inlinePreventDefault(e) {
     e.preventDefault();
 }
+function inlineStopPropagation(e) {
+    e.stopPropagation();
+    console.log("test")
+}
+
 
 function copyTextToClipboard(text) {
   if (!navigator.clipboard) {

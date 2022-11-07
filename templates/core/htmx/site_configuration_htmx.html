@@ -36,7 +36,7 @@
                         <div class="col-md-auto p-0">      
                             <form class="form-floating m-1">  
                                 <input value="{{site.name}}" type="text" name="name" class="form-control site_configuration_input" id="site_name"  {%if not request.user.profile.role == 'a'%}disabled{%endif%}
-                                    hx-post="" hx-swap="none" hx-indicator="#htmx_indicator_site_form" hx-vals='{"site_pk": "{{site.pk}}"}' hx-trigger='input'>
+                                    hx-post="" hx-swap="none" hx-indicator="#htmx_indicator_site_form" hx-vals='{"site_pk": "{{site.pk}}"}' hx-trigger='input delay:0.5s'>
                                 <label for="site_name">Name of this site</label>
                             </form>
                         </div>
