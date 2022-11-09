@@ -1,9 +1,7 @@
 <div class="card chat_bottom_window p-0" id="chat_list_bottom_window">
-    <div class="card-header chat_bottom_header">
+    <div class="card-header bg-dark text-white">
         <div class="row">
-            <div class="col-md-auto p-1" 
-            {% comment %} data-bs-toggle="collapse" data-bs-target="#messageCollapse_{{whatsappnumber.pk}}" aria-expanded="false" aria-controls="messageCollapse_{{whatsappnumber.pk}}" {% endcomment %}
-            >
+            <div class="col-md-auto p-1">
                 <span class="primary_td_layer text-white">
                     Site: {%if chat_Site%}{{chat_site.name}}{%else%}{{whatsappnumber.site.name}}{%endif%}
                 </span>
@@ -14,17 +12,41 @@
             </div>
 
             <div class="col-md-auto p-1">
-                <input class="form-control form-control-xs"/>
+                <input 
+                    class="form-control form-control-xs input_messageCollapse_{{whatsappnumber.pk}}"
+                    name="search_string"
+                    hx-target="#messageCollapse_{{whatsappnumber.pk}}"
+                    hx-swap="innerHTML"
+                    hx-vals='{"whatsappnumber_pk":"{{whatsappnumber.pk}}"}'
+                    hx-trigger="input delay:0.5s"
+                    hx-include=".input_messageCollapse_{{whatsappnumber.pk}}"
+                    hx-get="{%url 'get-message-list-body'%}"
+                    hx-indicator="#htmx_indicator_messageCollapse_{{whatsappnumber.pk}}"/>
                 
                 <div class="form-check form-switch">
-                    <small>Show Received</small> <input class="form-check-input" name="graph_type" {%if graph_type == 'doughnut'%}checked{%endif%} type="checkbox" id="graph_type_calls_today" onchange="$('#refresh_calls_today').click()">
+                    <small>Received</small> 
+                    <input 
+                        class="form-check-input input_messageCollapse_{{whatsappnumber.pk}}" 
+                        name="received"
+                        type="checkbox"
+                        hx-target="#messageCollapse_{{whatsappnumber.pk}}"
+                        hx-swap="innerHTML"
+                        hx-vals='{"whatsappnumber_pk":"{{whatsappnumber.pk}}"}'
+                        hx-include=".input_messageCollapse_{{whatsappnumber.pk}}"
+                        hx-get="{%url 'get-message-list-body'%}"
+                        hx-indicator="#htmx_indicator_messageCollapse_{{whatsappnumber.pk}}"/>
                 </div> 
+            </div>
+            <div class="col-auto p-0 pointer">
+                <span class="badge bg-light"   data-bs-toggle="collapse" data-bs-target="#messageCollapse_{{whatsappnumber.pk}}" aria-expanded="false" aria-controls="messageCollapse_{{whatsappnumber.pk}}">
+                    <i class="fa-sharp fa-arrow-down"></i>
+                </span>
+                <br>
+                <img class="htmx-indicator invert" id="htmx_indicator_messageCollapse_{{whatsappnumber.pk}}" src="https://htmx.org/img/bars.svg"/>
             </div>
         </div>
     </div>
-    <div class="card-body message_list_body collapse show p-0" id="messageCollapse_{{whatsappnumber.pk}}">
-        {%with whatsappnumber.get_latest_messages as messages%}
-            {%include 'messaging/htmx/message_list_htmx.html'%}
-        {%endwith%}
+    <div class="card-body message_list_body collapse show ps-2 p-0" id="messageCollapse_{{whatsappnumber.pk}}">
+        {%include 'messaging/htmx/message_list_body.html'%}
     </div>
 </div>

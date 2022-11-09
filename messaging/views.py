@@ -30,30 +30,31 @@ def message_list(request, **kwargs):
             whatsappnumber = latest_message.whatsappnumber
     if whatsappnumber:
         context['whatsappnumber'] = whatsappnumber
+        context['messages'] = whatsappnumber.get_latest_messages()
     # if get_user_allowed_to_use_site_messaging(request.user, site):
     return render(request, "messaging/messaging.html", context)
 
-@login_required
-def get_messaging_section(request, **kwargs):
-    try:
-        context = {}
-        # request.GET._mutable = True
-        # site = Site.objects.get(pk=request.GET.get('site_pk'))
-        whatsappnumber_pk = request.session.get('open_chat_whatsapp_number', '') 
-        print("get_messaging_section whatsappnumber_pk", str(whatsappnumber_pk))
-        if whatsappnumber_pk:
-            if request.user.profile.sites_allowed.filter(pk=whatsappnumber_pk):
-                print("get_messaging_section request.user.profile.sites_allowed.filter(pk=whatsappnumber_pk)", str(request.user.profile.sites_allowed.filter(pk=whatsappnumber_pk)))
-                whatsappnumber = WhatsappNumber.objects.filter(pk=whatsappnumber_pk).first()
-                if whatsappnumber:
-                    context['whatsappnumber'] = whatsappnumber
-                    context['customer_numbers'] = request.session.get('open_chat_conversation_customer_number', []) 
-                    print("get_messaging_section whatsappnumber.pk", str(whatsappnumber.pk))
-                    print("get_messaging_section customer_numbers", str(request.session.get('open_chat_conversation_customer_number', []) ))
-        return render(request, "messaging/messaging.html", context)   
-    except Exception as e:
-        logger.debug("get_messaging_section Error "+str(e))
-        return HttpResponse(e, status=500)
+# @login_required
+# def get_messaging_section(request, **kwargs):
+#     try:
+#         context = {}
+#         # request.GET._mutable = True
+#         # site = Site.objects.get(pk=request.GET.get('site_pk'))
+#         whatsappnumber_pk = request.session.get('open_chat_whatsapp_number', '') 
+#         print("get_messaging_section whatsappnumber_pk", str(whatsappnumber_pk))
+#         if whatsappnumber_pk:
+#             if request.user.profile.sites_allowed.filter(pk=whatsappnumber_pk):
+#                 print("get_messaging_section request.user.profile.sites_allowed.filter(pk=whatsappnumber_pk)", str(request.user.profile.sites_allowed.filter(pk=whatsappnumber_pk)))
+#                 whatsappnumber = WhatsappNumber.objects.filter(pk=whatsappnumber_pk).first()
+#                 if whatsappnumber:
+#                     context['whatsappnumber'] = whatsappnumber
+#                     context['customer_numbers'] = request.session.get('open_chat_conversation_customer_number', []) 
+#                     print("get_messaging_section whatsappnumber.pk", str(whatsappnumber.pk))
+#                     print("get_messaging_section customer_numbers", str(request.session.get('open_chat_conversation_customer_number', []) ))
+#         return render(request, "messaging/messaging.html", context)   
+#     except Exception as e:
+#         logger.debug("get_messaging_section Error "+str(e))
+#         return HttpResponse(e, status=500)
 
 
 @login_required
@@ -156,14 +157,26 @@ def update_message_counts(request, **kwargs):
     return render(request, "messaging/htmx/update_message_counts.html", {})
 
 @login_required
+def get_message_list_body(request, **kwargs):
+    try:
+        context = {}
+        whatsappnumber = WhatsappNumber.objects.get(pk=request.GET.get('whatsappnumber_pk')) 
+        context['whatsappnumber'] = whatsappnumber
+        context['messages'] = whatsappnumber.get_latest_messages(query={"search_string":request.GET.get('search_string'), "received":request.GET.get('received')})
+        return render(request, "messaging/htmx/message_list_body.html", context)   
+    except Exception as e:
+        logger.debug("get_more_messages Error "+str(e))
+        return HttpResponse(e, status=500)
+
+@login_required
 def get_more_message_list_rows(request, **kwargs):
     try:
         context = {}
         whatsappnumber = WhatsappNumber.objects.get(pk=request.GET.get('whatsappnumber_pk'))
         earliest_datetime_timestamp = request.GET.get('earliest_datetime_timestamp')        
         context['whatsappnumber'] = whatsappnumber
-        context['messages'] = whatsappnumber.get_latest_messages(after_datetime_timestamp=earliest_datetime_timestamp)
-        return render(request, "messaging/htmx/message_list_htmx.html", context)   
+        context['messages'] = whatsappnumber.get_latest_messages(after_datetime_timestamp=earliest_datetime_timestamp,query={"search_string":request.GET.get('search_string'), "received":request.GET.get('received')})
+        return render(request, "messaging/htmx/message_list_rows.html", context)   
     except Exception as e:
         logger.debug("get_more_messages Error "+str(e))
         return HttpResponse(e, status=500)

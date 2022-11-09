@@ -201,7 +201,7 @@ def handle_received_whatsapp_text_message(message_json, metadata, webhook_object
         raw_webhook=webhook_object,
         whatsappnumber=whatsappnumber,
     )
-    new_message_to_websocket(whatsapp_message, from_number)
+    new_message_to_websocket(whatsapp_message, whatsappnumber)
 
 def new_message_to_websocket(whatsapp_message, whatsapp_number):
     from channels.layers import get_channel_layer
