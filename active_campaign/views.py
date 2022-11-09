@@ -49,6 +49,9 @@ class Webhooks(View):
                         if Campaignlead.objects.filter(
                                 campaign=campaign,
                                 active_campaign_contact_id=data.get('contact[id]')
+                            ) or  Campaignlead.objects.filter(
+                                campaign=campaign,
+                                whatsapp_number=phone_number_whole,
                             ): 
                             possible_duplicate  = True
                         if not possible_duplicate:
