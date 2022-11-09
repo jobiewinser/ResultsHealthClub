@@ -31,28 +31,14 @@ class Webhooks(View):
                     campaign = ActiveCampaign.objects.get(guid=guid)
                     if campaign.site:
                         phone_number_whole = str(data.get('contact[phone]', "")).replace(' ','').replace('+','')
-                        # phone_number_whole = str(data.get('contact[phone]', "")).replace('+','').replace(' ','')
-                        # if phone_number_whole:
-                        #     if phone_number_whole[0] == "0":
-                        #         phone_number = phone_number_whole[1:]
-                        #         country_code = "44"
-                        #     elif phone_number_whole[:2] == "44":
-                        #         phone_number = phone_number_whole[2:]
-                        #         country_code = "44"
-                        #     else:
-                        #         phone_number = phone_number_whole
-                        #         country_code = "44"
-                        # else:
-                        #     phone_number = "None"
-                        #     country_code = "None"
+
                         possible_duplicate  = False
                         if Campaignlead.objects.filter(
                                 campaign=campaign,
                                 active_campaign_contact_id=data.get('contact[id]')
                             ) or  Campaignlead.objects.filter(
-                                campaign=campaign,
                                 whatsapp_number=phone_number_whole,
-                            ): 
+                            ): #temp disabled repeat numbers, active campaign spammed me?
                             possible_duplicate  = True
                         if not possible_duplicate:
                             lead = Campaignlead.objects.create(
@@ -66,28 +52,7 @@ class Webhooks(View):
                             )
                             lead.trigger_refresh_websocket()
             return HttpResponse("", "text", 200)
-        # except Exception as e:     
-        #     logger.error(f"Webhooks POST {str(e)}")     
-        #     return HttpResponse(str(e), "text", 500)
-
-
-# @login_required
-# def get_campaigns(request):
-#     # for campaign_dict in active_campaign.get_campaigns().get('campaigns',[]):
-#     #     campaign = Campaign.objects.get_or_create(
-#     #         active_campaign_id = campaign_dict.pop('id'),
-#     #     )[0]
-#     #     campaign.name = campaign_dict.pop('name')
-#     #     campaign.status = campaign_dict.pop('status')
-#     #     campaign.uniqueopens = int(campaign_dict.pop('uniqueopens'))
-#     #     campaign.opens = int(campaign_dict.pop('opens'))
-#     #     campaign.active_campaign_created = datetime.strptime(campaign_dict.pop('created_timestamp'), '%Y-%m-%d %H:%M:%S')
-#     #     campaign.active_campaign_updated = datetime.strptime(campaign_dict.pop('updated_timestamp'), '%Y-%m-%d %H:%M:%S')
-#     #     campaign.json_data = campaign_dict
-#     #     campaign.save()
-#     # temp = active_campaign.get_all_messages()
-#     return render(request, f"active_campaign/htmx/campaigns_select.html", {'campaigns':Campaign.objects.all()})
-    
+     
 logger = logging.getLogger(__name__)
     
 
