@@ -26,7 +26,7 @@ class Webhooks(View):
             data = request.POST  
             guid = kwargs.get('guid')
             ActiveCampaignWebhookRequest.objects.create(json_data = data, guid=guid)       
-            if data.get('type') in ['subscribe','update']:
+            if data.get('type') in ['subscribe','update'] and data.get('initiated_by') == 'contact':
                 if guid:
                     campaign = ActiveCampaign.objects.get(guid=guid)
                     if campaign.site:
@@ -37,8 +37,9 @@ class Webhooks(View):
                                 campaign=campaign,
                                 active_campaign_contact_id=data.get('contact[id]')
                             ) or  Campaignlead.objects.filter(
+                                campaign=campaign,
                                 whatsapp_number=phone_number_whole,
-                            ): #temp disabled repeat numbers, active campaign spammed me?
+                            ): 
                             possible_duplicate  = True
                         if not possible_duplicate:
                             lead = Campaignlead.objects.create(
