@@ -239,7 +239,7 @@ class Site(models.Model):
                 print("get_live_whatsapp_phone_numbers ERROR: ", str(e))
         return self.return_phone_numbers()
     def return_phone_numbers(self):
-        return WhatsappNumber.objects.filter(whatsapp_business_account__site=self, archived=False)
+        return WhatsappNumber.objects.filter(whatsapp_business_account__site=self, archived=False).order_by('pk')
     # def create_calendly_webhook(self):
     #     calendly = Calendly(self.calendly_token)
     #     if self.calendly_user:
