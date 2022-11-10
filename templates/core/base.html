@@ -10,7 +10,7 @@
         <script>
             var csrftoken = '{{ csrf_token }}';
         </script>
-        <link rel="shortcut icon" type="image/png" href="{% static 'img/logo-dark-back-img.png' %}"/>
+        <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>
         {%block cdn%}
             <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" />
 
@@ -33,7 +33,6 @@
         
         <link href="{% static 'css/drag_drop.css' %}" rel="stylesheet" />
         <script src="{% static 'js/drag_drop.js' %}"></script> 
-
         <script src="{% static 'js/base.js' %}"></script>
         <script src="{% static 'js/modules/leads.js' %}"></script>
         <script src="{% static 'js/modules/booking.js' %}"></script>
