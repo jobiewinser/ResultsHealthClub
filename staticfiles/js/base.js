@@ -54,6 +54,7 @@ function basehandlehtmxafterSwap(evt){
 }
 
 function basehandlehtmxafterRequest(evt){   
+    $('.popover').remove()
     let status = evt.detail.xhr.status;
     let srcElement = $(evt.srcElement);
     let src_id = srcElement.attr('id');

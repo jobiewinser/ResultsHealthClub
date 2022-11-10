@@ -1,6 +1,8 @@
 {%load core_tags static%}
+{%if not lead.complete%}
 <span class="column-drag fade-me-out lead-{{lead.pk}}"
     draggable="true" ondragstart="drag(event)" data-id="{{lead.pk}}" id="lead-{{lead.pk}}">
+    <input type="text" style="display:None" id="lead_pk_{{lead.pk}}" name="lead_pk" value="{{lead.pk}}"/>
     {%with call_count|division_percentage_max_100:max_call_count as call_percentage%}
     <article style="margin-right:50px"  class="card draggable-card top-highlight-{{call_percentage|roundup_tag:20}} lead_card">
         <div class="row" style="height:30px">
@@ -53,13 +55,13 @@
                         onclick="$('#chat_card_{{lead.whatsapp_number}}').remove(); $('#chat_list_bottom_window').remove();"
                         data-customer-number="{{lead.whatsapp_number}}">
                             Chat
-                            <span id="chat_notification_{{lead.whatsapp_number.pk}}">
+                            {% comment %} <span id="chat_notification_{{lead.whatsapp_number.pk}}">
                                 {%if lead.is_last_whatsapp_message_inbound%}
                                 <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
                                     <span class="visually-hidden">New alerts</span>
                                 </span>
                                 {%endif%}
-                            </span>
+                            </span> {% endcomment %}
                     </button>
                 {%endif%}
                 <!-- <span style="color:rgb(96, 248, 61y)" class="secondary_td_layer">£{{lead.campaign.product_cost|floatformat:2}}</span> -->
@@ -101,3 +103,4 @@
     </article>
     {%endwith%}
 </span>
+{%endif%}

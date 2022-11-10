@@ -73,11 +73,12 @@
     </div>
     <div class="col p-0 ps-1 hidden-overflow">
         <div class="row chat_lead_name_row">
-            <div class="col p-0 elipses-overflow m-1" id="latest_message_name_{{message.customer_number}}">
+            <div class="col-md-auto p-0 elipses-overflow m-1" id="latest_message_name_{{message.customer_number}}">
                 <span>{%if message.lead.name%}{{message.lead.name}}{%else%}{{message.customer_number}}{%endif%} </span>
             </div>
-            
-            <div class="col p-0 right pe-1">
+            <div class="col ps-1 pe-1">
+            </div>            
+            <div class="col-md-auto p-0 right pe-1">
                 <i>{{message.datetime|nice_message_datetime_tag}}</i>
             </div>
         </div>

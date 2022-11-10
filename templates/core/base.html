@@ -156,50 +156,53 @@
                 window.addEventListener( 'keyup', insertKey, false);
             }
             function insertKey( e ) {
-                if (!$('input').is(':focus')) {
-                // Get the character from e.keyCode
-                    var key = String.fromCharCode( e.keyCode ).toLowerCase(); 
-            
-                    // Match the character  
-                    if( key.match(listen)) {
-            
-                        // Change display: none; to display: block;
-                        searchBar.style.display = "block";
-                        $(searchBar).stop( true, true ).fadeIn();
-                        // Append every new character
-                        searchInput.value += key;
+                var current_module = $('#current_page').val();
+                if (current_module == 'campaign_leads_overview'){
+                    if (!$('input').is(':focus') && !$('textarea').is(':focus')&& !$('select').is(':focus')) {
+                    // Get the character from e.keyCode
+                        var key = String.fromCharCode( e.keyCode ).toLowerCase(); 
+                
+                        // Match the character  
+                        if( key.match(listen)) {
+                
+                            // Change display: none; to display: block;
+                            searchBar.style.display = "block";
+                            $(searchBar).stop( true, true ).fadeIn();
+                            // Append every new character
+                            searchInput.value += key;
 
-                        $(searchBar).stop( true, true ).fadeOut("slow", function () {
-                            $(this).css({display:"none"});
-                        });
-                    } else if(e.keyCode == 8){
-                        searchInput.value = "";
+                            $(searchBar).stop( true, true ).fadeOut("slow", function () {
+                                $(this).css({display:"none"});
+                            });
+                        } else if(e.keyCode == 8){
+                            searchInput.value = "";
+                        }
+
+                        if (searchInput.value != ""){
+                            jQuery.expr[':'].containsLower = function(elem, i, m) {
+                                let name_elem = $(elem).find('.lead_name');
+                                let campaign_elem = $(elem).find('.campaign_name');
+                                let site_elem = $(elem).find('.site_name');                        
+                                let cost_elem = $(elem).find('.lead_cost');
+                                let phone_elem = $(elem).find('.phone_number');
+                                let search_term = m[3].toLowerCase();
+                                return (
+                                    (name_elem.html().toLowerCase()).includes(search_term) ||
+                                    (campaign_elem.html().toLowerCase()).includes(search_term) ||
+                                    (site_elem.html().toLowerCase()).includes(search_term) ||
+                                    (cost_elem.html().toLowerCase()).includes(search_term) ||
+                                    (phone_elem.html().toLowerCase()).includes(search_term)
+                                )
+                            };
+
+                            $('.column-drag').hide().filter(':containsLower("'+searchInput.value+'")').show();
+                        } else {
+
+                            $('.column-drag').show();
+                        }
+
+                        $('#leadSearchValue').html(searchInput.value)
                     }
-
-                    if (searchInput.value != ""){
-                        jQuery.expr[':'].containsLower = function(elem, i, m) {
-                            let name_elem = $(elem).find('.lead_name');
-                            let campaign_elem = $(elem).find('.campaign_name');
-                            let site_elem = $(elem).find('.site_name');                        
-                            let cost_elem = $(elem).find('.lead_cost');
-                            let phone_elem = $(elem).find('.phone_number');
-                            let search_term = m[3].toLowerCase();
-                            return (
-                                (name_elem.html().toLowerCase()).includes(search_term) ||
-                                (campaign_elem.html().toLowerCase()).includes(search_term) ||
-                                (site_elem.html().toLowerCase()).includes(search_term) ||
-                                (cost_elem.html().toLowerCase()).includes(search_term) ||
-                                (phone_elem.html().toLowerCase()).includes(search_term)
-                            )
-                        };
-
-                        $('.column-drag').hide().filter(':containsLower("'+searchInput.value+'")').show();
-                    } else {
-
-                        $('.column-drag').show();
-                    }
-
-                    $('#leadSearchValue').html(searchInput.value)
                 }
             }
         }
