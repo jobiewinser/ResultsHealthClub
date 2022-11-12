@@ -29,8 +29,12 @@
         <div class="col">
         </div>
 
-        {%block extra_top_right_buttons %}
-        {%include 'campaign_leads/htmx/campaign_bookings_table_status_toggle_div.html'%}
+        {%block extra_top_right_buttons %}        
+        <div class="col-md-auto m-1">
+            <div id="swap_status_button">
+                {%include 'campaign_leads/htmx/campaign_bookings_table_status_toggle_div.html'%}
+            </div>
+        </div>
         <div class="col-md-auto">
         <span class="badge bg-dark text-white"><h6 class="m-1">Booking Table</h6><input id="current_page" hidden value="campaign_booking_overview"></input></span>           
         </div>

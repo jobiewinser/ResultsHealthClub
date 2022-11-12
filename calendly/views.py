@@ -30,11 +30,13 @@ class Webhooks(View):
     def post(self, request, *args, **kwargs):
         try:
             body = json.loads(request.body)
+            meta = json.loads(request.META)
             print(str(body))
             logger.debug(str(body))
             
             webhook = CalendlyWebhookRequest.objects.create(
                 json_data=body,
+                meta_data=meta,
                 request_type='a',
             )
             if body.get('event') == "invitee.created":

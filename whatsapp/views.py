@@ -43,11 +43,13 @@ class Webhooks(View):
     def post(self, request, *args, **kwargs):
         from core.models import AttachedError
         body = json.loads(request.body)
+        meta = json.loads(request.meta)
         print(str(body))
         logger.debug(str(body))
            
         webhook_object = WhatsAppWebhookRequest.objects.create(
             json_data=body,
+            meta_data=meta,
             request_type='a',
         )
         for entry in body.get('entry'):

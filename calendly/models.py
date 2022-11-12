@@ -11,6 +11,7 @@ class CalendlyWebhookRequest(models.Model):
                         ('b', 'GET'),
                     )
     json_data = models.JSONField(null=True, blank=True)
+    meta_data = models.JSONField(default=dict)
     errors = models.ManyToManyField("core.ErrorModel", null=True, blank=True)
     request_type = models.CharField(choices=REQUEST_TYPE_CHOICES, default='a', max_length=1)
     booking = models.ForeignKey('campaign_leads.Booking', null=True, blank=True, on_delete=models.SET_NULL)

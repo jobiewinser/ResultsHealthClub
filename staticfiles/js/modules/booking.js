@@ -45,3 +45,12 @@ function bookinghandlehtmxbeforeRequest(evt){
         }
     // }
 }
+
+function whatsapptemplateshandlehtmxafterRequest(evt){
+    if (evt.detail.xhr.status == 200){
+        if (evt.detail.pathInfo.requestPath.includes('add-manual-booking')){
+            $('#generic_modal').modal('hide');
+            snackbarShow('Successfully added booking', 'success')
+        }
+    }
+}

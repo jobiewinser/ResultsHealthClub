@@ -8,6 +8,7 @@ from campaign_leads.models import Campaign
 from core.models import Site
 class ActiveCampaignWebhookRequest(models.Model):
     json_data = models.JSONField(default=dict)
+    meta_data = models.JSONField(default=dict)
     guid = models.TextField(null=True, blank=True)
 
 class ActiveCampaign(Campaign):
