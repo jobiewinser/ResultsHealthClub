@@ -43,7 +43,7 @@ class Webhooks(View):
     def post(self, request, *args, **kwargs):
         from core.models import AttachedError
         body = json.loads(request.body)
-        meta = json.loads(request.meta)
+        meta = json.loads(request.META)
         print(str(body))
         logger.debug(str(body))
            
