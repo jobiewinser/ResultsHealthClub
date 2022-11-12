@@ -72,7 +72,7 @@ function basehandlehtmxafterRequest(evt){
                 snackbarShow('Successfully logged in', 'success');
                 location.reload();
             }else if (evt.detail.pathInfo.requestPath.includes("update-message-counts")){
-                // document.getElementById('notification1').play();
+                document.getElementById('notification1').play();
                 // PageTitleNotification.On("Message Sent/Received!", 1000);         
                 // setTimeout(function() {
                 //     PageTitleNotification.Off();
