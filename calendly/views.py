@@ -30,7 +30,7 @@ class Webhooks(View):
     def post(self, request, *args, **kwargs):
         try:
             body = json.loads(request.body)
-            meta = json.loads(request.META)
+            meta = request.META
             print(str(body))
             logger.debug(str(body))
             
