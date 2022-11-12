@@ -62,7 +62,7 @@ class Webhooks(View):
                 site = Site.objects.filter(whatsappbusinessaccount__whatsappnumber__number=metadata.get('display_phone_number')).first()
                 print("DEBUG site:", site)
                 if site:
-                    signature = 'sha1=' + hmac.new(site.whatsapp_access_token.encode('utf-8'), request.META.get('HTTP_X_HUB_SIGNATURE').replace('sha1=', '').encode('utf-8'), hashlib.sha1).hexdigest()
+                    signature = 'sha1=' + hmac.new(site.whatsapp_access_token.encode('utf-8'), body.encode('utf-8'), hashlib.sha1).hexdigest()
                     print("DEBUG signature:", signature)
                     print("DEBUG HTTP_X_HUB_SIGNATURE:", request.META.get('HTTP_X_HUB_SIGNATURE'))
                     if signature == request.META.get('HTTP_X_HUB_SIGNATURE'):
