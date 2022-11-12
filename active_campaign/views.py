@@ -27,7 +27,7 @@ class Webhooks(View):
             data = request.POST  
             guid = kwargs.get('guid')
             if not data.get('initiated_by') == 'admin':
-                ActiveCampaignWebhookRequest.objects.create(json_data = data, meta_data = request.META, guid=guid)       
+                ActiveCampaignWebhookRequest.objects.create(json_data = data, meta_data = str(request.META), guid=guid)       
                 if data.get('type') in ['subscribe','update']:
                     if guid:
                         campaign = ActiveCampaign.objects.get(guid=guid)

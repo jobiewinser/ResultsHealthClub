@@ -193,6 +193,8 @@ class Site(models.Model):
     # whatsapp_number = models.CharField(max_length=50, null=True, blank=True)
     default_number = models.ForeignKey("core.WhatsappNumber", on_delete=models.SET_NULL, null=True, blank=True, related_name="site_default_number")
     whatsapp_access_token = models.TextField(blank=True, null=True)
+    whatsapp_app_secret_key = models.TextField(blank=True, null=True)
+    
     whatsapp_business_account_id = models.TextField(null=True, blank=True)
     calendly_token = models.TextField(blank=True, null=True)
     calendly_user = models.TextField(blank=True, null=True)

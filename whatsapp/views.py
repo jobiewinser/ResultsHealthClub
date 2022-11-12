@@ -19,7 +19,6 @@ from django.utils.decorators import method_decorator
 from core.models import ErrorModel, Site, WhatsappBusinessAccount, WhatsappNumber
 from random import randrange
 from django.contrib.auth.decorators import login_required
-
 # def random_date(start,l):
 #     current = start
 #     while l >= 0:
@@ -32,6 +31,13 @@ from django.contrib.auth.decorators import login_required
 import hmac
 import hashlib
 import pickle
+import base64
+
+def verify_webhook(data, hmac_header, SECRET):    
+    digest = hmac.new(SECRET.encode('utf-8'), data, hashlib.sha256).digest()
+    genHmac = base64.b64encode(digest)
+
+    return hmac.compare_digest(genHmac, hmac_header.encode('utf-8'))
 
 @method_decorator(csrf_exempt, name="dispatch")
 class Webhooks(View):
@@ -51,7 +57,7 @@ class Webhooks(View):
            
         webhook_object = WhatsAppWebhookRequest.objects.create(
             json_data=body,
-            # meta_data=meta,
+            meta_data=str(request.META),
             request_type='a',
         )
         for entry in body.get('entry'):
@@ -60,12 +66,9 @@ class Webhooks(View):
                 value = change.get('value')
                 metadata = value.get('metadata')
                 site = Site.objects.filter(whatsappbusinessaccount__whatsappnumber__number=metadata.get('display_phone_number')).first()
-                print("DEBUG site:", site)
                 if site:
-                    signature = 'sha1=' + hmac.new(site.whatsapp_access_token.encode('utf-8'), str(body).encode('utf-8'), hashlib.sha1).hexdigest()
-                    print("DEBUG signature:", signature)
-                    print("DEBUG HTTP_X_HUB_SIGNATURE:", request.META.get('HTTP_X_HUB_SIGNATURE'))
-                    if signature == request.META.get('HTTP_X_HUB_SIGNATURE'):
+                    signature = 'sha256=' + hmac.new(site.whatsapp_app_secret_key.encode('utf-8'), bytes(request.body), digestmod=hashlib.sha256).hexdigest()
+                    if signature == request.META.get('HTTP_X_HUB_SIGNATURE_256'):
                         if site:
                             if field == 'messages':
                                 for message_json in value.get('messages', []):
