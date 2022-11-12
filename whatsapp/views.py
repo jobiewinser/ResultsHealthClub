@@ -44,7 +44,7 @@ class Webhooks(View):
         from core.models import AttachedError
         body = json.loads(request.body)
         # meta = request.META
-        # print(str(body))
+        print(str(request.META))
         logger.debug(str(body))
            
         webhook_object = WhatsAppWebhookRequest.objects.create(
