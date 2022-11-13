@@ -21,22 +21,23 @@ from whatsapp.models import WhatsAppMessage
 class AttachedError(models.Model): 
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     ERROR_TYPES = (
-                        ('1101', "You can only edit an active template once every 24 hours"),
-                        ('1102', "The system can not send Whatsapp Templates without a template name"),
-                        ('1103', "The number of parameters submitted does not match the Whatsapp Template (contact Winser Systems)"),
-                        ('1104', "Message failed to send because more than 24 hours have passed since the customer last replied to this number"),
+                        ('0101', "You can only edit an active template once every 24 hours"),
+                        ('0102', "The system can not send Whatsapp Templates without a template name"),
+                        ('0103', "The number of parameters submitted does not match the Whatsapp Template (contact Winser Systems)"),
+                        ('1104', "Message failed to send because more than 24 hours have passed since the customer last replied to this number. You can still send a template message at 24 hour intervals instead"),
                         ('1105', "Message failed to send because the Whatsapp account is not yet registered (contact Winser Systems)"),
                         ('1201', "Whatsapp Template not found Whatsapp's system"),
                         ('1202', "There is no Whatsapp Business linked to this Lead's assosciated Site"),
-                        ('1203', "There is no 1st Whatsapp Template linked to this Lead's assosciated Site"),
-                        ('1204', "There is no 2nd Whatsapp Template linked to this Lead's assosciated Site"),
-                        ('1205', "There is no 3rd Whatsapp Template linked to this Lead's assosciated Site"),
+                        ('1203', "There is no 1st Whatsapp Template linked to this Lead's Campaign"),
+                        ('1204', "There is no 2nd Whatsapp Template linked to this Lead's Campaign"),
+                        ('1205', "There is no 3rd Whatsapp Template linked to this Lead's Campaign"),
                     )
     type = models.CharField(choices=ERROR_TYPES, default='c', max_length=5)
     attached_field = models.CharField(null=True, blank=True, max_length=50)
     whatsapp_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="errors", on_delete=models.SET_NULL, null=True, blank=True)
     campaign_lead = models.ForeignKey("campaign_leads.Campaignlead", related_name="errors", on_delete=models.SET_NULL, null=True, blank=True)
     whatsapp_number = models.ForeignKey("core.WhatsappNumber", related_name="errors", on_delete=models.SET_NULL, null=True, blank=True)
+    whatsapp_message = models.ForeignKey("whatsapp.WhatsappMessage", related_name="attached_errors", on_delete=models.SET_NULL, null=True, blank=True)
     site = models.ForeignKey("core.Site", related_name="errors", on_delete=models.SET_NULL, null=True, blank=True)
     customer_number = models.TextField(blank=True, null=True)    
     admin_action_required = models.BooleanField(default=False)
@@ -46,9 +47,9 @@ class AttachedError(models.Model):
 # class AttachedWarning(models.Model): 
 #     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 #     ERROR_TYPES = (
-#                         ('1101', "You can only edit an active template once every 24 hours"),
-#                         ('1102', "The system can not send Whatsapp Templates without a template name"),
-#                         ('1103', "The number of parameters submitted does not match the Whatsapp Template (contact Winser Systems)"),
+#                         ('0101', "You can only edit an active template once every 24 hours"),
+#                         ('0102', "The system can not send Whatsapp Templates without a template name"),
+#                         ('0103', "The number of parameters submitted does not match the Whatsapp Template (contact Winser Systems)"),
 #                         ('1201', "Whatsapp Template not found Whatsapp's system"),
 #                         ('1202', "There is no Whatsapp Business linked to this Lead's assosciated Site"),
 #                         ('1203', "There is no 1st Whatsapp Template linked to this Lead's assosciated Site"),
@@ -118,20 +119,30 @@ class WhatsappNumber(PhoneNumber):
     #         return Site.objects.filter(company=self.site.company, whatsapp_business_account_id=self.site.whatsapp_business_account_id).exclude(pk=self.site.pk)
     #     except Exception as e:
     #         return Site.objects.none()
-
-    @property
-    def get_latest_messages(self):
+    def get_latest_messages(self, after_datetime_timestamp=None, query={}):
         message_pk_list = []
-        for dict in WhatsAppMessage.objects.filter(whatsappnumber=self).order_by('customer_number','-datetime').distinct('customer_number').values('pk'):
-            message_pk_list.append(dict.get('pk'))
-        return WhatsAppMessage.objects.filter(pk__in=message_pk_list).order_by('-datetime')
+        qs = WhatsAppMessage.objects.filter(whatsappnumber=self)
+        search_string = query.get('search_string')
+        if search_string:
+            qs = qs.filter(
+                            Q(lead__last_name__icontains=search_string)|
+                            Q(lead__first_name__icontains=search_string)|
+                            Q(lead__email__icontains=search_string)|
+                            Q(customer_number__icontains=search_string)|
+                            Q(message__icontains=search_string)
+                        )
 
-    # @property
-    # def get_latest_messages(self):
-    #     message_pk_list = []
-    #     for dict in WhatsAppMessage.objects.filter(whatsappnumber=self).order_by('customer_number').distinct('customer_number').values('pk'):
-    #         message_pk_list.append(dict.get('pk'))
-    #     return WhatsAppMessage.objects.filter(pk__in=message_pk_list).order_by('-inbound', '-datetime')
+        if after_datetime_timestamp:
+            after_datetime = datetime.fromtimestamp(int(float(after_datetime_timestamp)))
+            qs = qs.filter(datetime__lt=after_datetime)
+        
+        for dict in qs.order_by('customer_number','-datetime').distinct('customer_number').values('pk'):
+            message_pk_list.append(dict.get('pk'))
+        qs = WhatsAppMessage.objects.filter(pk__in=message_pk_list).order_by('-datetime')
+        received = query.get('received')
+        if received:
+            qs = qs.filter(inbound=True)
+        return qs[:10]
 
     def send_whatsapp_message(self, customer_number=None, lead=None, message="", user=None):  
         try:
@@ -157,6 +168,7 @@ class WhatsappNumber(PhoneNumber):
                                 customer_number=customer_number,
                                 inbound=False,
                                 whatsappnumber=self,
+                                pending=True,
                             )
                         logger.debug("site.send_whatsapp_message success") 
                         return message
@@ -181,6 +193,8 @@ class Site(models.Model):
     # whatsapp_number = models.CharField(max_length=50, null=True, blank=True)
     default_number = models.ForeignKey("core.WhatsappNumber", on_delete=models.SET_NULL, null=True, blank=True, related_name="site_default_number")
     whatsapp_access_token = models.TextField(blank=True, null=True)
+    whatsapp_app_secret_key = models.TextField(blank=True, null=True)
+    
     whatsapp_business_account_id = models.TextField(null=True, blank=True)
     calendly_token = models.TextField(blank=True, null=True)
     calendly_user = models.TextField(blank=True, null=True)
@@ -227,7 +241,7 @@ class Site(models.Model):
                 print("get_live_whatsapp_phone_numbers ERROR: ", str(e))
         return self.return_phone_numbers()
     def return_phone_numbers(self):
-        return WhatsappNumber.objects.filter(whatsapp_business_account__site=self, archived=False)
+        return WhatsappNumber.objects.filter(whatsapp_business_account__site=self, archived=False).order_by('pk')
     # def create_calendly_webhook(self):
     #     calendly = Calendly(self.calendly_token)
     #     if self.calendly_user:
@@ -239,7 +253,7 @@ class Site(models.Model):
         if lead_generation_app == 'b' and not self.company.active_campaign_enabled:
             return HttpResponse(f"Active Campaign is not enabled for {self.company.company_name}", status=500)
         if lead_generation_app == 'a':
-            manually_created_campaign, created = ManualCampaign.objects.get_or_create(site=self, name=f"Manually Created ({self.name})")
+            manually_created_campaign, created = ManualCampaign.objects.get_or_create(site=self, name=f"Manually Created")
             lead = Campaignlead.objects.create(
                 first_name=first_name,
                 email=email,

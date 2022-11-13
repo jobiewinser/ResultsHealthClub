@@ -119,7 +119,7 @@ class CampaignBookingsOverviewView(TemplateView):
 def get_booking_table_context(request):
     request.GET._mutable = True     
     context = {}
-    leads = Campaignlead.objects.exclude(booking__created=None)
+    leads = Campaignlead.objects.all()
     campaign_pk = request.GET.get('campaign_pk', None)
     if campaign_pk:
         leads = leads.filter(campaign=Campaign.objects.get(pk=campaign_pk))
@@ -131,6 +131,8 @@ def get_booking_table_context(request):
         context['site'] = Site.objects.get(pk=site_pk)            
     context['complete_count'] = leads.filter(complete=True).count()
     complete_filter = (request.GET.get('complete', '').lower() =='true')
+    if not complete_filter:
+        leads = leads.exclude(booking__created=None)
     leads = leads.filter(complete=complete_filter)   
     context['complete'] = complete_filter
     context['booking_needed_count'] = leads.filter(booking=None).count()

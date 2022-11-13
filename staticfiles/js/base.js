@@ -54,6 +54,7 @@ function basehandlehtmxafterSwap(evt){
 }
 
 function basehandlehtmxafterRequest(evt){   
+    $('.popover').remove()
     let status = evt.detail.xhr.status;
     let srcElement = $(evt.srcElement);
     let src_id = srcElement.attr('id');
@@ -72,8 +73,10 @@ function basehandlehtmxafterRequest(evt){
                 location.reload();
             }else if (evt.detail.pathInfo.requestPath.includes("update-message-counts")){
                 document.getElementById('notification1').play();
-                OriginalTitle = document.title;
-                PageTitleNotification.On("Message Received!", 1000);
+                // PageTitleNotification.On("Message Sent/Received!", 1000);         
+                // setTimeout(function() {
+                //     PageTitleNotification.Off();
+                // }, 2000);
             }
         }
     } else if (status == 404) {
@@ -148,6 +151,11 @@ function add_chat_whatsapp_number_to_session(whatsapp_number){
 function inlinePreventDefault(e) {
     e.preventDefault();
 }
+function inlineStopPropagation(e) {
+    e.stopPropagation();
+    console.log("test")
+}
+
 
 function copyTextToClipboard(text) {
   if (!navigator.clipboard) {

@@ -1,16 +1,12 @@
 {%load static core_tags%}
 <!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<html>
-    <div id="leadsSearchBar">
-    Search Here: <input type="search" id="searchInput" class="search" />
-    </div>
-    
+<html>    
     <head>
         <script>
             var csrftoken = '{{ csrf_token }}';
         </script>
-        <link rel="shortcut icon" type="image/png" href="{% static 'img/logo-dark-back-img.png' %}"/>
+        <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>
         {%block cdn%}
             <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" />
 
@@ -33,16 +29,15 @@
         
         <link href="{% static 'css/drag_drop.css' %}" rel="stylesheet" />
         <script src="{% static 'js/drag_drop.js' %}"></script> 
-
         <script src="{% static 'js/base.js' %}"></script>
         <script src="{% static 'js/modules/leads.js' %}"></script>
         <script src="{% static 'js/modules/booking.js' %}"></script>
         <script src="{% static 'js/modules/analytics.js' %}"></script>
         <script src="{% static 'js/modules/free_tasters.js' %}"></script>
+        <script src="{% static 'js/modules/campaign_configuration.js' %}"></script>
         <script src="{% static 'js/modules/company_configuration.js' %}"></script>
         <script src="{% static 'js/modules/whatsapp_templates.js' %}"></script>
         <script src="{% static 'js/modules/whatsapp_template_edit.js' %}"></script>
-        
         <audio id="notification1" src="{% static 'audio/notification1.wav' %}" preload="auto"></audio>
         <audio id="notification2" src="{% static 'audio/notification2.mp3' %}" preload="auto"></audio>
         
@@ -55,8 +50,6 @@
     </head>
     
     <script>  
-            
-
         $(document).ready(function() {
             
             function handlehtmxafterSwap(evt){
@@ -73,7 +66,7 @@
                 basehandlehtmxafterSwap(evt);
             }
             document.body.addEventListener('htmx:afterSwap', handlehtmxafterSwap);
-            
+            htmx:
             function handlehtmxafterRequest(evt){
                 var current_module = $('#current_page').val()
                 if (current_module == 'analytics_overview'){
@@ -86,6 +79,12 @@
                 basehandlehtmxafterRequest(evt);
             }
             document.body.addEventListener('htmx:afterRequest', handlehtmxafterRequest);
+            
+            function handlehtmxhistoryCacheError(evt){
+                var current_module = $('#current_page').val()
+                console.log(evt);
+            }
+            document.body.addEventListener('htmx:historyCacheError', handlehtmxhistoryCacheError);
 
             function handlehtmxbeforeRequest(evt){
                 var current_module = $('#current_page').val();
@@ -93,12 +92,18 @@
                     leadshandlehtmxbeforeRequest(evt);
                 } else if (current_module == 'free_tasters'){
                     freetastershandlehtmxbeforeRequest(evt);                    
+                } else if (current_module == 'campaign_configuration'){
+                    campaignconfigurationhandlehtmxbeforeRequest(evt);                    
                 }
+                
             }
             document.body.addEventListener('htmx:beforeRequest', handlehtmxbeforeRequest);
             
             function handlehtmxoobAfterSwap(evt){
                 var current_module = $('#current_page').val()
+                if (current_module == 'campaign_booking_overview'){
+                    bookinghandlehtmxbeforeRequest(evt);                    
+                }
                 basehandlehtmxoobAfterSwap(evt);
             }
             document.body.addEventListener('htmx:oobAfterSwap', handlehtmxoobAfterSwap);
@@ -137,85 +142,8 @@
                 }
             });
         });
-        window.onload = function() {
-            var listen = /^[a-z0-9]+$/i;
-            var searchInput = document.getElementById('searchInput');
-            var searchBar = document.getElementById('leadsSearchBar');
         
-            if ( window.addEventListener ){
-                window.addEventListener( 'keyup', insertKey, false);
-            }
-            function insertKey( e ) {
-                if (!$('input').is(':focus')) {
-                // Get the character from e.keyCode
-                    var key = String.fromCharCode( e.keyCode ).toLowerCase(); 
-            
-                    // Match the character  
-                    if( key.match(listen)) {
-            
-                        // Change display: none; to display: block;
-                        searchBar.style.display = "block";
-                        $(searchBar).stop( true, true ).fadeIn();
-                        // Append every new character
-                        searchInput.value += key;
-
-                        $(searchBar).stop( true, true ).fadeOut("slow", function () {
-                            $(this).css({display:"none"});
-                        });
-                    } else if(e.keyCode == 8){
-                        searchInput.value = "";
-                    }
-
-                    if (searchInput.value != ""){
-                        jQuery.expr[':'].containsLower = function(elem, i, m) {
-                            let name_elem = $(elem).find('.lead_name');
-                            let campaign_elem = $(elem).find('.campaign_name');
-                            let site_elem = $(elem).find('.site_name');                        
-                            let cost_elem = $(elem).find('.lead_cost');
-                            let phone_elem = $(elem).find('.phone_number');
-                            let search_term = m[3].toLowerCase();
-                            return (
-                                (name_elem.html().toLowerCase()).includes(search_term) ||
-                                (campaign_elem.html().toLowerCase()).includes(search_term) ||
-                                (site_elem.html().toLowerCase()).includes(search_term) ||
-                                (cost_elem.html().toLowerCase()).includes(search_term) ||
-                                (phone_elem.html().toLowerCase()).includes(search_term)
-                            )
-                        };
-
-                        $('.column-drag').hide().filter(':containsLower("'+searchInput.value+'")').show();
-                    } else {
-
-                        $('.column-drag').show();
-                    }
-
-                    $('#leadSearchValue').html(searchInput.value)
-                }
-            }
-        }
         $(document).ready(function() {
-            window.onkeydown = function(e) { 
-                return !(e.keyCode == 32 && e.target == document.body);
-            }; 
-            document.body.onkeyup = function(e) {
-                if (e.key == " " ||
-                    e.code == "Space" ||      
-                    e.keyCode == 32      
-                ) {
-                    e.preventDefault();
-                    let drag_elem = null;
-                    let hover_elem = $(':hover').last();
-                    if (hover_elem.hasClass('.column-drag')){
-                        drag_elem = hover_elem;
-                    } else{                    
-                        drag_elem = hover_elem.closest('.column-drag');
-                    }    
-                    if (drag_elem.length != 0)  {  
-                        htmx.ajax('GET', '/campaign-leads/toggle-claim-lead/'+drag_elem.data('id')+'/', {swap:"none"})
-                    }
-                }
-            }
-
             set_total_costs();
         });
     </script>
@@ -251,7 +179,7 @@
             
             <img  class="htmx-indicator invert" id="chat_bottom_htmx_indicator" src="https://htmx.org/img/bars.svg"/>
             <span
-            hx-get="{%url 'get-messaging-window'%}"
+            hx-get="{%url 'message-list'%}"
             hx-target="#chat_bottom_wrapper"
             hx-swap="#outerHTML"
             hx-indicator="#chat_bottom_htmx_indicator"        

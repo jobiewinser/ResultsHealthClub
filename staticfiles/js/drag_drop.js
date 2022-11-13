@@ -1,35 +1,37 @@
 
-const dragStart = target => {
+var dragStart = target => {
     target.classList.add('dragging');
     // console.log("dragStart")
 };
 
-const dragEnd = target => {
+var dragEnd = target => {
     target.classList.remove('dragging');
     document.querySelector('#add_booking_area').classList.remove('shown');
+    document.querySelector('#archive_area').classList.remove('shown');
     document.querySelector('#chat_bottom').classList.remove('temp_hidden');
     // console.log("dragEnd", target)
 };
 
-const dragEnter = event => {
+var dragEnter = event => {
     event.currentTarget.classList.add('drop');
     // console.log("dragEnter")
 };
 
-const dragLeave = event => {
+var dragLeave = event => {
     event.currentTarget.classList.remove('drop');
     // console.log("dragLeave")
 };
 
-const drag = event => {
+var drag = event => {
     event.dataTransfer.setData('text/html', event.currentTarget.outerHTML);
     event.dataTransfer.setData('text/plain', event.currentTarget.dataset.id);
     // console.log("drag")
     document.querySelector('#add_booking_area').classList.add('shown');
+    document.querySelector('#archive_area').classList.add('shown');
     document.querySelector('#chat_bottom').classList.add('temp_hidden');
 };
 
-const drop = event => {
+var drop = event => {
     document.querySelectorAll('.column').forEach(column => column.classList.remove('drop'));
     let dragged_elem = document.querySelector(`[data-id="${event.dataTransfer.getData('text/plain')}"]`)
     let dragged_elem_id = dragged_elem.id
@@ -40,24 +42,37 @@ const drop = event => {
     handleDraggedItem(dragged_elem_id, event.currentTarget)
     // console.log("drop", event.currentTarget)
     document.querySelector('#add_booking_area').classList.remove('shown');
+    document.querySelector('#archive_area').classList.remove('shown');
     document.querySelector('#chat_bottom').classList.remove('temp_hidden');
 };
 
-const drop_booking = event => {
+var drop_booking = event => {
     let dragged_elem = $(`[data-id="${event.dataTransfer.getData('text/plain')}"]`)
     event.preventDefault();
     // console.log("drop_booking", event.currentTarget)
     document.querySelector('#add_booking_area').classList.remove('shown');
+    document.querySelector('#archive_area').classList.remove('shown');
     document.querySelector('#chat_bottom').classList.remove('temp_hidden');
     
     htmx.ajax('GET', '/campaign-leads/campaign-lead-get-modal-content/'+dragged_elem.data('id')+'/?template_name=add_booking', {target:'#generic_modal_body'})
+};
+
+var drop_archive = event => {
+    let dragged_elem = $(`[data-id="${event.dataTransfer.getData('text/plain')}"]`)
+    event.preventDefault();
+    // console.log("drop_booking", event.currentTarget)
+    document.querySelector('#add_booking_area').classList.remove('shown');
+    document.querySelector('#archive_area').classList.remove('shown');
+    document.querySelector('#chat_bottom').classList.remove('temp_hidden');
+    console.log("#lead_pk_"+dragged_elem.data('id'))
+    htmx.ajax('POST', '/campaign-leads/mark-done/'+dragged_elem.data('id')+'/', {swap:'none'})
 };
 
 function handleDraggedItem(elem){
     // console.log("handleDraggedItem")
 }
 
-const allowDrop = event => {
+var allowDrop = event => {
     event.preventDefault();
 };
 

@@ -11,12 +11,15 @@ urlpatterns = [
 
     path("message-window/<str:customer_number>/<str:whatsappnumber_pk>/", message_window, name="message-window"),
     path("message-window/<str:customer_number>/", message_window, name="message-window"),
-    path('get-messaging-window/', get_messaging_section, name='get-messaging-window' ),
+    # path('get-messaging-window/', get_messaging_section, name='get-messaging-window' ),
     path('get-message-list-row/', get_messaging_list_row, name='get-message-list-row' ),
     path('send-first-template-whatsapp-lead-article/<str:lead_pk>/', send_first_template_whatsapp_lead_article_htmx, name='send-first-template-whatsapp-lead-article' ),
     path('send-first-template-whatsapp-booking-row/<str:lead_pk>/', send_first_template_whatsapp_booking_row_htmx, name='send-first-template-whatsapp-booking-row' ),
     
-    path('get-more-messages/', get_more_messages, name='get-more-messages' ),
+    # path('get-more-messages/', get_more_messages, name='get-more-messages' ),
+    path('get-message-list-body/', get_message_list_body, name='get-message-list-body' ),
+    path('get-more-message-list-rows/', get_more_message_list_rows, name='get-more-message-list-rows' ),
+    path('get-more-message-chat-rows/', get_more_message_chat_rows, name='get-more-message-chat-rows' ),
     path('messaging-get-modal-content/', get_modal_content, name='messaging-get-modal-content' ),
     path('update-message-counts/', update_message_counts, name='update-message-counts' ),
     

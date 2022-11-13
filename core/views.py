@@ -61,6 +61,10 @@ except:
 @method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
 class CustomerHomeView(TemplateView):
     template_name='core/customer_home.html'
+    def get(self, request, *args, **kwargs):
+        if request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+            self.template_name = 'core/htmx/customer_home_htmx.html'
+        return super(CustomerHomeView, self).get(request, args, kwargs)
     
 class CustomerLoginView(TemplateView):
     template_name='core/customer_login.html'
@@ -122,11 +126,6 @@ class SiteConfigurationView(TemplateView):
             site_webhook_active = False
             if calendly_webhooks:
                 for webhook in calendly_webhooks:
-                    print("for webhook in calendly_webhooks:")
-                    print(webhook.get('state'), 'active')
-                    print(webhook.get('callback_url'), f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/")
-                    print(webhook.get('organization'), f"{os.getenv('SITE_URL')}/organizations/{site.calendly_organization}")
-                    
                     if webhook.get('state') == 'active' \
                     and webhook.get('callback_url') == f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/" \
                     and webhook.get('organization') == f"{os.getenv('CALENDLY_URL')}/organizations/{site.calendly_organization}":

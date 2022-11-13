@@ -1,0 +1,20 @@
+{%load core_tags tz%}
+{%for message in messages%}
+{%include 'messaging/htmx/message_list_row.html' %}
+{% if forloop.last %}
+{%if messages|length == 10 %}
+<div class="row chat_row" id="more_list_messages_{{whatsappnumber.pk}}">
+    <div class="col center">
+        <a href="#" 
+        hx-trigger="click"
+        hx-target="#more_list_messages_{{whatsappnumber.pk}}" 
+        hx-include=".input_messageCollapse_{{whatsappnumber.pk}}"
+        hx-swap="outerHTML" hx-get="{%url 'get-more-message-list-rows'%}" 
+        hx-vals='{"whatsappnumber_pk":"{{whatsappnumber.pk}}", "earliest_datetime_timestamp":"{{message.datetime|timestamp}}"}'>
+            Load More
+        </a>
+    </div>
+</div>
+{% endif %}
+{% endif %}
+{%endfor%}

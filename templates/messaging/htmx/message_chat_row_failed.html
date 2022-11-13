@@ -1,7 +1,7 @@
 {%load static core_tags%}
 {%with whatsappnumber|active_errors_for_customer_number_tag:customer_number as errors%}
 <div class="row"
-id="message_chat_row_{{customer_number}}_{{whatsappnumber.pk}}"
+id="message_chat_row_{{message.pk}}"
     {%if errors%}
     data-bs-toggle="popover" 
     data-bs-trigger="hover" 
@@ -17,7 +17,7 @@ id="message_chat_row_{{customer_number}}_{{whatsappnumber.pk}}"
     </ul>"
     {%endif%}>
     <div class="col p-0 ps-1 m-1 card chat_row_{{customer_number}}">
-        Message Failed To Send!
+        {{message.message}}
     </div>
 </div>
 {%endwith%}

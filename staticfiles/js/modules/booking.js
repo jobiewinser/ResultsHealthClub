@@ -38,3 +38,19 @@ function bookinghandlehtmxafterSwap(evt){
         }                
     }
 }
+function bookinghandlehtmxbeforeRequest(evt){
+    // if (![undefined, ''].includes(evt.detail.pathInfo.path) && ![undefined, ''].includes(evt.detail.target.id)){
+        if (evt.detail.target.id == 'overview_table'){
+            $("#overview_table").dataTable().fnDestroy();
+        }
+    // }
+}
+
+function whatsapptemplateshandlehtmxafterRequest(evt){
+    if (evt.detail.xhr.status == 200){
+        if (evt.detail.pathInfo.requestPath.includes('add-manual-booking')){
+            $('#generic_modal').modal('hide');
+            snackbarShow('Successfully added booking', 'success')
+        }
+    }
+}

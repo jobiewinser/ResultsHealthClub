@@ -1,7 +1,7 @@
 {%load static core_tags%}
 {%if message.inbound%}
-    <div class="row"
-        id="message_chat_row_{{message.customer_number}}_{{whatsappnumber.pk}}"
+    <div class="row {%if message.pending%}pending_message{%endif%}"
+        id="message_chat_row_{{message.pk}}"
         data-bs-toggle="popover_delay" 
         data-bs-trigger="hover" 
         data-bs-html="true" 
@@ -9,6 +9,9 @@
         data-bs-title="Message Details"
         data-bs-content="
         Sent at <b>{{message.datetime|nice_datetime_tag}}</b><br>
+        {%if message.pending%}
+            This message has not sent yet.<br>
+        {%endif%}
         By <b>{%if message.lead.name%}{{message.lead.name}}{%else%}{{message.customer_number}}{%endif%}</b>"
     >
         <div class="col-auto p-0 ps-1 m-1">
@@ -33,32 +36,47 @@
         </div>
     </div>
 {%else%}
-    <div class="row"
-        id="message_chat_row_{{message.customer_number}}_{{whatsappnumber.pk}}"
+    <div class="row {%if message.pending%}pending_message{%endif%} {%if message.failed%}bg-danger-trans-20{%endif%}"
+        id="message_chat_row_{{message.pk}}"
         data-bs-toggle="popover_delay" 
         data-bs-trigger="hover" 
         data-bs-html="true" 
         data-bs-placement="right"
         data-bs-title="Message Details"
         data-bs-content="
-        Sent at <b>{{message.datetime|nice_datetime_tag}}</b><br>
+        {%if message.failed%}Attempted{%endif%} Sent at <b>{{message.datetime|nice_datetime_tag}}</b><br>
+        {%if message.active_errors%}
+        <br> 
+        <ul>
+            {%for error in message.active_errors%}
+            <li>{{error.created}} - {{error.get_type_display}}</li>
+            {%endfor%}
+        </ul> 
+        <br> 
+        {%endif%}
+
+        {%if message.pending%}
+            This message has not sent yet.<br>
+        {%endif%}
         By <b>{%if message.user.profile.name%}{{message.user.profile.name}}{%else%}Winser Systems{%endif%}</b>">
             <div class="col">
                 
             </div>
             <div class="col-md-auto p-0 pe-1 ps-1 ps-1 m-1 card borderless chat_row_{{message.customer_number}} bg-success-trans-80 text-white" style="max-width:70%">
-                {%if message.message%}
-                    {{message.message}}
-                {%elif message.image.all%}
-                    {% for image in message.image.all%}
-                    <img type="button" class="pointer m-1"
-                        hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
-                        hx-vals='{"template_name": "view_message_image", "whatsapp_message_image_pk": "{{image.pk}}"}'
-                        hx-get="{% url 'messaging-get-modal-content' %}" hx-push-url="false"
-                        hx-swap="innerHTML" hx-trigger="click" style="height:100px;width:fit-content;"
-                        src="{{image.thumbnail}}" alt="Image Message" />
-                    {%endfor%}
-                {%endif%}
+                <span>
+                    {%if message.message%}
+                    {%if message.failed%}<i class="fa-solid fa-triangle-exclamation" style="color:red"></i>{%endif%} {{message.message}}
+                    {%elif message.image.all%}
+                        {% for image in message.image.all%}
+                        <img type="button" class="pointer m-1"
+                            hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
+                            hx-vals='{"template_name": "view_message_image", "whatsapp_message_image_pk": "{{image.pk}}"}'
+                            hx-get="{% url 'messaging-get-modal-content' %}" hx-push-url="false"
+                            hx-swap="innerHTML" hx-trigger="click" style="height:100px;width:fit-content;"
+                            src="{{image.thumbnail}}" alt="Image Message" />
+                        {%endfor%}
+                    {%endif%}
+                </span>
             </div>
             <div class="col-auto p-0 pe-1 m-1">
                 <img src="

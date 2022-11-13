@@ -123,7 +123,7 @@ INSTALLED_APPS = [
     'analytics',
     'core',
     'import_export',
-    'rest_framework',
+    # 'rest_framework',
     'channels',
     'hijack',
     'hijack.contrib.admin',
@@ -229,25 +229,25 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 MEDIA_URL = '/media/'
 
-auth_classes = [
-        "rest_framework.authentication.SessionAuthentication",
-        "api.authentication.TokenAuthentication"               
-    ]
+# auth_classes = [
+#         "rest_framework.authentication.SessionAuthentication",
+#         # "api.authentication.TokenAuthentication"               
+# ]
     
-REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": auth_classes,
+# REST_FRAMEWORK = {
+#     "DEFAULT_AUTHENTICATION_CLASSES": auth_classes,
     
-    "DEFAULT_PERMISSION_CLASSES": [
-        # "rest_framework.permissions.IsAuthenticatedOrReadOnly",
-        "rest_framework.permissions.AllowAny"
-    ],
-    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
-    "PAGE_SIZE": 25,
-    'DEFAULT_RENDERER_CLASSES': (
-        'rest_framework.renderers.JSONRenderer', #DO NOT REMOVE, VIEWFLOW NEEDS THIS???
-        'rest_framework.renderers.TemplateHTMLRenderer', #DO NOT REMOVE, VIEWFLOW NEEDS THIS???
-    )
-}
+#     "DEFAULT_PERMISSION_CLASSES": [
+#         # "rest_framework.permissions.IsAuthenticatedOrReadOnly",
+#         "rest_framework.permissions.AllowAny"
+#     ],
+#     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+#     "PAGE_SIZE": 25,
+#     'DEFAULT_RENDERER_CLASSES': (
+#         'rest_framework.renderers.JSONRenderer', #DO NOT REMOVE, VIEWFLOW NEEDS THIS???
+#         'rest_framework.renderers.TemplateHTMLRenderer', #DO NOT REMOVE, VIEWFLOW NEEDS THIS???
+#     )
+# }
 
 CORS_ALLOWED_ORIGINS = [
     'https://app.winser.uk',

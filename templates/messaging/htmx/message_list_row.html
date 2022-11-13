@@ -1,5 +1,5 @@
 {%load static core_tags%}
-<div class="row chat_row {%if message.inbound%}active_chat_row{%else%}inactive_chat_row{%endif%}"
+<div class="row chat_row {%if message.inbound%}active_chat_row{%else%}inactive_chat_row{%endif%} {%if message.pending%}pending_message{%endif%} {%if message.failed%}bg-danger-trans-20{%endif%}"
     {%if message.customer_number and whatsappnumber.pk%}
         hx-get="{%url 'message-window' customer_number=message.customer_number whatsappnumber_pk=whatsappnumber.pk%}"
         hx-indicator=".htmx-indicator" 
@@ -7,18 +7,63 @@
         hx-push-url="false"
         hx-swap="outerHTML" hx-trigger="click"
     {%endif%}
+
+    {%if message.active_errors%}
     data-bs-toggle="popover_delay" 
     data-bs-trigger="hover" 
     data-bs-html="true" 
     data-bs-placement="right"
     data-bs-title="Message Details"
     data-bs-content="
-        Sent at <b>{{message.datetime|nice_datetime_tag}}</b><br>
+    {%if message.failed%}Attempted{%endif%} Sent at <b>{{message.datetime|nice_datetime_tag}}</b><br>
+    <br> 
+    <ul>
+        {%for error in message.active_errors%}
+        <li>{{error.created}} - {{error.get_type_display}}</li>
+        {%endfor%}
+    </ul> 
+    <br> 
+
+    {%if message.pending%}
+        This message has not sent yet.<br>
+    {%endif%}
+    
     {%if message.inbound%}
         By <b>{%if message.lead.name%}{{message.lead.name}}{%else%}{{message.customer_number}}{%endif%}</b>
     {%else%}
         By <b>{%if message.user.profile.name%}{{message.user.profile.name}}{%else%}Winser Systems{%endif%}</b>
     {%endif%}"
+    {%endif%}
+
+
+    {% comment %} data-bs-toggle="popover_delay" 
+    data-bs-trigger="hover" 
+    data-bs-html="true" 
+    data-bs-placement="right"
+    data-bs-title="Message Details"
+    data-bs-content="
+    {%if message.failed%}Attempted{%endif%} Sent at <b>{{message.datetime|nice_datetime_tag}}</b><br>
+    {%if message.active_errors%}
+    <br> 
+    <ul>
+        {%for error in message.active_errors%}
+        <li>{{error.created}} - {{error.get_type_display}}</li>
+        {%endfor%}
+    </ul> 
+    <br> 
+    {%endif%}
+
+    {%if message.pending%}
+        This message has not sent yet.<br>
+    {%endif%}
+    
+    {%if message.inbound%}
+        By <b>{%if message.lead.name%}{{message.lead.name}}{%else%}{{message.customer_number}}{%endif%}</b>
+    {%else%}
+        By <b>{%if message.user.profile.name%}{{message.user.profile.name}}{%else%}Winser Systems{%endif%}</b>
+    {%endif%}" {% endcomment %}
+
+
     data-customer-number="{{message.customer_number}}"
     data-whatsappnumber-pk="{{message.whatsappnumber.pk}}"
     id="latest_message_row_{{message.customer_number}}"
@@ -28,18 +73,18 @@
     </div>
     <div class="col p-0 ps-1 hidden-overflow">
         <div class="row chat_lead_name_row">
-            <div class="col p-0 elipses-overflow m-1" id="latest_message_name_{{message.customer_number}}">
-                <span>{%if message.lead.name%}{{message.lead.name}}{%else%}{{message.customer_number}}{%endif%}
-                {%if message.lead.name%}{{message.lead.name}}{%else%}{{message.customer_number}}{%endif%} </span>
+            <div class="col-md-auto p-0 elipses-overflow m-1" id="latest_message_name_{{message.customer_number}}">
+                <span>{%if message.lead.name%}{{message.lead.name}}{%else%}{{message.customer_number}}{%endif%} </span>
             </div>
-            
-            <div class="col p-0 right pe-1">
+            <div class="col ps-1 pe-1">
+            </div>            
+            <div class="col-md-auto p-0 right pe-1">
                 <i>{{message.datetime|nice_message_datetime_tag}}</i>
             </div>
         </div>
         <div class="row chat_message_row">
             <div class="col p-0" id="message_list_row_{{message.customer_number}}_{{whatsappnumber.pk}}">
-                {%if message.inbound%}Them{%else%}You{%endif%}:
+                {%if message.failed%}<i class="fa-solid fa-triangle-exclamation" style="color:red"></i>{%endif%}  {%if message.inbound%}Them{%else%}You{%endif%}:
                 {%if message.message%}
                     {{message.message}}
                 {%elif message.image.all%}

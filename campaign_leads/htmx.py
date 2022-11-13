@@ -119,8 +119,7 @@ def get_leads_column_meta_data(request, **kwargs):
 def refresh_lead_article(request, **kwargs):
     logger.debug(str(request.user))
     try:
-        lead = Campaignlead.objects.get(pk=kwargs.get('lead_pk'))
-       
+        lead = Campaignlead.objects.get(pk=kwargs.get('lead_pk'))       
         return render(request, 'campaign_leads/htmx/lead_article.html', {'lead':lead, 'max_call_count':0})
     except Exception as e:
         logger.debug("get_leads_column_meta_data Error "+str(e))
@@ -129,8 +128,7 @@ def refresh_lead_article(request, **kwargs):
 def refresh_booking_row(request, **kwargs):
     logger.debug(str(request.user))
     try:
-        lead = Campaignlead.objects.get(pk=kwargs.get('lead_pk'))
-       
+        lead = Campaignlead.objects.get(pk=kwargs.get('lead_pk'))       
         return render(request, 'campaign_leads/htmx/campaign_booking_row_htmx.html', {'lead':lead})
     except Exception as e:
         logger.debug("get_leads_column_meta_data Error "+str(e))
@@ -192,9 +190,11 @@ def mark_done(request, **kwargs):
     logger.debug(str(request.user))
     try:
         if request.user.is_authenticated:
-            lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'))
+            lead_pk = request.POST.get('lead_pk') or kwargs.get('lead_pk')
+            lead = Campaignlead.objects.get(pk=lead_pk)
             lead.complete = not lead.complete
             lead.save()
+            lead.trigger_refresh_websocket(refresh_position=False)
 
             return HttpResponse("", "text", 200)
     except Exception as e:

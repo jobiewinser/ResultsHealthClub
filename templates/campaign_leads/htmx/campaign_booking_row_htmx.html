@@ -32,7 +32,7 @@
                     onclick="$('#chat_card_{{lead.whatsapp_number}}').remove(); $('#chat_list_bottom_window').remove();"
                     data-customer-number="{{lead.whatsapp_number}}">
                         Chat
-                        <span id="chat_notification_{{lead.whatsapp_number}}">
+                        <span id="chat_notification_{{lead.whatsapp_number.pk}}">
                         </span>
                 </button>
             {%endif%}

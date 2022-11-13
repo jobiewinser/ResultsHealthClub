@@ -24,6 +24,30 @@ function leadshandlehtmxafterSwap(evt){
     }
 }
 
+function filterLeads(searchInput){
+    if (
+        searchInput.value != ""){
+        jQuery.expr[':'].containsLower = function(elem, i, m) {
+        let name_elem = $(elem).find('.lead_name');
+        let campaign_elem = $(elem).find('.campaign_name');
+        let site_elem = $(elem).find('.site_name');                        
+        let cost_elem = $(elem).find('.lead_cost');
+        let phone_elem = $(elem).find('.phone_number');
+        let search_term = m[3].toLowerCase();
+        return (
+            (name_elem.html().toLowerCase()).includes(search_term) ||
+            (campaign_elem.html().toLowerCase()).includes(search_term) ||
+            (site_elem.html().toLowerCase()).includes(search_term) ||
+            (cost_elem.html().toLowerCase()).includes(search_term) ||
+            (phone_elem.html().toLowerCase()).includes(search_term)
+        )
+    };
+    $('.column-drag').hide().filter(':containsLower("'+searchInput.value+'")').show();
+} else {
+    $('.column-drag').show();
+}
+}
+
 function handleDraggedItem(dragged_elem_id, drag_target){
     dragged_elem = $('#'+dragged_elem_id)
     var respStatus = $.ajax({

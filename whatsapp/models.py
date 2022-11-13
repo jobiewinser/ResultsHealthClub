@@ -11,6 +11,7 @@ from django.dispatch import receiver
 from PIL import Image
 from io import StringIO, BytesIO
             
+from datetime import datetime, timedelta
 from django.core.files.images import ImageFile
 import os
 
@@ -27,6 +28,7 @@ class WhatsAppWebhookRequest(models.Model):
                         ('b', 'GET'),
                     )
     json_data = models.JSONField(null=True, blank=True)
+    meta_data = models.JSONField(default=dict)
     errors = models.ManyToManyField("core.ErrorModel", null=True, blank=True)
     request_type = models.CharField(choices=REQUEST_TYPE_CHOICES, default='a', max_length=1)
 
@@ -68,7 +70,25 @@ class WhatsAppMessage(Message):
     raw_webhook = models.ForeignKey("whatsapp.WhatsAppWebhookRequest", null=True, blank=True, on_delete=models.SET_NULL)
     conversationid = models.TextField(null=True, blank=True)  
     whatsappnumber = models.ForeignKey("core.WhatsappNumber", null=True, blank=True, on_delete=models.SET_NULL)
-    image = models.ManyToManyField("whatsapp.WhatsappMessageImage")
+    image = models.ManyToManyField("whatsapp.WhatsappMessageImage", null=True, blank=True)
+    send_order =  models.IntegerField(null=True, blank=True)
+    @property
+    def active_errors(self):        
+        from core.models import AttachedError
+        return AttachedError.objects.filter(whatsapp_message=self).filter(archived=False)
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        unique = None
+        while not unique:
+            qs = WhatsAppMessage.objects.filter(datetime=self.datetime)
+            if self.pk:
+                qs = qs.exclude(pk=self.pk)
+            if qs:
+                self.datetime = self.datetime + datetime.timedelta(seconds=1)
+            else:
+                unique = True
+        super(WhatsAppMessage, self).save(force_insert, force_update, using, update_fields)
+
 # class WhatsAppMessage(models.Model):
 #     pass 
     

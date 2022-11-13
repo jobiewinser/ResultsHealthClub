@@ -19,7 +19,6 @@ from django.utils.decorators import method_decorator
 from core.models import ErrorModel, Site, WhatsappBusinessAccount, WhatsappNumber
 from random import randrange
 from django.contrib.auth.decorators import login_required
-
 # def random_date(start,l):
 #     current = start
 #     while l >= 0:
@@ -29,7 +28,16 @@ from django.contrib.auth.decorators import login_required
 
 # startDate = datetime(2013, 9, 20,13,00)
 # temp1 = random_date(startDate,10)
+import hmac
+import hashlib
+import pickle
+import base64
 
+def verify_webhook(data, hmac_header, SECRET):    
+    digest = hmac.new(SECRET.encode('utf-8'), data, hashlib.sha256).digest()
+    genHmac = base64.b64encode(digest)
+
+    return hmac.compare_digest(genHmac, hmac_header.encode('utf-8'))
 
 @method_decorator(csrf_exempt, name="dispatch")
 class Webhooks(View):
@@ -41,73 +49,110 @@ class Webhooks(View):
         return response
 
     def post(self, request, *args, **kwargs):
+        from core.models import AttachedError
         body = json.loads(request.body)
-        print(str(body))
+        # meta = request.META
+        print(str(request.META))
         logger.debug(str(body))
            
         webhook_object = WhatsAppWebhookRequest.objects.create(
             json_data=body,
+            meta_data=str(request.META),
             request_type='a',
         )
         for entry in body.get('entry'):
             for change in entry.get('changes'):
                 field = change.get('field')
                 value = change.get('value')
-                if field == 'messages':
-                    for message_json in value.get('messages', []):
-                        wamid = message_json.get('id')
-                        existing_messages = WhatsAppMessage.objects.filter( wamid=wamid ).exclude(wamid="ABGGFlA5Fpa1")
-                        if not existing_messages or settings.DEBUG:
-                            print("REACHED past if not existing_messages or settings.DEBUG")
-                            # Likely a message from a customer     
-                            if message_json.get('type') == 'text':
-                                handle_received_whatsapp_text_message(message_json, value.get('metadata'), webhook_object) 
-                            elif message_json.get('type') == 'image':  
-                                handle_received_whatsapp_image_message(message_json, value.get('metadata'), webhook_object) 
-                                            
+                metadata = value.get('metadata')
+                site = Site.objects.filter(whatsappbusinessaccount__whatsappnumber__number=metadata.get('display_phone_number')).first()
+                if site:
+                    signature = 'sha256=' + hmac.new(site.whatsapp_app_secret_key.encode('utf-8'), bytes(request.body), digestmod=hashlib.sha256).hexdigest()
+                    if signature == request.META.get('HTTP_X_HUB_SIGNATURE_256'):
+                        if site:
+                            if field == 'messages':
+                                for message_json in value.get('messages', []):
+                                    wamid = message_json.get('id')
+                                    existing_messages = WhatsAppMessage.objects.filter( wamid=wamid )
+                                    if not existing_messages or settings.DEBUG:
+                                        print("REACHED past if not existing_messages or settings.DEBUG")
+                                        # Likely a message from a customer     
+                                        if message_json.get('type') == 'text':
+                                            handle_received_whatsapp_text_message(message_json, metadata, webhook_object) 
+                                        elif message_json.get('type') == 'image':  
+                                            handle_received_whatsapp_image_message(message_json, metadata, webhook_object) 
+                                for status_json in value.get('statuses', []):
+                                    wamid = status_json.get('id')
+                                    existing_message = WhatsAppMessage.objects.filter( wamid=wamid, inbound=False ).last()
+                                    if existing_message:
+                                        if status_json.get('status') == 'failed':
+                                            potential_errors = status_json.get('errors', None)
+                                            if potential_errors:
+                                                for error in potential_errors:
+                                                    code = error.get('code')
+                                                    if str(code) == '131047':
+                                                        AttachedError.objects.create(
+                                                            type = '1104',
+                                                            attached_field = "whatsapp_message",
+                                                            whatsapp_message = existing_message,
+                                                        )
+                                                        existing_message.pending = False
+                                                        existing_message.failed = True
+                                                        existing_message.save()
+                                                        new_message_to_websocket(existing_message, existing_message.whatsappnumber)
+                                        elif status_json.get('status') == 'sent':
+                                            AttachedError.objects.filter(
+                                                type__in = ['1104','1105'],
+                                                archived = False,
+                                                attached_field = "whatsapp_message",
+                                                whatsapp_message = existing_message,
+                                            ).update(archived = True)
+                                            existing_message.pending = False
+                                            existing_message.failed = False
+                                            existing_message.save()
+                                            new_message_to_websocket(existing_message, existing_message.whatsappnumber)
+                            elif field == 'statuses':
+                                for status_dict in value.get('statuses', []):
+                                    print("STATUS", str(status_dict))
+                                    whatsapp_messages = WhatsAppMessage.objects.filter(wamid=status_dict.get('id'))
+                                    if whatsapp_messages:
+                                        whatsapp_message_status = WhatsAppMessageStatus.objects.get_or_create(
+                                            whatsapp_message=whatsapp_messages[0],
+                                            datetime = datetime.fromtimestamp(int(status_dict.get('timestamp'))),
+                                            status = status_dict.get('status'),
+                                            raw_webhook = webhook_object,
+                                        )[0]                
 
-                elif field == 'statuses':
-                    for status_dict in value.get('statuses', []):
-                        print("STATUS", str(status_dict))
-                        whatsapp_messages = WhatsAppMessage.objects.filter(wamid=status_dict.get('id'))
-                        if whatsapp_messages:
-                            whatsapp_message_status = WhatsAppMessageStatus.objects.get_or_create(
-                                whatsapp_message=whatsapp_messages[0],
-                                datetime = datetime.fromtimestamp(int(status_dict.get('timestamp'))),
-                                status = status_dict.get('status'),
-                                raw_webhook = webhook_object,
-                            )[0]                
+                            elif field == 'message_template_status_update':                    
+                                templates = WhatsappTemplate.objects.filter(message_template_id=value.get('message_template_id'))
+                                if templates:
+                                    template = templates[0]
+                                    template.status=value.get('event')
+                                    reason = value.get('reason', None)
+                                    print("TEMPLATE REASON", str(reason))
+                                    # if reason and not reason.lower() == 'none':
+                                    #     template.latest_reason=value.get('reason')
+                                    # else:
+                                    #     template.latest_reason=None
+                                    template.name=value.get('message_template_name')
+                                    template.language=value.get('message_template_language')
+                                    whatsapp = Whatsapp(template.site.whatsapp_access_token)
+                                    template_live = whatsapp.get_template(template.site.whatsapp_business_account_id, template.message_template_id)
+                                    # if value.get('event', "") == 'APPROVED':
+                                    template.name = template_live.get('name')
+                                    template.pending_name = ""
 
-                elif field == 'message_template_status_update':                    
-                    templates = WhatsappTemplate.objects.filter(message_template_id=value.get('message_template_id'))
-                    if templates:
-                        template = templates[0]
-                        template.status=value.get('event')
-                        reason = value.get('reason', None)
-                        print("TEMPLATE REASON", str(reason))
-                        # if reason and not reason.lower() == 'none':
-                        #     template.latest_reason=value.get('reason')
-                        # else:
-                        #     template.latest_reason=None
-                        template.name=value.get('message_template_name')
-                        template.language=value.get('message_template_language')
-                        whatsapp = Whatsapp(template.site.whatsapp_access_token)
-                        template_live = whatsapp.get_template(template.site.whatsapp_business_account_id, template.message_template_id)
-                        # if value.get('event', "") == 'APPROVED':
-                        template.name = template_live.get('name')
-                        template.pending_name = ""
+                                    template.category = template_live.get('category')
+                                    template.pending_category = ""
 
-                        template.category = template_live.get('category')
-                        template.pending_category = ""
+                                    template.language = template_live.get('language')
+                                    template.pending_language = ""
+                                    print("template.pending_components", str(template.pending_components))
+                                    template.components = template.pending_components
+                                    template.pending_components = []
 
-                        template.language = template_live.get('language')
-                        template.pending_language = ""
-                        print("template.pending_components", str(template.pending_components))
-                        template.components = template.pending_components
-                        template.pending_components = []
-
-                        template.last_approval = datetime.now()
-                        template.save()
+                                    template.last_approval = datetime.now()
+                                    template.save()
         response = HttpResponse("")
         response.status_code = 200     
         
@@ -118,12 +163,6 @@ def handle_received_whatsapp_image_message(message_json, metadata, webhook_objec
     wamid = message_json.get('id')
     to_number = metadata.get('display_phone_number')
     from_number = message_json.get('from')
-    
-                            # try:
-                            #     lead = Campaignlead.objects.get(whatsapp_number__icontains=from_number[-10:])
-                            #     # name = lead.name
-                            # except Exception as e:
-                            #     lead = None
     lead = Campaignlead.objects.filter(whatsapp_number=from_number).last()
     whatsappnumber = WhatsappNumber.objects.get(number=to_number)
     site = whatsappnumber.whatsapp_business_account.site
@@ -151,64 +190,14 @@ def handle_received_whatsapp_image_message(message_json, metadata, webhook_objec
         lead=lead,
         raw_webhook=webhook_object,
         whatsappnumber=whatsappnumber,
-    )
-    whatsapp_message.image.set([image_object])
-    from channels.layers import get_channel_layer
-    channel_layer = get_channel_layer()                            
-    message_context = {
-        "message": whatsapp_message,
-        "site": site,
-        "whatsappnumber": whatsappnumber,
-    }
-    rendered_message_list_row = loader.render_to_string('messaging/htmx/message_list_row.html', message_context)
-    rendered_message_chat_row = loader.render_to_string('messaging/htmx/message_chat_row.html', message_context)
-    rendered_html = f"""
-
-    <span id='latest_message_row_{from_number}' hx-swap-oob='delete'></span>
-    <span id='messageCollapse_{whatsappnumber.pk}' hx-swap-oob='afterbegin'>{rendered_message_list_row}</span>
-
-    <span id='messageWindowInnerBody_{from_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>
-    
-    <span id="chat_notification_{lead.whatsapp_number}" hx-swap-oob='innerHTML'>
-        <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
-                <span class="visually-hidden">New alerts</span>
-        </span>
-    </span>
-    """
-    from channels.layers import get_channel_layer
-    from asgiref.sync import async_to_sync
-    channel_layer = get_channel_layer()  
-    async_to_sync(channel_layer.group_send)(
-        f"messaging_{whatsappnumber.pk}",
-        {
-            'type': 'chatbox_message',
-            "message": rendered_html,
-        }
-    )
-
-    
-    async_to_sync(channel_layer.group_send)(
-        f"message_count_{whatsappnumber.site.company.pk}",
-        {
-            'type': 'messsages_count_update',
-            'data':{
-                'rendered_html':f"""<span hx-swap-oob="afterbegin:.company_message_count"><span hx-trigger="load" hx-swap="none" hx-get="/update-message-counts/"></span>""",
-            }
-        }
-    )
-    logger.debug("webhook sending image to chat end")     
+    )    
+    new_message_to_websocket(whatsapp_message, whatsappnumber)
 
 
 def handle_received_whatsapp_text_message(message_json, metadata, webhook_object):
     wamid = message_json.get('id')
     to_number = metadata.get('display_phone_number')
     from_number = message_json.get('from')
-    
-                            # try:
-                            #     lead = Campaignlead.objects.get(whatsapp_number__icontains=from_number[-10:])
-                            #     # name = lead.name
-                            # except Exception as e:
-                            #     lead = None
     lead = Campaignlead.objects.filter(whatsapp_number=from_number).last()
     whatsappnumber = WhatsappNumber.objects.get(number=to_number)
     site = whatsappnumber.whatsapp_business_account.site
@@ -228,24 +217,27 @@ def handle_received_whatsapp_text_message(message_json, metadata, webhook_object
         raw_webhook=webhook_object,
         whatsappnumber=whatsappnumber,
     )
-    # whatsapp_message.save()
+    new_message_to_websocket(whatsapp_message, whatsappnumber)
+
+def new_message_to_websocket(whatsapp_message, whatsapp_number):
     from channels.layers import get_channel_layer
     channel_layer = get_channel_layer()                            
     message_context = {
         "message": whatsapp_message,
-        "site": site,
-        "whatsappnumber": whatsappnumber,
+        "site": whatsapp_message.site,
+        "whatsappnumber": whatsapp_message.whatsappnumber,
     }
     rendered_message_list_row = loader.render_to_string('messaging/htmx/message_list_row.html', message_context)
     rendered_message_chat_row = loader.render_to_string('messaging/htmx/message_chat_row.html', message_context)
     rendered_html = f"""
 
-    <span id='latest_message_row_{from_number}' hx-swap-oob='delete'></span>
-    <span id='messageCollapse_{whatsappnumber.pk}' hx-swap-oob='afterbegin'>{rendered_message_list_row}</span>
+    <span id='latest_message_row_{whatsapp_message.customer_number}' hx-swap-oob='delete'></span>
+    <span id='message_chat_row_{whatsapp_message.pk}' hx-swap-oob='delete'></span>
+    <span id='messageCollapse_{whatsapp_message.whatsappnumber.pk}' hx-swap-oob='afterbegin'>{rendered_message_list_row}</span>
 
-    <span id='messageWindowInnerBody_{from_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>
+    <span id='messageWindowInnerBody_{whatsapp_message.customer_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>
     
-    <span id="chat_notification_{lead.whatsapp_number}" hx-swap-oob='innerHTML'>
+    <span id="chat_notification_{whatsapp_number.pk}" hx-swap-oob='innerHTML'>
         <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
                 <span class="visually-hidden">New alerts</span>
         </span>
@@ -255,7 +247,7 @@ def handle_received_whatsapp_text_message(message_json, metadata, webhook_object
     from asgiref.sync import async_to_sync
     channel_layer = get_channel_layer()  
     async_to_sync(channel_layer.group_send)(
-        f"messaging_{whatsappnumber.pk}",
+        f"messaging_{whatsapp_message.whatsappnumber.pk}",
         {
             'type': 'chatbox_message',
             "message": rendered_html,
@@ -264,7 +256,7 @@ def handle_received_whatsapp_text_message(message_json, metadata, webhook_object
 
     
     async_to_sync(channel_layer.group_send)(
-        f"message_count_{whatsappnumber.site.company.pk}",
+        f"message_count_{whatsapp_message.whatsappnumber.site.company.pk}",
         {
             'type': 'messsages_count_update',
             'data':{
@@ -272,7 +264,7 @@ def handle_received_whatsapp_text_message(message_json, metadata, webhook_object
             }
         }
     )
-    logger.debug("webhook sending text to chat end")     
+    logger.debug("webhook sending text to chat end")   
         
 # @method_decorator(campaign_leads_enabled_required, name='dispatch')
 @method_decorator(login_required, name='dispatch')
@@ -431,7 +423,7 @@ def whatsapp_number_make_default(request):
         site = whatsappnumber.site
         site.default_number = whatsappnumber
         site.save()
-        return render(request, 'core/htmx/site_configuration_htmx.html', {'whatsapp_numbers':site.get_live_whatsapp_phone_numbers(), 'site': site, })
+        return render(request, 'core/htmx/site_configuration_table_htmx.html', {'whatsapp_numbers':site.get_live_whatsapp_phone_numbers(), 'site': site, })
         # 'site_list': get_available_sites_for_user(request.user)})
     return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
     

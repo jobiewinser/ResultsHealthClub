@@ -36,7 +36,7 @@
         {%endblock extra_top_right_buttons %}
     </div>
     <div class="row ">
-        <div class="col" style=""> 
+        <div class="col p-0" style=""> 
         {%include 'campaign_leads/htmx/leads_board.html' %}
         </div>
     </div>
@@ -44,6 +44,13 @@
         <div class="card-body center text-white">
             <h3>Add Booking
                 <i class="fa-duotone fa-calendar-days"></i>
+            </h3>
+        </div>
+    </div>
+    <div id="archive_area" class="" ondrop="drop_archive(event)" ondragover="allowDrop(event)">        
+        <div class="card-body center text-white">
+            <h3>Archive
+                <i class="fa-duotone fa-trash"></i>
             </h3>
         </div>
     </div>
