@@ -19,6 +19,7 @@ function leadshandlehtmxafterSwap(evt){
             } else if (evt.detail.pathInfo.requestPath.includes("refresh-lead-article") || evt.detail.pathInfo.requestPath.includes("leads-and-calls")){
                 document.getElementById('notification2').play();
                 set_total_costs();
+                set_lead_counts();                
             }
         }             
     }
@@ -76,5 +77,15 @@ function set_total_costs(){
         });
         total_cost = total_cost.toFixed(2);
         $(this).val(total_cost).html(total_cost);
+    });
+}
+
+function set_lead_counts(){  
+    $('.total_count').each(function () {
+        let total_count = 0;
+        $(this).closest('.column-done').find(".column-drag").each(function() {
+            total_count += 1;
+        });
+        $(this).val(total_count).html(total_count);
     });
 }
