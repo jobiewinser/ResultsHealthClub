@@ -32,12 +32,12 @@
                     <div class="tab-pane fade show active" id="pills-calendly" role="tabpanel" aria-labelledby="pills-calendly-tab">
                         {%if request.user.profile.calendly_event_page_url%}
                         <div class="row">
-                            <div class="col center" id="calendly_wrapper" style="min-width:580px;min-height:580px;">
+                            <div class="col center" id="calendly_wrapper" style="min-height:60vh;">
                                 <img id="calendly_loading" src="{% static 'gif/loading.gif' %}" alt="" width="200">
                             </div>
                         </div>
                         {%else%}
-                        <div class="row m-2" style="min-width:580px;min-height:580px;">
+                        <div class="row m-2">
                             <div class="col center" style="">
                                 <p>Calendly not configured for your profile!</p> 
                                 <p>Please edit your profile using the "Edit Profile" button below.</p>
