@@ -71,6 +71,7 @@ class WhatsAppMessage(Message):
     conversationid = models.TextField(null=True, blank=True)  
     whatsappnumber = models.ForeignKey("core.WhatsappNumber", null=True, blank=True, on_delete=models.SET_NULL)
     image = models.ManyToManyField("whatsapp.WhatsappMessageImage", null=True, blank=True)
+    send_order =  models.IntegerField(null=True, blank=True)
     @property
     def active_errors(self):        
         from core.models import AttachedError

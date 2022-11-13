@@ -2,14 +2,19 @@ import logging
 from django.core.management.base import BaseCommand
 from campaign_leads.models import Campaignlead, Booking, Call, Note, WhatsappTemplate
 logger = logging.getLogger(__name__)
+from whatsapp.models import WhatsAppMessage
+from datetime import datetime, timedelta
 class Command(BaseCommand):
     help = 'help text'
 
     def handle(self, *args, **options):
-        # for campaign_lead in Campaignlead.objects.filter(booking=None).exclude(sold=True).exclude(complete=True).exclude(whatsappmessage__template__send_order=3):
-        #     if not campaign_lead.whatsappmessage_set.filter(whatsappmessage__template__send_order=1):
-        #         campaign_lead.send_template_whatsapp_message(1, communication_method='a')
-        #     elif not campaign_lead.whatsappmessage_set.filter(whatsappmessage__template__send_order=2):
-        #         campaign_lead.send_template_whatsapp_message(2, communication_method='a')
-        #     else:
-        #         campaign_lead.send_template_whatsapp_message(3, communication_method='a')
+        for campaign_lead in Campaignlead.objects.filter(booking=None).exclude(sold=True).exclude(complete=True):
+            whatsapp_messages = WhatsAppMessage.objects.filter(lead=campaign_lead)
+            day_ago =  datetime.now() - timedelta(days = 1)
+            if not whatsapp_messages.filter(datetime__gte=day_ago):
+                if not whatsapp_messages.filter(send_order=1):
+                    campaign_lead.send_template_whatsapp_message(send_order=1, communication_method='a')
+                elif not whatsapp_messages.filter(send_order=2):
+                    campaign_lead.send_template_whatsapp_message(send_order=2, communication_method='a')
+                elif not whatsapp_messages.filter(send_order=3):
+                    campaign_lead.send_template_whatsapp_message(send_order=3, communication_method='a')

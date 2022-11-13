@@ -28,9 +28,9 @@ class AttachedError(models.Model):
                         ('1105', "Message failed to send because the Whatsapp account is not yet registered (contact Winser Systems)"),
                         ('1201', "Whatsapp Template not found Whatsapp's system"),
                         ('1202', "There is no Whatsapp Business linked to this Lead's assosciated Site"),
-                        ('1203', "There is no 1st Whatsapp Template linked to this Lead's assosciated Site"),
-                        ('1204', "There is no 2nd Whatsapp Template linked to this Lead's assosciated Site"),
-                        ('1205', "There is no 3rd Whatsapp Template linked to this Lead's assosciated Site"),
+                        ('1203', "There is no 1st Whatsapp Template linked to this Lead's Campaign"),
+                        ('1204', "There is no 2nd Whatsapp Template linked to this Lead's Campaign"),
+                        ('1205', "There is no 3rd Whatsapp Template linked to this Lead's Campaign"),
                     )
     type = models.CharField(choices=ERROR_TYPES, default='c', max_length=5)
     attached_field = models.CharField(null=True, blank=True, max_length=50)
@@ -253,7 +253,7 @@ class Site(models.Model):
         if lead_generation_app == 'b' and not self.company.active_campaign_enabled:
             return HttpResponse(f"Active Campaign is not enabled for {self.company.company_name}", status=500)
         if lead_generation_app == 'a':
-            manually_created_campaign, created = ManualCampaign.objects.get_or_create(site=self, name=f"Manually Created ({self.name})")
+            manually_created_campaign, created = ManualCampaign.objects.get_or_create(site=self, name=f"Manually Created")
             lead = Campaignlead.objects.create(
                 first_name=first_name,
                 email=email,

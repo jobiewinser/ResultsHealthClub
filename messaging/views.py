@@ -104,7 +104,7 @@ def send_first_template_whatsapp_booking_row_htmx(request, **kwargs):
 def send_first_template_whatsapp(request, kwargs):
     lead = Campaignlead.objects.get(pk=kwargs.get('lead_pk'))
     if not lead.message_set.all():
-        lead.send_template_whatsapp_message(1, communication_method='a')
+        lead.send_template_whatsapp_message(send_order=1, communication_method='a')
     messages = WhatsAppMessage.objects.filter(customer_number=kwargs.get('customer_number'), whatsappnumber__number=kwargs.get('messaging_phone_number')).order_by('-datetime')
     context = {}
     context["messages"] = messages
