@@ -276,7 +276,7 @@ def get_site_pk_from_request(request):
 
 from django.core.mail import send_mail
 from django.shortcuts import redirect, render
-def handler500(request, render=True):
+def handler500(request):
     known_errors = []
     try:
         type_, value, tb = sys.exc_info()
@@ -318,6 +318,4 @@ def handler500(request, render=True):
 
     except Exception as e:
         logger.error(   "couldn't send error email", str(e))
-    if render:
-        return render(request, '500.html', status=500)
-    return True
+    return render(request, '500.html', status=500)

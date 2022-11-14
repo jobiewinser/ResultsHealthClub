@@ -304,7 +304,7 @@ def get_current_call_count_distribution(request):
     return render(request, 'analytics/htmx/current_call_count_distribution_data.html', context)
 @login_required
 def get_base_analytics(request):
-    try:
+    # try:
         context = {}
         campaign_pk = request.GET.get('campaign_pk', None)
         if campaign_pk:
@@ -367,5 +367,5 @@ def get_base_analytics(request):
         context['end_date'] = end_date
         # context['call_distribution'] = 
         return render(request, 'analytics/htmx/base_analytics.html', context)
-    except Exception as e:
-        pass
+    # except Exception as e:
+    #     pass
