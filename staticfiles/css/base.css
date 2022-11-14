@@ -738,3 +738,15 @@ tr.odd td {
     min-width:350px;
     margin: 10px;
 }
+
+.chart_wrapper{
+    position: relative; 
+    height:300px; 
+    width:300px; 
+}
+
+.chart_wrapper_long{
+    position: relative; 
+    height:100%;
+    width:100%; 
+}

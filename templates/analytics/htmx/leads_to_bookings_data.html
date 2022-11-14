@@ -25,9 +25,9 @@
 </div>
 
 <div class="row">
-    <div class="col">
-        <div class="" id="leads_to_bookings_chart_wrapper">
-            <canvas style="width:100%;height:200px;" id="leads_to_bookings_chart" ></canvas>
+    <div class="col p-0">
+        <div class="chart_wrapper_long" id="leads_to_bookings_chart_wrapper">
+            <canvas id="leads_to_bookings_chart" ></canvas>
         </div>
     </div>
 </div>
@@ -81,7 +81,7 @@
                         gridLines: { display: false }
                     }
                 },
-                responsive: false
+                responsive: true
             }
         });
     });
