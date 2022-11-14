@@ -288,7 +288,7 @@ def get_current_call_count_distribution(request):
 
     call_counts_tuples = []
     index = 0
-    if non_time_filtered_opportunities.filter(calls__gt=index):
+    if non_time_filtered_opportunities.filter(calls__gte=index):
         while non_time_filtered_opportunities.filter(calls__gte=index):
             if non_time_filtered_opportunities.exclude(calls=index).count():
                 queryset_percentage_portion = (non_time_filtered_opportunities.filter(calls=index).count() / non_time_filtered_opportunities.count())*100

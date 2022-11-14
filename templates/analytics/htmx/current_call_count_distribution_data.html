@@ -1,11 +1,27 @@
 <div class="row">
     <div class="col">
     </div>
-    <div class="col-md-auto" style="text-align:left">
+    <div class="col-md-auto center" style="text-align:left">
         {%for call_count_tuple in call_counts_tuples%}
-        <div class="row">
-            <div class="col-md-auto" style="text-align:left">
-                <small>Call {{call_count_tuple.0}} ({{call_count_tuple.1}}) - £{{call_count_tuple.2.campaign__product_cost__sum|floatformat:2}} ({{call_count_tuple.3|floatformat:2}}%)</small>
+        <div class="row  center">
+            <div class="col p-0">
+            </div>
+            <div class="col-md-auto p-0" style="min-width:70px; color:blue;">
+                Call {{call_count_tuple.0}} ({{call_count_tuple.1}})
+            </div>
+            <div class="col-md-auto p-0 center" style="min-width:20px">
+                - 
+            </div>
+            <div class="col-md-auto p-0" style="color:green;">
+                £{{call_count_tuple.2.campaign__product_cost__sum|floatformat:2}}
+            </div>
+            <div class="col-md-auto p-0 center" style="min-width:20px">
+                - 
+            </div>
+            <div class="col-md-auto p-0" style="color:red;">
+                ({{call_count_tuple.3|floatformat:2}}%)
+            </div>
+            <div class="col p-0">
             </div>
         </div>
         {%endfor%}

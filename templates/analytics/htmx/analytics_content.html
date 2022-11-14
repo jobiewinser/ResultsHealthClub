@@ -24,17 +24,19 @@
                         <div class="col p-0 m-1 ">
                             <button
                                 hx-include=".non_site_dependant_analytics_filters, .site_dependant_analytics_filters" hx-indicator="#page_load_indicator" id="refresh_analytics"
-                                hx-get="{%url 'refresh-analytics'%}" hx-target="#analytics_span_wrapper" hx-push-url="false" hx-swap="innerHTML" class="btn btn-success btn-sm"><i class="fa-solid fa-arrows-rotate"></i> Refresh</button>
+                                onclick="$('.refresh_date_specific_analytic').click(); $('.refresh_non_date_specific_analytic').click();"
+                                {% comment %} hx-get="{%url 'refresh-analytics'%}" hx-target="#analytics_span_wrapper" hx-push-url="false" hx-swap="innerHTML"  {% endcomment %}
+                                class="btn btn-success btn-sm"><i class="fa-solid fa-arrows-rotate"></i> Refresh</button>
                         </div>
                         <div class="col-md-auto m-1 right p-0">
-                            <input id="start_date" value="{%if start_date%}{{start_date}}{%else%}{{''|today_date_tag|add_years:-1|date_to_date_input_prefill}}{%endif%}" class="form-control form-control-sm non_site_dependant_analytics_filters" type="date" name="start_date"
+                            <input id="start_date" value="{%if start_date%}{{start_date}}{%else%}{{''|today_date_tag|add_months:-1|date_to_date_input_prefill}}{%endif%}" min="{{''|today_date_tag|add_years:-3|date_to_date_input_prefill}}" max="{{''|today_date_input_tag}}" class="form-control form-control-sm non_site_dependant_analytics_filters" type="date" name="start_date"
                             onchange="$('#refresh_analytics').click();"/>
                         </div>
                         <div class="col-md-auto m-1 p-0">
                             <small>To</small>
                         </div>
                         <div class="col-md-auto m-1 left p-0">
-                            <input id="end_date" value="{%if end_date%}{{end_date}}{%else%}{{''|today_date_input_tag}}{%endif%}" class="form-control form-control-sm non_site_dependant_analytics_filters" type="date" name="end_date"
+                            <input id="end_date" value="{%if end_date%}{{end_date}}{%else%}{{''|today_date_input_tag}}{%endif%}" min="{{''|today_date_tag|add_years:-3|date_to_date_input_prefill}}" max="{{''|today_date_input_tag}}" class="form-control form-control-sm non_site_dependant_analytics_filters" type="date" name="end_date"
                             onchange="$('#refresh_analytics').click();"/>
                         </div>
                         <div class="col p-0 m-1 right">
@@ -47,16 +49,16 @@
                     Quick Filters
                     <div class="row">
                         <div class="col m-1 p-0">
-                            <button class="btn btn-secondary btn-sm nowrap {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_input_tag%}active{%endif%}" onclick="$('#start_date').val('{{''|today_date_tag|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change');">{{''|today_date_tag|nice_date_tag}} (day)</button>
+                            <button class="btn btn-secondary btn-sm nowrap quick_filter_date_button" onclick="$('#start_date').val('{{''|today_date_tag|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change'); $('.quick_filter_date_button').removeClass('active'); $(this).addClass('active');">{{''|today_date_tag|nice_date_tag}} (day)</button>
                         </div>
                         <div class="col m-1 p-0">
-                            <button class="btn btn-secondary btn-sm nowrap {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_tag|add_days:-7|date_to_date_input_prefill%}active{%endif%}" onclick="$('#start_date').val('{{''|today_date_tag|add_days:-7|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change');">{{''|today_date_tag|add_days:-7|nice_date_tag}} (week)</button>
+                            <button class="btn btn-secondary btn-sm nowrap quick_filter_date_button" onclick="$('#start_date').val('{{''|today_date_tag|add_days:-7|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change'); $('.quick_filter_date_button').removeClass('active'); $(this).addClass('active');">{{''|today_date_tag|add_days:-7|nice_date_tag}} (week)</button>
                         </div>
                         <div class="col m-1 p-0">
-                            <button class="btn btn-secondary btn-sm nowrap {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_tag|add_months:-1|date_to_date_input_prefill%}active{%endif%}" onclick="$('#start_date').val('{{''|today_date_tag|add_months:-1|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change');">{{''|today_date_tag|add_months:-1|nice_date_tag}} (month)</button>
+                            <button class="btn btn-secondary btn-sm nowrap quick_filter_date_button active" onclick="$('#start_date').val('{{''|today_date_tag|add_months:-1|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change'); $('.quick_filter_date_button').removeClass('active'); $(this).addClass('active');">{{''|today_date_tag|add_months:-1|nice_date_tag}} (month)</button>
                         </div>
                         <div class="col m-1 p-0">
-                            <button class="btn btn-secondary btn-sm nowrap {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_tag|add_years:-1|date_to_date_input_prefill%}active{%elif not end_date and not start_date%}active{%endif%}" onclick="$('#start_date').val('{{''|today_date_tag|add_years:-1|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change');">{{''|today_date_tag|add_years:-1|nice_date_tag}} (year)</button>
+                            <button class="btn btn-secondary btn-sm nowrap quick_filter_date_button" onclick="$('#start_date').val('{{''|today_date_tag|add_years:-1|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change'); $('.quick_filter_date_button').removeClass('active'); $(this).addClass('active');">{{''|today_date_tag|add_years:-1|nice_date_tag}} (year)</button>
                         </div>
                     </div>
                 </div>
@@ -64,6 +66,7 @@
         </div>
         <div class="col">
             <button hidden id="refresh_calls_today" hx-trigger="load, click delay:0.5s"
+                class="refresh_non_date_specific_analytic"
                 hx-get="{%url 'get-calls-today' %}"
                 hx-include="#start_date, #end_date, #site_pk, #campaign_pk, #graph_type_calls_today"
                 hx-target="#calls_today_card_body"
@@ -86,6 +89,7 @@
         </div>
         <div class="col">
             <button hidden id="refresh_current_call_count_distribution" hx-trigger="load, click delay:0.5s"
+                class="refresh_non_date_specific_analytic"
                 hx-get="{%url 'get-current-call-count-distribution' %}"
                 hx-include="#start_date, #end_date, #site_pk, #campaign_pk, #graph_type_current_call_count_distribution"
                 hx-target="#current_call_count_distribution_card_body"
