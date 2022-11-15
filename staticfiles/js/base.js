@@ -57,7 +57,6 @@ function basehandlehtmxafterRequest(evt){
     $('.popover').remove()
     let status = evt.detail.xhr.status;
     let srcElement = $(evt.srcElement);
-    let src_id = srcElement.attr('id');
     if(status == 200) {
         if (![undefined, ''].includes(evt.detail.pathInfo.path)){
             if (evt.detail.pathInfo.path.includes("login")){
@@ -79,12 +78,9 @@ function basehandlehtmxafterRequest(evt){
                 // }, 2000);
             }
         }
-    } else if (status == 404) {
-        if ($('#'+src_id+"_error").length == 0){                                
-            $("#"+src_id).after("<div id='"+src_id+"_error' style='color:red'>Not Found</div>");
-        } else {                                
-            $('#'+src_id+"_error").html("<div id='"+src_id+"_error' style='color:red'>Not Found</div>");
-        }
+    } else if (status == 404) {    
+        $('#login_error').remove();                  
+        srcElement.after("<div id='login_error' style='color:red'>Not Found</div>");
     }else if (status == 500){
         snackbarShow('Error: '+evt.detail.xhr.response, 'danger')           
     }

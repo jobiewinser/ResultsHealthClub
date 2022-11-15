@@ -217,7 +217,8 @@ class CampaignLeadsProductPageView(TemplateView):
     template_name='core/campaign_leads_product_page.html'
 
 
-
+from ratelimit.decorators import ratelimit
+@ratelimit(key='ip', rate='10/h')
 def custom_login_post(request):    
     user = authenticate(username=request.POST.get('username', ''), email=request.POST.get('email', ''), password=request.POST.get('password', ''))
     if user:
