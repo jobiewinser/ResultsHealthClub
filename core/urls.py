@@ -18,7 +18,7 @@ import core.views as coreviews
 import core.htmx as corehtmx
 urlpatterns = [
     # Public Facing
-    path('products/campaign-leads-product-page', coreviews.CampaignLeadsProductPageView.as_view(), name='campaign-leads-product-page' ),
+    # path('products/campaign-leads-product-page', coreviews.CampaignLeadsProductPageView.as_view(), name='campaign-leads-product-page' ),
     path('login-htmx', coreviews.custom_login_post, name='login-htmx' ),
 
     path('', coreviews.CustomerHomeView.as_view(), name='customer-home'),

@@ -13,6 +13,7 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-lg-0">
+        {%if request.user.is_authenticated%}
         <li class="nav-item">
             <a class="nav-link pointer" hx-indicator="#page_load_indicator"
             hx-get="{%url 'campaign-leads-overview'%}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML"><i class="fa-light fa-magnifying-glass"></i> Leads</a>
@@ -41,7 +42,7 @@
                 hx-get="{%url 'whatsapp-templates'%}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML">Whatsapp Templates</a></li>
             </ul>
         </li>
-        
+        {%endif%}
         <li class="nav-item">
             <img  class="top-htmx-indicator htmx-indicator" id="top-htmx-indicator" src="https://htmx.org/img/bars.svg"/>
         </li>
