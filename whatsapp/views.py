@@ -190,8 +190,8 @@ def handle_received_whatsapp_image_message(message_json, metadata, webhook_objec
         lead=lead,
         raw_webhook=webhook_object,
         whatsappnumber=whatsappnumber,
-        image=image_object,
     )    
+    whatsapp_message.image.set(image_object)
     new_message_to_websocket(whatsapp_message, whatsappnumber)
 
 
