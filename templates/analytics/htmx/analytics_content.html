@@ -9,7 +9,7 @@
             onclick="$('.htmx-indicator-base-analytics').addClass('htmx-request')">refresh</button>
 
     <div class="row my-3">
-        <div class="col">
+        <div class="col analytics_col">
             <div class="card analytics-card">
                 <div class="card-header">
                     <h5 data-bs-toggle="popover" 
@@ -64,7 +64,7 @@
                 </div>
             </div>
         </div>
-        <div class="col">
+        <div class="col analytics_col">
             <button hidden id="refresh_calls_today" hx-trigger="load, click delay:0.5s"
                 class="refresh_non_date_specific_analytic"
                 hx-get="{%url 'get-calls-today' %}"
@@ -87,7 +87,7 @@
                 </div>
             </div>
         </div>
-        <div class="col">
+        <div class="col analytics_col">
             <button hidden id="refresh_current_call_count_distribution" hx-trigger="load, click delay:0.5s"
                 class="refresh_non_date_specific_analytic"
                 hx-get="{%url 'get-current-call-count-distribution' %}"
@@ -115,7 +115,7 @@
     {%include 'analytics/htmx/base_analytics.html'%}    
     
     <div class="row my-3">
-        <div class="col">
+        <div class="col analytics_col">
             <button hidden id="refresh_leads_to_sales" class="refresh_date_specific_analytic" hx-trigger="load, click delay:0.5s"
                 hx-get="{%url 'get-leads-to-sales' %}"
                 hx-include="#start_date, #end_date, #site_pk, #campaign_pk, #graph_type_leads_to_sales"
@@ -138,7 +138,7 @@
             </div>
         </div>
         
-        <div class="col">
+        <div class="col analytics_col">
             <button hidden id="refresh_leads_to_bookings" class="refresh_date_specific_analytic" hx-trigger="load, click delay:0.5s"
                 hx-get="{%url 'get-leads-to-bookings' %}"
                 hx-include="#start_date, #end_date, #site_pk, #campaign_pk, #graph_type_leads_to_bookings"
@@ -162,7 +162,7 @@
             </div>
         </div>
         
-        <div class="col">
+        <div class="col analytics_col">
             <button hidden id="refresh_calls_made_per_day" class="refresh_date_specific_analytic" hx-trigger="load, click delay:0.5s"
                 hx-get="{%url 'get-calls-made-per-day' %}"
                 hx-include="#start_date, #end_date, #site_pk, #campaign_pk, #graph_type_calls_made_per_day"
