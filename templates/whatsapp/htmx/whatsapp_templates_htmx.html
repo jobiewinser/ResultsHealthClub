@@ -14,7 +14,7 @@
         </div> {% endcomment %}
         {%with True as hide_show_all%}
         {%include 'core/htmx/site_selection.html'%}
-        <button hidden hx-get="" hx-push-url="false" hx-swap="innerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator=".htmx-indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
+        <button hidden hx-get="" hx-push-url="false" hx-swap="innerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
         {%endwith%}    
         {%endblock extra_top_left_buttons %}
         <div class="col">

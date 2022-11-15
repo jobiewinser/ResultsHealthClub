@@ -31,10 +31,10 @@
         </div> {% endcomment %}
         {%include 'core/htmx/site_selection.html'%}
 
-        <button hidden hx-get="{% url 'analytics-overview' %}" hx-push-url="false" hx-swap="innerHTML" hx-include=".non_site_dependant_analytics_filters" hx-indicator=".top-htmx-indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
+        <button hidden hx-get="{% url 'analytics-overview' %}" hx-push-url="false" hx-swap="innerHTML" hx-include=".non_site_dependant_analytics_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
         <button hidden
             hx-get="{%url 'refresh-analytics'%}"
-            hx-swap="outerHTML" hx-push-url="false" hx-include=".non_site_dependant_analytics_filters" hx-indicator=".htmx-indicator" hx-target="#analytics_span_wrapper" id="filter_campaign"></button>
+            hx-swap="outerHTML" hx-push-url="false" hx-include=".non_site_dependant_analytics_filters" hx-indicator="#page_load_indicator" hx-target="#analytics_span_wrapper" id="filter_campaign"></button>
 
             <div class="col-md-auto m-1" hx-get="{% url 'get-campaign'%}" hx-include=".non_site_dependant_analytics_filters" hx-trigger="load" hx-indicator=".htmx-indicator" hx-target="#campaign_list_span" hx-swap="outerHTML">
             <span id="campaign_list_span">   

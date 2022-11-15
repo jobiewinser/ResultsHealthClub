@@ -747,3 +747,7 @@ tr.odd td {
 .analytics_col{
     max-width:50%
 }
+
+#top-htmx-indicator{
+    height:30px
+}
