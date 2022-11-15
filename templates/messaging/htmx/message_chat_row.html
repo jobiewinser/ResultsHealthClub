@@ -20,7 +20,7 @@
         <div class="col-md-auto p-0 pe-1 ps-1 ps-1 m-1 card borderless chat_row_{{message.customer_number}} bg-secondary-trans-80 text-white" style="max-width:70%">
             {%if message.message%}
                 {{message.message}}
-            {%elif message.image.all%}
+            {%if message.image.all%}
                 {% for image in message.image.all%}
                 <img type="button" class="pointer m-1"
                     hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
@@ -66,7 +66,7 @@
                 <span>
                     {%if message.message%}
                     {%if message.failed%}<i class="fa-solid fa-triangle-exclamation" style="color:red"></i>{%endif%} {{message.message}}
-                    {%elif message.image.all%}
+                    {%if message.image.all%}
                         {% for image in message.image.all%}
                         <img type="button" class="pointer m-1"
                             hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
