@@ -5,6 +5,10 @@
     /* text-align:right; */
     width: unset;
     overflow-x: hidden;
+    overflow-y: hidden;
+    display: flex;
+    /* flex-wrap: wrap; */
+    align-items: flex-start;
 }
 
 #chat_bottom.temp_hidden {

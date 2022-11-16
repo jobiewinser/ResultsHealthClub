@@ -16,8 +16,11 @@
         </div>
     </div>
     <div class="collapse show" id="messageCollapse_{{whatsappnumber.pk}}_wrapper">
-        <div class="card-body ps-2 p-0 bg-secondary text-white" id="messageFilters_{{whatsappnumber.pk}}">
-            <div class="row">
+        <div class="card-body p-0 bg-secondary text-white" id="messageFilters_{{whatsappnumber.pk}}">
+            <div class="htmx-indicator disconnected_indicator message_count_disconnected_indicator">
+                <b>Connecting</b> <img class="invert" src="https://htmx.org/img/bars.svg">
+            </div>
+            <div class="row ps-2">
                 <div class="col-md-auto p-1 right">
                     <small>Search</small> 
                 </div>
@@ -36,7 +39,7 @@
                         hx-indicator="#htmx_indicator_messageCollapse_{{whatsappnumber.pk}}"/>
                 </div>
             </div>
-            <div class="row">
+            <div class="row ps-2">
                 <div class="col p-1 ">
                     <div class="form-check form-switch">
                         <small>Only Show Received</small> 

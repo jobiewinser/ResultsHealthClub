@@ -1,11 +1,5 @@
 {%load static core_tags user_permission_tags%}
-<span id="chat_bottom" class="" {%if whatsappnumber%}hx-ws="connect:/ws/messaging/{{whatsappnumber.pk}}/"{%endif%}
-style="  
-display: flex;
-flex-wrap: wrap;
-align-items: flex-start;" 
-{% comment %} hx-ws="connect:/ws/messaging/{{site.pk}}/" {% endcomment %}
->
+<span id="chat_bottom" class="" {%if whatsappnumber%}hx-ws="connect:/ws/messaging/{{whatsappnumber.pk}}/" hx-indicator="#page_load_indicator"{%endif%}>
     <script>
         $(document).ready(function() {   
             {% if site%}      
@@ -17,7 +11,8 @@ align-items: flex-start;"
                     let phone_number = src.data('customer-number');         
                     let whatsappnumber_pk = src.data('whatsappnumber-pk');            
                     if ($('#chat_card_'+phone_number).length > 0){
-                        evt.preventDefault()
+                        {% comment %} evt.preventDefault() {% endcomment %}
+                        $('#chat_card_'+phone_number).remove()
                     } else {
                     }
                 }
@@ -26,59 +21,63 @@ align-items: flex-start;"
     </script>
 
     <link href="{% static 'css/chat.css' %}" rel="stylesheet" />
-        <span id="next_chat_window"></span>
 
-        {%for customer_number in customer_numbers%}
-        {%if customer_number and whatsappnumber%}
-        <span hx-get="{%url 'message-window' customer_number=customer_number whatsappnumber_pk=whatsappnumber.pk%}"
-            hx-indicator=".htmx-indicator" 
-            hx-push-url="false"
-            hx-swap="outerHTML" hx-trigger="load"></span>
-        {%endif%}
-        {%endfor%}
+    {%for customer_number in customer_numbers%}
+    {%if customer_number and whatsappnumber%}
+    <span hx-get="{%url 'message-window' customer_number=customer_number whatsappnumber_pk=whatsappnumber.pk%}"
+        hx-indicator=".htmx-indicator" 
+        hx-push-url="false"
+        hx-swap="outerHTML" hx-trigger="load"></span>
+    {%endif%}
+    {%endfor%}
+    <span id="next_chat_window"></span>
 
-        {%if whatsappnumber%}
-        {%include 'messaging/message_list.html'%}
-        {%endif%}
-        <div class="card p-0" id="" style="margin-top: auto;" hx-ws="connect:/ws/message_count/{{request.user.profile.company.pk}}/">
-            <div class="card-header chat_bottom_header ps-2" data-bs-toggle="collapse" data-bs-target="#siteCollapse" aria-expanded="false" aria-controls="siteCollapse">
-                <span class="primary_td_layer text-white">
-                    <span class="badge bg-light badge-sm me-1"><i class="fa fa-whatsapp me-1"></i><span class="company_message_count">{{request.user|company_outstanding_whatsapp_messages_tag}}</span></span>Messaging Sites 
-                </span>
+    {%if whatsappnumber%}
+    {%include 'messaging/message_list.html'%}
+    {%endif%}
+    <div class="card p-0" id="" style="margin-top: auto;" hx-ws="connect:/ws/message_count/{{request.user.profile.company.pk}}/">
+
+        <div class="card-header chat_bottom_header ps-2" data-bs-toggle="collapse" data-bs-target="#siteCollapse" aria-expanded="false" aria-controls="siteCollapse">
+            <span class="primary_td_layer text-white">
+                <span class="badge bg-light badge-sm me-1"><i class="fa fa-whatsapp me-1"></i><span class="company_message_count">{{request.user|company_outstanding_whatsapp_messages_tag}}</span></span>Messaging Sites 
+            </span>
+        </div>
+        <div class="card-body collapse show p-0" id="siteCollapse">
+            <div class="htmx-indicator disconnected_indicator message_count_disconnected_indicator">
+                <b>Connecting</b> <img class="invert" src="https://htmx.org/img/bars.svg">
             </div>
-            <div class="card-body collapse show p-0" id="siteCollapse">
-                <div class="accordion accordion-flush" id="accordionFlushExample" style="margin-top: auto;">
-                    {%with request.user|get_allowed_site_chats_for_user_tag as chat_sites%}
-                    {%for site in chat_sites%}   
-                        <div class="accordion-item">
-                        <h2 class="accordion-header" id="flush-headingOne">
-                            <button class="accordion-button no-chevron-button ps-2 {%if whatsappnumber.site == site%} active{%else%} collapsed{%endif%}" type="button" data-bs-toggle="collapse" data-bs-target="#site_collapse_{{site.pk}}" aria-expanded="false" aria-controls="site_collapse_{{site.pk}}" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
-                                <span class="badge bg-dark badge-sm me-1"><i class="fa fa-whatsapp me-1"></i><span class="site_message_count_{{site.pk}}">{{site|site_outstanding_whatsapp_messages_tag:request.user}}</span></span>  <b>{{site.name}}</b>
-                            </button>
-                        </h2>
-                        <div id="site_collapse_{{site.pk}}" class="accordion-collapse collapse {%if whatsappnumber.site == site%} show{%endif%}" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
-                            <div class="accordion-body" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
-                                {%for chat_whatsappnumber in site.return_phone_numbers%}
-                                    <button class="btn btn-sm btn-secondary {%if chat_whatsappnumber == whatsappnumber%}active{%endif%} btn-xs"
-                                    hx-get="{%url 'message-list'%}"
-                                    hx-target="#chat_bottom"
-                                    hx-swap="#outerHTML"
-                                    hx-indicator=".htmx-indicator"                 
-                                    hx-vals='{"site_pk": "{{site.pk}}", "whatsappnumber_pk": "{{chat_whatsappnumber.pk}}"}'
-                                    hx-trigger="click"
-                                    
-                                    ><span class="badge bg-dark badge-sm me-1"><i class="fa fa-whatsapp me-1"></i><span class="whatsappnumber_message_count_{{chat_whatsappnumber.pk}}">{{chat_whatsappnumber|whatsappnumber_outstanding_whatsapp_messages_tag:request.user}}</span></span>
-                                     {%if chat_whatsappnumber.alias%}{{chat_whatsappnumber.alias}}{%else%}{{chat_whatsappnumber.number}}{%endif%}</button>
-                                    <br>
-                                {%endfor%}
-                            </div>
+            <div class="accordion accordion-flush" id="accordionFlushExample" style="margin-top: auto;">
+                {%with request.user|get_allowed_site_chats_for_user_tag as chat_sites%}
+                {%for site in chat_sites%}   
+                    <div class="accordion-item">
+                    <h2 class="accordion-header" id="flush-headingOne">
+                        <button class="accordion-button no-chevron-button ps-2 {%if whatsappnumber.site == site%} active{%else%} collapsed{%endif%}" type="button" data-bs-toggle="collapse" data-bs-target="#site_collapse_{{site.pk}}" aria-expanded="false" aria-controls="site_collapse_{{site.pk}}" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
+                            <span class="badge bg-dark badge-sm me-1"><i class="fa fa-whatsapp me-1"></i><span class="site_message_count_{{site.pk}}">{{site|site_outstanding_whatsapp_messages_tag:request.user}}</span></span>  <b>{{site.name}}</b>
+                        </button>
+                    </h2>
+                    <div id="site_collapse_{{site.pk}}" class="accordion-collapse collapse {%if whatsappnumber.site == site%} show{%endif%}" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+                        <div class="accordion-body" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
+                            {%for chat_whatsappnumber in site.return_phone_numbers%}
+                                <button class="btn btn-sm btn-secondary {%if chat_whatsappnumber == whatsappnumber%}active{%endif%} btn-xs"
+                                hx-get="{%url 'message-list'%}"
+                                hx-target="#chat_bottom"
+                                hx-swap="outerHTML"
+                                hx-indicator=".htmx-indicator"                 
+                                hx-vals='{"site_pk": "{{site.pk}}", "whatsappnumber_pk": "{{chat_whatsappnumber.pk}}"}'
+                                hx-trigger="click"
+                                
+                                ><span class="badge bg-dark badge-sm me-1"><i class="fa fa-whatsapp me-1"></i><span class="whatsappnumber_message_count_{{chat_whatsappnumber.pk}}">{{chat_whatsappnumber|whatsappnumber_outstanding_whatsapp_messages_tag:request.user}}</span></span>
+                                    {%if chat_whatsappnumber.alias%}{{chat_whatsappnumber.alias}}{%else%}{{chat_whatsappnumber.number}}{%endif%}</button>
+                                <br>
+                            {%endfor%}
                         </div>
-                        </div>
-                    {%endfor%}
-                    {%endwith%}
-                </div>
+                    </div>
+                    </div>
+                {%endfor%}
+                {%endwith%}
             </div>
         </div>
+    </div>
 </span>
 
 {% comment %} {%if chat_site%}

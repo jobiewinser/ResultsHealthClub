@@ -24,7 +24,7 @@
                 <button class="btn btn-sm btn-success text-white position-relative"                     
                     hx-get="{%url 'message-list'%}"
                     hx-target="#chat_bottom"
-                    hx-swap="#outerHTML"
+                    hx-swap="outerHTML"
                     hx-indicator=".htmx-indicator"                 
                     hx-vals='{"site_pk": "{{lead.campaign.site.pk}}", "customer_number": "{{lead.whatsapp_number}}"}'
                     hx-trigger="click"

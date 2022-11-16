@@ -20,6 +20,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.user = self.scope["user"]
         await self.channel_layer.group_add(self.group_name, self.channel_name)
         await self.accept()
+        await self.channel_layer.group_send(
+            self.group_name,
+            {
+                'type': 'chatbox_message',
+                'message': f"""<span hx-swap-oob="outerHTML:.messaging_disconnected_indicator">
+                                            <div class="htmx-indicator disconnected_indicator messaging_disconnected_indicator">
+                                                <b>Connecting</b> <img class="invert" src="https://htmx.org/img/bars.svg">
+                                            </div>
+                                        </span>""",
+            }
+        )
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(self.group_name, self.channel_name)
@@ -219,6 +230,19 @@ class CompanyMessageCountConsumer(AsyncWebsocketConsumer):
         self.user = self.scope["user"]
         await self.channel_layer.group_add(self.group_name, self.channel_name)
         await self.accept()
+        await self.channel_layer.group_send(
+            self.group_name,
+            {
+                'type': 'messsages_count_update',
+                'data':{
+                    'rendered_html':f"""<span hx-swap-oob="outerHTML:.message_count_disconnected_indicator">
+                                            <div class="htmx-indicator disconnected_indicator message_count_disconnected_indicator">
+                                                <b>Connecting</b> <img class="invert" src="https://htmx.org/img/bars.svg">
+                                            </div>
+                                        </span>""",
+                }
+            }
+        )
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(self.group_name, self.channel_name)

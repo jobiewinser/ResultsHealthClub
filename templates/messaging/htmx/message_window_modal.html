@@ -1,4 +1,4 @@
-<div class="generic_modal_contents">
+{% comment %} <div class="generic_modal_contents">
     <div class="row">
         <div class="col" {%if whatsappnumber%}hx-ws="connect:/ws/messaging/{{whatsappnumber.pk}}/"{%endif%}>
             {%include 'messaging/message_window_body.html'%}   
@@ -15,4 +15,4 @@
 </div>
 <span hx-swap-oob="true" id="generic_modal_title">
     {%include 'messaging/message_window_header.html'%}
-</span>
+</span> {% endcomment %}

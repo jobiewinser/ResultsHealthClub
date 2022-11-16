@@ -6,6 +6,7 @@
         hx-target="#next_chat_window"
         hx-push-url="false"
         hx-swap="outerHTML" hx-trigger="click"
+        onclick="$('chat_card_{{message.customer_number}}').remove()"
     {%endif%}
 
     {%if message.active_errors%}
