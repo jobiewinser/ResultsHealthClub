@@ -64,7 +64,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 await self.channel_layer.group_send(
                     f"message_count_{company_pk}",
                     {
-                        'type': 'messsages_count_update',
+                        'type': 'messages_count_update',
                         'data':{
                             'rendered_html':f"""<span hx-swap-oob="afterbegin:.company_message_count"><span hx-trigger="load" hx-swap="none" hx-get="/update-message-counts/"></span>""",
                         }
@@ -190,6 +190,21 @@ class LeadsConsumer(AsyncWebsocketConsumer):
         self.user = self.scope["user"]
         await self.channel_layer.group_add(self.group_name, self.channel_name)
         await self.accept()
+        await self.channel_layer.group_send(
+            self.group_name,
+            {
+                'type': 'lead_update',
+                'data':{
+                    'rendered_html':f"""<span hx-swap-oob="outerHTML:.leads_disconnected_indicator">
+                                            <div class="htmx-indicator whole_page_disconnected_indicator leads_disconnected_indicator">
+                                                <div class="whole_page_disconnected_indicator_content">
+                                                    <b>Connecting</b> <img class="invert" src="https://htmx.org/img/bars.svg">
+                                                </div>
+                                            </div>
+                                        </span>""",
+                }
+            }
+        )
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(self.group_name, self.channel_name)
@@ -210,9 +225,7 @@ class LeadsConsumer(AsyncWebsocketConsumer):
     # Receive message from room group.    
     async def lead_update(self, event):
         await self.send(
-            text_data=json.dumps({
-                'message':event['data']['rendered_html']
-            })
+            text_data=event['data']['rendered_html']
         )
     # async def lead_move(self, event):
     #     await self.send(
@@ -233,7 +246,7 @@ class CompanyMessageCountConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_send(
             self.group_name,
             {
-                'type': 'messsages_count_update',
+                'type': 'messages_count_update',
                 'data':{
                     'rendered_html':f"""<span hx-swap-oob="outerHTML:.message_count_disconnected_indicator">
                                             <div class="htmx-indicator disconnected_indicator message_count_disconnected_indicator">
@@ -261,8 +274,7 @@ class CompanyMessageCountConsumer(AsyncWebsocketConsumer):
     #         )
 
     # Receive message from room group.    
-    async def messsages_count_update(self, event):
-        print(event['data']['rendered_html'])
+    async def messages_count_update(self, event):
         await self.send(
             text_data=event['data']['rendered_html']
         )

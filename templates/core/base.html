@@ -92,7 +92,10 @@
                     $('.message_count_disconnected_indicator').addClass('htmx-request');
                 }else if(evt.detail.socket.url.includes("ws/messaging")){
                     $('.messaging_disconnected_indicator').addClass('htmx-request');
+                }else if(evt.detail.socket.url.includes("ws/lead")){
+                    $('.leads_disconnected_indicator').addClass('htmx-request');
                 }
+                
             }
             document.body.addEventListener('htmx:wsError', handlehtmxwsError);
 

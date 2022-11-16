@@ -259,7 +259,7 @@ def new_message_to_websocket(whatsapp_message, whatsapp_number):
     async_to_sync(channel_layer.group_send)(
         f"message_count_{whatsapp_message.whatsappnumber.site.company.pk}",
         {
-            'type': 'messsages_count_update',
+            'type': 'messages_count_update',
             'data':{
                 'rendered_html':f"""<span hx-swap-oob="afterbegin:.company_message_count"><span hx-trigger="load" hx-swap="none" hx-get="/update-message-counts/"></span>""",
             }
