@@ -52,6 +52,28 @@
     <script>  
         $(document).ready(function() {
             
+            document.body.onkeydown = function(e) {
+                var current_module = $('#current_page').val()
+                if (current_module == 'campaign_leads_overview'){
+                    if (e.key == " " ||
+                        e.code == "Space" ||      
+                        e.keyCode == 32      
+                    ) {
+                        let drag_elem = null;
+                        let hover_elem = $(':hover').last();
+                        if (hover_elem.hasClass('.column-drag')){
+                            drag_elem = hover_elem;
+                        } else{                    
+                            drag_elem = hover_elem.closest('.column-drag');
+                        }    
+                        if (drag_elem.length != 0)  {  
+                            e.preventDefault();
+                            htmx.ajax('GET', '/campaign-leads/toggle-claim-lead/'+drag_elem.data('id')+'/', {swap:"none"})
+                        }
+                    }
+                }
+            }
+            
             function handlehtmxafterSwap(evt){
                 var current_module = $('#current_page').val()
                 if (current_module == 'analytics_overview'){
