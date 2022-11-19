@@ -567,8 +567,8 @@ def send_new_template_message(request):
         else:
             if not first_name:
                 return HttpResponse("Please enter a first name", status=400)
-            if not country_code:
-                return HttpResponse("Please choose a country code", status=400)
+            # if not country_code:
+            #     return HttpResponse("Please choose a country code", status=400)
             if not phone:
                 return HttpResponse("Please enter a phone number", status=400)
             site = whatsappnumber.whatsapp_business_account.site
