@@ -42,9 +42,17 @@
 <td> 
     {%if template.message_template_id%}{{template.message_template_id}}{%else%}<i>Not Submitted Yet</i>{%endif%}  
 </td>
-<td class="double_layer_td">
+<td class="double_layer_td"
+{%if template.latest_reason%}
+    data-bs-toggle="popover" 
+    data-bs-trigger="hover" 
+    data-bs-placement="right"
+    data-bs-html="true"
+    data-bs-title="Reason for latest status"
+    data-bs-content="{{template.latest_reason}}"
+{%endif%}>
     <span class="primary_td_layer">
-        {%if template.status%}{{template.status}}{%endif%} 
+        {%if template.status%}{{template.status}}{%endif%} {%if template.latest_reason%}<i class="fa-solid fa-circle-info"></i>{%endif%}
         {%if template.active_errors%}
         <span 
             data-bs-toggle="popover" 

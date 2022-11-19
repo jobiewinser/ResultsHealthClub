@@ -128,6 +128,8 @@ class WhatsappTemplate(models.Model):
 
     message_template_id = models.TextField(null=True, blank=True)
 
+    latest_reason = models.TextField(null=True, blank=True)
+
     name = models.TextField(null=True, blank=True)
     pending_name = models.TextField(null=True, blank=True)
     

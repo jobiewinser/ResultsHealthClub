@@ -131,10 +131,10 @@ class Webhooks(View):
                                     template.status=value.get('event')
                                     reason = value.get('reason', None)
                                     print("TEMPLATE REASON", str(reason))
-                                    # if reason and not reason.lower() == 'none':
-                                    #     template.latest_reason=value.get('reason')
-                                    # else:
-                                    #     template.latest_reason=None
+                                    if reason and not reason.lower() == 'none':
+                                        template.latest_reason=value.get('reason')
+                                    else:
+                                        template.latest_reason=None
                                     template.name=value.get('message_template_name')
                                     template.language=value.get('message_template_language')
                                     whatsapp = Whatsapp(template.site.whatsapp_access_token)
