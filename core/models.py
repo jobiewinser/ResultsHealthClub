@@ -551,10 +551,12 @@ class Profile(models.Model):
         return warnings
         
     def __str__(self):
-        if self.user.first_name or self.user.last_name:
-            return f"{self.user.first_name} {self.user.last_name}"
-        else:
-            return str(self.pk)
+        try:
+            if self.user.first_name or self.user.last_name:
+                return f"{self.user.first_name} {self.user.last_name}"
+        except:
+            pass
+        return str(self.pk)
     @property
     def name(self):
         return f"{self.user.first_name} {self.user.last_name}"
