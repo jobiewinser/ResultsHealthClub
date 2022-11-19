@@ -24,7 +24,7 @@ function whatsapptemplateshandlehtmxafterRequest(evt){
         if (evt.detail.pathInfo.requestPath.includes('whatsapp-change-template-site')){
             $('#generic_modal').modal('hide');
             snackbarShow('Successfully transferred template', 'success')
-        }else if (evt.detail.pathInfo.requestPath.includes('whatsapp-approval')){
+        }else if (evt.detail.pathInfo.requestPath.includes('whatsapp-templates-approval')){
             location.reload();
         }
     }
