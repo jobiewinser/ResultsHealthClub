@@ -13,8 +13,8 @@ class Command(BaseCommand):
             day_ago =  datetime.now() - timedelta(days = 1)
             if not whatsapp_messages.filter(datetime__gte=day_ago):
                 if not whatsapp_messages.filter(send_order=1):
-                    campaign_lead.send_template_whatsapp_message(send_order=1, communication_method='a')
+                    campaign_lead.send_template_whatsapp_message(send_order=1)
                 elif not whatsapp_messages.filter(send_order=2):
-                    campaign_lead.send_template_whatsapp_message(send_order=2, communication_method='a')
+                    campaign_lead.send_template_whatsapp_message(send_order=2)
                 elif not whatsapp_messages.filter(send_order=3):
-                    campaign_lead.send_template_whatsapp_message(send_order=3, communication_method='a')
+                    campaign_lead.send_template_whatsapp_message(send_order=3)

@@ -349,7 +349,7 @@ class Campaignlead(models.Model):
 def execute_after_save(sender, instance, created, *args, **kwargs):
     if created and not instance.complete:
         try:
-            instance.send_template_whatsapp_message(send_order=1, communication_method='a')
+            instance.send_template_whatsapp_message(send_order=1)
         except:
             pass
         
