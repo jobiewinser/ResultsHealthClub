@@ -134,7 +134,7 @@ class Webhooks(View):
                             if template:
                                 template.status=value.get('event')
                                 reason = value.get('reason', None)
-                                print("TEMPLATE REASON", str(reason))
+                                
                                 if reason and not reason.lower() == 'none':
                                     template.latest_reason=value.get('reason')
                                 else:
@@ -143,7 +143,7 @@ class Webhooks(View):
                                 template.language=value.get('message_template_language')
                                 whatsapp = Whatsapp(template.site.whatsapp_access_token)
                                 template_live = whatsapp.get_template(template.site.whatsapp_business_account_id, template.message_template_id)
-                                # if value.get('event', "") == 'APPROVED':
+
                                 template.name = template_live.get('name')
                                 template.pending_name = ""
 
@@ -152,7 +152,7 @@ class Webhooks(View):
 
                                 template.language = template_live.get('language')
                                 template.pending_language = ""
-                                print("template.pending_components", str(template.pending_components))
+                                
                                 template.components = template.pending_components
                                 template.pending_components = []
 
