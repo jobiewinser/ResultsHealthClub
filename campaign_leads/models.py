@@ -178,6 +178,7 @@ class Campaignlead(models.Model):
                             ).update(archived = True)
                             whatsapp = Whatsapp(self.campaign.site.whatsapp_access_token)
                             template_live = whatsapp.get_template(template.site.whatsapp_business_account_id, template.message_template_id)
+                            print(template_live)
                             template.name = template_live['name']
 
                             template.category = template_live['category']
