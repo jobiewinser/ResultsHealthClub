@@ -64,12 +64,9 @@ def message_window(request, **kwargs):
     # messages = WhatsAppMessage.objects.filter(customer_number=kwargs.get('customer_number'), whatsappnumber=whatsappnumber).order_by('-datetime')[:20:-1]
     context = {}
     context["messages"] = messages
-    lead = Campaignlead.objects.filter(whatsapp_number=kwargs.get('customer_number')).last()
-    contact = Contact.objects.filter(customer_number=kwargs.get('customer_number')).last()
-    print()
     if get_user_allowed_to_use_site_messaging(request.user, whatsappnumber.site):
-        context["lead"] = lead
-        context["contact"] = contact
+        context["lead"] = Campaignlead.objects.filter(whatsapp_number=kwargs.get('customer_number')).last()
+        context["contact"] = Contact.objects.filter(customer_number=kwargs.get('customer_number')).last()
         context["customer_number"] = kwargs.get('customer_number')
         context['whatsappnumber'] = whatsappnumber
         return render(request, "messaging/message_window_htmx.html", context)

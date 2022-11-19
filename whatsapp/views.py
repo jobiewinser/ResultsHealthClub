@@ -541,14 +541,26 @@ def save_whatsapp_template_ajax(request):
 @login_required
 def send_new_template_message(request):
     whatsappnumber = WhatsappNumber.objects.get(pk=request.POST.get('whatsappnumber_pk'))
-    template = WhatsappTemplate.objects.get(pk=request.POST.get('template_pk'))
+    template = WhatsappTemplate.objects.filter(pk=request.POST.get('template_pk')).first()
+    contact = Contact.objects.filter(pk=request.POST.get('contact_pk', 0)).first()
+    lead = Campaignlead.objects.filter(pk=request.POST.get('lead_pk', 0)).first()
+    country_code = request.POST.get('country_code')
+    phone = request.POST.get('phone')
+    first_name = request.POST.get('first_name')
     if get_user_allowed_to_send_from_whatsappnumber(request.user, whatsappnumber) and template:
-        site = whatsappnumber.whatsapp_business_account.site
-        contact, created = Contact.objects.get_or_create(site=site, customer_number=f"{request.POST.get('country_code')}{request.POST.get('phone')}")
-        contact.first_name = request.POST.get('first_name')
-        contact.save()
-        if contact.send_template_whatsapp_message(whatsappnumber, template=template):
-            return HttpResponse("", status=200)
+        if contact:
+            if contact.send_template_whatsapp_message(whatsappnumber, template=template):
+                return HttpResponse("", status=200)
+        elif lead:
+            if lead.send_template_whatsapp_message(template=template, communication_method='a'):
+                return HttpResponse("", status=200)
+        elif country_code and phone and first_name:
+            site = whatsappnumber.whatsapp_business_account.site
+            contact, created = Contact.objects.get_or_create(site=site, customer_number=f"{country_code}{phone}")
+            contact.first_name = first_name
+            contact.save()
+            if contact.send_template_whatsapp_message(whatsappnumber, template=template):
+                return HttpResponse("", status=200)
         return HttpResponse("", status=500)
 
     return HttpResponse("", status=403)

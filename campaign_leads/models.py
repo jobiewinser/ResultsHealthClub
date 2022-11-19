@@ -148,13 +148,16 @@ class Campaignlead(models.Model):
             elif send_order == 3:
                 template = self.campaign.third_send_template
                 type = '1205'
+            else:
+                type = None
             
-            if template:                
-                AttachedError.objects.filter(
-                    type = type,
-                    campaign_lead = self,
-                    archived = False,
-                ).update(archived = True)
+            if template:      
+                if type:          
+                    AttachedError.objects.filter(
+                        type = type,
+                        campaign_lead = self,
+                        archived = False,
+                    ).update(archived = True)
                 if template.site.whatsapp_business_account_id:                    
                     AttachedError.objects.filter(
                         type = '1202',

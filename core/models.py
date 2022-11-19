@@ -376,10 +376,10 @@ class Site(models.Model):
         return f"({self.pk}) {self.name}"
     @property
     def active_templates(self):
-        return self.whatsapptemplate_set.exclude(archived=True)
+        return self.whatsapptemplate_set.exclude(archived=True).exclude(name__icontains="sample")
     @property
     def active_live_templates(self):
-        return self.whatsapptemplate_set.filter(status="APPROVED").exclude(archived=True)
+        return self.whatsapptemplate_set.filter(status="APPROVED").exclude(archived=True).exclude(name__icontains="sample")
         
     def outstanding_whatsapp_messages(self, user):
         # Readdress this, I can't find a good way to get latest message for each conversation, then filter based on the last message being inbound...

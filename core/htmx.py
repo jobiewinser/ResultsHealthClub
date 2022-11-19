@@ -2,7 +2,7 @@ import json
 import os
 import uuid
 from calendly.api import Calendly
-from core.models import ROLE_CHOICES, FreeTasterLink, Profile, Site, WhatsappNumber
+from core.models import ROLE_CHOICES, FreeTasterLink, Profile, Site, WhatsappNumber, Contact
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import render
@@ -15,7 +15,7 @@ from django.views import View
 from core.user_permission_functions import get_available_sites_for_user, get_user_allowed_to_edit_other_user, get_user_allowed_to_edit_site 
 from core.views import get_site_pk_from_request
 from django.http import QueryDict
-
+from campaign_leads.models import Campaignlead
 logger = logging.getLogger(__name__)
 
 # @login_required
@@ -62,6 +62,12 @@ def get_modal_content(request, **kwargs):
                 whatsappnumber_pk = request.GET.get('whatsappnumber_pk', None)
                 context['whatsappnumber'] = WhatsappNumber.objects.get(pk=whatsappnumber_pk)
                 context['site'] = context['whatsappnumber'].whatsapp_business_account.site
+                lead_pk = request.GET.get('lead_pk', None)
+                contact_pk = request.GET.get('contact_pk', None)
+                if lead_pk:
+                    context['lead'] = Campaignlead.objects.filter(pk=lead_pk).first()
+                if contact_pk:
+                    context['contact'] = Contact.objects.filter(pk=contact_pk).first()
             
             return render(request, f"campaign_leads/htmx/{template_name}.html", context)   
     except Exception as e:

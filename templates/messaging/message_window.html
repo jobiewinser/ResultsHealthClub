@@ -7,9 +7,22 @@
             <div class="col p-0 left text-white" data-bs-toggle="collapse" data-bs-target="#messageWindowCollapse_{{customer_number}}_wrapper" aria-expanded="true" aria-controls="messageWindowCollapse_{{customer_number}}_wrapper">
                 {%include 'messaging/message_window_header.html'%}
             </div>
-            <div class="col-auto p-0">
+            <div class="col-auto p-0 right">
                 {% comment %} <i class="fa-sharp fa-solid fa-circle-xmark" onclick="$('#chat_card_{{customer_number}}').remove(); clear_chat_from_session('{{customer_number}}')"></i> {% endcomment %}
                 <i class="fa-sharp fa-solid fa-circle-xmark" onclick="$('#chat_card_{{customer_number}}').remove();"></i>
+                <br>
+                <button class="btn btn-primary btn-sm" 
+                    data-bs-toggle="popover" 
+                    data-bs-trigger="hover" 
+                    data-bs-placement="top"
+                    data-bs-content="Manually start a conversation using a template."
+                    hx-indicator="#htmx_indicator_messageCollapse_{{whatsappnumber.pk}}" hx-target="#generic_modal_body" 
+                    hx-get="{% url 'get-modal-content' %}" 
+                    hx-push-url="false"
+                    hx-vals='{"template_name": "send_new_template_message", "whatsappnumber_pk":"{{whatsappnumber.pk}}", "lead_pk":"{{lead.pk}}", "contact_pk":"{{contact.pk}}"}'
+                    hx-swap="innerHTML" hx-trigger="click">
+                        <i class="fa fa-pencil" aria-hidden="true"></i>
+                </button>
             </div>
         </div>
     </div>
