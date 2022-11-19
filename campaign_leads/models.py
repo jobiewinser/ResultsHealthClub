@@ -137,6 +137,7 @@ class Campaignlead(models.Model):
                 return mark_safe(f"{rendered_html} {delete_htmx}")
 
     def send_template_whatsapp_message(self, whatsappnumber=None, send_order=None, template=None, communication_method = 'a'):
+        print("Campaignlead send_template_whatsapp_message", whatsappnumber, send_order, template, communication_method)
         from core.models import AttachedError
         if communication_method == 'a':
             if send_order == 1:

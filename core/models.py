@@ -61,6 +61,7 @@ class Contact(models.Model):
             return f"{self.first_name} {self.last_name}"
         return self.first_name
     def send_template_whatsapp_message(self, whatsappnumber=None, template=None, communication_method = 'a'):
+        print("Contact send_template_whatsapp_message", whatsappnumber, template, communication_method)
         from core.models import AttachedError
         if communication_method == 'a' and whatsappnumber:
             if template:                
