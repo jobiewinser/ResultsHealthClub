@@ -75,7 +75,7 @@ class Contact(models.Model):
                         contact = self,
                         archived = False,
                     ).update(archived = True)
-                    if template.site.template_sending_enabled:
+                    if template.site.whatsapp_template_sending_enabled:
                         AttachedError.objects.filter(
                             type = '1206',
                             contact = self,
@@ -132,7 +132,7 @@ class Contact(models.Model):
                             if created:
                                 attached_error.created = datetime.now()
                                 attached_error.save()
-                            return HttpResponse("Messaging error encountered", status=400)
+                            return HttpResponse("Messaging Error: Couldn't find the specified template", status=400)
                     else:
                         print("errorhere template messaging disabled")
                         attached_error, created = AttachedError.objects.get_or_create(
@@ -143,7 +143,7 @@ class Contact(models.Model):
                         if created:
                             attached_error.created = datetime.now()
                             attached_error.save()
-                        return HttpResponse("Messaging error encountered", status=400)
+                        return HttpResponse("Messaging Error: Template Messaging disabled for this site", status=400)
                 else:
                     print("errorhere no Whatsapp Business Account Linked")
                     attached_error, created = AttachedError.objects.get_or_create(
@@ -154,7 +154,7 @@ class Contact(models.Model):
                     if created:
                         attached_error.created = datetime.now()
                         attached_error.save()
-                    return HttpResponse("Messaging error encountered", status=400)
+                    return HttpResponse("Messaging Error: No Whatsapp Business Account linked", status=400)
                 language = {
                     "policy":"deterministic",
                     "code":template.language
@@ -212,7 +212,7 @@ class Contact(models.Model):
                                 }
                             )
                     logger.debug("site.send_template_whatsapp_message success") 
-                    return True     
+                    return HttpResponse("Message Sent", status=200)
         return HttpResponse("No Communication method specified", status=500)
 
 # class AttachedWarning(models.Model): 
@@ -365,7 +365,9 @@ class Site(models.Model):
     default_number = models.ForeignKey("core.WhatsappNumber", on_delete=models.SET_NULL, null=True, blank=True, related_name="site_default_number")
     whatsapp_access_token = models.TextField(blank=True, null=True)
     whatsapp_app_secret_key = models.TextField(blank=True, null=True)
-    template_sending_enabled = models.BooleanField(default=True)
+    whatsapp_template_sending_enabled = models.BooleanField(default=True)
+    active_campaign_leads_enabled = models.BooleanField(default=True)
+    
     whatsapp_business_account_id = models.TextField(null=True, blank=True)
     calendly_token = models.TextField(blank=True, null=True)
     calendly_user = models.TextField(blank=True, null=True)

@@ -164,7 +164,7 @@ class Campaignlead(models.Model):
                         campaign_lead = self,
                         archived = False,
                     ).update(archived = True)
-                    if template.site.template_sending_enabled:
+                    if template.site.whatsapp_template_sending_enabled:
                         AttachedError.objects.filter(
                             type = '1206',
                             campaign_lead = self,
@@ -238,7 +238,7 @@ class Campaignlead(models.Model):
                             if created:
                                 attached_error.created = datetime.now()
                                 attached_error.save()
-                            return HttpResponse("Messaging error encountered", status=400)
+                            return HttpResponse("Messaging Error: Couldn't find the specified template", status=400)
                     else:
                         print("errorhere template messaging disabled")
                         attached_error, created = AttachedError.objects.get_or_create(
@@ -249,7 +249,7 @@ class Campaignlead(models.Model):
                         if created:
                             attached_error.created = datetime.now()
                             attached_error.save()
-                        return HttpResponse("Messaging error encountered", status=400)
+                        return HttpResponse("Messaging Error: Template Messaging disabled for this site", status=400)
                 else:
                     print("errorhere no Whatsapp Business Account Linked")
                     attached_error, created = AttachedError.objects.get_or_create(
@@ -260,7 +260,7 @@ class Campaignlead(models.Model):
                     if created:
                         attached_error.created = datetime.now()
                         attached_error.save()
-                    return HttpResponse("Messaging error encountered", status=400)
+                    return HttpResponse("Messaging Error: No Whatsapp Business Account linked", status=400)
                 language = {
                     "policy":"deterministic",
                     "code":template.language
@@ -320,7 +320,7 @@ class Campaignlead(models.Model):
                                 }
                             )
                     logger.debug("site.send_template_whatsapp_message success") 
-                    return True
+                    return HttpResponse("Message Sent", status=200)
             else:
                 if send_order == 1:
                     type = '1203'

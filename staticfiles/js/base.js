@@ -81,11 +81,16 @@ function basehandlehtmxafterRequest(evt){
                 snackbarShow('Successfully sent message', 'success')
             }
         }
-    } else if (status == 404) {    
-        $('#login_error').remove();                  
-        srcElement.after("<div id='login_error' style='color:red'>Not Found</div>");
+    } else if (status == 404) {   
+        if (evt.detail.pathInfo.requestPath.includes("login-htmx")){ 
+            $('#login_error').remove();                  
+            srcElement.after("<div id='login_error' style='color:red'>Not Found</div>");
+        }
+        snackbarShow('Error: '+evt.detail.xhr.response, 'danger', display_ms=5000)           
     }else if (status == 500){
-        snackbarShow('Error: '+evt.detail.xhr.response, 'danger')           
+        snackbarShow('Error: '+evt.detail.xhr.response, 'danger', display_ms=5000)           
+    }else if (status == 400){
+        snackbarShow('Error: '+evt.detail.xhr.response, 'danger', display_ms=5000)           
     }
 }
 

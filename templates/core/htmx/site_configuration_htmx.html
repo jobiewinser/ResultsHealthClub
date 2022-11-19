@@ -65,7 +65,7 @@
                         <div class="col-md-auto">
                             <div class="row">
                                 <div class="col-md-auto p-0" id="whatsapp_template_sending_wrapper">   
-                                    {%include 'core/htmx/active_campaign_lead_sending_enabled_htmx.html'%}
+                                    {%include 'core/htmx/whatsapp_template_sending_enabled_htmx.html'%}
                                 </div>
                                 <div class="col-md p-0">   
                                 </div>
@@ -129,13 +129,21 @@
                     <i class="fa-light fa-dumbbell"></i> <b class="name_display_{{site.pk}}">{{site.name}}</b> Active Campaign Settings
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-auto p-0">   
+                    <div class="row mt-2">
+                        <div class="col-md-auto">
+                            <div class="row">
+                                <div class="col-md-auto p-0" id="active_campaign_leads_wrapper">   
+                                    {%include 'core/htmx/active_campaign_enabled_htmx.html'%}
+                                </div>
+                                <div class="col-md p-0">   
+                                </div>
+                                <div class="col-md-auto p-0">   
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md p-0 center">   
-                            Nothing Yet, Coming Soon!
+                        <div class="col">
                         </div>
-                        <div class="col-md-auto p-0">   
+                        <div class="col-md-auto">
                         </div>
                     </div>
                 </div>

@@ -541,7 +541,11 @@ def save_whatsapp_template_ajax(request):
 @login_required
 def send_new_template_message(request):
     whatsappnumber = WhatsappNumber.objects.get(pk=request.POST.get('whatsappnumber_pk'))
-    template = WhatsappTemplate.objects.filter(pk=request.POST.get('template_pk')).first()
+    template_pk = request.POST.get('template_pk')
+    if not template_pk:
+        return HttpResponse("Please Choose a template", status=400)        
+    template = WhatsappTemplate.objects.filter(pk=template_pk).first()
+
     contact = Contact.objects.filter(pk=request.POST.get('contact_pk', 0)).first()
     lead = Campaignlead.objects.filter(pk=request.POST.get('lead_pk', 0)).first()
     country_code = request.POST.get('country_code')
@@ -549,18 +553,27 @@ def send_new_template_message(request):
     first_name = request.POST.get('first_name')
     if get_user_allowed_to_send_from_whatsappnumber(request.user, whatsappnumber) and template:
         if contact:
-            if contact.send_template_whatsapp_message(whatsappnumber, template=template):
-                return HttpResponse("", status=200)
+            response = contact.send_template_whatsapp_message(whatsappnumber, template=template)
+            if response:
+                return response
         elif lead:
-            if lead.send_template_whatsapp_message(template=template, communication_method='a'):
-                return HttpResponse("", status=200)
-        elif country_code and phone and first_name:
+            response = lead.send_template_whatsapp_message(template=template, communication_method='a')
+            if response:
+                return response
+        else:
+            if not first_name:
+                return HttpResponse("Please enter a first name", status=400)
+            if not country_code:
+                return HttpResponse("Please choose a country code", status=400)
+            if not phone:
+                return HttpResponse("Please enter a phone number", status=400)
             site = whatsappnumber.whatsapp_business_account.site
             contact, created = Contact.objects.get_or_create(site=site, customer_number=f"{country_code}{phone}")
             contact.first_name = first_name
             contact.save()
-            if contact.send_template_whatsapp_message(whatsappnumber, template=template):
-                return HttpResponse("", status=200)
+            response = contact.send_template_whatsapp_message(whatsappnumber, template=template)
+            if response:
+                return response
         return HttpResponse("", status=500)
 
     return HttpResponse("", status=403)
