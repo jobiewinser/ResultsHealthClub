@@ -13,6 +13,11 @@
             <input name="first_name" class="form-control send_new_template_message_input" placeholder="Customer Name"/>
             <br>
             <div class="row">
+                {%if customer_number%}
+                <div class="col">
+                    To: <b>{{customer_number}}</b>
+                </div>
+                {%else%}
                 <div class="col-md-auto">
                     <select name="country_code" class="form-select send_new_template_message_input">
                         <option data-country_code="GB" value="44" Selected>UK (+44)</option>
@@ -238,6 +243,7 @@
                 <div class="col">
                     <input name="phone" id="campaign_phone" class="form-control send_new_template_message_input" placeholder="Customer Phone Number"/>
                 </div>
+                {%endif%}
             </div> 
             <br>
             {%endif%}

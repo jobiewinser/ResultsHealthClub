@@ -64,10 +64,14 @@ def get_modal_content(request, **kwargs):
                 context['site'] = context['whatsappnumber'].whatsapp_business_account.site
                 lead_pk = request.GET.get('lead_pk', None)
                 contact_pk = request.GET.get('contact_pk', None)
+                customer_number = request.GET.get('customer_number', None)                
                 if lead_pk:
                     context['lead'] = Campaignlead.objects.filter(pk=lead_pk).first()
                 if contact_pk:
                     context['contact'] = Contact.objects.filter(pk=contact_pk).first()
+                if customer_number:
+                    context['customer_number'] = customer_number
+                    
             
             return render(request, f"campaign_leads/htmx/{template_name}.html", context)   
     except Exception as e:
