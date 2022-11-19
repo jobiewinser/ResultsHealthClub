@@ -157,7 +157,7 @@ class Webhooks(View):
                                 template.pending_components = []
 
                                 template.last_approval = datetime.now()
-                                template.save(``)
+                                template.save()
         response = HttpResponse("")
         response.status_code = 200     
         
