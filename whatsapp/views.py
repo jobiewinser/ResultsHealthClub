@@ -6,7 +6,7 @@ import json
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from campaign_leads.models import Campaign, Campaignlead, Call
-from core.user_permission_functions import get_available_sites_for_user, get_user_allowed_to_edit_site, get_user_allowed_to_edit_template, get_user_allowed_to_edit_whatsappnumber
+from core.user_permission_functions import get_available_sites_for_user, get_user_allowed_to_edit_site, get_user_allowed_to_edit_template, get_user_allowed_to_edit_whatsappnumber, get_user_allowed_to_send_from_whatsappnumber
 from core.views import get_site_pk_from_request
 from messaging.models import Message
 from whatsapp.api import Whatsapp
@@ -16,9 +16,10 @@ from django.template import loader
 logger = logging.getLogger(__name__)
 from django.views import View 
 from django.utils.decorators import method_decorator
-from core.models import ErrorModel, Site, WhatsappBusinessAccount, WhatsappNumber
+from core.models import ErrorModel, Site, WhatsappBusinessAccount, WhatsappNumber, Contact
 from random import randrange
 from django.contrib.auth.decorators import login_required
+from whatsapp.models import WhatsappTemplate
 # def random_date(start,l):
 #     current = start
 #     while l >= 0:
@@ -289,7 +290,7 @@ class WhatsappTemplatesView(TemplateView):
             else:
                 site = Site.objects.filter(company=self.request.user.profile.company.first()).first()
         refresh_template_data(site)
-        context['templates'] = WhatsappTemplate.objects.filter(site=site).exclude(archived=True)
+        context['templates'] = site.active_templates
         # context['site_list'] = get_available_sites_for_user(self.request.user)
         context['site'] = site
         context['WHATSAPP_ORDER_CHOICES'] = WHATSAPP_ORDER_CHOICES
@@ -536,3 +537,26 @@ def save_whatsapp_template_ajax(request):
             template.edited = datetime.now()
             template.save()
     return HttpResponse("", status=200)
+
+@login_required
+def send_new_template_message(request):
+    whatsappnumber = WhatsappNumber.objects.get(pk=request.POST.get('whatsappnumber_pk'))
+    template = WhatsappTemplate.objects.get(pk=request.POST.get('template_pk'))
+    if get_user_allowed_to_send_from_whatsappnumber(request.user, whatsappnumber) and template:
+        site = whatsappnumber.whatsapp_business_account.site
+        contact, created = Contact.objects.get_or_create(site=site, customer_number=f"{request.POST.get('country_code')}{request.POST.get('phone')}")
+        contact.first_name = request.POST.get('first_name')
+        contact.save()
+        if contact.send_template_whatsapp_message(whatsappnumber, template=template):
+            return HttpResponse("", status=200)
+        return HttpResponse("", status=500)
+
+    return HttpResponse("", status=403)
+
+    
+# class Contact(Message):
+#     name = models.TextField(null=True, blank=True)
+#     errors = models.ManyToManyField("core.ErrorModel", null=True, blank=True)
+#     site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
+#     customer_number = models.CharField(max_length=50, null=True, blank=True)
+#     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)

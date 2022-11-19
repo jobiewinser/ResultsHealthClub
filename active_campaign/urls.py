@@ -18,5 +18,6 @@ import active_campaign.views as activecampaignviews
 urlpatterns = [
     path('active-campaign-webhooks/<str:guid>/', activecampaignviews.Webhooks.as_view(), name='active-campaign-webhooks' ),
     path('set-campaign-site/<int:campaign_pk>/', activecampaignviews.set_campaign_site, name='set-campaign-site'),
+    path('set-active-campaign-sending-status/', activecampaignviews.set_active_campaign_sending_status, name='set-active-campaign-sending-status'),
     
 ]

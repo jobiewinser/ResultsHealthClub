@@ -2,22 +2,19 @@
 <div class="generic_modal_contents">
     <div class="row">
         <div class="col center">          
-            <select class="form-select campaign_bookings_inputs" name="site_pk">
-                {%for site in request.user.profile.sites_allowed.all%}
-                <option {%if site.pk == request|get_key_in_get_or_post:'site_pk'|str_to_int %}selected{%endif%} value="{{site.pk}}">{{site.name}}</option>
+            <select class="form-select send_new_template_message_input" name="template_pk">
+                <option value="">Choose a template</option>
+                {%for template in site.active_live_templates%} 
+                <option value="{{template.pk}}">{{template.name}}</option>
                 {%endfor%}
             </select>
             <br>
             
-            <input name="first_name" id="campaign_first_name" class="form-control campaign_bookings_inputs" placeholder="Customer Name"/>
-            <br>    
-            <input name="email" id="campaign_email" class="form-control campaign_bookings_inputs" placeholder="Customer Email"/>            
-            <br>          
-            {% comment %} <input name="last_name" id="campaign_last_name" class="form-control campaign_bookings_inputs" placeholder="Customer Last Name"/>
-            <br>    {% endcomment %}
+            <input name="first_name" class="form-control send_new_template_message_input" placeholder="Customer Name"/>
+            <br>
             <div class="row">
                 <div class="col-md-auto">
-                    <select name="country_code" class="form-select campaign_bookings_inputs" id="campaign_phone_extension">
+                    <select name="country_code" class="form-select send_new_template_message_input">
                         <option data-country_code="GB" value="44" Selected>UK (+44)</option>
                         <option data-country_code="US" value="1">USA (+1)</option>
                         <optgroup label="Other countries">
@@ -239,7 +236,7 @@
                     </select>   
                 </div>
                 <div class="col">
-                    <input name="phone" id="campaign_phone" class="form-control campaign_bookings_inputs" placeholder="Customer Phone Number"/>
+                    <input name="phone" id="campaign_phone" class="form-control send_new_template_message_input" placeholder="Customer Phone Number"/>
                 </div>
             </div> 
             <br>
@@ -249,16 +246,16 @@
     <div class="row">
         <div class="col center">
             <button class="btn btn-success"
-                hx-include=".campaign_bookings_inputs"
-                hx-post="{% url 'create-campaign-lead' %}" 
+                hx-include=".send_new_template_message_input"
+                hx-post="{% url 'send-new-template-message' %}" 
                 hx-push-url="false"
-                hx-target=".manually_add_lead_div"
-                hx-swap="afterend" hx-trigger="click">
-                    <i class="fa-solid fa-link" aria-hidden="true"></i> Generate Campaign Lead
+                hx-vals='{"whatsappnumber_pk":"{{whatsappnumber.pk}}"}'
+                hx-swap="none" hx-trigger="click">
+                <i class="fa-solid fa-paper-plane-top"></i> Send
             </button>
         </div>
     </div>
 </div>
 <span hx-swap-oob="true" id="generic_modal_title">
-    Manually Create Campaign Lead
+    Send new template message
 </span>

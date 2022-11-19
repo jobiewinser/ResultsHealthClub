@@ -2,7 +2,7 @@ import json
 import os
 import uuid
 from calendly.api import Calendly
-from core.models import ROLE_CHOICES, FreeTasterLink, Profile, Site
+from core.models import ROLE_CHOICES, FreeTasterLink, Profile, Site, WhatsappNumber
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import render
@@ -58,6 +58,10 @@ def get_modal_content(request, **kwargs):
                 site_pk = request.GET.get('site_pk', None)
                 if site_pk:
                     context["site"] = Site.objects.get(pk=site_pk)
+            elif template_name == 'send_new_template_message':
+                whatsappnumber_pk = request.GET.get('whatsappnumber_pk', None)
+                context['whatsappnumber'] = WhatsappNumber.objects.get(pk=whatsappnumber_pk)
+                context['site'] = context['whatsappnumber'].whatsapp_business_account.site
             
             return render(request, f"campaign_leads/htmx/{template_name}.html", context)   
     except Exception as e:

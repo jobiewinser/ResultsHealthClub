@@ -62,6 +62,17 @@
                 </div>
                 <div class="card-body">
                     <div class="row mt-2">
+                        <div class="col-md-auto">
+                            <div class="row">
+                                <div class="col-md-auto p-0" id="whatsapp_template_sending_wrapper">   
+                                    {%include 'core/htmx/active_campaign_lead_sending_enabled_htmx.html'%}
+                                </div>
+                                <div class="col-md p-0">   
+                                </div>
+                                <div class="col-md-auto p-0">   
+                                </div>
+                            </div>
+                        </div>
                         <div class="col">
                         </div>
                         <div class="col-md-auto">
@@ -79,8 +90,6 @@
                                 You may need to contact Winser Systems about this function
                                 "
                                 hx-swap="innerHTML" hx-trigger="click"><i class="fa-light fa-plus"></i> Add Phone Number to {{site.name}}</a>
-                        </div>
-                        <div class="col">
                         </div>
                     </div>
                     <div class="m-3">

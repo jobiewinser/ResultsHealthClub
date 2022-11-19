@@ -76,7 +76,7 @@
                     </tr>
                 </thead>
                 <tbody> 
-                    {%for template in templates%}
+                    {%for template in site.active_templates%}
                     {%if not 'sample_' in template.name%}
                     <tr id="template_row_{{template.id}}">
                         {%include 'whatsapp/whatsapp_templates_row.html'%}

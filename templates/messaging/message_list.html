@@ -10,6 +10,8 @@
                     Your Number: {%if whatsappnumber.alias%}{{whatsappnumber.alias}}{%else%}{{whatsappnumber.number}}{%endif%}
                 </span> 
             </div>
+            <div class="col">
+            </div>
             <div class="col-auto p-0 pointer">
                 <img class="htmx-indicator invert" id="htmx_indicator_messageCollapse_{{whatsappnumber.pk}}" src="https://htmx.org/img/bars.svg"/>
             </div>
@@ -40,7 +42,7 @@
                 </div>
             </div>
             <div class="row ps-2">
-                <div class="col p-1 ">
+                <div class="col-md-auto p-1 ">
                     <div class="form-check form-switch">
                         <small>Only Show Received</small> 
                         <input 
@@ -57,6 +59,22 @@
                             hx-get="{%url 'get-message-list-body'%}"
                             hx-indicator="#htmx_indicator_messageCollapse_{{whatsappnumber.pk}}"/>
                     </div> 
+                </div>
+                <div class="col">
+                </div>
+                <div class="col-md-auto p-1">
+                    <button class="btn btn-primary btn-sm" 
+                        data-bs-toggle="popover" 
+                        data-bs-trigger="hover" 
+                        data-bs-placement="top"
+                        data-bs-content="Manually start a conversation using a template."
+                        hx-indicator="#htmx_indicator_messageCollapse_{{whatsappnumber.pk}}" hx-target="#generic_modal_body" 
+                        hx-get="{% url 'get-modal-content' %}" 
+                        hx-push-url="false"
+                        hx-vals='{"template_name": "send_new_template_message", "whatsappnumber_pk":"{{whatsappnumber.pk}}"}'
+                        hx-swap="innerHTML" hx-trigger="click">
+                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                    </button>
                 </div>
             </div>
         </div>

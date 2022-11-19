@@ -17,6 +17,9 @@ import logging
 logger = logging.getLogger(__name__)
 from polymorphic.models import PolymorphicModel
 from whatsapp.models import WhatsAppMessage
+from django.template import loader
+from asgiref.sync import async_to_sync, sync_to_async
+from channels.layers import get_channel_layer
 
 class AttachedError(models.Model): 
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -31,11 +34,13 @@ class AttachedError(models.Model):
                         ('1203', "There is no 1st Whatsapp Template linked to this Lead's Campaign"),
                         ('1204', "There is no 2nd Whatsapp Template linked to this Lead's Campaign"),
                         ('1205', "There is no 3rd Whatsapp Template linked to this Lead's Campaign"),
+                        ('1206', "This site has template messaging currently disabled, reenable it on the site configuration page"),
                     )
     type = models.CharField(choices=ERROR_TYPES, default='c', max_length=5)
     attached_field = models.CharField(null=True, blank=True, max_length=50)
     whatsapp_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="errors", on_delete=models.SET_NULL, null=True, blank=True)
     campaign_lead = models.ForeignKey("campaign_leads.Campaignlead", related_name="errors", on_delete=models.SET_NULL, null=True, blank=True)
+    contact = models.ForeignKey("core.Contact", related_name="errors", on_delete=models.SET_NULL, null=True, blank=True)
     whatsapp_number = models.ForeignKey("core.WhatsappNumber", related_name="errors", on_delete=models.SET_NULL, null=True, blank=True)
     whatsapp_message = models.ForeignKey("whatsapp.WhatsappMessage", related_name="attached_errors", on_delete=models.SET_NULL, null=True, blank=True)
     site = models.ForeignKey("core.Site", related_name="errors", on_delete=models.SET_NULL, null=True, blank=True)
@@ -43,6 +48,172 @@ class AttachedError(models.Model):
     admin_action_required = models.BooleanField(default=False)
     archived = models.BooleanField(default=False)
     archived_time = models.DateTimeField(null=True, blank=True)
+    
+class Contact(models.Model):
+    first_name = models.TextField(null=True, blank=True)
+    last_name = models.TextField(null=True, blank=True)
+    site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
+    customer_number = models.CharField(max_length=50, null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    @property
+    def name(self):
+        if self.last_name:
+            return f"{self.first_name} {self.last_name}"
+        return self.first_name
+    def send_template_whatsapp_message(self, whatsappnumber, template=None, communication_method = 'a'):
+        from core.models import AttachedError
+        if communication_method == 'a':
+            if template:                
+                AttachedError.objects.filter(
+                    type = type,
+                    contact = self,
+                    archived = False,
+                ).update(archived = True)
+                if template.site.whatsapp_business_account_id:                    
+                    AttachedError.objects.filter(
+                        type = '1202',
+                        contact = self,
+                        archived = False,
+                    ).update(archived = True)
+                    if template.site.template_sending_enabled:
+                        AttachedError.objects.filter(
+                            type = '1206',
+                            contact = self,
+                            archived = False,
+                        ).update(archived = True)
+                        if template.message_template_id:
+                            AttachedError.objects.filter(
+                                type = '1201',
+                                contact = self,
+                                archived = False,
+                            ).update(archived = True)
+                            whatsapp = Whatsapp(self.site.whatsapp_access_token)
+                            template_live = whatsapp.get_template(template.site.whatsapp_business_account_id, template.message_template_id)
+                            template.name = template_live['name']
+                            template.category = template_live['category']
+                            template.language = template_live['language']
+                            template.save()
+                            components =   [] 
+                            whole_text = ""
+                            counter = 1
+                            for component in template.components:
+                                params = []
+                                component_type = component.get('type', "").lower()
+                                # if component_type == 'header':
+                                text = component.get('text', '')
+                                if component_type in ['header', 'body']:
+                                    if '[[1]]' in text:
+                                        params.append(              
+                                            {
+                                                "type": "text",
+                                                "text":  self.first_name
+                                            }
+                                        )
+                                        text = text.replace('[[1]]',self.first_name)
+                                        counter = counter + 1
+                                whole_text = f"""
+                                    {whole_text} 
+                                    {text}
+                                """
+                                if params:
+                                    components.append(
+                                        {
+                                            "type": component_type,
+                                            "parameters": params
+                                        }
+                                    )
+                        else:
+                            print("errorhere selected template not found on Whatsapp's system")
+                            attached_error, created = AttachedError.objects.get_or_create(
+                                type = '1201',
+                                attached_field = "contact",
+                                contact = self,
+                            )
+                            if created:
+                                attached_error.created = datetime.now()
+                                attached_error.save()
+                            return HttpResponse("Messaging error encountered", status=400)
+                    else:
+                        print("errorhere template messaging disabled")
+                        attached_error, created = AttachedError.objects.get_or_create(
+                            type = '1206',
+                            attached_field = "contact",
+                            contact = self,
+                        )
+                        if created:
+                            attached_error.created = datetime.now()
+                            attached_error.save()
+                        return HttpResponse("Messaging error encountered", status=400)
+                else:
+                    print("errorhere no Whatsapp Business Account Linked")
+                    attached_error, created = AttachedError.objects.get_or_create(
+                        type = '1202',
+                        attached_field = "contact",
+                        contact = self,
+                    )
+                    if created:
+                        attached_error.created = datetime.now()
+                        attached_error.save()
+                    return HttpResponse("Messaging error encountered", status=400)
+                language = {
+                    "policy":"deterministic",
+                    "code":template.language
+                }
+                site = self.site
+                customer_number = self.customer_number
+                response = whatsapp.send_template_message(self.customer_number, whatsappnumber, template, language, components)
+                reponse_messages = response.get('messages',[])
+                if reponse_messages:
+                    for response_message in reponse_messages:
+                        whatsapp_message, created = WhatsAppMessage.objects.get_or_create(
+                            wamid=response_message.get('id'),
+                            datetime=datetime.now(),
+                            contact=self,
+                            message=whole_text,
+                            site=site,
+                            whatsappnumber=whatsappnumber,
+                            customer_number=customer_number,
+                            template=template,
+                            inbound=False,
+                        )
+                        if created:                        
+                            channel_layer = get_channel_layer()                            
+                            message_context = {
+                                "message": whatsapp_message,
+                                "site": site,
+                                "whatsappnumber": whatsappnumber,
+                            }
+                            rendered_message_list_row = loader.render_to_string('messaging/htmx/message_list_row.html', message_context)
+                            rendered_message_chat_row = loader.render_to_string('messaging/htmx/message_chat_row.html', message_context)
+                            rendered_html = f"""
+
+                            <span id='latest_message_row_{customer_number}' hx-swap-oob='delete'></span>
+                            <span id='messageCollapse_{whatsappnumber.pk}' hx-swap-oob='afterbegin'>{rendered_message_list_row}</span>
+
+                            <span id='messageWindowInnerBody_{customer_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>
+                            """
+                            
+                            async_to_sync(channel_layer.group_send)(
+                                f"messaging_{whatsappnumber.pk}",
+                                {
+                                    'type': 'chatbox_message',
+                                    "message": rendered_html,
+                                }
+                            )
+                            channel_layer = get_channel_layer()   
+                            
+                            async_to_sync(channel_layer.group_send)(
+                                f"message_count_{whatsappnumber.site.company.pk}",
+                                {
+                                    'type': 'messages_count_update',
+                                    'data':{
+                                        'rendered_html':f"""<span hx-swap-oob="afterbegin:.company_message_count"><span hx-trigger="load" hx-swap="none" hx-get="/update-message-counts/"></span>""",
+                                    }
+                                }
+                            )
+                    logger.debug("site.send_template_whatsapp_message success") 
+                    return True     
+        return HttpResponse("No Communication method specified", status=500)
 
 # class AttachedWarning(models.Model): 
 #     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -194,7 +365,7 @@ class Site(models.Model):
     default_number = models.ForeignKey("core.WhatsappNumber", on_delete=models.SET_NULL, null=True, blank=True, related_name="site_default_number")
     whatsapp_access_token = models.TextField(blank=True, null=True)
     whatsapp_app_secret_key = models.TextField(blank=True, null=True)
-    
+    template_sending_enabled = models.BooleanField(default=True)
     whatsapp_business_account_id = models.TextField(null=True, blank=True)
     calendly_token = models.TextField(blank=True, null=True)
     calendly_user = models.TextField(blank=True, null=True)
@@ -203,6 +374,12 @@ class Site(models.Model):
     guid = models.TextField(null=True, blank=True) 
     def __str__(self):
         return f"({self.pk}) {self.name}"
+    @property
+    def active_templates(self):
+        return self.whatsapptemplate_set.exclude(archived=True)
+    @property
+    def active_live_templates(self):
+        return self.whatsapptemplate_set.filter(status="APPROVED").exclude(archived=True)
         
     def outstanding_whatsapp_messages(self, user):
         # Readdress this, I can't find a good way to get latest message for each conversation, then filter based on the last message being inbound...

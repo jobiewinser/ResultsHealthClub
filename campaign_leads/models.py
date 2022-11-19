@@ -12,7 +12,6 @@ from django.db.models import Q, Count
 from django.template import loader
 from asgiref.sync import async_to_sync, sync_to_async
 from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
 logger = logging.getLogger(__name__)
 
 BOOKING_CHOICES = (
@@ -149,87 +148,105 @@ class Campaignlead(models.Model):
             elif send_order == 3:
                 template = self.campaign.third_send_template
                 type = '1205'
-                
+            
             if template:                
                 AttachedError.objects.filter(
                     type = type,
                     campaign_lead = self,
                     archived = False,
                 ).update(archived = True)
-                if template.site.whatsapp_business_account_id:
+                if template.site.whatsapp_business_account_id:                    
                     AttachedError.objects.filter(
                         type = '1202',
                         campaign_lead = self,
                         archived = False,
                     ).update(archived = True)
-                    if template.message_template_id:
+                    if template.site.template_sending_enabled:
                         AttachedError.objects.filter(
-                            type = '1201',
+                            type = '1206',
                             campaign_lead = self,
                             archived = False,
                         ).update(archived = True)
-                        whatsapp = Whatsapp(self.campaign.site.whatsapp_access_token)
-                        template_live = whatsapp.get_template(template.site.whatsapp_business_account_id, template.message_template_id)
-                        template.name = template_live['name']
+                        if template.message_template_id:
+                            AttachedError.objects.filter(
+                                type = '1201',
+                                campaign_lead = self,
+                                archived = False,
+                            ).update(archived = True)
+                            whatsapp = Whatsapp(self.campaign.site.whatsapp_access_token)
+                            template_live = whatsapp.get_template(template.site.whatsapp_business_account_id, template.message_template_id)
+                            template.name = template_live['name']
 
-                        template.category = template_live['category']
-                        template.language = template_live['language']
-                        template.save()
+                            template.category = template_live['category']
+                            template.language = template_live['language']
+                            template.save()
 
-                        components =   [] 
+                            components =   [] 
 
-                        whole_text = ""
-                        counter = 1
-                        for component in template.components:
-                            params = []
-                            component_type = component.get('type', "").lower()
-                            # if component_type == 'header':
-                            text = component.get('text', '')
-                            if component_type in ['header', 'body']:
-                                if '[[1]]' in text:
-                                    params.append(              
+                            whole_text = ""
+                            counter = 1
+                            for component in template.components:
+                                params = []
+                                component_type = component.get('type', "").lower()
+                                # if component_type == 'header':
+                                text = component.get('text', '')
+                                if component_type in ['header', 'body']:
+                                    if '[[1]]' in text:
+                                        params.append(              
+                                            {
+                                                "type": "text",
+                                                "text":  self.first_name
+                                            }
+                                        )
+                                        text = text.replace('[[1]]',self.first_name)
+                                        counter = counter + 1
+                                # if '{{3}}' in text:
+                                #     params.append(           
+                                #         {
+                                #             "type": "text",
+                                #             "text":  self.campaign.company.company_name
+                                #         }
+                                #     )
+                                # if '{{4}}' in text:
+                                #     params.append(                   
+                                #         {
+                                #             "type": "text",
+                                #             "text":  self.campaign.site.whatsapp_number
+                                #         }
+                                #     )
+                                whole_text = f"""
+                                    {whole_text} 
+                                    {text}
+                                """
+                                if params:
+                                    components.append(
                                         {
-                                            "type": "text",
-                                            "text":  self.first_name
+                                            "type": component_type,
+                                            "parameters": params
                                         }
                                     )
-                                    text = text.replace('[[1]]',self.first_name)
-                                    counter = counter + 1
-                            # if '{{3}}' in text:
-                            #     params.append(           
-                            #         {
-                            #             "type": "text",
-                            #             "text":  self.campaign.company.company_name
-                            #         }
-                            #     )
-                            # if '{{4}}' in text:
-                            #     params.append(                   
-                            #         {
-                            #             "type": "text",
-                            #             "text":  self.campaign.site.whatsapp_number
-                            #         }
-                            #     )
-                            whole_text = f"""
-                                {whole_text} 
-                                {text}
-                            """
-                            if params:
-                                components.append(
-                                    {
-                                        "type": component_type,
-                                        "parameters": params
-                                    }
-                                )
+                        else:
+                            print("errorhere selected template not found on Whatsapp's system")
+                            attached_error, created = AttachedError.objects.get_or_create(
+                                type = '1201',
+                                attached_field = "campaign_lead",
+                                campaign_lead = self,
+                            )
+                            if created:
+                                attached_error.created = datetime.now()
+                                attached_error.save()
+                            return HttpResponse("Messaging error encountered", status=400)
                     else:
-                        print("errorhere selected template not found on Whatsapp's system")
+                        print("errorhere template messaging disabled")
                         attached_error, created = AttachedError.objects.get_or_create(
-                            type = '1201',
+                            type = '1206',
                             attached_field = "campaign_lead",
                             campaign_lead = self,
                         )
                         if created:
                             attached_error.created = datetime.now()
                             attached_error.save()
+                        return HttpResponse("Messaging error encountered", status=400)
                 else:
                     print("errorhere no Whatsapp Business Account Linked")
                     attached_error, created = AttachedError.objects.get_or_create(
@@ -240,6 +257,7 @@ class Campaignlead(models.Model):
                     if created:
                         attached_error.created = datetime.now()
                         attached_error.save()
+                    return HttpResponse("Messaging error encountered", status=400)
                 language = {
                     "policy":"deterministic",
                     "code":template.language

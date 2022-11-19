@@ -76,6 +76,9 @@ function basehandlehtmxafterRequest(evt){
                 // setTimeout(function() {
                 //     PageTitleNotification.Off();
                 // }, 2000);
+            }else if (evt.detail.pathInfo.requestPath.includes("send-new-template-message")){
+                $('#generic_modal').modal('hide');
+                snackbarShow('Successfully sent message', 'success')
             }
         }
     } else if (status == 404) {    

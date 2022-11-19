@@ -1,0 +1,29 @@
+
+
+<div class="row" style="margin-left:0px !important;"
+    data-bs-toggle="popover" 
+    data-bs-trigger="hover" 
+    data-bs-placement="top"
+    data-bs-html="true"
+    data-bs-title="Disable Messsages"
+    data-bs-content="Disabling this toggle will stop template whatsapps sending, including follow up messages, initial lead messages. The messages can then be sent after turning this back on freely.
+    <br>
+    <b>Example Usage:</b>
+    <br>
+    You've noticed a typo in a whatsapp template, toggle this switch to disabled, make your template changes, then retoggle this switch to enabled and send any whatsapp messages that weren't sent during the downtime.
+    ">
+    <div class="col-md-auto">
+        Automatic/Template Whatsapp sending for <i class="fa-regular fa-calendar-days"></i> <b class="name_display_{{site.pk}}">{{site.name}}</b> <i class="fa-solid fa-circle-info"></i>: 
+    </div>
+
+    <div class="col-md-auto p-0">
+        <div class="form-check form-switch">
+            <input hx-post="{%url 'set-active-campaign-sending-status'%}" hx-target="#whatsapp_template_sending_wrapper" hx-swap="innerHTML" hx-trigger="input delay:0.3s" hx-indicator="#htmx_indicator_site_form" hx-vals='{"site_pk": "{{site.pk}}"}'
+            class="form-check-input" name="template_sending_enabled" {%if site.template_sending_enabled%}checked{%endif%} type="checkbox">
+        </div>
+    </div>
+
+    <div class="col">
+        
+    </div>
+</div>

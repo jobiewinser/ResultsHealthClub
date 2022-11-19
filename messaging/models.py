@@ -6,6 +6,7 @@ from polymorphic.models import PolymorphicModel
 
 class Message(PolymorphicModel):
     lead = models.ForeignKey("campaign_leads.Campaignlead", null=True, blank=True, on_delete=models.SET_NULL)
+    contact = models.ForeignKey("core.Contact", null=True, blank=True, on_delete=models.SET_NULL)
     inbound = models.BooleanField(default=True)
     read = models.BooleanField(default=False)
     pending = models.BooleanField(default=False)

@@ -86,3 +86,15 @@ def set_campaign_site(request, **kwargs):
         logger.error(f"set_campaign_site {str(e)}")
         return HttpResponse("Couldn't set Campaign Site", status=500)
 
+@login_required
+def set_active_campaign_sending_status(request, **kwargs):
+    try:
+        site = Site.objects.get(pk=request.POST.get('site_pk',None))
+        site.template_sending_enabled = request.POST.get('template_sending_enabled', 'off') == 'on'
+        site.save()
+        return render(request, 'core/htmx/active_campaign_lead_sending_enabled_htmx.html', {'site':site,})
+                                                                                # 'site_list': get_available_sites_for_user(request.user)})
+    except Exception as e:        
+        logger.error(f"set_active_campaign_sending_status {str(e)}")
+        return HttpResponse("Couldn't set_active_campaign_sending_status", status=500)
+

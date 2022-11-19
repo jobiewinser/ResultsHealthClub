@@ -42,4 +42,8 @@ urlpatterns = [
     path('whatsapp-get-modal-content/', whatsapphtmx.get_modal_content, name='whatsapp-get-modal-content' ),
     path('whatsapp-get-modal-content/<str:param1>/', whatsapphtmx.get_modal_content, name='whatsapp-get-modal-content' ),
     path('whatsapp-get-modal-content/<str:param1>/<str:param2>/', whatsapphtmx.get_modal_content, name='whatsapp-get-modal-content' ),
+
+    path('send-new-template-message/', whatsappviews.send_new_template_message, name='send-new-template-message' ),
+
+    
 ]    
