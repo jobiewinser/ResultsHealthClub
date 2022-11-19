@@ -126,35 +126,38 @@ class Webhooks(View):
                                             )[0]                
 
                 elif field == 'message_template_status_update':                    
-                    templates = WhatsappTemplate.objects.filter(message_template_id=value.get('message_template_id'))
-                    if templates:
-                        template = templates[0]
-                        template.status=value.get('event')
-                        reason = value.get('reason', None)
-                        print("TEMPLATE REASON", str(reason))
-                        if reason and not reason.lower() == 'none':
-                            template.latest_reason=value.get('reason')
-                        else:
-                            template.latest_reason=None
-                        template.name=value.get('message_template_name')
-                        template.language=value.get('message_template_language')
-                        whatsapp = Whatsapp(template.site.whatsapp_access_token)
-                        template_live = whatsapp.get_template(template.site.whatsapp_business_account_id, template.message_template_id)
-                        # if value.get('event', "") == 'APPROVED':
-                        template.name = template_live.get('name')
-                        template.pending_name = ""
+                    template = WhatsappTemplate.objects.filter(message_template_id=value.get('message_template_id')).last()
+                    site = template.site
+                    if site:
+                        signature = 'sha256=' + hmac.new(site.whatsapp_app_secret_key.encode('utf-8'), bytes(request.body), digestmod=hashlib.sha256).hexdigest()
+                        if signature == request.META.get('HTTP_X_HUB_SIGNATURE_256'):
+                            if template:
+                                template.status=value.get('event')
+                                reason = value.get('reason', None)
+                                print("TEMPLATE REASON", str(reason))
+                                if reason and not reason.lower() == 'none':
+                                    template.latest_reason=value.get('reason')
+                                else:
+                                    template.latest_reason=None
+                                template.name=value.get('message_template_name')
+                                template.language=value.get('message_template_language')
+                                whatsapp = Whatsapp(template.site.whatsapp_access_token)
+                                template_live = whatsapp.get_template(template.site.whatsapp_business_account_id, template.message_template_id)
+                                # if value.get('event', "") == 'APPROVED':
+                                template.name = template_live.get('name')
+                                template.pending_name = ""
 
-                        template.category = template_live.get('category')
-                        template.pending_category = ""
+                                template.category = template_live.get('category')
+                                template.pending_category = ""
 
-                        template.language = template_live.get('language')
-                        template.pending_language = ""
-                        print("template.pending_components", str(template.pending_components))
-                        template.components = template.pending_components
-                        template.pending_components = []
+                                template.language = template_live.get('language')
+                                template.pending_language = ""
+                                print("template.pending_components", str(template.pending_components))
+                                template.components = template.pending_components
+                                template.pending_components = []
 
-                        template.last_approval = datetime.now()
-                        template.save()
+                                template.last_approval = datetime.now()
+                                template.save(``)
         response = HttpResponse("")
         response.status_code = 200     
         
