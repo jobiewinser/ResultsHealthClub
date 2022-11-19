@@ -72,14 +72,14 @@ class Contact(models.Model):
                     contact = self,
                     archived = False,
                 ).update(archived = True)
-                if template.site.whatsapp_business_account_id: 
+                if template.whatsapp_business_account.whatsapp_business_account_id: 
                     print("ContactDEBUG3")                   
                     AttachedError.objects.filter(
                         type = '1202',
                         contact = self,
                         archived = False,
                     ).update(archived = True)
-                    if template.site.whatsapp_template_sending_enabled:
+                    if template.whatsapp_business_account.site.whatsapp_template_sending_enabled:
                         print("ContactDEBUG4")
                         AttachedError.objects.filter(
                             type = '1206',
@@ -94,7 +94,7 @@ class Contact(models.Model):
                                 archived = False,
                             ).update(archived = True)
                             whatsapp = Whatsapp(self.site.whatsapp_access_token)
-                            template_live = whatsapp.get_template(template.site.whatsapp_business_account_id, template.message_template_id)
+                            template_live = whatsapp.get_template(template.whatsapp_business_account.whatsapp_business_account_id, template.message_template_id)
                             template.name = template_live['name']
                             template.category = template_live['category']
                             template.language = template_live['language']
@@ -223,7 +223,7 @@ class Contact(models.Model):
                             )
                     logger.debug("site.send_template_whatsapp_message success") 
                     return HttpResponse("Message Sent", status=200)
-        return HttpResponse("No Communication method specified", status=500)
+        # return HttpResponse("No Communication method specified", status=500)
 
 # class AttachedWarning(models.Model): 
 #     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -250,6 +250,12 @@ class Contact(models.Model):
 class WhatsappBusinessAccount(models.Model):
     whatsapp_business_account_id = models.TextField(null=True, blank=True)
     site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
+    @property
+    def active_templates(self):
+        return self.whatsapptemplate_set.exclude(archived=True).exclude(name__icontains="sample")
+    @property
+    def active_live_templates(self):
+        return self.whatsapptemplate_set.filter(status="APPROVED").exclude(archived=True).exclude(name__icontains="sample")
 
 class PhoneNumber(PolymorphicModel):
     number = models.CharField(max_length=30, null=True, blank=True)
@@ -268,7 +274,7 @@ class WhatsappNumber(PhoneNumber):
     quality_rating = models.CharField(max_length=50, null=True, blank=True)
     code_verification_status = models.CharField(max_length=50, null=True, blank=True)
     verified_name = models.CharField(max_length=50, null=True, blank=True)
-    whatsapp_business_account = models.ForeignKey('core.WhatsappBusinessAccount', on_delete=models.SET_NULL, null=True, blank=True)
+    whatsapp_business_account = models.OneToOneField('core.WhatsappBusinessAccount', on_delete=models.SET_NULL, null=True, blank=True)
 
     @property
     def active_errors(self):        
@@ -378,7 +384,7 @@ class Site(models.Model):
     whatsapp_template_sending_enabled = models.BooleanField(default=True)
     active_campaign_leads_enabled = models.BooleanField(default=True)
     
-    whatsapp_business_account_id = models.TextField(null=True, blank=True)
+    # whatsapp_business_account_id = models.TextField(null=True, blank=True)
     calendly_token = models.TextField(blank=True, null=True)
     calendly_user = models.TextField(blank=True, null=True)
     calendly_organization = models.TextField(blank=True, null=True)   
@@ -386,12 +392,6 @@ class Site(models.Model):
     guid = models.TextField(null=True, blank=True) 
     def __str__(self):
         return f"({self.pk}) {self.name}"
-    @property
-    def active_templates(self):
-        return self.whatsapptemplate_set.exclude(archived=True).exclude(name__icontains="sample")
-    @property
-    def active_live_templates(self):
-        return self.whatsapptemplate_set.filter(status="APPROVED").exclude(archived=True).exclude(name__icontains="sample")
         
     def outstanding_whatsapp_messages(self, user):
         # Readdress this, I can't find a good way to get latest message for each conversation, then filter based on the last message being inbound...

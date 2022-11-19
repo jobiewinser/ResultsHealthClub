@@ -157,7 +157,9 @@ class WhatsappTemplate(models.Model):
 
     hidden = models.BooleanField(default=False)
     archived = models.BooleanField(default=False)
-    site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
+    # site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
+    whatsapp_business_account = models.ForeignKey('core.WhatsappBusinessAccount', on_delete=models.SET_NULL, null=True, blank=True)
+    
     company = models.ForeignKey("core.Company", on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:

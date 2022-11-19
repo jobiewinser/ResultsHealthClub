@@ -45,7 +45,7 @@ class WhatsAppTemplateAdmin(admin.ModelAdmin):
         'pk', 
         'name',  
         'message_template_id',  
-        'site_name',  
+        # 'site_name',  
         'category', 
         'language',     
         'created',  

@@ -24,7 +24,6 @@ class Whatsapp():
     whatsapp_app_id = os.getenv("WHATSAPP_APP_ID")
     
     whatsapp_business_id = os.getenv("WHATSAPP_BUSINESS_ID")
-    whatsapp_business_account_id = os.getenv("WHATSAPP_BUSINESS_ACCOUNT_ID")
 
     def __init__(self, whatsapp_access_token):
         self.whatsapp_access_token = whatsapp_access_token
@@ -216,7 +215,7 @@ class Whatsapp():
             )
     #POST
     def create_template(self, template_object):   
-        url = f"{self.whatsapp_url}/{template_object.site.whatsapp_business_account_id}/message_templates"
+        url = f"{self.whatsapp_url}/{template_object.whatsapp_business_account.whatsapp_business_account_id}/message_templates"
         headers = self._get_headers()
         pending_components = template_object.pending_components
         for component in pending_components:

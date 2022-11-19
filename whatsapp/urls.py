@@ -24,7 +24,7 @@ urlpatterns = [
     path('configuration/whatsapp-template-readonly/<str:template_pk>/', whatsappviews.WhatsappTemplatesReadOnlyView.as_view(), name='whatsapp-template-readonly'),
 
 
-    path('configuration/whatsapp-template-create/<str:site_pk>/', whatsappviews.WhatsappTemplatesCreateView.as_view(), name='whatsapp-template-create'),
+    path('configuration/whatsapp-template-create/<str:whatsapp_business_account_pk>/', whatsappviews.WhatsappTemplatesCreateView.as_view(), name='whatsapp-template-create'),
     # path('configuration/whatsapp-template/', whatsappviews.WhatsappTemplatesCreateView.as_view(), name='whatsapp-template'),
     path('configuration/whatsapp-template-delete/', whatsappviews.delete_whatsapp_template_htmx, name='whatsapp-template-delete'),
     path('configuration/whatsapp-templates-save/', whatsappviews.save_whatsapp_template_ajax, name='whatsapp-template-save'),
@@ -34,8 +34,8 @@ urlpatterns = [
     
     path('configuration/whatsapp-number-make-default  /', whatsappviews.whatsapp_number_make_default, name='whatsapp-number-make-default'),
       
-    path('configuration/whatsapp-change-template-site/', whatsappviews.whatsapp_template_change_site, name='whatsapp-change-template-site'),    
-    path('configuration/whatsapp-change-number-site/', whatsappviews.whatsapp_number_change_site, name='whatsapp-change-number-site'),      
+    # path('configuration/whatsapp-change-template-site/', whatsappviews.whatsapp_template_change_site, name='whatsapp-change-template-site'),    
+    # path('configuration/whatsapp-change-number-site/', whatsappviews.whatsapp_number_change_site, name='whatsapp-change-number-site'),      
     path('configuration/add-phone-number/', whatsappviews.add_phone_number, name='add-phone-number'),      
     path('configuration/add-whatsapp-business-account/', whatsappviews.add_whatsapp_business_account, name='add-whatsapp-business-account'),    
 

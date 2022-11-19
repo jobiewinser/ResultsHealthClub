@@ -19,7 +19,7 @@ function replaceVariables(content){
     }
     return content
 }
-function saveTemplate(site_pk, template_pk, create=false){
+function saveTemplate(whatsapp_business_account_pk, template_pk, create=false){
     let variables_valid = true;
     let header = $('#template_header').val();
     let body = $('#template_body').val();
@@ -38,7 +38,7 @@ function saveTemplate(site_pk, template_pk, create=false){
             'category':$('#template_category').val(), 
             'header':$('#template_header').val(), 
             'body':$('#template_body').val(), 
-            'site_pk':site_pk, 
+            'whatsapp_business_account_pk':whatsapp_business_account_pk, 
             'footer':$('#template_footer').val(), 
             'csrfmiddlewaretoken':csrftoken
         }

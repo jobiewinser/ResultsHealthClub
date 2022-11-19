@@ -41,7 +41,7 @@ try:
             whatsapp_number = os.getenv('default_whatsapp_number'),
             whatsapp_business_phone_number_id = os.getenv('default_whatsapp_business_phone_number_id'),
             whatsapp_access_token = os.getenv('default_whatsapp_access_token'),
-            whatsapp_business_account_id = os.getenv('default_whatsapp_business_account_id'),
+            # whatsapp_business_account_id = os.getenv('default_whatsapp_business_account_id'),
             )
         site.company.set([company])
     else:

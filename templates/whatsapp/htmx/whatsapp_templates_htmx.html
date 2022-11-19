@@ -1,3 +1,4 @@
+{%load core_tags%}
 <span>
     <script>
         $(document).ready(function() {
@@ -14,7 +15,18 @@
         </div> {% endcomment %}
         {%with True as hide_show_all%}
         {%include 'core/htmx/site_selection.html'%}
-        <button hidden hx-get="" hx-push-url="false" hx-swap="innerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
+
+        <div class="col-md-auto m-1 ps-0">
+            <span id="site_list_span">  
+                <select class="form-select overview_table_filters" name="whatsapp_business_account_pk" id="whatsapp_business_account_pk" onchange="$('#change_site').click();">
+                    {%for whatsapp_business_account in whatsapp_business_accounts%}
+                    <option {%if whatsapp_business_account.pk == request|get_key_in_get_or_post:'whatsapp_business_account_pk'|str_to_int %}selected{%endif%} value="{{whatsapp_business_account.pk}}">{{whatsapp_business_account.whatsappnumber.alias}}</option>
+                    {%endfor%}
+                </select>
+            </span>
+        </div>
+
+        <button hidden hx-get="" hx-push-url="false" hx-swap="innerHTML" hx-include=".overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
         {%endwith%}    
         {%endblock extra_top_left_buttons %}
         <div class="col">
@@ -31,16 +43,16 @@
             <p class="m-0">Messages in Rejected or Paused states can be edited an unlimited number of times (this feature is a bit glitchy, avoid editing templates for the time being).</p>
         </div>
         <div class="col m-3 alert alert-info">
-            <p>Template names must be unique.</p>
+            <p>Template names must be unique per site.</p>
             <p class="m-0">Once you have saved your edits/new template, click the green submit button to send it for approval to Whatsapp.</p>
         </div>
     </div>
-
+    {%if whatsapp_business_account%}
     <div class="row mt-2">
         <div class="col-md-auto">
             <a class="btn btn-success btn-sm m-1 pointer" 
             hx-indicator="#page_load_indicator"
-            hx-get="{%url 'whatsapp-template-create' site_pk=site.pk%}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML">
+            hx-get="{%url 'whatsapp-template-create' whatsapp_business_account_pk=whatsapp_business_account.pk%}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML">
                 <i class="fa fa-plus" aria-hidden="true"></i> Add Template
             </a>            
         </div>
@@ -65,9 +77,6 @@
                         <th>
                             Status
                         </th>
-                        <th>
-                            Site
-                        </th>
                         {% comment %} <th>
                             Auto send
                         </th> {% endcomment %}
@@ -76,7 +85,7 @@
                     </tr>
                 </thead>
                 <tbody> 
-                    {%for template in site.active_templates%}
+                    {%for template in whatsapp_business_account.active_templates%}
                     {%if not 'sample_' in template.name%}
                     <tr id="template_row_{{template.id}}">
                         {%include 'whatsapp/whatsapp_templates_row.html'%}
@@ -87,4 +96,7 @@
             </table>
         </div>
     </div>
+    {%else%}
+    Please select a phone number in the top left. 
+    {%endif%}
 </span>

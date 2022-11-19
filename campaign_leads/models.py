@@ -161,14 +161,14 @@ class Campaignlead(models.Model):
                         campaign_lead = self,
                         archived = False,
                     ).update(archived = True)
-                if template.site.whatsapp_business_account_id:  
+                if template.whatsapp_business_account.whatsapp_business_account_id:  
                     print("CampaignleadDEBUG3")                  
                     AttachedError.objects.filter(
                         type = '1202',
                         campaign_lead = self,
                         archived = False,
                     ).update(archived = True)
-                    if template.site.whatsapp_template_sending_enabled:
+                    if template.whatsapp_business_account.site.whatsapp_template_sending_enabled:
                         print("CampaignleadDEBUG4")
                         AttachedError.objects.filter(
                             type = '1206',
@@ -183,7 +183,7 @@ class Campaignlead(models.Model):
                                 archived = False,
                             ).update(archived = True)
                             whatsapp = Whatsapp(self.campaign.site.whatsapp_access_token)
-                            template_live = whatsapp.get_template(template.site.whatsapp_business_account_id, template.message_template_id)
+                            template_live = whatsapp.get_template(template.whatsapp_business_account.whatsapp_business_account_id, template.message_template_id)
                             print(template_live)
                             template.name = template_live['name']
 
