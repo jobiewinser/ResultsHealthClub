@@ -140,7 +140,7 @@ class Campaignlead(models.Model):
         print("Campaignlead send_template_whatsapp_message", whatsappnumber, send_order, template, communication_method)
         from core.models import AttachedError
         if communication_method == 'a':
-            print("DEBUG1")
+            print("CampaignleadDEBUG1")
             if send_order == 1:
                 template = self.campaign.first_send_template
                 type = '1203'
@@ -154,7 +154,7 @@ class Campaignlead(models.Model):
                 type = None
             
             if template:      
-                print("DEBUG2")
+                print("CampaignleadDEBUG2")
                 if type:          
                     AttachedError.objects.filter(
                         type = type,
@@ -162,21 +162,21 @@ class Campaignlead(models.Model):
                         archived = False,
                     ).update(archived = True)
                 if template.site.whatsapp_business_account_id:  
-                    print("DEBUG3")                  
+                    print("CampaignleadDEBUG3")                  
                     AttachedError.objects.filter(
                         type = '1202',
                         campaign_lead = self,
                         archived = False,
                     ).update(archived = True)
                     if template.site.whatsapp_template_sending_enabled:
-                        print("DEBUG4")
+                        print("CampaignleadDEBUG4")
                         AttachedError.objects.filter(
                             type = '1206',
                             campaign_lead = self,
                             archived = False,
                         ).update(archived = True)
                         if template.message_template_id:
-                            print("DEBUG5")
+                            print("CampaignleadDEBUG5")
                             AttachedError.objects.filter(
                                 type = '1201',
                                 campaign_lead = self,
@@ -236,7 +236,7 @@ class Campaignlead(models.Model):
                                         }
                                     )
                         else:
-                            print("DEBUG6")
+                            print("CampaignleadDEBUG6")
                             print("errorhere selected template not found on Whatsapp's system")
                             attached_error, created = AttachedError.objects.get_or_create(
                                 type = '1201',
@@ -248,7 +248,7 @@ class Campaignlead(models.Model):
                                 attached_error.save()
                             return HttpResponse("Messaging Error: Couldn't find the specified template", status=400)
                     else:
-                        print("DEBUG7")
+                        print("CampaignleadDEBUG7")
                         print("errorhere template messaging disabled")
                         attached_error, created = AttachedError.objects.get_or_create(
                             type = '1206',
@@ -260,7 +260,7 @@ class Campaignlead(models.Model):
                             attached_error.save()
                         return HttpResponse("Messaging Error: Template Messaging disabled for this site", status=400)
                 else:
-                    print("DEBUG8")
+                    print("CampaignleadDEBUG8")
                     print("errorhere no Whatsapp Business Account Linked")
                     attached_error, created = AttachedError.objects.get_or_create(
                         type = '1202',
@@ -282,7 +282,7 @@ class Campaignlead(models.Model):
                 response = whatsapp.send_template_message(self.whatsapp_number, whatsappnumber, template, language, components)
                 reponse_messages = response.get('messages',[])
                 if reponse_messages:
-                    print("DEBUG9")
+                    print("CampaignleadDEBUG9")
                     for response_message in reponse_messages:
                         whatsapp_message, created = WhatsAppMessage.objects.get_or_create(
                             wamid=response_message.get('id'),
@@ -334,7 +334,7 @@ class Campaignlead(models.Model):
                     logger.debug("site.send_template_whatsapp_message success") 
                     return HttpResponse("Message Sent", status=200)
             else:
-                print("DEBUG10")
+                print("CampaignleadDEBUG10")
                 if send_order == 1:
                     type = '1203'
                 elif send_order == 2:
@@ -348,7 +348,7 @@ class Campaignlead(models.Model):
                     campaign_lead = self,
                 )
                 if created:
-                    print("DEBUG11")
+                    print("CampaignleadDEBUG11")
                     attached_error.created = datetime.now()
                     attached_error.save()
             

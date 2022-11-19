@@ -64,25 +64,30 @@ class Contact(models.Model):
         print("Contact send_template_whatsapp_message", whatsappnumber, template, communication_method)
         from core.models import AttachedError
         if communication_method == 'a' and whatsappnumber:
-            if template:                
+            print("ContactDEBUG1")
+            if template:    
+                print("ContactDEBUG2")            
                 AttachedError.objects.filter(
                     type = type,
                     contact = self,
                     archived = False,
                 ).update(archived = True)
-                if template.site.whatsapp_business_account_id:                    
+                if template.site.whatsapp_business_account_id: 
+                    print("ContactDEBUG3")                   
                     AttachedError.objects.filter(
                         type = '1202',
                         contact = self,
                         archived = False,
                     ).update(archived = True)
                     if template.site.whatsapp_template_sending_enabled:
+                        print("ContactDEBUG4")
                         AttachedError.objects.filter(
                             type = '1206',
                             contact = self,
                             archived = False,
                         ).update(archived = True)
                         if template.message_template_id:
+                            print("ContactDEBUG5")
                             AttachedError.objects.filter(
                                 type = '1201',
                                 contact = self,
@@ -124,6 +129,7 @@ class Contact(models.Model):
                                         }
                                     )
                         else:
+                            print("ContactDEBUG6")
                             print("errorhere selected template not found on Whatsapp's system")
                             attached_error, created = AttachedError.objects.get_or_create(
                                 type = '1201',
@@ -135,6 +141,7 @@ class Contact(models.Model):
                                 attached_error.save()
                             return HttpResponse("Messaging Error: Couldn't find the specified template", status=400)
                     else:
+                        print("ContactDEBUG7")
                         print("errorhere template messaging disabled")
                         attached_error, created = AttachedError.objects.get_or_create(
                             type = '1206',
@@ -146,6 +153,7 @@ class Contact(models.Model):
                             attached_error.save()
                         return HttpResponse("Messaging Error: Template Messaging disabled for this site", status=400)
                 else:
+                    print("ContactDEBUG8")
                     print("errorhere no Whatsapp Business Account Linked")
                     attached_error, created = AttachedError.objects.get_or_create(
                         type = '1202',
@@ -165,6 +173,7 @@ class Contact(models.Model):
                 response = whatsapp.send_template_message(self.customer_number, whatsappnumber, template, language, components)
                 reponse_messages = response.get('messages',[])
                 if reponse_messages:
+                    print("ContactDEBUG9")
                     for response_message in reponse_messages:
                         whatsapp_message, created = WhatsAppMessage.objects.get_or_create(
                             wamid=response_message.get('id'),
