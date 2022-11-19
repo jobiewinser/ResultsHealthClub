@@ -572,7 +572,11 @@ def send_new_template_message(request):
             if not phone:
                 return HttpResponse("Please enter a phone number", status=400)
             site = whatsappnumber.whatsapp_business_account.site
-            contact, created = Contact.objects.get_or_create(site=site, customer_number=f"{country_code}{phone}")
+            if country_code:
+                combined_number = f"{country_code}{phone}"
+            else:
+                combined_number = phone
+            contact, created = Contact.objects.get_or_create(site=site, customer_number=combined_number)
             contact.first_name = first_name
             contact.save()
             response = contact.send_template_whatsapp_message(whatsappnumber, template=template)

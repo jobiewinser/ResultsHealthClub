@@ -58,8 +58,8 @@ def create_campaign_lead(request, **kwargs):
             return HttpResponse("Please provide a first name", status=500)
 
         email = request.POST.get('email')
-        if not email:
-            return HttpResponse("Please provide a email", status=500)
+        # if not email:
+        #     return HttpResponse("Please provide a email", status=500)
         
         phone = request.POST.get('phone')
         if not phone:

@@ -16,7 +16,7 @@
                 {%if customer_number%}
                 <div class="col">
                     To: <b>{{customer_number}}</b>
-                    <input name="phone" hidden class="form-control send_new_template_message_input" value="customer_number"/>
+                    <input name="phone" hidden class="form-control send_new_template_message_input" value="{{customer_number}}"/>
                 </div>
                 {%else%}
                 <div class="col-md-auto">
