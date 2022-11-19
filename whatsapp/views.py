@@ -550,10 +550,17 @@ def send_new_template_message(request):
         return HttpResponse("Please Choose a template", status=400)        
     template = WhatsappTemplate.objects.filter(pk=template_pk).first()
 
-    contact = Contact.objects.filter(pk=request.POST.get('contact_pk', 0)).first()
-    lead = Campaignlead.objects.filter(pk=request.POST.get('lead_pk', 0)).first()
     country_code = request.POST.get('country_code')
     phone = request.POST.get('phone')
+    if country_code:
+        combined_number = f"{country_code}{phone}"
+    else:
+        combined_number = phone
+
+    contact = Contact.objects.filter(pk=request.POST.get('contact_pk', 0)).first()
+    lead = Campaignlead.objects.filter(pk=request.POST.get('lead_pk', 0)).first()
+    if not lead:
+        lead = Campaignlead.objects.filter(campaign__site=whatsappnumber.whatsapp_business_account.site, whatsapp_number=combined_number).first()
     first_name = request.POST.get('first_name')
     if get_user_allowed_to_send_from_whatsappnumber(request.user, whatsappnumber) and template:
         if contact:
@@ -572,10 +579,6 @@ def send_new_template_message(request):
             if not phone:
                 return HttpResponse("Please enter a phone number", status=400)
             site = whatsappnumber.whatsapp_business_account.site
-            if country_code:
-                combined_number = f"{country_code}{phone}"
-            else:
-                combined_number = phone
             contact, created = Contact.objects.get_or_create(site=site, customer_number=combined_number)
             contact.first_name = first_name
             contact.save()
