@@ -564,7 +564,7 @@ def send_new_template_message(request):
     first_name = request.POST.get('first_name')
     if get_user_allowed_to_send_from_whatsappnumber(request.user, whatsappnumber) and template:
         if contact:
-            response = contact.send_template_whatsapp_message(whatsappnumber, template=template)
+            response = contact.send_template_whatsapp_message(whatsappnumber=whatsappnumber, template=template)
             if response:
                 return response
         elif lead:
@@ -582,7 +582,7 @@ def send_new_template_message(request):
             contact, created = Contact.objects.get_or_create(site=site, customer_number=combined_number)
             contact.first_name = first_name
             contact.save()
-            response = contact.send_template_whatsapp_message(whatsappnumber, template=template)
+            response = contact.send_template_whatsapp_message(whatsappnumber=whatsappnumber, template=template)
             if response:
                 return response
         return HttpResponse("", status=500)
