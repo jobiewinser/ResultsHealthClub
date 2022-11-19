@@ -136,7 +136,7 @@ class Campaignlead(models.Model):
                 from django.utils.safestring import mark_safe
                 return mark_safe(f"{rendered_html} {delete_htmx}")
 
-    def send_template_whatsapp_message(self, send_order=None, template=None, communication_method = 'a'):
+    def send_template_whatsapp_message(self, whatsappnumber=None, send_order=None, template=None, communication_method = 'a'):
         from core.models import AttachedError
         if communication_method == 'a':
             if send_order == 1:
@@ -267,7 +267,8 @@ class Campaignlead(models.Model):
                     "code":template.language
                 }
                 site = self.campaign.site
-                whatsappnumber = site.default_number
+                if not whatsappnumber:
+                    whatsappnumber = site.default_number
                 customer_number = self.whatsapp_number
                 response = whatsapp.send_template_message(self.whatsapp_number, whatsappnumber, template, language, components)
                 reponse_messages = response.get('messages',[])

@@ -568,7 +568,7 @@ def send_new_template_message(request):
             if response:
                 return response
         elif lead:
-            response = lead.send_template_whatsapp_message(template=template, communication_method='a')
+            response = lead.send_template_whatsapp_message(whatsappnumber=whatsappnumber, template=template, communication_method='a')
             if response:
                 return response
         else:
