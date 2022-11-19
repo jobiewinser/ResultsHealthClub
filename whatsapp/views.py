@@ -65,7 +65,7 @@ class Webhooks(View):
             for change in entry.get('changes'):
                 field = change.get('field')
                 value = change.get('value')
-                metadata = value.get('metadata')
+                metadata = value.get('metadata', {})
                 site = Site.objects.filter(whatsappbusinessaccount__whatsappnumber__number=metadata.get('display_phone_number')).first()
                 if site:
                     signature = 'sha256=' + hmac.new(site.whatsapp_app_secret_key.encode('utf-8'), bytes(request.body), digestmod=hashlib.sha256).hexdigest()
