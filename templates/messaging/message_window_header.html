@@ -1,5 +1,5 @@
 <span class="primary_td_layer">
-    Recipient: {%if lead.name%}{{lead.name}}{%else%}{{customer_number}}{%endif%}
+    Recipient: {%if lead.name%}{{lead.name}}{%elif contact.name%}{{contact.name}}{%else%}{{customer_number}}{%endif%}
 </span>
 <br>
 <span class="secondary_td_layer">

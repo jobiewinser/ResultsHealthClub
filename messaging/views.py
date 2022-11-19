@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 
 from campaign_leads.models import Campaignlead
-from core.models import Site, WhatsappNumber
+from core.models import Site, WhatsappNumber, Contact
 from core.user_permission_functions import get_allowed_site_chats_for_user, get_user_allowed_to_use_site_messaging
 from core.views import get_site_pk_from_request
 from whatsapp.models import WhatsAppMessage, WhatsappMessageImage
@@ -65,9 +65,11 @@ def message_window(request, **kwargs):
     context = {}
     context["messages"] = messages
     lead = Campaignlead.objects.filter(whatsapp_number=kwargs.get('customer_number')).last()
+    contact = Contact.objects.filter(customer_number=kwargs.get('customer_number')).last()
     print()
     if get_user_allowed_to_use_site_messaging(request.user, whatsappnumber.site):
         context["lead"] = lead
+        context["contact"] = contact
         context["customer_number"] = kwargs.get('customer_number')
         context['whatsappnumber'] = whatsappnumber
         return render(request, "messaging/message_window_htmx.html", context)
