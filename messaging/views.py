@@ -85,11 +85,11 @@ def get_messaging_list_row(request, **kwargs):
 
 @login_required
 def send_first_template_whatsapp_lead_article_htmx(request, **kwargs):
-    try:
-        return render(request, "campaign_leads/htmx/lead_article.html", send_first_template_whatsapp(request, kwargs))
-    except Exception as e:
-        logger.debug("send_first_template_whatsapp_htmx Error "+str(e))
-        return HttpResponse(e, status=500)
+    # try:
+    return render(request, "campaign_leads/htmx/lead_article.html", send_first_template_whatsapp(request, kwargs))
+    # except Exception as e:
+    #     logger.debug("send_first_template_whatsapp_htmx Error "+str(e))
+    #     return HttpResponse(e, status=500)
 
 @login_required
 def send_first_template_whatsapp_booking_row_htmx(request, **kwargs):
