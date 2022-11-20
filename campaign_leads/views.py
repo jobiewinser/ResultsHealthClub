@@ -21,7 +21,21 @@ from whatsapp.api import Whatsapp
 from whatsapp.models import WhatsappTemplate
 from django.template import loader
 logger = logging.getLogger(__name__)
-from core.templatetags.core_tags import hex_to_rgb_tuple
+
+def hex_to_rgb_tuple(hex):
+	hex = hex.replace('#','')
+	return f"{int(hex[0:2], 16)},{int(hex[2:4], 16)},{int(hex[4:6], 16)}"
+
+def rgb_to_hex_tuple(rgb_string):
+    try:
+        r,g,b = rgb_string.split(',')
+        r = ('{:X}').format(int(r)).zfill(2)
+        g = ('{:X}').format(int(g)).zfill(2)
+        b = ('{:X}').format(int(b)).zfill(2)
+        return f"{r}{g}{b}"
+    except Exception as e:
+        return "FFFFFF"
+
 
 def get_campaign_qs(request):
     first_model_query = (Campaignlead.objects
