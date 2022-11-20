@@ -52,7 +52,7 @@ id="submit_site_pk_{{campaign.pk}}"></button>
     <input type="number" min="0.00" max="10000.00" step="0.01" value="{{campaign.product_cost|floatformat:2}}" name="product_cost"
         class="form-control"
         hx-post="{% url 'campaign-assign-product_cost' %}" hx-swap="innerHTML" 
-        hx-trigger="change"
+        hx-trigger="change delay:0.5s"
         hx-indicator=".top-htmx-indicator" 
         hx-vals='{"campaign_pk": "{{campaign.pk}}"}'
         hx-target="#row_{{campaign.pk}}"/>
