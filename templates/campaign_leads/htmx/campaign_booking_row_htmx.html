@@ -36,7 +36,7 @@
                         </span>
                 </button>
             {%endif%}
-            <span style="text-decoration: none; color: #25d366" class="nowrap pointer" target="_blank"><i class="fa fa-whatsapp" aria-hidden="true"></i> {{lead.whatsapp_number}}</span>
+            <span style="text-decoration: none; color: #25d366" class="nowrap" target="_blank"><i class="fa fa-whatsapp" aria-hidden="true"></i> {{lead.whatsapp_number}}</span>
         </span>        
     </td>
     <td class="nowrap">
@@ -96,21 +96,27 @@
                     data-bs-trigger="hover" 
                     data-bs-placement="top"
                     data-bs-content="Add new booking for this lead."
-                    hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
+                    onclick="htmx.ajax('GET', '{% url 'campaign-lead-get-modal-content' param1=lead.pk %}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'add_booking'}})"
+                    {% comment %} hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
                     hx-vals='{"template_name": "add_booking"}'
                     hx-get="{% url 'campaign-lead-get-modal-content' param1=lead.pk %}" 
                     hx-push-url="false"
-                    hx-swap="innerHTML" hx-trigger="click"><i class="fa-regular fa-plus" ></i> New</button>
+                    hx-swap="innerHTML" hx-trigger="click" {% endcomment %}
+                    ><i class="fa-regular fa-plus" ></i> New</button>
                 <button class="btn btn-secondary btn-sm" type="button"
                     data-bs-toggle="popover" 
                     data-bs-trigger="hover" 
                     data-bs-placement="top"
                     data-bs-content="See booking history for this lead."
-                    hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
+                    onclick="htmx.ajax('GET', '{% url 'campaign-lead-get-modal-content' param1=lead.pk %}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'booking_history'}})"
+                    
+                    {% comment %} hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
                     hx-vals='{"template_name": "booking_history"}'
                     hx-get="{% url 'campaign-lead-get-modal-content' param1=lead.pk %}" 
                     hx-push-url="false"
-                    hx-swap="innerHTML" hx-trigger="click"><i class="fa-regular fa-clock-rotate-left" ></i> <span style="color:Silver">{{lead.booking_set.all.count}}</span></button>
+                    hx-swap="innerHTML" hx-trigger="click" {% endcomment %}
+                    
+                    ><i class="fa-regular fa-clock-rotate-left" ></i> <span style="color:Silver">{{lead.booking_set.all.count}}</span></button>
             </div>
         </span>
         <br>
@@ -119,26 +125,35 @@
                 {%include 'campaign_leads/htmx/arrived_button.html'%}
                 {%include 'campaign_leads/htmx/sold_button.html'%}
                 {%if lead.complete%}
-                    <button class="btn btn-danger btn-sm nowrap" hx-include="#lead_pk_{{lead.pk}}"
+                    <button class="btn btn-danger btn-sm nowrap"
                         data-bs-toggle="popover" 
                         data-bs-trigger="hover" 
                         data-bs-placement="top"
                         data-bs-content="Unarchive this lead"
-                        hx-post="{% url 'mark-done' %}" hx-indicator=".top-htmx-indicator" hx-target="#row_{{lead.pk}}"><i class="fa-regular fa-box-archive"></i></button>
-                    <button class="btn btn-dark btn-sm nowrap" hx-include="#lead_pk_{{lead.pk}}"
+                        onclick="htmx.ajax('POST', '{% url 'mark-done' %}', {target:'#row_{{lead.pk}}', values:htmx.values(htmx.find('#lead_pk_{{lead.pk}}'))})"
+                            {% comment %} hx-trigger="click"
+                            hx-post="{% url 'mark-done' %}" hx-indicator=".top-htmx-indicator" hx-target="#row_{{lead.pk}}" {% endcomment %}
+                        ><i class="fa-regular fa-box-archive"></i></button>
+                    <button class="btn btn-dark btn-sm nowrap" 
                         data-bs-toggle="popover" 
                         data-bs-trigger="hover" 
                         data-bs-placement="top"
                         data-bs-content="Delete this lead"
-                        hx-confirm="Are you sure you want to PERMANENTLY DELETE this archived lead"
-                        hx-post="{% url 'delete-lead' %}" hx-indicator=".top-htmx-indicator" hx-target="#row_{{lead.pk}}"><i class="fa-regular fa-trash"></i></button>
+                        onclick="if (confirm('Are you sure you want to PERMANENTLY DELETE this archived lead')){htmx.ajax('POST', '{% url 'delete-lead' %}', {target:'#row_{{lead.pk}}', values:htmx.values(htmx.find('#lead_pk_{{lead.pk}}'))})}"
+                            {% comment %} hx-confirm=""
+                            hx-trigger="click"
+                            hx-post="{% url 'delete-lead' %}" hx-indicator=".top-htmx-indicator" hx-target="#row_{{lead.pk}}" {% endcomment %}
+                        ><i class="fa-regular fa-trash"></i></button>
                 {%else%}
-                    <button class="btn btn-success btn-sm nowrap" hx-include="#lead_pk_{{lead.pk}}"
+                    <button class="btn btn-success btn-sm nowrap" 
                     data-bs-toggle="popover" 
                     data-bs-trigger="hover" 
                     data-bs-placement="top"
                     data-bs-content="Archive this lead"
-                        hx-post="{% url 'mark-done' %}" hx-indicator=".top-htmx-indicator" hx-target="#row_{{lead.pk}}"><i class="fa-regular fa-box-archive"></i></button>
+                    onclick="htmx.ajax('POST', '{% url 'mark-done' %}', {target:'#row_{{lead.pk}}', values:htmx.values(htmx.find('#lead_pk_{{lead.pk}}'))})"
+                        {% comment %} hx-trigger="click" hx-include="#lead_pk_{{lead.pk}}"
+                        hx-post="{% url 'mark-done' %}" hx-indicator=".top-htmx-indicator" hx-target="#row_{{lead.pk}}" {% endcomment %}
+                        ><i class="fa-regular fa-box-archive"></i></button>
                 {%endif%} 
             </div>
         </span>
