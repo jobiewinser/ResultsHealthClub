@@ -69,14 +69,14 @@
     </div>
 </td>
 <td>   
-    {%if not profile.role == 'a' or profile == request.user.profile%}
+    {%if not profile.role == 'a' and not request.user.profile == 'c' or profile == request.user.profile%}
         <a class="nowrap btn btn-light pointer" type="button" 
             hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
             hx-vals='{"template_name": "edit_user", "user_pk": "{{profile.user.pk}}"}'
             hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
             hx-swap="innerHTML" hx-trigger="click"><i class="fa-light fa-gear"></i> Config</a>
     {%endif%}
-    {%if not profile.role == 'a'%}
+    {%if not profile.role == 'a' and not request.user.profile == 'c'%}
     <a class="nowrap btn btn-light pointer" type="button"
         hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
         hx-vals='{"template_name": "edit_permissions", "profile_pk": "{{profile.pk}}"}'
