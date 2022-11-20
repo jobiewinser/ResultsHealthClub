@@ -26,11 +26,11 @@
         <div class="col">
         </div>
         <div class="col-md-auto">
-            <a class="nowrap btn btn-success btn-sm pointer" type="button" {%if request.user.profile.role == 'c'%}disabled{%endif%}
+            <button class="nowrap btn btn-success btn-sm pointer" type="button" {%if request.user.profile.role == 'c'%}disabled{%endif%}
                 hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
                 hx-vals='{"template_name": "add_user"}'
                 hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
-                hx-swap="innerHTML" hx-trigger="click"><i class="fa-light fa-plus"></i> Add User to {{request.user.profile.company.company_name}}</a>
+                hx-swap="innerHTML" hx-trigger="click"><i class="fa-light fa-plus"></i> Add User to {{request.user.profile.company.company_name}}</button>
         </div>
         <div class="col">
         </div>
