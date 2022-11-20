@@ -378,7 +378,7 @@ class Site(models.Model):
     name = models.TextField(blank=True, null=True)
     company = models.ForeignKey("core.Company", on_delete=models.SET_NULL, null=True, blank=True)
     # whatsapp_number = models.CharField(max_length=50, null=True, blank=True)
-    default_number = models.ForeignKey("core.WhatsappNumber", on_delete=models.SET_NULL, null=True, blank=True, related_name="site_default_number")
+    # default_number = models.ForeignKey("core.WhatsappNumber", on_delete=models.SET_NULL, null=True, blank=True, related_name="site_default_number")
     whatsapp_access_token = models.TextField(blank=True, null=True)
     whatsapp_app_secret_key = models.TextField(blank=True, null=True)
     whatsapp_template_sending_enabled = models.BooleanField(default=True)

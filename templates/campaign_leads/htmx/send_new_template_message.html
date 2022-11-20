@@ -4,7 +4,7 @@
         <div class="col center">          
             <select class="form-select send_new_template_message_input" name="template_pk">
                 <option value="">Choose a template</option>
-                {%for template in site.active_live_templates%} 
+                {%for template in whatsappnumber.whatsapp_business_account.active_live_templates%} 
                 <option value="{{template.pk}}">{{template.name}}</option>
                 {%endfor%}
             </select>
@@ -265,5 +265,5 @@
     </div>
 </div>
 <span hx-swap-oob="true" id="generic_modal_title">
-    Send new template message {% if lead %} to {{lead.name}}{% elif contact %} to {{contact.name}}{%endif%}
+    Send new template message {% if lead %} to <b>{{lead.name}}</b>{% elif contact %} to <b>{{contact.name}}</b>{%endif%} {% if whatsappnumber.whatsapp_business_account %} from <b>{{whatsappnumber.whatsapp_business_account.whatsappnumber.alias}}</b>{%endif%}
 </span>

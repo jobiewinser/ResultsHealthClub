@@ -76,7 +76,7 @@
     {%endif%}
     {%if template.pending_components%}
     <span class="secondary_td_layer nowrap">
-            {%if not template.status == 'AWAITING_APPROVAL'%}Draft awaiting submission <i class="fa-solid fa-arrow-right"></i>{%else%}Waiting for Whatsapp approval{%endif%}          
+            {%if not template.status == 'AWAITING_APPROVAL' and not template.status == 'PENDING'%}Draft awaiting submission <i class="fa-solid fa-arrow-right"></i>{%else%}Waiting for Whatsapp approval{%endif%}          
     </span>   
     {%endif%}
 </td>

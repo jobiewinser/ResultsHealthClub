@@ -57,6 +57,30 @@ id="submit_site_pk_{{campaign.pk}}"></button>
         hx-vals='{"campaign_pk": "{{campaign.pk}}"}'
         hx-target="#row_{{campaign.pk}}"/>
 </td>
+<td>         
+    <span hidden>{{campaign.first_send_template.name}}</span>                   
+    <select class="form-select" name="whatsapp_business_account_pk" id="whatsapp_business_account_pk_{{campaign.pk}}" 
+        hx-post="{% url 'campaign-assign-whatsapp-business-account' %}" hx-swap="innerHTML" 
+        hx-trigger="change"
+        hx-indicator=".top-htmx-indicator" 
+        hx-vals='{"campaign_pk": "{{campaign.pk}}"}'
+        hx-target="#row_{{campaign.pk}}"   
+        data-bs-toggle="popover" 
+        data-bs-trigger="hover" 
+        data-bs-html="true" 
+        data-bs-placement="top"
+        data-bs-title="What does this do?"
+        data-bs-content='
+        <p>
+            You can assign your a whatsapp account for this campaign, this will then allow you to choose templates for this campaign.
+        </p>
+        '>
+        <option value=""></option>
+        {%for whatsapp_business_account in campaign.site.whatsappbusinessaccount_set.all%}
+        <option {%if campaign.whatsapp_business_account.pk == whatsapp_business_account.pk %}selected{%endif%} value="{{whatsapp_business_account.pk}}">{{whatsapp_business_account.whatsappnumber.alias}}</option>
+        {%endfor%}
+    </select>
+</td>
 <td>              
     <span hidden>{{campaign.first_send_template.name}}</span>                   
     <select class="form-select" name="first_template_pk" id="first_template_{{campaign.pk}}" 
@@ -79,7 +103,7 @@ id="submit_site_pk_{{campaign.pk}}"></button>
         </p>
         '>
         <option value=""></option>
-        {%for template in campaign.site_templates%}
+        {%for template in campaign.whatsapp_business_account.whatsapptemplate_set.all%}
         {%if not 'sample_' in template.name%}
         <option {%if campaign.first_send_template.pk == template.pk %}selected{%endif%} value="{{template.pk}}">{{template.name}}</option>
         {%endif%}
@@ -108,7 +132,7 @@ id="submit_site_pk_{{campaign.pk}}"></button>
         </p>
         '>
         <option value=""></option>
-        {%for template in campaign.site_templates%}
+        {%for template in campaign.whatsapp_business_account.whatsapptemplate_set.all%}
         {%if not 'sample_' in template.name%}
         <option {%if campaign.second_send_template.pk == template.pk %}selected{%endif%} value="{{template.pk}}">{{template.name}}</option>
         {%endif%}
@@ -136,7 +160,7 @@ id="submit_site_pk_{{campaign.pk}}"></button>
         </p>
         '>
         <option value=""></option>
-        {%for template in campaign.site_templates%}
+        {%for template in campaign.whatsapp_business_account.whatsapptemplate_set.all%}
         {%if not 'sample_' in template.name%}
         <option {%if campaign.third_send_template.pk == template.pk %}selected{%endif%} value="{{template.pk}}">{{template.name}}</option>
         {%endif%}

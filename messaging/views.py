@@ -131,7 +131,7 @@ def get_modal_content(request, **kwargs):
             lead = Campaignlead.objects.get(pk=lead_pk)
             context['lead'] = lead
             if request.GET.get('template_name', None) == "message_window_modal":
-                whatsappnumber = lead.campaign.site.default_number
+                # whatsappnumber = lead.campaign.site.default_number
                 customer_number = lead.whatsapp_number
                 context['customer_number'] = customer_number
                 context['whatsappnumber'] = whatsappnumber

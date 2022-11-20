@@ -11,7 +11,7 @@ from campaign_leads.models import Call, Campaign, Campaignlead
 from active_campaign.api import ActiveCampaignApi
 from active_campaign.models import ActiveCampaign
 from core.core_decorators import campaign_leads_enabled_required
-from core.models import Profile, Site
+from core.models import Profile, Site, WhatsappBusinessAccount
 from core.user_permission_functions import get_available_sites_for_user, get_user_allowed_to_add_call
 from core.views import get_site_pk_from_request
 from django.db.models import Q, Count
@@ -239,8 +239,20 @@ def campaign_assign_auto_send_template_htmx(request):
     if not third_template_pk == None:
         campaign.third_send_template = WhatsappTemplate.objects.filter(pk=(third_template_pk or 0)).first()
     campaign.save()
-    return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign,})
-                                                                            # 'site_list': get_available_sites_for_user(request.user)})
+    return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign})
+
+@login_required
+def campaign_assign_whatsapp_business_account_htmx(request):
+    campaign = Campaign.objects.get(pk=request.POST.get('campaign_pk'))
+    whatsapp_business_account_pk = request.POST.get('whatsapp_business_account_pk')
+    
+    campaign.whatsapp_business_account = WhatsappBusinessAccount.objects.filter(pk=whatsapp_business_account_pk).first()
+    campaign.first_send_template = None
+    campaign.second_send_template = None
+    campaign.third_send_template = None
+    campaign.save()
+    return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign})
+    
 
 @login_required
 def campaign_assign_product_cost_htmx(request):

@@ -61,7 +61,7 @@ def get_modal_content(request, **kwargs):
             elif template_name == 'send_new_template_message':
                 whatsappnumber_pk = request.GET.get('whatsappnumber_pk', None)
                 context['whatsappnumber'] = WhatsappNumber.objects.get(pk=whatsappnumber_pk)
-                context['site'] = context['whatsappnumber'].whatsapp_business_account.site
+                # context['site'] = context['whatsappnumber'].whatsapp_business_account.site
                 lead_pk = request.GET.get('lead_pk', None)
                 contact_pk = request.GET.get('contact_pk', None)
                 customer_number = request.GET.get('customer_number', None)                

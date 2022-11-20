@@ -144,6 +144,7 @@ class SiteConfigurationView(TemplateView):
         if 'name' in request.POST:
             site.name = request.POST['name']
             response_text = f"{response_text} <span hx-swap-oob='innerHTML:.name_display_{site.pk}'>{site.name}</span>"
+            
         if 'calendly_organization' in request.POST:
             site.calendly_organization = request.POST['calendly_organization']
             response_text = f"""{response_text} 

@@ -67,7 +67,7 @@
                                 hx-trigger="click"
                                 
                                 ><span class="badge bg-dark badge-sm me-1"><i class="fa fa-whatsapp me-1"></i><span class="whatsappnumber_message_count_{{chat_whatsappnumber.pk}}">{{chat_whatsappnumber|whatsappnumber_outstanding_whatsapp_messages_tag:request.user}}</span></span>
-                                    {%if chat_whatsappnumber.alias%}{{chat_whatsappnumber.alias}}{%else%}{{chat_whatsappnumber.number}}{%endif%}</button>
+                                    <b class="phone_display_{{chat_whatsappnumber.pk}}">{%if chat_whatsappnumber.alias%}{{chat_whatsappnumber.alias}}{%else%}{{chat_whatsappnumber.number}}{%endif%}</b></button>
                                 <br>
                             {%endfor%}
                         </div>

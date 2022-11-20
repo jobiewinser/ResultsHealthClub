@@ -432,18 +432,19 @@ def whatsapp_number_change_alias(request):
         if alias or alias == '':
             whatsappnumber.alias = alias
             whatsappnumber.save()
-            return HttpResponse("",status=200)
+            response_text = f"<span hx-swap-oob='innerHTML:.phone_display_{whatsappnumber.pk}'>{whatsappnumber.alias}</span>"
+            return HttpResponse(response_text,status=200)
     return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
-@login_required
-def whatsapp_number_make_default(request):
-    whatsappnumber = WhatsappNumber.objects.get(pk=request.POST.get('whatsappnumber_pk'))
-    if get_user_allowed_to_edit_whatsappnumber(request.user, whatsappnumber):
-        site = whatsappnumber.site
-        site.default_number = whatsappnumber
-        site.save()
-        return render(request, 'core/htmx/site_configuration_table_htmx.html', {'whatsapp_numbers':site.get_live_whatsapp_phone_numbers(), 'site': site, })
-        # 'site_list': get_available_sites_for_user(request.user)})
-    return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
+# @login_required
+# def whatsapp_number_make_default(request):
+#     whatsappnumber = WhatsappNumber.objects.get(pk=request.POST.get('whatsappnumber_pk'))
+#     if get_user_allowed_to_edit_whatsappnumber(request.user, whatsappnumber):
+#         site = whatsappnumber.site
+#         site.default_number = whatsappnumber
+#         site.save()
+#         return render(request, 'core/htmx/site_configuration_table_htmx.html', {'whatsapp_numbers':site.get_live_whatsapp_phone_numbers(), 'site': site, })
+#         # 'site_list': get_available_sites_for_user(request.user)})
+#     return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
     
 
 # @login_required

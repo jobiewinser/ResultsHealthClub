@@ -31,13 +31,6 @@
             <th>
                 Verified?
             </th>
-            <th>
-                Default?
-            </th>
-            <th>
-                
-                
-            </th>
         </tr>
     </thead>
     <tbody> 
@@ -81,43 +74,13 @@
             <td>
                 {{number.code_verification_status}}
             </td>
-            <td>
+            {% comment %} <td>
                 <input type="checkbox" class="form-check-input" name="default_number" {%if site.default_number == number %}checked{%endif%} {%if site.default_number == number or not request.user.profile.role == 'a'%}disabled{%endif%}
                     hx-post="{% url 'whatsapp-number-make-default' %}" hx-swap="innerHTML" 
                     hx-include="this" hx-indicator="#htmx_indicator_default_number_{{number.pk}}" 
                     hx-vals='{"whatsappnumber_pk": "{{number.pk}}"}' hx-target="#overview_table">
                 <img  class="htmx-indicator invert" id="htmx_indicator_default_number_{{number.pk}}" src="https://htmx.org/img/bars.svg"/>
-            </td>
-            <td>        
-                {% comment %} {%with number.company_sites_with_same_whatsapp_business_details as company_sites_with_same_whatsapp_business_details%}                        
-                <span
-                    data-bs-toggle="popover" 
-                    data-bs-trigger="hover" 
-                    data-bs-html="true" 
-                    data-bs-placement="top"
-                    data-bs-title="What does this do?"
-                    data-bs-content="
-                    <p>
-                        This button allows you to transfer this number to another site under the same company, as long as they share the same whatsapp business account.
-                    </p>
-                    {%if not company_sites_with_same_whatsapp_business_details%}
-                        <p>
-                            This button is disabled because you do not have another site linked to your whatsapp business account.
-                        </p>
-                    {%endif%}
-                    ">
-                    <button class="btn btn-primary btn-sm m-1"   {%if not request.user.profile.role == 'a'%}disabled{%endif%}
-                        {%if not company_sites_with_same_whatsapp_business_details%}disabled{%endif%}
-                        hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
-                        hx-vals='{"template_name": "transfer_number", "whatsappnumber_pk": "{{number.pk}}"}'
-                        hx-get="{% url 'campaign-lead-get-modal-content' %}" 
-                        hx-push-url="false"
-                        hx-swap="innerHTML" hx-trigger="click" id="transfer_number_{{template.pk}}"> 
-                            <i class="fa fa-arrow-right" aria-hidden="true"></i> Transfer
-                    </button>
-                </span>
-                {%endwith%} {% endcomment %}
-            </td>
+            </td> {% endcomment %}
         </tr>
         {%endfor%}
     </tbody>

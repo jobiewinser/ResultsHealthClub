@@ -38,6 +38,7 @@ class Campaign(PolymorphicModel):
     first_send_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="first_send_template_campaign", on_delete=models.SET_NULL, null=True, blank=True)
     second_send_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="second_send_template_campaign", on_delete=models.SET_NULL, null=True, blank=True)
     third_send_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="third_send_template_campaign", on_delete=models.SET_NULL, null=True, blank=True)
+    whatsapp_business_account = models.ForeignKey('core.WhatsappBusinessAccount', on_delete=models.SET_NULL, null=True, blank=True)
     def get_active_leads_qs(self):
         return self.campaignlead_set.filter(complete=False)
     def is_manual(self):
@@ -276,8 +277,8 @@ class Campaignlead(models.Model):
                     "code":template.language
                 }
                 site = self.campaign.site
-                if not whatsappnumber:
-                    whatsappnumber = site.default_number
+                if not whatsappnumber and send_order:
+                    whatsappnumber = self.campaign.whatsapp_business_account.whatsappnumber
                 customer_number = self.whatsapp_number
                 response = whatsapp.send_template_message(self.whatsapp_number, whatsappnumber, template, language, components)
                 reponse_messages = response.get('messages',[])

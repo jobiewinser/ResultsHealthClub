@@ -105,7 +105,7 @@
                     <div class="row">
                         <div class="col-md-auto p-0">        
                             <form class="form-floating m-1">
-                                <input value="{{site.calendly_organization}}" id="calendly_organization" type="text" class="form-control" name="calendly_organization" {%if not request.user.profile.role == 'a'%}disabled{%endif%}
+                                <input style="min-width:400px" value="{{site.calendly_organization}}" id="calendly_organization" type="text" class="form-control" name="calendly_organization" {%if not request.user.profile.role == 'a'%}disabled{%endif%}
                                     hx-post="" hx-swap="none" hx-indicator="#htmx_indicator_site_form" hx-vals='{"site_pk": "{{site.pk}}"}' hx-trigger='input'>
                                 <label for="calendly_organization">Site Calendly Organtisation</label>
                             </form>
