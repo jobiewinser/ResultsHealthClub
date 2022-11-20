@@ -229,12 +229,15 @@ def active_errors_for_customer_number_tag(whatsappnumber, customer_number):
 @register.filter
 def hex_to_rgb_tuple_tag(hex):
 	hex = hex.replace('#','')
-	return f"{int(hex[0:2], 16)}, {int(hex[2:4], 16)}, {int(hex[4:6], 16)}"
+	return f"{int(hex[0:2], 16)},{int(hex[2:4], 16)},{int(hex[4:6], 16)}"
 
 @register.filter
 def rgb_to_hex_tuple_tag(rgb_string):
     try:
         r,g,b = rgb_string.split(',')
-        return ('{:X}{:X}{:X}').format(int(r), int(g), int(b))
-    except:
-        return "255,255,255"
+        r = ('{:X}').format(int(r)).zfill(2)
+        g = ('{:X}').format(int(g)).zfill(2)
+        b = ('{:X}').format(int(b)).zfill(2)
+        return f"{r}{g}{b}"
+    except Exception as e:
+        return "FFFFFF"
