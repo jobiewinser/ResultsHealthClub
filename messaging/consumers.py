@@ -130,6 +130,7 @@ def get_rendered_html(message, message_context, messaging_customer_number, whats
     <span id='messageCollapse_{whatsappnumber.pk}' hx-swap-oob='afterbegin'>{rendered_message_list_row}</span> #this line is clearing the whole message list?!
     <span id='messageWindowInnerBody_{messaging_customer_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>                
     """
+    print(f"messageWindowInnerBody_{messaging_customer_number}")
 
     if message.inbound:
         rendered_html = f"""{rendered_html}
