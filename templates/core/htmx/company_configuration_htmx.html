@@ -26,7 +26,7 @@
         <div class="col">
         </div>
         <div class="col-md-auto">
-            <a class="nowrap btn btn-success btn-sm pointer" type="button" 
+            <a class="nowrap btn btn-success btn-sm pointer" type="button" {%if request.user.profile.role == 'c'%}disabled{%endif%}
                 hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
                 hx-vals='{"template_name": "add_user"}'
                 hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
