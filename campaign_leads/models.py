@@ -281,6 +281,7 @@ class Campaignlead(models.Model):
                     whatsappnumber = self.campaign.whatsapp_business_account.whatsappnumber
                 customer_number = self.whatsapp_number
                 response = whatsapp.send_template_message(self.whatsapp_number, whatsappnumber, template, language, components)
+                self.trigger_refresh_websocket(refresh_position=False)
                 reponse_messages = response.get('messages',[])
                 if reponse_messages:
                     print("CampaignleadDEBUG9")

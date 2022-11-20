@@ -11,6 +11,12 @@ body {
     height: 100vh;
 }
 
+.htmx-indicator {
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 500ms ease-in;
+}
+
 #top-htmx-indicator {
     visibility: hidden;
     opacity: 0;
