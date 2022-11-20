@@ -244,7 +244,7 @@ def campaign_assign_auto_send_template_htmx(request):
 @login_required
 def campaign_assign_whatsapp_business_account_htmx(request):
     campaign = Campaign.objects.get(pk=request.POST.get('campaign_pk'))
-    whatsapp_business_account_pk = request.POST.get('whatsapp_business_account_pk')
+    whatsapp_business_account_pk = request.POST.get('whatsapp_business_account_pk') or 0
     
     campaign.whatsapp_business_account = WhatsappBusinessAccount.objects.filter(pk=whatsapp_business_account_pk).first()
     campaign.first_send_template = None
