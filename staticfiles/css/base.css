@@ -16,6 +16,9 @@ body {
     opacity: 0;
     transition: opacity 500ms ease-in;
 }
+.htmx-request{
+    visibility: visible;
+}
 
 #top-htmx-indicator {
     visibility: hidden;
@@ -23,9 +26,6 @@ body {
     transition: opacity 500ms ease-in;
 }
 
-#top-htmx-indicator.htmx-request {
-    visibility: visible;
-}
 .navbar-collapse{
     z-index:1059;
 }
