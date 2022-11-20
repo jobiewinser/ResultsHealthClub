@@ -43,7 +43,9 @@
         
         {%block styles%}
         <style>
-              
+            #content {
+                overflow-x: hidden;
+            }
         </style>
         {%endblock styles%}
         
@@ -187,12 +189,12 @@
         
         $(document).ready(function() {
             set_total_costs();
-            set_lead_counts();            
+            set_lead_counts();           
         });
     </script>
     <body class="cartoon-background">
         {%include 'core/nav.html'%}
-        <div class="container-fluid pb-5" id="content" style="">  
+        <div class="container-fluid" id="content" style="">  
             {%block content%} 
             {%endblock content%}
         </div>
