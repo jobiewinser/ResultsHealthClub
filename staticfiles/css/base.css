@@ -651,24 +651,6 @@ tr.odd td {
 .draggable-card {
     margin: 5px
 }
-.top-highlight-100 {
-    border-top: 4px solid rgba(231, 0, 0, 1)
-}
-.top-highlight-80 {
-    border-top: 4px solid rgba(231, 36, 29, 1)
-}
-.top-highlight-60 {
-    border-top: 4px solid rgba(239, 131, 44, 1)
-}
-.top-highlight-40 {
-    border-top: 4px solid rgba(255, 253, 70, 1)
-}
-.top-highlight-20 {
-    border-top: 4px solid rgba(156, 250, 64, 1)
-}
-.top-highlight-0 {
-    border-top: 4px solid rgba(96, 248, 61, 1)
-}
 .highlight-100 {
     background: rgba(231, 0, 0, 0.05)
 }

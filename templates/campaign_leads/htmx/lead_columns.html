@@ -1,6 +1,5 @@
 {%load core_tags%}
 {%for queryset_title, queryset, call_count in querysets%}
-{%with call_count|division_percentage_max_100:max_call_count as call_percentage%}
 <div class="column-done">
     <div class="m-2 manually_add_lead_div">
     <h2 class="m-0">{{queryset_title}} <img  class="htmx-indicator invert column-htmx-indicator" src="https://htmx.org/img/bars.svg"/></h2> 
@@ -18,7 +17,6 @@
         {%endfor%}
     </div>
 </div>
-{%endwith%}
 {%endfor%}
 
 <span hidden id="max_call_count_span">

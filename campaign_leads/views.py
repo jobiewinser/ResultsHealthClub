@@ -21,7 +21,7 @@ from whatsapp.api import Whatsapp
 from whatsapp.models import WhatsappTemplate
 from django.template import loader
 logger = logging.getLogger(__name__)
-
+from core.templatetags.core_tags import hex_to_rgb_tuple_tag
 
 def get_campaign_qs(request):
     first_model_query = (Campaignlead.objects
@@ -250,6 +250,13 @@ def campaign_assign_whatsapp_business_account_htmx(request):
     campaign.first_send_template = None
     campaign.second_send_template = None
     campaign.third_send_template = None
+    campaign.save()
+    return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign})
+
+@login_required
+def campaign_assign_color_htmx(request):
+    campaign = Campaign.objects.get(pk=request.POST.get('campaign_pk'))
+    campaign.color = hex_to_rgb_tuple_tag(request.POST.get('color', "60F83D"))
     campaign.save()
     return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign})
     
