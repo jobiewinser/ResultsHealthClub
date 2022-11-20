@@ -4,9 +4,9 @@
             hx-get="{%url 'get-base-analytics' %}"
             hx-include="#start_date, #end_date, #site_pk, #campaign_pk"
             hx-target="#base_analytics_span_wrapper"
-            hx-indicator=".htmx-indicator-base-analytics"
+            hx-indicator="#top-htmx-indicator-base-analytics"
             hx-swap="innerHTML"
-            onclick="$('.htmx-indicator-base-analytics').addClass('htmx-request')">refresh</button>
+            onclick="$('#top-htmx-indicator-base-analytics').addClass('htmx-request')">refresh</button>
 
     <div class="row my-3">
         <div class="col analytics_col">

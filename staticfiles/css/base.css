@@ -11,13 +11,13 @@ body {
     height: 100vh;
 }
 
-.htmx-indicator {
+#top-htmx-indicator {
     visibility: hidden;
     opacity: 0;
     transition: opacity 500ms ease-in;
 }
 
-.htmx-indicator.htmx-request {
+#top-htmx-indicator.htmx-request {
     visibility: visible;
 }
 .navbar-collapse{
@@ -487,14 +487,14 @@ button:not(:disabled) {
 tr.odd td {
     background-color: unset
 }
-.htmx-request .htmx-indicator {
+.htmx-request #top-htmx-indicator {
     opacity: 1
 }
-.htmx-request.htmx-indicator {
+.htmx-request#top-htmx-indicator {
     opacity: 1
 }
 .month_header {}
-.htmx-indicator.invert {
+#top-htmx-indicator.invert {
     height: 30px;
     margin: 0px;
     filter: invert(42%) sepia(93%) saturate(1352%) hue-rotate(87deg) brightness(119%) contrast(119%);

@@ -25,7 +25,7 @@
     {%for customer_number in customer_numbers%}
     {%if customer_number and whatsappnumber%}
     <span hx-get="{%url 'message-window' customer_number=customer_number whatsappnumber_pk=whatsappnumber.pk%}"
-        hx-indicator=".htmx-indicator" 
+        hx-indicator="#top-htmx-indicator" 
         hx-push-url="false"
         hx-swap="outerHTML" hx-trigger="load"></span>
     {%endif%}
@@ -62,7 +62,7 @@
                                 hx-get="{%url 'message-list'%}"
                                 hx-target="#chat_bottom"
                                 hx-swap="outerHTML"
-                                hx-indicator=".htmx-indicator"                 
+                                hx-indicator="#top-htmx-indicator"                 
                                 hx-vals='{"site_pk": "{{site.pk}}", "whatsappnumber_pk": "{{chat_whatsappnumber.pk}}"}'
                                 hx-trigger="click"
                                 

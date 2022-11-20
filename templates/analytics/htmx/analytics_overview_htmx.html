@@ -36,7 +36,7 @@
             hx-get="{%url 'refresh-analytics'%}"
             hx-swap="outerHTML" hx-push-url="false" hx-include=".non_site_dependant_analytics_filters" hx-indicator="#page_load_indicator" hx-target="#analytics_span_wrapper" id="filter_campaign"></button>
 
-            <div class="col-md-auto m-1" hx-get="{% url 'get-campaign'%}" hx-include=".non_site_dependant_analytics_filters" hx-trigger="load" hx-indicator=".htmx-indicator" hx-target="#campaign_list_span" hx-swap="outerHTML">
+            <div class="col-md-auto m-1" hx-get="{% url 'get-campaign'%}" hx-include=".non_site_dependant_analytics_filters" hx-trigger="load" hx-indicator="#top-htmx-indicator" hx-target="#campaign_list_span" hx-swap="outerHTML">
             <span id="campaign_list_span">   
                 <select class="form-select">
                     <option>Loading</option>
