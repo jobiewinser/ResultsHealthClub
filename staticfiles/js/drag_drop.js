@@ -6,13 +6,11 @@ var dragStart = target => {
 
 var dragEnd = target => {
     target.classList.remove('dragging');
-    target.classList.remove('tilt');
     
-    
+    $('.tilt').removeClass('tilt')
     document.querySelector('#add_booking_area').classList.remove('shown');
     document.querySelector('#archive_area').classList.remove('shown');
     document.querySelector('#chat_bottom').classList.remove('temp_hidden');
-    // console.log("dragEnd", target)
 };
 
 var dragEnter = event => {
@@ -30,7 +28,9 @@ var drag = event => {
     event.currentTarget.classList.add("dragging")
     event.dataTransfer.setData('text/html', event.currentTarget.outerHTML);
     event.dataTransfer.setData('text/plain', event.currentTarget.dataset.id);
-    event.dataTransfer.dropEffect = "copy";
+    event.effectAllowed = "copyMove";
+    event.dataTransfer.dragEffect = "copyMove";
+    event.dataTransfer.dropEffect = "copyMove";
     drag_divs_showing = true;
     setTimeout(function(){
         if (drag_divs_showing) {
@@ -100,8 +100,8 @@ var allowDrop = event => {
 //     }
 // });
 
-// document.addEventListener('dragend', e => {
-//     if (e.target.className.includes('column-drag')) {
-//         dragEnd(e.target);
-//     }
-// });
+document.addEventListener('dragend', e => {
+    if (e.target.className.includes('column-drag')) {
+        dragEnd(e.target);
+    }
+});

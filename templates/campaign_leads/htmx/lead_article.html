@@ -3,7 +3,7 @@
 <span class="column-drag lead-{{lead.pk}}"
     draggable="true" ondragstart="drag(event)" data-id="{{lead.pk}}" id="lead-{{lead.pk}}">
     <input type="text" style="display:None" id="lead_pk_{{lead.pk}}" name="lead_pk" value="{{lead.pk}}"/>
-    <article style="margin-right:50px; border-top: 4px solid rgba({{lead.campaign.color}}, 1)"  class="card draggable-card lead_card">
+    <article style="margin-right:50px; border-top: 4px solid rgba({{lead.campaign.color}}, 1)" id="article-{{lead.pk}}"  class="card draggable-card lead_card">
         <div class="row" style="height:30px">
             <div class="col p-0 elipses-overflow">
                 <span class="primary_td_layer">
@@ -123,10 +123,7 @@
     </article>
 </span>
 <script>
-    article_event_listener(".draggable-card")
-    $(document).mouseup(function() {
-        $('.tilt').removeClass('tilt')
-    });
+    article_event_listener("#article-{{lead.pk}}")
 </script>
 
 {%endif%}
