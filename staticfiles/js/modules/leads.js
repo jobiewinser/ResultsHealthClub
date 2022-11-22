@@ -93,5 +93,6 @@ function set_lead_counts(){
 function article_event_listener(identifier){
     $(identifier).mousedown(function() {
         $(this).addClass('tilt')
+        drag_divs_showing = false;
     });
 }

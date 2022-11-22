@@ -53,6 +53,9 @@
     
     <script>  
         $(document).ready(function() {
+            window.addEventListener('mouseup', function(event){
+                $('.tilt').removeClass('tilt')
+            })
             
             document.body.onkeydown = function(e) {
                 var current_module = $('#current_page').val()
