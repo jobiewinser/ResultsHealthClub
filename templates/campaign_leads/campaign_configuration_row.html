@@ -60,7 +60,7 @@ id="submit_site_pk_{{campaign.pk}}"></button>
 </td>
 <td>
     <span hidden>{{campaign.color}}</span>   
-    <input type="color" id="color_{{campaign.pk}}"  name="color" class="form-control" style="min-height:24px"
+    <input type="color" id="color_{{campaign.pk}}"  name="color" class="form-control" style="min-height: 38.5px"
         hx-post="{% url 'campaign-assign-color' %}" hx-swap="innerHTML" 
         hx-trigger="change"
         hx-indicator=".top-htmx-indicator" 
