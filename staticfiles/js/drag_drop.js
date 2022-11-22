@@ -27,10 +27,11 @@ var dragLeave = event => {
 };
 var drag_divs_showing = false;
 var drag = event => {
+    event.currentTarget.classList.add("dragging")
     event.dataTransfer.setData('text/html', event.currentTarget.outerHTML);
     event.dataTransfer.setData('text/plain', event.currentTarget.dataset.id);
+    event.dataTransfer.dropEffect = "copy";
     drag_divs_showing = true;
-    // console.log("drag")
     setTimeout(function(){
         if (drag_divs_showing) {
             document.querySelector('#add_booking_area').classList.add('shown');

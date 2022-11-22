@@ -11,7 +11,7 @@
     width: 220px;
     /* height: 140px; */
     cursor: grab;
-    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    /* transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1); */
 }
 
 .card:active {
@@ -33,7 +33,7 @@
     margin-top: 10px;
     padding: 10px;
     /* background: unset; */
-    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    /* transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1); */
     width: 250px;
     flex: 0 0 250px;
     min-height: 100vh;
