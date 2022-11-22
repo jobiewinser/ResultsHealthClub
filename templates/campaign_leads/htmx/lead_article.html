@@ -1,6 +1,6 @@
 {%load core_tags static%}
 {%if not lead.complete%}
-<span class="column-drag fade-me-out lead-{{lead.pk}}"
+<span class="column-drag lead-{{lead.pk}}"
     draggable="true" ondragstart="drag(event)" data-id="{{lead.pk}}" id="lead-{{lead.pk}}">
     <input type="text" style="display:None" id="lead_pk_{{lead.pk}}" name="lead_pk" value="{{lead.pk}}"/>
     <article style="margin-right:50px; border-top: 4px solid rgba({{lead.campaign.color}}, 1)"  class="card draggable-card  lead_card">

@@ -1,11 +1,14 @@
 
 var dragStart = target => {
     target.classList.add('dragging');
-    // console.log("dragStart")
+    target.classList.add('tilt');    
 };
 
 var dragEnd = target => {
     target.classList.remove('dragging');
+    target.classList.remove('tilt');
+    
+    
     document.querySelector('#add_booking_area').classList.remove('shown');
     document.querySelector('#archive_area').classList.remove('shown');
     document.querySelector('#chat_bottom').classList.remove('temp_hidden');
@@ -13,6 +16,7 @@ var dragEnd = target => {
 };
 
 var dragEnter = event => {
+    console.log("test")
     event.currentTarget.classList.add('drop');
     // console.log("dragEnter")
 };
@@ -68,27 +72,27 @@ var drop_archive = event => {
     htmx.ajax('POST', '/campaign-leads/mark-done/'+dragged_elem.data('id')+'/', {swap:'none'})
 };
 
-function handleDraggedItem(elem){
-    // console.log("handleDraggedItem")
-}
+// function handleDraggedItem(elem){
+//     // console.log("handleDraggedItem")
+// }
 
 var allowDrop = event => {
     event.preventDefault();
 };
 
-document.querySelectorAll('.column').forEach(column => {
-    column.addEventListener('dragenter', dragEnter);
-    column.addEventListener('dragleave', dragLeave);
-});
+// document.querySelectorAll('.column').forEach(column => {
+//     column.addEventListener('dragenter', dragEnter);
+//     column.addEventListener('dragleave', dragLeave);
+// });
 
-document.addEventListener('dragstart', e => {
-    if (e.target.className.includes('column-drag')) {
-        dragStart(e.target);
-    }
-});
+// document.addEventListener('dragstart', e => {
+//     if (e.target.className.includes('column-drag')) {
+//         dragStart(e.target);
+//     }
+// });
 
-document.addEventListener('dragend', e => {
-    if (e.target.className.includes('column-drag')) {
-        dragEnd(e.target);
-    }
-});
+// document.addEventListener('dragend', e => {
+//     if (e.target.className.includes('column-drag')) {
+//         dragEnd(e.target);
+//     }
+// });

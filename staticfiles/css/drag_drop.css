@@ -18,9 +18,15 @@
     cursor: grabbing;
 }
 
-.card.dragging {
-    opacity: .5;
-    transform: scale(.8);
+.dragging {
+    opacity: 1 !important;
+    transform: scale(.7);
+}
+
+.tilt {
+    transform: rotate(30deg);
+    -moz-transform: rotate(30deg);
+    -webkit-transform: rotate(30deg);
 }
 
 .column-done {
@@ -28,10 +34,10 @@
     padding: 10px;
     /* background: unset; */
     transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-    width:250px;
+    width: 250px;
     flex: 0 0 250px;
-    min-height:100vh;
-    border-right: 1px solid rgba(33, 37, 41 , 0.5);
+    min-height: 100vh;
+    border-right: 1px solid rgba(33, 37, 41, 0.5);
 }
 
 .column.column-ip {
