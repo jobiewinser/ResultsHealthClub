@@ -20,7 +20,6 @@
 
 .dragging {
     opacity: 1 !important;
-    transform: scale(.7);
 }
 
 .tilt {

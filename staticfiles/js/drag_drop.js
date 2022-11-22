@@ -1,13 +1,11 @@
 
 var dragStart = target => {
     target.classList.add('dragging');
-    target.classList.add('tilt');    
 };
 
 var dragEnd = target => {
     target.classList.remove('dragging');
     
-    $('.tilt').removeClass('tilt')
     document.querySelector('#add_booking_area').classList.remove('shown');
     document.querySelector('#archive_area').classList.remove('shown');
     document.querySelector('#chat_bottom').classList.remove('temp_hidden');
@@ -25,7 +23,6 @@ var dragLeave = event => {
 };
 var drag_divs_showing = false;
 var drag = event => {
-    event.currentTarget.classList.add("tilt")
     event.currentTarget.classList.add("dragging")
     event.dataTransfer.setData('text/html', event.currentTarget.outerHTML);
     event.dataTransfer.setData('text/plain', event.currentTarget.dataset.id);
@@ -53,7 +50,6 @@ var drop = event => {
     handleDraggedItem(dragged_elem_id, event.currentTarget)
     // console.log("drop", event.currentTarget)
     drag_divs_showing = false;
-    $('.tilt').removeClass('tilt')
     document.querySelector('#add_booking_area').classList.remove('shown');
     document.querySelector('#archive_area').classList.remove('shown');
     document.querySelector('#chat_bottom').classList.remove('temp_hidden');
@@ -64,7 +60,6 @@ var drop_booking = event => {
     event.preventDefault();
     // console.log("drop_booking", event.currentTarget)
     drag_divs_showing = false;
-    $('.tilt').removeClass('tilt')
     document.querySelector('#add_booking_area').classList.remove('shown');
     document.querySelector('#archive_area').classList.remove('shown');
     document.querySelector('#chat_bottom').classList.remove('temp_hidden');
