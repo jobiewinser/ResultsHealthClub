@@ -24,9 +24,9 @@
 }
 
 .tilt {
-    transform: rotate(30deg);
-    -moz-transform: rotate(30deg);
-    -webkit-transform: rotate(30deg);
+    transform: rotate(3deg);
+    -moz-transform: rotate(3deg);
+    -webkit-transform: rotate(3deg);
 }
 
 .column-done {

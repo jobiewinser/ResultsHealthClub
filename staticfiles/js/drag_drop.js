@@ -25,14 +25,19 @@ var dragLeave = event => {
     event.currentTarget.classList.remove('drop');
     // console.log("dragLeave")
 };
-
+var drag_divs_showing = false;
 var drag = event => {
     event.dataTransfer.setData('text/html', event.currentTarget.outerHTML);
     event.dataTransfer.setData('text/plain', event.currentTarget.dataset.id);
+    drag_divs_showing = true;
     // console.log("drag")
-    document.querySelector('#add_booking_area').classList.add('shown');
-    document.querySelector('#archive_area').classList.add('shown');
-    document.querySelector('#chat_bottom').classList.add('temp_hidden');
+    setTimeout(function(){
+        if (drag_divs_showing) {
+            document.querySelector('#add_booking_area').classList.add('shown');
+            document.querySelector('#archive_area').classList.add('shown');
+            document.querySelector('#chat_bottom').classList.add('temp_hidden');
+        }
+    }, 200); 
 };
 
 var drop = event => {
@@ -45,6 +50,7 @@ var drop = event => {
     event.currentTarget.innerHTML = event.dataTransfer.getData('text/html') + event.currentTarget.innerHTML;
     handleDraggedItem(dragged_elem_id, event.currentTarget)
     // console.log("drop", event.currentTarget)
+    drag_divs_showing = false;
     document.querySelector('#add_booking_area').classList.remove('shown');
     document.querySelector('#archive_area').classList.remove('shown');
     document.querySelector('#chat_bottom').classList.remove('temp_hidden');
@@ -54,6 +60,7 @@ var drop_booking = event => {
     let dragged_elem = $(`[data-id="${event.dataTransfer.getData('text/plain')}"]`)
     event.preventDefault();
     // console.log("drop_booking", event.currentTarget)
+    drag_divs_showing = false;
     document.querySelector('#add_booking_area').classList.remove('shown');
     document.querySelector('#archive_area').classList.remove('shown');
     document.querySelector('#chat_bottom').classList.remove('temp_hidden');
@@ -65,6 +72,7 @@ var drop_archive = event => {
     let dragged_elem = $(`[data-id="${event.dataTransfer.getData('text/plain')}"]`)
     event.preventDefault();
     // console.log("drop_booking", event.currentTarget)
+    drag_divs_showing = false;
     document.querySelector('#add_booking_area').classList.remove('shown');
     document.querySelector('#archive_area').classList.remove('shown');
     document.querySelector('#chat_bottom').classList.remove('temp_hidden');
