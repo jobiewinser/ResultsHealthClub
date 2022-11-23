@@ -182,7 +182,7 @@
         {%endif%}
         ">
         {%endif%}
-        <button class="btn btn-primary btn-sm m-1" 
+        {% comment %} <button class="btn btn-primary btn-sm m-1" 
             {%if not company_sites_with_same_whatsapp_business_details%}disabled{%endif%}
             hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
             hx-vals='{"template_name": "transfer_template", "whatsapp_template_pk": "{{template.pk}}"}'
@@ -190,7 +190,7 @@
             hx-push-url="false"
             hx-swap="innerHTML" hx-trigger="click" id="transfer_template_{{template.pk}}"> 
                 <i class="fa fa-arrow-right" aria-hidden="true"></i> Transfer
-        </button>
+        </button> {% endcomment %}
     </span>
 </td>
 {%endwith%}

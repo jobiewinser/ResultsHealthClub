@@ -89,3 +89,9 @@ function set_lead_counts(){
         $(this).val(total_count).html(total_count);
     });
 }
+
+function lead_event_listener(identifier){
+    $(identifier).mousedown(function() {
+        drag_divs_showing = false;
+    });
+}

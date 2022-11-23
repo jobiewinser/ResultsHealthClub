@@ -16,7 +16,8 @@ body {
     opacity: 0;
     transition: opacity 500ms ease-in;
 }
-.htmx-request{
+
+.htmx-request {
     visibility: visible;
 }
 
@@ -26,8 +27,8 @@ body {
     transition: opacity 500ms ease-in;
 }
 
-.navbar-collapse{
-    z-index:1059;
+.navbar-collapse {
+    z-index: 1059;
 }
 
 #page_load_indicator {
@@ -41,10 +42,10 @@ body {
 .disconnected_indicator {
     height: 100%;
     width: 100%;
-    padding-top:40%;
-    text-align:center;
-    background: rgba(211,211,211, 0.4);
-    z-index:1061;
+    padding-top: 40%;
+    text-align: center;
+    background: rgba(211, 211, 211, 0.4);
+    z-index: 1061;
     position: absolute;
 }
 
@@ -55,6 +56,7 @@ body {
     top: 40%;
     left: 40%;
 }
+
 .whole_page_disconnected_indicator_content {
     height: 20%;
     width: 20%;
@@ -64,27 +66,29 @@ body {
 }
 
 .whole_page_disconnected_indicator {
-    background: rgba(211,211,211, 0.4);
+    background: rgba(211, 211, 211, 0.4);
     top: 0;
     left: 0;
     bottom: 0;
     right: 0;
     position: absolute;
-    width:100vw;
-    height:100vh;
+    width: 100vw;
+    height: 100vh;
     z-index: 1071;
 }
 
-
-.dropdown-menu{
+.dropdown-menu {
     z-index: 1070;
 }
-.generic_modal_contents{
+
+.generic_modal_contents {
     position: relative;
     overflow-y: auto;
-    padding: 15px; 
-    max-height:70vh;
+    padding: 15px;
+    max-height: 70vh;
 }
+
+
 /* custom scrollbar */
 
 ::-webkit-scrollbar {
@@ -203,6 +207,7 @@ font-size: 1.5vh
 }
 #content {
     padding: 10px;
+    padding-bottom: 50px;
     top: 7vh;
     height: 93vh;
     position: fixed;
@@ -362,8 +367,6 @@ font-size: 1.5vh
 .bg-warning-trans {
     background-color: rgba(255, 193, 7, 0.6) !important;
 }
-
-
 .bg-success-trans-80 {
     background-color: rgba(25, 135, 84, 0.8) !important;
 }
@@ -379,8 +382,6 @@ font-size: 1.5vh
 .bg-warning-trans-80 {
     background-color: rgba(255, 193, 7, 0.8) !important;
 }
-
-
 .bg-success-trans-20 {
     background-color: rgba(25, 135, 84, 0.2) !important;
 }
@@ -396,7 +397,6 @@ font-size: 1.5vh
 .bg-warning-trans-20 {
     background-color: rgba(255, 193, 7, 0.2) !important;
 }
-
 .complete-tr>* {
     background-color: rgba(25, 135, 84, 0.1) !important;
 }
@@ -686,7 +686,8 @@ tr.odd td {
     left: 2%;
     top: 40vh;
 }
-#add_booking_area,#archive_area {
+#add_booking_area,
+#archive_area {
     visibility: hidden;
     position: absolute;
     width: 20vw;
@@ -694,7 +695,8 @@ tr.odd td {
     z-index: 1000;
     border-radius: 10px
 }
-#add_booking_area.shown,#archive_area.shown {
+#add_booking_area.shown,
+#archive_area.shown {
     visibility: visible;
 }
 .col-md-auto {
@@ -762,20 +764,18 @@ tr.odd td {
     bottom: 35%;
     right: 2%;
 }
-.analytics-card{
-    min-width:350px;
+.analytics-card {
+    min-width: 350px;
     margin: 10px;
 }
-.chart_wrapper{
-    position: relative; 
-    height:100%;
-    width:100%; 
+.chart_wrapper {
+    position: relative;
+    height: 100%;
+    width: 100%;
 }
-
-.analytics_col{
-    max-width:50%
+.analytics_col {
+    max-width: 50%
 }
-
-#top-htmx-indicator{
-    height:30px
+#top-htmx-indicator {
+    height: 30px
 }

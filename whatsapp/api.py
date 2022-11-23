@@ -36,6 +36,7 @@ class Whatsapp():
         return headers
     #POST
     def send_free_text_message(self, customer_number, message, whatsapp_number, preview_url = False):   
+        print("send_free_text_message", customer_number, message, whatsapp_number)
         from core.models import AttachedError
         if message:  
             if settings.WHATSAPP_PHONE_OVERRIDE1:
@@ -246,9 +247,11 @@ class Whatsapp():
             recipient_list=['jobiewinser@gmail.com'])
         print(response_body)
         template_object = WhatsappTemplate.objects.get(pk=template_object.pk)
-        template_object.message_template_id = response_body['id']
-        template_object.save()
-        return response_body
+        message_template_id = response_body.get('id')
+        if message_template_id:
+            template_object.message_template_id = message_template_id
+            template_object.save()
+            return response_body
     #POST
     def edit_template(self, template_object):   
         if template_object.status in ["APPROVED", "REJECTED", "PAUSED"]:

@@ -11,27 +11,32 @@
     width: 220px;
     /* height: 140px; */
     cursor: grab;
-    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    /* transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1); */
 }
 
 .card:active {
     cursor: grabbing;
 }
 
-.card.dragging {
-    opacity: .5;
-    transform: scale(.8);
+.dragging {
+    opacity: 1 !important;
+}
+
+.tilt {
+    transform: rotate(3deg);
+    -moz-transform: rotate(3deg);
+    -webkit-transform: rotate(3deg);
 }
 
 .column-done {
     margin-top: 10px;
     padding: 10px;
     /* background: unset; */
-    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-    width:250px;
+    /* transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1); */
+    width: 250px;
     flex: 0 0 250px;
-    min-height:100vh;
-    border-right: 1px solid rgba(33, 37, 41 , 0.5);
+    min-height: 100vh;
+    border-right: 1px solid rgba(33, 37, 41, 0.5);
 }
 
 .column.column-ip {

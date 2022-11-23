@@ -3,11 +3,11 @@
     <div class="col">
         <div class="m-3">
             <label class="form-label custom-badge-label" for="booking_date">Date of Booking</label>
-            <input type="date" id="booking_date" name="booking_date" class="form-control booking_input" {%if debug%}value="{{''|prefill_date_input_with_now}}"{%endif%}>
+            <input type="date" id="booking_date" placeholder="dd/mm/yyyy" name="booking_date" class="form-control booking_input" {%if debug%}value="{{''|prefill_date_input_with_now}}"{%endif%}>
         </div>
         <div class="m-3">
             <label class="form-label custom-badge-label" for="booking_time">Time of Booking</label>
-            <input type="time" id="booking_time" name="booking_time" class="form-control booking_input" {%if debug%}value="{{''|prefill_time_input_with_now}}"{%endif%}>
+            <input type="time" id="booking_time" placeholder="hh:mm" name="booking_time" class="form-control booking_input" {%if debug%}value="{{''|prefill_time_input_with_now}}"{%endif%}>
         </div>
 
         <div class="m-3 row" style="text-align:left; margin-left:0px !important; min-width:300px;">
