@@ -36,6 +36,7 @@ class Whatsapp():
         return headers
     #POST
     def send_free_text_message(self, customer_number, message, whatsapp_number, preview_url = False):   
+        print("send_free_text_message", customer_number, message, whatsapp_number)
         from core.models import AttachedError
         if message:  
             if settings.WHATSAPP_PHONE_OVERRIDE1:
