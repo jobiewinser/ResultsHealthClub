@@ -247,9 +247,11 @@ class Whatsapp():
             recipient_list=['jobiewinser@gmail.com'])
         print(response_body)
         template_object = WhatsappTemplate.objects.get(pk=template_object.pk)
-        template_object.message_template_id = response_body['id']
-        template_object.save()
-        return response_body
+        message_template_id = response_body.get('id')
+        if message_template_id:
+            template_object.message_template_id = message_template_id
+            template_object.save()
+            return response_body
     #POST
     def edit_template(self, template_object):   
         if template_object.status in ["APPROVED", "REJECTED", "PAUSED"]:
