@@ -10,7 +10,7 @@ from calendly.api import Calendly
 from campaign_leads.models import Call, Campaign, Campaignlead
 from active_campaign.api import ActiveCampaignApi
 from active_campaign.models import ActiveCampaign
-from core.core_decorators import campaign_leads_enabled_required
+# from core.core_decorators import campaign_leads_enabled_required
 from core.models import Profile, Site, WhatsappBusinessAccount
 from core.user_permission_functions import get_available_sites_for_user, get_user_allowed_to_add_call
 from core.views import get_site_pk_from_request
@@ -52,7 +52,7 @@ def get_campaign_qs(request):
         campaign_qs = campaign_qs.filter(site__pk=site_pk)
     return campaign_qs.order_by('first_model_count')
 
-@method_decorator(campaign_leads_enabled_required, name='dispatch')
+# @method_decorator(campaign_leads_enabled_required, name='dispatch')
 @method_decorator(login_required, name='dispatch')
 class CampaignleadsOverviewView(TemplateView):
     template_name='campaign_leads/campaign_leads_overview.html'
@@ -119,7 +119,7 @@ def get_leads_board_context(request):
 
 def refresh_leads_board(request):
     return render(request, 'campaign_leads/htmx/leads_board.html', get_leads_board_context(request))
-@method_decorator(campaign_leads_enabled_required, name='dispatch')
+# @method_decorator(campaign_leads_enabled_required, name='dispatch')
 @method_decorator(login_required, name='dispatch')
 class CampaignBookingsOverviewView(TemplateView):
     template_name='campaign_leads/campaign_bookings_overview.html'
@@ -155,7 +155,7 @@ def get_booking_table_context(request):
     return context
 def refresh_booking_table_htmx(request):
     return render(request, 'campaign_leads/htmx/campaign_bookings_table.html', get_booking_table_context(request))
-@method_decorator(campaign_leads_enabled_required, name='dispatch')
+# @method_decorator(campaign_leads_enabled_required, name='dispatch')
 @method_decorator(login_required, name='dispatch')
 class CampaignConfigurationView(TemplateView):
     template_name='campaign_leads/campaign_configuration.html'
