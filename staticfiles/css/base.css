@@ -37,6 +37,7 @@ body {
     position: absolute;
     top: 40%;
     left: 40%;
+    z-index: 11111;
 }
 
 .disconnected_indicator {

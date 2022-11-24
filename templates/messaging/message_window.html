@@ -16,7 +16,7 @@
                     data-bs-trigger="hover" 
                     data-bs-placement="top"
                     data-bs-content="Manually start a conversation using a template."
-                    hx-indicator="#htmx_indicator_messageCollapse_{{whatsappnumber.pk}}" hx-target="#generic_modal_body" 
+                    hx-indicator="#page_load_indicator" hx-target="#generic_modal_body" 
                     hx-get="{% url 'get-modal-content' %}" 
                     hx-push-url="false"
                     hx-vals='{"template_name": "send_new_template_message", "whatsappnumber_pk":"{{whatsappnumber.pk}}", "lead_pk":"{{lead.pk}}", "contact_pk":"{{contact.pk}}", "customer_number":"{{customer_number}}"}'

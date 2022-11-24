@@ -56,6 +56,10 @@
             window.addEventListener('mouseup', function(event){
             })
             
+            $( "#nav-link" ).click(function() {
+                $('#generic_modal').modal('hide');
+            });
+            
             document.body.onkeydown = function(e) {
                 var current_module = $('#current_page').val()
                 if (current_module == 'campaign_leads_overview'){

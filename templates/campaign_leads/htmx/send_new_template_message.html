@@ -252,15 +252,21 @@
     </div>
     <br>
     <div class="row">
-        <div class="col center">
+        <div class="col">
+        </div>
+        <div class="col-md-auto center">
             <button class="btn btn-success"
                 hx-include=".send_new_template_message_input"
                 hx-post="{% url 'send-new-template-message' %}" 
                 hx-push-url="false"
+                hx-indicator="#send_new_template_message_htmx_indicator"
                 hx-vals='{"whatsappnumber_pk":"{{whatsappnumber.pk}}"{%if contact.pk%}, "contact_pk":"{{contact.pk}}"{%endif%}{%if lead.pk%}, "lead_pk":"{{lead.pk}}"{%endif%}}'
                 hx-swap="none" hx-trigger="click">
                 <i class="fa-solid fa-paper-plane-top"></i> Send
             </button>
+        </div>
+        <div class="col">            
+        <img  class="htmx-indicator invert" id="send_new_template_message_htmx_indicator" src="https://htmx.org/img/bars.svg"/>
         </div>
     </div>
 </div>
