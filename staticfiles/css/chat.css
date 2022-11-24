@@ -20,8 +20,6 @@
 .chat_bottom_window {
     min-width: 300px;
     text-align: left;
-    padding-left: 4px;
-    margin-right: 4px;
     margin-top: auto;
 }
 .collapsed .fa-arrow-down {    
@@ -53,6 +51,8 @@ transition-duration: 0.5s;
     max-width: 100%;
     width: auto;
     padding-top: 2px;
+    padding-left: 4px;
+    padding-right: 4px;
 }
 
 .chat_bottom_header {
