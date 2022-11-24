@@ -55,7 +55,7 @@
                 {%if not lead.message_set.all%}
                 <button class="btn btn-sm btn-success text-white position-relative" 
                     hx-get="{%url 'send-first-template-whatsapp-lead-article' lead_pk=lead.pk%}"
-                    hx-indicator="#top-htmx-indicator" 
+                    hx-indicator="#page_load_indicator" 
                     hx-include="#max_call_count"
                     hx-target="#lead-{{lead.pk}}"
                     hx-push-url="false"
@@ -68,7 +68,7 @@
                         hx-get="{%url 'message-list'%}"
                         hx-target="#chat_bottom"
                         hx-swap="outerHTML"
-                        hx-indicator="#top-htmx-indicator"                 
+                        hx-indicator="#page_load_indicator"                 
                         hx-vals='{"site_pk": "{{lead.campaign.site.pk}}", "customer_number": "{{lead.whatsapp_number}}"}'
                         hx-trigger="click"
                         
