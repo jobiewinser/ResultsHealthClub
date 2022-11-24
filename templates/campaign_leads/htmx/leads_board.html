@@ -20,7 +20,7 @@
             data-bs-trigger="hover" 
             data-bs-placement="top"
             data-bs-content="Manually create a campaign lead."
-            hx-indicator="#top-htmx-indicator" hx-target="#generic_modal_body" 
+            hx-indicator="#page_load_indicator" hx-target="#generic_modal_body" 
             hx-include="#site_pk"
             hx-get="{% url 'campaign-lead-get-modal-content' %}" 
             hx-push-url="false"

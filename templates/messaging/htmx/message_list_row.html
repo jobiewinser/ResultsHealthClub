@@ -2,7 +2,7 @@
 <div class="row chat_row {%if message.inbound%}active_chat_row{%else%}inactive_chat_row{%endif%} {%if message.pending%}pending_message{%endif%} {%if message.failed%}bg-danger-trans-20{%endif%}"
     {%if message.customer_number and whatsappnumber.pk%}
         hx-get="{%url 'message-window' customer_number=message.customer_number whatsappnumber_pk=whatsappnumber.pk%}"
-        hx-indicator="#top-htmx-indicator" 
+        hx-indicator="#page_load_indicator" 
         hx-target="#next_chat_window"
         hx-push-url="false"
         hx-swap="outerHTML" hx-trigger="click"
