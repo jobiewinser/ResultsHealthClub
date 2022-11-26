@@ -4,26 +4,26 @@
         <div class="col center">
             
             {%if user.profile.company%}
-            <form class="form-floating m-1">
+            <div class="form-floating m-1">
                 <input disabled name="company" value="{%if edit_user.profile.company%}{{edit_user.profile.company.company_name}}{%else%}Company not configured{%endif%}" class="form-control" id="company"/>
                 <label for="company">Company</label>
-            </form>
+            </div>
             {%endif%}
             
-            <form class="form-floating m-1">
+            <div class="form-floating m-1">
                 <input name="first_name" value="{{edit_user.first_name}}" class="form-control modify_user_input" id="first_name"/>
                 <label for="first_name">First Name</label>
-            </form>
+            </div>
             
-            <form class="form-floating m-1">
+            <div class="form-floating m-1">
                 <input name="last_name" value="{{edit_user.last_name}}" class="form-control modify_user_input" id="last_name"/>
                 <label for="last_name">Last Name</label>
-            </form>
+            </div>
             
-            <form class="form-floating m-1">
+            <div class="form-floating m-1">
                 <input name="calendly_event_page_url" value="{{edit_user.profile.calendly_event_page_url}}" class="form-control modify_user_input" id="calendly_event_page_url"/>
                 <label for="calendly_event_page_url">Calendly Event Page Url</label>
-            </form>
+            </div>
                     
             <br>
             <div class="form-group">

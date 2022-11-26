@@ -10,7 +10,33 @@ from django.contrib.auth.models import User
 from core.templatetags.core_tags import short_month_name
 from django.db.models import Sum
 from django.db.models import Q, Count
-def get_sales_to_leads_between_dates_with_timeframe_differences(start_date, end_date, timeframe, user, timeframe_label_string='month', campaign=None, site=None):
+# def get_sales_to_leads_between_dates_with_timeframe_differences(start_date, end_date, timeframe, user, timeframe_label_string='month', campaign=None, site=None):
+#     if start_date + relativedelta.relativedelta(years=3) > end_date:
+#         index_date = start_date
+#         time_label_set = []
+#         data_set = []
+#         while index_date < end_date + timeframe:
+#             qs = Campaignlead.objects.filter(created__gte=index_date, created__lt=index_date + timeframe)
+#             if campaign:
+#                 qs = qs.filter(campaign=campaign)
+#             elif site:
+#                 qs = qs.filter(campaign__site=site)
+#             leads = qs.count()
+#             sales = qs.filter(sold=True).count()
+#             if leads:
+#                 percentage = sales/leads*100
+#             else:
+#                 percentage = 0
+#             data_set.append({
+#                 'leads':leads,
+#                 'sales':sales,
+#                 'percentage':percentage,
+#             })
+#             time_label_set.append(f"{index_date}")
+#             index_date = index_date + timeframe
+#         return data_set, time_label_set    
+#     return [],[]
+def get_leads_to_bookings_and_sales_between_dates_with_timeframe_differences(start_date, end_date, timeframe, user, campaign=None, site=None):
     if start_date + relativedelta.relativedelta(years=3) > end_date:
         index_date = start_date
         time_label_set = []
@@ -22,63 +48,57 @@ def get_sales_to_leads_between_dates_with_timeframe_differences(start_date, end_
             elif site:
                 qs = qs.filter(campaign__site=site)
             leads = qs.count()
+            # Bookings
+            bookings = qs.exclude(booking=None).count()
+            # if leads:
+            #     bookings_percentage = bookings/leads*100
+            # else:
+            #     bookings_percentage = 0
+            # Sales
             sales = qs.filter(sold=True).count()
-            if leads:
-                percentage = sales/leads*100
-            else:
-                percentage = 0
+            # if leads:
+            #     sales_percentage = sales/leads*100
+            # else:
+            #     sales_percentage = 0
+
             data_set.append({
                 'leads':leads,
+                'bookings':bookings,
+                # 'bookings_percentage':bookings_percentage,
                 'sales':sales,
-                'percentage':percentage,
+                # 'sales_percentage':sales_percentage,
             })
-            # if timeframe_label_string == 'months':
-            #     time_label_set.append(f"{short_month_name(index_date.month)} {str(index_date.year)[2:]} - {short_month_name((index_date + timeframe).month)} {str((index_date + timeframe).year)[2:]}")
-            # elif timeframe_label_string == 'month':
-            #     time_label_set.append(f"{short_month_name(index_date.month)} {str(index_date.year)[2:]}")
-            # elif timeframe_label_string == 'week':
-            #     time_label_set.append(f"{index_date} - {index_date + timeframe}")
-            # elif timeframe_label_string == 'day':
-            #     time_label_set.append(f"{index_date}")
             time_label_set.append(f"{index_date}")
             index_date = index_date + timeframe
         return data_set, time_label_set    
     return [],[]
     
-def get_bookings_to_leads_between_dates_with_timeframe_differences(start_date, end_date, timeframe, user, timeframe_label_string='month', campaign=None, site=None):
-    if start_date + relativedelta.relativedelta(years=3) > end_date:
-        index_date = start_date
-        time_label_set = []
-        data_set = []
-        while index_date < end_date + timeframe:
-            qs = Campaignlead.objects.filter(created__gte=index_date, created__lt=index_date + timeframe)
-            if campaign:
-                qs = qs.filter(campaign=campaign)
-            elif site:
-                qs = qs.filter(campaign__site=site)
-            leads = qs.count()
-            booked_leads_count = qs.exclude(booking=None).count()
-            if leads:
-                percentage = booked_leads_count/leads*100
-            else:
-                percentage = 0
-            data_set.append({
-                'leads':leads,
-                'bookings':booked_leads_count,
-                'percentage':percentage,
-            })
-            # if timeframe_label_string == 'months':
-            #     time_label_set.append(f"{short_month_name(index_date.month)} {str(index_date.year)[2:]} - {short_month_name((index_date + timeframe).month)} {str((index_date + timeframe).year)[2:]}")
-            # elif timeframe_label_string == 'month':
-            #     time_label_set.append(f"{short_month_name(index_date.month)} {str(index_date.year)[2:]}")
-            # elif timeframe_label_string == 'week':
-            #     time_label_set.append(f"{index_date} - {index_date + timeframe}")
-            # elif timeframe_label_string == 'day':
-            #     time_label_set.append(f"{index_date}")
-            time_label_set.append(f"{index_date}")
-            index_date = index_date + timeframe
-        return data_set, time_label_set    
-    return [],[]
+# def get_bookings_to_leads_between_dates_with_timeframe_differences(start_date, end_date, timeframe, user, timeframe_label_string='month', campaign=None, site=None):
+#     if start_date + relativedelta.relativedelta(years=3) > end_date:
+#         index_date = start_date
+#         time_label_set = []
+#         data_set = []
+#         while index_date < end_date + timeframe:
+#             qs = Campaignlead.objects.filter(created__gte=index_date, created__lt=index_date + timeframe)
+#             if campaign:
+#                 qs = qs.filter(campaign=campaign)
+#             elif site:
+#                 qs = qs.filter(campaign__site=site)
+#             leads = qs.count()
+#             booked_leads_count = qs.exclude(booking=None).count()
+#             if leads:
+#                 percentage = booked_leads_count/leads*100
+#             else:
+#                 percentage = 0
+#             data_set.append({
+#                 'leads':leads,
+#                 'bookings':booked_leads_count,
+#                 'percentage':percentage,
+#             })            
+#             time_label_set.append(f"{index_date}")
+#             index_date = index_date + timeframe
+#         return data_set, time_label_set    
+#     return [],[]
     
 def get_calls_made_per_day_between_dates(start_date, end_date, user, campaign=None, site=None, get_user_totals=False):
     if start_date + relativedelta.relativedelta(years=3) > end_date:
@@ -127,8 +147,21 @@ def get_calls_today_dataset(campaign=None, site=None):
         data_set.append((user.profile.name, qs.filter(user=user).count()))
     return data_set, qs
 
+def get_sales_today_dataset(campaign=None, site=None):
+    data_set = []
+    qs = Campaignlead.objects.filter(marked_sold__gte= datetime.now().replace(hour=0,minute=0,second=0,microsecond=0))
+    if campaign:
+        qs = qs.filter(campaign=campaign)
+    elif site:
+        qs = qs.filter(campaign__site=site)
+    unique_users = list(qs.order_by('sold_by').distinct('sold_by').values_list('sold_by', flat=True))
+    for user_pk in unique_users:
+        user = User.objects.get(pk=user_pk)
+        data_set.append((user.profile.name, qs.filter(sold_by=user).count()))
+    return data_set, qs
+
 @login_required
-def get_leads_to_sales(request):
+def get_leads_to_bookings_and_sales(request):
     context = {}
     campaign_pk = request.GET.get('campaign_pk', None)
     if campaign_pk:
@@ -147,16 +180,16 @@ def get_leads_to_sales(request):
     date_diff = end_date - start_date
     if date_diff > timedelta(days=364):
         # 3 month chunks, 
-        data_set, time_label_set = get_sales_to_leads_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(months=3), request.user, timeframe_label_string='months', campaign=campaign, site=site)
+        data_set, time_label_set = get_leads_to_bookings_and_sales_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(months=3), request.user, campaign=campaign, site=site)
     elif date_diff > timedelta(days=83):
         # 1 month chunks, 
-        data_set, time_label_set = get_sales_to_leads_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(months=1), request.user, timeframe_label_string='month', campaign=campaign, site=site)
+        data_set, time_label_set = get_leads_to_bookings_and_sales_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(months=1), request.user, campaign=campaign, site=site)
     elif date_diff > timedelta(days=13):
         # 1 week chunks, 
-        data_set, time_label_set = get_sales_to_leads_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(weeks=1), request.user, timeframe_label_string='week', campaign=campaign, site=site)
+        data_set, time_label_set = get_leads_to_bookings_and_sales_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(weeks=1), request.user, campaign=campaign, site=site)
     else:
         # 1 day chunks,
-        data_set, time_label_set = get_sales_to_leads_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(days=1), request.user, timeframe_label_string='day', campaign=campaign, site=site)
+        data_set, time_label_set = get_leads_to_bookings_and_sales_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(days=1), request.user, campaign=campaign, site=site)
         
     context['data_set'] = data_set
     context['time_label_set'] = time_label_set
@@ -166,48 +199,48 @@ def get_leads_to_sales(request):
         context['graph_type'] = 'line'
     else:
         context['graph_type'] = 'bar'
-    return render(request, 'analytics/htmx/leads_to_sales_data.html', context)
+    return render(request, 'analytics/htmx/leads_to_bookings_and_sales_data.html', context)
 
-@login_required
-def get_leads_to_bookings(request):
-    context = {}
-    campaign_pk = request.GET.get('campaign_pk', None)
-    if campaign_pk:
-        campaign = Campaign.objects.get(pk=campaign_pk)
-        site = campaign.site
-    else:
-        site_pk = request.GET.get('site_pk', 'all')
-        campaign = None
-        if not site_pk == 'all':
-            site = Site.objects.get(pk=site_pk)
-        else:
-            site = None
-    start_date = datetime.strptime(request.GET.get('start_date'), '%Y-%m-%d')
-    end_date = datetime.strptime(request.GET.get('end_date'), '%Y-%m-%d') + relativedelta.relativedelta(days=1)   
+# @login_required
+# def get_leads_to_bookings(request):
+#     context = {}
+#     campaign_pk = request.GET.get('campaign_pk', None)
+#     if campaign_pk:
+#         campaign = Campaign.objects.get(pk=campaign_pk)
+#         site = campaign.site
+#     else:
+#         site_pk = request.GET.get('site_pk', 'all')
+#         campaign = None
+#         if not site_pk == 'all':
+#             site = Site.objects.get(pk=site_pk)
+#         else:
+#             site = None
+#     start_date = datetime.strptime(request.GET.get('start_date'), '%Y-%m-%d')
+#     end_date = datetime.strptime(request.GET.get('end_date'), '%Y-%m-%d') + relativedelta.relativedelta(days=1)   
      
-    date_diff = end_date - start_date
-    if date_diff > timedelta(days=364):
-        # 3 month chunks, 
-        data_set, time_label_set = get_bookings_to_leads_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(months=3), request.user, timeframe_label_string='months', campaign=campaign, site=site)
-    elif date_diff > timedelta(days=83):
-        # 1 month chunks, 
-        data_set, time_label_set = get_bookings_to_leads_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(months=1), request.user, timeframe_label_string='month', campaign=campaign, site=site)
-    elif date_diff > timedelta(days=13):
-        # 1 week chunks, 
-        data_set, time_label_set = get_bookings_to_leads_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(weeks=1), request.user, timeframe_label_string='week', campaign=campaign, site=site)
-    else:
-        # 1 day chunks,
-        data_set, time_label_set = get_bookings_to_leads_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(days=1), request.user, timeframe_label_string='day', campaign=campaign, site=site)
+#     date_diff = end_date - start_date
+#     if date_diff > timedelta(days=364):
+#         # 3 month chunks, 
+#         data_set, time_label_set = get_bookings_to_leads_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(months=3), request.user, timeframe_label_string='months', campaign=campaign, site=site)
+#     elif date_diff > timedelta(days=83):
+#         # 1 month chunks, 
+#         data_set, time_label_set = get_bookings_to_leads_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(months=1), request.user, timeframe_label_string='month', campaign=campaign, site=site)
+#     elif date_diff > timedelta(days=13):
+#         # 1 week chunks, 
+#         data_set, time_label_set = get_bookings_to_leads_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(weeks=1), request.user, timeframe_label_string='week', campaign=campaign, site=site)
+#     else:
+#         # 1 day chunks,
+#         data_set, time_label_set = get_bookings_to_leads_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(days=1), request.user, timeframe_label_string='day', campaign=campaign, site=site)
         
-    context['data_set'] = data_set
-    context['time_label_set'] = time_label_set
-    context['start_date'] = start_date
-    context['end_date'] = end_date
-    if request.GET.get('graph_type', 'off') == 'on':
-        context['graph_type'] = 'line'
-    else:
-        context['graph_type'] = 'bar'
-    return render(request, 'analytics/htmx/leads_to_bookings_data.html', context)
+#     context['data_set'] = data_set
+#     context['time_label_set'] = time_label_set
+#     context['start_date'] = start_date
+#     context['end_date'] = end_date
+#     if request.GET.get('graph_type', 'off') == 'on':
+#         context['graph_type'] = 'line'
+#     else:
+#         context['graph_type'] = 'bar'
+#     return render(request, 'analytics/htmx/leads_to_bookings_data.html', context)
 
 @login_required()
 def get_calls_today(request):
@@ -229,10 +262,35 @@ def get_calls_today(request):
     context['data_set'] = data_set
     context['raw_qs'] = raw_qs
     if request.GET.get('graph_type', 'off') == 'on':
-        context['graph_type'] = 'doughnut'
+        context['graph_type'] = 'polarArea'
     else:
-        context['graph_type'] = 'pie'
+        context['graph_type'] = 'doughnut'
     return render(request, 'analytics/htmx/calls_today_data.html', context)
+
+@login_required()
+def get_sales_today(request):
+    context = {}
+    campaign_pk = request.GET.get('campaign_pk', None)
+    if campaign_pk:
+        campaign = Campaign.objects.get(pk=campaign_pk)
+        site = campaign.site
+    else:
+        site_pk = request.GET.get('site_pk', 'all')
+        campaign = None
+        if not site_pk == 'all':
+            site = Site.objects.get(pk=site_pk)
+        else:
+            site = None
+
+    data_set, raw_qs = get_sales_today_dataset(campaign=campaign, site=site)
+        
+    context['data_set'] = data_set
+    context['raw_qs'] = raw_qs
+    if request.GET.get('graph_type', 'off') == 'on':
+        context['graph_type'] = 'polarArea'
+    else:
+        context['graph_type'] = 'doughnut'
+    return render(request, 'analytics/htmx/sales_today_data.html', context)
     
 @login_required
 def get_calls_made_per_day(request):

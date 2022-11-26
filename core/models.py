@@ -336,7 +336,7 @@ class WhatsappNumber(PhoneNumber):
             logger.debug("site.send_whatsapp_message start") 
             if lead:
                 customer_number = lead.whatsapp_number
-            if settings.ENABLE_WHATSAPP_MESSAGING and self.whatsapp_business_phone_number_id and self.site.whatsapp_access_token and message:
+            if self.whatsapp_business_phone_number_id and self.site.whatsapp_access_token and message:
                 whatsapp = Whatsapp(self.site.whatsapp_access_token)
                 if '+' in self.number:
                     customer_number = f"{self.number.split('+')[-1]}"
@@ -362,9 +362,7 @@ class WhatsappNumber(PhoneNumber):
                 
                 logger.debug("site.send_whatsapp_message fail") 
                 return None
-            logger.debug(f"""site.send_whatsapp_message error: 
-            
-                (settings.ENABLE_WHATSAPP_MESSAGING,{str(settings.ENABLE_WHATSAPP_MESSAGING)})             
+            logger.debug(f"""site.send_whatsapp_message error:           
                 (self.whatsapp_business_phone_number_id,{str(self.whatsapp_business_phone_number_id)})             
                 (self.site.whatsapp_access_token,{str(self.site.whatsapp_access_token)}) 
                 (message,{str(message)}) 
@@ -572,6 +570,10 @@ class Profile(models.Model):
     @property
     def name(self):
         return f"{self.user.first_name} {self.user.last_name}"
+@receiver(models.signals.post_save, sender=Profile)
+def execute_after_save(sender, instance, created, *args, **kwargs):  
+    if not instance.site in instance.sites_allowed.all():
+        instance.sites_allowed.add(instance.site)
 class FreeTasterLink(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)

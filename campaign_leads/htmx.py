@@ -250,8 +250,16 @@ def mark_sold(request, **kwargs):
     try:
         if request.user.is_authenticated:
             lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'))
-            lead.sold = not lead.sold
-            lead.complete = not lead.complete
+            if lead.sold:
+                lead.complete = False
+                lead.sold = False
+                lead.marked_sold = None
+                lead.sold_by = None
+            else:
+                lead.complete = True
+                lead.sold = True
+                lead.marked_sold = datetime.now()
+                lead.sold_by = request.user
             lead.save()
             return render(request, "campaign_leads/htmx/campaign_booking_row.html", {'lead':lead}) 
     except Exception as e:

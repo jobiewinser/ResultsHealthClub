@@ -15,47 +15,10 @@ from django.contrib.auth import login
 
 from core.user_permission_functions import get_available_sites_for_user, get_user_allowed_to_edit_other_user
 from whatsapp.api import Whatsapp
+from core.startup import run_debug_startup
 logger = logging.getLogger(__name__)
-try:
-    super_users = User.objects.filter(email="jobiewinser@gmail.com")
-    if not super_users:
-        super_user = User.objects.create_superuser(username="jobiewinser@gmail.com", password=os.getenv('SUPERUSER_PASS'), email="jobiewinser@gmail.com")
-    else:
-        super_user = super_users[0]
 
-    companies = Company.objects.filter(company_name="Winser Systems")
-    if not companies:
-        company = Company.objects.create(
-            company_name="Winser Systems",
-            campaign_leads_enabled=True,
-            free_taster_enabled=True,
-            active_campaign_enabled=True,
-            )
-    else:
-        company = companies[0]
-        
-    sites = Site.objects.filter(name="Daisy Bank")
-    if not sites:
-        site = Site.objects.create(
-            name="Daisy Bank",    
-            whatsapp_number = os.getenv('default_whatsapp_number'),
-            whatsapp_business_phone_number_id = os.getenv('default_whatsapp_business_phone_number_id'),
-            whatsapp_access_token = os.getenv('default_whatsapp_access_token'),
-            # whatsapp_business_account_id = os.getenv('default_whatsapp_business_account_id'),
-            )
-        site.company.set([company])
-    else:
-        site = sites[0]
-
-    if not Profile.objects.filter(user=super_user):
-        profile = Profile.objects.create(
-            user = super_user,
-            site = site,
-        )
-        profile.company.set([company])
-except:
-    pass
-
+run_debug_startup()
 
 @method_decorator(login_required, name='dispatch')
 @method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')

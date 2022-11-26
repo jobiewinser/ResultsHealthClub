@@ -77,6 +77,8 @@ class Campaignlead(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     arrived = models.BooleanField(default=False)
     sold = models.BooleanField(default=False)
+    marked_sold = models.DateTimeField(null=True, blank=True)
+    sold_by = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="campaignlead_sold_by", null=True, blank=True)
     complete = models.BooleanField(default=False)
     active_campaign_contact_id = models.TextField(null=True, blank=True)
     active_campaign_form_id = models.TextField(null=True, blank=True)
