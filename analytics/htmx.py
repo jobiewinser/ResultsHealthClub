@@ -177,19 +177,19 @@ def get_leads_to_bookings_and_sales(request):
     start_date = datetime.strptime(request.GET.get('start_date'), '%Y-%m-%d')
     end_date = datetime.strptime(request.GET.get('end_date'), '%Y-%m-%d') + relativedelta.relativedelta(days=1) 
      
-    date_diff = end_date - start_date
-    if date_diff > timedelta(days=364):
-        # 3 month chunks, 
-        data_set, time_label_set = get_leads_to_bookings_and_sales_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(months=3), request.user, campaign=campaign, site=site)
-    elif date_diff > timedelta(days=83):
-        # 1 month chunks, 
-        data_set, time_label_set = get_leads_to_bookings_and_sales_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(months=1), request.user, campaign=campaign, site=site)
-    elif date_diff > timedelta(days=13):
-        # 1 week chunks, 
-        data_set, time_label_set = get_leads_to_bookings_and_sales_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(weeks=1), request.user, campaign=campaign, site=site)
-    else:
-        # 1 day chunks,
-        data_set, time_label_set = get_leads_to_bookings_and_sales_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(days=1), request.user, campaign=campaign, site=site)
+    # date_diff = end_date - start_date
+    # if date_diff > timedelta(days=364):
+    #     # 3 month chunks, 
+    #     data_set, time_label_set = get_leads_to_bookings_and_sales_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(months=3), request.user, campaign=campaign, site=site)
+    # elif date_diff > timedelta(days=83):
+    #     # 1 month chunks, 
+    #     data_set, time_label_set = get_leads_to_bookings_and_sales_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(months=1), request.user, campaign=campaign, site=site)
+    # elif date_diff > timedelta(days=13):
+    #     # 1 week chunks, 
+    #     data_set, time_label_set = get_leads_to_bookings_and_sales_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(weeks=1), request.user, campaign=campaign, site=site)
+    # else:
+    #     # 1 day chunks,
+    data_set, time_label_set = get_leads_to_bookings_and_sales_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(days=1), request.user, campaign=campaign, site=site)
         
     context['data_set'] = data_set
     context['time_label_set'] = time_label_set
