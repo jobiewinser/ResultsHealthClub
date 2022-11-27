@@ -1,7 +1,7 @@
 {%load static%}
 <span>
     <script>
-        let variables = {{variables|safe}}  
+        var variables = {{variables|safe}}  
         $(document).ready(function() {  
             $("[data-bs-toggle=popover]").popover();
             renderTemplate()

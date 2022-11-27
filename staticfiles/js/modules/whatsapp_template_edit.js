@@ -20,7 +20,7 @@ function replaceVariables(content){
     return content
 }
 function saveTemplate(whatsapp_business_account_pk, template_pk, create=false){
-    let variables_valid = true;
+    var variables_valid = true;
     let header = $('#template_header').val();
     let body = $('#template_body').val();
     let footer = $('#template_footer').val();
@@ -45,6 +45,8 @@ function saveTemplate(whatsapp_business_account_pk, template_pk, create=false){
     } else {
         post_data = {
             'template_pk':template_pk,
+            'name':$('#template_name').val(), 
+            'category':$('#template_category').val(), 
             'header':header, 
             'body':body, 
             'footer':footer, 
@@ -52,15 +54,18 @@ function saveTemplate(whatsapp_business_account_pk, template_pk, create=false){
         }
     }
     if (variables_valid){
+        $('#page_load_indicator').addClass('htmx-request')
         var respStatus = $.ajax({
             type:'POST',
             url:'/configuration/whatsapp-templates-save/',
             data: post_data,
             success: function (data) {
                 $(window).unbind('beforeunload');                
+                $('#page_load_indicator').removeClass('htmx-request')
                 htmx.ajax('GET', '/configuration/whatsapp-templates/', {target:'#content'})
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
+                $('#page_load_indicator').removeClass('htmx-request')
             }
         })
     } else {

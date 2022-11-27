@@ -522,21 +522,26 @@ def add_whatsapp_business_account(request):
 
 @login_required
 def save_whatsapp_template_ajax(request):
+    changes_made = False
     if request.POST.get('created', False):
-        template = WhatsappTemplate()
-        template.pending_name = request.POST.get('name')
-        template.pending_category = request.POST.get('category')
-        template.whatsapp_business_account = WhatsappBusinessAccount.objects.get(pk=request.POST.get('whatsapp_business_account_pk'))
-        template.company = request.user.profile.company
+        template = WhatsappTemplate(
+            whatsapp_business_account = WhatsappBusinessAccount.objects.get(pk=request.POST.get('whatsapp_business_account_pk')),
+            company = request.user.profile.company
+        )
     else:
         template = WhatsappTemplate.objects.get(pk=request.POST.get('template_pk'))
+
+    if not template.message_template_id:
+        template.pending_name = request.POST.get('name')
+        template.pending_category = request.POST.get('category')
+        changes_made = True
+
     if request.user.profile.company == template.company:
         new_components = [
                 {'type': 'HEADER', 'format': 'TEXT', 'text': request.POST.get('header')},
                 {'type': 'BODY', 'text': request.POST.get('body')},
                 {'type': 'FOOTER', 'text': request.POST.get('footer')},
             ]
-        changes_made = False
         if template.pending_components:
             if not new_components == template.pending_components:
                 changes_made = True
