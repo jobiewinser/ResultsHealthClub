@@ -48,7 +48,7 @@
                         data-bs-placement="top"
                         data-bs-title="Why is this input disabled?"
                         data-bs-content="This input can't be changed for template edits. Please only make small changes, otherwise create a new template.">
-                            <input {%if readonly%}disabled{%endif%} class="form-control" disabled id="template_name" value="{{template.name}}" name="template_name">
+                            <input {%if readonly or template.message_template_id%}disabled{%endif%} class="form-control" id="template_name" value="{%if template.name%}{{template.name}}{%elif not template.name and template.pending_name%}{{template.pending_name}}{%endif%}" name="template_name">
                         </div>
                     </div>
                     {%endblock template_name%}
@@ -62,9 +62,9 @@
                         data-bs-placement="top"
                         data-bs-title="Why is this input disabled?"
                         data-bs-content="This input can't be changed for template edits. Please only make small changes, otherwise create a new template.">
-                            <select {%if readonly%}disabled{%endif%} id="template_category" disabled name="template_category" class="form-select form-select-sm align-self-center m-1">
+                            <select {%if readonly or template.message_template_id%}disabled{%endif%} id="template_category" name="template_category" class="form-select form-select-sm align-self-center m-1">
                                 {%for k,v in categories.items%}
-                                <option {%if template.category == k%}selected {%endif%}value="{{k}}">{{k}}</option>
+                                <option {%if template.category == k%}selected {%elif not template.category and template.pending_category == k%}selected {%endif%}value="{{k}}">{{k}}</option>
                                 {%endfor%}        
                             </select>
                         </div>
