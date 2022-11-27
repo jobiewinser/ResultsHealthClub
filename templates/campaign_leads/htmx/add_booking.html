@@ -10,7 +10,6 @@
                     prefill: {
                         name: "{{lead.name}}",
                         email: "{{lead.email}}",
-                        customAnswers: "",
                     },
                     utm: {}
                 });
@@ -20,49 +19,44 @@
         });
     </script>
     <div class="row">
-            <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
-                <li class="nav-item" role="presentation">
-                  <button class="nav-link active" id="pills-calendly-tab" data-bs-toggle="pill" data-bs-target="#pills-calendly" type="button" role="tab" aria-controls="pills-calendly" aria-selected="true">Calendly</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                  <button class="nav-link" id="pills-manual-tab" data-bs-toggle="pill" data-bs-target="#pills-manual" type="button" role="tab" aria-controls="pills-manual" aria-selected="false">Manual</button>
-                </li>
-              </ul>
-              <div class="tab-content" id="pills-tabContent">
-                    <div class="tab-pane fade show active" id="pills-calendly" role="tabpanel" aria-labelledby="pills-calendly-tab">
-                        {%if request.user.profile.calendly_event_page_url%}
-                        <div class="row">
-                            <div class="col center" id="calendly_wrapper" style="min-height:60vh;">
-                                <img id="calendly_loading" src="{% static 'gif/loading.gif' %}" alt="" width="200">
-                            </div>
-                        </div>
-                        {%else%}
-                        <div class="row m-2">
-                            <div class="col center" style="">
-                                <p>Calendly not configured for your profile!</p> 
-                                <p>Please edit your profile using the "Edit Profile" button below.</p>
-                            </div>
-                        </div>
-                        <a class="btn btn-primary pointer"
-                                    hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
-                                    hx-vals='{"template_name": "edit_user", "user_pk":"{{request.user.pk}}"}'
-                                    hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
-                                    hx-swap="innerHTML" hx-trigger="click">Edit Profile</a>
-                        {%endif%}
+        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="pills-calendly-tab" data-bs-toggle="pill" data-bs-target="#pills-calendly" type="button" role="tab" aria-controls="pills-calendly" aria-selected="true">Calendly</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="pills-manual-tab" data-bs-toggle="pill" data-bs-target="#pills-manual" type="button" role="tab" aria-controls="pills-manual" aria-selected="false">Manual</button>
+            </li>
+        </ul>
+        <div class="tab-content" id="pills-tabContent">
+            <div class="tab-pane fade show active" id="pills-calendly" role="tabpanel" aria-labelledby="pills-calendly-tab">
+                {%if request.user.profile.calendly_event_page_url%}
+                <div class="row">
+                    <div class="col center" id="calendly_wrapper" style="min-height:60vh;">
+                        <img id="calendly_loading" src="{% static 'gif/loading.gif' %}" alt="" width="200">
                     </div>
-                    <div class="tab-pane fade" id="pills-manual" role="tabpanel" aria-labelledby="pills-manual-tab">
-                        {%include 'campaign_leads/htmx/manual_booking.html'%}
+                </div>
+                {%else%}
+                <div class="row m-2">
+                    <div class="col center" style="">
+                        <p>Calendly not configured for your profile!</p> 
+                        <p>Please edit your profile using the "Edit Profile" button below.</p>
                     </div>
-
-
-
-
-            
-        </div>        
+                </div>
+                <a class="btn btn-primary pointer"
+                            hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
+                            hx-vals='{"template_name": "edit_user", "user_pk":"{{request.user.pk}}"}'
+                            hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
+                            hx-swap="innerHTML" hx-trigger="click">Edit Profile</a>
+                {%endif%}
+            </div>
+            <div class="tab-pane fade" id="pills-manual" role="tabpanel" aria-labelledby="pills-manual-tab">
+                {%include 'campaign_leads/htmx/manual_booking.html'%}
+            </div>
+        </div>     
     </div>
     
 </span>
 <span hx-swap-oob="true" id="generic_modal_title">
-    Add Booking - {{lead.name}}
+    Add Booking - {{lead.name}} - {{lead.whatsapp_number}}
     <input class="booking_input" type="text" style="display:None" id="modal_lead_pk" name="lead_pk" value="{{lead.pk}}"/>
 </span>
