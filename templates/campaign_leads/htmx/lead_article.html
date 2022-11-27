@@ -57,9 +57,11 @@
                     hx-get="{%url 'send-first-template-whatsapp-lead-article' lead_pk=lead.pk%}"
                     hx-indicator="#page_load_indicator" 
                     hx-include="#max_call_count"
-                    hx-target="#lead-{{lead.pk}}"
+                    hx-swap="none"
+                    onclick="$('#page_load_indicator').addClass('htmx-request')"
+                    {% comment %} hx-target="#lead-{{lead.pk}}" {% endcomment %}
                     hx-push-url="false"
-                    hx-trigger="click"  
+                    hx-trigger="click delay:0.5s"  
                     data-customer-number="{{lead.whatsapp_number}}">
                         1st <i class="fa fa-whatsapp"></i>
                 </button>
