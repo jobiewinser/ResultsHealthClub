@@ -32,8 +32,8 @@ urlpatterns = [
     
 
     
-    path('mark-done/', campaignleadshtmx.mark_done, name='mark-done' ),
-    path('mark-done/<str:lead_pk>/', campaignleadshtmx.mark_done, name='mark-done' ),
+    path('mark-archived/', campaignleadshtmx.mark_archived, name='mark-archived' ),
+    path('mark-archived/<str:lead_pk>/', campaignleadshtmx.mark_archived, name='mark-archived' ),
     
     path('new-leads-column/', campaignleadshtmx.new_leads_column, name='new-leads-column' ),
     path('delete-lead/', campaignleadshtmx.delete_lead, name='delete-lead' ),

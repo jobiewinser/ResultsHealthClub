@@ -86,7 +86,7 @@ def create_campaign_lead(request, **kwargs):
 def get_leads_column_meta_data(request, **kwargs):
     logger.debug(str(request.user))
     try:
-        leads = Campaignlead.objects.filter(complete=False, booking=None, campaign__site__in=request.user.profile.sites_allowed.all())
+        leads = Campaignlead.objects.filter(archived=False, booking=None, campaign__site__in=request.user.profile.sites_allowed.all())
         campaign_pk = request.GET.get('campaign_pk', None)
         if campaign_pk:
             leads = leads.filter(campaign=Campaign.objects.get(pk=campaign_pk))
@@ -186,19 +186,23 @@ def add_manual_booking(request, **kwargs):
 
 
 @login_required
-def mark_done(request, **kwargs):
+def mark_archived(request, **kwargs):
     logger.debug(str(request.user))
     try:
         if request.user.is_authenticated:
             lead_pk = request.POST.get('lead_pk') or kwargs.get('lead_pk')
             lead = Campaignlead.objects.get(pk=lead_pk)
-            lead.complete = not lead.complete
+            if lead.archived:
+                lead.archived = False
+                lead.sold = False
+            else:
+                lead.archived = True
+                lead.sold = False
             lead.save()
             lead.trigger_refresh_websocket(refresh_position=False)
-
-            return HttpResponse("", "text", 200)
+            return render(request, "campaign_leads/htmx/campaign_booking_row.html", {'lead':lead}) 
     except Exception as e:
-        logger.debug("mark_done Error "+str(e))
+        logger.debug("mark_archived Error "+str(e))
         return HttpResponse(e, status=500)
 
 
@@ -227,7 +231,7 @@ def delete_lead(request, **kwargs):
 
             return HttpResponse("", "text", 200)
     except Exception as e:
-        logger.debug("mark_done Error "+str(e))
+        logger.debug("mark_archived Error "+str(e))
         return HttpResponse(e, status=500)
 
 @login_required
@@ -240,7 +244,7 @@ def mark_arrived(request, **kwargs):
             lead.save()
             return render(request, "campaign_leads/htmx/campaign_booking_row.html", {'lead':lead}) 
     except Exception as e:
-        logger.debug("mark_done Error "+str(e))
+        logger.debug("mark_archived Error "+str(e))
         return HttpResponse(e, status=500)
 
 
@@ -250,12 +254,20 @@ def mark_sold(request, **kwargs):
     try:
         if request.user.is_authenticated:
             lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'))
-            lead.sold = not lead.sold
-            lead.complete = not lead.complete
+            if lead.sold:
+                lead.archived = False
+                lead.sold = False
+                lead.marked_sold = None
+                lead.sold_by = None
+            else:
+                lead.archived = False
+                lead.sold = True
+                lead.marked_sold = datetime.now()
+                lead.sold_by = request.user
             lead.save()
             return render(request, "campaign_leads/htmx/campaign_booking_row.html", {'lead':lead}) 
     except Exception as e:
-        logger.debug("mark_done Error "+str(e))
+        logger.debug("mark_archived Error "+str(e))
         return HttpResponse(e, status=500)
         
 # @login_required
@@ -267,7 +279,7 @@ def mark_sold(request, **kwargs):
 #             lead.send_whatsapp_message('testing api', request.user)
 #             return render(request, "campaign_leads/htmx/campaign_booking_row.html", {'lead':lead}) 
 #     except Exception as e:
-#         logger.debug("mark_done Error "+str(e))
+#         logger.debug("mark_archived Error "+str(e))
 # #         return HttpResponse(e, status=500)
 # @login_required
 # def template_editor(request, **kwargs):
@@ -277,7 +289,7 @@ def mark_sold(request, **kwargs):
 #             template = WhatsappTemplate.objects.get(pk=request.GET.get('template_pk'))
 #             return render(request, "campaign_leads/htmx/template_editor.html", {'template':template}) 
 #     except Exception as e:
-#         logger.debug("mark_done Error "+str(e))
+#         logger.debug("mark_archived Error "+str(e))
 #         return HttpResponse(e, status=500)
 
 # @login_required
@@ -290,7 +302,7 @@ def mark_sold(request, **kwargs):
 #             template.save()
 #             return render(request, "campaign_leads/htmx/template_editor.html", {'template':template}) 
 #     except Exception as e:
-#         logger.debug("mark_done Error "+str(e))
+#         logger.debug("mark_archived Error "+str(e))
 #         return HttpResponse(e, status=500)
 
         

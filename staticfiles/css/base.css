@@ -89,7 +89,10 @@ body {
     max-height: 70vh;
 }
 
-
+.required{
+    color:red;
+    margin-left:2px
+}
 /* custom scrollbar */
 
 ::-webkit-scrollbar {
@@ -774,8 +777,8 @@ tr.odd td {
     height: 100%;
     width: 100%;
 }
-.analytics_col {
-    max-width: 50%
+.chart_canvas {
+    max-height: 30vh !important
 }
 #top-htmx-indicator {
     height: 30px

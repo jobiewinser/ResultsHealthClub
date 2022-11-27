@@ -34,7 +34,9 @@ class AttachedError(models.Model):
                         ('1203', "There is no 1st Whatsapp Template linked to this Lead's Campaign"),
                         ('1204', "There is no 2nd Whatsapp Template linked to this Lead's Campaign"),
                         ('1205', "There is no 3rd Whatsapp Template linked to this Lead's Campaign"),
-                        ('1206', "This site has template messaging currently disabled, reenable it on the site configuration page"),
+                        ('1206', "There is no 4th Whatsapp Template linked to this Lead's Campaign"),
+                        ('1207', "There is no 5th Whatsapp Template linked to this Lead's Campaign"),
+                        ('1220', "This site has template messaging currently disabled, reenable it on the site configuration page"),
                     )
     type = models.CharField(choices=ERROR_TYPES, default='c', max_length=5)
     attached_field = models.CharField(null=True, blank=True, max_length=50)
@@ -82,7 +84,7 @@ class Contact(models.Model):
                     if template.whatsapp_business_account.site.whatsapp_template_sending_enabled:
                         print("ContactDEBUG4")
                         AttachedError.objects.filter(
-                            type = '1206',
+                            type = '1220',
                             contact = self,
                             archived = False,
                         ).update(archived = True)
@@ -144,7 +146,7 @@ class Contact(models.Model):
                         print("ContactDEBUG7")
                         print("errorhere template messaging disabled")
                         attached_error, created = AttachedError.objects.get_or_create(
-                            type = '1206',
+                            type = '1220',
                             attached_field = "contact",
                             contact = self,
                         )
@@ -263,6 +265,11 @@ class PhoneNumber(PolymorphicModel):
     # site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
     company = models.ForeignKey("core.Company", on_delete=models.SET_NULL, null=True, blank=True)
     archived = models.BooleanField(default=False)
+    
+    def __str__(self):
+        if self.alias:
+            return self.alias
+        return self.number
     @property
     def is_whatsapp(self):
         return False
@@ -336,7 +343,7 @@ class WhatsappNumber(PhoneNumber):
             logger.debug("site.send_whatsapp_message start") 
             if lead:
                 customer_number = lead.whatsapp_number
-            if settings.ENABLE_WHATSAPP_MESSAGING and self.whatsapp_business_phone_number_id and self.site.whatsapp_access_token and message:
+            if self.whatsapp_business_phone_number_id and self.site.whatsapp_access_token and message:
                 whatsapp = Whatsapp(self.site.whatsapp_access_token)
                 if '+' in self.number:
                     customer_number = f"{self.number.split('+')[-1]}"
@@ -362,9 +369,7 @@ class WhatsappNumber(PhoneNumber):
                 
                 logger.debug("site.send_whatsapp_message fail") 
                 return None
-            logger.debug(f"""site.send_whatsapp_message error: 
-            
-                (settings.ENABLE_WHATSAPP_MESSAGING,{str(settings.ENABLE_WHATSAPP_MESSAGING)})             
+            logger.debug(f"""site.send_whatsapp_message error:           
                 (self.whatsapp_business_phone_number_id,{str(self.whatsapp_business_phone_number_id)})             
                 (self.site.whatsapp_access_token,{str(self.site.whatsapp_access_token)}) 
                 (message,{str(message)}) 
@@ -572,6 +577,10 @@ class Profile(models.Model):
     @property
     def name(self):
         return f"{self.user.first_name} {self.user.last_name}"
+@receiver(models.signals.post_save, sender=Profile)
+def execute_after_save(sender, instance, created, *args, **kwargs):  
+    if not instance.site in instance.sites_allowed.all():
+        instance.sites_allowed.add(instance.site)
 class FreeTasterLink(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)

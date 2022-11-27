@@ -88,7 +88,7 @@ id="submit_site_pk_{{campaign.pk}}"></button>
         '>
         <option value=""></option>
         {%for whatsapp_business_account in campaign.site.whatsappbusinessaccount_set.all%}
-        <option {%if campaign.whatsapp_business_account.pk == whatsapp_business_account.pk %}selected{%endif%} value="{{whatsapp_business_account.pk}}">{{whatsapp_business_account.whatsappnumber.alias}}</option>
+        <option {%if campaign.whatsapp_business_account.pk == whatsapp_business_account.pk %}selected{%endif%} value="{{whatsapp_business_account.pk}}">{{whatsapp_business_account.whatsappnumber}}</option>
         {%endfor%}
     </select>
 </td>
@@ -174,6 +174,62 @@ id="submit_site_pk_{{campaign.pk}}"></button>
         {%for template in campaign.whatsapp_business_account.whatsapptemplate_set.all%}
         {%if not 'sample_' in template.name%}
         <option {%if campaign.third_send_template.pk == template.pk %}selected{%endif%} value="{{template.pk}}">{{template.name}}</option>
+        {%endif%}
+        {%endfor%}
+    </select>                             
+</td>
+<td>          
+    <span hidden>{{campaign.fourth_send_template.name}}</span>                         
+    <select class="form-select" name="fourth_template_pk" id="fourth_template_{{campaign.pk}}" 
+        hx-post="{% url 'campaign-assign-auto-send-template' %}" hx-swap="innerHTML" 
+        hx-indicator=".top-htmx-indicator" hx-trigger="change"
+        hx-vals='{"campaign_pk": "{{campaign.pk}}"}'
+        hx-target="#row_{{campaign.pk}}"
+        data-bs-toggle="popover" 
+        data-bs-trigger="hover" 
+        data-bs-html="true" 
+        data-bs-placement="top"
+        data-bs-title="What does this do?"
+        data-bs-content='
+        <p>
+            You can assign your lead campaign a template to send through your chosen messaging service automatically (Whatsapp by default).
+        </p>
+        <p>
+            For example, if the lead has not responded to the first notification, they will receive the "3rd Auto-Send Template" 24 hours after the second.
+        </p>
+        '>
+        <option value=""></option>
+        {%for template in campaign.whatsapp_business_account.whatsapptemplate_set.all%}
+        {%if not 'sample_' in template.name%}
+        <option {%if campaign.fourth_send_template.pk == template.pk %}selected{%endif%} value="{{template.pk}}">{{template.name}}</option>
+        {%endif%}
+        {%endfor%}
+    </select>                             
+</td>
+<td>          
+    <span hidden>{{campaign.fifth_send_template.name}}</span>                         
+    <select class="form-select" name="fifth_template_pk" id="fifth_template_{{campaign.pk}}" 
+        hx-post="{% url 'campaign-assign-auto-send-template' %}" hx-swap="innerHTML" 
+        hx-indicator=".top-htmx-indicator" hx-trigger="change"
+        hx-vals='{"campaign_pk": "{{campaign.pk}}"}'
+        hx-target="#row_{{campaign.pk}}"
+        data-bs-toggle="popover" 
+        data-bs-trigger="hover" 
+        data-bs-html="true" 
+        data-bs-placement="top"
+        data-bs-title="What does this do?"
+        data-bs-content='
+        <p>
+            You can assign your lead campaign a template to send through your chosen messaging service automatically (Whatsapp by default).
+        </p>
+        <p>
+            For example, if the lead has not responded to the first notification, they will receive the "3rd Auto-Send Template" 24 hours after the second.
+        </p>
+        '>
+        <option value=""></option>
+        {%for template in campaign.whatsapp_business_account.whatsapptemplate_set.all%}
+        {%if not 'sample_' in template.name%}
+        <option {%if campaign.fifth_send_template.pk == template.pk %}selected{%endif%} value="{{template.pk}}">{{template.name}}</option>
         {%endif%}
         {%endfor%}
     </select>                             

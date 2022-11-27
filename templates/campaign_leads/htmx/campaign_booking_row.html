@@ -1,4 +1,4 @@
 {%load static core_tags tz%}
-<tr id="row_{{lead.pk}}" class="campaign_booking_row {% if lead.complete and not lead.sold%}danger-tr{% elif lead.sold %}complete-tr{%endif%}">
+<tr id="row_{{lead.pk}}" class="campaign_booking_row {% if lead.archived and not lead.sold%}danger-tr{% elif lead.sold %}archived-tr{%endif%}">
     {%include 'campaign_leads/htmx/campaign_booking_row_htmx.html'%}
 </tr>

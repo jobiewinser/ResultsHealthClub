@@ -7,11 +7,8 @@
             <div class="col p-0 left text-white" data-bs-toggle="collapse" data-bs-target="#messageWindowCollapse_{{customer_number}}_wrapper" aria-expanded="true" aria-controls="messageWindowCollapse_{{customer_number}}_wrapper">
                 {%include 'messaging/message_window_header.html'%}
             </div>
-            <div class="col-auto p-0 right">
-                {% comment %} <i class="fa-sharp fa-solid fa-circle-xmark" onclick="$('#chat_card_{{customer_number}}').remove(); clear_chat_from_session('{{customer_number}}')"></i> {% endcomment %}
-                <i class="fa-sharp fa-solid fa-circle-xmark" onclick="$('#chat_card_{{customer_number}}').remove();"></i>
-                <br>
-                <button class="btn btn-primary btn-sm" 
+            <div class="col-auto p-0 ps-1 pe-2 right">
+                <button class="btn btn-primary btn-xs" 
                     data-bs-toggle="popover" 
                     data-bs-trigger="hover" 
                     data-bs-placement="top"
@@ -23,6 +20,9 @@
                     hx-swap="innerHTML" hx-trigger="click">
                         <i class="fa fa-pencil" aria-hidden="true"></i>
                 </button>
+            </div>
+            <div class="col-auto p-0 right">
+                <i class="fa-sharp fa-solid fa-circle-xmark" onclick="$('#chat_card_{{customer_number}}').remove();"></i>
             </div>
         </div>
     </div>

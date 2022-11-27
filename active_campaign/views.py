@@ -74,6 +74,8 @@ def set_campaign_site(request, **kwargs):
         campaign.first_send_template = None
         campaign.second_send_template = None
         campaign.third_send_template = None
+        campaign.fourth_send_template = None
+        campaign.fifth_send_template = None
 
         if site_pk:
             site = Site.objects.get(pk=site_pk)

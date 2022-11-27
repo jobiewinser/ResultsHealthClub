@@ -39,7 +39,7 @@ def rgb_to_hex_tuple(rgb_string):
 
 def get_campaign_qs(request):
     first_model_query = (Campaignlead.objects
-        .filter(campaign=OuterRef('pk'), complete=False)
+        .filter(campaign=OuterRef('pk'), archived=False)
         .values('campaign')
         .annotate(cnt=Count('pk'))
         .values('cnt')
@@ -61,7 +61,7 @@ class CampaignleadsOverviewView(TemplateView):
             return super().get(request, *args, **kwargs)
         except Exception as e:        
             logger.error(f"get_campaigns {str(e)}")
-            return HttpResponse("Couldn't complete Campaign Leads Overview request", status=500)
+            return HttpResponse("Couldn't archived Campaign Leads Overview request", status=500)
 
     def get_context_data(self, **kwargs):    
         context = super(CampaignleadsOverviewView, self).get_context_data(**kwargs)  
@@ -76,7 +76,7 @@ def get_leads_board_context(request):
     request.GET._mutable = True 
     context = {}   
     context['campaigns'] = get_campaign_qs(request)
-    leads = Campaignlead.objects.filter(complete=False, campaign__site__in=request.user.profile.sites_allowed.all()).exclude(booking__archived=False)
+    leads = Campaignlead.objects.filter(archived=False, campaign__site__in=request.user.profile.sites_allowed.all()).exclude(booking__archived=False)
     campaign_pk = request.GET.get('campaign_pk', None)
     if campaign_pk:
         try:
@@ -143,12 +143,19 @@ def get_booking_table_context(request):
         leads = leads.filter(campaign__site__pk=site_pk)
         request.GET['site_pk'] = site_pk 
         context['site'] = Site.objects.get(pk=site_pk)            
-    context['complete_count'] = leads.filter(complete=True).count()
-    complete_filter = (request.GET.get('complete', '').lower() =='true')
-    if not complete_filter:
+    # context['archived_count'] = leads.filter(archived=True).count()
+    archived_filter = (request.GET.get('archived', '').lower() =='true')
+    if not archived_filter:
         leads = leads.exclude(booking__created=None)
-    leads = leads.filter(complete=complete_filter)   
-    context['complete'] = complete_filter
+    leads = leads.filter(archived=archived_filter)   
+    context['archived'] = archived_filter
+    
+    sold_filter = (request.GET.get('sold', '').lower() =='true')
+    if not sold_filter:
+        leads = leads.exclude(booking__created=None)
+    leads = leads.filter(sold=sold_filter)   
+    context['sold'] = sold_filter
+
     context['booking_needed_count'] = leads.filter(booking=None).count()
     context['leads'] = leads
     context['company'] = request.user.profile.company
@@ -246,12 +253,18 @@ def campaign_assign_auto_send_template_htmx(request):
     first_template_pk = request.POST.get('first_template_pk')
     second_template_pk = request.POST.get('second_template_pk')
     third_template_pk = request.POST.get('third_template_pk')
+    fourth_template_pk = request.POST.get('fourth_template_pk')
+    fifth_template_pk = request.POST.get('fifth_template_pk')
     if not first_template_pk == None:
         campaign.first_send_template = WhatsappTemplate.objects.filter(pk=(first_template_pk or 0)).first()
     if not second_template_pk == None:
         campaign.second_send_template = WhatsappTemplate.objects.filter(pk=(second_template_pk or 0)).first()
     if not third_template_pk == None:
         campaign.third_send_template = WhatsappTemplate.objects.filter(pk=(third_template_pk or 0)).first()
+    if not fourth_template_pk == None:
+        campaign.fourth_send_template = WhatsappTemplate.objects.filter(pk=(fourth_template_pk or 0)).first()
+    if not fifth_template_pk == None:
+        campaign.fifth_send_template = WhatsappTemplate.objects.filter(pk=(fifth_template_pk or 0)).first()
     campaign.save()
     return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign})
 
@@ -264,6 +277,8 @@ def campaign_assign_whatsapp_business_account_htmx(request):
     campaign.first_send_template = None
     campaign.second_send_template = None
     campaign.third_send_template = None
+    campaign.fourth_send_template = None
+    campaign.fifth_send_template = None
     campaign.save()
     return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign})
 

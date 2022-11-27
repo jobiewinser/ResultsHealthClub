@@ -79,7 +79,11 @@ function basehandlehtmxafterRequest(evt){
             }else if (evt.detail.pathInfo.requestPath.includes("send-new-template-message")){
                 $('#generic_modal').modal('hide');
                 snackbarShow('Successfully sent message', 'success')
+            }else if (evt.detail.pathInfo.requestPath.includes("add-whatsapp-business-account")){
+                $('#generic_modal').modal('hide');
+                snackbarShow('Successfully added phone', 'success')
             }
+            
         }
     } else if (status == 404) {   
         if (evt.detail.pathInfo.requestPath.includes("login-htmx")){ 

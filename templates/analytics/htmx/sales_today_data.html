@@ -2,14 +2,13 @@
 <div class="row">
     <div class="col-md-auto p-0">
         <div class="row" style="margin-left:0px !important;">
-
             <div class="col-md-auto" style="text-align:left; padding-left:5px">
                 <small>Doughnut</small>
             </div>
 
             <div class="col-md-auto p-0">
                 <div class="form-check form-switch">
-                    <input class="form-check-input" name="graph_type" {%if graph_type == 'polarArea'%}checked{%endif%} type="checkbox" id="graph_type_calls_today" onchange="$('#refresh_calls_today').click()">
+                    <input class="form-check-input" name="graph_type" {%if graph_type == 'polarArea'%}checked{%endif%} type="checkbox" id="graph_type_sales_today" onchange="$('#refresh_sales_today').click()">
                 </div> 
             </div>
 
@@ -23,7 +22,7 @@
     </div>
 
     <div class="col-md-auto p-0">
-        <h5>{{raw_qs.count}} Calls</h5>
+        <h5>{{raw_qs.count}} Sales</h5>
     </div>
 </div>
 
@@ -32,8 +31,8 @@
     </div>
     {%if data_set%}
     <div class="col-md-auto p-0">
-        <div class="chart_wrapper_long" id="calls_today_chart_wrapper">
-            <canvas class="chart_canvas" id="calls_today_chart" ></canvas>
+        <div class="chart_wrapper_long" id="sales_today_chart_wrapper">
+            <canvas class="chart_canvas" id="sales_today_chart" ></canvas>
         </div>
     </div>
     {%else%}
@@ -60,13 +59,13 @@
     color_random_list.push(dynamicColors());
     {%endfor%}
     $(document).ready(function() {
-        calls_today_chart_var = document.getElementById('calls_today_chart');
-        calls_today_chart = new Chart(calls_today_chart_var, {
+        sales_today_chart_var = document.getElementById('sales_today_chart');
+        sales_today_chart = new Chart(sales_today_chart_var, {
             type: '{%if graph_type%}{{graph_type}}{%else%}polarArea{%endif%}',
             data: {
                 labels: [{%for data_set_tuple in data_set%}'{{data_set_tuple.0}}'{% if not forloop.last %},{%endif%}{%endfor%}],
                 datasets: [{
-                    label: 'Calls',
+                    label: 'Sales',
                     data: [{%for data_set_tuple in data_set%}'{{data_set_tuple.1}}'{% if not forloop.last %},{%endif%}{%endfor%}],
                     backgroundColor: color_random_list,
                     borderColor: color_random_list,

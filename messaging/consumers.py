@@ -90,21 +90,19 @@ class ChatConsumer(AsyncWebsocketConsumer):
 from asgiref.sync import sync_to_async
 @sync_to_async
 def send_whatsapp_message_to_number(message, customer_number, user, whatsappnumber_pk):  
-    if settings.ENABLE_WHATSAPP_MESSAGING:
-        whatsappnumber = WhatsappNumber.objects.get(pk=whatsappnumber_pk)
-        logger.debug("send_whatsapp_message_to_number start") 
-        lead = Campaignlead.objects.filter(whatsapp_number=customer_number).first()  
-        if get_user_allowed_to_use_site_messaging(user, whatsappnumber.site):
-            if lead:     
-                if whatsappnumber.site.company == user.profile.company: 
-                    logger.debug("send_whatsapp_message_to_number success lead true") 
-                    return whatsappnumber.send_whatsapp_message(customer_number=customer_number, message=message, user=user, lead=lead)
+    whatsappnumber = WhatsappNumber.objects.get(pk=whatsappnumber_pk)
+    logger.debug("send_whatsapp_message_to_number start") 
+    lead = Campaignlead.objects.filter(whatsapp_number=customer_number).first()  
+    if get_user_allowed_to_use_site_messaging(user, whatsappnumber.site):
+        if lead:     
+            if whatsappnumber.site.company == user.profile.company: 
+                logger.debug("send_whatsapp_message_to_number success lead true") 
+                return whatsappnumber.send_whatsapp_message(customer_number=customer_number, message=message, user=user, lead=lead)
 
-            if WhatsAppMessage.objects.filter(whatsappnumber=whatsappnumber, customer_number=customer_number):
-                logger.debug("send_whatsapp_message_to_number success lead false") 
-                return whatsappnumber.send_whatsapp_message(customer_number=customer_number, message=message, user=user)
-            logger.debug("send_whatsapp_message_to_number fail") 
-    return None
+        if WhatsAppMessage.objects.filter(whatsappnumber=whatsappnumber, customer_number=customer_number):
+            logger.debug("send_whatsapp_message_to_number success lead false") 
+            return whatsappnumber.send_whatsapp_message(customer_number=customer_number, message=message, user=user)
+        logger.debug("send_whatsapp_message_to_number fail") 
 @sync_to_async
 def message_details_user(user):   
     logger.debug("message_details_user start")
