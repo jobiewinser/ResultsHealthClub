@@ -42,11 +42,12 @@ class Webhooks(View):
             if body.get('event') == "invitee.created":
                 try:
                     event_url = body.get('payload').get('event')
-                    booking = Booking.objects.get(calendly_event_uri=event_url)
+                    event_uuid = event_url.split('/')[-1]
+                    booking = Booking.objects.get(calendly_event_uri__icontains=event_uuid)
                     calendly = Calendly(booking.lead.campaign.site.calendly_token)
                     updated_booking_details = calendly.get_from_uri(event_url)
                     print("CALENDLY Webhooks updated_booking_details", str(updated_booking_details))
-                    start_time = datetime.strptime(updated_booking_details['resource']['start_time'], '%Y-%m-%dT%H:%M:%S.%fZ')
+                    start_time = datetime.strptime(updated_booking_details['resource']['start_time'][0:19], '%Y-%m-%dT%H:%M:%S')
                     
                     timezone = pytz.timezone('Europe/London')
                     start_time = timezone.localize(start_time)
