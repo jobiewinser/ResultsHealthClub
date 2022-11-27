@@ -38,10 +38,12 @@ class Campaign(PolymorphicModel):
     first_send_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="first_send_template_campaign", on_delete=models.SET_NULL, null=True, blank=True)
     second_send_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="second_send_template_campaign", on_delete=models.SET_NULL, null=True, blank=True)
     third_send_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="third_send_template_campaign", on_delete=models.SET_NULL, null=True, blank=True)
+    fourth_send_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="fourth_send_template_campaign", on_delete=models.SET_NULL, null=True, blank=True)
+    fifth_send_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="fifth_send_template_campaign", on_delete=models.SET_NULL, null=True, blank=True)
     whatsapp_business_account = models.ForeignKey('core.WhatsappBusinessAccount', on_delete=models.SET_NULL, null=True, blank=True)
     color = models.CharField(max_length=15, null=False, blank=False, default="96,248,61")
     def get_active_leads_qs(self):
-        return self.campaignlead_set.filter(complete=False)
+        return self.campaignlead_set.filter(archived=False)
     def is_manual(self):
         return False
     @property
@@ -79,7 +81,7 @@ class Campaignlead(models.Model):
     sold = models.BooleanField(default=False)
     marked_sold = models.DateTimeField(null=True, blank=True)
     sold_by = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="campaignlead_sold_by", null=True, blank=True)
-    complete = models.BooleanField(default=False)
+    archived = models.BooleanField(default=False)
     active_campaign_contact_id = models.TextField(null=True, blank=True)
     active_campaign_form_id = models.TextField(null=True, blank=True)
     possible_duplicate = models.BooleanField(default=False)
@@ -154,6 +156,12 @@ class Campaignlead(models.Model):
             elif send_order == 3:
                 template = self.campaign.third_send_template
                 type = '1205'
+            elif send_order == 4:
+                template = self.campaign.fourth_send_template
+                type = '1206'
+            elif send_order == 5:
+                template = self.campaign.fifth_send_template
+                type = '1207'
             else:
                 type = None
             
@@ -175,7 +183,7 @@ class Campaignlead(models.Model):
                     if template.whatsapp_business_account.site.whatsapp_template_sending_enabled:
                         print("CampaignleadDEBUG4")
                         AttachedError.objects.filter(
-                            type = '1206',
+                            type = '1220',
                             campaign_lead = self,
                             archived = False,
                         ).update(archived = True)
@@ -255,7 +263,7 @@ class Campaignlead(models.Model):
                         print("CampaignleadDEBUG7")
                         print("errorhere template messaging disabled")
                         attached_error, created = AttachedError.objects.get_or_create(
-                            type = '1206',
+                            type = '1220',
                             attached_field = "campaign_lead",
                             campaign_lead = self,
                         )
@@ -346,6 +354,10 @@ class Campaignlead(models.Model):
                     type = '1204'
                 elif send_order == 3:
                     type = '1205'
+                elif send_order == 4:
+                    type = '1206'
+                elif send_order == 5:
+                    type = '1207'
                 print("errorhere no suitable template found")
                 attached_error, created = AttachedError.objects.get_or_create(
                     type = type,
@@ -356,6 +368,7 @@ class Campaignlead(models.Model):
                     print("CampaignleadDEBUG11")
                     attached_error.created = datetime.now()
                     attached_error.save()
+        return HttpResponse("Message Error", status=400)
             
             
 
@@ -364,7 +377,7 @@ class Campaignlead(models.Model):
 
 @receiver(models.signals.post_save, sender=Campaignlead)
 def execute_after_save(sender, instance, created, *args, **kwargs):
-    if created and not instance.complete:
+    if created and not instance.archived:
         try:
             instance.send_template_whatsapp_message(send_order=1)
         except:

@@ -336,13 +336,13 @@ def get_current_call_count_distribution(request):
         else:
             site = None
     if campaign:
-        non_time_filtered_opportunities = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, booking = None, campaign=campaign, complete = False, sold = False, campaign__site__in=request.user.profile.sites_allowed.all()).annotate(calls=Count('call'))
+        non_time_filtered_opportunities = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, booking = None, campaign=campaign, archived = False, sold = False, campaign__site__in=request.user.profile.sites_allowed.all()).annotate(calls=Count('call'))
     elif site:
-        non_time_filtered_opportunities = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, booking = None, campaign__site=site, complete = False, sold = False, campaign__site__in=request.user.profile.sites_allowed.all()).annotate(calls=Count('call'))
+        non_time_filtered_opportunities = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, booking = None, campaign__site=site, archived = False, sold = False, campaign__site__in=request.user.profile.sites_allowed.all()).annotate(calls=Count('call'))
     else:
-        non_time_filtered_opportunities = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, booking = None, complete = False, sold = False, campaign__site__in=request.user.profile.sites_allowed.all()).annotate(calls=Count('call'))
+        non_time_filtered_opportunities = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, booking = None, archived = False, sold = False, campaign__site__in=request.user.profile.sites_allowed.all()).annotate(calls=Count('call'))
 
-    non_time_filtered_live_opportunities = non_time_filtered_opportunities.filter(complete=False, sold=False)
+    non_time_filtered_live_opportunities = non_time_filtered_opportunities.filter(archived=False, sold=False)
 
     call_counts_tuples = []
     index = 0
@@ -386,9 +386,9 @@ def get_base_analytics(request):
         else:
             opportunities = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, created__gte=start_date, created__lt=end_date, campaign__site__in=request.user.profile.sites_allowed.all()).annotate(calls=Count('call'))
 
-        live_opportunities = opportunities.exclude(complete=True).exclude(sold=True)
+        live_opportunities = opportunities.exclude(archived=True).exclude(sold=True)
         closed_opportunities = opportunities.filter(sold=True)
-        lost_opportunities = opportunities.filter(complete=True).exclude(sold=True)
+        lost_opportunities = opportunities.filter(archived=True).exclude(sold=True)
 
         context['opportunities_count'] = opportunities.count()
         context['live_opportunities_count'] = live_opportunities.count()

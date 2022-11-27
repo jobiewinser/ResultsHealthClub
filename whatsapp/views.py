@@ -301,8 +301,9 @@ class WhatsappTemplatesView(TemplateView):
             whatsapp_business_account = WhatsappBusinessAccount.objects.get(pk=whatsapp_business_account_pk)
         else:
             whatsapp_business_account = site.whatsappbusinessaccount_set.all().first()
-        refresh_template_data(whatsapp_business_account)
-        context['templates'] = whatsapp_business_account.active_templates
+        if whatsapp_business_account:
+            refresh_template_data(whatsapp_business_account)
+            context['templates'] = whatsapp_business_account.active_templates
         # context['site_list'] = get_available_sites_for_user(self.request.user)
         context['site'] = site
         context['whatsapp_business_account'] = whatsapp_business_account

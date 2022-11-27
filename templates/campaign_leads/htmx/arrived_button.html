@@ -1,4 +1,4 @@
-<button class="btn btn-space btn-{%if lead.arrived%}success{%else%}light{%endif%} btn-sm nowrap" id="arrived_{{lead.pk}}"
+<button class="btn btn-space btn-{%if lead.arrived%}warning{%else%}light{%endif%} btn-sm nowrap" id="arrived_{{lead.pk}}"
 data-bs-toggle="popover" 
 data-bs-trigger="hover" 
 data-bs-placement="top"
@@ -9,4 +9,4 @@ data-bs-content="{%if lead.arrived%}Mark this lead as not arrived{%else%}Mark th
     hx-push-url="false"
     hx-swap="outerHTML" hx-trigger="click"      {% endcomment %}
 onclick="htmx.ajax('POST', '{% url 'mark-arrived' %}', {target:'#row_{{lead.pk}}', swap:'outerHTML', values:htmx.values(htmx.find('#lead_pk_{{lead.pk}}'))})"
->{%if lead.arrived%}<i class="fa-solid fa-check"></i>{%else%}<i class="fa-solid fa-x"></i>{%endif%} Arrived</button>
+><i class="fa-regular fa-house-person-return"></i> Arrived</button>

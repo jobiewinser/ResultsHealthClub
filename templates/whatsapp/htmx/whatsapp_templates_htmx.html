@@ -20,7 +20,7 @@
             <span id="site_list_span">  
                 <select class="form-select overview_table_filters" name="whatsapp_business_account_pk" id="whatsapp_business_account_pk" onchange="$('#change_site').click();">
                     {%for whatsapp_business_account in whatsapp_business_accounts%}
-                    <option {%if whatsapp_business_account.pk == request|get_key_in_get_or_post:'whatsapp_business_account_pk'|str_to_int %}selected{%endif%} value="{{whatsapp_business_account.pk}}">{{whatsapp_business_account.whatsappnumber.alias}}</option>
+                    <option {%if whatsapp_business_account.pk == request|get_key_in_get_or_post:'whatsapp_business_account_pk'|str_to_int %}selected{%endif%} value="{{whatsapp_business_account.pk}}">{{whatsapp_business_account.whatsappnumber}}</option>
                     {%endfor%}
                 </select>
             </span>

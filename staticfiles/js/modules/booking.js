@@ -16,7 +16,7 @@ function bookinghandlehtmxafterSwap(evt){
     }
     if (evt.detail.xhr.status == 200){
         if (![undefined, ''].includes(evt.detail.pathInfo.path)){
-            if (evt.detail.pathInfo.path.includes("mark-done")){
+            if (evt.detail.pathInfo.path.includes("mark-archived")){
                 snackbarShow('Successfully marked lead as done', 'success')
             } else if (evt.detail.pathInfo.path.includes("add-manual-booking")){
                 $('#generic_modal').modal('hide');

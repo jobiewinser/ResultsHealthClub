@@ -1,5 +1,5 @@
 {%load core_tags static%}
-{%if not lead.complete%}
+{%if not lead.archived%}
 <article style="margin-right:50px; border-top: 4px solid rgba({{lead.campaign.color}}, 1)"
     id="lead-{{lead.pk}}"  class="card draggable-card lead_card column-drag lead-{{lead.pk}}"
     draggable="true" ondragstart="drag(event)" data-id="{{lead.pk}}">
@@ -59,7 +59,7 @@
                     hx-include="#max_call_count"
                     hx-target="#lead-{{lead.pk}}"
                     hx-push-url="false"
-                    hx-swap="outerHTML" hx-trigger="click"  
+                    hx-trigger="click"  
                     data-customer-number="{{lead.whatsapp_number}}">
                         1st <i class="fa fa-whatsapp"></i>
                 </button>

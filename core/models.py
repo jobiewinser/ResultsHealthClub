@@ -34,7 +34,9 @@ class AttachedError(models.Model):
                         ('1203', "There is no 1st Whatsapp Template linked to this Lead's Campaign"),
                         ('1204', "There is no 2nd Whatsapp Template linked to this Lead's Campaign"),
                         ('1205', "There is no 3rd Whatsapp Template linked to this Lead's Campaign"),
-                        ('1206', "This site has template messaging currently disabled, reenable it on the site configuration page"),
+                        ('1206', "There is no 4th Whatsapp Template linked to this Lead's Campaign"),
+                        ('1207', "There is no 5th Whatsapp Template linked to this Lead's Campaign"),
+                        ('1220', "This site has template messaging currently disabled, reenable it on the site configuration page"),
                     )
     type = models.CharField(choices=ERROR_TYPES, default='c', max_length=5)
     attached_field = models.CharField(null=True, blank=True, max_length=50)
@@ -82,7 +84,7 @@ class Contact(models.Model):
                     if template.whatsapp_business_account.site.whatsapp_template_sending_enabled:
                         print("ContactDEBUG4")
                         AttachedError.objects.filter(
-                            type = '1206',
+                            type = '1220',
                             contact = self,
                             archived = False,
                         ).update(archived = True)
@@ -144,7 +146,7 @@ class Contact(models.Model):
                         print("ContactDEBUG7")
                         print("errorhere template messaging disabled")
                         attached_error, created = AttachedError.objects.get_or_create(
-                            type = '1206',
+                            type = '1220',
                             attached_field = "contact",
                             contact = self,
                         )
@@ -263,6 +265,11 @@ class PhoneNumber(PolymorphicModel):
     # site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
     company = models.ForeignKey("core.Company", on_delete=models.SET_NULL, null=True, blank=True)
     archived = models.BooleanField(default=False)
+    
+    def __str__(self):
+        if self.alias:
+            return self.alias
+        return self.number
     @property
     def is_whatsapp(self):
         return False
