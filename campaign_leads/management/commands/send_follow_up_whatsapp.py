@@ -10,7 +10,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         for campaign_lead in Campaignlead.objects.filter(booking=None).exclude(sold=True).exclude(archived=True):
             whatsapp_messages = WhatsAppMessage.objects.filter(lead=campaign_lead)
-            day_ago =  datetime.now() - timedelta(seconds = 1)
+            day_ago =  datetime.now() - timedelta(days = 1)
             if not whatsapp_messages.filter(datetime__gte=day_ago):
                 if not whatsapp_messages.filter(send_order=1):
                     campaign_lead.send_template_whatsapp_message(send_order=1)
