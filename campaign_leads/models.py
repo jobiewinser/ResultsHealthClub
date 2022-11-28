@@ -295,7 +295,12 @@ class Campaignlead(models.Model):
                 
                 reponse_messages = response.get('messages',[])
                 if reponse_messages:
-                    print("CampaignleadDEBUG9")
+                    attached_error, created = AttachedError.objects.get_or_create(
+                        type = '1107',
+                        attached_field = "campaign_lead",
+                        campaign_lead = self,
+                        archived = False,
+                    ).update(archived = True)
                     for response_message in reponse_messages:
                         whatsapp_message, created = WhatsAppMessage.objects.get_or_create(
                             wamid=response_message.get('id'),
@@ -347,11 +352,21 @@ class Campaignlead(models.Model):
                     logger.debug("site.send_template_whatsapp_message success") 
                     self.trigger_refresh_websocket(refresh_position=False)
                     return HttpResponse("Message Sent", status=200)
+                elif response.status_code == 400:
+                    print(str(response))
+                    logger.debug(str(response))     
+                    attached_error, created = AttachedError.objects.get_or_create(
+                        type = '1107',
+                        attached_field = "campaign_lead",
+                        campaign_lead = self,
+                    )
+                    self.trigger_refresh_websocket(refresh_position=False)
+                    return HttpResponse("Message Not Sent", status=400)
                 else:
                     print(str(response))
                     logger.debug(str(response))     
                     self.trigger_refresh_websocket(refresh_position=False)
-                    return HttpResponse("Message Sent", status=200)
+                    return HttpResponse("Message Sent", status=500)
 
             else:
                 print("CampaignleadDEBUG10")
