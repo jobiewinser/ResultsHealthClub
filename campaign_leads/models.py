@@ -349,6 +349,8 @@ class Campaignlead(models.Model):
                     return HttpResponse("Message Sent", status=200)
                 else:
                     print(str(response))
+                    logger.debug(str(response))     
+                    self.trigger_refresh_websocket(refresh_position=False)
                     return HttpResponse("Message Sent", status=200)
 
             else:
