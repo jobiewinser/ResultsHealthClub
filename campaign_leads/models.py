@@ -292,12 +292,14 @@ class Campaignlead(models.Model):
                     whatsappnumber = self.campaign.whatsapp_business_account.whatsappnumber
                 customer_number = self.whatsapp_number
                 response = whatsapp.send_template_message(self.whatsapp_number, whatsappnumber, template, language, components)
+                print(str(response))
+                logger.debug(str(response))
                 
                 reponse_messages = response.get('messages',[])
                 error = response.get('error',[])
                 if reponse_messages:
                     attached_error, created = AttachedError.objects.get_or_create(
-                        type = '1107',
+                        type = '1107', 
                         attached_field = "campaign_lead",
                         campaign_lead = self,
                         archived = False,
@@ -353,9 +355,7 @@ class Campaignlead(models.Model):
                     logger.debug("site.send_template_whatsapp_message success") 
                     self.trigger_refresh_websocket(refresh_position=False)
                     return HttpResponse("Message Sent", status=200)
-                elif error:
-                    print(str(response))
-                    logger.debug(str(response))     
+                elif error:   
                     attached_error, created = AttachedError.objects.get_or_create(
                         type = '1107',
                         attached_field = "campaign_lead",
@@ -363,9 +363,7 @@ class Campaignlead(models.Model):
                     )
                     self.trigger_refresh_websocket(refresh_position=False)
                     return HttpResponse("Message Not Sent", status=400)
-                else:
-                    print(str(response))
-                    logger.debug(str(response))     
+                else:     
                     self.trigger_refresh_websocket(refresh_position=False)
                     return HttpResponse("Message Sent", status=500)
 
