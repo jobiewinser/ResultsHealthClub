@@ -298,7 +298,7 @@ class Campaignlead(models.Model):
                 reponse_messages = response.get('messages',[])
                 error = response.get('error',[])
                 if reponse_messages:
-                    attached_error, created = AttachedError.objects.get_or_create(
+                    AttachedError.objects.create(
                         type = '1107', 
                         attached_field = "campaign_lead",
                         campaign_lead = self,
