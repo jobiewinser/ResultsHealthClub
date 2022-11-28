@@ -29,7 +29,7 @@ class AttachedError(models.Model):
                         ('0103', "The number of parameters submitted does not match the Whatsapp Template (contact Winser Systems)"),
                         ('1104', "Message failed to send because more than 24 hours have passed since the customer last replied to this number. You can still send a template message at 24 hour intervals instead"),
                         ('1105', "Message failed to send because the Whatsapp account is not yet registered (contact Winser Systems)"),
-                        ('1107', "Parameter Invalid"),
+                        ('1107', "Parameter Invalid - They probably aren't on Whatsapp"),
                         
                         ('1201', "Whatsapp Template not found Whatsapp's system"),
                         ('1202', "There is no Whatsapp Business linked to this Lead's assosciated Site"),
