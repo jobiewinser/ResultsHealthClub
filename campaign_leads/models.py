@@ -292,7 +292,7 @@ class Campaignlead(models.Model):
                     whatsappnumber = self.campaign.whatsapp_business_account.whatsappnumber
                 customer_number = self.whatsapp_number
                 response = whatsapp.send_template_message(self.whatsapp_number, whatsappnumber, template, language, components)
-                self.trigger_refresh_websocket(refresh_position=False)
+                
                 reponse_messages = response.get('messages',[])
                 if reponse_messages:
                     print("CampaignleadDEBUG9")
@@ -345,7 +345,12 @@ class Campaignlead(models.Model):
                                 }
                             )
                     logger.debug("site.send_template_whatsapp_message success") 
+                    self.trigger_refresh_websocket(refresh_position=False)
                     return HttpResponse("Message Sent", status=200)
+                else:
+                    print(str(response))
+                    return HttpResponse("Message Sent", status=200)
+
             else:
                 print("CampaignleadDEBUG10")
                 if send_order == 1:
