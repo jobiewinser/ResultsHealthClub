@@ -294,6 +294,7 @@ class Campaignlead(models.Model):
                 response = whatsapp.send_template_message(self.whatsapp_number, whatsappnumber, template, language, components)
                 
                 reponse_messages = response.get('messages',[])
+                error = response.get('error',[])
                 if reponse_messages:
                     attached_error, created = AttachedError.objects.get_or_create(
                         type = '1107',
@@ -352,7 +353,7 @@ class Campaignlead(models.Model):
                     logger.debug("site.send_template_whatsapp_message success") 
                     self.trigger_refresh_websocket(refresh_position=False)
                     return HttpResponse("Message Sent", status=200)
-                elif response.status_code == 400:
+                elif error:
                     print(str(response))
                     logger.debug(str(response))     
                     attached_error, created = AttachedError.objects.get_or_create(
