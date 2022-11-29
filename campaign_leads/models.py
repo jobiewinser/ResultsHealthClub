@@ -87,6 +87,8 @@ class Campaignlead(models.Model):
     possible_duplicate = models.BooleanField(default=False)
     last_dragged = models.DateTimeField(null=True, blank=True)
     assigned_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    def __str__(self):
+        return self.name
     @property
     def is_last_whatsapp_message_inbound(self):        
         message = WhatsAppMessage.objects.filter(customer_number=self.whatsapp_number, whatsappnumber__whatsapp_business_account__site=self.campaign.site).last()

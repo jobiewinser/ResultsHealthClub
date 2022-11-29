@@ -763,11 +763,17 @@ tr.odd td {
     padding: 4px;
     border-radius: 5px;
 }
-.lead_claimed_img {
+.lead_claimed_img_wrapper {
     position: absolute;
-    bottom: 35%;
-    right: 2%;
+    bottom: 42%;
+    right: 5%;
 }
+.lead_notes_button_wrapper {
+    position: absolute;
+    bottom: 25%;
+    right: 6%;
+}
+lead_notes_button_wrapper
 .analytics-card {
     min-width: 350px;
     margin: 10px;

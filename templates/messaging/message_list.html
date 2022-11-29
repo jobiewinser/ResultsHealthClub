@@ -1,15 +1,11 @@
 <div class="card chat_bottom_window p-0" id="chat_list_bottom_window">
     <div class="card-header chat_bottom_header" data-bs-toggle="collapse" data-bs-target="#messageCollapse_{{whatsappnumber.pk}}_wrapper" aria-expanded="false" aria-controls="messageCollapse_{{whatsappnumber.pk}}_wrapper">
         <div class="row">
-            <div class="col-md-auto p-0">
-                <span class="primary_td_layer text-white">
-                    {%if chat_Site%}{{chat_site.name}}{%else%}{{whatsappnumber.site.name}}{%endif%}:
-                </span>
-                <span class="secondary_td_layer">
-                    {{whatsappnumber}}
-                </span> 
-            </div>
-            <div class="col">
+            <div class="col p-0">
+                <div class="elipses-overflow" style="max-width:230px">
+                    <span class="primary_td_layer text-white">{%if chat_Site%}{{chat_site.name}}{%else%}{{whatsappnumber.site.name}}{%endif%}:</span>                    
+                    <span class="secondary_td_layer phone_display_{{whatsappnumber.pk}}">{{whatsappnumber}}</span> 
+                </div> 
             </div>
             <div class="col-auto p-0 pointer">
                 <img class="htmx-indicator invert" style="height:100%" id="htmx_indicator_messageCollapse_{{whatsappnumber.pk}}" src="https://htmx.org/img/bars.svg"/>

@@ -82,7 +82,11 @@ function basehandlehtmxafterRequest(evt){
             }else if (evt.detail.pathInfo.requestPath.includes("add-whatsapp-business-account")){
                 $('#generic_modal').modal('hide');
                 snackbarShow('Successfully added phone', 'success')
+            }else if (evt.detail.pathInfo.requestPath.includes("create-lead-note")){
+                $('#generic_modal').modal('hide');
+                snackbarShow('Successfully added note', 'success')
             }
+            
             
         }
     } else if (status == 404) {   
