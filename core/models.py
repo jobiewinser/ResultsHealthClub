@@ -29,8 +29,8 @@ class AttachedError(models.Model):
                         ('0103', "The number of parameters submitted does not match the Whatsapp Template (contact Winser Systems)"),
                         ('1104', "Message failed to send because more than 24 hours have passed since the customer last replied to this number. You can still send a template message at 24 hour intervals instead"),
                         ('1105', "Message failed to send because the Whatsapp account is not yet registered (contact Winser Systems)"),
+                        ('1106', "The requested phone number has been deleted"),
                         ('1107', "Parameter Invalid - They probably aren't on Whatsapp"),
-                        
                         ('1201', "Whatsapp Template not found Whatsapp's system"),
                         ('1202', "There is no Whatsapp Business linked to this Lead's assosciated Site"),
                         ('1203', "There is no 1st Whatsapp Template linked to this Lead's Campaign"),
@@ -140,7 +140,7 @@ class Contact(models.Model):
                                 attached_field = "contact",
                                 contact = self,
                             )
-                            if created:
+                            if not created:
                                 attached_error.created = datetime.now()
                                 attached_error.save()
                             return HttpResponse("Messaging Error: Couldn't find the specified template", status=400)
@@ -152,7 +152,7 @@ class Contact(models.Model):
                             attached_field = "contact",
                             contact = self,
                         )
-                        if created:
+                        if not created:
                             attached_error.created = datetime.now()
                             attached_error.save()
                         return HttpResponse("Messaging Error: Template Messaging disabled for this site", status=400)
@@ -164,7 +164,7 @@ class Contact(models.Model):
                         attached_field = "contact",
                         contact = self,
                     )
-                    if created:
+                    if not created:
                         attached_error.created = datetime.now()
                         attached_error.save()
                     return HttpResponse("Messaging Error: No Whatsapp Business Account linked", status=400)

@@ -255,7 +255,7 @@ class Campaignlead(models.Model):
                                 attached_field = "campaign_lead",
                                 campaign_lead = self,
                             )
-                            if created:
+                            if not created:
                                 attached_error.created = datetime.now()
                                 attached_error.save()
                             return HttpResponse("Messaging Error: Couldn't find the specified template", status=400)
@@ -267,7 +267,7 @@ class Campaignlead(models.Model):
                             attached_field = "campaign_lead",
                             campaign_lead = self,
                         )
-                        if created:
+                        if not created:
                             attached_error.created = datetime.now()
                             attached_error.save()
                         return HttpResponse("Messaging Error: Template Messaging disabled for this site", status=400)
@@ -279,7 +279,7 @@ class Campaignlead(models.Model):
                         attached_field = "campaign_lead",
                         campaign_lead = self,
                     )
-                    if created:
+                    if not created:
                         attached_error.created = datetime.now()
                         attached_error.save()
                     return HttpResponse("Messaging Error: No Whatsapp Business Account linked", status=400)
@@ -299,11 +299,11 @@ class Campaignlead(models.Model):
                 error = response.get('error',[])
                 if reponse_messages:
                     AttachedError.objects.filter(
-                        type = '1107', 
+                        type__in = ['1107','1106'], 
                         attached_field = "campaign_lead",
                         campaign_lead = self,
                         archived = False,
-                    ).update(archived = True)
+                    ).update(archived = True)    
                     for response_message in reponse_messages:
                         whatsapp_message, created = WhatsAppMessage.objects.get_or_create(
                             wamid=response_message.get('id'),
@@ -355,7 +355,16 @@ class Campaignlead(models.Model):
                     logger.debug("site.send_template_whatsapp_message success") 
                     self.trigger_refresh_websocket(refresh_position=False)
                     return HttpResponse("Message Sent", status=200)
-                elif error:   
+                    
+                elif error.get('code', None) == 33:
+                    AttachedError.objects.create(
+                        type = '1106',
+                        attached_field = "customer_number",
+                        whatsapp_number = whatsappnumber,
+                        customer_number = customer_number,
+                        admin_action_required = True,
+                    )
+                elif error.get('code', None) == 100:   
                     attached_error, created = AttachedError.objects.get_or_create(
                         type = '1107',
                         attached_field = "campaign_lead",
@@ -366,7 +375,6 @@ class Campaignlead(models.Model):
                 else:     
                     self.trigger_refresh_websocket(refresh_position=False)
                     return HttpResponse("Message Sent", status=500)
-
             else:
                 print("CampaignleadDEBUG10")
                 if send_order == 1:
@@ -385,7 +393,7 @@ class Campaignlead(models.Model):
                     attached_field = "campaign_lead",
                     campaign_lead = self,
                 )
-                if created:
+                if not created:
                     print("CampaignleadDEBUG11")
                     attached_error.created = datetime.now()
                     attached_error.save()
