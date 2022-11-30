@@ -4,7 +4,7 @@ function initBookingDataTable() {
     
     var dt = $('#overview_table').DataTable(            
     {  
-        order: [[ 4, 'asc' ],[ 2, 'asc' ]],
+        order: [[ 3, 'desc' ],[ 2, 'desc' ]],
         iDisplayLength: 10
     }
     );
