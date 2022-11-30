@@ -107,7 +107,7 @@ def get_calls_made_per_day_between_dates(start_date, end_date, user, campaign=No
         data_set = []
         
         while index_date < end_date + relativedelta.relativedelta(days=1):
-            qs = Call.objects.filter(created__gte=index_date, created__lt=index_date + relativedelta.relativedelta(days=1))
+            qs = Call.objects.filter(datetime__gte=index_date, datetime__lt=index_date + relativedelta.relativedelta(days=1))
             if campaign:
                 qs = qs.filter(lead__campaign=campaign)
             elif site:
@@ -136,7 +136,7 @@ def get_calls_made_per_day_between_dates(start_date, end_date, user, campaign=No
 
 def get_calls_today_dataset(campaign=None, site=None):
     data_set = []
-    qs = Call.objects.filter(created__gte= datetime.now().replace(hour=0,minute=0,second=0,microsecond=0))
+    qs = Call.objects.filter(datetime__gte= datetime.now().replace(hour=0,minute=0,second=0,microsecond=0))
     if campaign:
         qs = qs.filter(lead__campaign=campaign)
     elif site:
