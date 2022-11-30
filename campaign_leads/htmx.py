@@ -74,9 +74,8 @@ def create_campaign_lead(request, **kwargs):
             return HttpResponse("Please provide a Choice of Site", status=500)
 
         lead = site.generate_lead(first_name, email, f"{country_code}{phone}", request=request)
-        
-        context = {'lead':lead,'max_call_count':1,'call_count':0, 'site':site}
-        return render(request, 'campaign_leads/htmx/lead_article.html', context)
+        lead.trigger_refresh_websocket(refresh_position=True)
+        return HttpResponse("", status=200)
     # except Exception as e:
     #     # messages.add_message(request, messages.ERROR, f'Error with creating a campaign lead')
     #     logger.debug("create_campaign_lead Error "+str(e))

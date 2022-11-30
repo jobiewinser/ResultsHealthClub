@@ -270,6 +270,9 @@ font-size: 1.5vh
 .pointer {
     cursor: pointer;
 }
+.help {
+    cursor: help;
+}
 .current-user-highlight {
     background-color: rgba(25, 135, 84, 0.3) !important;
     border: rgba(25, 135, 84, 0.8) !important;

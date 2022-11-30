@@ -2,11 +2,37 @@
     <td class="double_layer_td">
         <span hidden class="booking-lead-{{lead.pk}}"></span>
         <input type="text" style="display:None" id="lead_pk_{{lead.pk}}" name="lead_pk" value="{{lead.pk}}"/>
-        <span class="primary_td_layer">{{lead.name}} {%if lead.possible_duplicate%}<i class="fa-solid fa-triangle-exclamation"
+        <span class="primary_td_layer">
+            
+            <span 
+            class="help"
+            data-bs-toggle="popover" 
+            data-bs-trigger="hover" 
+            data-bs-html="true" 
+            data-bs-placement="top"
+            data-bs-title="Full Information"
+            data-bs-content="
+            <b>Name:</b> {{lead.name}}<br>
+            <b>Number:</b> {{lead.whatsapp_number}}<br>
+            <b>Email:</b> {{lead.email}}<br>
+            <b>Campaign:</b> {{lead.campaign.name}}<br>
+            <b>Site:</b> {{lead.campaign.site.name}}<br>
+            <b>Created:</b> {{lead.created}}<br>
+            <b>Last Dragged:</b> {{lead.last_dragged}}<br>
+
+            <br>
+            <b>Price:</b> {{lead.campaign.product_cost|floatformat:2}}<br>
+            ">
+                <i class="fa-solid fa-circle-info" style="color:light-blue"></i>
+            </span>
+            {{lead.name}} 
+           
+            {%if lead.possible_duplicate%}<i class="fa-solid fa-triangle-exclamation"
             data-bs-toggle="popover" 
             data-bs-trigger="hover" 
             data-bs-placement="top"
-            data-bs-content="This is a possible duplicate"></i>{%endif%}</span>
+            data-bs-content="This is a possible duplicate"></i>{%endif%}
+        </span>
         <br>
         <span class="secondary_td_layer">
             {%if not lead.message_set.all%}
