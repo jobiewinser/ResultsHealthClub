@@ -19,12 +19,14 @@
                 data-bs-trigger="hover" 
                 data-bs-placement="top"
                 data-bs-content="Manually create a campaign lead."
-                hx-indicator="#page_load_indicator" hx-target="#generic_modal_body" 
+                hx-indicator="#page_load_indicator" 
+                hx-target="#generic_modal_body" 
                 hx-include="#site_pk"
                 hx-get="{% url 'campaign-lead-get-modal-content' %}" 
                 hx-push-url="false"
                 hx-vals='{"template_name": "create_campaign_lead"}'
-                hx-swap="innerHTML" hx-trigger="click">
+                hx-swap="innerHTML" 
+                hx-trigger="click">
                     <i class="fa fa-plus" aria-hidden="true"></i> Manually Add Campaign Lead
             </button>
         </div>
