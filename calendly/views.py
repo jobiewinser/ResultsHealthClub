@@ -21,6 +21,7 @@ from django.utils.decorators import method_decorator
 from core.models import ErrorModel
 from asgiref.sync import async_to_sync
 from django.core.exceptions import ObjectDoesNotExist
+import time
 @method_decorator(csrf_exempt, name="dispatch")
 class Webhooks(View):
     def get(self, request, *args, **kwargs):
@@ -28,6 +29,7 @@ class Webhooks(View):
         return HttpResponse("", status = 200)
 
     def post(self, request, *args, **kwargs):
+        time.sleep(5)
         try:
             body = json.loads(request.body)
             # meta = request.META
@@ -76,11 +78,11 @@ class Webhooks(View):
                     webhook.errors.add(error)
                     webhook.save()
                     # raise Exception                
-            return HttpResponse("", status=200)
+            return HttpResponse("", status=400)
             
         except ObjectDoesNotExist:               
             print("CALENDLY Webhooks post ObjectDoesNotExist body", str(body)) 
-            return HttpResponse("", status=200)
+            return HttpResponse("", status=400)
 
 def calendly_booking_success(request):
     lead = Campaignlead.objects.get(pk = request.POST['lead_pk'])

@@ -428,7 +428,7 @@ class Booking(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     datetime = models.DateTimeField(null=True, blank=True)
     lead = models.ForeignKey(Campaignlead, on_delete=models.SET_NULL, null=True, blank=True)
-    type = models.CharField(choices=BOOKING_CHOICES, max_length=2, null=False, blank=False)
+    # type = models.CharField(choices=BOOKING_CHOICES, max_length=2, null=False, blank=False)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     calendly_event_uri = models.TextField(null=True, blank=True)
     archived = models.BooleanField(default=False)

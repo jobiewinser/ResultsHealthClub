@@ -141,15 +141,15 @@ def add_manual_booking(request, **kwargs):
         lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'))
         booking_date = request.POST.get('booking_date')
         booking_time = request.POST.get('booking_time')
-        if (request.POST.get('booking_type', 'off') == 'on'):
-            booking_type = 'a'
-        else:
-            booking_type = 'b'
+        # if (request.POST.get('booking_type', 'off') == 'on'):
+        #     booking_type = 'a'
+        # else:
+        #     booking_type = 'b'
         booking_datetime = datetime.strptime(f"{booking_date} {booking_time}", '%Y-%m-%d %H:%M')
         booking = Booking.objects.create(
             datetime = booking_datetime,
             lead = lead,
-            type = booking_type,
+            # type = booking_type,
             user=request.user
         )
 
