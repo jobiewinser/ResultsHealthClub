@@ -56,9 +56,9 @@
                         </button>
                     </h2>
                     <div id="site_collapse_{{site.pk}}" class="accordion-collapse collapse {%if whatsappnumber.site == site%} show{%endif%}" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
-                        <div class="accordion-body" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
+                        <div class="accordion-body" style="white-space: nowrap; overflow: hidden;">
                             {%for chat_whatsappnumber in site.return_phone_numbers%}
-                                <button class="btn btn-sm btn-secondary {%if chat_whatsappnumber == whatsappnumber%}active{%endif%} btn-xs"
+                                <button class="btn btn-sm btn-secondary elipses-overflow {%if chat_whatsappnumber == whatsappnumber%}active{%endif%} btn-xs" style="max-width:125px"
                                 hx-get="{%url 'message-list'%}"
                                 hx-target="#chat_bottom"
                                 hx-swap="outerHTML"

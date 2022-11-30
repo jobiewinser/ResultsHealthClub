@@ -269,6 +269,27 @@ def mark_sold(request, **kwargs):
     except Exception as e:
         logger.debug("mark_archived Error "+str(e))
         return HttpResponse(e, status=500)
+
+@login_required
+def create_lead_note(request, **kwargs):
+    logger.debug(str(request.user))
+    try:
+        if request.user.is_authenticated:
+            lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'))
+            note = request.POST.get('note','')
+            if note:
+                Note.objects.create(                    
+                    lead=lead,
+                    text=note,
+                    user=request.user,
+                    datetime=datetime.now()
+                    )
+            lead.trigger_refresh_websocket(refresh_position=False)
+
+            return HttpResponse("", status=200)
+    except Exception as e:
+        logger.debug("mark_archived Error "+str(e))
+        return HttpResponse(e, status=500)
         
 # @login_required
 # def test_whatsapp_message(request, **kwargs):

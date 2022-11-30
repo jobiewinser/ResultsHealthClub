@@ -21,22 +21,63 @@
 .dragging {
     opacity: 1 !important;
 }
+.ghost-card{
+    background-color:rgba(33, 37, 41, 0.1);
+}
+.ghost-card-hidden{
+    opacity:0
+}
 
-.tilt {
-    transform: rotate(3deg);
-    -moz-transform: rotate(3deg);
-    -webkit-transform: rotate(3deg);
+#archive_area, #add_booking_area {
+    width: 20vw;
+    height: 20vh;
+    position: fixed;
+    z-index: 1000;
+    visibility: hidden;
+}
+#add_booking_area {
+    right: 40vh;
+    bottom: 2vh;
+}
+#archive_area {
+    left: 40vh;
+    bottom: 2vh;
+}
+#archive_area_card, #add_booking_area_card {
+    border-radius: 10px
+}
+#archive_area_card {
+    background-color: rgba(220, 53, 69, 1);
+}
+#add_booking_area_card {
+    background-color: rgba(11, 102, 59, 1);
+}
+
+#archive_area_body, #add_booking_area_body {
+    /* width: 260px;
+    height: 140px;  */
+}
+
+#add_booking_area.shown,
+#archive_area.shown {
+    visibility: visible;
 }
 
 .column-done {
     margin-top: 10px;
-    padding: 10px;
+    margin: 10px;
     /* background: unset; */
     /* transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1); */
-    width: 250px;
-    flex: 0 0 250px;
+    width: 231px;
+    flex: 0 0 231px;
     min-height: 100vh;
-    border-right: 1px solid rgba(33, 37, 41, 0.5);
+    
+}
+.column{
+    padding:2px;
+    border-radius: 10px;
+    background:rgba(33, 37, 41, 0.1);
+    min-height:200px
 }
 
 .column.column-ip {

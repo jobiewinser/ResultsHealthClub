@@ -263,7 +263,7 @@ class WhatsappBusinessAccount(models.Model):
 
 class PhoneNumber(PolymorphicModel):
     number = models.CharField(max_length=30, null=True, blank=True)
-    alias = models.TextField(blank=True, null=True)
+    alias = models.CharField(max_length=25, blank=True, null=True)
     # site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
     company = models.ForeignKey("core.Company", on_delete=models.SET_NULL, null=True, blank=True)
     archived = models.BooleanField(default=False)
@@ -600,3 +600,9 @@ class ErrorModel(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     type = models.TextField(null=True, blank=True)
     json_data = models.JSONField(null=True, blank=True)
+
+# class ChangeLog(models.Model):     
+#     datetime = models.DateTimeField(null=True, blank=True)
+#     version = models.FloatField(null=True, blank=True)
+#     content = models.TextField(null=True, blank=True)
+

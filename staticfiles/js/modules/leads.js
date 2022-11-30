@@ -49,8 +49,9 @@ function filterLeads(searchInput){
 }
 }
 
-function handleDraggedItem(dragged_elem_id, drag_target){
-    dragged_elem = $('#'+dragged_elem_id)
+function handleDraggedItem(dragged_elem, drag_target){
+    // dragged_elem = $('#'+dragged_elem_id)
+    console.log(dragged_elem)
     var respStatus = $.ajax({
         type:'POST',
         url:'/campaign-leads/new-call/'+dragged_elem.data('id')+'/'+$(drag_target).data("call-count")+'/'+$('#max_call_count').val()+'/',

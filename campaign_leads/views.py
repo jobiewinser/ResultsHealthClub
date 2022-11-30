@@ -151,8 +151,6 @@ def get_booking_table_context(request):
     context['archived'] = archived_filter
     
     sold_filter = (request.GET.get('sold', '').lower() =='true')
-    if not sold_filter:
-        leads = leads.exclude(booking__created=None)
     leads = leads.filter(sold=sold_filter)   
     context['sold'] = sold_filter
 

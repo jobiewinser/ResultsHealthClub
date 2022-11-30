@@ -49,6 +49,8 @@ urlpatterns = [
     path('add-manual-booking/', campaignleadshtmx.add_manual_booking, name='add-manual-booking' ),
     path('mark-arrived/', campaignleadshtmx.mark_arrived, name='mark-arrived' ),
     path('mark-sold/', campaignleadshtmx.mark_sold, name='mark-sold' ),
+    path('create-lead-note/', campaignleadshtmx.create_lead_note, name='create-lead-note' ),
+    
     # path('test-whatsapp-message/', campaignleadshtmx.test_whatsapp_message, name='test-whatsapp-message' ),
     # path('template-editor/', campaignleadshtmx.template_editor, name='template-editor' ),
     # path('template-save/', campaignleadshtmx.template_save, name='template-save' ),

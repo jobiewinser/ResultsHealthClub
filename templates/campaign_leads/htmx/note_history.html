@@ -1,99 +1,64 @@
 <div class="generic_modal_contents">
-    <div class="row">
-        <div class="col center">
-            
-            <div class="btn-group btn-space">
-                <button class="btn btn-sm btn-secondary" type="button"
-                    data-bs-toggle="popover" 
-                    data-bs-trigger="hover" 
-                    data-bs-placement="top"
-                    data-bs-content="See call history for this lead."
-                    hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
-                    hx-vals='{"template_name": "call_history"}'
-                    hx-get="{% url 'campaign-lead-get-modal-content' param1=lead.pk %}" 
-                    hx-push-url="false"
-                    hx-swap="innerHTML" hx-trigger="click">
-                        Call History
-                        <span class="badge bg-info" style="font-size:10px">
-                            {{lead.call_set.all.count}}                
-                        </span>
-                </button>
-                <button class="btn btn-sm btn-secondary"
-                    data-bs-toggle="popover" 
-                    data-bs-trigger="hover" 
-                    data-bs-placement="top"
-                    data-bs-content="See booking history for this lead."
-                    hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
-                    hx-vals='{"template_name": "booking_history"}'
-                    hx-get="{% url 'campaign-lead-get-modal-content' param1=lead.pk %}" 
-                    hx-push-url="false"
-                    hx-swap="innerHTML" hx-trigger="click">
-                        Booking History
-                        <span class="badge bg-info" style="font-size:10px">
-                            {{lead.booking_set.all.count}}                
-                        </span>
-                </button>   
-                <button class="btn btn-sm btn-success"
-                    data-bs-toggle="popover" 
-                    data-bs-trigger="hover" 
-                    data-bs-placement="top"
-                    data-bs-content="See note history for this lead."
-                    hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
-                    hx-vals='{"template_name": "note_history"}'
-                    hx-get="{% url 'campaign-lead-get-modal-content' param1=lead.pk %}" 
-                    hx-push-url="false"
-                    hx-swap="innerHTML" hx-trigger="click">
-                        Note History
-                        <span class="badge bg-info" style="font-size:10px">
-                            {{lead.note_set.all.count}}                
-                        </span>
-                </button>   
-            </div> 
+    <div class="card m-1">
+        <div class="card-header">
+            <b><i class="fa-regular fa-plus" ></i> Add New</b>
+        </div>        
+        <div class="card-body center">
+            <form hx-post="{%url 'create-lead-note'%}" hx-include=".create_lead_note_input" hx-vals='{"lead_pk":"{{lead.pk}}"}'>
+                <div class="row m-1">
+                    <div class="col">
+                        <textarea rows="4" class="form-control create_lead_note_input" name="note"></textarea>
+                    </div>
+                </div>
+                <div class="row m-1">
+                    <div class="col">
+                        <button class="btn btn-success btn-sm"><i class="fa-solid fa-note" type="submit"></i> Create</button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
-    <br>
-    <div class="row">
-        <div class="col">
-            <table class="table">
-                <thead>
-                  <tr>
-                    <th ><strong>History</strong></th>
-                    <th style="width:400px">
-                    </th>
-                  </tr>
-                </thead>
-                <tbody class="">
-                    {%for note in lead.note_set.all%}
-                    <tr
-                        data-bs-toggle="popover" 
-                        data-bs-trigger="hover" 
-                        data-bs-placement="right"
-                        data-bs-html="true"
-                        data-bs-content="
-                        {%if note.call%}
-                        <p>Attached to the <b>{{note.call.get_type_display}}</b> call{%if note.call.user%} made by <b>{{note.call.user.first_name}} {{note.call.user.last_name}}</b>{%endif%} at <b>{{note.call.datetime}}</b></p>
-                        {%endif%}  
-                        {%if note.booking%}
-                        <p>Attached to the <b>{{note.booking.get_type_display}}</b> booking{%if note.booking.user%} made by <b>{{note.booking.user.first_name}} {{note.booking.user.last_name}}</b>{%endif%} booked for <b>{{note.booking.datetime}}</b></p>
-                        {%endif%}                        
-                        ">
-                        <td colspan="2" class="double_layer_td">                         
-                            <div class="row">   
-                                <div class="col p-0">   
-                                    <span class="primary_td_layer">{{note.text}}</span>
-                                    <br>
-                                    <span class="secondary_td_layer">{{note.user.first_name}} {{note.user.last_name}} - {{note.datetime}}</span>   
+    <div class="card m-1">
+        <div class="card-header">
+            <b><i class="fa-regular fa-clock-rotate-left" ></i> History</b>
+        </div>        
+        <div class="card-body"><div class="row">
+            <div class="col">
+                <table class="table">
+                    <tbody class="">
+                        {%for note in lead.note_set.all%}
+                        <tr
+                            data-bs-toggle="popover" 
+                            data-bs-trigger="hover" 
+                            data-bs-placement="right"
+                            data-bs-html="true"
+                            data-bs-content="
+                            {%if note.booking%}
+                            <p>Attached to the booking{%if note.booking.user%} made by <b>{{note.booking.user.first_name}} {{note.booking.user.last_name}}</b>{%endif%} booked for <b>{{note.booking.datetime}}</b></p>
+                            <br>
+                            {%endif%}       
+                            <p>Attached to the Lead: <b>{{lead}}</b></p>                  
+                            ">
+                            <td class="double_layer_td">                         
+                                <div class="row">   
+                                    <div class="col p-0">   
+                                        <span class="primary_td_layer">{{note.text}}</span>
+                                        <br>
+                                        <span class="secondary_td_layer">{{note.user.first_name}} {{note.user.last_name}} - {{note.datetime}}</span>   
+                                    </div>
+                                    <div class="col-md-auto p-0">
+                                    </div>
                                 </div>
-                                <div class="col-md-auto p-0">
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                    {%endfor%}
-                </tbody>
-              </table>
+                            </td>
+                        </tr>
+                        {%endfor%}
+                    </tbody>
+                  </table>
+            </div>
+        </div>
         </div>
     </div>
+    
 </div>
 <span hx-swap-oob="true" id="generic_modal_title">
     Booking History - {{lead.name}}

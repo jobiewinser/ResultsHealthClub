@@ -75,7 +75,6 @@ var drop_archive = event => {
     document.querySelector('#add_booking_area').classList.remove('shown');
     document.querySelector('#archive_area').classList.remove('shown');
     document.querySelector('#chat_bottom').classList.remove('temp_hidden');
-    console.log("#lead_pk_"+dragged_elem.data('id'))
     htmx.ajax('POST', '/campaign-leads/mark-archived/'+dragged_elem.data('id')+'/', {swap:'none'})
 };
 

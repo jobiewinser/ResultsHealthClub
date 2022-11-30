@@ -1,8 +1,7 @@
 {%load core_tags static%}
 {%if not lead.archived%}
 <article style="margin-right:50px; border-top: 4px solid rgba({{lead.campaign.color}}, 1)"
-    id="lead-{{lead.pk}}"  class="card draggable-card lead_card column-drag lead-{{lead.pk}}"
-    draggable="true" ondragstart="drag(event)" data-id="{{lead.pk}}">
+    id="lead-{{lead.pk}}" data-id="{{lead.pk}}"  class="card draggable-card lead_card column-drag lead-{{lead.pk}}">
         <input type="text" style="display:None" id="lead_pk_{{lead.pk}}" name="lead_pk" value="{{lead.pk}}"/>
         <div class="row" style="height:30px">
             <div class="col p-0 elipses-overflow">
@@ -60,7 +59,6 @@
                     hx-include="#max_call_count"
                     hx-swap="none"
                     onclick="$('#page_load_indicator').addClass('htmx-request')"
-                    {% comment %} hx-target="#lead-{{lead.pk}}" {% endcomment %}
                     hx-push-url="false"
                     hx-trigger="click delay:0.5s"  
                     data-customer-number="{{lead.whatsapp_number}}">
@@ -73,21 +71,12 @@
                         hx-swap="outerHTML"
                         hx-indicator="#page_load_indicator"                 
                         hx-vals='{"site_pk": "{{lead.campaign.site.pk}}", "customer_number": "{{lead.whatsapp_number}}"}'
-                        hx-trigger="click"
-                        
+                        hx-trigger="click"                        
                         onclick="$('#chat_card_{{lead.whatsapp_number}}').remove(); $('#chat_list_bottom_window').remove();"
                         data-customer-number="{{lead.whatsapp_number}}">
                             Chat
-                            {% comment %} <span id="chat_notification_{{lead.whatsapp_number.pk}}">
-                                {%if lead.is_last_whatsapp_message_inbound%}
-                                <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
-                                    <span class="visually-hidden">New alerts</span>
-                                </span>
-                                {%endif%}
-                            </span> {% endcomment %}
                     </button>
                 {%endif%}
-                <!-- <span style="color:rgb(96, 248, 61y)" class="secondary_td_layer">£{{lead.campaign.product_cost|floatformat:2}}</span> -->
             </div>
         </div>
         <div class="row">
@@ -100,7 +89,7 @@
             <span class="secondary_td_layer p-0" >
                 <div class="row">
                     <div class="col p-0 elipses-overflow">
-                        <i class="fa fa-whatsapp" aria-hidden="true"></i> <span class="phone_number">{{lead.whatsapp_number}}</span>
+                        <b><i class="fa fa-whatsapp" aria-hidden="true"></i> <span class="phone_number">{{lead.whatsapp_number}}</span></b>
                     </div>
                     <div class="col-md-auto p-0 right"> 
                         <span style="color:rgb(96, 248, 61y)" class="secondary_td_layer">£<span class="lead_cost" id="lead_cost_{{lead.pk}}" data-cost="{{lead.campaign.product_cost|floatformat:2}}">{{lead.campaign.product_cost|floatformat:2}}</span></span>
@@ -109,7 +98,7 @@
             </span>
         </div>
         {%if lead.assigned_user%}
-        <span class="lead_claimed_img" 
+        <span class="lead_claimed_img_wrapper" 
             data-bs-toggle="popover" 
             data-bs-trigger="hover" 
             data-bs-html="true" 
@@ -123,6 +112,37 @@
             <img src="{%if lead.assigned_user.profile.avatar%}/media/{{lead.assigned_user.profile.avatar}}{%else%}{% static 'img/blank-profile-picture.png' %}{%endif%}" alt="" style="width:25px; height:25px;" class="rounded-circle m-1">
         </span>
         {%endif%}
+        <span class="lead_notes_button_wrapper" 
+            data-bs-toggle="popover" 
+            data-bs-trigger="hover" 
+            data-bs-html="true" 
+            data-bs-placement="top"
+            data-bs-title="Create and View Notes."
+            data-bs-content="
+            <ul>
+                {%for note in lead.note_set.all|queryset_last_x:10%}
+                <li>
+                    <div class='double_layer_td'>                         
+                        <div class='row'>   
+                            <div class='col p-0 elipses-overflow' style='max-width: 200px;'>   
+                                <span class='primary_td_layer'>{{note.text}}</span>
+                                <br>
+                                <span class='secondary_td_layer'>{{note.user.first_name}} {{note.user.last_name}} - {{note.datetime}}</span>   
+                            </div>
+                            <div class='col-md-auto p-0'>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                {%endfor%}
+            </ul>
+            ">
+            <div class="btn-group btn-space mt-1">    
+                <button class="btn btn-{%if lead.note_set.all%}dark{%else%}secondary{%endif%} btn-xs" type="button"
+                    onclick="htmx.ajax('GET', '{% url 'campaign-lead-get-modal-content' param1=lead.pk %}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'note_history'}})">
+                    <i class="fa-solid fa-notes"></i> <span style="color:Silver">{{lead.note_set.all.count}}</span></button>
+            </div>
+        </span>
     </article>
 <script>
     lead_event_listener("#lead-{{lead.pk}}")

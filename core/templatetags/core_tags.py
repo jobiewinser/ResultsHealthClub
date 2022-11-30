@@ -235,3 +235,7 @@ def hex_to_rgb_tuple_tag(hex):
 @register.filter
 def rgb_to_hex_tuple_tag(rgb_string):
     return rgb_to_hex_tuple(rgb_string)
+
+@register.filter
+def queryset_last_x(qs, x):
+    return qs.order_by('-pk')[:x]

@@ -1,5 +1,45 @@
 {%load core_tags%}
-{%for queryset_title, queryset, call_count in querysets%}
+{%for queryset_title, queryset, call_count in querysets%} 
+<script>
+  $(document).ready(function() {
+    new Sortable(document.getElementById('{%if campaign.pk%}campaign_column_{{campaign.pk}}_calls_{{call_count}}{%elif site.pk%}site_column_{{site.pk}}_calls_{{call_count}}{%else%}company_column_{{request.user.profile.company.pk}}_calls_{{call_count}}{%endif%}'), {
+            
+        group: {
+            name: 'leads-columns',
+        },
+            draggable: ".draggable-card",
+            sort: false,
+            ghostClass: "ghost-card",               
+            animation: 150, 
+            fallbackOnBody: true,
+            
+            onAdd: function (/**Event*/evt) {
+                handleDraggedItem($(evt.item), $(evt.to)) 
+                evt.preventDefault();
+            },
+            onStart: function (/**Event*/evt) {
+                document.querySelector('#add_booking_area').classList.add('shown');
+                document.querySelector('#archive_area').classList.add('shown');
+                document.querySelector('#chat_bottom').classList.add('temp_hidden');
+            },
+            onEnd: function (/**Event*/evt) {
+                document.querySelector('#add_booking_area').classList.remove('shown');
+                document.querySelector('#archive_area').classList.remove('shown');
+                document.querySelector('#chat_bottom').classList.remove('temp_hidden');
+                
+                var tagName = evt.item.tagName;
+                var items = evt.from.getElementsByTagName(tagName);
+                if (evt.oldIndex > evt.newIndex) {
+                    evt.from.insertBefore(evt.item, items[evt.oldIndex+1]);
+                }
+                else {
+                    evt.from.insertBefore(evt.item, items[evt.oldIndex]);
+                }
+            },
+
+        });
+});
+</script>
 <div class="column-done">
     <div class="m-2 manually_add_lead_div">
     <h2 class="m-0">{{queryset_title}} <img  class="htmx-indicator invert column-htmx-indicator" src="https://htmx.org/img/bars.svg"/></h2> 
@@ -9,9 +49,8 @@
     </div>
     <div 
     id="{%if campaign.pk%}campaign_column_{{campaign.pk}}_calls_{{call_count}}{%elif site.pk%}site_column_{{site.pk}}_calls_{{call_count}}{%else%}company_column_{{request.user.profile.company.pk}}_calls_{{call_count}}{%endif%}" 
-    class="column {%if campaign.pk%}campaign_column_{{campaign.pk}}_calls_{{call_count}}{%elif site.pk%}site_column_{{site.pk}}_calls_{{call_count}}{%else%}company_column_{{request.user.profile.company.pk}}_calls_{{call_count}}{%endif%}"
-    ondrop="drop(event)" 
-    ondragover="allowDrop(event)" style="height:100%" data-call-count="{{ call_count }}">
+    class="sortable_drag column {%if campaign.pk%}campaign_column_{{campaign.pk}}_calls_{{call_count}}{%elif site.pk%}site_column_{{site.pk}}_calls_{{call_count}}{%else%}company_column_{{request.user.profile.company.pk}}_calls_{{call_count}}{%endif%}"
+    data-call-count="{{ call_count }}">
         {%for lead in queryset%}
         {%include 'campaign_leads/htmx/lead_article.html'%}
         {%endfor%}
