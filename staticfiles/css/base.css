@@ -678,30 +678,7 @@ tr.odd td {
     /* max-height: 85vh; */
     
     overflow-x: scroll;
-    overflow-y: hidden;
-}
-#add_booking_area {
-    background-color: rgba(11, 102, 59, 0.9);
-    right: 40vh;
-    bottom: 2vh;
-}
-#archive_area {
-    background-color: rgba(220, 53, 69, 0.9);
-    left: 40vh;
-    bottom: 2vh;
-}
-#add_booking_area,
-#archive_area {
-    visibility: hidden;
-    position: absolute;
-    width: 20vw;
-    height: 20vh;
-    z-index: 1000;
-    border-radius: 10px
-}
-#add_booking_area.shown,
-#archive_area.shown {
-    visibility: visible;
+    overflow-y: scroll;
 }
 .col-md-auto {
     flex: 0 0 auto;

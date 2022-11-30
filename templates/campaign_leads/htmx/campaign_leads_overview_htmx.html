@@ -45,18 +45,75 @@
         {%include 'campaign_leads/htmx/leads_board.html' %}
         </div>
     </div>
-    <div id="add_booking_area" class="" ondrop="drop_booking(event)" ondragover="allowDrop(event)">        
-        <div class="card-body center text-white">
-            <h3>Add Booking
-                <i class="fa-duotone fa-calendar-days"></i>
-            </h3>
+</span>
+    <script>
+      $(document).ready(function() {
+            new Sortable(document.getElementById('archive_area_body'), {
+                group: {
+                    name: 'leads-columns',
+                    put: true
+                },
+                draggable: ".draggable-card",
+                sort: false,
+                ghostClass: "ghost-card",      
+                animation: 100,
+                onAdd: function (/**Event*/evt) {
+                    htmx.ajax('POST', '/campaign-leads/mark-archived/'+$(evt.item).data('id')+'/', {swap:'none'})
+                    return false;
+                },
+                onMove: function (/**Event*/evt) {
+                    return evt.related.className.indexOf('disabled') === -1;
+                    return false;
+                },
+                onEnd: function (/**Event*/evt) {
+                    var tagName = evt.item.tagName;
+                    var items = evt.from.getElementsByTagName(tagName);
+                    if (evt.oldIndex > evt.newIndex) {
+                        evt.from.insertBefore(evt.item, items[evt.oldIndex+1]);
+                    }
+                    else {
+                        evt.from.insertBefore(evt.item, items[evt.oldIndex]);
+                    }
+                },
+            });
+            new Sortable(document.getElementById('add_booking_area_body'), {
+                group: {
+                    name: 'leads-columns',
+                    put: true
+                },
+                draggable: ".draggable-card",
+                sort: false,
+                ghostClass: "ghost-card",    
+                animation: 100,
+                onAdd: function (/**Event*/evt) {
+                    htmx.ajax('GET', '/campaign-leads/campaign-lead-get-modal-content/'+$(evt.item).data('id')+'/?template_name=add_booking', {target:'#generic_modal_body'})
+                    return false;
+                },
+                onMove: function (/**Event*/evt) {
+                    return false;
+                },
+            });
+    });
+    </script>
+    <div id="add_booking_area" class="">        
+        <div class="card h-100" id="add_booking_area_card">
+            <div class="card-header center text-white">
+                <h3>
+                    <i class="fa-duotone fa-calendar-days"></i> Add Booking
+                </h3>
+            </div>
+            <div class="card-body" id="add_booking_area_body">
+            </div>
         </div>
     </div>
-    <div id="archive_area" class="" ondrop="drop_archive(event)" ondragover="allowDrop(event)">        
-        <div class="card-body center text-white">
-            <h3>Archive
-                <i class="fa-duotone fa-trash"></i>
-            </h3>
+    <div id="archive_area" class="">        
+        <div class="card h-100" id="archive_area_card">
+            <div class="card-header center text-white">
+                <h3>
+                    <i class="fa-duotone fa-trash"></i> Archive
+                </h3>
+            </div>
+            <div class="card-body" id="archive_area_body">
+            </div>
         </div>
     </div>
-<span>

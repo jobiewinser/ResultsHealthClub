@@ -1,9 +1,7 @@
 {%load core_tags static%}
 {%if not lead.archived%}
 <article style="margin-right:50px; border-top: 4px solid rgba({{lead.campaign.color}}, 1)"
-    id="lead-{{lead.pk}}"  class="card draggable-card lead_card column-drag lead-{{lead.pk}}"
-    draggable="true" ondragstart="drag(event)" data-id="{{lead.pk}}">
-    <script>$('#lead-{{lead.pk}}').draggable({containment: "parent"});</script>
+    id="lead-{{lead.pk}}" data-id="{{lead.pk}}"  class="card draggable-card lead_card column-drag lead-{{lead.pk}}">
         <input type="text" style="display:None" id="lead_pk_{{lead.pk}}" name="lead_pk" value="{{lead.pk}}"/>
         <div class="row" style="height:30px">
             <div class="col p-0 elipses-overflow">
