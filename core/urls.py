@@ -24,8 +24,8 @@ urlpatterns = [
     path('', coreviews.CustomerHomeView.as_view(), name='customer-home'),
     path('customer-login/', coreviews.CustomerLoginView.as_view(), name='customer-login'),
     
-    path('company-configuration/', coreviews.CompanyConfigurationView.as_view(), name='company-configuration'),
-    path('site-configuration/', coreviews.SiteConfigurationView.as_view(), name='site-configuration'),
+    path('configuration/company-configuration/', coreviews.CompanyConfigurationView.as_view(), name='company-configuration'),
+    path('configuration/site-configuration/', coreviews.SiteConfigurationView.as_view(), name='site-configuration'),
 
 
     path('configuration/change-profile-role/', coreviews.change_profile_role, name='change-profile-role'),
@@ -42,6 +42,8 @@ urlpatterns = [
     path('generate-free-taster-link/', corehtmx.generate_free_taster_link, name='generate-free-taster-link' ),
     path('create-calendly-webhook-subscription/', corehtmx.create_calendly_webhook_subscription, name='create-calendly-webhook-subscription' ),
     path('delete-calendly-webhook-subscription/', corehtmx.delete_calendly_webhook_subscription, name='delete-calendly-webhook-subscription' ),
+
+    path('add-site/', corehtmx.add_site, name='add-site' ),
     
     path('delete-free-taster-link/', corehtmx.delete_free_taster_link, name='delete-free-taster-link' ),  
     path('configuration/', coreviews.ConfigurationView.as_view(), name='configuration'),  

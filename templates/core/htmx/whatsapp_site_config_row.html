@@ -1,0 +1,79 @@
+{%load core_tags%}
+<form class="alert alert-success bg-success-trans-20" hx-post="{%url 'set-whatsapp-site-config'%}" hx-target="#whatsapp_site_config_wrapper" 
+hx-confirm="Are you sure you want to make this change. It may prevent you receiving and sending whatsapp messages if set up incorrectly!"
+hx-swap="innerHTML" hx-trigger="submit delay:0.3s" hx-indicator="#htmx_indicator_site_form" hx-vals='{"site_pk": "{{site.pk}}"}' autocomplete="off" autofill="off">
+
+<div class="row" style="margin-left:0px !important;">
+        <div class="col-md-auto p-0">        
+            <b>Whatsapp Business Management API configuration</b>
+            
+            <div class="row mt-3" style="margin-left:0px !important;"
+                data-bs-toggle="popover" 
+                data-bs-trigger="hover" 
+                data-bs-placement="top"
+                data-bs-html="true"
+                data-bs-title="Disable Messsages"
+                data-bs-content="Test">
+                    <div class="col-md-auto">        
+                        <div class="form-floating m-1">
+                            <input name="whatsapp_access_token" type="password" class="form-control" oninput="$('#whatsapp_config_submit').attr('disabled', false)"
+                            value="{{site.whatsapp_access_token|censor}}" />
+                            <label class="elipses-overflow">Whatsapp Access Token</label>
+                        </div>
+                    </div>
+                    {% comment %} <div class="col-md-auto">        
+                        <div class="form-floating m-1">
+                            <input name="whatsapp_app_secret_key" type="password" class="form-control" oninput="$('#whatsapp_config_submit').attr('disabled', false)"
+                            value="********************************" />
+                            <label>Whatsapp Secret Key</label>
+                        </div>
+                    </div> {% endcomment %}
+
+                    <div class="col-md-auto p-0">            
+                        <button class="btn btn-primary btn-sm m-3" id="whatsapp_config_submit" disabled>Submit</button>
+                    </div>
+                    
+
+                    <div class="col">
+                        
+                    </div>
+            </div>
+        </div>
+        <div class="col">
+        </div>
+        <div class="col-md-auto center">    
+            <div class="form-floating m-1">
+                <input value='{%if whatsapp_business_details.id%}{{whatsapp_business_details.id}}{%else%}N/A{%endif%}' disabled class="form-control">
+                <label class="elipses-overflow" for="guid">Whatsapp Business ID</label>
+            </div>
+            <div class="form-floating m-1">
+                <input value='{%if whatsapp_business_details.name%}{{whatsapp_business_details.name}}{%else%}N/A{%endif%}' disabled class="form-control">
+                <label class="elipses-overflow" for="guid">Business Name</label>
+            </div> 
+            <div>
+                {%if whatsapp_business_details.id%}
+                <span class="badge bg-success help"
+                    data-bs-toggle="popover" 
+                    data-bs-trigger="hover" 
+                    data-bs-html="true" 
+                    data-bs-placement="top"
+                    data-bs-title="Valid Config"
+                    data-bs-content="We've detected that your whatsapp config is valid">
+                    <i class="fa-solid fa-circle-info"></i> Valid Config <i class="fa-duotone fa-check"></i>
+                </span>
+                {%else%}
+                <span class="badge bg-danger help"
+                    data-bs-toggle="popover" 
+                    data-bs-trigger="hover" 
+                    data-bs-html="true" 
+                    data-bs-placement="top"
+                    data-bs-title="Invalid Config"
+                    data-bs-content="We've detected that your whatsapp config is invalid">
+                    <i class="fa-solid fa-circle-info"></i> Invalid Config <i class="fa-solid fa-times"></i>
+                </span>
+                {%endif%}
+            </div>
+        </div>
+</div>
+
+</form>

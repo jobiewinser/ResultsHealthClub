@@ -30,19 +30,21 @@
         hx-swap="outerHTML" hx-trigger="load"></span>
     {%endif%}
     {%endfor%}
+    
+    {%if request.user.profile.company.subscription == 'pro'%}
     <span id="next_chat_window"></span>
 
     {%if whatsappnumber%}
     {%include 'messaging/message_list.html'%}
     {%endif%}
-    <div class="card p-0" id="" style="margin-top: auto;" hx-ws="connect:/ws/message_count/{{request.user.profile.company.pk}}/">
+    <div class="card p-0 messaging_site_accordion" id="" style="margin-top: auto;" hx-ws="connect:/ws/message_count/{{request.user.profile.company.pk}}/">
 
-        <div class="card-header chat_bottom_header ps-2" data-bs-toggle="collapse" data-bs-target="#siteCollapse" aria-expanded="false" aria-controls="siteCollapse">
+        <div class="card-header chat_bottom_header ps-2 collapsed" data-bs-toggle="collapse" data-bs-target="#siteCollapse" aria-expanded="false" aria-controls="siteCollapse">
             <span class="primary_td_layer text-white">
-                <span class="badge bg-light badge-sm me-1"><i class="fa fa-whatsapp me-1"></i><span class="company_message_count">{{request.user|company_outstanding_whatsapp_messages_tag}}</span></span>Messaging Sites 
+                <span class="badge bg-light badge-sm me-1"><i class="fa fa-whatsapp me-1"></i><span class="company_message_count">{{request.user|company_outstanding_whatsapp_messages_tag}}</span></span>Whatsapp 
             </span>
         </div>
-        <div class="card-body collapse show p-0" id="siteCollapse">
+        <div class="card-body collapse p-0" id="siteCollapse">
             <div class="htmx-indicator disconnected_indicator message_count_disconnected_indicator">
                 <b>Connecting</b> <img class="invert" src="https://htmx.org/img/bars.svg">
             </div>
@@ -78,6 +80,21 @@
             </div>
         </div>
     </div>
+    {%else%}
+    <div class="card p-0 messaging_site_accordion" id="" style="margin-top: auto;" hx-ws="connect:/ws/message_count/{{request.user.profile.company.pk}}/">
+        <div class="card-header chat_bottom_header ps-2 collapsed" data-bs-toggle="collapse" data-bs-target="#siteCollapse" aria-expanded="false" aria-controls="siteCollapse">
+            <span class="primary_td_layer text-white">
+                <i class="fa fa-whatsapp" aria-hidden="true"></i> Whatsapp <i class="fa-solid fa-rectangle-pro"></i>
+            </span>
+        </div>
+        <div class="card-body collapse p-2 center" id="siteCollapse">
+            <small>
+                <p>With a <i class="fa-solid fa-rectangle-pro"></i> subscription, you can automate further by automatically sending <i class="fa fa-whatsapp text-success" aria-hidden="true"></i> Whatsapp templates to your customers immediately after they fill in your Active Campaign Forms.</p>
+                <p>You can also manage multiple whatsapp phone numbers from one screen, here on Winser Systems.</p>
+            </small>
+        </div>
+    </div>
+    {%endif%}
 </span>
 
 {% comment %} {%if chat_site%}

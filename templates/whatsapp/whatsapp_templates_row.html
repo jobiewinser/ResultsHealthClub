@@ -1,14 +1,16 @@
 {%load core_tags%}
 {%with template.company_sites_with_same_whatsapp_business_details as company_sites_with_same_whatsapp_business_details%}
 <td
+    class="help"
     data-bs-toggle="popover" 
     data-bs-trigger="hover" 
     data-bs-html="true" 
     data-bs-placement="top"
-    data-bs-title="Additional Information?"
+    data-bs-title="Additional Information"
     data-bs-content="
     Last edited by: <b>{%if template.edited_by.profile.name%}{{template.edited_by.profile.name}}{%else%}Unknown{%endif%}</b>     
     at <b>{%if template.edited.profile.name%}{{template.edited|nice_date_tag}}{%else%}Unknown{%endif%}</b>">
+    <i class="fa-solid fa-circle-info"></i>
     {%if template.name%}
         <small>({%if template.language%}{{template.language}}{%endif%})</small>
         <span class="primary_td_layer">{{template.name}}</span> 
@@ -52,7 +54,7 @@
     data-bs-content="{{template.latest_reason}}"
 {%endif%}>
     <span class="primary_td_layer">
-        {%if template.status%}{{template.status}}{%endif%} {%if template.latest_reason%}<i class="fa-solid fa-circle-info help"></i>{%endif%}
+        {%if template.latest_reason%}<i class="fa-solid fa-circle-info help"></i>{%endif%} {%if template.status%}{{template.status}}{%endif%} 
         {%if template.active_errors%}
         <span 
             data-bs-toggle="popover" 

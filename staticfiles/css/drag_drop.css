@@ -22,7 +22,8 @@
     opacity: 1 !important;
 }
 .ghost-card{
-    background-color:rgba(33, 37, 41, 0.1);
+    background-color:rgba(33, 37, 41, 0.8);
+    color:white;
 }
 .ghost-card-hidden{
     opacity:0

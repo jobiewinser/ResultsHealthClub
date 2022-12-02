@@ -52,7 +52,7 @@
         var r = Math.floor(Math.random() * 255);
         var g = Math.floor(Math.random() * 255);
         var b = Math.floor(Math.random() * 255);
-        return "rgb(" + r + "," + g + "," + b + ")";
+        return "rgba(" + r + "," + g + "," + b + ", {%if graph_type == 'polarArea'%}0.5{%else%}0.8{%endif%})";
     };
     var color_random_list = []
     {%for data_set_tuple in data_set%}

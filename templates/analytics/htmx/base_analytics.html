@@ -1,4 +1,4 @@
-{%load static%}
+{%load static core_tags%}
 
 <span id="base_analytics_span_wrapper">
     <div class="row my-3">
@@ -10,103 +10,76 @@
                         data-bs-trigger="hover" 
                         data-bs-placement="right"
                         data-bs-html="true"
-                        data-bs-content="This shows the number of leads <b>created</b> between the shown dates that were successfully marked as sold, still live or closed without being sold (filtered by site and campaign above).">Opportunities <i class="fa-solid fa-circle-info"></i>
+                        data-bs-content="This shows the potential monetary value of leads <b>created</b> between the shown dates that were successfully marked as sold, still live or closed without being sold (filtered by site and campaign above)."><i class="fa-solid fa-circle-info"></i> Pipeline   {%if not request.user.profile.company.subscription == 'pro'%}<i class="fa-solid fa-rectangle-pro"></i>{%endif%}
                         <img  class="htmx-indicator invert htmx-indicator-base-analytics" src="https://htmx.org/img/bars.svg"/>
                     </h5> 
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col p-0">
+                    {%if request.user.profile.company.subscription == 'pro'%}
+                        <div class="row">
+                            <div class="col p-0">
+                            </div>
+                            <div class="col-md-auto">
+                                <span class="secondary_td_layer">{{start_date}} - {{end_date}}</span>
+                            </div>
                         </div>
-                        <div class="col-md-auto">
-                            <span class="secondary_td_layer">{{start_date}} - {{end_date}}</span>
+                        <div class="row">
+                            <div class="col center">
+                                <h1>{{opportunities}}</h1>
+                            </div>
+                            <div class="col center">
+                                <h1>£{{opportunities_value|floatformat:2}}</h1>
+                            </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col center">
-                            <h1>{{opportunities_count}}</h1>
+                        <div class="row" style="color:green">
+                            <div class="col center">
+                                Closed
+                            </div>
+                            <div class="col center">
+                                {{closed_opportunities}}
+                            </div>
+                            <div class="col center">
+                                Closed
+                            </div>
+                            <div class="col center">
+                                £{{closed_value|floatformat:2}}
+                            </div>
                         </div>
-                    </div>
-                    <div class="row" style="color:green">
-                        <div class="col center">
-                            Closed
+                        <div class="row" style="color:grey">
+                            <div class="col center">
+                                Live
+                            </div>
+                            <div class="col center">
+                                {{live_opportunities }}
+                            </div>
+                            <div class="col center">
+                                Live
+                            </div>
+                            <div class="col center">
+                                £{{live_value|floatformat:2}}
+                            </div>
                         </div>
-                        <div class="col center">
-                            {{closed_opportunities_count}}
+                        <div class="row" style="color:red">
+                            <div class="col center">
+                                Lost
+                            </div>
+                            <div class="col center">
+                                {{lost_opportunities}}
+                            </div>
+                            <div class="col center">
+                                Lost
+                            </div>
+                            <div class="col center">
+                                £{{lost_value|floatformat:2}}
+                            </div>
                         </div>
-                    </div>
-                    <div class="row" style="color:grey">
-                        <div class="col center">
-                            Live
-                        </div>
-                        <div class="col center">
-                            {{live_opportunities_count}}
-                        </div>
-                    </div>
-                    <div class="row" style="color:red">
-                        <div class="col center">
-                            Lost
-                        </div>
-                        <div class="col center">
-                            {{lost_opportunities_count}}
-                        </div>
-                    </div>
-                </div>
-            </div> 
-        </div>  
-        <div class="col analytics_col">
-            <div class="card analytics-card">
-                <div class="card-header">
-                    <h5 class="help"
-                        data-bs-toggle="popover" 
-                        data-bs-trigger="hover" 
-                        data-bs-placement="right"
-                        data-bs-html="true"
-                        data-bs-content="This shows the potential monetary value of leads <b>created</b> between the shown dates that were successfully marked as sold, still live or closed without being sold (filtered by site and campaign above).">Pipeline Value <i class="fa-solid fa-circle-info"></i>
-                        <img  class="htmx-indicator invert htmx-indicator-base-analytics" src="https://htmx.org/img/bars.svg"/>
-                    </h5> 
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col p-0">
-                        </div>
-                        <div class="col-md-auto">
-                            <span class="secondary_td_layer">{{start_date}} - {{end_date}}</span>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col center">
-                            <h1>£{{opportunities_value|floatformat:2}}</h1>
-                        </div>
-                    </div>
-                    <div class="row" style="color:green">
-                        <div class="col center">
-                            Closed
-                        </div>
-                        <div class="col center">
-                            £{{closed_value|floatformat:2}}
-                        </div>
-                    </div>
-                    <div class="row" style="color:grey">
-                        <div class="col center">
-                            Live
-                        </div>
-                        <div class="col center">
-                            £{{live_value|floatformat:2}}
-                        </div>
-                    </div>
-                    <div class="row" style="color:red">
-                        <div class="col center">
-                            Lost
-                        </div>
-                        <div class="col center">
-                            £{{lost_value|floatformat:2}}
-                        </div>
-                    </div>
+                    {%else%}
+                    <small>Extra analytics can be unlocked through a <i class="fa-solid fa-rectangle-pro"></i> subscription!</small>
+                    {%endif%}
                 </div>
             </div> 
         </div>
-        <div class="col analytics_col">
+        {% comment %} <div class="col analytics_col">
             <div class="card analytics-card">
                 <div class="card-header">
                     <h5 class="help"
@@ -133,6 +106,51 @@
                     </div> 
                 </div>     
             </div> 
+        </div> {% endcomment %}
+        <div class="col analytics_col">
+            {%if request.user.profile.company.subscription == 'pro'%}
+            <button hidden id="refresh_current_call_count_distribution" hx-trigger="load, click delay:0.5s"
+                class="refresh_non_date_specific_analytic"
+                hx-get="{%url 'get-current-call-count-distribution' %}"
+                hx-include="#start_date, #end_date, #site_pk, #campaign_pk, #graph_type_current_call_count_distribution"
+                hx-target="#current_call_count_distribution_card_body"
+                hx-indicator="#htmx-indicator-current-call-count-distribution"
+                hx-swap="innerHTML"
+                onclick="$('#htmx-indicator-current-call-count-distribution').addClass('htmx-request'); ">refresh</button>
+            {%endif%}
+            <div class="card analytics-card">
+                <div class="card-header">
+                    <h5 class="help"
+                        data-bs-toggle="popover" 
+                        data-bs-trigger="hover" 
+                        data-bs-placement="right"
+                        data-bs-html="true"
+                        data-bs-content="This shows the <b>current</b> distribution of leads in each call count column on the <b>Leads</b> page (filtered by site and campaign above)."><i class="fa-solid fa-circle-info"></i> Current Call Count Distribution  {%if not request.user.profile.company.subscription == 'pro'%}<i class="fa-solid fa-rectangle-pro"></i>{%endif%}
+                        <img class="htmx-indicator invert" id="htmx-indicator-current-call-count-distribution" src="https://htmx.org/img/bars.svg"/>
+                    </h5> 
+                        
+                </div>
+                <div class="card-body" id="{%if request.user.profile.company.subscription == 'pro'%}current_call_count_distribution_card_body{%endif%}">                    
+                    {%if not request.user.profile.company.subscription == 'pro'%}<small>Extra analytics can be unlocked through a <i class="fa-solid fa-rectangle-pro"></i> subscription!</small>{%endif%}
+                </div>
+            </div>
         </div>
     </div> 
 </span>
+
+{%if request.META.HTTP_HX_REQUEST%}
+<span hx-swap-oob="true" id="conversion_rate_body">
+    <div class="row">
+        <div class="col p-0">
+        </div>
+        <div class="col-md-auto">
+            <span class="secondary_td_layer">{{start_date}} - {{end_date}}</span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col center">
+            <h1>{{conversion_rate|floatformat:2}}%</h1>
+        </div>
+    </div> 
+</span>
+{%endif%}

@@ -264,7 +264,7 @@ CORS_ALLOW_HEADERS = list(default_headers) + [
 ]
 
 
-LOGIN_REDIRECT_URL = "/campaign-leads/leads-and-calls/"
+LOGIN_REDIRECT_URL = "/leads-and-calls/"
 LOGOUT_REDIRECT_URL = "/"
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

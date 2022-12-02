@@ -10,6 +10,7 @@ from active_campaign.models import ActiveCampaignWebhookRequest, ActiveCampaign
 from core.models import Site
 logger = logging.getLogger(__name__)
 from django.views import View 
+from whatsapp.api import Whatsapp
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render

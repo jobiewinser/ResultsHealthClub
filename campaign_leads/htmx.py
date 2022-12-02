@@ -166,7 +166,7 @@ def add_manual_booking(request, **kwargs):
         channel_layer = get_channel_layer()          
         lead = booking.lead
         company_pk = lead.campaign.site.company.pk   
-        rendered_html = f"<span hx-swap-oob='delete' id='lead-{lead.pk}'></span> <span hx-swap-oob='outerHTML:.booking-lead-{lead.pk}'><span hx-get='/campaign-leads/refresh-booking-row/{lead.pk}/' hx-swap='innerHTML' hx-target='#row_{lead.pk}' hx-indicator='#top-htmx-indicator' hx-trigger='load'></span></span>"
+        rendered_html = f"<span hx-swap-oob='delete' id='lead-{lead.pk}'></span> <span hx-swap-oob='outerHTML:.booking-lead-{lead.pk}'><span hx-get='/refresh-booking-row/{lead.pk}/' hx-swap='innerHTML' hx-target='#row_{lead.pk}' hx-indicator='#top-htmx-indicator' hx-trigger='load'></span></span>"
         async_to_sync(channel_layer.group_send)(
             f"lead_{company_pk}",
             {

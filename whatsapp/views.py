@@ -69,7 +69,7 @@ class Webhooks(View):
                 if not field == 'message_template_status_update':
                     site = Site.objects.filter(whatsappbusinessaccount__whatsappnumber__number=metadata.get('display_phone_number')).first()
                     if site:
-                        signature = 'sha256=' + hmac.new(site.whatsapp_app_secret_key.encode('utf-8'), bytes(request.body), digestmod=hashlib.sha256).hexdigest()
+                        signature = 'sha256=' + hmac.new(site.company.whatsapp_app_secret_key.encode('utf-8'), bytes(request.body), digestmod=hashlib.sha256).hexdigest()
                         if signature == request.META.get('HTTP_X_HUB_SIGNATURE_256'):
                             if site:
                                 if field == 'messages':
@@ -130,7 +130,7 @@ class Webhooks(View):
                     if template:
                         site = template.whatsapp_business_account.site
                         if site:
-                            signature = 'sha256=' + hmac.new(site.whatsapp_app_secret_key.encode('utf-8'), bytes(request.body), digestmod=hashlib.sha256).hexdigest()
+                            signature = 'sha256=' + hmac.new(site.company.whatsapp_app_secret_key.encode('utf-8'), bytes(request.body), digestmod=hashlib.sha256).hexdigest()
                             if signature == request.META.get('HTTP_X_HUB_SIGNATURE_256'):
                                 if template:
                                     template.status=value.get('event')
@@ -616,3 +616,15 @@ def send_new_template_message(request):
 #     site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
 #     customer_number = models.CharField(max_length=50, null=True, blank=True)
 #     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+@login_required
+def set_whatsapp_site_config(request, **kwargs):
+    try:
+        site = Site.objects.get(pk=request.POST.get('site_pk',None))
+        site.whatsapp_access_token = request.POST.get('whatsapp_access_token')
+        site.save()
+        whatsapp = Whatsapp(site.whatsapp_access_token)
+        whatsapp_business_details = whatsapp.get_business()
+        return render(request, 'core/htmx/whatsapp_site_config_row.html', {'site':site, 'whatsapp_business_details':whatsapp_business_details})
+    except Exception as e:        
+        logger.error(f"set_whatsapp_template_sending_status {str(e)}")
+        return HttpResponse("Couldn't set_whatsapp_template_sending_status", status=500)

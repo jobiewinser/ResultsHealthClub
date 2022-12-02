@@ -45,5 +45,6 @@ urlpatterns = [
 
     path('send-new-template-message/', whatsappviews.send_new_template_message, name='send-new-template-message' ),
 
+    path('set-whatsapp-site-config/', whatsappviews.set_whatsapp_site_config, name='set-whatsapp-site-config'),
     
 ]    

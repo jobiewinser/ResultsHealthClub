@@ -64,7 +64,7 @@ var drop_booking = event => {
     document.querySelector('#archive_area').classList.remove('shown');
     document.querySelector('#chat_bottom').classList.remove('temp_hidden');
     
-    htmx.ajax('GET', '/campaign-leads/campaign-lead-get-modal-content/'+dragged_elem.data('id')+'/?template_name=add_booking', {target:'#generic_modal_body'})
+    htmx.ajax('GET', '/campaign-lead-get-modal-content/'+dragged_elem.data('id')+'/?template_name=add_booking', {target:'#generic_modal_body'})
 };
 
 var drop_archive = event => {
@@ -75,7 +75,7 @@ var drop_archive = event => {
     document.querySelector('#add_booking_area').classList.remove('shown');
     document.querySelector('#archive_area').classList.remove('shown');
     document.querySelector('#chat_bottom').classList.remove('temp_hidden');
-    htmx.ajax('POST', '/campaign-leads/mark-archived/'+dragged_elem.data('id')+'/', {swap:'none'})
+    htmx.ajax('POST', '/mark-archived/'+dragged_elem.data('id')+'/', {swap:'none'})
 };
 
 // function handleDraggedItem(elem){

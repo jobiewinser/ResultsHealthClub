@@ -166,6 +166,12 @@ def multiplication(num1, num2):
         return int(num1) * int(num2)
     except Exception as e:
         return 0
+@register.filter
+def censor(str):  
+    try:
+        return "*" * len(str)
+    except Exception as e:
+        return "Error"
 
 @register.filter
 def add_years(date, x):  

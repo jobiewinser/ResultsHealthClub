@@ -27,7 +27,7 @@ class CustomerHomeView(TemplateView):
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             if request.user.profile:
-                return redirect("/campaign-leads/leads-and-calls/")
+                return redirect("/leads-and-calls/")
         if request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'core/htmx/customer_home_htmx.html'
         return super(CustomerHomeView, self).get(request, args, kwargs)
@@ -88,17 +88,23 @@ class SiteConfigurationView(TemplateView):
             site = Site.objects.get(pk=site_pk)     
             context['whatsapp_numbers'] = site.get_live_whatsapp_phone_numbers()          
             calendly = Calendly(site.calendly_token)
-            calendly_webhooks = calendly.list_webhook_subscriptions(organization = site.calendly_organization).get('collection')
             site_webhook_active = False
-            if calendly_webhooks:
-                for webhook in calendly_webhooks:
-                    if webhook.get('state') == 'active' \
-                    and webhook.get('callback_url') == f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/" \
-                    and webhook.get('organization') == f"{os.getenv('CALENDLY_URL')}/organizations/{site.calendly_organization}":
-                        site_webhook_active = True
-                        break
+            if site.calendly_organization:
+                calendly_webhooks = calendly.list_webhook_subscriptions(organization = site.calendly_organization).get('collection')
+                if calendly_webhooks:
+                    for webhook in calendly_webhooks:
+                        if webhook.get('state') == 'active' \
+                        and webhook.get('callback_url') == f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/" \
+                        and webhook.get('organization') == f"{os.getenv('CALENDLY_URL')}/organizations/{site.calendly_organization}":
+                            site_webhook_active = True
+                            break
             context['site'] = site
             context['site_webhook_active'] = site_webhook_active
+            if site.whatsapp_access_token:
+                whatsapp = Whatsapp(site.whatsapp_access_token)
+                context['whatsapp_business_details'] = whatsapp.get_business()
+            else:
+                context['whatsapp_business_details'] = {"error":True}
             return context
     def post(self, request):
         self.request.POST._mutable = True 
@@ -111,7 +117,12 @@ class SiteConfigurationView(TemplateView):
         if 'calendly_organization' in request.POST:
             site.calendly_organization = request.POST['calendly_organization']
             response_text = f"""{response_text} 
-                <span hx-swap-oob='innerHTML:#calendly_webhook_status_wrapper'><b>Organization changed, please refresh page</b></span>"""
+                <span hx-swap-oob='innerHTML:#calendly_webhook_status_wrapper'><br><div class="mt-3"><b>Organization changed, please refresh page</b></div></span>"""
+            
+        if 'calendly_token' in request.POST:
+            site.calendly_token = request.POST['calendly_token']
+            response_text = f"""{response_text} 
+                <span hx-swap-oob='innerHTML:#calendly_webhook_status_wrapper'><br><div class="mt-3"><b>Organization changed, please refresh page</b></div></span>"""
             
         site.save()
         return HttpResponse(response_text, status=200)
@@ -126,10 +137,10 @@ class CompanyConfigurationView(TemplateView):
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'core/htmx/company_configuration_htmx.html'
         # context['site_list'] = get_available_sites_for_user(self.request.user)
-        site_pk = get_site_pk_from_request(self.request)
-        if site_pk:
-            self.request.GET['site_pk'] = site_pk    
+        
         context['role_choices'] = ROLE_CHOICES
+        context['company'] = self.request.user.profile.company
+        
         # context['site_list'] = get_available_sites_for_user(self.request.user)
         return context
 @login_required
