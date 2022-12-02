@@ -25,7 +25,7 @@
                         </div>
                         <div class="row">
                             <div class="col center">
-                                <h1>£{{opportunities|floatformat:2}}</h1>
+                                <h1>{{opportunities}}</h1>
                             </div>
                             <div class="col center">
                                 <h1>£{{opportunities_value|floatformat:2}}</h1>
@@ -36,7 +36,10 @@
                                 Closed
                             </div>
                             <div class="col center">
-                                £{{closed|floatformat:2}}
+                                {{closed_opportunities}}
+                            </div>
+                            <div class="col center">
+                                Closed
                             </div>
                             <div class="col center">
                                 £{{closed_value|floatformat:2}}
@@ -47,7 +50,10 @@
                                 Live
                             </div>
                             <div class="col center">
-                                £{{live|floatformat:2}}
+                                {{live_opportunities }}
+                            </div>
+                            <div class="col center">
+                                Live
                             </div>
                             <div class="col center">
                                 £{{live_value|floatformat:2}}
@@ -58,7 +64,10 @@
                                 Lost
                             </div>
                             <div class="col center">
-                                £{{lost|floatformat:2}}
+                                {{lost_opportunities}}
+                            </div>
+                            <div class="col center">
+                                Lost
                             </div>
                             <div class="col center">
                                 £{{lost_value|floatformat:2}}
