@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import uuid
 from django.conf import settings
 from django.db import models
@@ -364,7 +364,7 @@ class WhatsappNumber(PhoneNumber):
                                 customer_number=customer_number,
                                 inbound=False,
                                 whatsappnumber=self,
-                                pending=True,
+                                pending=not settings.DEBUG,
                             )
                         logger.debug("site.send_whatsapp_message success") 
                         return message
@@ -387,9 +387,8 @@ class Site(models.Model):
     # whatsapp_number = models.CharField(max_length=50, null=True, blank=True)
     # default_number = models.ForeignKey("core.WhatsappNumber", on_delete=models.SET_NULL, null=True, blank=True, related_name="site_default_number")
     whatsapp_access_token = models.TextField(blank=True, null=True)
-    whatsapp_app_secret_key = models.TextField(blank=True, null=True)
-    whatsapp_template_sending_enabled = models.BooleanField(default=True)
-    active_campaign_leads_enabled = models.BooleanField(default=True)
+    whatsapp_template_sending_enabled = models.BooleanField(default=False)
+    active_campaign_leads_enabled = models.BooleanField(default=False)
     
     # whatsapp_business_account_id = models.TextField(null=True, blank=True)
     calendly_token = models.TextField(blank=True, null=True)
@@ -446,8 +445,6 @@ class Site(models.Model):
     #         calendly.create_webhook_subscription(self.guid, organization = self.calendly_organization)
 
     def generate_lead(self, first_name, email, phone_number, lead_generation_app='a', request=None):
-        if lead_generation_app == 'b' and not self.company.active_campaign_enabled:
-            return HttpResponse(f"Active Campaign is not enabled for {self.company.company_name}", status=500)
         if lead_generation_app == 'a':
             manually_created_campaign, created = ManualCampaign.objects.get_or_create(site=self, name=f"Manually Created")
             lead = Campaignlead.objects.create(
@@ -488,10 +485,18 @@ class Company(models.Model):
     company_logo_white = models.ImageField(default='default.png', upload_to='company_images')
     company_logo_black = models.ImageField(default='default.png', upload_to='company_images')
     company_logo_trans = models.ImageField(default='default.png', upload_to='company_images')
-    campaign_leads_enabled = models.BooleanField(default=False)#
-    calendly_enabled = models.BooleanField(default=False)#
-    free_taster_enabled = models.BooleanField(default=False)
-    active_campaign_enabled = models.BooleanField(default=False)
+    # campaign_leads_enabled = models.BooleanField(default=False)#
+    # calendly_enabled = models.BooleanField(default=False)#
+    # free_taster_enabled = models.BooleanField(default=False)
+    # whatsapp_enabled = models.BooleanField(default=False)
+    # active_campaign_enabled = models.BooleanField(default=False)
+    whatsapp_app_secret_key = models.TextField(blank=True, null=True)
+    SUBSCRIPTION_CHOICES = (
+                    ('free', 'Free'),
+                    ('lite', 'Lite'),
+                    ('pro', 'Pro'),
+                )
+    subscription = models.CharField(choices=SUBSCRIPTION_CHOICES, max_length=5, default="lite")
     active_campaign_url = models.TextField(null=True, blank=True)
     active_campaign_api_key = models.TextField(null=True, blank=True)
     
@@ -514,11 +519,18 @@ class Company(models.Model):
     @property
     def get_calendly_enabled(self):
         return self.calendly_enabled
+    
+    def check_if_allowed_to_get_analytics(self, start_date):
+        if self.subscription == 'pro':
+            return True
+        if (datetime.now() - timedelta(days=8)) < start_date:
+            return True
+        return False
     def __str__(self):
         return f"{self.company_name}"   
 
     def get_and_generate_campaign_objects(self):
-        if self.active_campaign_enabled and self.active_campaign_url:
+        if self.active_campaign_url:
             from active_campaign.api import ActiveCampaignApi
             from active_campaign.models import ActiveCampaign
             
@@ -533,14 +545,15 @@ class Company(models.Model):
             #     campaign.save()
         return Campaign.objects.all()
  
-ROLE_CHOICES = (
-                    ('a', 'Owner'),
-                    ('b', 'Manager'),
-                    ('c', 'Employee'),
-                )
 # Extending User Model Using a One-To-One Link
+ROLE_CHOICES = (
+                ('a', 'Owner'),
+                ('b', 'Manager'),
+                ('c', 'Employee'),
+            )
 class Profile(models.Model):
-    role = models.CharField(choices=ROLE_CHOICES, default='c', max_length=1)
+    ROLE_CHOICES_PROFILE = ROLE_CHOICES
+    role = models.CharField(choices=ROLE_CHOICES_PROFILE, default='c', max_length=1)
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True)
     avatar = models.ImageField(default='default.png', upload_to='profile_images')

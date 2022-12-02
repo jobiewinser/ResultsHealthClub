@@ -2,7 +2,7 @@ import json
 import os
 import uuid
 from calendly.api import Calendly
-from core.models import ROLE_CHOICES, FreeTasterLink, Profile, Site, WhatsappNumber, Contact
+from core.models import ROLE_CHOICES, FreeTasterLink, Profile, Site, WhatsappNumber, Contact, Company
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import render
@@ -164,6 +164,20 @@ def delete_calendly_webhook_subscription(request, **kwargs):
                 response = calendly.delete_webhook_subscriptions(webhook_guuid = active_webhook_uuid)
                 break
     return render(request, "core/htmx/calendly_webhook_status_wrapper.html", {'site':site, 'site_webhook_active':False})
+
+@login_required
+def add_site(request, **kwargs):
+    company = Company.objects.get(pk=request.POST.get('company_pk'))
+    if not company.subscription == 'pro':
+        site = Site.objects.create(
+            name = "New Site",
+            company = company,
+        )
+
+        response = HttpResponse("", status=200)
+        response["HX-Redirect"] = f"/site-configuration/?site_pk={site.pk}"
+        return response
+    return HttpResponse("This feature requires a Pro subscription", status=403)
 
 @login_required
 def generate_free_taster_link(request, **kwargs):

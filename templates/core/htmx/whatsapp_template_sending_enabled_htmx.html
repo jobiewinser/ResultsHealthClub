@@ -12,18 +12,31 @@
     <br>
     You've noticed a typo in a whatsapp template, toggle this switch to disabled, make your template changes, then retoggle this switch to enabled and send any whatsapp messages that weren't sent during the downtime.
     ">
-    <div class="col-md-auto">
-        Automatic/Template Whatsapp sending for <i class="fa-regular fa-calendar-days"></i> <b class="name_display_{{site.pk}}">{{site.name}}</b> <i class="fa-solid fa-circle-info help"></i>: 
-    </div>
-
-    <div class="col-md-auto p-0">
+    <div class="col-md-auto alert alert-info">
         <div class="form-check form-switch">
+            <label> Template Whatsapp sending <i class="fa-solid fa-circle-info help"></i></label> 
             <input hx-post="{%url 'set-whatsapp-template-sending-status'%}" hx-target="#whatsapp_template_sending_wrapper" hx-swap="innerHTML" hx-trigger="input delay:0.3s" hx-indicator="#htmx_indicator_site_form" hx-vals='{"site_pk": "{{site.pk}}"}'
             class="form-check-input" name="whatsapp_template_sending_enabled" {%if site.whatsapp_template_sending_enabled%}checked{%endif%} type="checkbox">
         </div>
     </div>
 
     <div class="col">
-        
+    </div>
+
+    <div class="col-md-auto p-0">
+        <a href="#" class="nowrap btn btn-success btn-sm" type="button" 
+            hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
+            hx-vals='{"template_name": "add_whatsapp_business_account", "site_pk": "{{site.pk}}"}'
+            hx-get="{% url 'whatsapp-get-modal-content' %}" hx-push-url="false"
+            
+            data-bs-toggle="popover" 
+            data-bs-trigger="hover" 
+            data-bs-html="true" 
+            data-bs-placement="top"
+            data-bs-title="Errors"
+            data-bs-content="
+            You may need to contact Winser Systems about this function
+            "
+            hx-swap="innerHTML" hx-trigger="click"><i class="fa-light fa-plus"></i> Add Phone Number to {{site.name}}</a>
     </div>
 </div>

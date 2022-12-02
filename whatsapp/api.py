@@ -367,7 +367,13 @@ class Whatsapp():
         from django.core.files.images import ImageFile
         image = ImageFile(io.BytesIO(response.content), name=filename)  # << the answer!
         return image
-
+            
+    def get_business(self):     
+        url = f"{self.whatsapp_url}/2121813794756425"
+        headers = self._get_headers()
+        response = requests.get(url=url, headers=headers)
+        response_body = response.json()
+        return response_body
 
 import re
 def get_filename_from_cd(cd):

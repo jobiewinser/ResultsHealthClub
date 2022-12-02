@@ -516,9 +516,9 @@ tr.odd td {
 .flex-column {
     background-color: #f4f4f4;
 }
-.row {
+/* .row {
     background-color: unset;
-}
+} */
 .card {
     background-color: #FFF;
 }
@@ -768,4 +768,7 @@ lead_notes_button_wrapper
 }
 #top-htmx-indicator {
     height: 30px
+}
+.messaging_site_accordion{
+    width:200px
 }

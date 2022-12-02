@@ -159,7 +159,7 @@ def get_sales_today_dataset(campaign=None, site=None):
         user = User.objects.get(pk=user_pk)
         data_set.append((user.profile.name, qs.filter(sold_by=user).count()))
     return data_set, qs
-
+    
 @login_required
 def get_leads_to_bookings_and_sales(request):
     context = {}
@@ -175,6 +175,8 @@ def get_leads_to_bookings_and_sales(request):
         else:
             site = None
     start_date = datetime.strptime(request.GET.get('start_date'), '%Y-%m-%d')
+    if not request.user.profile.company.check_if_allowed_to_get_analytics(start_date):
+        return HttpResponse("Your company does not have access to analytics beyond a week ago.", status="403")
     end_date = datetime.strptime(request.GET.get('end_date'), '%Y-%m-%d') + relativedelta.relativedelta(days=1) 
      
     # date_diff = end_date - start_date
@@ -307,6 +309,8 @@ def get_calls_made_per_day(request):
         else:
             site = None
     start_date = datetime.strptime(request.GET.get('start_date'), '%Y-%m-%d')
+    if not request.user.profile.company.check_if_allowed_to_get_analytics(start_date):
+        return HttpResponse("Your company does not have access to analytics beyond a week ago.", status="403")
     end_date = datetime.strptime(request.GET.get('end_date'), '%Y-%m-%d') + relativedelta.relativedelta(days=1)   
     
     data_set, time_label_set = get_calls_made_per_day_between_dates(start_date, end_date, request.user, campaign=campaign, site=site)
@@ -378,6 +382,8 @@ def get_base_analytics(request):
         context['start_date'] = request.GET.get('start_date')
         context['end_date'] = request.GET.get('end_date')
         start_date = datetime.strptime(request.GET.get('start_date'), '%Y-%m-%d')
+        if not request.user.profile.company.check_if_allowed_to_get_analytics(start_date):
+            return HttpResponse("Your company does not have access to analytics beyond a week ago.", status="403")
         end_date = datetime.strptime(request.GET.get('end_date'), '%Y-%m-%d') + relativedelta.relativedelta(days=1)   
         if campaign:
             opportunities = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, campaign=campaign, created__gte=start_date, created__lt=end_date, campaign__site__in=request.user.profile.sites_allowed.all()).annotate(calls=Count('call'))
@@ -390,10 +396,10 @@ def get_base_analytics(request):
         closed_opportunities = opportunities.filter(sold=True)
         lost_opportunities = opportunities.filter(archived=True).exclude(sold=True)
 
-        context['opportunities_count'] = opportunities.count()
-        context['live_opportunities_count'] = live_opportunities.count()
-        context['closed_opportunities_count'] = closed_opportunities.count()
-        context['lost_opportunities_count'] = lost_opportunities.count()
+        context['opportunities'] = opportunities.count()
+        context['live_opportunities'] = live_opportunities.count()
+        context['closed_opportunities'] = closed_opportunities.count()
+        context['lost_opportunities'] = lost_opportunities.count()
         
         if live_opportunities:
             context['live_value'] = float(live_opportunities.aggregate(Sum('campaign__product_cost')).get('campaign__product_cost__sum', 0))
@@ -415,9 +421,9 @@ def get_base_analytics(request):
         else:
             context['opportunities_value'] = 0
 
-        if context['live_opportunities_count'] or context['lost_opportunities_count']:
-            context['conversion_rate'] = (context['closed_opportunities_count'] / (context['live_opportunities_count'] + context['lost_opportunities_count'])) * 100
-        elif context['live_opportunities_count']:
+        if context['live_opportunities'] or context['lost_opportunities']:
+            context['conversion_rate'] = (context['closed_opportunities'] / (context['live_opportunities'] + context['lost_opportunities'])) * 100
+        elif context['live_opportunities']:
             context['conversion_rate'] = 100
         else:
             context['conversion_rate'] = 0

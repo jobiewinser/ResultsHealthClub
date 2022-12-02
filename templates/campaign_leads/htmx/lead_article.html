@@ -1,6 +1,6 @@
 {%load core_tags static%}
 {%if not lead.archived%}
-<article style="margin-right:50px; border-top: 4px solid rgba({{lead.campaign.color}}, 1)"
+<article style="margin-right:50px; border-top: 3px solid rgba({{lead.campaign.color}}, 1); border-bottom: 3px solid rgba({{lead.campaign.color}}, 1);"
     id="lead-{{lead.pk}}" data-id="{{lead.pk}}"  class="card draggable-card lead_card column-drag lead-{{lead.pk}}">
         <input type="text" style="display:None" id="lead_pk_{{lead.pk}}" name="lead_pk" value="{{lead.pk}}"/>
         <div class="row" style="height:30px">
@@ -26,8 +26,7 @@
                     <b>Price:</b> {{lead.campaign.product_cost|floatformat:2}}<br>
                     ">
                         <i class="fa-solid fa-circle-info" style="color:light-blue"></i>
-                    </span>
-                    
+                    </span> 
                     {%if lead.active_errors%}
                     <span 
                     data-bs-toggle="popover" 
@@ -43,10 +42,11 @@
                         {%endfor%}
                     </ul>
                     ">
-                        <i class="fa-solid fa-triangle-exclamation" style="color:red"></i>
+                        <i class="fa-solid fa-triangle-exclamation help" style="color:red"></i>
                     </span>
-                    {%endif%}  
+                    {%endif%} 
                     <span class="lead_name">{{lead.name}}</span>
+                    
                     
                     
                 </span>
@@ -120,6 +120,7 @@
             data-bs-placement="top"
             data-bs-title="Create and View Notes."
             data-bs-content="
+            {%if lead.note_set.first%}
             <ul>
                 {%for note in lead.note_set.all|queryset_last_x:10%}
                 <li>
@@ -137,6 +138,9 @@
                 </li>
                 {%endfor%}
             </ul>
+            {%else%}
+            <div class='center'>No Notes Yet!</div>
+            {%endif%}
             ">
             <div class="btn-group btn-space mt-1">    
                 <button class="btn btn-{%if lead.note_set.all%}dark{%else%}secondary{%endif%} btn-xs" type="button"

@@ -9,7 +9,7 @@
             onclick="$('#htmx-indicator-calls-today').addClass('htmx-request')">refresh</button>
 
     <div class="row my-3">
-        <div class="col analytics_col">
+        <div class="col-4 analytics_col">
             <div class="card analytics-card">
                 <div class="card-header">
                     <h5 class="help"
@@ -17,7 +17,7 @@
                         data-bs-trigger="hover" 
                         data-bs-placement="right"
                         data-bs-html="true"
-                        data-bs-content="These inputs filter the graphs below by time."><b>Filters</b> <i class="fa-solid fa-circle-info"></i>
+                        data-bs-content="These inputs filter the graphs below by time."><i class="fa-solid fa-circle-info"></i> <b>Filters</b> 
                     </h5> 
                 </div>
                 <div class="card-body" id="filters_card_body">
@@ -25,15 +25,19 @@
                         <div class="col p-0">
                         </div>
                         <div class="col m-1 right p-0">
-                            <input id="start_date" value="{%if start_date%}{{start_date}}{%else%}{{''|today_date_tag|add_months:-1|date_to_date_input_prefill}}{%endif%}" min="{{''|today_date_tag|add_years:-3|date_to_date_input_prefill}}" max="{{''|today_date_input_tag}}" class="form-control form-control-sm non_site_dependant_analytics_filters" type="date" name="start_date"
-                            onchange="$('#refresh_analytics').click();"/>
+                            <input id="start_date" value="{%if start_date%}{{start_date}}{%else%}{{''|today_date_tag|add_days:-7|date_to_date_input_prefill}}{%endif%}" 
+                                min="{%if not request.user.profile.company.subscription == 'pro'%}{{''|today_date_tag|add_days:-7|date_to_date_input_prefill}}{%else%}{{''|today_date_tag|add_years:-3|date_to_date_input_prefill}}{%endif%}" 
+                                max="{{''|today_date_input_tag}}" class="form-control form-control-sm non_site_dependant_analytics_filters" type="date" name="start_date"
+                                onchange="$('#refresh_analytics').click();"/>
                         </div>
                         <div class="col-md-auto m-1 p-0">
                             <small>To</small>
                         </div>
                         <div class="col m-1 left p-0">
-                            <input id="end_date" value="{%if end_date%}{{end_date}}{%else%}{{''|today_date_input_tag}}{%endif%}" min="{{''|today_date_tag|add_years:-3|date_to_date_input_prefill}}" max="{{''|today_date_input_tag}}" class="form-control form-control-sm non_site_dependant_analytics_filters" type="date" name="end_date"
-                            onchange="$('#refresh_analytics').click();"/>
+                            <input id="end_date" value="{%if end_date%}{{end_date}}{%else%}{{''|today_date_input_tag}}{%endif%}" 
+                                min="{{''|today_date_tag|add_years:-3|date_to_date_input_prefill}}" 
+                                max="{{''|today_date_input_tag}}" class="form-control form-control-sm non_site_dependant_analytics_filters" type="date" name="end_date"
+                                onchange="$('#refresh_analytics').click();"/>
                         </div>
                         <div class="col p-0">
                         </div>
@@ -60,19 +64,45 @@
                     Quick Filters
                     <div class="row">
                         <div class="col m-1 p-0">
-                            <button class="btn btn-secondary btn-sm nowrap quick_filter_date_button {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_input_tag%}active{%endif%}" onclick="$('#start_date').val('{{''|today_date_tag|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change'); $('.quick_filter_date_button').removeClass('active'); $(this).addClass('active');">{{''|today_date_tag|nice_date_tag}} (day)</button>
+                            <button 
+                                class="btn btn-secondary btn-sm nowrap quick_filter_date_button {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_input_tag%}active{%endif%}" 
+                                onclick="$('#start_date').val('{{''|today_date_tag|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change'); $('.quick_filter_date_button').removeClass('active'); $(this).addClass('active');">
+                                <small>{{''|today_date_tag|nice_date_tag}} (day)</small>
+                            </button>
                         </div>
                         <div class="col m-1 p-0">
-                            <button class="btn btn-secondary btn-sm nowrap quick_filter_date_button {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_tag|add_days:-7|date_to_date_input_prefill%}active{%endif%}" onclick="$('#start_date').val('{{''|today_date_tag|add_days:-7|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change'); $('.quick_filter_date_button').removeClass('active'); $(this).addClass('active');">{{''|today_date_tag|add_days:-7|nice_date_tag}} (week)</button>
+                            <button 
+                                class="btn btn-secondary btn-sm nowrap quick_filter_date_button {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_tag|add_days:-7|date_to_date_input_prefill%}active{%elif not end_date and not start_date%}active{%endif%}" 
+                                onclick="$('#start_date').val('{{''|today_date_tag|add_days:-7|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change'); $('.quick_filter_date_button').removeClass('active'); $(this).addClass('active');">
+                                <small>{{''|today_date_tag|add_days:-7|nice_date_tag}} (week)</small>
+                            </button>
                         </div>
                         <div class="col m-1 p-0">
-                            <button class="btn btn-secondary btn-sm nowrap quick_filter_date_button {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_tag|add_months:-1|date_to_date_input_prefill%}active{%elif not end_date and not start_date%}active{%endif%}" onclick="$('#start_date').val('{{''|today_date_tag|add_months:-1|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change'); $('.quick_filter_date_button').removeClass('active'); $(this).addClass('active');">{{''|today_date_tag|add_months:-1|nice_date_tag}} (month)</button>
+                            <button {%if not request.user.profile.company.subscription == 'pro'%}disabled{%endif%}
+                                class="btn btn-secondary btn-sm nowrap quick_filter_date_button {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_tag|add_months:-1|date_to_date_input_prefill%}active{%endif%}" 
+                                onclick="$('#start_date').val('{{''|today_date_tag|add_months:-1|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change'); $('.quick_filter_date_button').removeClass('active'); $(this).addClass('active');">
+                                <small>{{''|today_date_tag|add_months:-1|nice_date_tag}} (month) {%if not request.user.profile.company.subscription == 'pro'%}<i class="fa-solid fa-rectangle-pro"></i>{%endif%}</small>
+                            </button>
                         </div>
                         <div class="col m-1 p-0">
-                            <button class="btn btn-secondary btn-sm nowrap quick_filter_date_button {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_tag|add_years:-1|date_to_date_input_prefill%}active{%endif%}" onclick="$('#start_date').val('{{''|today_date_tag|add_years:-1|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change'); $('.quick_filter_date_button').removeClass('active'); $(this).addClass('active');">{{''|today_date_tag|add_years:-1|nice_date_tag}} (year)</button>
+                            <button {%if not request.user.profile.company.subscription == 'pro'%}disabled{%endif%}
+                                class="btn btn-secondary btn-sm nowrap quick_filter_date_button {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_tag|add_years:-1|date_to_date_input_prefill%}active{%endif%}" 
+                                onclick="$('#start_date').val('{{''|today_date_tag|add_years:-1|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change'); $('.quick_filter_date_button').removeClass('active'); $(this).addClass('active');">
+                                <small>{{''|today_date_tag|add_years:-1|nice_date_tag}} (year) {%if not request.user.profile.company.subscription == 'pro'%}<i class="fa-solid fa-rectangle-pro"></i>{%endif%}</small>
+                            </button>
                         </div>
                     </div>
                 </div>
+                {%if not request.user.profile.company.subscription == 'pro'%}
+                <hr>
+                <div class="row">
+                    <div class="col p-0 m-0 center">
+                        <p>
+                            <small>With a <i class="fa-solid fa-rectangle-pro"></i> subscription you can see further back in time!</small>
+                        </p>
+                    </div>
+                </div>
+                {%endif%}
             </div>
         </div>
         <div class="col analytics_col">
@@ -91,7 +121,7 @@
                         data-bs-trigger="hover" 
                         data-bs-placement="right"
                         data-bs-html="true"
-                        data-bs-content="This shows the amount of calls made today since midnight (filtered by site and campaign above).">Calls Today <i class="fa-solid fa-circle-info"></i>
+                        data-bs-content="This shows the amount of calls made today since midnight (filtered by site and campaign above)."><i class="fa-solid fa-circle-info"></i> Calls Today 
                         <img  class="htmx-indicator invert" id="htmx-indicator-calls-today" src="https://htmx.org/img/bars.svg"/>
                     </h5> 
                 </div>
@@ -115,7 +145,7 @@
                         data-bs-trigger="hover" 
                         data-bs-placement="right"
                         data-bs-html="true"
-                        data-bs-content="This shows the amount of sales made today since midnight (filtered by site and campaign above).">Sales Today <i class="fa-solid fa-circle-info"></i>
+                        data-bs-content="This shows the amount of sales made today since midnight (filtered by site and campaign above)."><i class="fa-solid fa-circle-info"></i> Sales Today 
                         <img  class="htmx-indicator invert" id="htmx-indicator-sales-today" src="https://htmx.org/img/bars.svg"/>
                     </h5> 
                 </div>
@@ -124,14 +154,6 @@
             </div>
         </div>
         <div class="col analytics_col">
-            <button hidden id="refresh_current_call_count_distribution" hx-trigger="load, click delay:0.5s"
-                class="refresh_non_date_specific_analytic"
-                hx-get="{%url 'get-current-call-count-distribution' %}"
-                hx-include="#start_date, #end_date, #site_pk, #campaign_pk, #graph_type_current_call_count_distribution"
-                hx-target="#current_call_count_distribution_card_body"
-                hx-indicator="#htmx-indicator-current-call-count-distribution"
-                hx-swap="innerHTML"
-                onclick="$('#htmx-indicator-current-call-count-distribution').addClass('htmx-request'); ">refresh</button>
             <div class="card analytics-card">
                 <div class="card-header">
                     <h5 class="help"
@@ -139,17 +161,27 @@
                         data-bs-trigger="hover" 
                         data-bs-placement="right"
                         data-bs-html="true"
-                        data-bs-content="This shows the <b>current</b> distribution of leads in each call count column on the <b>Leads</b> page (filtered by site and campaign above).">Current Call Count Distribution <i class="fa-solid fa-circle-info"></i>
-                        <img class="htmx-indicator invert" id="htmx-indicator-current-call-count-distribution" src="https://htmx.org/img/bars.svg"/>
+                        data-bs-content="This shows the percentage of leads <b>created</b> between the shown dates that were successfully marked as sold (filtered by site and campaign above)."><i class="fa-solid fa-circle-info"></i> Conversion Rate 
+                        <img  class="htmx-indicator invert htmx-indicator-base-analytics" src="https://htmx.org/img/bars.svg"/>
                     </h5> 
-                        
                 </div>
-                <div class="card-body" id="current_call_count_distribution_card_body">
-                </div>
-            </div>
+                <div class="card-body" id="conversion_rate_body">
+                    {% comment %} <div class="row">
+                        <div class="col p-0">
+                        </div>
+                        <div class="col-md-auto">
+                            <span class="secondary_td_layer">{{start_date}} - {{end_date}}</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col center">
+                            <h1>{{conversion_rate|floatformat:2}}%</h1>
+                        </div>
+                    </div>  {% endcomment %}
+                </div>     
+            </div> 
         </div>
-    </div> 
-    {%include 'analytics/htmx/base_analytics.html'%}    
+    </div>    
     
     <div class="row my-3">
         {% comment %} <div class="col analytics_col">
@@ -214,7 +246,7 @@
                         data-bs-trigger="hover" 
                         data-bs-placement="right"
                         data-bs-html="true"
-                        data-bs-content='This shows the analytics for Leads and Bookings for the chosen site/campaign per day, between the chosen dates. The "Leads" bar/line indicates the number of unique leads received, the "Bookings" bar/line indicates the number of those leads that were successfully marked as sold.'>Leads to Bookings and Sales <i class="fa-solid fa-circle-info"></i>
+                        data-bs-content='This shows the analytics for Leads and Bookings for the chosen site/campaign per day, between the chosen dates. The "Leads" bar/line indicates the number of unique leads received, the "Bookings" bar/line indicates the number of those leads that were successfully marked as sold.'><i class="fa-solid fa-circle-info"></i> Leads to Bookings and Sales 
                         <img  class="htmx-indicator invert" id="htmx-indicator-leads-and-bookings" src="https://htmx.org/img/bars.svg"/>
                     </h5> 
                 </div>
@@ -239,7 +271,7 @@
                         data-bs-trigger="hover" 
                         data-bs-placement="right"
                         data-bs-html="true"
-                        data-bs-content="This shows the number of calls made per day for the chosen site and/or campaign (top left), between the times chosen (right).">Calls Made Per Day <i class="fa-solid fa-circle-info"></i>
+                        data-bs-content="This shows the number of calls made per day for the chosen site and/or campaign (top left), between the times chosen (right)."><i class="fa-solid fa-circle-info"></i> Calls Made Per Day 
                         <img  class="htmx-indicator invert" id="htmx-indicator-calls-made-per-day" src="https://htmx.org/img/bars.svg"/>
                     </h5> 
                 </div>
@@ -248,4 +280,5 @@
             </div>
         </div>
     </div> 
+    {%include 'analytics/htmx/base_analytics.html'%} 
 </span>

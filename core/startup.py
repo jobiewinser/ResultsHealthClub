@@ -23,10 +23,6 @@ def run_debug_startup():
             company, created = Company.objects.get_or_create(
                 company_name="Test Company",
                 defaults={
-                    'campaign_leads_enabled': True,
-                    'free_taster_enabled': True,
-                    'active_campaign_enabled': True,
-                    'calendly_enabled': True,
                     'active_campaign_url': os.getenv("DEFAULT_ACTIVE_CAMPAIGN_URL"),
                     'active_campaign_api_key': os.getenv("DEFAULT_ACTIVE_CAMPAIGN_API_KEY"),
                 }

@@ -1,6 +1,7 @@
 <span id="calendly_webhook_status_wrapper">
     {%if site_webhook_active%}
         <b style="color:green">Active</b>
+        <br>
         <button class="btn btn-danger ms-3" {%if not request.user.profile.role == 'a'%}disabled{%endif%}
             hx-indicator=".top-htmx-indicator" hx-target="#calendly_webhook_status_wrapper" 
             hx-vals='{"site_pk": "{{site.pk}}"}'
@@ -10,8 +11,9 @@
                 <i class="fa-solid fa-trash" aria-hidden="true"></i> Delete Calendly Webhook
         </button>
     {%else%}
-        <b style="color:red">Inactive</b> {%if not request.user.profile.role == 'a'%}disabled{%endif%}
-        <button class="btn btn-secondary ms-3"
+        <b style="color:red">Inactive</b> 
+        <br>
+        <button class="btn btn-secondary mt-2" {%if not request.user.profile.role == 'a'%}disabled{%endif%}
             hx-indicator=".top-htmx-indicator" hx-target="#calendly_webhook_status_wrapper" 
             hx-vals='{"site_pk": "{{site.pk}}"}'
             hx-post="{% url 'create-calendly-webhook-subscription' %}" 
