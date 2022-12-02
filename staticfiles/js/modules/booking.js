@@ -46,14 +46,12 @@ function bookinghandlehtmxbeforeRequest(evt){
     // }
 }
 
-function whatsapptemplateshandlehtmxafterRequest(evt){
+function  bookinghandlehtmxafterRequest(evt){
+    console.log(evt)
     if (evt.detail.xhr.status == 200){
-        if (evt.detail.pathInfo.requestPath.includes('add-manual-booking')){
-            $('#generic_modal').modal('hide');
-            snackbarShow('Successfully added booking', 'success')
-        } else if (evt.detail.pathInfo.requestPath.includes("create-lead-note")){
+        if (evt.detail.pathInfo.requestPath.includes("create-lead-note")){
             snackbarShow('Successfully added note', 'success')
-            console.log(evt)
+            console.log("evt2")
             // htmx.ajax('GET', "/refresh-booking-row/<str:lead_pk>/", {swap:'innerHTML', target: '#row_{{lead.pk}}'})
         } 
     }

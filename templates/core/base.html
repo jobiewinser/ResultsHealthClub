@@ -105,7 +105,9 @@
                     leadshandlehtmxafterSwap(evt);
                 } else if (current_module == 'whatsapp_templates'){
                     whatsapptemplateshandlehtmxafterRequest(evt);                    
-                }
+                }  else if (current_module == 'campaign_booking_overview'){
+                    bookinghandlehtmxafterRequest(evt);                    
+                } 
                 basehandlehtmxafterRequest(evt);
             }
             document.body.addEventListener('htmx:afterRequest', handlehtmxafterRequest);
@@ -137,16 +139,15 @@
                     freetastershandlehtmxbeforeRequest(evt);                    
                 } else if (current_module == 'campaign_configuration'){
                     campaignconfigurationhandlehtmxbeforeRequest(evt);                    
-                }
-                
+                } else if (current_module == 'campaign_booking_overview'){
+                    bookinghandlehtmxbeforeRequest(evt);                    
+                }                
             }
             document.body.addEventListener('htmx:beforeRequest', handlehtmxbeforeRequest);
             
             function handlehtmxoobAfterSwap(evt){
                 var current_module = $('#current_page').val()
-                if (current_module == 'campaign_booking_overview'){
-                    bookinghandlehtmxbeforeRequest(evt);                    
-                }
+                
                 basehandlehtmxoobAfterSwap(evt);
             }
             document.body.addEventListener('htmx:oobAfterSwap', handlehtmxoobAfterSwap);
