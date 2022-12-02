@@ -34,7 +34,11 @@ function bookinghandlehtmxafterSwap(evt){
             } else if (evt.detail.pathInfo.path.includes("campaign-booking-overview")){
                 $('#refresh_campaign_list_span').click(); 
                 snackbarShow('Successfully refreshed table', 'success')
-            }                
+            } else if (evt.detail.pathInfo.path.includes("create-lead-note")){
+                snackbarShow('Successfully added note', 'success')
+                console.log(evt)
+                // htmx.ajax('GET', "/refresh-booking-row/<str:lead_pk>/", {swap:'innerHTML', target: '#row_{{lead.pk}}'})
+            }     
         }                
     }
 }

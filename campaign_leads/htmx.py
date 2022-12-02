@@ -1,12 +1,11 @@
 from datetime import datetime
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.models import User
 from django.shortcuts import render
 import logging
 from django.contrib.auth import login
 from django.middleware.csrf import get_token
 from django.contrib.auth.decorators import login_required
-
 from campaign_leads.models import Campaign, Campaignlead, Booking, Call, Note
 from campaign_leads.views import CampaignBookingsOverviewView
 from core.models import Site, WhatsappNumber
@@ -285,7 +284,7 @@ def create_lead_note(request, **kwargs):
                     )
             lead.trigger_refresh_websocket(refresh_position=False)
 
-            return HttpResponse("", status=200)
+            return JsonResponse({"lead_pk":str(lead.pk)}, status=200)
     except Exception as e:
         logger.debug("mark_archived Error "+str(e))
         return HttpResponse(e, status=500)

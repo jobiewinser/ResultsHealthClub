@@ -88,6 +88,10 @@
         <br>
         <span class="secondary_td_layer">{{lead.campaign.site.name}}</span>
     </td>
+    <td class="double_layer_td">
+        {% comment %} Live Well Female {% endcomment %}        
+        <span class="primary_td_layer">£{{lead.campaign.product_cost|floatformat:2}}</span>
+    </td>
     <td>                 
         {%with lead.active_bookings.0.datetime as latest_booking%}
         <span hidden>{%if latest_booking%}{{latest_booking|timestamp}}{%else%}9999999999{%endif%}</span>
@@ -143,6 +147,35 @@
                     hx-swap="innerHTML" hx-trigger="click" {% endcomment %}
                     
                     ><i class="fa-regular fa-clock-rotate-left" ></i> <span style="color:Silver">{{lead.booking_set.all.count}}</span></button>
+            </div>
+            <div class="btn-group btn-space btn-space-with-history mb-1"
+                data-bs-toggle="popover" 
+                data-bs-trigger="hover" 
+                data-bs-html="true" 
+                data-bs-placement="top"
+                data-bs-title="Create and View Notes."
+                data-bs-content="
+                <ul>
+                    {%for note in lead.note_set.all|queryset_last_x:10%}
+                    <li>
+                        <div class='double_layer_td'>                         
+                            <div class='row'>   
+                                <div class='col p-0 elipses-overflow' style='max-width: 200px;'>   
+                                    <span class='primary_td_layer'>{{note.text}}</span>
+                                    <br>
+                                    <span class='secondary_td_layer'>{{note.user.first_name}} {{note.user.last_name}} - {{note.datetime}}</span>   
+                                </div>
+                                <div class='col-md-auto p-0'>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    {%endfor%}
+                </ul>
+                ">
+                <button class="btn btn-{%if lead.note_set.all%}dark{%else%}secondary{%endif%} btn-sm" type="button"
+                    onclick="htmx.ajax('GET', '{% url 'campaign-lead-get-modal-content' param1=lead.pk %}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'note_history'}})">
+                    <i class="fa-solid fa-notes"></i> <span style="color:Silver">{{lead.note_set.all.count}}</span></button>
             </div>
         </span>
         <br>
