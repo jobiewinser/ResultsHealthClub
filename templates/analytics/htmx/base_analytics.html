@@ -108,6 +108,7 @@
             </div> 
         </div> {% endcomment %}
         <div class="col analytics_col">
+            {%if request.user.profile.company.subscription == 'pro'%}
             <button hidden id="refresh_current_call_count_distribution" hx-trigger="load, click delay:0.5s"
                 class="refresh_non_date_specific_analytic"
                 hx-get="{%url 'get-current-call-count-distribution' %}"
@@ -116,6 +117,7 @@
                 hx-indicator="#htmx-indicator-current-call-count-distribution"
                 hx-swap="innerHTML"
                 onclick="$('#htmx-indicator-current-call-count-distribution').addClass('htmx-request'); ">refresh</button>
+            {%endif%}
             <div class="card analytics-card">
                 <div class="card-header">
                     <h5 class="help"
@@ -128,8 +130,8 @@
                     </h5> 
                         
                 </div>
-                <div class="card-body" id="{%if request.user.profile.company.subscription == 'pro'%}current_call_count_distribution_card_body{%endif%}">
-                    <small>Extra analytics can be unlocked through a <i class="fa-solid fa-rectangle-pro"></i> subscription!</small>
+                <div class="card-body" id="{%if request.user.profile.company.subscription == 'pro'%}current_call_count_distribution_card_body{%endif%}">                    
+                    {%if not request.user.profile.company.subscription == 'pro'%}<small>Extra analytics can be unlocked through a <i class="fa-solid fa-rectangle-pro"></i> subscription!</small>{%endif%}
                 </div>
             </div>
         </div>
