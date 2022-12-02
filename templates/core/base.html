@@ -53,12 +53,17 @@
     
     <script>  
         $(document).ready(function() {
+            
             window.addEventListener('mouseup', function(event){
             })
             
-            $( "#nav-link" ).click(function() {
+            $( ".top-nav-link" ).click(function() {
                 $('#generic_modal').modal('hide');
+                $( ".top-nav-link.active, .nav-link.active" ).removeClass('active');
+                $($( this ).data('active-selector')).addClass('active');
             });
+
+            
             
             document.body.onkeydown = function(e) {
                 var current_module = $('#current_page').val()
@@ -76,7 +81,7 @@
                         }    
                         if (drag_elem.length != 0)  {  
                             e.preventDefault();
-                            htmx.ajax('GET', '/campaign-leads/toggle-claim-lead/'+drag_elem.data('id')+'/', {swap:"none"})
+                            htmx.ajax('GET', '/toggle-claim-lead/'+drag_elem.data('id')+'/', {swap:"none"})
                         }
                     }
                 }

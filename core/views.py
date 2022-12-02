@@ -27,7 +27,7 @@ class CustomerHomeView(TemplateView):
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             if request.user.profile:
-                return redirect("/campaign-leads/leads-and-calls/")
+                return redirect("/leads-and-calls/")
         if request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'core/htmx/customer_home_htmx.html'
         return super(CustomerHomeView, self).get(request, args, kwargs)

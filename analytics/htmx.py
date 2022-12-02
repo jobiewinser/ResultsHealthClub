@@ -176,7 +176,7 @@ def get_leads_to_bookings_and_sales(request):
             site = None
     start_date = datetime.strptime(request.GET.get('start_date'), '%Y-%m-%d')
     if not request.user.profile.company.check_if_allowed_to_get_analytics(start_date):
-        return HttpResponse("Your company does not have access to analytics beyond a week ago.", status="403")
+        start_date = datetime.now() - timedelta(days=7)
     end_date = datetime.strptime(request.GET.get('end_date'), '%Y-%m-%d') + relativedelta.relativedelta(days=1) 
      
     # date_diff = end_date - start_date
@@ -310,7 +310,7 @@ def get_calls_made_per_day(request):
             site = None
     start_date = datetime.strptime(request.GET.get('start_date'), '%Y-%m-%d')
     if not request.user.profile.company.check_if_allowed_to_get_analytics(start_date):
-        return HttpResponse("Your company does not have access to analytics beyond a week ago.", status="403")
+        start_date = datetime.now() - timedelta(days=7)
     end_date = datetime.strptime(request.GET.get('end_date'), '%Y-%m-%d') + relativedelta.relativedelta(days=1)   
     
     data_set, time_label_set = get_calls_made_per_day_between_dates(start_date, end_date, request.user, campaign=campaign, site=site)
@@ -383,7 +383,7 @@ def get_base_analytics(request):
         context['end_date'] = request.GET.get('end_date')
         start_date = datetime.strptime(request.GET.get('start_date'), '%Y-%m-%d')
         if not request.user.profile.company.check_if_allowed_to_get_analytics(start_date):
-            return HttpResponse("Your company does not have access to analytics beyond a week ago.", status="403")
+            start_date = datetime.now() - timedelta(days=7)
         end_date = datetime.strptime(request.GET.get('end_date'), '%Y-%m-%d') + relativedelta.relativedelta(days=1)   
         if campaign:
             opportunities = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, campaign=campaign, created__gte=start_date, created__lt=end_date, campaign__site__in=request.user.profile.sites_allowed.all()).annotate(calls=Count('call'))

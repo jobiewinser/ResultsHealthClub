@@ -54,7 +54,7 @@ function handleDraggedItem(dragged_elem, drag_target){
     console.log(dragged_elem)
     var respStatus = $.ajax({
         type:'POST',
-        url:'/campaign-leads/new-call/'+dragged_elem.data('id')+'/'+$(drag_target).data("call-count")+'/'+$('#max_call_count').val()+'/',
+        url:'/new-call/'+dragged_elem.data('id')+'/'+$(drag_target).data("call-count")+'/'+$('#max_call_count').val()+'/',
         data:{'csrfmiddlewaretoken':csrftoken},
         success: function (data) {                
             // $('#refresh_column_metadata').click()

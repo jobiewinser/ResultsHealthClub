@@ -58,7 +58,7 @@
                 ghostClass: "ghost-card",      
                 animation: 100,
                 onAdd: function (/**Event*/evt) {
-                    htmx.ajax('POST', '/campaign-leads/mark-archived/'+$(evt.item).data('id')+'/', {swap:'none'})
+                    htmx.ajax('POST', '/mark-archived/'+$(evt.item).data('id')+'/', {swap:'none'})
                     return false;
                 },
                 onMove: function (/**Event*/evt) {
@@ -86,7 +86,7 @@
                 ghostClass: "ghost-card",    
                 animation: 100,
                 onAdd: function (/**Event*/evt) {
-                    htmx.ajax('GET', '/campaign-leads/campaign-lead-get-modal-content/'+$(evt.item).data('id')+'/?template_name=add_booking', {target:'#generic_modal_body'})
+                    htmx.ajax('GET', '/campaign-lead-get-modal-content/'+$(evt.item).data('id')+'/?template_name=add_booking', {target:'#generic_modal_body'})
                     return false;
                 },
                 onMove: function (/**Event*/evt) {

@@ -24,8 +24,8 @@ urlpatterns = [
     path('', coreviews.CustomerHomeView.as_view(), name='customer-home'),
     path('customer-login/', coreviews.CustomerLoginView.as_view(), name='customer-login'),
     
-    path('company-configuration/', coreviews.CompanyConfigurationView.as_view(), name='company-configuration'),
-    path('site-configuration/', coreviews.SiteConfigurationView.as_view(), name='site-configuration'),
+    path('configuration/company-configuration/', coreviews.CompanyConfigurationView.as_view(), name='company-configuration'),
+    path('configuration/site-configuration/', coreviews.SiteConfigurationView.as_view(), name='site-configuration'),
 
 
     path('configuration/change-profile-role/', coreviews.change_profile_role, name='change-profile-role'),
