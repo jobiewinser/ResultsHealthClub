@@ -284,7 +284,7 @@ def create_lead_note(request, **kwargs):
                     )
             lead.trigger_refresh_websocket(refresh_position=False)
 
-            return JsonResponse({"lead_pk":str(lead.pk)}, status=200)
+            return HttpResponse(str(lead.pk), status=200)
     except Exception as e:
         logger.debug("mark_archived Error "+str(e))
         return HttpResponse(e, status=500)

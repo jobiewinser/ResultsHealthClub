@@ -47,12 +47,10 @@ function bookinghandlehtmxbeforeRequest(evt){
 }
 
 function  bookinghandlehtmxafterRequest(evt){
-    console.log(evt)
     if (evt.detail.xhr.status == 200){
         if (evt.detail.pathInfo.requestPath.includes("create-lead-note")){
             snackbarShow('Successfully added note', 'success')
-            console.log("evt2")
-            // htmx.ajax('GET', "/refresh-booking-row/<str:lead_pk>/", {swap:'innerHTML', target: '#row_{{lead.pk}}'})
+            htmx.ajax('GET', "/refresh-booking-row/"+evt.detail.xhr.response+"/", {swap:'innerHTML', target: '#row_'+evt.detail.xhr.response})
         } 
     }
 }
