@@ -11,6 +11,11 @@
     align-items: flex-start;
 }
 
+@media (max-width: 825px){
+    #chat_bottom {
+        visibility: hidden;
+    }
+}
 #chat_bottom.temp_hidden {
     visibility: hidden;
 }

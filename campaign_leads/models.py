@@ -33,6 +33,8 @@ class Campaign(PolymorphicModel):
     guid = models.TextField(null=True, blank=True)
     webhook_created = models.BooleanField(default=False)
     webhook_id = models.TextField(null=True, blank=True)
+    webhook_enabled = models.BooleanField(default=True)
+    
     site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
     company = models.ForeignKey("core.Company", on_delete=models.SET_NULL, null=True, blank=True)
     first_send_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="first_send_template_campaign", on_delete=models.SET_NULL, null=True, blank=True)

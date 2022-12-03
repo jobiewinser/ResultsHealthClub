@@ -21,9 +21,12 @@ urlpatterns = [
     # path('products/campaign-leads-product-page', coreviews.CampaignLeadsProductPageView.as_view(), name='campaign-leads-product-page' ),
     path('login-htmx', coreviews.custom_login_post, name='login-htmx' ),
 
-    path('', coreviews.CustomerHomeView.as_view(), name='customer-home'),
+    path('', coreviews.HomeView.as_view(), name='customer-home'),
     path('customer-login/', coreviews.CustomerLoginView.as_view(), name='customer-login'),
     
+    path('change-log/', coreviews.ChangeLogView.as_view(), name='change-log'),
+
+
     path('configuration/company-configuration/', coreviews.CompanyConfigurationView.as_view(), name='company-configuration'),
     path('configuration/site-configuration/', coreviews.SiteConfigurationView.as_view(), name='site-configuration'),
 
@@ -46,7 +49,7 @@ urlpatterns = [
     path('add-site/', corehtmx.add_site, name='add-site' ),
     
     path('delete-free-taster-link/', corehtmx.delete_free_taster_link, name='delete-free-taster-link' ),  
-    path('configuration/', coreviews.ConfigurationView.as_view(), name='configuration'),  
+    # path('configuration/', coreviews.ConfigurationView.as_view(), name='configuration'),  
 
     path('profile-incorrectly-configured/', coreviews.ProfileIncorrectlyConfiguredView.as_view(), name='profile-incorrectly-configured'),  
 

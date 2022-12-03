@@ -1,13 +1,13 @@
 {%load static%}
-<ul class="navbar-nav ms-auto mb-lg-0" >
+<ul class="navbar-nav mb-lg-0" >
     {%if request.user.is_authenticated%} 
     <li class="nav-item dropstart p-2">
         <a class="nav-link dropdown-toggle text-white p-0 pointer" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <img src="{%if user.profile.avatar%}/media/{{user.profile.avatar}}{%else%}{% static 'img/blank-profile-picture.png' %}{%endif%}" width="24" height="24" class="rounded-circle m-1">
+            <img src="{%if user.profile.avatar%}/media/{{user.profile.avatar}}{%else%}{% static 'img/blank-profile-picture.png' %}{%endif%}" width="32" height="32" class="rounded-circle m-1">
             <strong style="font-size:1.5vh">{{user.profile}}</strong>
         </a>
         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <li><a class="dropdown-item pointer nav-link"
+            <li><a class="dropdown-item pointer"
                 hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
                 hx-vals='{"template_name": "edit_user", "user_pk":"{{request.user.pk}}"}'
                 hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
@@ -18,7 +18,7 @@
     </li>
     {%else%}
     <li class="nav-item ">
-        <a class="nav-link text-white pointer"
+        <a class="pointer btn btn-light ms-3"
             hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" hx-vals='{"template_name": "login"}'
             hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
             hx-swap="innerHTML" hx-trigger="click">

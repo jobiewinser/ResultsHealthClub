@@ -209,18 +209,18 @@ font-size: 1.5vh
     font-family: Inter;
     font-size: 16px;
 }
-#content {
+/* #content {
     padding: 10px;
     padding-bottom: 50px;
     top: 7vh;
     height: 93vh;
     position: fixed;
     overflow-y: scroll;
-}
-#topnav {
+} */
+/* #topnav {
     padding: 0px;
     height: 7vh;
-}
+} */
 .app_picture {
     image-rendering: auto;
     object-fit: cover;
@@ -724,9 +724,7 @@ tr.odd td {
 .side_nav_button {
     font-size: unset
 }
-.side_nav_logo {
-    width: 100%
-}
+
 .btn-xs {
     padding: 2px 2px;
     font-size: 11px;

@@ -24,9 +24,10 @@ class ActiveCampaign(Campaign):
 
 @receiver(models.signals.post_save, sender=ActiveCampaign)
 def execute_after_save(sender, instance, created, *args, **kwargs):
-    if created:
+    if not instance.guid:
         instance.guid = str(uuid.uuid4())[:16]
         instance.save()
+    if instance.webhook_enabled and not instance.webhook_id:
         instance.create_webhook()
 
 
