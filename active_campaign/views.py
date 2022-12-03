@@ -61,7 +61,7 @@ class Webhooks(View):
                                         possible_duplicate = possible_duplicate,
                                         email = data.get('contact[email]', "")
                                     )
-                                    lead.trigger_refresh_websocket()
+                                    lead.trigger_refresh_websocket(refresh_position=True)
             return HttpResponse("", "text", 200)
      
 logger = logging.getLogger(__name__)
