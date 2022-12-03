@@ -26,7 +26,6 @@ class ActiveCampaign(Campaign):
 def execute_after_save(sender, instance, created, *args, **kwargs):
     if not instance.guid:
         instance.guid = str(uuid.uuid4())[:16]
-        instance.save()
     elif instance.webhook_enabled and not instance.webhook_id:
         instance.create_webhook()
 
