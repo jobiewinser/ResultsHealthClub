@@ -138,4 +138,4 @@ media/**
 nano.save
 settings.py1
 .requirements.txt.swp
-__init__.py
+# __init__.py
