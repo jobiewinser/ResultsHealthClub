@@ -7,7 +7,7 @@ from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from calendly.api import Calendly
-from campaign_leads.models import Call, Campaign, Campaignlead
+from campaign_leads.models import Call, Campaign, Campaignlead, CampaignTemplateLink
 from active_campaign.api import ActiveCampaignApi
 from active_campaign.models import ActiveCampaign
 # from core.core_decorators import campaign_leads_enabled_required
@@ -245,26 +245,26 @@ def new_call(request, **kwargs):
 
 
 
-# @login_required
-# def campaign_assign_auto_send_template_htmx(request):
-#     campaign = Campaign.objects.get(pk=request.POST.get('campaign_pk'))
-#     first_template_pk = request.POST.get('first_template_pk')
-#     second_template_pk = request.POST.get('second_template_pk')
-#     third_template_pk = request.POST.get('third_template_pk')
-#     fourth_template_pk = request.POST.get('fourth_template_pk')
-#     fifth_template_pk = request.POST.get('fifth_template_pk')
-#     if not first_template_pk == None:
-#         campaign.first_send_template = WhatsappTemplate.objects.filter(pk=(first_template_pk or 0)).first()
-#     if not second_template_pk == None:
-#         campaign.second_send_template = WhatsappTemplate.objects.filter(pk=(second_template_pk or 0)).first()
-#     if not third_template_pk == None:
-#         campaign.third_send_template = WhatsappTemplate.objects.filter(pk=(third_template_pk or 0)).first()
-#     if not fourth_template_pk == None:
-#         campaign.fourth_send_template = WhatsappTemplate.objects.filter(pk=(fourth_template_pk or 0)).first()
-#     if not fifth_template_pk == None:
-#         campaign.fifth_send_template = WhatsappTemplate.objects.filter(pk=(fifth_template_pk or 0)).first()
-#     campaign.save()
-#     return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign})
+@login_required
+def campaign_assign_auto_send_template_htmx(request):
+    campaign = Campaign.objects.get(pk=request.POST.get('campaign_pk'))
+    send_order = send_order = request.POST['send_order']
+    template_pk = request.POST.get('template_pk')
+    if not template_pk:
+        if not CampaignTemplateLink.objects.filter(send_order__gt=send_order).exclude(template=None):
+            CampaignTemplateLink.objects.filter(send_order__gte=send_order).delete()
+        else:
+            CampaignTemplateLink.objects.filter(send_order=send_order).delete()
+
+    else:
+        template = WhatsappTemplate.objects.filter(pk=template_pk).first()
+        campaign_template_link, created = CampaignTemplateLink.objects.get_or_create(
+            campaign = campaign,
+            send_order = send_order,
+        )
+        campaign_template_link.template = template
+        campaign_template_link.save()
+    return render(request, 'campaign_leads/htmx/choose_auto_templates.html', {'campaign':campaign})
 
 @login_required
 def campaign_assign_whatsapp_business_account_htmx(request):
@@ -276,6 +276,12 @@ def campaign_assign_whatsapp_business_account_htmx(request):
     campaign.save()
     return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign})
 
+@login_required
+def refresh_campaign_configuration_row(request):
+    campaign = Campaign.objects.get(pk=request.POST.get('campaign_pk'))
+    campaign.save()
+    return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign})
+    
 @login_required
 def campaign_assign_color_htmx(request):
     campaign = Campaign.objects.get(pk=request.POST.get('campaign_pk'))

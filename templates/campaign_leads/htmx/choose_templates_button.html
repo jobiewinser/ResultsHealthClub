@@ -1,0 +1,15 @@
+{%with campaign.campaigntemplatelinks_with_templates.count as campaigntemplatelink_count%}
+<button class="btn btn-{%if campaigntemplatelink_count%}primary{%else%}secondary{%endif%} btn-sm" type="button"
+    data-bs-toggle="popover" 
+    data-bs-trigger="hover" 
+    data-bs-placement="top"
+    data-bs-title="What does this do?"
+    data-bs-content="Choose the templates to auto send to this campaign's leads."
+    onclick="htmx.ajax('GET', '{% url 'campaign-lead-get-modal-content' %}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'choose_auto_templates', 'campaign_pk':'{{campaign.pk}}'}})"
+    {% comment %} hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
+    hx-vals='{"template_name": "add_booking"}'
+    hx-get="{% url 'campaign-lead-get-modal-content' param1=lead.pk %}" 
+    hx-push-url="false"
+    hx-swap="innerHTML" hx-trigger="click" {% endcomment %}
+    >Choose Templates <span class="badge bg-{%if campaigntemplatelink_count%}light{%else%}primary{%endif%}">{{campaigntemplatelink_count}}</span></button> 
+{%endwith%}

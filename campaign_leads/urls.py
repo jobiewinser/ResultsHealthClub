@@ -63,8 +63,10 @@ urlpatterns = [
     path('new-call/<int:lead_pk>/<int:call_count>/<int:max_call_count>/', campaignleadsviews.new_call, name='new-call' ),
 
     
-    # path('configuration/campaign-assign-auto-send-template/', campaignleadsviews.campaign_assign_auto_send_template_htmx, name='campaign-assign-auto-send-template'), 
+    path('configuration/campaign-assign-auto-send-template/', campaignleadsviews.campaign_assign_auto_send_template_htmx, name='campaign-assign-auto-send-template'), 
     path('configuration/campaign-assign-color/', campaignleadsviews.campaign_assign_color_htmx, name='campaign-assign-color'), 
+    path('configuration/refresh-campaign-configuration-row/', campaignleadsviews.refresh_campaign_configuration_row, name='refresh-campaign-configuration-row'), 
+    
     path('configuration/campaign-assign-whatsapp-business-account/', campaignleadsviews.campaign_assign_whatsapp_business_account_htmx, name='campaign-assign-whatsapp-business-account'), 
     path('configuration/campaign-assign-product_cost/', campaignleadsviews.campaign_assign_product_cost_htmx, name='campaign-assign-product_cost'), 
     

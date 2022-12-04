@@ -55,8 +55,8 @@ function basehandlehtmxafterSwap(evt){
 
 
 function basehandlehtmxafterSettle(evt){ 
-    console.log("basehandlehtmxafterSettle")   
-    $('select:not(.select2-hidden-accessible)').select2({
+    console.log("basehandlehtmxafterSettle")    
+    $('.select2:not([data-select2-id])').select2({
         searchInputPlaceholder: '🔎 Search here...',        
         theme: 'bootstrap-5',
     })

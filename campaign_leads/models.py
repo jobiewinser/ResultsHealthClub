@@ -56,6 +56,21 @@ class Campaign(PolymorphicModel):
         return self.campaignlead_set.filter(archived=False)
     def is_manual(self):
         return False
+        
+    @property
+    def campaigntemplatelinks_with_templates(self):
+        return self.campaigntemplatelink_set.exclude(template=None)
+    @property
+    def campaign_template_links_with_send_orders(self):
+        campaign_template_links = []
+        try:
+            max_send_order = self.campaigntemplatelink_set.all().order_by('-send_order').first().send_order or 1
+        except:
+            max_send_order = 0
+
+        for i in range(1, max_send_order+2):
+            campaign_template_links.append(self.campaigntemplatelink_set.filter(send_order = i).first())
+        return campaign_template_links
     @property
     def site_templates(self):
         return WhatsappTemplate.objects.filter(site=self.site)
@@ -160,7 +175,9 @@ class Campaignlead(models.Model):
         if communication_method == 'a':
             print("CampaignleadDEBUG1")
             if send_order:
-                template = self.campaign.campaigntemplatelink_set.filter(send_order=send_order)
+                campaigntemplatelink = self.campaign.campaigntemplatelink_set.filter(send_order=send_order).first()
+                if campaigntemplatelink:
+                    template = campaigntemplatelink.template
                 type = str(1202 + send_order)
             else:
                 type = None
