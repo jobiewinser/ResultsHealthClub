@@ -1,5 +1,6 @@
 from datetime import datetime
 from django.http import HttpResponse
+from django.views.generic import TemplateView
 from django.shortcuts import render
 
 from campaign_leads.models import Campaignlead
@@ -9,6 +10,7 @@ from core.views import get_site_pk_from_request
 from whatsapp.models import WhatsAppMessage, WhatsappMessageImage
 from django.contrib.auth.decorators import login_required
 
+from django.utils.decorators import method_decorator
 import logging
 logger = logging.getLogger(__name__)
 
@@ -32,30 +34,7 @@ def message_list(request, **kwargs):
         context['whatsappnumber'] = whatsappnumber
         context['messages'] = whatsappnumber.get_latest_messages()
     # if get_user_allowed_to_use_site_messaging(request.user, site):
-    return render(request, "messaging/messaging.html", context)
-
-# @login_required
-# def get_messaging_section(request, **kwargs):
-#     try:
-#         context = {}
-#         # request.GET._mutable = True
-#         # site = Site.objects.get(pk=request.GET.get('site_pk'))
-#         whatsappnumber_pk = request.session.get('open_chat_whatsapp_number', '') 
-#         print("get_messaging_section whatsappnumber_pk", str(whatsappnumber_pk))
-#         if whatsappnumber_pk:
-#             if request.user.profile.sites_allowed.filter(pk=whatsappnumber_pk):
-#                 print("get_messaging_section request.user.profile.sites_allowed.filter(pk=whatsappnumber_pk)", str(request.user.profile.sites_allowed.filter(pk=whatsappnumber_pk)))
-#                 whatsappnumber = WhatsappNumber.objects.filter(pk=whatsappnumber_pk).first()
-#                 if whatsappnumber:
-#                     context['whatsappnumber'] = whatsappnumber
-#                     context['customer_numbers'] = request.session.get('open_chat_conversation_customer_number', []) 
-#                     print("get_messaging_section whatsappnumber.pk", str(whatsappnumber.pk))
-#                     print("get_messaging_section customer_numbers", str(request.session.get('open_chat_conversation_customer_number', []) ))
-#         return render(request, "messaging/messaging.html", context)   
-#     except Exception as e:
-#         logger.debug("get_messaging_section Error "+str(e))
-#         return HttpResponse(e, status=500)
-
+    return render(request, "messaging/messaging_list.html", context)
 
 @login_required
 def message_window(request, **kwargs):
@@ -244,3 +223,14 @@ def clear_chat_from_session(request):
 #     except Exception as e:
 #         print("add_chat_conversation_to_session error", str(e))
 #     return HttpResponse("", "text", 200)
+
+
+
+@method_decorator(login_required, name='dispatch')
+class MessagingView(TemplateView):
+    template_name='messaging/messaging.html'
+    def get(self, request, *args, **kwargs):        
+        if request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+            self.template_name = 'messaging/messaging_htmx.html'
+        return super(MessagingView, self).get(request, args, kwargs)
+    

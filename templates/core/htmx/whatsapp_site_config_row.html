@@ -1,5 +1,5 @@
 {%load core_tags%}
-<form class="alert alert-success bg-success-trans-20" hx-post="{%url 'set-whatsapp-site-config'%}" hx-target="#whatsapp_site_config_wrapper" 
+<form class="" hx-post="{%url 'set-whatsapp-site-config'%}" hx-target="#whatsapp_site_config_wrapper" 
 hx-confirm="Are you sure you want to make this change. It may prevent you receiving and sending whatsapp messages if set up incorrectly!"
 hx-swap="innerHTML" hx-trigger="submit delay:0.3s" hx-indicator="#htmx_indicator_site_form" hx-vals='{"site_pk": "{{site.pk}}"}' autocomplete="off" autofill="off">
 
@@ -12,8 +12,8 @@ hx-swap="innerHTML" hx-trigger="submit delay:0.3s" hx-indicator="#htmx_indicator
                 data-bs-trigger="hover" 
                 data-bs-placement="top"
                 data-bs-html="true"
-                data-bs-title="Disable Messsages"
-                data-bs-content="Test">
+                data-bs-title="More Info coming soon"
+                data-bs-content="More Info coming soon">
                     <div class="col-md-auto">        
                         <div class="form-floating m-1">
                             <input name="whatsapp_access_token" type="password" class="form-control" oninput="$('#whatsapp_config_submit').attr('disabled', false)"

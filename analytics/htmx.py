@@ -243,7 +243,6 @@ def get_leads_to_bookings_and_sales(request):
 #     else:
 #         context['graph_type'] = 'bar'
 #     return render(request, 'analytics/htmx/leads_to_bookings_data.html', context)
-
 @login_required()
 def get_calls_today(request):
     context = {}
@@ -365,7 +364,7 @@ def get_current_call_count_distribution(request):
     context['call_counts_tuples'] = call_counts_tuples
     return render(request, 'analytics/htmx/current_call_count_distribution_data.html', context)
 @login_required
-def get_base_analytics(request):
+def get_pipeline(request):
     # try:
         context = {}
         campaign_pk = request.GET.get('campaign_pk', None)
@@ -430,6 +429,7 @@ def get_base_analytics(request):
         context['start_date'] = start_date
         context['end_date'] = end_date
         # context['call_distribution'] = 
-        return render(request, 'analytics/htmx/base_analytics.html', context)
+        return render(request, 'analytics/htmx/pipeline_data.html', context)
     # except Exception as e:
     #     pass
+

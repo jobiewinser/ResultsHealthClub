@@ -11,6 +11,11 @@
     align-items: flex-start;
 }
 
+@media (max-width: 825px){
+    #chat_bottom {
+        visibility: hidden;
+    }
+}
 #chat_bottom.temp_hidden {
     visibility: hidden;
 }
@@ -18,9 +23,11 @@
     opacity: 0.6;
 }
 .chat_bottom_window {
-    min-width: 300px;
+    width: 300px;
     text-align: left;
     margin-top: auto;
+    margin-left: 2px;
+    margin-right: 2px;
 }
 .collapsed .fa-arrow-down {    
     transform: rotate(180deg);
@@ -58,6 +65,7 @@ transition-duration: 0.5s;
 .chat_bottom_header {
     background-color: rgba(33, 37, 41, 1);
     color: white;
+    padding:4px
 }
 
 .chat_bottom_header:hover {

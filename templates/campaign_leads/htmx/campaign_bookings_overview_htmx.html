@@ -31,18 +31,16 @@
 
         {%block extra_top_right_buttons %}        
         <div class="col-md-auto m-1">
-            <div id="swap_sold_button">
-                {%include 'campaign_leads/htmx/campaign_bookings_table_sold_toggle_div.html'%}
-            </div>
-        </div>       
-        <div class="col-md-auto m-1">
-            <div id="swap_archived_button">
+            <div class="btn-group btn-space mt-1" id="swap_booking_filter_button">
+                {%include 'campaign_leads/htmx/campaign_bookings_table_sold_toggle_div.html'%}                    
                 {%include 'campaign_leads/htmx/campaign_bookings_table_archived_toggle_div.html'%}
             </div>
         </div>
-        <div class="col-md-auto">
+
+
+        {% comment %} <div class="col-md-auto">
         <span class="badge bg-dark text-white"><h6 class="m-1">Booking Table</h6><input id="current_page" hidden value="campaign_booking_overview"></input></span>           
-        </div>
+        </div> {% endcomment %}
         {%endblock extra_top_right_buttons %}
     </div>
     <span hx-swap-oob="true" id="site_pk_span">   

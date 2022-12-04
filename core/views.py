@@ -22,7 +22,7 @@ run_debug_startup()
 
 @method_decorator(login_required, name='dispatch')
 @method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
-class CustomerHomeView(TemplateView):
+class HomeView(TemplateView):
     template_name='core/customer_home.html'
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
@@ -30,8 +30,16 @@ class CustomerHomeView(TemplateView):
                 return redirect("/leads-and-calls/")
         if request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'core/htmx/customer_home_htmx.html'
-        return super(CustomerHomeView, self).get(request, args, kwargs)
+        return super(HomeView, self).get(request, args, kwargs)
     
+
+
+class ChangeLogView(TemplateView):
+    template_name='core/change_log.html'
+    def get(self, request, *args, **kwargs):
+        if request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+            self.template_name = 'core/change_log_htmx.html'
+        return super().get(request, *args, **kwargs)
 class CustomerLoginView(TemplateView):
     template_name='core/customer_login.html'
     def get(self, request, *args, **kwargs):
@@ -186,8 +194,6 @@ def change_profile_sites_allowed(request):
     return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
 
 
-class HomeView(TemplateView):
-    template_name='core/home.html'
 class CampaignLeadsProductPageView(TemplateView):
     template_name='core/campaign_leads_product_page.html'
 
@@ -221,13 +227,13 @@ class FreeTasterOverviewView(TemplateView):
         return context
         
         
-@method_decorator(login_required, name='dispatch')
-class ConfigurationView(TemplateView):
-    template_name='core/configuration.html'
+# @method_decorator(login_required, name='dispatch')
+# class ConfigurationView(TemplateView):
+#     template_name='core/configuration.html'
 
-    def get_context_data(self, **kwargs):
-        context = super(ConfigurationView, self).get_context_data(**kwargs)        
-        return context
+#     def get_context_data(self, **kwargs):
+#         context = super(ConfigurationView, self).get_context_data(**kwargs)        
+#         return context
 
 def free_taster_redirect(request, **kwargs):
     try:

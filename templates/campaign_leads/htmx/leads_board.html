@@ -1,39 +1,39 @@
-<span id="leads_board_span_wrapper"> 
-    <div class="row">
-        <div class="col-md-auto m-1 p-0 secondary_td_layer">
-            <div class="input-group m-0">
-                <span class="input-group-text" id="search-addon"><i class="fa-brands fa-searchengin"></i></span>
-                <input type="text" oninput="filterLeads(this)" class="form-control" placeholder="Search" aria-label="Search" aria-describedby="search-addon">
-            </div>          
-        </div> 
-        <div class="col">
-        </div>
-        <div class="col-md-auto m-1 p-0 secondary_td_layer center">
-            Press "Space" while hovering on a lead to claim! <br>Click on the leads board and use the arrow keys to scroll around.    
-        </div> 
-        <div class="col">
-        </div>
-        <div class="col-md-auto m-1 p-0">
-            <button class="btn btn-primary btn-sm" 
-                data-bs-toggle="popover" 
-                data-bs-trigger="hover" 
-                data-bs-placement="top"
-                data-bs-content="Manually create a campaign lead."
-                hx-indicator="#page_load_indicator" 
-                hx-target="#generic_modal_body" 
-                hx-include="#site_pk"
-                hx-get="{% url 'campaign-lead-get-modal-content' %}" 
-                hx-push-url="false"
-                hx-vals='{"template_name": "create_campaign_lead"}'
-                hx-swap="innerHTML" 
-                hx-trigger="click">
-                    <i class="fa fa-plus" aria-hidden="true"></i> Manually Add Campaign Lead
-            </button>
-        </div>
+<div class="row p-0 m-0" id="leads_board_span_wrapper">
+    <div class="col-md-auto m-1 p-0 secondary_td_layer">
+        <div class="input-group m-0">
+            <span class="input-group-text" id="search-addon"><i class="fa-brands fa-searchengin"></i></span>
+            <input type="text" oninput="filterLeads(this)" class="form-control" placeholder="Search" aria-label="Search" aria-describedby="search-addon">
+        </div>          
+    </div> 
+    <div class="col">
     </div>
-    <span id="leads_board" class="board" hx-ws="connect:/ws/lead/{{company.pk}}/">
-        <!-- <button hidden hx-get="{% url 'get-leads-column-meta-data'%}" hx-include=".overview_table_filters" id="refresh_column_metadata" hx-indicator=".column-htmx-indicator" hx-target="#column_metadata_0" hx-trigger="click" hx-swap="outerHTML"></button> -->
-        <button hidden hx-get="{% url 'new-leads-column' %}" hx-include="#max_call_count" id="add_column" hx-indicator=".column-htmx-indicator" hx-target="#leads_board_span_wrapper" hx-trigger="click" hx-swap="beforeend"></button>
-        {%include 'campaign_leads/htmx/lead_columns.html' %}
-    </span>
-</span>
+    <div class="col-md-auto m-1 p-0 secondary_td_layer center">
+        Press "Space" while hovering on a lead to claim! <br>Click on the leads board and use the arrow keys to scroll around.    
+    </div> 
+    <div class="col">
+    </div>
+    <div class="col-md-auto m-1 p-0">
+        <button class="btn btn-primary btn-sm" 
+            data-bs-toggle="popover" 
+            data-bs-trigger="hover" 
+            data-bs-placement="top"
+            data-bs-content="Manually create a campaign lead."
+            hx-indicator="#page_load_indicator" 
+            hx-target="#generic_modal_body" 
+            hx-include="#site_pk"
+            hx-get="{% url 'campaign-lead-get-modal-content' %}" 
+            hx-push-url="false"
+            hx-vals='{"template_name": "create_campaign_lead"}'
+            hx-swap="innerHTML" 
+            hx-trigger="click">
+                <i class="fa fa-plus" aria-hidden="true"></i> Manually Add Campaign Lead
+        </button>
+    </div>
+</div>
+<div class="row p-0 m-0 ">
+    <div class="col p-0 m-0 board Content" id="leads_board" class="" hx-ws="connect:/ws/lead/{{company.pk}}/">
+            <!-- <button hidden hx-get="{% url 'get-leads-column-meta-data'%}" hx-include=".overview_table_filters" id="refresh_column_metadata" hx-indicator=".column-htmx-indicator" hx-target="#column_metadata_0" hx-trigger="click" hx-swap="outerHTML"></button> -->
+            <button hidden hx-get="{% url 'new-leads-column' %}" hx-include="#max_call_count" id="add_column" hx-indicator=".column-htmx-indicator" hx-target="#leads_board_span_wrapper" hx-trigger="click" hx-swap="beforeend"></button>
+            {%include 'campaign_leads/htmx/lead_columns.html' %}
+    </div>
+</div>
