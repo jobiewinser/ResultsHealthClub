@@ -1,17 +1,15 @@
 {%load static core_tags%}
-<span>    
-    <div class="htmx-indicator whole_page_disconnected_indicator leads_disconnected_indicator">
-        <div class="whole_page_disconnected_indicator_content">
-            <b>Connecting</b> <img class="invert" src="https://htmx.org/img/bars.svg">
-        </div>
-    </div>
-    <script>
-        document.title = "Campaign Leads"; 
-    </script>
-
-
-
+<div>
     <div class="row mt-0">
+        <div class="htmx-indicator whole_page_disconnected_indicator leads_disconnected_indicator">
+            <div class="whole_page_disconnected_indicator_content">
+                <b>Connecting</b> <img class="invert" src="https://htmx.org/img/bars.svg">
+            </div>
+        </div>
+        <script>
+            document.title = "Campaign Leads"; 
+        </script>
+    
         {%block extra_top_left_buttons %}
         {% comment %} <div class="col-md-auto m-1">
             <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
@@ -22,7 +20,7 @@
             hx-get="{%url 'refresh-leads-board'%}"
             hx-swap="outerHTML" hx-push-url="false" hx-include=".overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#leads_board_span_wrapper" id="filter_campaign"></button>
         {% comment %} <button hidden hx-get="{% url 'get-campaign'%}" hx-include=".overview_table_filters" id="refresh_campaign_list_span" hx-indicator="#page_load_indicator" hx-target="#campaign_list_span" hx-trigger="click" hx-swap="outerHTML"></button> {% endcomment %}
-        <div class="col-md-auto m-1" hx-get="{% url 'get-campaign'%}" hx-include=".overview_table_filters" hx-trigger="load" hx-indicator="#page_load_indicator" hx-target="#campaign_list_span" hx-swap="outerHTML">
+        <div class="col-md-auto m-1 p-0" hx-get="{% url 'get-campaign'%}" hx-include=".overview_table_filters" hx-trigger="load" hx-indicator="#page_load_indicator" hx-target="#campaign_list_span" hx-swap="outerHTML">
             <span id="campaign_list_span">   
                 <select class="form-select">
                     <option>Loading</option>
@@ -35,17 +33,17 @@
         </div>
 
         {%block extra_top_right_buttons %}
-        <div class="col-md-auto">
+        {% comment %} <div class="col-md-auto">
             <span class="badge bg-dark text-white"><h6 class="m-1">Campaign Leads</h6><input id="current_page" hidden value="campaign_leads_overview"></input></span>               
-        </div>
+        </div> {% endcomment %}
         {%endblock extra_top_right_buttons %}
     </div>
-    <div class="row ">
-        <div class="col p-0" style=""> 
+    <div class="row p-0 m-0">
+        <div class="col p-0 m-0" style=""> 
         {%include 'campaign_leads/htmx/leads_board.html' %}
         </div>
     </div>
-</span>
+</div>
     <script>
       $(document).ready(function() {
             new Sortable(document.getElementById('archive_area_body'), {
@@ -55,7 +53,7 @@
                 },
                 draggable: ".draggable-card",
                 sort: false,
-                ghostClass: "ghost-card",      
+                ghostClass: "",  
                 animation: 100,
                 onAdd: function (/**Event*/evt) {
                     htmx.ajax('POST', '/mark-archived/'+$(evt.item).data('id')+'/', {swap:'none'})
@@ -83,7 +81,7 @@
                 },
                 draggable: ".draggable-card",
                 sort: false,
-                ghostClass: "ghost-card",    
+                ghostClass: "",   
                 animation: 100,
                 onAdd: function (/**Event*/evt) {
                     htmx.ajax('GET', '/campaign-lead-get-modal-content/'+$(evt.item).data('id')+'/?template_name=add_booking', {target:'#generic_modal_body'})
@@ -102,7 +100,7 @@
                     <i class="fa-duotone fa-calendar-days"></i> Add Booking
                 </h3>
             </div>
-            <div class="card-body" id="add_booking_area_body">
+            <div class="card-body draggable-card-area" id="add_booking_area_body">
             </div>
         </div>
     </div>
@@ -113,7 +111,7 @@
                     <i class="fa-duotone fa-trash"></i> Archive
                 </h3>
             </div>
-            <div class="card-body" id="archive_area_body">
+            <div class="card-body draggable-card-area" id="archive_area_body">
             </div>
         </div>
     </div>

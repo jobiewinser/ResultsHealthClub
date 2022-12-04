@@ -1,7 +1,9 @@
 {%load core_tags%}
 <div class="row">
-    <div class="col-md-auto p-0">
+    <div class="col center">
         <div class="row" style="margin-left:0px !important;">
+            <div class="col p-0">
+            </div>
             <div class="col-md-auto" style="text-align:left; padding-left:5px">
                 <small>Doughnut</small>
             </div>
@@ -12,17 +14,13 @@
                 </div> 
             </div>
 
-            <div class="col right">
+            <div class="col-md-auto right ps-0">
                 <small>Polar Area</small>
             </div>
+            <div class="col p-0">
+            </div>
         </div>
-    </div>
-
-    <div class="col">
-    </div>
-
-    <div class="col-md-auto p-0">
-        <h5>{{raw_qs.count}} Sales</h5>
+        <hr>
     </div>
 </div>
 
@@ -30,7 +28,12 @@
     <div class="col p-0">
     </div>
     {%if data_set%}
-    <div class="col-md-auto p-0">
+    <div class="col-md-auto p-0 center">
+
+        <div class="">
+            <h6>{{raw_qs.count}} Sales</h6>
+        </div>
+        
         <div class="chart_wrapper_long" id="sales_today_chart_wrapper">
             <canvas class="chart_canvas" id="sales_today_chart" ></canvas>
         </div>

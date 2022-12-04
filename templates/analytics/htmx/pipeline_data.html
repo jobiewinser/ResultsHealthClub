@@ -1,0 +1,80 @@
+{%load core_tags%}
+{%if request.user.profile.company.subscription == 'pro'%}
+<div class="row">
+    <div class="col p-0">
+    </div>
+    <div class="col-md-auto">
+        <span class="secondary_td_layer">{{start_date}} - {{end_date}}</span>
+    </div>
+</div>
+<div class="row mt-3">
+    <div class="col">
+        <div class="row">
+            <div class="col center">
+                <h5>{{opportunities}}</h5>
+            </div>
+        </div>
+        <div class="row" style="color:green">
+            <div class="col center">
+                Closed
+            </div>
+            <div class="col center">
+                {{closed_opportunities}}
+            </div>
+        </div>
+        <div class="row" style="color:grey">
+            <div class="col center">
+                Live
+            </div>
+            <div class="col center">
+                {{live_opportunities }}
+            </div>
+        </div>
+        <div class="row" style="color:red">
+            <div class="col center">
+                Lost
+            </div>
+            <div class="col center">
+                {{lost_opportunities}}
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="row">
+            <div class="col center">
+                <h5>£{{opportunities_value|floatformat:2}}</h5>
+            </div>
+        </div>
+        <div class="row" style="color:green">
+            <div class="col center">
+                Closed
+            </div>
+            <div class="col center">
+                £{{closed_value|floatformat:2}}
+            </div>
+        </div>
+        <div class="row" style="color:grey">
+            <div class="col center">
+                Live
+            </div>
+            <div class="col center">
+                £{{live_value|floatformat:2}}
+            </div>
+        </div>
+        <div class="row" style="color:red">
+            <div class="col center">
+                Lost
+            </div>
+            <div class="col center">
+                £{{lost_value|floatformat:2}}
+            </div>
+        </div>
+    </div>
+    <div class="col center">
+        <h5>Conversion Rate</h5>
+        <h6>{{conversion_rate|floatformat:2}}%</h6>
+    </div>
+</div>
+{%else%}
+<small>Extra analytics can be unlocked through a <i class="fa-solid fa-rectangle-pro"></i> subscription!</small>
+{%endif%}

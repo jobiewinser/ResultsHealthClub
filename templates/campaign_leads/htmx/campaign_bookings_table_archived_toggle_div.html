@@ -1,4 +1,7 @@
 {%if archived%}
+<input type="text" style="display:None" id="current_status" class="overview_table_filters non_site_dependant_overview_table_filters" name="archived" value="true"/>  
+<input type="text" style="display:None" id="archived_status" name="archived" value="false"/>
+
     <button class="btn btn-success btn-sm"
         hx-indicator=".top-htmx-indicator" hx-target="#overview_table_span_wrapper" 
         hx-get="{% url 'refresh-booking-table' %}"
@@ -6,18 +9,15 @@
         hx-swap="outerHTML" hx-include=".overview_table_filters:not(#current_status),#archived_status" hx-trigger="click"><i class="fa-regular fa-box-archive"></i> Show Archived
         {% comment %} <span class="badge bg-light bg-light-border">{{archived_count}}</span> {% endcomment %}
     </button>      
-        <input type="text" style="display:None" id="current_status" class="overview_table_filters non_site_dependant_overview_table_filters" name="archived" value="true"/>  
-        <input type="text" style="display:None" id="archived_status" name="archived" value="false"/>
-
 {%else%}
-    <button class="btn btn-light bg-light-border btn-sm" style=""
+<input type="text" style="display:None" id="current_status" class="overview_table_filters non_site_dependant_overview_table_filters" name="archived" value="false"/>
+<input type="text" style="display:None" id="archived_status" name="archived" value="true"/>
+    <button class="btn btn-light bg-light-border btn-sm"
         hx-indicator=".top-htmx-indicator" hx-target="#overview_table_span_wrapper" 
         hx-get="{% url 'refresh-booking-table' %}"
         hx-push-url="false"
         hx-swap="outerHTML" hx-include=".overview_table_filters:not(#current_status),#archived_status" hx-trigger="click"><i class="fa-regular fa-box-archive"></i> Show Archived
         {% comment %} <span class="badge bg-primary">{{archived_count}}</span> {% endcomment %}
     </button>
-        <input type="text" style="display:None" id="current_status" class="overview_table_filters non_site_dependant_overview_table_filters" name="archived" value="false"/>
-        <input type="text" style="display:None" id="archived_status" name="archived" value="true"/>
 
 {%endif%}

@@ -194,13 +194,13 @@ class LeadsConsumer(AsyncWebsocketConsumer):
             {
                 'type': 'lead_update',
                 'data':{
-                    'rendered_html':f"""<span hx-swap-oob="outerHTML:.leads_disconnected_indicator">
+                    'rendered_html':f"""<div hx-swap-oob="outerHTML:.leads_disconnected_indicator">
                                             <div class="htmx-indicator whole_page_disconnected_indicator leads_disconnected_indicator">
                                                 <div class="whole_page_disconnected_indicator_content">
                                                     <b>Connecting</b> <img class="invert" src="https://htmx.org/img/bars.svg">
                                                 </div>
                                             </div>
-                                        </span>""",
+                                        </div>""",
                 }
             }
         )

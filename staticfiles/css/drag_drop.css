@@ -4,14 +4,13 @@
 }
 
 .draggable-card {
-    padding: 10px;
-    margin-bottom: 10px;
+    width: 220px;
     border-radius: 6px;
     cursor: pointer;
-    width: 220px;
-    /* height: 140px; */
+    margin: 5px;
     cursor: grab;
-    /* transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1); */
+    margin-bottom: 10px;
+    padding: 10px;
 }
 
 .card:active {
@@ -21,17 +20,19 @@
 .dragging {
     opacity: 1 !important;
 }
-.ghost-card{
-    background-color:rgba(33, 37, 41, 0.8);
-    color:white;
+.ghost-card{    
+    background-color:rgba(33, 37, 41, 0.3) !important;
+    color:white !important;
+}
+.ghost-card * > :not(.btn *){    
+    color:white !important;
 }
 .ghost-card-hidden{
     opacity:0
 }
 
 #archive_area, #add_booking_area {
-    width: 20vw;
-    height: 20vh;
+    /* width: 20vw; */
     position: fixed;
     z-index: 1000;
     visibility: hidden;
@@ -54,9 +55,12 @@
     background-color: rgba(11, 102, 59, 1);
 }
 
-#archive_area_body, #add_booking_area_body {
-    /* width: 260px;
-    height: 140px;  */
+.draggable-card-area {
+    padding-right:50px;
+    padding-top:0px;
+    padding-left:0px;
+    width: 229px;
+    height: 140px;
 }
 
 #add_booking_area.shown,
@@ -76,6 +80,7 @@
 }
 .column{
     padding:2px;
+    /* background:rgba(33, 37, 41, 0.1); */
     border-radius: 10px;
     background:rgba(33, 37, 41, 0.1);
     min-height:200px
@@ -91,7 +96,7 @@
 
 h3 {
     font-size: 21px;
-    font-family: Helvetica;
+    /* font-family: Helvetica; */
     margin: 0;
 }
 
@@ -101,6 +106,6 @@ h3 {
 
 h2 {
     /* margin: -10px -10px; */
-    font-family: Helvetica;
+    /* font-family: Helvetica; */
     font-size: 21px;
 }

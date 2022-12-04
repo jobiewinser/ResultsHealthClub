@@ -21,15 +21,15 @@
         <div class="col">
         </div>
         {%block extra_top_right_buttons %}
-        <div class="col-md-auto">
+        {% comment %} <div class="col-md-auto">
             <span class="badge bg-dark text-white"><h6 class="m-1">Site Configuration</h6><input id="current_page" hidden value="site_configuration"></input></span>           
-        </div>
+        </div> {% endcomment %}
         {%endblock extra_top_right_buttons %}
     </div>
     <div class="row mt-2">
         <div class="col">
         </div>
-        <div class="col-md-auto card p-2"> 
+        <div class="col-md-auto p-2"> 
             <div class="row m-2">
                 <div class="col-md p-0">   
                     <div class="row ">
@@ -56,7 +56,7 @@
                 <input type="checkbox" onClick="this.checked=!this.checked" class="form-check-input" id="calendly_configured" {%if site.calendly_token and site.calendly_organization %}checked{%endif%}>
                 <label class="form-check-label" for="exampleCheck1">Calendly Enabled? <small><i>(configured by Winser Systems)</i></small></label>
             </div> {% endcomment %}
-            <div class="card m-2">
+            <div class="card card-white m-2">
                 <div class="card-header">
                     <i class="fa fa-whatsapp" aria-hidden="true"></i> <b class="name_display_{{site.pk}}">{{site.name}}</b> Whatsapp Settings {%if not site.company.subscription == 'pro'%}<i class="fa-solid fa-rectangle-pro"></i>{%endif%}
                 </div>
@@ -79,7 +79,7 @@
                     {%endif%}
                 </div>
             </div>
-            <div class="card m-2">
+            <div class="card card-white m-2">
                 <div class="card-header">
                     <i class="fa-regular fa-calendar-days"></i> <b class="name_display_{{site.pk}}">{{site.name}}</b> Calendly Settings
                 </div>
@@ -104,7 +104,7 @@
                         
                         <div class="col-md p-0">   
                         </div>
-                        <div class="col-md-auto m-1 p-2 card center" style="min-width:350px;min-height:100px;">  
+                        <div class="col-md-auto m-1 p-2 alert alert-dark center" style="min-width:350px;min-height:100px;">  
                         
                             <div>   
                                 Calendly Webhook for <span class="name_display_{{site.pk}}">{{site.name}}</span>: 
@@ -114,7 +114,7 @@
                     </div>
                 </div>
             </div>
-            <div class="card m-2">
+            <div class="card card-white m-2">
                 <div class="card-header">
                     <i class="fa-light fa-dumbbell"></i> <b class="name_display_{{site.pk}}">{{site.name}}</b> Active Campaign Settings
                 </div>
