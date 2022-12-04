@@ -22,6 +22,7 @@ urlpatterns = [
     path('get-more-message-chat-rows/', get_more_message_chat_rows, name='get-more-message-chat-rows' ),
     path('messaging-get-modal-content/', get_modal_content, name='messaging-get-modal-content' ),
     path('update-message-counts/', update_message_counts, name='update-message-counts' ),
+    path('messaging', MessagingView.as_view(), name='messaging'),
     
     path('ajax-clear-chat-from-session/', clear_chat_from_session, name='clear-chat-from-session' ),
     # path('ajax-add-chat-whatsapp-number-to-session/', add_chat_whatsapp_number_to_session, name='add-chat-whatsapp-number-to-session' ),

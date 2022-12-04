@@ -57,7 +57,7 @@
                 <label class="form-check-label" for="exampleCheck1">Calendly Enabled? <small><i>(configured by Winser Systems)</i></small></label>
             </div> {% endcomment %}
             <div class="card m-2">
-                <div class="card-header bg-success-trans-20">
+                <div class="card-header">
                     <i class="fa fa-whatsapp" aria-hidden="true"></i> <b class="name_display_{{site.pk}}">{{site.name}}</b> Whatsapp Settings {%if not site.company.subscription == 'pro'%}<i class="fa-solid fa-rectangle-pro"></i>{%endif%}
                 </div>
                 <div class="card-body">
@@ -65,9 +65,14 @@
                         <span id="whatsapp_site_config_wrapper">
                             {%include 'core/htmx/whatsapp_site_config_row.html'%}
                         </span>
+                        <hr>
                         <span id="whatsapp_template_sending_wrapper">
                             {%include 'core/htmx/whatsapp_template_sending_enabled_htmx.html'%}
                         </span>
+                        <hr>
+                        <div class="m-3">
+                            {%include 'core/htmx/site_configuration_table_htmx.html'%}
+                        </div>
                     {%else%}
                         <p>With a <i class="fa-solid fa-rectangle-pro"></i> subscription, you can automate further by automatically sending <i class="fa fa-whatsapp text-success" aria-hidden="true"></i> Whatsapp templates to your customers immediately after they fill in your Active Campaign Forms.</p>
                         <p>You can also manage multiple whatsapp phone numbers from one screen, here on Winser Systems.</p>
@@ -75,7 +80,7 @@
                 </div>
             </div>
             <div class="card m-2">
-                <div class="card-header bg-primary-trans-20">
+                <div class="card-header">
                     <i class="fa-regular fa-calendar-days"></i> <b class="name_display_{{site.pk}}">{{site.name}}</b> Calendly Settings
                 </div>
                 <div class="card-body">
@@ -99,7 +104,7 @@
                         
                         <div class="col-md p-0">   
                         </div>
-                        <div class="col-md-auto m-1 p-2 card card-info bg-primary-trans-20 center" style="min-width:350px;min-height:100px;">  
+                        <div class="col-md-auto m-1 p-2 card center" style="min-width:350px;min-height:100px;">  
                         
                             <div>   
                                 Calendly Webhook for <span class="name_display_{{site.pk}}">{{site.name}}</span>: 
@@ -110,7 +115,7 @@
                 </div>
             </div>
             <div class="card m-2">
-                <div class="card-header bg-warning-trans-20">
+                <div class="card-header">
                     <i class="fa-light fa-dumbbell"></i> <b class="name_display_{{site.pk}}">{{site.name}}</b> Active Campaign Settings
                 </div>
                 <div class="card-body">

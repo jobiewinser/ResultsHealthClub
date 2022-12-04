@@ -1,18 +1,18 @@
 
 
-<div class="row" style="margin-left:0px !important;"
-    data-bs-toggle="popover" 
-    data-bs-trigger="hover" 
-    data-bs-placement="top"
-    data-bs-html="true"
-    data-bs-title="Disable Messages"
-    data-bs-content="Disabling this toggle will stop template whatsapps sending, including follow up messages, initial lead messages. The messages can then be sent after turning this back on freely.
-    <br>
-    <b>Example Usage:</b>
-    <br>
-    You've noticed a typo in a whatsapp template, toggle this switch to disabled, make your template changes, then retoggle this switch to enabled and send any whatsapp messages that weren't sent during the downtime.
-    ">
-    <div class="col-md-auto alert alert-info">
+<div class="row" style="margin-left:0px !important;">
+    <div class="col-md-auto alert" 
+        data-bs-toggle="popover" 
+        data-bs-trigger="hover" 
+        data-bs-placement="top"
+        data-bs-html="true"
+        data-bs-title="Disable Messages"
+        data-bs-content="Disabling this toggle will stop template whatsapps sending, including follow up messages, initial lead messages. The messages can then be sent after turning this back on freely.
+        <br>
+        <b>Example Usage:</b>
+        <br>
+        You've noticed a typo in a whatsapp template, toggle this switch to disabled, make your template changes, then retoggle this switch to enabled and send any whatsapp messages that weren't sent during the downtime.
+        ">
         <div class="form-check form-switch">
             <label> Template Whatsapp sending <i class="fa-solid fa-circle-info help"></i></label> 
             <input hx-post="{%url 'set-whatsapp-template-sending-status'%}" hx-target="#whatsapp_template_sending_wrapper" hx-swap="innerHTML" hx-trigger="input delay:0.3s" hx-indicator="#htmx_indicator_site_form" hx-vals='{"site_pk": "{{site.pk}}"}'
@@ -20,10 +20,7 @@
         </div>
     </div>
 
-    <div class="col">
-    </div>
-
-    <div class="col-md-auto p-0">
+    <div class="col-md-auto p-0 ms-2">
         <a href="#" class="nowrap btn btn-success btn-sm" type="button" 
             hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
             hx-vals='{"template_name": "add_whatsapp_business_account", "site_pk": "{{site.pk}}"}'
@@ -33,10 +30,13 @@
             data-bs-trigger="hover" 
             data-bs-html="true" 
             data-bs-placement="top"
-            data-bs-title="Errors"
+            data-bs-title="Add Phone Number"
             data-bs-content="
-            You may need to contact Winser Systems about this function
+                You may need to contact Winser Systems about this function if you are not a developer.
             "
             hx-swap="innerHTML" hx-trigger="click"><i class="fa-light fa-plus"></i> Add Phone Number to {{site.name}}</a>
+    </div>
+
+    <div class="col">
     </div>
 </div>
