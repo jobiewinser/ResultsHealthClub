@@ -245,26 +245,26 @@ def new_call(request, **kwargs):
 
 
 
-@login_required
-def campaign_assign_auto_send_template_htmx(request):
-    campaign = Campaign.objects.get(pk=request.POST.get('campaign_pk'))
-    first_template_pk = request.POST.get('first_template_pk')
-    second_template_pk = request.POST.get('second_template_pk')
-    third_template_pk = request.POST.get('third_template_pk')
-    fourth_template_pk = request.POST.get('fourth_template_pk')
-    fifth_template_pk = request.POST.get('fifth_template_pk')
-    if not first_template_pk == None:
-        campaign.first_send_template = WhatsappTemplate.objects.filter(pk=(first_template_pk or 0)).first()
-    if not second_template_pk == None:
-        campaign.second_send_template = WhatsappTemplate.objects.filter(pk=(second_template_pk or 0)).first()
-    if not third_template_pk == None:
-        campaign.third_send_template = WhatsappTemplate.objects.filter(pk=(third_template_pk or 0)).first()
-    if not fourth_template_pk == None:
-        campaign.fourth_send_template = WhatsappTemplate.objects.filter(pk=(fourth_template_pk or 0)).first()
-    if not fifth_template_pk == None:
-        campaign.fifth_send_template = WhatsappTemplate.objects.filter(pk=(fifth_template_pk or 0)).first()
-    campaign.save()
-    return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign})
+# @login_required
+# def campaign_assign_auto_send_template_htmx(request):
+#     campaign = Campaign.objects.get(pk=request.POST.get('campaign_pk'))
+#     first_template_pk = request.POST.get('first_template_pk')
+#     second_template_pk = request.POST.get('second_template_pk')
+#     third_template_pk = request.POST.get('third_template_pk')
+#     fourth_template_pk = request.POST.get('fourth_template_pk')
+#     fifth_template_pk = request.POST.get('fifth_template_pk')
+#     if not first_template_pk == None:
+#         campaign.first_send_template = WhatsappTemplate.objects.filter(pk=(first_template_pk or 0)).first()
+#     if not second_template_pk == None:
+#         campaign.second_send_template = WhatsappTemplate.objects.filter(pk=(second_template_pk or 0)).first()
+#     if not third_template_pk == None:
+#         campaign.third_send_template = WhatsappTemplate.objects.filter(pk=(third_template_pk or 0)).first()
+#     if not fourth_template_pk == None:
+#         campaign.fourth_send_template = WhatsappTemplate.objects.filter(pk=(fourth_template_pk or 0)).first()
+#     if not fifth_template_pk == None:
+#         campaign.fifth_send_template = WhatsappTemplate.objects.filter(pk=(fifth_template_pk or 0)).first()
+#     campaign.save()
+#     return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign})
 
 @login_required
 def campaign_assign_whatsapp_business_account_htmx(request):
@@ -272,11 +272,7 @@ def campaign_assign_whatsapp_business_account_htmx(request):
     whatsapp_business_account_pk = request.POST.get('whatsapp_business_account_pk') or 0
     
     campaign.whatsapp_business_account = WhatsappBusinessAccount.objects.filter(pk=whatsapp_business_account_pk).first()
-    campaign.first_send_template = None
-    campaign.second_send_template = None
-    campaign.third_send_template = None
-    campaign.fourth_send_template = None
-    campaign.fifth_send_template = None
+    campaign.campaigntemplatelink_set.all().delete()
     campaign.save()
     return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign})
 

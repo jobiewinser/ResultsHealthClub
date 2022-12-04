@@ -72,11 +72,7 @@ def set_campaign_site(request, **kwargs):
     try:
         campaign = Campaign.objects.get(pk=kwargs.get('campaign_pk'))
         site_pk = request.POST.get('site_pk',None)
-        campaign.first_send_template = None
-        campaign.second_send_template = None
-        campaign.third_send_template = None
-        campaign.fourth_send_template = None
-        campaign.fifth_send_template = None
+        campaign.campaigntemplatelink_set.all().delete()
 
         if site_pk:
             site = Site.objects.get(pk=site_pk)

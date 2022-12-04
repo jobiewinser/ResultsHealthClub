@@ -109,7 +109,7 @@ id="submit_site_pk_{{campaign.pk}}"></button>
         hx-get="{% url 'campaign-lead-get-modal-content' param1=lead.pk %}" 
         hx-push-url="false"
         hx-swap="innerHTML" hx-trigger="click" {% endcomment %}
-        ><i class="fa-regular fa-plus" ></i> Choose Templates</button>
+        ><i class="fa-regular fa-plus" ></i> Choose Templates</button> {{campaign.campaigntemplatelink_set.all}}
         
         {% comment %} <button type="button" class="btn btn-primary">
             Notifications <span class="badge text-bg-secondary">4</span>

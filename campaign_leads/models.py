@@ -27,6 +27,11 @@ for tuple in BOOKING_CHOICES:
 class CampaignCategory(models.Model):
     name = models.TextField(null=True, blank=True)  
     company = models.ForeignKey("core.Company", on_delete=models.SET_NULL, null=True, blank=True) 
+class CampaignTemplateLink(PolymorphicModel):
+    send_order =  models.IntegerField(null=True, blank=True)
+    template = models.ForeignKey("whatsapp.WhatsappTemplate", on_delete=models.CASCADE, null=True, blank=True)
+    campaign = models.ForeignKey("campaign_leads.Campaign", on_delete=models.CASCADE, null=True, blank=True)
+    
 class Campaign(PolymorphicModel):
     name = models.TextField(null=True, blank=True)   
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -40,11 +45,11 @@ class Campaign(PolymorphicModel):
     campaign_category = models.ForeignKey("campaign_leads.CampaignCategory", on_delete=models.SET_NULL, null=True, blank=True)
     site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
     company = models.ForeignKey("core.Company", on_delete=models.SET_NULL, null=True, blank=True)
-    first_send_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="first_send_template_campaign", on_delete=models.SET_NULL, null=True, blank=True)
-    second_send_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="second_send_template_campaign", on_delete=models.SET_NULL, null=True, blank=True)
-    third_send_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="third_send_template_campaign", on_delete=models.SET_NULL, null=True, blank=True)
-    fourth_send_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="fourth_send_template_campaign", on_delete=models.SET_NULL, null=True, blank=True)
-    fifth_send_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="fifth_send_template_campaign", on_delete=models.SET_NULL, null=True, blank=True)
+    # first_send_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="first_send_template_campaign", on_delete=models.SET_NULL, null=True, blank=True)
+    # second_send_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="second_send_template_campaign", on_delete=models.SET_NULL, null=True, blank=True)
+    # third_send_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="third_send_template_campaign", on_delete=models.SET_NULL, null=True, blank=True)
+    # fourth_send_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="fourth_send_template_campaign", on_delete=models.SET_NULL, null=True, blank=True)
+    # fifth_send_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="fifth_send_template_campaign", on_delete=models.SET_NULL, null=True, blank=True)
     whatsapp_business_account = models.ForeignKey('core.WhatsappBusinessAccount', on_delete=models.SET_NULL, null=True, blank=True)
     color = models.CharField(max_length=15, null=False, blank=False, default="96,248,61")
     def get_active_leads_qs(self):
@@ -57,7 +62,7 @@ class Campaign(PolymorphicModel):
     @property
     def warnings(self):
         warnings = {}
-        if not self.first_send_template:
+        if not self.campaigntemplatelink_set.filter(send_order=1):
             warnings["first_send_template_missing"] = "This campaign doesn't have a 1st Auto-Send Template, it won't automatically send a message to the customer"
         return warnings
 @receiver(models.signals.post_save, sender=Campaign)
@@ -154,21 +159,9 @@ class Campaignlead(models.Model):
         from core.models import AttachedError
         if communication_method == 'a':
             print("CampaignleadDEBUG1")
-            if send_order == 1:
-                template = self.campaign.first_send_template
-                type = '1203'
-            elif send_order == 2:
-                template = self.campaign.second_send_template
-                type = '1204'
-            elif send_order == 3:
-                template = self.campaign.third_send_template
-                type = '1205'
-            elif send_order == 4:
-                template = self.campaign.fourth_send_template
-                type = '1206'
-            elif send_order == 5:
-                template = self.campaign.fifth_send_template
-                type = '1207'
+            if send_order:
+                template = self.campaign.campaigntemplatelink_set.filter(send_order=send_order)
+                type = str(1202 + send_order)
             else:
                 type = None
             
