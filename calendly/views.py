@@ -84,6 +84,7 @@ class Webhooks(View):
             print("CALENDLY Webhooks post ObjectDoesNotExist body", str(body)) 
             return HttpResponse("", status=400)
 
+@login_required
 def calendly_booking_success(request):
     lead = Campaignlead.objects.get(pk = request.POST['lead_pk'])
     uri = request.POST['uri']
