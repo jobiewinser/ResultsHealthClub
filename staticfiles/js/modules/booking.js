@@ -1,6 +1,6 @@
 function initBookingDataTable() {
     console.log("initBookingDataTable")
-    try{dt.fnDestroy();}catch{}
+    try{$('#overview_table').dataTable().fnDestroy()}catch{};
     
     var dt = $('#overview_table').DataTable(            
     {  
@@ -32,7 +32,7 @@ function bookinghandlehtmxafterSwap(evt){
                 $('#generic_modal').modal('hide');
                 snackbarShow('Successfully sold to customer', 'success')
             } else if (evt.detail.pathInfo.path.includes("campaign-booking-overview")){
-                $('#refresh_campaign_list_span').click(); 
+                $('#refresh_campaign_list_wrapper').click(); 
                 snackbarShow('Successfully refreshed table', 'success')
             }    
         }                

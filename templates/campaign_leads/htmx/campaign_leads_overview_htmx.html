@@ -19,13 +19,13 @@
         <button hidden
             hx-get="{%url 'refresh-leads-board'%}"
             hx-swap="outerHTML" hx-push-url="false" hx-include=".overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#leads_board_span_wrapper" id="filter_campaign"></button>
-        {% comment %} <button hidden hx-get="{% url 'get-campaign'%}" hx-include=".overview_table_filters" id="refresh_campaign_list_span" hx-indicator="#page_load_indicator" hx-target="#campaign_list_span" hx-trigger="click" hx-swap="outerHTML"></button> {% endcomment %}
-        <div class="col-md-auto m-1 p-0" hx-get="{% url 'get-campaign'%}" hx-include=".overview_table_filters" hx-trigger="load" hx-indicator="#page_load_indicator" hx-target="#campaign_list_span" hx-swap="outerHTML">
-            <span id="campaign_list_span">   
-                <select class="form-select">
+        {% comment %} <button hidden hx-get="{% url 'get-campaign'%}" hx-include=".overview_table_filters" id="refresh_campaign_list_wrapper" hx-indicator="#page_load_indicator" hx-target="#campaign_list_wrapper" hx-trigger="click" hx-swap="outerHTML"></button> {% endcomment %}
+        <div class="col-md-auto m-1 p-0" hx-get="{% url 'get-campaign'%}" hx-include=".overview_table_filters" hx-trigger="load" hx-indicator="#page_load_indicator" hx-target="#campaign_list_wrapper" hx-swap="outerHTML">
+            <div id="campaign_list_wrapper">   
+                <select class="form-select select2-styling">
                     <option>Loading</option>
                 </select>    
-            </span>
+            </div>
         </div>
         {%endblock extra_top_left_buttons %}
 

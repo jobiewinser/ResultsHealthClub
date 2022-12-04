@@ -24,7 +24,9 @@ for tuple in BOOKING_CHOICES:
 
 # class AdCampaign(models.Model):
 #     name = models.TextField(null=True, blank=True)
-
+class CampaignCategory(models.Model):
+    name = models.TextField(null=True, blank=True)  
+    company = models.ForeignKey("core.Company", on_delete=models.SET_NULL, null=True, blank=True) 
 class Campaign(PolymorphicModel):
     name = models.TextField(null=True, blank=True)   
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -35,6 +37,7 @@ class Campaign(PolymorphicModel):
     webhook_id = models.TextField(null=True, blank=True)
     webhook_enabled = models.BooleanField(default=True)
     
+    campaign_category = models.ForeignKey("campaign_leads.CampaignCategory", on_delete=models.SET_NULL, null=True, blank=True)
     site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
     company = models.ForeignKey("core.Company", on_delete=models.SET_NULL, null=True, blank=True)
     first_send_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="first_send_template_campaign", on_delete=models.SET_NULL, null=True, blank=True)
@@ -225,6 +228,15 @@ class Campaignlead(models.Model):
                                             }
                                         )
                                         text = text.replace('[[1]]',self.first_name)
+                                        counter = counter + 1
+                                    if '[[2]]' in text:
+                                        params.append(              
+                                            {
+                                                "type": "text",
+                                                "text":  self.first_name
+                                            }
+                                        )
+                                        text = text.replace('[[2]]',self.first_name)
                                         counter = counter + 1
                                 # if '{{3}}' in text:
                                 #     params.append(           

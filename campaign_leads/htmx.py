@@ -30,6 +30,10 @@ def get_modal_content(request, **kwargs):
         if whatsapp_template_pk:
             context['template'] = WhatsappTemplate.objects.get(pk=whatsapp_template_pk)
 
+        campaign_pk = request.GET.get('campaign_pk')
+        if campaign_pk:
+            context['campaign'] = Campaign.objects.get(pk=campaign_pk)
+
         whatsappnumber_pk = request.GET.get('whatsappnumber_pk')
         if whatsappnumber_pk:
             context['whatsappnumber'] = WhatsappNumber.objects.get(pk=whatsappnumber_pk)

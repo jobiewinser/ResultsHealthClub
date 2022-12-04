@@ -15,22 +15,24 @@
         </div> {% endcomment %}
         {%with True as hide_show_all%}
         {%include 'core/htmx/site_selection.html'%}
-
         <div class="col-md-auto m-1 ps-0">
-            <span id="site_list_span">  
-                <select class="form-select overview_table_filters" name="whatsapp_business_account_pk" id="whatsapp_business_account_pk" onchange="$('#change_site').click();">
+            <div id="site_list_wrapper">  
+                <select class="form-select select2 select2-styling overview_table_filters"name="whatsapp_business_account_pk" id="whatsapp_business_account_pk" onchange="$('#change_site').click();">
                     {%for whatsapp_business_account in whatsapp_business_accounts%}
                     <option {%if whatsapp_business_account.pk == request|get_key_in_get_or_post:'whatsapp_business_account_pk'|str_to_int %}selected{%endif%} value="{{whatsapp_business_account.pk}}">{{whatsapp_business_account.whatsappnumber}}</option>
                     {%endfor%}
                 </select>
-            </span>
+            </div>
+        </div>
+
+
+        <div class="col-md-auto m-1 ps-0">
         </div>
 
         <button hidden hx-get="" hx-push-url="false" hx-swap="innerHTML" hx-include=".overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
         {%endwith%}    
         {%endblock extra_top_left_buttons %}
-        <div class="col">
-        </div>
+        
         {%block extra_top_right_buttons %}
         <input id="current_page" hidden value="whatsapp_templates"></input>
         {% comment %} <div class="col-md-auto">

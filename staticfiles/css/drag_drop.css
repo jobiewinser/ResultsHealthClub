@@ -38,11 +38,11 @@
     visibility: hidden;
 }
 #add_booking_area {
-    right: 40vh;
+    right: 10vw;
     bottom: 2vh;
 }
 #archive_area {
-    left: 40vh;
+    left: 10vw;
     bottom: 2vh;
 }
 #archive_area_card, #add_booking_area_card {

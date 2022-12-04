@@ -384,7 +384,8 @@ body * {
     padding: 10px;
     padding-bottom: 50px;
     /* top: 7vh; */
-    height: 93vh !important;
+    height: calc(100vh - 60px) !important;
+    
     /* position: fixed; */
     overflow-y: scroll;
     margin: 0;
@@ -422,7 +423,7 @@ body * {
 
 #topnav {
     padding: 0px;
-    /* height: 7vh; */
+    height: 60px;
 }
 .app_picture {
     image-rendering: auto;
@@ -964,15 +965,33 @@ lead_notes_button_wrapper
     width: 100%;
 }
 .chart_canvas {
-    max-height: 30vh !important
+    max-height: 30vh !important;
 }
 #top-htmx-indicator {
-    height: 30px
+    height: 30px;
 }
 .messaging_site_accordion{
-    width:200px
+    width:200px;
 }
 
 .analytics_col{
-    padding:4px
+    padding:4px;
 }
+
+.select2-styling {
+    height:28px;
+    font-size:10px;
+}
+
+#site_list_wrapper{
+    min-width:250px
+}
+
+#campaign_category_pk{
+    min-width:350px
+}
+
+#campaign_list_wrapper{
+    min-width:450px
+}
+

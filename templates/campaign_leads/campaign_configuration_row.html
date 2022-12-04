@@ -69,7 +69,11 @@ id="submit_site_pk_{{campaign.pk}}"></button>
             value="#{{campaign.color|rgb_to_hex_tuple_tag}}">
 </td>
 <td>         
-    <span hidden>{{campaign.first_send_template.name}}</span>                   
+    <span hidden>{{campaign.campaign_category.name}}</span>           
+    
+</td>
+<td>         
+    <span hidden>{{campaign.whatsapp_business_account.pk}}</span>                   
     <select class="form-select" name="whatsapp_business_account_pk" id="whatsapp_business_account_pk_{{campaign.pk}}" 
         hx-post="{% url 'campaign-assign-whatsapp-business-account' %}" hx-swap="innerHTML" 
         hx-trigger="change"
@@ -92,7 +96,26 @@ id="submit_site_pk_{{campaign.pk}}"></button>
         {%endfor%}
     </select>
 </td>
-<td>              
+<td>
+    
+    <button class="btn btn-secondary btn-sm" type="button"
+        data-bs-toggle="popover" 
+        data-bs-trigger="hover" 
+        data-bs-placement="top"
+        data-bs-content="Add new booking for this lead."
+        onclick="htmx.ajax('GET', '{% url 'campaign-lead-get-modal-content' %}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'choose_auto_templates', 'campaign_pk':'{{campaign.pk}}'}})"
+        {% comment %} hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
+        hx-vals='{"template_name": "add_booking"}'
+        hx-get="{% url 'campaign-lead-get-modal-content' param1=lead.pk %}" 
+        hx-push-url="false"
+        hx-swap="innerHTML" hx-trigger="click" {% endcomment %}
+        ><i class="fa-regular fa-plus" ></i> Choose Templates</button>
+        
+        {% comment %} <button type="button" class="btn btn-primary">
+            Notifications <span class="badge text-bg-secondary">4</span>
+          </button> {% endcomment %}
+</td>
+{% comment %} <td>              
     <span hidden>{{campaign.first_send_template.name}}</span>                   
     <select class="form-select" name="first_template_pk" id="first_template_{{campaign.pk}}" 
         hx-post="{% url 'campaign-assign-auto-send-template' %}" hx-swap="innerHTML" 
@@ -233,4 +256,4 @@ id="submit_site_pk_{{campaign.pk}}"></button>
         {%endif%}
         {%endfor%}
     </select>                             
-</td>
+</td> {% endcomment %}
