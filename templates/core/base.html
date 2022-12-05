@@ -237,7 +237,9 @@
         });
     </script>
     <body>        
+        {%block nav%}
         {%include 'core/nav.html'%}
+        {%endblock%}
         <div class="container-fluid" id="content">  
             {%block content%} 
             {%endblock content%}
