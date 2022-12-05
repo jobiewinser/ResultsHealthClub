@@ -878,12 +878,6 @@ tr.odd td {
 .highlight-0 {
     background: rgba(96, 248, 61, 0.05)
 }
-#leads_board {
-    justify-content: unset;
-    /* width: 100vh; */
-    overflow-x: scroll;
-    overflow-y: scroll;
-}
 .col-md-auto {
     flex: 0 0 auto;
     width: auto;
@@ -995,3 +989,7 @@ lead_notes_button_wrapper
     min-width:450px
 }
 
+
+.sortable_drag{
+    height:100%;
+}

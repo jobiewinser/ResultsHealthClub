@@ -1,6 +1,17 @@
 {%load static core_tags%}
+<style>
+    #content {
+        padding:0px;
+        padding-bottom:50px;
+        {% comment %} overflow-y: hidden; {% endcomment %}
+    }
+    
+    body {
+        height:100vh;
+    }
+</style>
 <div>
-    <div class="row mt-0">
+    <div class="row mt-0" style="padding:10px">
         <div class="htmx-indicator whole_page_disconnected_indicator leads_disconnected_indicator">
             <div class="whole_page_disconnected_indicator_content">
                 <b>Connecting</b> <img class="invert" src="https://htmx.org/img/bars.svg">
@@ -39,7 +50,7 @@
         </div> {% endcomment %}
         {%endblock extra_top_right_buttons %}
     </div>
-    <div class="row p-0 m-0">
+    <div class="row p-0 m-0" style="padding:10px">
         <div class="col p-0 m-0" style=""> 
         {%include 'campaign_leads/htmx/leads_board.html' %}
         </div>
