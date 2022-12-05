@@ -50,6 +50,18 @@ def sum_cost_tag(queryset_or_list):
         return "Error"
 
 @register.filter
+def percentage_to_opacity(percentage, average_out_opacity=0.9):
+    try:
+        return ((percentage / 100) + average_out_opacity) / 2
+    except:
+        return 0.6
+@register.filter
+def percentage_to_font_weight(percentage, average_out_var=0.9):
+    try:
+        return 900 * ((percentage / 100) + average_out_var) / 2
+    except:
+        return 400
+@register.filter
 def percentage_to_colour(percentage, opacity=1):
     try:
         percentage = int(percentage or 0)

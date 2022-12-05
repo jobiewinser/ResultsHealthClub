@@ -30,7 +30,7 @@
     {%endif%}
     
     {%if message.inbound%}
-        By <b>{%if message.lead.name%}{{message.lead.name}}{%elif message.contact.name%}{{message.contact.name}}{%else%}{{message.customer_number}}{%endif%}</b>
+        By <b>{%if message.lead.name%}{{message.lead.name}}{%elif message.get_contact.name%}{{message.get_contact.name}}{%else%}{{message.customer_number}}{%endif%}</b>
     {%else%}
         By <b>{%if message.user.profile.name%}{{message.user.profile.name}}{%else%}Winser Systems{%endif%}</b>
     {%endif%}"
@@ -59,7 +59,7 @@
     {%endif%}
     
     {%if message.inbound%}
-        By <b>{%if message.lead.name%}{{message.lead.name}}{%elif message.contact.name%}{{message.contact.name}}{%else%}{{message.customer_number}}{%endif%}</b>
+        By <b>{%if message.lead.name%}{{message.lead.name}}{%elif message.get_contact.name%}{{message.get_contact.name}}{%else%}{{message.customer_number}}{%endif%}</b>
     {%else%}
         By <b>{%if message.user.profile.name%}{{message.user.profile.name}}{%else%}Winser Systems{%endif%}</b>
     {%endif%}" {% endcomment %}
@@ -75,7 +75,7 @@
     <div class="col p-0 ps-1 hidden-overflow">
         <div class="row chat_lead_name_row">
             <div class="col p-0 elipses-overflow me-1" id="latest_message_name_{{message.customer_number}}">
-                <span>{%if message.lead.name%}{{message.lead.name}}{%elif message.contact.name%}{{message.contact.name}}{%else%}{{message.customer_number}}{%endif%} </span>
+                <span>{%if message.lead.name%}{{message.lead.name}}{%elif message.get_contact.name%}{{message.get_contact.name}}{%else%}{{message.customer_number}}{%endif%} </span>
             </div>
             {% comment %} <div class="col ps-1 pe-1">
             </div>             {% endcomment %}

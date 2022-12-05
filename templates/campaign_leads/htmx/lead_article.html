@@ -24,7 +24,7 @@
                     <b>Last Dragged:</b> {{lead.last_dragged}}<br>
 
                     <br>
-                    <b>Price:</b> {{lead.campaign.product_cost|floatformat:2}}<br>
+                    <b>Campaign Cost (at lead creation):</b> {{lead.get_product_cost|floatformat:2}}<br>
                     ">
                         <i class="fa-solid fa-circle-info" style="color:light-blue"></i>
                     </span> 
@@ -94,7 +94,7 @@
                         <b><i class="fa fa-whatsapp" aria-hidden="true"></i> <span class="phone_number">{{lead.whatsapp_number}}</span></b>
                     </div>
                     <div class="col-md-auto p-0 right"> 
-                        <span style="color:rgb(96, 248, 61y)" class="secondary_td_layer">£<span class="lead_cost" id="lead_cost_{{lead.pk}}" data-cost="{{lead.campaign.product_cost|floatformat:2}}">{{lead.campaign.product_cost|floatformat:2}}</span></span>
+                        <span style="color:rgb(96, 248, 61y)" class="secondary_td_layer">£<span class="lead_cost" id="lead_cost_{{lead.pk}}" data-cost="{{lead.get_product_cost|floatformat:2}}">{{lead.get_product_cost|floatformat:2}}</span></span>
                     </div>
                 </div>
             </span>
