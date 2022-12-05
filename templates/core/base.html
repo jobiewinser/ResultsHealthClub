@@ -89,8 +89,41 @@
                         }
                     }
                 }
-            }
+            }           
+
+            ondblclick = (event) => { 
+                var current_module = $('#current_page').val()
+                if (current_module == 'campaign_leads_overview'){
+                    let drag_elem = null;
+                    let hover_elem = $(':hover').last();
+                    if (hover_elem.hasClass('.column-drag')){
+                        drag_elem = hover_elem;
+                    } else{                    
+                        drag_elem = hover_elem.closest('.column-drag');
+                    }    
+                    if (drag_elem.length != 0)  {     
+                        event.preventDefault();
+                        htmx.ajax('GET', '/toggle-claim-lead/'+drag_elem.data('id')+'/', {swap:"none"})
+                    }
+                }
+            };
             
+            var tapped=false
+            $(".lead_card").on("touchstart",function(e){
+                if(!tapped){ //if tap is not set, set up single tap
+                  tapped=setTimeout(function(){
+                      tapped=null
+                      //insert things you want to do when single tapped
+                  },300);   //wait 300ms then run single click code
+                } else {    //tapped within 300ms of last tap. double tap
+                  clearTimeout(tapped); //stop single tap callback
+                  tapped=null
+                  //insert things you want to do when double tapped
+                  htmx.ajax('GET', '/toggle-claim-lead/'+$(e.currentTarget).data('id')+'/', {swap:"none"})
+                }
+                e.preventDefault()
+            });
+
             function handlehtmxafterSwap(evt){
                 var current_module = $('#current_page').val()
                 if (current_module == 'analytics_overview'){
