@@ -39,11 +39,11 @@
 }
 #add_booking_area {
     right: 10vw;
-    top: 2vh;
+    bottom: 2vh;
 }
 #archive_area {
     left: 10vw;
-    top: 2vh;
+    bottom: 2vh;
 }
 #archive_area_card, #add_booking_area_card {
     border-radius: 10px

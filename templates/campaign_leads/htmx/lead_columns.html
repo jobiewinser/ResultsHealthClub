@@ -11,8 +11,8 @@
             sort: false,
             ghostClass: "ghost-card",              
             animation: 150, 
+            multiDrag: true,
             fallbackOnBody: true,
-            
             onAdd: function (/**Event*/evt) {
                 handleDraggedItem($(evt.item), $(evt.to)) 
                 evt.preventDefault();
@@ -50,6 +50,7 @@
     id="{%if campaign.pk%}campaign_column_{{campaign.pk}}_calls_{{call_count}}{%elif site.pk%}site_column_{{site.pk}}_calls_{{call_count}}{%else%}company_column_{{request.user.profile.company.pk}}_calls_{{call_count}}{%endif%}" 
     class="sortable_drag column_{{call_count}} column {%if campaign.pk%}campaign_column_{{campaign.pk}}_calls_{{call_count}}{%elif site.pk%}site_column_{{site.pk}}_calls_{{call_count}}{%else%}company_column_{{request.user.profile.company.pk}}_calls_{{call_count}}{%endif%}"
     data-call-count="{{ call_count }}">
+        <article lass="card draggable-card lead_card column-drag lead-hidden" >  </article>
         {%for lead in queryset%}
         {%include 'campaign_leads/htmx/lead_article.html'%}
         {%endfor%}
