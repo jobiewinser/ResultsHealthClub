@@ -31,7 +31,7 @@
         <script src="{% static 'js/base.js' %}?0.4"></script>
         <script src="{% static 'js/modules/leads.js' %}?0.4"></script>
         <script src="{% static 'js/modules/booking.js' %}?0.4"></script>
-        <script src="{% static 'js/modules/analytics.js' %}?0.4"></script>
+        <script src="{% static 'js/modules/graphs.js' %}?0.4"></script>
         <script src="{% static 'js/modules/free_tasters.js' %}?0.4"></script>
         <script src="{% static 'js/modules/campaign_configuration.js' %}?0.4"></script>
         <script src="{% static 'js/modules/company_configuration.js' %}?0.4"></script>
@@ -89,7 +89,7 @@
             function handlehtmxafterSwap(evt){
                 var current_module = $('#current_page').val()
                 if (current_module == 'analytics_overview'){
-                    analyticshandlehtmxafterSwap(evt);                    
+                    graphshandlehtmxafterSwap(evt);                    
                 } else if (current_module == 'campaign_booking_overview'){
                     bookinghandlehtmxafterSwap(evt);                    
                 } else if (current_module == 'free_tasters'){
