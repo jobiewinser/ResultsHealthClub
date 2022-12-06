@@ -1,32 +1,26 @@
-<div class="row p-0 m-0" id="leads_board_span_wrapper">
+<div class="row ps-3 m-0" id="leads_board_span_wrapper">
+    <div class="col-md-auto m-1 p-2 left alert alert-info">
+        <small>Press <b>"Space"</b> or <b>Double Click</b> while hovering on a lead to claim! (now touch screen friendly)<br>Click on the leads board and use the arrow keys to scroll around.</small>
+    </div> 
+    <div class="col right">
+        <span id="users_online_leads">
+
+        </span>
+    </div>
     <div class="col-md-auto m-1 p-0 secondary_td_layer">
         <div class="input-group m-0">
             <span class="input-group-text" id="search-addon"><i class="fa-brands fa-searchengin"></i></span>
-            <input type="text" oninput="filterLeads(this)" class="form-control" placeholder="Search" aria-label="Search" aria-describedby="search-addon">
+            <input type="text" oninput="filterLeads(this)" class="form-control form-control-sm" placeholder="Search Leads" aria-label="Search Leads" aria-describedby="search-addon">
         </div>          
     </div> 
-    <div class="col">
-    </div>
-    <div class="col-md-auto m-1 p-0 secondary_td_layer center">
-        Press "Space" while hovering on a lead to claim! <br>Click on the leads board and use the arrow keys to scroll around.    
-    </div> 
-    <div class="col">
-    </div>
     <div class="col-md-auto m-1 p-0">
         <button class="btn btn-primary btn-sm" 
             data-bs-toggle="popover" 
             data-bs-trigger="hover" 
             data-bs-placement="top"
             data-bs-content="Manually create a campaign lead."
-            hx-indicator="#page_load_indicator" 
-            hx-target="#generic_modal_body" 
-            hx-include="#site_pk"
-            hx-get="{% url 'campaign-lead-get-modal-content' %}" 
-            hx-push-url="false"
-            hx-vals='{"template_name": "create_campaign_lead"}'
-            hx-swap="innerHTML" 
-            hx-trigger="click">
-                <i class="fa fa-plus" aria-hidden="true"></i> Manually Add Campaign Lead
+            onclick="htmx.ajax('GET', '{% url 'campaign-lead-get-modal-content'%}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'edit_lead'}})">
+                <i class="fa fa-plus" aria-hidden="true"></i> Manual Lead
         </button>
     </div>
 </div>

@@ -41,6 +41,7 @@
         {%if template.language%}{{template.language}}{%endif%}  
     </span>
 </td> {% endcomment %}
+{% if not submitting_to_whatsapp%}
 <td> 
     {%if template.message_template_id%}{{template.message_template_id}}{%else%}<i>Not Submitted Yet</i>{%endif%}  
 </td>
@@ -88,7 +89,7 @@
     <button 
         class="btn btn-danger btn-sm m-1" hx-confirm="Are you sure you want to clear your changes made to this template since the last whatsapp approval?"
         hx-post="{% url 'whatsapp-clear-changes' %}" hx-vals='{"template_pk":"{{template.pk}}"}' 
-        hx-indicator=".top-htmx-indicator" hx-target="#template_row_{{template.pk}}"
+        hx-indicator="#page_load_indicator" hx-target="#template_row_{{template.pk}}"
         hx-swap="innerHTML"
         ><i class="fa fa-arrow-rotate-left"></i> Clear Changes</button>
     {%if ''|today_date_tag|timestamp < template.last_approval|add_days:1|timestamp and not template.status == 'REJECTED'%}
@@ -109,7 +110,7 @@
     {%endif%}
         <button class="btn btn-success btn-sm m-1" hx-confirm="Are you sure you want to request approval for this template?"
         hx-post="{% url 'whatsapp-approval' %}" hx-vals='{"template_pk":"{{template.pk}}"}' 
-        hx-indicator=".top-htmx-indicator" hx-target="#template_row_{{template.pk}}"
+        hx-indicator="#page_load_indicator" hx-target="#template_row_{{template.pk}}"
         hx-swap="innerHTML"
         ><i class="fa fa-whatsapp" aria-hidden="true"></i> Submit to Whatsapp</button>
     </span>
@@ -195,4 +196,7 @@
         </button> {% endcomment %}
     </span>
 </td>
+{%else%}
+<td colspan="3">Submitted to whatsapp, refresh the page in a short while (usually a few seconds) to check its status</td>
+{%endif%}
 {%endwith%}

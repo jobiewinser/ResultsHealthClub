@@ -17,8 +17,8 @@ admin.site.register(Campaignlead, CampaignleadAdmin)
 
 class CampaignAdmin(admin.ModelAdmin):
     list_display = ['name','created','product_cost','guid',
-    'webhook_created','webhook_id','site','company','first_send_template',
-    'second_send_template','third_send_template',
+    'webhook_created','webhook_id','site','company',
+    
     'whatsapp_business_account']
 admin.site.register(Campaign, CampaignAdmin)
 

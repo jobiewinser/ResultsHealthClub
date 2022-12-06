@@ -1,10 +1,10 @@
 function initBookingDataTable() {
     console.log("initBookingDataTable")
-    try{dt.fnDestroy();}catch{}
+    try{$('#overview_table').dataTable().fnDestroy()}catch{};
     
     var dt = $('#overview_table').DataTable(            
     {  
-        order: [[ 3, 'desc' ],[ 2, 'desc' ]],
+        order: [[ 4, 'desc' ],[ 2, 'desc' ]],
         iDisplayLength: 10
     }
     );
@@ -32,7 +32,7 @@ function bookinghandlehtmxafterSwap(evt){
                 $('#generic_modal').modal('hide');
                 snackbarShow('Successfully sold to customer', 'success')
             } else if (evt.detail.pathInfo.path.includes("campaign-booking-overview")){
-                $('#refresh_campaign_list_span').click(); 
+                $('#refresh_campaign_list_wrapper').click(); 
                 snackbarShow('Successfully refreshed table', 'success')
             }    
         }                
@@ -50,7 +50,7 @@ function  bookinghandlehtmxafterRequest(evt){
     if (evt.detail.xhr.status == 200){
         if (evt.detail.pathInfo.requestPath.includes("create-lead-note")){
             snackbarShow('Successfully added note', 'success')
-            htmx.ajax('GET', "/campaign-leads/refresh-booking-row/"+evt.detail.xhr.response+"/", {swap:'innerHTML', target: '#row_'+evt.detail.xhr.response})
+            htmx.ajax('GET', "/refresh-booking-row/"+evt.detail.xhr.response+"/", {swap:'innerHTML', target: '#row_'+evt.detail.xhr.response})
         } 
     }
 }

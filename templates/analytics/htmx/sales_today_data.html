@@ -62,24 +62,26 @@
     color_random_list.push(dynamicColors());
     {%endfor%}
     $(document).ready(function() {
-        sales_today_chart_var = document.getElementById('sales_today_chart');
-        sales_today_chart = new Chart(sales_today_chart_var, {
-            type: '{%if graph_type%}{{graph_type}}{%else%}polarArea{%endif%}',
-            data: {
-                labels: [{%for data_set_tuple in data_set%}'{{data_set_tuple.0}}'{% if not forloop.last %},{%endif%}{%endfor%}],
-                datasets: [{
-                    label: 'Sales',
-                    data: [{%for data_set_tuple in data_set%}'{{data_set_tuple.1}}'{% if not forloop.last %},{%endif%}{%endfor%}],
-                    backgroundColor: color_random_list,
-                    borderColor: color_random_list,
-                    fill: true,
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true
-            }
-        });
+        setTimeout(function(){
+            sales_today_chart_var = document.getElementById('sales_today_chart');
+            sales_today_chart = new Chart(sales_today_chart_var, {
+                type: '{%if graph_type%}{{graph_type}}{%else%}polarArea{%endif%}',
+                data: {
+                    labels: [{%for data_set_tuple in data_set%}'{{data_set_tuple.0}}'{% if not forloop.last %},{%endif%}{%endfor%}],
+                    datasets: [{
+                        label: 'Sales',
+                        data: [{%for data_set_tuple in data_set%}'{{data_set_tuple.1}}'{% if not forloop.last %},{%endif%}{%endfor%}],
+                        backgroundColor: color_random_list,
+                        borderColor: color_random_list,
+                        fill: true,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true
+                }
+            });
+        }, 250); 
     });
     {%endif%}
 </script>

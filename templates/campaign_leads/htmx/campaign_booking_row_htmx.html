@@ -21,7 +21,7 @@
             <b>Last Dragged:</b> {{lead.last_dragged}}<br>
 
             <br>
-            <b>Price:</b> {{lead.campaign.product_cost|floatformat:2}}<br>
+            <b>Campaign Cost (at lead creation):</b> {{lead.get_product_cost|floatformat:2}}<br>
             ">
                 <i class="fa-solid fa-circle-info" style="color:light-blue"></i>
             </span>
@@ -90,7 +90,7 @@
     </td>
     <td class="double_layer_td">
         {% comment %} Live Well Female {% endcomment %}        
-        <span class="primary_td_layer">£{{lead.campaign.product_cost|floatformat:2}}</span>
+        <span class="primary_td_layer">£{{lead.get_product_cost|floatformat:2}}</span>
     </td>
     <td>                 
         {%with lead.active_bookings.0.datetime as latest_booking%}

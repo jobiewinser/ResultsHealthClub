@@ -253,7 +253,7 @@
                 <div class="col m-1 p-0">
                     <div class="form-floating">
                         <input name="phone" id="campaign_phone" class="form-control campaign_bookings_inputs"/>
-                        <label for="campaign_phone">Customer Phone Number<span class="required">*</span></label>
+                        <label for="campaign_phone" class="nowrap">Customer Phone Number<span class="required">*</span></label>
                     </div>
                 </div>
             </div>
@@ -264,7 +264,7 @@
         <div class="col center">
             <button class="btn btn-success"
                 hx-include=".campaign_bookings_inputs"
-                hx-post="{% url 'create-campaign-lead' %}" 
+                onclick="htmx.ajax('GET', '{% url 'campaign-lead-get-modal-content'%}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'edit_lead'}})"
                 hx-push-url="false"
                 
                 hx-swap="none" hx-trigger="click">

@@ -6,7 +6,7 @@ import logging
 from django.contrib.auth import login
 from django.middleware.csrf import get_token
 from django.contrib.auth.decorators import login_required
-from campaign_leads.models import Campaign, Campaignlead, Booking, Call, Note
+from campaign_leads.models import Campaign, Campaignlead, Booking, Call, Note, ManualCampaign, CampaignCategory
 from campaign_leads.views import CampaignBookingsOverviewView
 from core.models import Site, WhatsappNumber
 from core.user_permission_functions import get_available_sites_for_user, get_user_allowed_to_add_call
@@ -14,7 +14,7 @@ from core.views import get_site_pk_from_request
 from django.db.models import Q, Count
 from django.contrib import messages
 from asgiref.sync import async_to_sync
-
+from campaign_leads.views import get_campaign_qs
 from whatsapp.models import WhatsappTemplate
 logger = logging.getLogger(__name__) 
 
@@ -22,25 +22,43 @@ logger = logging.getLogger(__name__)
 def get_modal_content(request, **kwargs):
     try:
         request.GET._mutable = True
-        site_pk = get_site_pk_from_request(request)
-        context = {}
-        if site_pk:
-            request.GET['site_pk'] = site_pk
-        whatsapp_template_pk = request.GET.get('whatsapp_template_pk')
-        if whatsapp_template_pk:
-            context['template'] = WhatsappTemplate.objects.get(pk=whatsapp_template_pk)
-
-        whatsappnumber_pk = request.GET.get('whatsappnumber_pk')
-        if whatsappnumber_pk:
-            context['whatsappnumber'] = WhatsappNumber.objects.get(pk=whatsappnumber_pk)
-        
         if request.user.is_authenticated:
+            context = {}
             template_name = request.GET.get('template_name', '')
             # context['site_list'] = get_available_sites_for_user(request.user)
             param1 = kwargs.get('param1', '')
             if param1:
                 context['lead'] = Campaignlead.objects.get(pk=param1)
-                
+
+
+
+            site_pk = get_site_pk_from_request(request)
+            if site_pk:
+                request.GET['site_pk'] = site_pk
+            whatsapp_template_pk = request.GET.get('whatsapp_template_pk')
+            if whatsapp_template_pk:
+                context['template'] = WhatsappTemplate.objects.get(pk=whatsapp_template_pk)
+
+            campaign_pk = request.GET.get('campaign_pk')
+            if campaign_pk:
+                context['campaign'] = Campaign.objects.get(pk=campaign_pk)
+
+            whatsappnumber_pk = request.GET.get('whatsappnumber_pk')
+            if whatsappnumber_pk:
+                context['whatsappnumber'] = WhatsappNumber.objects.get(pk=whatsappnumber_pk)
+
+            lead_pk = request.GET.get('lead_pk')
+            if template_name == 'edit_lead':
+                if lead_pk:
+                    context['lead'] = Campaignlead.objects.get(pk=lead_pk)
+                    context['site'] = context['lead'].campaign.site
+                else:
+                    context['site'] = Site.objects.get(pk=site_pk)
+                manual_campaign =  ManualCampaign.objects.filter(site=context['site']).first()
+                if not manual_campaign:
+                    ManualCampaign.objects.create(site=context['site'], name = "Manually Created")
+                context['campaigns'] = get_campaign_qs(request)         
+                    
             return render(request, f"campaign_leads/htmx/{template_name}.html", context)   
     except Exception as e:
         logger.debug("get_modal_content Error "+str(e))
@@ -49,31 +67,64 @@ def get_modal_content(request, **kwargs):
 
 
 @login_required
-def create_campaign_lead(request, **kwargs):
+def add_campaign_category(request, **kwargs):
     # logger.debug(str(request.user))
-    # try:
+    # try:        
+        name = request.POST.get('category_name')
+        if not name:
+            return HttpResponse("Please enter a name", status=500)
+        campaign_pk = request.POST.get('campaign_pk')
+        campaign = Campaign.objects.get(pk=campaign_pk)
+        campaign_category, created = CampaignCategory.objects.get_or_create(site=campaign.site, name=name)
+        campaign.campaign_category = campaign_category
+        campaign.save()
+        return HttpResponse("", status=200)
+    # except Exception as e:
+    #     # messages.add_message(request, messages.ERROR, f'Error with creating a campaign lead')
+    #     logger.debug("create_campaign_lead Error "+str(e))
+    #     # raise Exception
+    #     return HttpResponse("Error with creating a campaign lead", status=500)
+
+@login_required
+def edit_lead(request, **kwargs):
+    # logger.debug(str(request.user))
+    # try:        
+        campaign_pk = request.POST.get('campaign_pk')
+        if not campaign_pk:
+            return HttpResponse("Please choose a campaign", status=500)
+        campaign = Campaign.objects.get(pk=campaign_pk)    
+        
         first_name = request.POST.get('first_name')
         if not first_name:
             return HttpResponse("Please provide a first name", status=500)
 
+        last_name = request.POST.get('last_name')
+
         email = request.POST.get('email')
-        # if not email:
-        #     return HttpResponse("Please provide a email", status=500)
         
         phone = request.POST.get('phone')
         if not phone:
             return HttpResponse("Please provide a valid Phone Number", status=500)
         
-        country_code = request.POST.get('country_code')
-        if not country_code:
-            return HttpResponse("Please provide a Country Code", status=500)
+        country_code = request.POST.get('country_code', "")
         
-        site = Site.objects.get(pk=request.POST.get('site_pk'))        
-        if not first_name:
-            return HttpResponse("Please provide a Choice of Site", status=500)
-
-        lead = site.generate_lead(first_name, email, f"{country_code}{phone}", request=request)
-        lead.trigger_refresh_websocket(refresh_position=True)
+        product_cost = request.POST.get('product_cost')
+        
+        lead_pk = request.POST.get('lead_pk')
+        if lead_pk:
+            lead = Campaignlead.objects.get(pk=lead_pk)
+            refresh_position = False
+        else:
+            lead = Campaignlead()
+            refresh_position = True
+        lead.campaign = campaign
+        lead.first_name = first_name
+        lead.last_name = last_name
+        lead.email = email
+        lead.whatsapp_number = f"{country_code}{phone}"
+        lead.product_cost = product_cost
+        lead.save()
+        lead.trigger_refresh_websocket(refresh_position=refresh_position)
         return HttpResponse("", status=200)
     # except Exception as e:
     #     # messages.add_message(request, messages.ERROR, f'Error with creating a campaign lead')

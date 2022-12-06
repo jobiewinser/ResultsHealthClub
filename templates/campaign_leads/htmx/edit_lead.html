@@ -1,0 +1,70 @@
+{%load core_tags%}
+<div class="generic_modal_contents">
+    <div class="card card-white m-1 p-3">
+        <form hx-post="{%url 'edit-lead'%}" hx-trigger="submit" hx-indicator="#page_load_indicator" hx-swap="none">
+            <input type="text" style="display:None" id="modal_lead_pk" name="lead_pk" value="{{lead.pk}}"/>
+            {% csrf_token %}
+            <div class="row">
+                <div class="col center">
+                    <div class="form-floating m-1">
+                        <select name="campaign_pk" class="form-select edit_lead_input" id="modal_campaign_pk">  
+                            {%for campaign in campaigns%}
+                            <option {%if lead.campaign.pk == campaign.pk%}selected{%endif%} value="{{campaign.pk}}">{{campaign.name}}</option>
+                            {%endfor%}
+                        </select>
+                        <label for="modal_campaign_pk">Campaign<span class="required">*</span></label>
+                    </div>
+
+                    <div class="form-floating m-1">
+                        <input name="first_name" value="{{lead.first_name|or_empty_string}}" class="form-control edit_lead_input" id="modal_first_name"/>
+                        <label for="modal_first_name">First Name<span class="required">*</span></label>
+                    </div>
+                    
+                    <div class="form-floating m-1">
+                        <input name="last_name" value="{{lead.last_name|or_empty_string}}" class="form-control edit_lead_input" id="modal_last_name"/>
+                        <label for="modal_last_name">Last Name</label>
+                    </div>
+                    
+                    <div class="form-floating m-1">
+                        <input name="email" type="email" value="{{lead.email|or_empty_string}}" class="form-control edit_lead_input" id="modal_email"/>
+                        <label for="modal_email">Email</label>
+                    </div>
+                    
+                    <div class="form-floating m-1">
+                        <input name="phone" type="text" value="{{lead.whatsapp_number|or_empty_string}}" class="form-control edit_lead_input" id="modal_phone"/>
+                        <label for="modal_phone">Whatsapp Number</label>
+                    </div>
+                    
+                    <div class="form-floating m-1">
+                        <input name="product_cost" type="number" min="0" step="0.01" value="{{lead.product_cost|or_empty_string}}" class="form-control edit_lead_input" id="modal_product_cost"/>
+                        <label for="modal_product_cost">Campaign Cost</label>
+                    </div>
+                    {%if not lead%}
+                    <div class="alert alert-warning m-1">
+                        WARNING: This will send a whatsapp message to this phone number if this campaign has a template attached to it!
+                    </div>
+                    {%endif%}
+                    
+                </div>
+            </div>
+            <div class="row m-1">
+                <div class="col center" >
+                    <button class="btn btn-primary" type="submit">
+                        {%if lead%}
+                        Save   
+                        {%else%}
+                        Create
+                        {%endif%} Lead
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<span hx-swap-oob="true" id="generic_modal_title">
+    {%if lead%}
+    Edit Lead - {{lead.name}}    
+    {%else%}
+    Create Lead
+    {%endif%}
+</span>

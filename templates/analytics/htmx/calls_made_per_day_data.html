@@ -35,46 +35,49 @@
 
 <script>
     $(document).ready(function() {
-        calls_made_per_day_chart_var = document.getElementById('calls_made_per_day_chart');
-        calls_made_per_day_chart = new Chart(calls_made_per_day_chart_var, {
-            type: '{%if graph_type%}{{graph_type}}{%else%}bar{%endif%}',
-            data: {
-                labels: [{%for label in time_label_set%}'{{label}}'{% if not forloop.last %},{%endif%}{%endfor%}],
-                datasets: [{
-                    label: 'Calls',
-                    data: [{%for data_entry in data_set%}{{data_entry.total_calls}}{% if not forloop.last %},{%endif%}{%endfor%}],
-                    backgroundColor: 'rgba(25, 135, 84, 0.4)',
-                    borderColor: 'rgba(25, 135, 84, 0.85)',
-                    fill: true,
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                        beginAtZero: true,
-                        callback: function(value) {if (value % 1 === 0) {return value;} }
+        setTimeout(function(){
+            calls_made_per_day_chart_var = document.getElementById('calls_made_per_day_chart');
+            calls_made_per_day_chart = new Chart(calls_made_per_day_chart_var, {
+                type: '{%if graph_type%}{{graph_type}}{%else%}bar{%endif%}',
+                data: {
+                    labels: [{%for label in time_label_set%}'{{label}}'{% if not forloop.last %},{%endif%}{%endfor%}],
+                    datasets: [{
+                        label: 'Calls',
+                        data: [{%for data_entry in data_set%}{{data_entry.total_calls}}{% if not forloop.last %},{%endif%}{%endfor%}],
+                        backgroundColor: 'rgba(25, 135, 84, 0.4)',
+                        borderColor: 'rgba(25, 135, 84, 0.85)',
+                        fill: true,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                            beginAtZero: true,
+                            callback: function(value) {if (value % 1 === 0) {return value;} }
+                            }
+                        },
+                        xAxis: {
+                            type: "time",
+                            time: {
+                                displayFormats: {
+                                    hour: "hA"
+                                },
+                                unit: "day",
+                            },
+                            display: true,
+                            ticks: {
+                                reverse: true
+                            },
+                            gridLines: { display: false }
                         }
                     },
-                    xAxis: {
-                        type: "time",
-                        time: {
-                            displayFormats: {
-                                hour: "hA"
-                            },
-                            unit: "day",
-                        },
-                        display: true,
-                        ticks: {
-                            reverse: true
-                        },
-                        gridLines: { display: false }
-                    }
-                },
-                responsive: true
-            }
-        });
+                    responsive: true
+                }
+            });
+        }, 250); 
+        
     });
 </script>

@@ -71,8 +71,9 @@
                         data-bs-trigger="hover" 
                         data-bs-placement="right"
                         data-bs-content="
-                        {% comment %} <p>{%if booking.type == 'a'%}This appointment is in person{%elif booking.type == 'b'%}This appointment is over the phone{%endif%}</p> {% endcomment %}
+                        <b>Created:</b> {{booking.created}}
                         {%if booking.note_set.all%}
+                        <br>
                         <br>
                         <b>Notes:</b>
                         <ul>

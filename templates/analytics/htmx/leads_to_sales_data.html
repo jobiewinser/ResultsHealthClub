@@ -36,53 +36,55 @@
 
 <script>
     $(document).ready(function() {
-        leads_to_sales_chart_var = document.getElementById('leads_to_sales_chart');
-        leads_to_sales_chart = new Chart(leads_to_sales_chart_var, {
-            type: '{%if graph_type%}{{graph_type}}{%else%}bar{%endif%}',
-            data: {
-                labels: [{%for label in time_label_set%}'{{label}}'{% if not forloop.last %},{%endif%}{%endfor%}],
-                datasets: [{
-                    label: 'Leads',
-                    data: [{%for data_entry in data_set%}{{data_entry.leads}}{% if not forloop.last %},{%endif%}{%endfor%}],
-                    backgroundColor: 'rgba(180, 180, 180, 0.4)',
-                    borderColor: 'rgba(180, 180, 180, 0.85)',
-                    fill: true,
-                    borderWidth: 1
-                }, {
-                    label: 'Sales',
-                    data: [{%for data_entry in data_set%}{{data_entry.sales}}{% if not forloop.last %},{%endif%}{%endfor%}],
-                    backgroundColor: [{%for data_entry in data_set%}'{{data_entry.percentage|percentage_to_colour:0.35}}'{% if not forloop.last %},{%endif%}{%endfor%}],
-                    borderColor: [{%for data_entry in data_set%}'{{data_entry.percentage|percentage_to_colour:0.7}}'{% if not forloop.last %},{%endif%}{%endfor%}],
-                    fill: true,
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {      
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                        beginAtZero: true,
-                        callback: function(value) {if (value % 1 === 0) {return value;} }
+        setTimeout(function(){
+            leads_to_sales_chart_var = document.getElementById('leads_to_sales_chart');
+            leads_to_sales_chart = new Chart(leads_to_sales_chart_var, {
+                type: '{%if graph_type%}{{graph_type}}{%else%}bar{%endif%}',
+                data: {
+                    labels: [{%for label in time_label_set%}'{{label}}'{% if not forloop.last %},{%endif%}{%endfor%}],
+                    datasets: [{
+                        label: 'Leads',
+                        data: [{%for data_entry in data_set%}{{data_entry.leads}}{% if not forloop.last %},{%endif%}{%endfor%}],
+                        backgroundColor: 'rgba(180, 180, 180, 0.4)',
+                        borderColor: 'rgba(180, 180, 180, 0.85)',
+                        fill: true,
+                        borderWidth: 1
+                    }, {
+                        label: 'Sales',
+                        data: [{%for data_entry in data_set%}{{data_entry.sales}}{% if not forloop.last %},{%endif%}{%endfor%}],
+                        backgroundColor: [{%for data_entry in data_set%}'{{data_entry.percentage|percentage_to_colour:0.35}}'{% if not forloop.last %},{%endif%}{%endfor%}],
+                        borderColor: [{%for data_entry in data_set%}'{{data_entry.percentage|percentage_to_colour:0.7}}'{% if not forloop.last %},{%endif%}{%endfor%}],
+                        fill: true,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {      
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                            beginAtZero: true,
+                            callback: function(value) {if (value % 1 === 0) {return value;} }
+                            }
+                        },
+                        xAxis: {
+                            type: "time",
+                            time: {
+                                displayFormats: {
+                                    hour: "hA"
+                                },
+                                unit: "day",
+                            },
+                            display: true,
+                            ticks: {
+                                reverse: true
+                            },
+                            gridLines: { display: false }
                         }
                     },
-                    xAxis: {
-                        type: "time",
-                        time: {
-                            displayFormats: {
-                                hour: "hA"
-                            },
-                            unit: "day",
-                        },
-                        display: true,
-                        ticks: {
-                            reverse: true
-                        },
-                        gridLines: { display: false }
-                    }
-                },
-                responsive: true
-            }
-        });
+                    responsive: true
+                }
+            });
+        }, 250);         
     });
 </script>

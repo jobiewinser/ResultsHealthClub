@@ -38,11 +38,11 @@
     visibility: hidden;
 }
 #add_booking_area {
-    right: 40vh;
+    right: 10vw;
     bottom: 2vh;
 }
 #archive_area {
-    left: 40vh;
+    left: 10vw;
     bottom: 2vh;
 }
 #archive_area_card, #add_booking_area_card {
@@ -108,4 +108,10 @@ h2 {
     /* margin: -10px -10px; */
     /* font-family: Helvetica; */
     font-size: 21px;
+}
+#leads_board {
+    justify-content: unset;
+    /* width: 100vh; */
+    overflow-x: scroll;
+    overflow-y: hidden;
 }

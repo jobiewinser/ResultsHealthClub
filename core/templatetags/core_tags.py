@@ -8,12 +8,24 @@ from dateutil import relativedelta
 from django.conf import settings
 register = template.Library()
 from campaign_leads.views import rgb_to_hex_tuple, hex_to_rgb_tuple
-
+from django.contrib.auth.models import User
 import math
 
 def roundup(x, round_target):
     return int(int(math.ceil(x / round_target)) * round_target)
 
+@register.filter
+def split_tag(string, split_var):
+    return string.split(split_var)
+@register.filter
+def get_users_with_pks_tag(user_pk_list):
+    clean_user_pk_list = []
+    for user_pk in user_pk_list:
+        try:
+            clean_user_pk_list.append(int(user_pk))
+        except:
+            pass
+    return User.objects.filter(pk__in=clean_user_pk_list)
 @register.filter
 def month_name(month_number):
     return calendar.month_name[month_number]
@@ -49,6 +61,18 @@ def sum_cost_tag(queryset_or_list):
     except:
         return "Error"
 
+@register.filter
+def percentage_to_opacity(percentage, average_out_opacity=0.9):
+    try:
+        return ((percentage / 100) + average_out_opacity) / 2
+    except:
+        return 0.6
+@register.filter
+def percentage_to_font_weight(percentage, average_out_var=0.9):
+    try:
+        return 900 * ((percentage / 100) + average_out_var) / 2
+    except:
+        return 400
 @register.filter
 def percentage_to_colour(percentage, opacity=1):
     try:
@@ -134,6 +158,13 @@ def get_type(value):
 def str_to_int(value):
     try:
         return int(value)
+    except:
+        return value
+
+@register.filter
+def or_empty_string(value):
+    try:
+        return value or ""
     except:
         return value
 

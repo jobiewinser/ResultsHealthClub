@@ -70,7 +70,7 @@ class Webhooks(View):
                     site = Site.objects.filter(whatsappbusinessaccount__whatsappnumber__number=metadata.get('display_phone_number')).first()
                     if site:
                         signature = 'sha256=' + hmac.new(site.company.whatsapp_app_secret_key.encode('utf-8'), bytes(request.body), digestmod=hashlib.sha256).hexdigest()
-                        if signature == request.META.get('HTTP_X_HUB_SIGNATURE_256'):
+                        if signature == request.META.get('HTTP_X_HUB_SIGNATURE_256') or settings.DEBUG:
                             if site:
                                 if field == 'messages':
                                     for message_json in value.get('messages', []):
@@ -303,11 +303,12 @@ class WhatsappTemplatesView(TemplateView):
         else:
             whatsapp_business_account = site.whatsappbusinessaccount_set.all().first()
         if whatsapp_business_account:
-            refresh_template_data(whatsapp_business_account)
-            context['templates'] = whatsapp_business_account.active_templates
+            if whatsapp_business_account.site == site:
+                refresh_template_data(whatsapp_business_account)
+                context['templates'] = whatsapp_business_account.active_templates
+                context['whatsapp_business_account'] = whatsapp_business_account
         # context['site_list'] = get_available_sites_for_user(self.request.user)
         context['site'] = site
-        context['whatsapp_business_account'] = whatsapp_business_account
         context['whatsapp_business_accounts'] = WhatsappBusinessAccount.objects.filter(site=site)
         context['hide_show_all'] = True
         context['WHATSAPP_ORDER_CHOICES'] = WHATSAPP_ORDER_CHOICES
@@ -398,7 +399,7 @@ def whatsapp_approval_htmx(request):
             whatsapp.edit_template(template)
         else:
             whatsapp.create_template(template)
-        return render(request, 'whatsapp/whatsapp_templates_row.html', {'template':WhatsappTemplate.objects.get(pk=request.POST.get('template_pk')), 'site':template.whatsapp_business_account.site, 'WHATSAPP_ORDER_CHOICES': WHATSAPP_ORDER_CHOICES})
+        return render(request, 'whatsapp/whatsapp_templates_row.html', {'template':WhatsappTemplate.objects.get(pk=request.POST.get('template_pk')), 'site':template.whatsapp_business_account.site, 'submitting_to_whatsapp': True})
 
 @login_required
 def delete_whatsapp_template_htmx(request):

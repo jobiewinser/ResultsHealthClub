@@ -2,6 +2,7 @@
 {%if not lead.archived%}
 <article style="margin-right:50px; border-top: 3px solid rgba({{lead.campaign.color}}, 1); border-bottom: 3px solid rgba({{lead.campaign.color}}, 1);"
     id="lead-{{lead.pk}}" data-id="{{lead.pk}}"  class="card draggable-card lead_card column-drag lead-{{lead.pk}}">
+    <script>setDoubleTap("#lead-{{lead.pk}}")</script>
         <input type="text" style="display:None" id="lead_pk_{{lead.pk}}" name="lead_pk" value="{{lead.pk}}"/>
         <div class="row" style="height:30px">
             <div class="col p-0 elipses-overflow">
@@ -23,7 +24,7 @@
                     <b>Last Dragged:</b> {{lead.last_dragged}}<br>
 
                     <br>
-                    <b>Price:</b> {{lead.campaign.product_cost|floatformat:2}}<br>
+                    <b>Campaign Cost (at lead creation):</b> {{lead.get_product_cost|floatformat:2}}<br>
                     ">
                         <i class="fa-solid fa-circle-info" style="color:light-blue"></i>
                     </span> 
@@ -93,7 +94,7 @@
                         <b><i class="fa fa-whatsapp" aria-hidden="true"></i> <span class="phone_number">{{lead.whatsapp_number}}</span></b>
                     </div>
                     <div class="col-md-auto p-0 right"> 
-                        <span style="color:rgb(96, 248, 61y)" class="secondary_td_layer">£<span class="lead_cost" id="lead_cost_{{lead.pk}}" data-cost="{{lead.campaign.product_cost|floatformat:2}}">{{lead.campaign.product_cost|floatformat:2}}</span></span>
+                        <span style="color:rgb(96, 248, 61y)" class="secondary_td_layer">£<span class="lead_cost" id="lead_cost_{{lead.pk}}" data-cost="{{lead.get_product_cost|floatformat:2}}">{{lead.get_product_cost|floatformat:2}}</span></span>
                     </div>
                 </div>
             </span>
@@ -113,6 +114,28 @@
             <img src="{%if lead.assigned_user.profile.avatar%}/media/{{lead.assigned_user.profile.avatar}}{%else%}{% static 'img/blank-profile-picture.png' %}{%endif%}" alt="" style="width:25px; height:25px;" class="rounded-circle m-1">
         </span>
         {%endif%}
+        <span class="lead_edit_button_wrapper" 
+            data-bs-toggle="popover" 
+            data-bs-trigger="hover" 
+            data-bs-html="true" 
+            data-bs-placement="top"
+            data-bs-title="Edit Lead."
+            data-bs-content="
+            Click here to make changes to this lead within the Leads Management System. 
+            <br>
+            <br>
+            This will affect:
+            <ul>
+                <li>Outgoing Whatsapp template messages</li>
+                <li>How the lead is displayed on the system</li>
+            </ul>
+            ">
+            <div class="btn-group btn-space mt-1">    
+                <button class="btn btn-warning btn-xs" type="button"
+                    onclick="htmx.ajax('GET', '{% url 'campaign-lead-get-modal-content'%}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'edit_lead','lead_pk':'{{lead.pk}}'}})">
+                    <i class="fa-solid fa-pencil"></i></button>
+            </div>
+        </span>
         <span class="lead_notes_button_wrapper" 
             data-bs-toggle="popover" 
             data-bs-trigger="hover" 

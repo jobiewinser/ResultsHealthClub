@@ -231,31 +231,15 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 MEDIA_URL = '/media/'
 
-# auth_classes = [
-#         "rest_framework.authentication.SessionAuthentication",
-#         # "api.authentication.TokenAuthentication"               
-# ]
-    
-# REST_FRAMEWORK = {
-#     "DEFAULT_AUTHENTICATION_CLASSES": auth_classes,
-    
-#     "DEFAULT_PERMISSION_CLASSES": [
-#         # "rest_framework.permissions.IsAuthenticatedOrReadOnly",
-#         "rest_framework.permissions.AllowAny"
-#     ],
-#     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
-#     "PAGE_SIZE": 25,
-#     'DEFAULT_RENDERER_CLASSES': (
-#         'rest_framework.renderers.JSONRenderer', #DO NOT REMOVE, VIEWFLOW NEEDS THIS???
-#         'rest_framework.renderers.TemplateHTMLRenderer', #DO NOT REMOVE, VIEWFLOW NEEDS THIS???
-#     )
-# }
-
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'core.backends.CustomBackend',
+    )
 CORS_ALLOWED_ORIGINS = [
-    'https://app.winser.uk',
+    'https://results.winser.uk',
     # '82.37.38.164'
 ]
-CSRF_TRUSTED_ORIGINS = ['https://app.winser.uk']
+CSRF_TRUSTED_ORIGINS = ['https://results.winser.uk']
 
 CORS_REPLACE_HTTPS_REFERER = True
 
@@ -282,9 +266,8 @@ CHANNEL_LAYERS = {
 }
 
 
-LOGIN_REDIRECT_URL = '/'
-LOGIN_URL = '/customer-login/'
-LOGOUT_REDIRECT_URL = '/customer-login/'
+# LOGIN_URL = '/customer-login/'
+# LOGOUT_REDIRECT_URL = '/customer-login/'
 
 # django login as other https://django-hijack.readthedocs.io/en/stable/
 # Where admins are redirected to after hijacking a user

@@ -1,0 +1,31 @@
+{%load static%}
+<span>
+    <div class="row">
+        <div class="col">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Order</th>
+                        <th>Template</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {%for campaign_template_link in campaign.campaign_template_links_with_send_orders%}
+                        {%include 'campaign_leads/htmx/choose_auto_templates_row.html'%}
+                    {%endfor%}
+                </tbody>
+            </table>
+        </div>     
+    </div>
+    
+</span>
+<span hx-swap-oob="true" id="generic_modal_title">
+    Choose Auto Templates - {{campaign.name}}
+</span>
+
+<button hidden
+    hx-post="{% url 'refresh-campaign-configuration-row' %}" hx-swap="innerHTML" 
+    hx-trigger="load"
+    hx-indicator=".top-htmx-indicator" 
+    hx-vals='{"campaign_pk": "{{campaign.pk}}"}'
+    hx-target="#row_{{campaign.pk}}"></button>

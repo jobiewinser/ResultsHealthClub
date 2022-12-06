@@ -21,6 +21,12 @@ from django.template import loader
 from asgiref.sync import async_to_sync, sync_to_async
 from channels.layers import get_channel_layer
 
+class SiteUsersOnline(models.Model):
+    users_online = models.CharField(max_length=1500, default=";")
+    site = models.ForeignKey("core.Site", on_delete=models.SET_NULL, null=True, blank=True)
+    feature = models.CharField(max_length=50, default="leads")
+
+
 class AttachedError(models.Model): 
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     ERROR_TYPES = (
@@ -33,11 +39,16 @@ class AttachedError(models.Model):
                         ('1107', "Parameter Invalid - They probably aren't on Whatsapp"),
                         ('1201', "Whatsapp Template not found Whatsapp's system"),
                         ('1202', "There is no Whatsapp Business linked to this Lead's assosciated Site"),
-                        ('1203', "There is no 1st Whatsapp Template linked to this Lead's Campaign"),
-                        ('1204', "There is no 2nd Whatsapp Template linked to this Lead's Campaign"),
-                        ('1205', "There is no 3rd Whatsapp Template linked to this Lead's Campaign"),
-                        ('1206', "There is no 4th Whatsapp Template linked to this Lead's Campaign"),
-                        ('1207', "There is no 5th Whatsapp Template linked to this Lead's Campaign"),
+                        ('1203', "Couldn't auto-send, there is no 1st Whatsapp Template linked to this Lead's Campaign"),
+                        ('1204', "Couldn't auto-send, there is no 2nd Whatsapp Template linked to this Lead's Campaign"),
+                        ('1205', "Couldn't auto-send, there is no 3rd Whatsapp Template linked to this Lead's Campaign"),
+                        ('1206', "Couldn't auto-send, there is no 4th Whatsapp Template linked to this Lead's Campaign"),
+                        ('1207', "Couldn't auto-send, there is no 5th Whatsapp Template linked to this Lead's Campaign"),
+                        ('1208', "Couldn't auto-send, there is no 6th Whatsapp Template linked to this Lead's Campaign"),
+                        ('1209', "Couldn't auto-send, there is no 7th Whatsapp Template linked to this Lead's Campaign"),
+                        ('1210', "Couldn't auto-send, there is no 8th Whatsapp Template linked to this Lead's Campaign"),
+                        ('1211', "Couldn't auto-send, there is no 9th Whatsapp Template linked to this Lead's Campaign"),
+                        ('1212', "Couldn't auto-send, there is no 10th Whatsapp Template linked to this Lead's Campaign"),
                         ('1220', "This site has template messaging currently disabled, reenable it on the site configuration page"),
                     )
     type = models.CharField(choices=ERROR_TYPES, default='c', max_length=5)
@@ -444,16 +455,16 @@ class Site(models.Model):
     #     elif self.calendly_organization:
     #         calendly.create_webhook_subscription(self.guid, organization = self.calendly_organization)
 
-    def generate_lead(self, first_name, email, phone_number, lead_generation_app='a', request=None):
-        if lead_generation_app == 'a':
-            manually_created_campaign, created = ManualCampaign.objects.get_or_create(site=self, name=f"Manually Created")
-            lead = Campaignlead.objects.create(
-                first_name=first_name,
-                email=email,
-                whatsapp_number=phone_number,
-                campaign=manually_created_campaign
-            )
-            return lead
+    # def generate_lead(self, first_name, email, phone_number, lead_generation_app='a', request=None):
+    #     if lead_generation_app == 'a':
+    #         manually_created_campaign, created = ManualCampaign.objects.get_or_create(site=self, name=f"Manually Created")
+    #         lead = Campaignlead.objects.create(
+    #             first_name=first_name,
+    #             email=email,
+    #             whatsapp_number=phone_number,
+    #             campaign=manually_created_campaign
+    #         )
+    #         return lead
 
 
     # def get_leads_created_in_month_and_year(self, date):

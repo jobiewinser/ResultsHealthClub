@@ -384,7 +384,8 @@ body * {
     padding: 10px;
     padding-bottom: 50px;
     /* top: 7vh; */
-    height: 93vh !important;
+    height: calc(100vh - 60px) !important;
+    
     /* position: fixed; */
     overflow-y: scroll;
     margin: 0;
@@ -422,7 +423,7 @@ body * {
 
 #topnav {
     padding: 0px;
-    /* height: 7vh; */
+    height: 60px;
 }
 .app_picture {
     image-rendering: auto;
@@ -716,9 +717,7 @@ tr.odd td {
     filter: invert(42%) sepia(93%) saturate(1352%) hue-rotate(87deg) brightness(119%) contrast(119%);
     transition: opacity 50ms ease-in !important;
 }
-.flex-column {
-    background-color: #f4f4f4;
-}
+
 /* .row {
     background-color: unset;
 } */
@@ -877,12 +876,6 @@ tr.odd td {
 .highlight-0 {
     background: rgba(96, 248, 61, 0.05)
 }
-#leads_board {
-    justify-content: unset;
-    /* width: 100vh; */
-    overflow-x: scroll;
-    overflow-y: scroll;
-}
 .col-md-auto {
     flex: 0 0 auto;
     width: auto;
@@ -945,15 +938,24 @@ tr.odd td {
 }
 .lead_claimed_img_wrapper {
     position: absolute;
-    bottom: 42%;
-    right: 5%;
+    bottom: 40.5%;
+    right: 4%;
 }
 .lead_notes_button_wrapper {
     position: absolute;
     bottom: 25%;
-    right: 6%;
+    right: 5%;
 }
-lead_notes_button_wrapper
+.lead_edit_button_wrapper {
+    position: absolute;
+    bottom: 25%;
+    right: 20%;
+}
+
+.popover {
+    max-width:450px
+}
+
 .analytics-card {
     min-width: 350px;
     margin: 10px;
@@ -964,15 +966,37 @@ lead_notes_button_wrapper
     width: 100%;
 }
 .chart_canvas {
-    max-height: 30vh !important
+    max-height: 30vh !important;
 }
 #top-htmx-indicator {
-    height: 30px
+    height: 30px;
 }
 .messaging_site_accordion{
-    width:200px
+    width:200px;
 }
 
 .analytics_col{
-    padding:4px
+    padding:4px;
+}
+
+.select2-styling {
+    height:28px;
+    font-size:10px;
+}
+
+#site_list_wrapper{
+    min-width:250px
+}
+
+#campaign_category_pk{
+    min-width:350px
+}
+
+#campaign_list_wrapper{
+    min-width:450px
+}
+
+
+.sortable_drag{
+    height:100%;
 }

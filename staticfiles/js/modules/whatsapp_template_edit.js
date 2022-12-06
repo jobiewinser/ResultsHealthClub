@@ -13,11 +13,16 @@ function renderTemplate(){
     
     $('#template_render').html(content)
 }
+
+
 function replaceVariables(content){
     for (const [k,v] of Object.entries(variables)){
         content = content.replaceAll(k, v[1])
     }
     return content
+}
+function validateWhatsappText(elem){
+    elem.value = elem.value.replaceAll(" ", "_").toLowerCase()
 }
 function saveTemplate(whatsapp_business_account_pk, template_pk, create=false){
     var variables_valid = true;

@@ -52,6 +52,31 @@ function basehandlehtmxafterSwap(evt){
         }
     });
 }
+var tapped=false
+
+function setDoubleTap(identifier){
+    $(identifier).on("touchstart",function(e){
+        if(!tapped){ //if tap is not set, set up single tap
+            tapped=setTimeout(function(){
+                tapped=null
+                //insert things you want to do when single tapped
+            },300);   //wait 300ms then run single click code
+        } else {    //tapped within 300ms of last tap. double tap
+          clearTimeout(tapped); //stop single tap callback
+          tapped=null
+          htmx.ajax('GET', '/toggle-claim-lead/'+$(e.currentTarget).data('id')+'/', {swap:"none"})
+        }
+        e.preventDefault()
+    });
+}
+
+function basehandlehtmxafterSettle(evt){ 
+    console.log("basehandlehtmxafterSettle")    
+    $('.select2:not([data-select2-id])').select2({
+        searchInputPlaceholder: '🔎 Search here...',        
+        theme: 'bootstrap-5',
+    })
+}
 
 function basehandlehtmxafterRequest(evt){   
     $('.popover').remove()
@@ -85,6 +110,13 @@ function basehandlehtmxafterRequest(evt){
             }else if (evt.detail.pathInfo.requestPath.includes("create-lead-note")){
                 $('#generic_modal').modal('hide');
                 snackbarShow('Successfully added note', 'success')
+            }else if (evt.detail.pathInfo.requestPath.includes("edit-lead")){
+                $('#generic_modal').modal('hide');
+                snackbarShow('Successfully changed/created a campaign lead', 'success')
+            }else if (evt.detail.pathInfo.requestPath.includes("add-campaign-category")){
+                $('#generic_modal').modal('hide');
+                snackbarShow('Successfully added a campaign category, reloading...', 'success')
+                location.reload();
             }
             
             
@@ -172,3 +204,27 @@ function fallbackCopyTextToClipboard(text) {
     document.body.removeChild(textArea);
 }
 
+
+(function($) {
+
+    var Defaults = $.fn.select2.amd.require('select2/defaults');
+
+    $.extend(Defaults.defaults, {
+        searchInputPlaceholder: ''
+    });
+
+    var SearchDropdown = $.fn.select2.amd.require('select2/dropdown/search');
+
+    var _renderSearchDropdown = SearchDropdown.prototype.render;
+
+    SearchDropdown.prototype.render = function(decorated) {
+
+        // invoke parent method
+        var $rendered = _renderSearchDropdown.apply(this, Array.prototype.slice.apply(arguments));
+
+        this.$search.attr('placeholder', this.options.get('searchInputPlaceholder'));
+
+        return $rendered;
+    };
+
+})(window.jQuery);

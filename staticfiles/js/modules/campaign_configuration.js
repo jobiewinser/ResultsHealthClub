@@ -11,5 +11,12 @@ function initCampaignConfigurationDataTable() {
     
     $("#overview_table").dataTable().fnDestroy();
     
-    var dt = $('#overview_table').DataTable();
+    var dt = $('#overview_table').DataTable({
+        "columnDefs": [ 
+            {
+              "targets": [1,3,6],
+              "orderable": false
+            },
+          ]
+    });
 }

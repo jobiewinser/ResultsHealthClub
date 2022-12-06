@@ -1,0 +1,36 @@
+{%load static%}
+<span>
+    <div class="card p-3" style="overflow-y:scroll; max-height:250px">
+        Existing templates for <b>{{campaign.site.name}}</b>
+        <br>
+        <ul>
+            {%for campaign_category in campaign.site.campaigncategory_set.all%}
+                <li>{{campaign_category.name}}</li>
+            {%empty%}
+                <li>No Templates to show</li>
+            {%endfor%}
+        </ul>
+    </div>
+    <form hx-post="{%url 'add-campaign-category'%}" hx-trigger="submit" hx-indicator="#page_load_indicator" hx-swap="none">
+        {% csrf_token %}
+        <input hidden name="campaign_pk" value="{{campaign.pk}}"/>
+        <div class="row">
+            <div class="col center p-0">
+                <div class="form-floating m-1">
+                    <input name="category_name" class="form-control" id="modal_category_name"/>
+                    <label for="modal_category_name">Category Name<span class="required">*</span></label>
+                </div>            
+            </div>
+        </div>
+        <div class="row m-1">
+            <div class="col center" >
+                <button class="btn btn-primary" type="submit">
+                    Create
+                </button>
+            </div>
+        </div>
+    </form>
+</span>
+<span hx-swap-oob="true" id="generic_modal_title">
+    Add a campaign category - {{campaign.site.name}}
+</span>

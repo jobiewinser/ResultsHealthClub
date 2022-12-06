@@ -1,4 +1,4 @@
-from datetime import timedelta, datetime
+from datetime import datetime
 import uuid
 from django.db import models
 from django.contrib.auth.models import User
@@ -8,9 +8,9 @@ from whatsapp.models import WhatsAppMessage, WhatsappTemplate
 from django.dispatch import receiver
 from polymorphic.models import PolymorphicModel
 import logging
-from django.db.models import Q, Count
+from django.db.models import Q
 from django.template import loader
-from asgiref.sync import async_to_sync, sync_to_async
+from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 logger = logging.getLogger(__name__)
 
@@ -24,7 +24,14 @@ for tuple in BOOKING_CHOICES:
 
 # class AdCampaign(models.Model):
 #     name = models.TextField(null=True, blank=True)
-
+class CampaignCategory(models.Model):
+    name = models.TextField(null=True, blank=True)  
+    site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
+class CampaignTemplateLink(PolymorphicModel):
+    send_order =  models.IntegerField(null=True, blank=True)
+    template = models.ForeignKey("whatsapp.WhatsappTemplate", on_delete=models.CASCADE, null=True, blank=True)
+    campaign = models.ForeignKey("campaign_leads.Campaign", on_delete=models.CASCADE, null=True, blank=True)
+    
 class Campaign(PolymorphicModel):
     name = models.TextField(null=True, blank=True)   
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -35,26 +42,42 @@ class Campaign(PolymorphicModel):
     webhook_id = models.TextField(null=True, blank=True)
     webhook_enabled = models.BooleanField(default=True)
     
+    campaign_category = models.ForeignKey("campaign_leads.CampaignCategory", on_delete=models.SET_NULL, null=True, blank=True)
     site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
     company = models.ForeignKey("core.Company", on_delete=models.SET_NULL, null=True, blank=True)
-    first_send_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="first_send_template_campaign", on_delete=models.SET_NULL, null=True, blank=True)
-    second_send_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="second_send_template_campaign", on_delete=models.SET_NULL, null=True, blank=True)
-    third_send_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="third_send_template_campaign", on_delete=models.SET_NULL, null=True, blank=True)
-    fourth_send_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="fourth_send_template_campaign", on_delete=models.SET_NULL, null=True, blank=True)
-    fifth_send_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="fifth_send_template_campaign", on_delete=models.SET_NULL, null=True, blank=True)
+    # first_send_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="first_send_template_campaign", on_delete=models.SET_NULL, null=True, blank=True)
+    # second_send_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="second_send_template_campaign", on_delete=models.SET_NULL, null=True, blank=True)
+    # third_send_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="third_send_template_campaign", on_delete=models.SET_NULL, null=True, blank=True)
+    # fourth_send_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="fourth_send_template_campaign", on_delete=models.SET_NULL, null=True, blank=True)
+    # fifth_send_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="fifth_send_template_campaign", on_delete=models.SET_NULL, null=True, blank=True)
     whatsapp_business_account = models.ForeignKey('core.WhatsappBusinessAccount', on_delete=models.SET_NULL, null=True, blank=True)
     color = models.CharField(max_length=15, null=False, blank=False, default="96,248,61")
     def get_active_leads_qs(self):
         return self.campaignlead_set.filter(archived=False)
     def is_manual(self):
         return False
+        
+    @property
+    def campaigntemplatelinks_with_templates(self):
+        return self.campaigntemplatelink_set.exclude(template=None)
+    @property
+    def campaign_template_links_with_send_orders(self):
+        campaign_template_links = []
+        try:
+            max_send_order = self.campaigntemplatelink_set.all().order_by('-send_order').first().send_order or 1
+        except:
+            max_send_order = 0
+
+        for i in range(1, max_send_order+2):
+            campaign_template_links.append(self.campaigntemplatelink_set.filter(send_order = i).first())
+        return campaign_template_links
     @property
     def site_templates(self):
         return WhatsappTemplate.objects.filter(site=self.site)
     @property
     def warnings(self):
         warnings = {}
-        if not self.first_send_template:
+        if not self.campaigntemplatelink_set.filter(send_order=1):
             warnings["first_send_template_missing"] = "This campaign doesn't have a 1st Auto-Send Template, it won't automatically send a message to the customer"
         return warnings
 @receiver(models.signals.post_save, sender=Campaign)
@@ -89,8 +112,18 @@ class Campaignlead(models.Model):
     possible_duplicate = models.BooleanField(default=False)
     last_dragged = models.DateTimeField(null=True, blank=True)
     assigned_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    product_cost = models.FloatField(null=True, blank=True)
     def __str__(self):
         return self.name
+    @property
+    def get_product_cost(self):  
+        if self.product_cost:
+            return self.product_cost      
+        if self.campaign:
+            self.product_cost = self.campaign.product_cost
+            self.save()
+            return self.product_cost
+        return 0
     @property
     def is_last_whatsapp_message_inbound(self):        
         message = WhatsAppMessage.objects.filter(customer_number=self.whatsapp_number, whatsappnumber__whatsapp_business_account__site=self.campaign.site).last()
@@ -151,21 +184,11 @@ class Campaignlead(models.Model):
         from core.models import AttachedError
         if communication_method == 'a':
             print("CampaignleadDEBUG1")
-            if send_order == 1:
-                template = self.campaign.first_send_template
-                type = '1203'
-            elif send_order == 2:
-                template = self.campaign.second_send_template
-                type = '1204'
-            elif send_order == 3:
-                template = self.campaign.third_send_template
-                type = '1205'
-            elif send_order == 4:
-                template = self.campaign.fourth_send_template
-                type = '1206'
-            elif send_order == 5:
-                template = self.campaign.fifth_send_template
-                type = '1207'
+            if send_order:
+                campaigntemplatelink = self.campaign.campaigntemplatelink_set.filter(send_order=send_order).first()
+                if campaigntemplatelink:
+                    template = campaigntemplatelink.template
+                type = str(1202 + send_order)
             else:
                 type = None
             
@@ -225,6 +248,15 @@ class Campaignlead(models.Model):
                                             }
                                         )
                                         text = text.replace('[[1]]',self.first_name)
+                                        counter = counter + 1
+                                    if '[[2]]' in text:
+                                        params.append(              
+                                            {
+                                                "type": "text",
+                                                "text":  self.first_name
+                                            }
+                                        )
+                                        text = text.replace('[[2]]',self.first_name)
                                         counter = counter + 1
                                 # if '{{3}}' in text:
                                 #     params.append(           
