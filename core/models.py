@@ -21,6 +21,12 @@ from django.template import loader
 from asgiref.sync import async_to_sync, sync_to_async
 from channels.layers import get_channel_layer
 
+# class SiteUsersOnline(models.Model):
+
+#     #collect in charfield `pk` of all users online 
+#     users_online = models.CharField(max_length=1500)
+
+
 class AttachedError(models.Model): 
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     ERROR_TYPES = (
@@ -449,16 +455,16 @@ class Site(models.Model):
     #     elif self.calendly_organization:
     #         calendly.create_webhook_subscription(self.guid, organization = self.calendly_organization)
 
-    def generate_lead(self, first_name, email, phone_number, lead_generation_app='a', request=None):
-        if lead_generation_app == 'a':
-            manually_created_campaign, created = ManualCampaign.objects.get_or_create(site=self, name=f"Manually Created")
-            lead = Campaignlead.objects.create(
-                first_name=first_name,
-                email=email,
-                whatsapp_number=phone_number,
-                campaign=manually_created_campaign
-            )
-            return lead
+    # def generate_lead(self, first_name, email, phone_number, lead_generation_app='a', request=None):
+    #     if lead_generation_app == 'a':
+    #         manually_created_campaign, created = ManualCampaign.objects.get_or_create(site=self, name=f"Manually Created")
+    #         lead = Campaignlead.objects.create(
+    #             first_name=first_name,
+    #             email=email,
+    #             whatsapp_number=phone_number,
+    #             campaign=manually_created_campaign
+    #         )
+    #         return lead
 
 
     # def get_leads_created_in_month_and_year(self, date):

@@ -39,30 +39,46 @@
         </div>
         <div class="col-md-auto">
             <div class="row mt-2">
-                <div class="col-md-auto center card card-white p-3"  style="">                    
+                <div class="col">
+                </div>
+                <div class="col-6 center card card-white p-3"  style="">                    
                     {%block template_name%}
                     <h5>Template Name</h5>
                     <div class="row">
                         <div class="col"
-                        data-bs-toggle="popover" 
-                        data-bs-trigger="hover" 
-                        data-bs-placement="top"
-                        data-bs-title="Why is this input disabled?"
-                        data-bs-content="This input can't be changed for template edits. Please only make small changes, otherwise create a new template.">
-                            <input {%if readonly or template.message_template_id%}disabled{%endif%} class="form-control" id="template_name" value="{%if template.name%}{{template.name}}{%elif not template.name and template.pending_name%}{{template.pending_name}}{%endif%}" name="template_name">
+                            data-bs-toggle="popover" 
+                            data-bs-trigger="hover" 
+                            data-bs-placement="top"
+                            data-bs-html="true"
+                            data-bs-title="{%if readonly or template.message_template_id%}Why is this input disabled?{%else%}Template Name Rules{%endif%}"
+                            data-bs-content="{%if readonly or template.message_template_id%}This input can't be changed for template edits. Please only make small changes, otherwise create a new template.{%else%}This it the name of the template sent to whatsapp. It must only use lowercase letters and underscores! <br><br><small>e.g <b>my_first_message_template</b></small>{%endif%}">
+                            <input {%if readonly or template.message_template_id%}disabled{%endif%} oninput="validateWhatsappText(this);" class="form-control" id="template_name" value="{%if template.name%}{{template.name}}{%elif not template.name and template.pending_name%}{{template.pending_name}}{%endif%}" name="template_name">
                         </div>
                     </div>
                     {%endblock template_name%}
                     
                     {%block template_category%}
+                    <hr>
                     <h5>Category</h5>
                     <div class="row">
                         <div class="col"
                         data-bs-toggle="popover" 
                         data-bs-trigger="hover" 
+                        data-bs-html="true"
                         data-bs-placement="top"
-                        data-bs-title="Why is this input disabled?"
-                        data-bs-content="This input can't be changed for template edits. Please only make small changes, otherwise create a new template.">
+                        data-bs-title="{%if readonly or template.message_template_id%}Why is this input disabled?{%else%}What do these categories mean?{%endif%}"
+                        data-bs-content="{%if readonly or template.message_template_id%}
+                                        This input can't be changed for template edits. Please only make small changes, otherwise create a new template.
+                                        {%else%}
+                                        <b>Transactional</b>
+                                        <p>
+                                            Send account updates, order updates, alerts and more to share important information.
+                                        </p>
+                                        <br>
+                                        <b>Marketing</b>
+                                        <p>
+                                            Send promotional offers, product announcements and more to increase awareness.
+                                        </p>{%endif%}" >
                             <select {%if readonly or template.message_template_id%}disabled{%endif%} id="template_category" name="template_category" class="form-select form-select-sm align-self-center m-1">
                                 {%for k,v in categories.items%}
                                 <option {%if template.category == k%}selected {%elif not template.category and template.pending_category == k%}selected {%endif%}value="{{k}}">{{k}}</option>
@@ -71,8 +87,11 @@
                         </div>
                     </div>
                     {%endblock template_category%}
-                    
-                    <h5>Header</h5>
+                    <hr>
+                    <h5>Header </h5>
+                    <small>
+                        <p><b>Max 60 characters including any variables</b>. For example a header that is 55 characters long would fail to send to a customer with a name longer than 5 characters (if you include their name in the header).</p>
+                    </small>
                     <div class="row">
                         <div class="col-md-3">
                             <select {%if readonly%}disabled{%endif%} {%if readonly%}disabled{%endif%} id="variable_choice"  onclick="$('#template_header').val($('#template_header').val()+$(this).val()).trigger('input'); $(this).val('');" name="variable_choice" class="form-select form-select-sm align-self-center m-1">
@@ -83,15 +102,20 @@
                             </select>
                         </div>
                         <div class="col">
-                            <input {%if readonly%}disabled{%endif%} type="text" style="width:300px;" 
+                            <input {%if readonly%}disabled{%endif%} type="text" style="width:300px;" maxlength="60"
+                            
                             id="template_header" 
                             name="template_header" 
                             class="template_editor_input form-control" 
                             oninput="renderTemplate();" value="{%if template.pending_components%}{%for component in template.pending_components%}{%if component.type == 'HEADER'%}{{component.text}}{%endif%}{%endfor%}{%else%}{%for component in template.components%}{%if component.type == 'HEADER'%}{{component.text}}{%endif%}{%endfor%}{%endif%}">
                         </div>
                     </div>
+                    <hr>
 
                     <h5>Body</h5>
+                    <small>
+                        <p><b>Max 1024 characters including any variables</b>. Messages longer than 1024 characters will fail to send.</p>
+                    </small>
                     <div class="row">
                         <div class="col-md-3">
                             <select {%if readonly%}disabled{%endif%} id="variable_choice"  onclick="$('#template_body').val($('#template_body').val()+$(this).val()).trigger('input'); $(this).val('');" name="variable_choice" class="form-select form-select-sm align-self-center m-1">
@@ -102,20 +126,24 @@
                             </select>
                         </div>
                         <div class="col">
-                            <textarea {%if readonly%}disabled{%endif%} style="width:300px; height:340px;" 
+                            <textarea {%if readonly%}disabled{%endif%} style="width:300px; height:340px;"  maxlength="1024"
                                 id="template_body" 
                                 name="template_body" 
                                 class="template_editor_input form-control" 
                                 oninput="renderTemplate();">{%if template.pending_components%}{%for component in template.pending_components%}{%if component.type == 'BODY'%}{{component.text}}{%endif%}{%endfor%}{%else%}{%for component in template.components%}{%if component.type == 'BODY'%}{{component.text}}{%endif%}{%endfor%}{%endif%}</textarea>
                         </div>
                     </div>
+                    <hr>
 
                     <h5>Footer</h5>
+                    <small>
+                        <p><b>Max 60 characters including any variables</b>. For example a footer that is 55 characters long would fail to send to a customer with a name longer than 5 characters (if you include their name in the footer).</p>
+                    </small>
                     <div class="row">
                         <div class="col-md-3">
                         </div>
                         <div class="col">
-                            <input {%if readonly%}disabled{%endif%} type="text" style="width:300px;" 
+                            <input {%if readonly%}disabled{%endif%} type="text" style="width:300px;"  maxlength="60"
                             id="template_footer" 
                             name="template_footer" 
                             class="template_editor_input form-control" 
@@ -127,7 +155,7 @@
                 <div class="col-md-auto d-flex justify-content-start ms-4 m-1">
                     <i class="fa-solid fa-arrow-right align-self-center" style="font-size:40px"></i>                    
                 </div>
-                <div class="col center">                    
+                <div class="col-md-auto center">                    
                     {%block submit_button%}
                     <button {%if readonly%}disabled{%endif%} class="btn template_save_button btn-success m-3"
                         onclick="saveTemplate('{{whatsapp_business_account.pk}}', '{{template.pk}}')"
@@ -199,6 +227,8 @@
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class="col">
                 </div>
             </div>
         </div>

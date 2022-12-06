@@ -938,15 +938,24 @@ tr.odd td {
 }
 .lead_claimed_img_wrapper {
     position: absolute;
-    bottom: 42%;
-    right: 5%;
+    bottom: 40.5%;
+    right: 4%;
 }
 .lead_notes_button_wrapper {
     position: absolute;
     bottom: 25%;
-    right: 6%;
+    right: 5%;
 }
-lead_notes_button_wrapper
+.lead_edit_button_wrapper {
+    position: absolute;
+    bottom: 25%;
+    right: 20%;
+}
+
+.popover {
+    max-width:450px
+}
+
 .analytics-card {
     min-width: 350px;
     margin: 10px;

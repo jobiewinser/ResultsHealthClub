@@ -110,6 +110,10 @@ function basehandlehtmxafterRequest(evt){
             }else if (evt.detail.pathInfo.requestPath.includes("create-lead-note")){
                 $('#generic_modal').modal('hide');
                 snackbarShow('Successfully added note', 'success')
+            }else if (evt.detail.pathInfo.requestPath.includes("edit-lead")){
+                $('#generic_modal').modal('hide');
+                // $('#refresh_column_metadata').click()
+                snackbarShow('Successfully changed/created a campaign lead', 'success')
             }
             
             

@@ -9,11 +9,7 @@ function leadshandlehtmxbeforeRequest(evt){
 function leadshandlehtmxafterSwap(evt){
     if (evt.detail.xhr.status == 200){
         if (![undefined, ''].includes(evt.detail.pathInfo.requestPath)){
-            if (evt.detail.pathInfo.requestPath.includes("create-campaign-lead")){
-                $('#generic_modal').modal('hide');
-                // $('#refresh_column_metadata').click()
-                snackbarShow('Successfully manually created a campaign lead', 'success')
-            } else if (evt.detail.pathInfo.requestPath.includes("add-manual-booking")){
+            if (evt.detail.pathInfo.requestPath.includes("add-manual-booking")){
                 $('#generic_modal').modal('hide');
                 snackbarShow('Successfully added a booking', 'success')
             } else if (evt.detail.pathInfo.requestPath.includes("refresh-lead-article") || evt.detail.pathInfo.requestPath.includes("leads-and-calls") || evt.detail.pathInfo.requestPath.includes("refresh-leads-board")){

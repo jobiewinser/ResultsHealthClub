@@ -114,6 +114,28 @@
             <img src="{%if lead.assigned_user.profile.avatar%}/media/{{lead.assigned_user.profile.avatar}}{%else%}{% static 'img/blank-profile-picture.png' %}{%endif%}" alt="" style="width:25px; height:25px;" class="rounded-circle m-1">
         </span>
         {%endif%}
+        <span class="lead_edit_button_wrapper" 
+            data-bs-toggle="popover" 
+            data-bs-trigger="hover" 
+            data-bs-html="true" 
+            data-bs-placement="top"
+            data-bs-title="Edit Lead."
+            data-bs-content="
+            Click here to make changes to this lead within the Leads Management System. 
+            <br>
+            <br>
+            This will affect:
+            <ul>
+                <li>Outgoing Whatsapp template messages</li>
+                <li>How the lead is displayed on the system</li>
+            </ul>
+            ">
+            <div class="btn-group btn-space mt-1">    
+                <button class="btn btn-warning btn-xs" type="button"
+                    onclick="htmx.ajax('GET', '{% url 'campaign-lead-get-modal-content'%}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'edit_lead','lead_pk':'{{lead.pk}}'}})">
+                    <i class="fa-solid fa-pencil"></i></button>
+            </div>
+        </span>
         <span class="lead_notes_button_wrapper" 
             data-bs-toggle="popover" 
             data-bs-trigger="hover" 

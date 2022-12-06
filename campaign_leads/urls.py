@@ -42,7 +42,7 @@ urlpatterns = [
     path('refresh-booking-row/<str:lead_pk>/', campaignleadshtmx.refresh_booking_row, name='refresh-booking-row' ),
     path('toggle-claim-lead/<str:lead_pk>/', campaignleadsviews.toggle_claim_lead, name='toggle-claim-lead' ),
     path('get-leads-column-meta-data/', campaignleadshtmx.get_leads_column_meta_data, name='get-leads-column-meta-data' ),
-    path('create-campaign-lead/', campaignleadshtmx.create_campaign_lead, name='create-campaign-lead' ),
+    # path('create-campaign-lead/', campaignleadshtmx.create_campaign_lead, name='create-campaign-lead' ),
     
     path('get-campaign/', campaignleadsviews.get_campaigns, name='get-campaign'),
     
@@ -50,6 +50,7 @@ urlpatterns = [
     path('mark-arrived/', campaignleadshtmx.mark_arrived, name='mark-arrived' ),
     path('mark-sold/', campaignleadshtmx.mark_sold, name='mark-sold' ),
     path('create-lead-note/', campaignleadshtmx.create_lead_note, name='create-lead-note' ),
+    path('edit-lead/', campaignleadshtmx.edit_lead, name='edit-lead' ),
     
     # path('test-whatsapp-message/', campaignleadshtmx.test_whatsapp_message, name='test-whatsapp-message' ),
     # path('template-editor/', campaignleadshtmx.template_editor, name='template-editor' ),

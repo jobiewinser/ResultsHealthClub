@@ -150,6 +150,13 @@ def str_to_int(value):
         return value
 
 @register.filter
+def or_empty_string(value):
+    try:
+        return value or ""
+    except:
+        return value
+
+@register.filter
 def division_percentage(num, divider):  
     try:
         return (int(num) / int(divider)) * 100
