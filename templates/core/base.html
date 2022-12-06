@@ -30,7 +30,23 @@
             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.rtl.min.css" />
            {%endblock cdn%}
         
-        <link href="{% static 'css/drag_drop.css' %}?0.4" rel="stylesheet" />
+        
+        <link href="{% static 'css/drag_drop.css' %}?0.5" rel="stylesheet" />
+        <link rel="stylesheet" type="text/css"  href="{% static 'css/base.css' %}?0.5">
+        <script src="{% static 'js/drag_drop.js' %}?0.5"></script> 
+        <script src="{% static 'js/base.js' %}?0.5"></script>
+        <script src="{% static 'js/modules/leads.js' %}?0.5"></script>
+        <script src="{% static 'js/modules/booking.js' %}?0.5"></script>
+        <script src="{% static 'js/modules/graphs.js' %}?0.5"></script>
+        <script src="{% static 'js/modules/free_tasters.js' %}?0.5"></script>
+        <script src="{% static 'js/modules/campaign_configuration.js' %}?0.5"></script>
+        <script src="{% static 'js/modules/company_configuration.js' %}?0.5"></script>
+        <script src="{% static 'js/modules/whatsapp_templates.js' %}?0.5"></script>
+        <script src="{% static 'js/modules/whatsapp_template_edit.js' %}?0.5"></script>
+        <audio id="notification1" src="{% static 'audio/notification1.wav' %}?0.5" preload="auto"></audio>
+        <audio id="notification2" src="{% static 'audio/notification2.mp3' %}?0.5" preload="auto"></audio>
+        
+        {%comment%}<link href="{% static 'css/drag_drop.css' %}?0.4" rel="stylesheet" />
         <link rel="stylesheet" type="text/css"  href="{% static 'css/base.css' %}?0.4">
         <script src="{% static 'js/drag_drop.js' %}?0.4"></script> 
         <script src="{% static 'js/base.js' %}?0.4"></script>
@@ -43,7 +59,7 @@
         <script src="{% static 'js/modules/whatsapp_templates.js' %}?0.4"></script>
         <script src="{% static 'js/modules/whatsapp_template_edit.js' %}?0.4"></script>
         <audio id="notification1" src="{% static 'audio/notification1.wav' %}?0.4" preload="auto"></audio>
-        <audio id="notification2" src="{% static 'audio/notification2.mp3' %}?0.4" preload="auto"></audio>
+        <audio id="notification2" src="{% static 'audio/notification2.mp3' %}?0.4" preload="auto"></audio>{%endcomment%}
         
         {%block styles%}
         <style>
