@@ -22,7 +22,9 @@ function replaceVariables(content){
     return content
 }
 function validateWhatsappText(elem){
-    elem.value = elem.value.replaceAll(" ", "_").toLowerCase()
+    let value = elem.value.replaceAll(" ", "_").toLowerCase()
+    value = value.replace(/[^a-z_]/, '');
+    elem.value = value
 }
 function saveTemplate(whatsapp_business_account_pk, template_pk, create=false){
     var variables_valid = true;

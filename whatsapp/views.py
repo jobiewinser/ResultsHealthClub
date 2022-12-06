@@ -133,32 +133,36 @@ class Webhooks(View):
                             signature = 'sha256=' + hmac.new(site.company.whatsapp_app_secret_key.encode('utf-8'), bytes(request.body), digestmod=hashlib.sha256).hexdigest()
                             if signature == request.META.get('HTTP_X_HUB_SIGNATURE_256'):
                                 if template:
-                                    template.status=value.get('event')
-                                    reason = value.get('reason', None)
-                                    
-                                    if reason and not reason.lower() == 'none':
-                                        template.latest_reason=value.get('reason')
+                                    event = value.get('event')
+                                    if event == 'PENDING_DELETION':
+                                        template.delete()
                                     else:
-                                        template.latest_reason=None
-                                    template.name=value.get('message_template_name')
-                                    template.language=value.get('message_template_language')
-                                    whatsapp = Whatsapp(template.whatsapp_business_account.site.whatsapp_access_token)
-                                    template_live = whatsapp.get_template(template.whatsapp_business_account.whatsapp_business_account_id, template.message_template_id)
+                                        template.status=event
+                                        reason = value.get('reason', None)
+                                        
+                                        if reason and not reason.lower() == 'none':
+                                            template.latest_reason=value.get('reason')
+                                        else:
+                                            template.latest_reason=None
+                                        template.name=value.get('message_template_name')
+                                        template.language=value.get('message_template_language')
+                                        whatsapp = Whatsapp(template.whatsapp_business_account.site.whatsapp_access_token)
+                                        template_live = whatsapp.get_template(template.whatsapp_business_account.whatsapp_business_account_id, template.message_template_id)
 
-                                    template.name = template_live.get('name')
-                                    template.pending_name = ""
+                                        template.name = template_live.get('name')
+                                        template.pending_name = ""
 
-                                    template.category = template_live.get('category')
-                                    template.pending_category = ""
+                                        template.category = template_live.get('category')
+                                        template.pending_category = ""
 
-                                    template.language = template_live.get('language')
-                                    template.pending_language = ""
-                                    
-                                    template.components = template.pending_components
-                                    template.pending_components = []
+                                        template.language = template_live.get('language')
+                                        template.pending_language = ""
+                                        
+                                        template.components = template.pending_components
+                                        template.pending_components = []
 
-                                    template.last_approval = datetime.now()
-                                    template.save()
+                                        template.last_approval = datetime.now()
+                                        template.save()
         response = HttpResponse("")
         response.status_code = 200     
         
@@ -409,7 +413,7 @@ def delete_whatsapp_template_htmx(request):
     whatsapp = Whatsapp(whatsapp_business_account.site.whatsapp_access_token)
     if template.message_template_id and not template.status == 'PENDING_DELETEION':
         whatsapp.delete_template(whatsapp_business_account.whatsapp_business_account_id, template.name)
-    template.delete()
+    template.status="PENDING_DELETION"
     template.archived = True
     template.save()
     return HttpResponse("", status=200)
