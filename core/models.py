@@ -21,10 +21,10 @@ from django.template import loader
 from asgiref.sync import async_to_sync, sync_to_async
 from channels.layers import get_channel_layer
 
-# class SiteUsersOnline(models.Model):
-
-#     #collect in charfield `pk` of all users online 
-#     users_online = models.CharField(max_length=1500)
+class SiteUsersOnline(models.Model):
+    users_online = models.CharField(max_length=1500, default=";")
+    site = models.ForeignKey("core.Site", on_delete=models.SET_NULL, null=True, blank=True)
+    feature = models.CharField(max_length=50, default="leads")
 
 
 class AttachedError(models.Model): 

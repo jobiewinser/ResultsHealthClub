@@ -51,6 +51,7 @@ urlpatterns = [
     path('mark-sold/', campaignleadshtmx.mark_sold, name='mark-sold' ),
     path('create-lead-note/', campaignleadshtmx.create_lead_note, name='create-lead-note' ),
     path('edit-lead/', campaignleadshtmx.edit_lead, name='edit-lead' ),
+    path('add-campaign-category/', campaignleadshtmx.add_campaign_category, name='add-campaign-category' ),
     
     # path('test-whatsapp-message/', campaignleadshtmx.test_whatsapp_message, name='test-whatsapp-message' ),
     # path('template-editor/', campaignleadshtmx.template_editor, name='template-editor' ),
@@ -68,6 +69,7 @@ urlpatterns = [
     path('configuration/campaign-assign-color/', campaignleadsviews.campaign_assign_color_htmx, name='campaign-assign-color'), 
     path('configuration/refresh-campaign-configuration-row/', campaignleadsviews.refresh_campaign_configuration_row, name='refresh-campaign-configuration-row'), 
     
+    path('configuration/campaign-assign-campaign-category/', campaignleadsviews.campaign_assign_campaign_category_htmx, name='campaign-assign-campaign-category'), 
     path('configuration/campaign-assign-whatsapp-business-account/', campaignleadsviews.campaign_assign_whatsapp_business_account_htmx, name='campaign-assign-whatsapp-business-account'), 
     path('configuration/campaign-assign-product_cost/', campaignleadsviews.campaign_assign_product_cost_htmx, name='campaign-assign-product_cost'), 
     

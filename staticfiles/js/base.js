@@ -112,8 +112,11 @@ function basehandlehtmxafterRequest(evt){
                 snackbarShow('Successfully added note', 'success')
             }else if (evt.detail.pathInfo.requestPath.includes("edit-lead")){
                 $('#generic_modal').modal('hide');
-                // $('#refresh_column_metadata').click()
                 snackbarShow('Successfully changed/created a campaign lead', 'success')
+            }else if (evt.detail.pathInfo.requestPath.includes("add-campaign-category")){
+                $('#generic_modal').modal('hide');
+                snackbarShow('Successfully added a campaign category, reloading...', 'success')
+                location.reload();
             }
             
             

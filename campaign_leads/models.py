@@ -26,7 +26,7 @@ for tuple in BOOKING_CHOICES:
 #     name = models.TextField(null=True, blank=True)
 class CampaignCategory(models.Model):
     name = models.TextField(null=True, blank=True)  
-    company = models.ForeignKey("core.Company", on_delete=models.SET_NULL, null=True, blank=True) 
+    site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
 class CampaignTemplateLink(PolymorphicModel):
     send_order =  models.IntegerField(null=True, blank=True)
     template = models.ForeignKey("whatsapp.WhatsappTemplate", on_delete=models.CASCADE, null=True, blank=True)

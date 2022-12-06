@@ -6,7 +6,7 @@ import logging
 from django.contrib.auth import login
 from django.middleware.csrf import get_token
 from django.contrib.auth.decorators import login_required
-from campaign_leads.models import Campaign, Campaignlead, Booking, Call, Note, ManualCampaign
+from campaign_leads.models import Campaign, Campaignlead, Booking, Call, Note, ManualCampaign, CampaignCategory
 from campaign_leads.views import CampaignBookingsOverviewView
 from core.models import Site, WhatsappNumber
 from core.user_permission_functions import get_available_sites_for_user, get_user_allowed_to_add_call
@@ -57,7 +57,7 @@ def get_modal_content(request, **kwargs):
                 manual_campaign =  ManualCampaign.objects.filter(site=context['site']).first()
                 if not manual_campaign:
                     ManualCampaign.objects.create(site=context['site'], name = "Manually Created")
-                context['campaigns'] = get_campaign_qs(request)           
+                context['campaigns'] = get_campaign_qs(request)         
                     
             return render(request, f"campaign_leads/htmx/{template_name}.html", context)   
     except Exception as e:
@@ -65,6 +65,25 @@ def get_modal_content(request, **kwargs):
         return HttpResponse(e, status=500)
 
 
+
+@login_required
+def add_campaign_category(request, **kwargs):
+    # logger.debug(str(request.user))
+    # try:        
+        name = request.POST.get('category_name')
+        if not name:
+            return HttpResponse("Please enter a name", status=500)
+        campaign_pk = request.POST.get('campaign_pk')
+        campaign = Campaign.objects.get(pk=campaign_pk)
+        campaign_category, created = CampaignCategory.objects.get_or_create(site=campaign.site, name=name)
+        campaign.campaign_category = campaign_category
+        campaign.save()
+        return HttpResponse("", status=200)
+    # except Exception as e:
+    #     # messages.add_message(request, messages.ERROR, f'Error with creating a campaign lead')
+    #     logger.debug("create_campaign_lead Error "+str(e))
+    #     # raise Exception
+    #     return HttpResponse("Error with creating a campaign lead", status=500)
 
 @login_required
 def edit_lead(request, **kwargs):

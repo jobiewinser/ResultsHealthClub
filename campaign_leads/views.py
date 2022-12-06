@@ -7,7 +7,7 @@ from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from calendly.api import Calendly
-from campaign_leads.models import Call, Campaign, Campaignlead, CampaignTemplateLink
+from campaign_leads.models import Call, Campaign, Campaignlead, CampaignTemplateLink, CampaignCategory
 from active_campaign.api import ActiveCampaignApi
 from active_campaign.models import ActiveCampaign
 # from core.core_decorators import campaign_leads_enabled_required
@@ -78,19 +78,35 @@ def get_leads_board_context(request):
     context['campaigns'] = get_campaign_qs(request)
     leads = Campaignlead.objects.filter(archived=False, campaign__site__in=request.user.profile.sites_allowed.all()).exclude(booking__archived=False)
     campaign_pk = request.GET.get('campaign_pk', None)
+    campaign_category_pk = request.GET.get('campaign_category_pk', None)
+    filtered = False
+    
     if campaign_pk:
         try:
             leads = leads.filter(campaign=Campaign.objects.get(pk=campaign_pk))
+            filtered = True
             request.GET['campaign_pk'] = campaign_pk
             context['campaign'] = Campaign.objects.get(pk=campaign_pk)
             request.GET['site_pk'] = context['campaign'].site.pk
-        except:
+        except Exception as e:
+            pass
+    if campaign_category_pk and not campaign_category_pk == 'all':
+        try:
+            context['campaign_category'] = CampaignCategory.objects.get(pk=campaign_category_pk)
+            if not filtered:
+                leads = leads.filter(campaign__campaign_category=context['campaign_category'])
+                filtered = True
+                request.GET['site_pk'] = context['campaign_category'].site.pk
+            request.GET['campaign_category_pk'] = campaign_category_pk
+        except Exception as e:
             pass
     site_pk = get_site_pk_from_request(request)
     if site_pk and not site_pk == 'all':
         try:
-            leads = leads.filter(campaign__site__pk=site_pk)
-            request.GET['site_pk'] = site_pk    
+            if not filtered:
+                leads = leads.filter(campaign__site__pk=site_pk)
+                filtered = True
+                request.GET['site_pk'] = site_pk    
             context['site'] = Site.objects.get(pk=site_pk)
         except:
             pass
@@ -273,6 +289,13 @@ def campaign_assign_whatsapp_business_account_htmx(request):
     
     campaign.whatsapp_business_account = WhatsappBusinessAccount.objects.filter(pk=whatsapp_business_account_pk).first()
     campaign.campaigntemplatelink_set.all().delete()
+    campaign.save()
+    return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign})
+@login_required
+def campaign_assign_campaign_category_htmx(request):
+    campaign = Campaign.objects.get(pk=request.POST.get('campaign_pk'))
+    campaign_category_pk = request.POST.get('campaign_category_pk') or 0    
+    campaign.campaign_category = CampaignCategory.objects.filter(pk=campaign_category_pk).first()
     campaign.save()
     return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign})
 

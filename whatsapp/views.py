@@ -303,11 +303,12 @@ class WhatsappTemplatesView(TemplateView):
         else:
             whatsapp_business_account = site.whatsappbusinessaccount_set.all().first()
         if whatsapp_business_account:
-            refresh_template_data(whatsapp_business_account)
-            context['templates'] = whatsapp_business_account.active_templates
+            if whatsapp_business_account.site == site:
+                refresh_template_data(whatsapp_business_account)
+                context['templates'] = whatsapp_business_account.active_templates
+                context['whatsapp_business_account'] = whatsapp_business_account
         # context['site_list'] = get_available_sites_for_user(self.request.user)
         context['site'] = site
-        context['whatsapp_business_account'] = whatsapp_business_account
         context['whatsapp_business_accounts'] = WhatsappBusinessAccount.objects.filter(site=site)
         context['hide_show_all'] = True
         context['WHATSAPP_ORDER_CHOICES'] = WHATSAPP_ORDER_CHOICES

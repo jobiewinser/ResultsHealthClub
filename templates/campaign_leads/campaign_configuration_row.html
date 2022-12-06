@@ -59,7 +59,7 @@ id="submit_site_pk_{{campaign.pk}}"></button>
 </td>
 <td>
     <span hidden>{{campaign.color}}</span>   
-    <input type="color" id="color_{{campaign.pk}}"  name="color" class="form-control" style="min-height: 38.5px"
+    <input type="color" id="color_{{campaign.pk}}"  name="color" class="form-control" style="height: 38.5px; width: 52.5px;"
         hx-post="{% url 'campaign-assign-color' %}" hx-swap="innerHTML" 
         hx-trigger="change"
         hx-indicator=".top-htmx-indicator" 
@@ -67,9 +67,33 @@ id="submit_site_pk_{{campaign.pk}}"></button>
         hx-target="#row_{{campaign.pk}}"
             value="#{{campaign.color|rgb_to_hex_tuple_tag}}">
 </td>
-<td>         
-    <span hidden>{{campaign.campaign_category.name}}</span>           
-    
+<td>       
+    <div class="row">
+        <div class="col p-0">
+            <span hidden>{{campaign.campaign_category.name}}</span>           
+            <select class="form-select" name="campaign_category_pk" id="campaign_category_pk_{{campaign.pk}}" 
+                hx-post="{% url 'campaign-assign-campaign-category' %}" hx-swap="innerHTML" 
+                hx-trigger="change"
+                hx-indicator=".top-htmx-indicator" 
+                hx-vals='{"campaign_pk": "{{campaign.pk}}"}'
+                hx-target="#row_{{campaign.pk}}" >
+                <option value="">🚫</option>
+                {%for campaign_category in campaign.site.campaigncategory_set.all%}
+                <option {%if campaign.campaign_category.pk == campaign_category.pk %}selected{%endif%} value="{{campaign_category.pk}}">{{campaign_category.name}}</option>
+                {%endfor%}
+            </select>
+        </div>  
+        <div class="col-md-auto p-0 ps-1 mt-1">
+            <button class="btn btn-primary btn-sm" type="button"
+                data-bs-toggle="popover" 
+                data-bs-trigger="hover" 
+                data-bs-placement="top"
+                data-bs-title="What does this do?"
+                data-bs-content="Add a new campaign category"
+                onclick="htmx.ajax('GET', '{% url 'campaign-lead-get-modal-content' %}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'add_campaign_category', 'campaign_pk':'{{campaign.pk}}'}})"
+                >Add</button> 
+        </div>  
+    </div>  
 </td>
 <td >         
     <span hidden>{{campaign.whatsapp_business_account.pk}}</span>                   
