@@ -1,4 +1,4 @@
-from datetime import timedelta, datetime
+from datetime import datetime
 import uuid
 from django.db import models
 from django.contrib.auth.models import User
@@ -8,9 +8,9 @@ from whatsapp.models import WhatsAppMessage, WhatsappTemplate
 from django.dispatch import receiver
 from polymorphic.models import PolymorphicModel
 import logging
-from django.db.models import Q, Count
+from django.db.models import Q
 from django.template import loader
-from asgiref.sync import async_to_sync, sync_to_async
+from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 logger = logging.getLogger(__name__)
 

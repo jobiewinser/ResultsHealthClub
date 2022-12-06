@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
 from polymorphic.models import PolymorphicModel
-from core.models import Contact
 # Create your models here.
 
 class Message(PolymorphicModel):
@@ -23,7 +22,8 @@ class Message(PolymorphicModel):
     class Meta:
         ordering = ['-datetime']
     @property
-    def get_contact(self):        
+    def get_contact(self):     
+        from core.models import Contact   
         if self.contact:
             return self.contact
         self.contact = Contact.objects.filter(customer_number=self.customer_number).last()
