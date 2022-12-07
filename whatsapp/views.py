@@ -628,7 +628,7 @@ def set_whatsapp_site_config(request, **kwargs):
         site.whatsapp_access_token = request.POST.get('whatsapp_access_token')
         site.save()
         whatsapp = Whatsapp(site.whatsapp_access_token)
-        whatsapp_business_details = whatsapp.get_business()
+        whatsapp_business_details = whatsapp.get_business(site.company.whatsapp_app_business_id)
         return render(request, 'core/htmx/whatsapp_site_config_row.html', {'site':site, 'whatsapp_business_details':whatsapp_business_details})
     except Exception as e:        
         logger.error(f"set_whatsapp_template_sending_status {str(e)}")

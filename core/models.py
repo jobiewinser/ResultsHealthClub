@@ -502,6 +502,7 @@ class Company(models.Model):
     # whatsapp_enabled = models.BooleanField(default=False)
     # active_campaign_enabled = models.BooleanField(default=False)
     whatsapp_app_secret_key = models.TextField(blank=True, null=True)
+    whatsapp_app_business_id = models.TextField(blank=True, null=True)
     SUBSCRIPTION_CHOICES = (
                     ('free', 'Free'),
                     ('lite', 'Lite'),

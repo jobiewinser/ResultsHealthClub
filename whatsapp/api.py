@@ -23,7 +23,6 @@ class Whatsapp():
     whatsapp_url = os.getenv("WHATSAPP_URL")
     whatsapp_app_id = os.getenv("WHATSAPP_APP_ID")
     
-    whatsapp_business_id = os.getenv("WHATSAPP_BUSINESS_ID")
 
     def __init__(self, whatsapp_access_token):
         self.whatsapp_access_token = whatsapp_access_token
@@ -368,8 +367,8 @@ class Whatsapp():
         image = ImageFile(io.BytesIO(response.content), name=filename)  # << the answer!
         return image
             
-    def get_business(self):     
-        url = f"{self.whatsapp_url}/2121813794756425"
+    def get_business(self, whatsapp_business_id):     
+        url = f"{self.whatsapp_url}/{156326223677791}"
         headers = self._get_headers()
         response = requests.get(url=url, headers=headers)
         response_body = response.json()
