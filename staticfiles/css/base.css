@@ -37,7 +37,7 @@ body * {
 #page_load_indicator {
     height: 20%;
     width: 20%;
-    position: absolute;
+    position: fixed;
     top: 40%;
     left: 40%;
     z-index: 11111;
