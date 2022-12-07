@@ -85,6 +85,7 @@ if os.getenv('ENVIRONMENT') == 'development':
         os.path.join(BASE_DIR, "staticfiles"),
     )
     INTERNAL_IPS = ['127.0.0.1',]
+    WSGI_APPLICATION = 'WinserSystems.wsgi.application'
 
 else:
     ALLOWED_HOSTS = [os.getenv('ALLOWED_HOSTS'), '*']
@@ -97,6 +98,7 @@ else:
     STATICFILES_DIRS = (
         os.path.join(BASE_DIR, "staticfiles"),
     )
+    WSGI_APPLICATION = 'wsgi.application' #haven't testied this on prod yet, might be pointless?
 
 # if DEBUG:
 WHATSAPP_PHONE_OVERRIDE1=None
@@ -129,6 +131,7 @@ INSTALLED_APPS = [
     'channels',
     'hijack',
     'hijack.contrib.admin',
+    "django_extensions",
 ]
 
 MIDDLEWARE = [
@@ -163,7 +166,6 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 

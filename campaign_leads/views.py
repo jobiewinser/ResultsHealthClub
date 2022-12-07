@@ -61,7 +61,9 @@ class CampaignleadsOverviewView(TemplateView):
             return super().get(request, *args, **kwargs)
         except Exception as e:        
             logger.error(f"get_campaigns {str(e)}")
-            return HttpResponse("Couldn't archived Campaign Leads Overview request", status=500)
+            if request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+                return HttpResponse("Couldn't access Campaign Leads Overview request", status=500)
+            raise e
 
     def get_context_data(self, **kwargs):    
         context = super(CampaignleadsOverviewView, self).get_context_data(**kwargs)  
