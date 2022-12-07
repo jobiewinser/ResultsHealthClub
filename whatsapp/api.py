@@ -368,7 +368,7 @@ class Whatsapp():
         return image
             
     def get_business(self, whatsapp_business_id):     
-        url = f"{self.whatsapp_url}/{156326223677791}"
+        url = f"{self.whatsapp_url}/{whatsapp_business_id}"
         headers = self._get_headers()
         response = requests.get(url=url, headers=headers)
         response_body = response.json()
