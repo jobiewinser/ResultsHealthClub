@@ -116,6 +116,9 @@ class Campaignlead(models.Model):
     def __str__(self):
         return self.name
     @property
+    def ordered_bookings(self):  
+        return self.booking_set.all().order_by('-datetime')
+    @property
     def get_product_cost(self):  
         if self.product_cost:
             return self.product_cost      
@@ -466,8 +469,8 @@ class Booking(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     calendly_event_uri = models.TextField(null=True, blank=True)
     archived = models.BooleanField(default=False)
-    class Meta:
-        ordering = ['-datetime']
+    # class Meta:
+    #     ordering = ['-datetime']
 
 class Note(models.Model):
     text = models.TextField(null=False, blank=False)
