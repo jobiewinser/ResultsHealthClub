@@ -2,24 +2,48 @@
     {%if site_webhook_active%}
         <b style="color:green">Active</b>
         <br>
-        <button class="btn btn-danger ms-3" {%if not request.user.profile.role == 'a'%}disabled{%endif%}
-            hx-indicator=".top-htmx-indicator" hx-target="#calendly_webhook_status_wrapper" 
-            hx-vals='{"site_pk": "{{site.pk}}"}'
-            hx-post="{% url 'delete-calendly-webhook-subscription' %}" 
-            hx-push-url="false"
-            hx-swap="outerHTML" hx-trigger="click">
-                <i class="fa-solid fa-trash" aria-hidden="true"></i> Delete Calendly Webhook
-        </button>
+        <span 
+            {%if not user_allowed_to_edit_site_configuration%}
+            data-bs-toggle="popover" 
+            data-bs-trigger="hover" 
+            data-bs-html="true" 
+            data-bs-placement="top"
+            data-bs-title="Delete Calendly Webhook"
+            data-bs-content="
+                You do not have permission to edit this field: Edit Site Configuration
+            "{%endif%}>
+            <button class="btn btn-danger ms-3" {%if not request.user.profile.role == 'a'%}disabled{%endif%}
+                {%if not user_allowed_to_edit_site_configuration%}disabled{%endif%}
+                hx-indicator=".top-htmx-indicator" hx-target="#calendly_webhook_status_wrapper" 
+                hx-vals='{"site_pk": "{{site.pk}}"}'
+                hx-post="{% url 'delete-calendly-webhook-subscription' %}" 
+                hx-push-url="false"
+                hx-swap="outerHTML" hx-trigger="click">
+                    <i class="fa-solid fa-trash" aria-hidden="true"></i> Delete Calendly Webhook
+            </button>
+        </span>
     {%else%}
         <b style="color:red">Inactive</b> 
         <br>
-        <button class="btn btn-secondary mt-2" {%if not request.user.profile.role == 'a'%}disabled{%endif%}
-            hx-indicator=".top-htmx-indicator" hx-target="#calendly_webhook_status_wrapper" 
-            hx-vals='{"site_pk": "{{site.pk}}"}'
-            hx-post="{% url 'create-calendly-webhook-subscription' %}" 
-            hx-push-url="false"
-            hx-swap="outerHTML" hx-trigger="click">
-                <i class="fa-solid fa-link" aria-hidden="true"></i> Create Calendly Webhook
-        </button>
+        <span 
+            {%if not user_allowed_to_edit_site_configuration%}disabled
+            data-bs-toggle="popover" 
+            data-bs-trigger="hover" 
+            data-bs-html="true" 
+            data-bs-placement="top"
+            data-bs-title="Create Calendly Webhook"
+            data-bs-content="
+                You do not have permission to edit this field: Edit Site Configuration
+            "{%endif%}>
+            <button class="btn btn-secondary mt-2" {%if not request.user.profile.role == 'a'%}disabled{%endif%}
+                {%if not user_allowed_to_edit_site_configuration%}disabled{%endif%}
+                hx-indicator=".top-htmx-indicator" hx-target="#calendly_webhook_status_wrapper" 
+                hx-vals='{"site_pk": "{{site.pk}}"}'
+                hx-post="{% url 'create-calendly-webhook-subscription' %}" 
+                hx-push-url="false"
+                hx-swap="outerHTML" hx-trigger="click">
+                    <i class="fa-solid fa-link" aria-hidden="true"></i> Create Calendly Webhook
+            </button>
+        </span>
     {%endif%}
 </span>
