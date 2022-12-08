@@ -40,9 +40,9 @@ transition-duration: 0.5s;
 }
 
 .chat_card_body {
-    height: 350px;
+    height: 385px;
     overflow-y: scroll;
-    margin-bottom: 50px;
+    margin-bottom: 85px;
     /* scroll-behavior: smooth; */
     overflow-anchor: none;
 }

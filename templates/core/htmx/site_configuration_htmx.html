@@ -2,10 +2,8 @@
 {%load static tz core_tags%}
 <span>    
     <script>
-        $(document).ready(function() {  
-            console.log("$(document).ready")
-            $("[data-bs-toggle=popover]").popover();
-            {% comment %} renderTemplate() {% endcomment %}
+        $(document).ready(function() {
+            document.title = "Site Configuration";
         });
     </script>
     <div class="row mt-0">

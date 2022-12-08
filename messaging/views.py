@@ -9,7 +9,7 @@ from core.user_permission_functions import get_allowed_site_chats_for_user, get_
 from core.views import get_site_pk_from_request
 from whatsapp.models import WhatsAppMessage, WhatsappMessageImage
 from django.contrib.auth.decorators import login_required
-
+from core.templatetags.core_tags import seconds_until_hours_passed
 from django.utils.decorators import method_decorator
 import logging
 logger = logging.getLogger(__name__)
@@ -39,10 +39,17 @@ def message_list(request, **kwargs):
 @login_required
 def message_window(request, **kwargs):
     whatsappnumber = WhatsappNumber.objects.get(pk=kwargs.get('whatsappnumber_pk'))
-    messages = WhatsAppMessage.objects.filter(customer_number=kwargs.get('customer_number'), whatsappnumber=whatsappnumber).order_by('-datetime')[:10:-1]
+    all_messages = WhatsAppMessage.objects.filter(customer_number=kwargs.get('customer_number'), whatsappnumber=whatsappnumber)
     # messages = WhatsAppMessage.objects.filter(customer_number=kwargs.get('customer_number'), whatsappnumber=whatsappnumber).order_by('-datetime')[:20:-1]
     context = {}
-    context["messages"] = messages
+    context["messages"] = all_messages.order_by('-datetime')[:10:-1]
+    last_customer_message = all_messages.filter(inbound=True).last()
+    if last_customer_message:
+        seconds_until_send_disabled = seconds_until_hours_passed(last_customer_message.datetime, 24)
+        if seconds_until_send_disabled:
+            if seconds_until_send_disabled > 3:
+                context["seconds_until_send_disabled"]
+    
     if get_user_allowed_to_use_site_messaging(request.user, whatsappnumber.site):
         context["lead"] = Campaignlead.objects.filter(whatsapp_number=kwargs.get('customer_number')).last()
         context["contact"] = Contact.objects.filter(customer_number=kwargs.get('customer_number')).last()

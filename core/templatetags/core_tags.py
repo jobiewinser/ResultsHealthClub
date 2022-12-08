@@ -3,6 +3,7 @@ from django import template
 from datetime import datetime, timedelta
 import time
 import calendar
+import uuid
 
 from dateutil import relativedelta
 from django.conf import settings
@@ -14,6 +15,9 @@ import math
 def roundup(x, round_target):
     return int(int(math.ceil(x / round_target)) * round_target)
 
+@register.filter
+def generate_uuid_tag(anything):
+    return uuid.uuid4()
 @register.filter
 def split_tag(string, split_var):
     return string.split(split_var)
@@ -60,6 +64,16 @@ def sum_cost_tag(queryset_or_list):
         return total_cost
     except:
         return "Error"
+        
+def seconds_until_hours_passed(dt, hours):
+    try:        
+        return math.floor((dt + timedelta(hours=hours) - datetime.now()).total_seconds())
+    except:
+        return 0
+
+@register.filter
+def seconds_until_hours_passed_tag(dt, hours):
+    return seconds_until_hours_passed(dt, hours)
 
 @register.filter
 def percentage_to_opacity(percentage, average_out_opacity=0.9):
