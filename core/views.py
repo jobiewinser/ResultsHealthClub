@@ -101,12 +101,24 @@ class SiteConfigurationView(TemplateView):
                 calendly_webhooks = calendly.list_webhook_subscriptions(organization = site.calendly_organization).get('collection')
                 print("calendly_webhooks", calendly_webhooks)
                 if calendly_webhooks:
+                    site_webhook_disabled = False
                     for webhook in calendly_webhooks:
                         if webhook.get('state') == 'active' \
                         and webhook.get('callback_url') == f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/" \
                         and webhook.get('organization') == f"{os.getenv('CALENDLY_URL')}/organizations/{site.calendly_organization}":
                             site_webhook_active = True
                             break
+                        elif webhook.get('state') == 'disabled' \
+                        and webhook.get('callback_url') == f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/" \
+                        and webhook.get('organization') == f"{os.getenv('CALENDLY_URL')}/organizations/{site.calendly_organization}":
+                            active_webhook_uuid = webhook.get('uri').replace(f"{os.getenv('CALENDLY_URL')}/webhook_subscriptions/", "")
+                            calendly.delete_webhook_subscriptions(webhook_guuid = active_webhook_uuid)
+                            site_webhook_disabled = True
+                            break
+                    if site_webhook_disabled:
+                        response = calendly.create_webhook_subscription(site.guid, organization = site.calendly_organization)
+                        site_webhook_active = True
+
             context['site'] = site
             context['site_webhook_active'] = site_webhook_active
             if site.whatsapp_access_token:
