@@ -10,21 +10,20 @@
             <input type="time" id="booking_time" placeholder="hh:mm" name="booking_time" class="form-control booking_input" {%if debug%}value="{{''|prefill_time_input_with_now}}"{%endif%}>
         </div>
 
-        <div class="m-3 row" style="text-align:left; margin-left:0px !important; min-width:300px;">
+        {% comment %} <div class="m-3 row" style="text-align:left; margin-left:0px !important; min-width:300px;">
             <div class="col right">
                 <span id="booking-type-span-one">Phone</span>
-            </div>
-
-            {% comment %} <div class="col-md-auto p-0">
+            </div> 
+            <div class="col-md-auto p-0">
                 <div class="form-check form-switch">
                     <input class="form-check-input booking_input" name="booking_type" checked type="checkbox" id="booking-type">
                 </div>
-            </div> {% endcomment %}
+            </div> 
 
             <div class="col" style="text-align:left; padding-left:5px">
                 In Person
             </div>
-        </div>
+        </div> {% endcomment %}
         <div class="m-3">
             <label class="form-label custom-badge-label" for="time_occurred">Notes</label>
             <textarea rows=5 type="time" style="width:100%" id="time_occurred" 
