@@ -99,6 +99,7 @@ class SiteConfigurationView(TemplateView):
             site_webhook_active = False
             if site.calendly_organization:
                 calendly_webhooks = calendly.list_webhook_subscriptions(organization = site.calendly_organization).get('collection')
+                print("calendly_webhooks", calendly_webhooks)
                 if calendly_webhooks:
                     for webhook in calendly_webhooks:
                         if webhook.get('state') == 'active' \
