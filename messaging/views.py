@@ -39,16 +39,16 @@ def message_list(request, **kwargs):
 @login_required
 def message_window(request, **kwargs):
     whatsappnumber = WhatsappNumber.objects.get(pk=kwargs.get('whatsappnumber_pk'))
-    all_messages = WhatsAppMessage.objects.filter(customer_number=kwargs.get('customer_number'), whatsappnumber=whatsappnumber)
+    all_messages = WhatsAppMessage.objects.filter(customer_number=kwargs.get('customer_number'), whatsappnumber=whatsappnumber).order_by('-datetime')
     # messages = WhatsAppMessage.objects.filter(customer_number=kwargs.get('customer_number'), whatsappnumber=whatsappnumber).order_by('-datetime')[:20:-1]
     context = {}
-    context["messages"] = all_messages.order_by('-datetime')[:10:-1]
-    last_customer_message = all_messages.filter(inbound=True).last()
+    context["messages"] = all_messages[:10:-1]
+    last_customer_message = all_messages.filter(inbound=True).first()
     if last_customer_message:
         seconds_until_send_disabled = seconds_until_hours_passed(last_customer_message.datetime, 24)
         if seconds_until_send_disabled:
             if seconds_until_send_disabled > 3:
-                context["seconds_until_send_disabled"]
+                context["seconds_until_send_disabled"] = seconds_until_send_disabled
     
     if get_user_allowed_to_use_site_messaging(request.user, whatsappnumber.site):
         context["lead"] = Campaignlead.objects.filter(whatsapp_number=kwargs.get('customer_number')).last()
