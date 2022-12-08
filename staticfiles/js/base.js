@@ -131,6 +131,8 @@ function basehandlehtmxafterRequest(evt){
         snackbarShow('Error: '+evt.detail.xhr.response, 'danger', display_ms=5000)           
     }else if (status == 400){
         snackbarShow('Error: '+evt.detail.xhr.response, 'danger', display_ms=5000)           
+    }else if (status == 403){
+        snackbarShow('You are not permitted to perform this action: '+evt.detail.xhr.response, 'danger', display_ms=5000)           
     }
 }
 

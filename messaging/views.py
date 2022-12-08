@@ -67,7 +67,8 @@ def get_messaging_list_row(request, **kwargs):
         return render(request, "messaging/htmx/message_list_row.html", {'site':site, 'message':message})   
     except Exception as e:
         logger.debug("get_messaging_list_row Error "+str(e))
-        return HttpResponse(e, status=500)
+        #return HttpResponse(e, status=500)
+        raise e
 
 @login_required
 def send_first_template_whatsapp_lead_article_htmx(request, **kwargs):
@@ -76,7 +77,7 @@ def send_first_template_whatsapp_lead_article_htmx(request, **kwargs):
     return HttpResponse('', status=200)
     # except Exception as e:
     #     logger.debug("send_first_template_whatsapp_htmx Error "+str(e))
-    #     return HttpResponse(e, status=500)
+    #     #return HttpResponse(e, status=500)
 
 @login_required
 def send_first_template_whatsapp_booking_row_htmx(request, **kwargs):
@@ -84,7 +85,8 @@ def send_first_template_whatsapp_booking_row_htmx(request, **kwargs):
         return render(request, "campaign_leads/htmx/campaign_booking_row_htmx.html", send_first_template_whatsapp(request, kwargs))
     except Exception as e:
         logger.debug("send_first_template_whatsapp_htmx Error "+str(e))
-        return HttpResponse(e, status=500)
+        #return HttpResponse(e, status=500)
+        raise e
 
 @login_required
 def send_first_template_whatsapp(request, kwargs):
@@ -135,7 +137,8 @@ def get_modal_content(request, **kwargs):
             return render(request, f"messaging/htmx/{template_name}.html", context)   
     except Exception as e:
         logger.debug("get_modal_content Error "+str(e))
-        return HttpResponse(e, status=500)
+        #return HttpResponse(e, status=500)
+        raise e
 
 
 @login_required
@@ -152,7 +155,8 @@ def get_message_list_body(request, **kwargs):
         return render(request, "messaging/htmx/message_list_body.html", context)   
     except Exception as e:
         logger.debug("get_more_messages Error "+str(e))
-        return HttpResponse(e, status=500)
+        #return HttpResponse(e, status=500)
+        raise e
 
 @login_required
 def get_more_message_list_rows(request, **kwargs):
@@ -165,7 +169,8 @@ def get_more_message_list_rows(request, **kwargs):
         return render(request, "messaging/htmx/message_list_rows.html", context)   
     except Exception as e:
         logger.debug("get_more_messages Error "+str(e))
-        return HttpResponse(e, status=500)
+        #return HttpResponse(e, status=500)
+        raise e
 
 @login_required
 def get_more_message_chat_rows(request):
@@ -181,25 +186,9 @@ def get_more_message_chat_rows(request):
         return render(request, "messaging/message_window_message_rows.html", context)   
     except Exception as e:
         logger.debug("get_more_messages Error "+str(e))
-        return HttpResponse(e, status=500)
-
-# @login_required
-# def get_more_messages(request, **kwargs):
-#     try:
-#         context = {}
-#         rendered_html = ""
-#         whatsappnumber = WhatsappNumber.objects.get(pk=request.GET.get('whatsappnumber_pk'))
-#         customer_number = request.GET.get('customer_number')
-#         created_before_date = datetime.fromtimestamp(float(request.GET.get('created_before_date')))
-#         context['customer_number'] = customer_number
-#         context['whatsappnumber'] = whatsappnumber
-#         context['created_before_date'] = created_before_date
+        #return HttpResponse(e, status=500)
+        raise e
         
-#         context['messages'] = WhatsAppMessage.objects.filter(customer_number=customer_number, whatsappnumber=whatsappnumber, datetime__lt=created_before_date).order_by('-datetime')[:10:-1]   
-#         return render(request, "messaging/htmx/message_list_htmx.html", context)   
-#     except Exception as e:
-#         logger.debug("get_more_messages Error "+str(e))
-#         return HttpResponse(e, status=500)
 
 @login_required
 def clear_chat_from_session(request):
@@ -208,30 +197,7 @@ def clear_chat_from_session(request):
     except Exception as e:
         print("clear_chat_from_session error", str(e))
     return HttpResponse("", "text", 200)
-        
-# from django.contrib.auth.decorators import login_required
-# @login_required
-# def add_chat_whatsapp_number_to_session(request):
-#     try:
-#         request.session['open_chat_whatsapp_number'] = request.POST.get('whatsappnumber_pk')
-#     except Exception as e:
-#         print("add_chat_whatsapp_number_to_session error", str(e))
-#     return HttpResponse("", "text", 200)
-# from django.contrib.auth.decorators import login_required
-# @login_required
-# def add_chat_conversation_to_session(request):
-#     try:
-#         request.session['open_chat_whatsapp_number'] = request.POST.get('whatsappnumber_pk')
-#         if not request.session.get('open_chat_conversation_customer_number', []):
-#             request.session['open_chat_conversation_customer_number'] = [request.POST.get('customer_number')]
-#         elif not request.POST.get('customer_number') in request.session.get('open_chat_conversation_customer_number', []):
-#             request.session['open_chat_conversation_customer_number'].append(request.POST.get('customer_number'))
-#         print("add_chat_conversation_to_session current open_chat_whatsapp_number", str(request.session['open_chat_whatsapp_number']) )
-#         print("add_chat_conversation_to_session current open_chat_conversation_customer_number", str(request.session['open_chat_conversation_customer_number']) )
-#     except Exception as e:
-#         print("add_chat_conversation_to_session error", str(e))
-#     return HttpResponse("", "text", 200)
-
+    
 
 
 @method_decorator(login_required, name='dispatch')

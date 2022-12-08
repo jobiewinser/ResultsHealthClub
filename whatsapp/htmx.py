@@ -38,4 +38,5 @@ def get_modal_content(request, **kwargs):
             return render(request, f"whatsapp/htmx/{template_name}.html", context)   
     except Exception as e:
         logger.debug("get_modal_content Error "+str(e))
-        return HttpResponse(e, status=500)
+        #return HttpResponse(e, status=500)
+        raise e

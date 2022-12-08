@@ -1,0 +1,78 @@
+{%load static%}
+    <div class="row">        
+        <div class="col">
+            <div class="form-check form-switch">
+                <label> View Site Configuration</label> 
+                <input class="form-check-input" name="view_site_configuration" type="checkbox"
+                    hx-post="{%url 'site-permissions'%}" 
+                    hx-target="#site_permissions_wrapper" 
+                    hx-trigger="input delay:0.3s" 
+                    hx-indicator="#htmx-indicator-site-permissions" 
+                    hx-vals='{"permissions_pk": "{{permissions.pk}}"}'               
+                    {%if permissions.view_site_configuration%}checked{%endif%}                >
+            </div>
+        </div>
+    </div>
+    <div class="row">        
+        <div class="col">
+            <div class="form-check form-switch">
+                <label> Edit Site Configuration</label> 
+                <input class="form-check-input" name="edit_site_configuration" type="checkbox"
+                    hx-post="{%url 'site-permissions'%}" 
+                    hx-target="#site_permissions_wrapper" 
+                    hx-trigger="input delay:0.3s" 
+                    hx-indicator="#htmx-indicator-site-permissions" 
+                    hx-vals='{"permissions_pk": "{{permissions.pk}}"}'               
+                    {%if permissions.edit_site_configuration%}checked{%endif%}                >
+            </div>
+        </div>
+    </div>
+    <div class="row">        
+        <div class="col">
+            <div class="form-check form-switch">
+                <label> Edit Whatsapp Settings</label> 
+                <input class="form-check-input" name="edit_whatsapp_settings" type="checkbox"
+                    hx-post="{%url 'site-permissions'%}" 
+                    hx-target="#site_permissions_wrapper" 
+                    hx-trigger="input delay:0.3s" 
+                    hx-indicator="#htmx-indicator-site-permissions" 
+                    hx-vals='{"permissions_pk": "{{permissions.pk}}"}'               
+                    {%if permissions.edit_whatsapp_settings%}checked{%endif%}                >
+            </div>
+        </div>
+    </div>
+    <div class="row">        
+        <div class="col">
+            <div class="form-check form-switch">
+                <label> Toggle Active Campaign/label> 
+                <input class="form-check-input" name="toggle_active_campaign" type="checkbox"
+                    hx-post="{%url 'site-permissions'%}" 
+                    hx-target="#site_permissions_wrapper" 
+                    hx-trigger="input delay:0.3s" 
+                    hx-indicator="#htmx-indicator-site-permissions" 
+                    hx-vals='{"permissions_pk": "{{permissions.pk}}"}'               
+                    {%if permissions.toggle_active_campaign%}checked{%endif%}                >
+            </div>
+        </div>
+    </div>
+    <div class="row">        
+        <div class="col">
+            <div class="form-check form-switch">
+                <label> Edit User Permissions</label> 
+                <input class="form-check-input" name="edit_user_permissions" type="checkbox"
+                    hx-post="{%url 'site-permissions'%}" 
+                    hx-target="#site_permissions_wrapper" 
+                    hx-trigger="input delay:0.3s" 
+                    hx-indicator="#htmx-indicator-site-permissions" 
+                    hx-vals='{"permissions_pk": "{{permissions.pk}}"}'               
+                    {%if permissions.edit_user_permissions%}checked{%endif%}                >
+            </div>
+        </div>
+    </div>
+    {%if error%}    
+    <div class="row">        
+        <div class="col">
+            <p class="alert alert-danger">{{error}}</p>
+        </div>
+    </div>
+    {%endif%}  

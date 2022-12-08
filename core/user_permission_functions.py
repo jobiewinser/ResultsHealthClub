@@ -14,6 +14,32 @@ def get_available_sites_for_user(user):
         return profile.sites_allowed.all()
     return Site.objects.none()
 
+def get_user_allowed_to_toggle_active_campaign(profile, site):
+    permissions = SiteProfilePermissions.objects.filter(profile=profile, site=site).first()
+    if permissions:
+        return permissions.toggle_active_campaign
+    return False
+def get_user_allowed_to_edit_whatsapp_settings(profile, site):
+    permissions = SiteProfilePermissions.objects.filter(profile=profile, site=site).first()
+    if permissions:
+        return permissions.edit_whatsapp_settings
+    return False
+def get_user_allowed_to_edit_site_configuration(profile, site):
+    permissions = SiteProfilePermissions.objects.filter(profile=profile, site=site).first()
+    if permissions:
+        return permissions.edit_site_configuration
+    return False
+def get_user_allowed_to_edit_other_user_permissions(profile, site):
+    permissions = SiteProfilePermissions.objects.filter(profile=profile, site=site).first()
+    if permissions:
+        return permissions.edit_user_permissions
+    return False
+
+
+
+
+
+
 def get_user_allowed_to_edit_whatsappnumber(user, whatsappnumber):
     #TODO
     return True
@@ -29,22 +55,6 @@ def get_user_allowed_to_use_site_messaging(user, site):
 def get_user_allowed_to_use_site_analytics(user, site):
     #TODO
     return True
-
-def get_user_allowed_to_toggle_whatsapp_template_sending(profile, site):
-    permissions = SiteProfilePermissions.objects.filter(profile=profile, site=site).first()
-    if permissions:
-        return permissions.toggle_whatsapp_template_sending
-    return False
-def get_user_allowed_to_edit_site_configuration(profile, site):
-    permissions = SiteProfilePermissions.objects.filter(profile=profile, site=site).first()
-    if permissions:
-        return permissions.edit_site_configuration
-    return False
-def get_user_allowed_to_view_site_configuration(profile, site):
-    permissions = SiteProfilePermissions.objects.filter(profile=profile, site=site).first()
-    if permissions:
-        return permissions.view_site_configuration
-    return False
 
 def get_allowed_site_chats_for_user(user):
     #TODO

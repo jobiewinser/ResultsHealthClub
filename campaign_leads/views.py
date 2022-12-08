@@ -260,7 +260,8 @@ def new_call(request, **kwargs):
             # return render(request, 'campaign_leads/htmx/lead_article.html', {'lead':lead,'max_call_count':kwargs.get('max_call_count', 1), 'call_count':call_count})
     except Exception as e:
         logger.debug("new_call Error "+str(e))
-        return HttpResponse(e, status=500)
+        #return HttpResponse(e, status=500)
+        raise e
 
 
 
@@ -344,4 +345,5 @@ def toggle_claim_lead(request, **kwargs):
         return HttpResponse("", status=500)
     except Exception as e:
         logger.debug("get_leads_column_meta_data Error "+str(e))
-        return HttpResponse(e, status=500)
+        #return HttpResponse(e, status=500)
+        raise e

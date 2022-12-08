@@ -62,7 +62,9 @@ def get_modal_content(request, **kwargs):
             return render(request, f"campaign_leads/htmx/{template_name}.html", context)   
     except Exception as e:
         logger.debug("get_modal_content Error "+str(e))
-        return HttpResponse(e, status=500)
+        #return HttpResponse(e, status=500)
+        raise e
+        
 
 
 
@@ -163,7 +165,8 @@ def get_leads_column_meta_data(request, **kwargs):
         return render(request, 'campaign_leads/htmx/column_metadata_htmx.html', {'querysets':querysets})
     except Exception as e:
         logger.debug("get_leads_column_meta_data Error "+str(e))
-        return HttpResponse(e, status=500)
+        #return HttpResponse(e, status=500)
+        raise e
 @login_required
 def refresh_lead_article(request, **kwargs):
     logger.debug(str(request.user))
@@ -172,7 +175,8 @@ def refresh_lead_article(request, **kwargs):
         return render(request, 'campaign_leads/htmx/lead_article.html', {'lead':lead, 'max_call_count':0})
     except Exception as e:
         logger.debug("get_leads_column_meta_data Error "+str(e))
-        return HttpResponse(e, status=500)
+        #return HttpResponse(e, status=500)
+        raise e
 @login_required
 def refresh_booking_row(request, **kwargs):
     logger.debug(str(request.user))
@@ -181,7 +185,8 @@ def refresh_booking_row(request, **kwargs):
         return render(request, 'campaign_leads/htmx/campaign_booking_row_htmx.html', {'lead':lead})
     except Exception as e:
         logger.debug("get_leads_column_meta_data Error "+str(e))
-        return HttpResponse(e, status=500)
+        #return HttpResponse(e, status=500)
+        raise e
 
 
 @login_required
@@ -231,7 +236,8 @@ def add_manual_booking(request, **kwargs):
         return HttpResponse("", status=200)
     except Exception as e:
         logger.debug("add_manual_booking Error "+str(e))
-        return HttpResponse(e, status=500)
+        #return HttpResponse(e, status=500)
+        raise e
 
 
 @login_required
@@ -252,7 +258,8 @@ def mark_archived(request, **kwargs):
             return render(request, "campaign_leads/htmx/campaign_booking_row.html", {'lead':lead}) 
     except Exception as e:
         logger.debug("mark_archived Error "+str(e))
-        return HttpResponse(e, status=500)
+        #return HttpResponse(e, status=500)
+        raise e
 
 
 @login_required
@@ -267,7 +274,8 @@ def new_leads_column(request, **kwargs):
             return render(request, 'campaign_leads/htmx/lead_columns.html', {'querysets':querysets, 'max_call_count':max_call_count-1})
     except Exception as e:
         logger.debug("new_call Error "+str(e))
-        return HttpResponse(e, status=500)
+        #return HttpResponse(e, status=500)
+        raise e
 
 
 @login_required
@@ -281,7 +289,8 @@ def delete_lead(request, **kwargs):
             return HttpResponse("", "text", 200)
     except Exception as e:
         logger.debug("mark_archived Error "+str(e))
-        return HttpResponse(e, status=500)
+        #return HttpResponse(e, status=500)
+        raise e
 
 @login_required
 def mark_arrived(request, **kwargs):
@@ -294,7 +303,8 @@ def mark_arrived(request, **kwargs):
             return render(request, "campaign_leads/htmx/campaign_booking_row.html", {'lead':lead}) 
     except Exception as e:
         logger.debug("mark_archived Error "+str(e))
-        return HttpResponse(e, status=500)
+        #return HttpResponse(e, status=500)
+        raise e
 
 
 @login_required
@@ -317,7 +327,8 @@ def mark_sold(request, **kwargs):
             return render(request, "campaign_leads/htmx/campaign_booking_row.html", {'lead':lead}) 
     except Exception as e:
         logger.debug("mark_archived Error "+str(e))
-        return HttpResponse(e, status=500)
+        #return HttpResponse(e, status=500)
+        raise e
 
 @login_required
 def create_lead_note(request, **kwargs):
@@ -338,41 +349,6 @@ def create_lead_note(request, **kwargs):
             return HttpResponse(str(lead.pk), status=200)
     except Exception as e:
         logger.debug("mark_archived Error "+str(e))
-        return HttpResponse(e, status=500)
-        
-# @login_required
-# def test_whatsapp_message(request, **kwargs):
-#     logger.debug(str(request.user))
-#     try:
-#         if request.user.is_authenticated:
-#             lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'))
-#             lead.send_whatsapp_message('testing api', request.user)
-#             return render(request, "campaign_leads/htmx/campaign_booking_row.html", {'lead':lead}) 
-#     except Exception as e:
-#         logger.debug("mark_archived Error "+str(e))
-# #         return HttpResponse(e, status=500)
-# @login_required
-# def template_editor(request, **kwargs):
-#     logger.debug(str(request.user))
-#     try:
-#         if request.user.is_authenticated:
-#             template = WhatsappTemplate.objects.get(pk=request.GET.get('template_pk'))
-#             return render(request, "campaign_leads/htmx/template_editor.html", {'template':template}) 
-#     except Exception as e:
-#         logger.debug("mark_archived Error "+str(e))
-#         return HttpResponse(e, status=500)
-
-# @login_required
-# def template_save(request, **kwargs):
-#     logger.debug(str(request.user))
-#     try:
-#         if request.user.is_authenticated:
-#             template = WhatsappTemplate.objects.get(pk=request.POST.get('template_pk'))
-#             template.text = request.POST.get('template_text')
-#             template.save()
-#             return render(request, "campaign_leads/htmx/template_editor.html", {'template':template}) 
-#     except Exception as e:
-#         logger.debug("mark_archived Error "+str(e))
-#         return HttpResponse(e, status=500)
-
+        #return HttpResponse(e, status=500)
+        raise e
         

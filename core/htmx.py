@@ -18,20 +18,6 @@ from django.http import QueryDict
 from campaign_leads.models import Campaignlead
 logger = logging.getLogger(__name__)
 
-# @login_required
-# def switch_user(request, **kwargs):
-#     logger.debug(str(request.user))
-#     try:
-#         if request.user.is_authenticated:
-#             user_pk = request.POST.get('user_pk')
-#             if type(user_pk) == list:
-#                 user_pk = user_pk[0]
-#             logger.debug(f"TEST {str(user_pk)}")
-#             login(request, User.objects.get(pk=user_pk))
-#             return render(request, f"core/htmx/profile-nav-section.html", {})   
-#     except Exception as e:
-#         logger.debug("switch_user Error "+str(e))
-#         return HttpResponse(e, status=500)
 
 @login_required
 def get_modal_content(request, **kwargs):
@@ -41,6 +27,7 @@ def get_modal_content(request, **kwargs):
         site_pk = get_site_pk_from_request(request)
         if site_pk:
             request.GET['site_pk'] = site_pk
+            context["site"] = Site.objects.get(pk=site_pk)
         if request.user.is_authenticated:
             template_name = request.GET.get('template_name', '')
             # context = {'site_list':get_available_sites_for_user(request.user)}
@@ -58,6 +45,8 @@ def get_modal_content(request, **kwargs):
                 site_pk = request.GET.get('site_pk', None)
                 if site_pk:
                     context["site"] = Site.objects.get(pk=site_pk)
+            elif template_name == 'add_user':
+                context['role_choices'] = ROLE_CHOICES                 
             elif template_name == 'send_new_template_message':
                 whatsappnumber_pk = request.GET.get('whatsappnumber_pk', None)
                 context['whatsappnumber'] = WhatsappNumber.objects.get(pk=whatsappnumber_pk)
@@ -76,7 +65,8 @@ def get_modal_content(request, **kwargs):
             return render(request, f"campaign_leads/htmx/{template_name}.html", context)   
     except Exception as e:
         logger.debug("get_modal_content Error "+str(e))
-        return HttpResponse(e, status=500)
+        #return HttpResponse(e, status=500)
+        raise e
 
 
 @method_decorator(login_required, name="dispatch")
@@ -88,8 +78,15 @@ class ModifyUser(View):
                 first_name = request.POST.get('first_name', '')
                 last_name = request.POST.get('last_name', '')
                 password = request.POST.get('password', '')
+                role = request.POST.get('role', '')
+                if not first_name:
+                    return HttpResponse("Please enter a First Name", status=400)
+                if not password:
+                    return HttpResponse("Please enter a Password", status=400)
+                if not role:
+                    return HttpResponse("Please enter a Role", status=400)
                 profile_picture = request.FILES.get('profile_picture')
-                # site_pk = request.POST.get('site_pk', '')
+                site = Site.objects.get(pk=request.POST.get('site_pk', ''))
                 # calendly_event_page_url = request.POST.get('calendly_event_page_url', '')
                 username = f"{first_name}{last_name}"
                 index = 0
@@ -102,7 +99,9 @@ class ModifyUser(View):
                                             password=password)
                 Profile.objects.create(user = user, 
                                         avatar = profile_picture, 
-                                        company = request.user.profile.company)
+                                        company = request.user.profile.company, 
+                                        role = role, 
+                                        site = site)
             elif action == 'edit':       
                 user = User.objects.get(pk=request.POST['user_pk'])   
                 profile = Profile.objects.get_or_create(user = user)[0] 
@@ -133,7 +132,8 @@ class ModifyUser(View):
             return render(request, "core/htmx/company_configuration_row.html", context)   
         except Exception as e:
             logger.debug("ModifyUser Post Error "+str(e))
-            return HttpResponse(e, status=500)
+            #return HttpResponse(e, status=500)
+            raise e
 @login_required
 def create_calendly_webhook_subscription(request, **kwargs):
     site = Site.objects.get(pk=request.POST.get('site_pk'))    
@@ -193,7 +193,8 @@ def generate_free_taster_link(request, **kwargs):
                 return render(request, f"core/htmx/generated_link_display.html", {'generated_link':generated_link})  
     except Exception as e:
         logger.debug("generate_free_taster_link Error "+str(e))
-        return HttpResponse(e, status=500)
+        #return HttpResponse(e, status=500)
+        raise e
 
 
 @login_required
@@ -207,7 +208,8 @@ def delete_free_taster_link(request, **kwargs):
             return HttpResponse("", "text", 200)
     except Exception as e:
         logger.debug("delete_free_taster_link Error "+str(e))
-        return HttpResponse(e, status=500)
+        #return HttpResponse(e, status=500)
+        raise e
 
 
         

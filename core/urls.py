@@ -52,6 +52,7 @@ urlpatterns = [
     # path('configuration/', coreviews.ConfigurationView.as_view(), name='configuration'),  
 
     path('profile-incorrectly-configured/', coreviews.ProfileIncorrectlyConfiguredView.as_view(), name='profile-incorrectly-configured'),  
+    path('configuration/site-permissions/', coreviews.SitePermissionsView.as_view(), name='site-permissions'),  
 
     
 ]

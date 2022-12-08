@@ -1,9 +1,10 @@
+{%load user_permission_tags%}
 <span id="calendly_webhook_status_wrapper">
     {%if site_webhook_active%}
         <b style="color:green">Active</b>
         <br>
         <span 
-            {%if not user_allowed_to_edit_site_configuration%}
+            {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}
             data-bs-toggle="popover" 
             data-bs-trigger="hover" 
             data-bs-html="true" 
@@ -13,7 +14,7 @@
                 You do not have permission to edit this field: Edit Site Configuration
             "{%endif%}>
             <button class="btn btn-danger ms-3" {%if not request.user.profile.role == 'a'%}disabled{%endif%}
-                {%if not user_allowed_to_edit_site_configuration%}disabled{%endif%}
+                {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}disabled{%endif%}
                 hx-indicator=".top-htmx-indicator" hx-target="#calendly_webhook_status_wrapper" 
                 hx-vals='{"site_pk": "{{site.pk}}"}'
                 hx-post="{% url 'delete-calendly-webhook-subscription' %}" 
@@ -26,7 +27,7 @@
         <b style="color:red">Inactive</b> 
         <br>
         <span 
-            {%if not user_allowed_to_edit_site_configuration%}disabled
+            {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}disabled
             data-bs-toggle="popover" 
             data-bs-trigger="hover" 
             data-bs-html="true" 
@@ -36,7 +37,7 @@
                 You do not have permission to edit this field: Edit Site Configuration
             "{%endif%}>
             <button class="btn btn-secondary mt-2" {%if not request.user.profile.role == 'a'%}disabled{%endif%}
-                {%if not user_allowed_to_edit_site_configuration%}disabled{%endif%}
+                {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}disabled{%endif%}
                 hx-indicator=".top-htmx-indicator" hx-target="#calendly_webhook_status_wrapper" 
                 hx-vals='{"site_pk": "{{site.pk}}"}'
                 hx-post="{% url 'create-calendly-webhook-subscription' %}" 

@@ -81,6 +81,33 @@ class ProfileIncorrectlyConfiguredView(TemplateView):
         return context
 
 @method_decorator(login_required, name='dispatch')
+class SitePermissionsView(TemplateView):
+    template_name='campaign_leads/htmx/site_permissions.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(SitePermissionsView, self).get_context_data(**kwargs)       
+        site = Site.objects.get(pk=self.request.GET.get('site_pk'))
+        # context['site'] = Site.objects.get(pk=self.request.GET.get('site_pk'))
+        context['permissions'] = SiteProfilePermissions.objects.get(profile=self.request.user.profile, site=site)
+        return context
+    def post(self, request):
+        permissions = SiteProfilePermissions.objects.get(pk = request.POST.get('permissions_pk'))
+        context = {'permissions':permissions}
+        if get_user_allowed_to_edit_other_user_permissions(request.user.profile, permissions.site):
+            if request.user.profile.role == 'a' or (request.user.profile.role == 'b' and permissions.profile.role == 'c'):      
+                for key in ['view_site_configuration',
+                            'edit_site_configuration',
+                            'edit_whatsapp_settings',
+                            'toggle_active_campaign',
+                            'edit_user_permissions',] :
+
+                    setattr(permissions, key, request.POST.get(key, False))
+                permissions.save()
+                return render(request, 'campaign_leads/htmx/site_permissions.html', context)
+        context['error'] = "You do not have permission to do this"
+        return render(request, 'campaign_leads/htmx/site_permissions.html', context)
+
+@method_decorator(login_required, name='dispatch')
 class SiteConfigurationView(TemplateView):
     template_name='core/site_configuration.html'
 
@@ -122,8 +149,9 @@ class SiteConfigurationView(TemplateView):
             context['whatsapp_business_details'] = whatsapp.get_business(site.company.whatsapp_app_business_id)
         else:
             context['whatsapp_business_details'] = {"error":True}
-        context['user_allowed_to_edit_site_configuration'] = get_user_allowed_to_edit_site_configuration(self.request.user.profile, site)
-        context['user_allowed_to_toggle_whatsapp_template_sending'] = get_user_allowed_to_toggle_whatsapp_template_sending(self.request.user.profile, site)
+        # context['user_allowed_to_edit_site_configuration'] = get_user_allowed_to_edit_site_configuration(self.request.user.profile, site)
+        # context['user_allowed_to_edit_whatsapp_settings'] = get_user_allowed_to_edit_whatsapp_settings(self.request.user.profile, site)
+        # context['user_allowed_to_toggle_active_campaign'] = get_user_allowed_to_toggle_active_campaign(self.request.user.profile, site)
         
         return context
     def post(self, request):
@@ -282,6 +310,7 @@ def get_site_pk_from_request(request):
 from django.core.mail import send_mail
 from django.shortcuts import redirect, render
 def handler500(request):
+    template_name = '500.html'
     known_errors = []
     try:
         type_, value, tb = sys.exc_info()
@@ -323,4 +352,6 @@ def handler500(request):
 
     except Exception as e:
         logger.error(   "couldn't send error email", str(e))
-    return render(request, '500.html', status=500)
+    if request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+        template_name = '500_snackbar.html'  
+    return render(request, template_name, status=500)

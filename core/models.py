@@ -611,7 +611,7 @@ def execute_after_save(sender, instance, created, *args, **kwargs):
         permissions, created = SiteProfilePermissions.objects.get_or_create(profile=instance, site=site)
 @receiver(models.signals.post_save, sender=Profile)
 def execute_after_save(sender, instance, created, *args, **kwargs):  
-    if not instance.site in instance.sites_allowed.all():
+    if not instance.site in instance.sites_allowed.all() and instance.site:
         instance.sites_allowed.add(instance.site)
 class FreeTasterLink(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -641,4 +641,7 @@ class SiteProfilePermissions(models.Model):
     site = models.ForeignKey("core.Site", on_delete=models.CASCADE, null=True, blank=True)
     view_site_configuration = models.BooleanField(default=False)
     edit_site_configuration = models.BooleanField(default=False)
-    toggle_whatsapp_template_sending = models.BooleanField(default=False)
+    edit_whatsapp_settings = models.BooleanField(default=False)
+    toggle_active_campaign = models.BooleanField(default=False)
+    edit_user_permissions = models.BooleanField(default=False)
+    

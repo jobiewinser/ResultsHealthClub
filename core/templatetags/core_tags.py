@@ -48,7 +48,6 @@ def get_env_var(key):
 @register.filter
 def settings_value(name):
     return getattr(settings, name, "")
-
 @register.filter
 def roundup_tag(number, round_target):
     try:

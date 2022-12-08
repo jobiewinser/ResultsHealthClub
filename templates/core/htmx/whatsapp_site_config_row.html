@@ -1,4 +1,5 @@
 {%load core_tags%}
+{%load user_permission_tags%}
 <form class="" hx-post="{%url 'set-whatsapp-site-config'%}" hx-target="#whatsapp_site_config_wrapper" 
 hx-confirm="Are you sure you want to make this change. It may prevent you receiving and sending whatsapp messages if set up incorrectly!"
 hx-swap="innerHTML" hx-trigger="submit delay:0.3s" hx-indicator="#htmx_indicator_site_form" hx-vals='{"site_pk": "{{site.pk}}"}' autocomplete="off" autofill="off">
@@ -14,13 +15,13 @@ hx-swap="innerHTML" hx-trigger="submit delay:0.3s" hx-indicator="#htmx_indicator
                                                         data-bs-toggle="popover" data-bs-placement="left" 
                                                         data-bs-trigger="hover"
                                                         title="Whatsapp Access Token"
-                                                        {%if not user_allowed_to_edit_site_configuration%}
+                                                        {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}
                                                         data-bs-content="You do not have permission to edit this field: Edit Site Configuration"
                                                         {%else%}
                                                         data-bs-content="This is the token found for a system user at https://business.facebook.com/settings/system-users/ (This may change)"
                                                         {%endif%}>
                             <input name="whatsapp_access_token" type="password" class="form-control" oninput="$('#whatsapp_config_submit').attr('disabled', false)"
-                            value="{{site.whatsapp_access_token|censor}}" {%if not user_allowed_to_edit_site_configuration%}disabled{%endif%}/>
+                            value="{{site.whatsapp_access_token|censor}}" {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}disabled{%endif%}/>
                             <label class="elipses-overflow">Whatsapp Access Token</label>
                         </div>
                     </div>
@@ -33,7 +34,7 @@ hx-swap="innerHTML" hx-trigger="submit delay:0.3s" hx-indicator="#htmx_indicator
                     </div> {% endcomment %}
 
                     <div class="col-md-auto p-0">            
-                        {%if user_allowed_to_edit_site_configuration%}<button class="btn btn-primary btn-sm m-3" id="whatsapp_config_submit" disabled>Submit</button>{%endif%} 
+                        {%if request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}<button class="btn btn-primary btn-sm m-3" id="whatsapp_config_submit" disabled>Submit</button>{%endif%} 
                     </div>
                     
 
