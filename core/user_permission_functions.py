@@ -29,6 +29,11 @@ def get_user_allowed_to_edit_site_configuration(profile, site):
     if permissions:
         return permissions.edit_site_configuration
     return False
+def get_user_allowed_to_view_site_configuration(profile, site):
+    permissions = SiteProfilePermissions.objects.filter(profile=profile, site=site).first()
+    if permissions:
+        return permissions.view_site_configuration
+    return False
 def get_user_allowed_to_edit_other_user_permissions(profile, site):
     permissions = SiteProfilePermissions.objects.filter(profile=profile, site=site).first()
     if permissions:

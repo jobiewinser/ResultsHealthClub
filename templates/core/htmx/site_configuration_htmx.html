@@ -90,47 +90,57 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-auto p-0">        
-                            <div class="form-floating m-1"
-                            {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}
-                                data-bs-toggle="popover" 
-                                data-bs-trigger="hover" 
-                                data-bs-html="true" 
-                                data-bs-placement="top"
-                                data-bs-title="Site Calendly Organisation"
-                                data-bs-content="
-                                    You do not have permission to edit this field: Edit Site Configuration
-                                "
-                            {%endif%}>
-                                <input style="min-width:400px" id="calendly_organization" type="text" class="form-control" name="calendly_organization" {%if not request.user.profile.role == 'a'%}disabled{%endif%}
-                                    hx-post="" hx-swap="none" hx-indicator="#htmx_indicator_site_form" hx-vals='{"site_pk": "{{site.pk}}"}' hx-trigger='input delay:0.3s'
-                                    value="{%if site.calendly_organization%}{{site.calendly_organization}}{%endif%}" {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}disabled{%endif%}/>
-                                <label for="calendly_organization">Site Calendly Organisation</label>
-                            </div>
-                        </div>
-                        <div class="col-md-auto p-0">   
-                            <div class="form-floating m-1"
-                            {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}
-                                data-bs-toggle="popover" 
-                                data-bs-trigger="hover" 
-                                data-bs-html="true" 
-                                data-bs-placement="top"
-                                data-bs-title="Site Calendly Token"
-                                data-bs-content="
-                                    You do not have permission to edit this field: Edit Site Configuration
-                                "
-                            {%endif%}>
-                                <input name="calendly_token" type="password" class="form-control"
-                                    hx-post="" hx-swap="none" hx-indicator="#htmx_indicator_site_form" hx-vals='{"site_pk": "{{site.pk}}"}' hx-trigger='input delay:0.3s'
-                                    value="{{site.calendly_token|censor}}" {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}disabled{%endif%}/>
-                                <label class="elipses-overflow">Site Calendly Token</label>
-                            </div>
+                        <div class="col-md-auto p-0 card card-light">      
+                            <form class="" hx-post="" hx-swap="none" hx-indicator="#htmx_indicator_site_form" hx-vals='{"site_pk": "{{site.pk}}"}' hx-trigger='input delay:0.3s' autocomplete="off" autofill="off">
+                                <div class="row mt-1">
+                                    <div class="col-md-auto">   
+                                        <div class="form-floating m-1"
+                                        {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}
+                                            data-bs-toggle="popover" 
+                                            data-bs-trigger="hover" 
+                                            data-bs-html="true" 
+                                            data-bs-placement="top"
+                                            data-bs-title="Site Calendly Organisation"
+                                            data-bs-content="
+                                                You do not have permission to edit this field: Edit Site Configuration
+                                            "
+                                        {%endif%}>
+                                            <input style="min-width:400px" id="calendly_organization" type="text" class="form-control" name="calendly_organization" {%if not request.user.profile.role == 'a'%}disabled{%endif%}
+                                                
+                                                value="{%if site.calendly_organization%}{{site.calendly_organization}}{%endif%}" {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}disabled{%endif%}/>
+                                            <label for="calendly_organization">Site Calendly Organisation</label>
+                                        </div>
+                                    </div>
+                                    <div class="col">   
+                                        <div class="form-floating m-1"
+                                        {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}
+                                            data-bs-toggle="popover" 
+                                            data-bs-trigger="hover" 
+                                            data-bs-html="true" 
+                                            data-bs-placement="top"
+                                            data-bs-title="Site Calendly Token"
+                                            data-bs-content="
+                                                You do not have permission to edit this field: Edit Site Configuration
+                                            "
+                                        {%endif%}>
+                                            <input name="calendly_token" type="password" class="form-control"
+                                                hx-post="" hx-swap="none" hx-indicator="#htmx_indicator_site_form" hx-vals='{"site_pk": "{{site.pk}}"}' hx-trigger='input delay:0.3s'
+                                                value="{{site.calendly_token|censor}}" {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}disabled{%endif%}/>
+                                            <label class="elipses-overflow">Site Calendly Token</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col center">  
+                                        {%if request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}<button class="btn btn-primary btn-sm m-3" id="calendly_config_submit" disabled>Submit</button>{%endif%}  
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                         
                         <div class="col-md p-0">   
                         </div>
-                        <div class="col-md-auto m-1 p-2 alert alert-dark center" style="min-width:350px;min-height:100px;">  
-                        
+                        <div class="col-md-auto m-1 p-2 alert alert-light center" style="min-width:350px;min-height:100px;">                          
                             <div>   
                                 Calendly Webhook for <span class="name_display_{{site.pk}}">{{site.name}}</span>: 
                                 {%include 'core/htmx/calendly_webhook_status_wrapper.html'%}  

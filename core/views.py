@@ -82,13 +82,16 @@ class ProfileIncorrectlyConfiguredView(TemplateView):
 
 @method_decorator(login_required, name='dispatch')
 class SitePermissionsView(TemplateView):
-    template_name='campaign_leads/htmx/site_permissions.html'
+    template_name='campaign_leads/htmx/edit_permissions.html'
 
     def get_context_data(self, **kwargs):
         context = super(SitePermissionsView, self).get_context_data(**kwargs)       
-        site = Site.objects.get(pk=self.request.GET.get('site_pk'))
+        permission_site = Site.objects.get(pk=self.request.GET.get('site_pk'))
         # context['site'] = Site.objects.get(pk=self.request.GET.get('site_pk'))
-        context['permissions'] = SiteProfilePermissions.objects.get(profile=self.request.user.profile, site=site)
+        profile = Profile.objects.get(pk=self.request.GET.get('profile_pk'))
+        context['permissions'] = SiteProfilePermissions.objects.get(profile=self.request.user.profile, site=permission_site)
+        context['profile'] = profile
+        context['permission_site'] = permission_site
         return context
     def post(self, request):
         permissions = SiteProfilePermissions.objects.get(pk = request.POST.get('permissions_pk'))

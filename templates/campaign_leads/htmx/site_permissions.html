@@ -1,5 +1,5 @@
 {%load static%}
-    <div class="row">        
+    <div class="row" style="min-width:600px">        
         <div class="col">
             <div class="form-check form-switch">
                 <label> View Site Configuration</label> 
@@ -69,10 +69,10 @@
             </div>
         </div>
     </div>
-    {%if error%}    
-    <div class="row">        
+    <div class="row" style="min-height:100px">  
+    {%if error%}          
         <div class="col">
             <p class="alert alert-danger">{{error}}</p>
         </div>
-    </div>
     {%endif%}  
+</div>

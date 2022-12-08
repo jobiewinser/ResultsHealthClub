@@ -2,7 +2,7 @@ import json
 import os
 import uuid
 from calendly.api import Calendly
-from core.models import ROLE_CHOICES, FreeTasterLink, Profile, Site, WhatsappNumber, Contact, Company
+from core.models import ROLE_CHOICES, FreeTasterLink, Profile, Site, WhatsappNumber, Contact, Company, SiteProfilePermissions
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import render
@@ -40,7 +40,11 @@ def get_modal_content(request, **kwargs):
             elif template_name == 'edit_permissions':
                 profile_pk = request.GET.get('profile_pk', None)
                 if profile_pk:
-                    context["profile"] = Profile.objects.get(pk=profile_pk)
+                    profile = Profile.objects.get(pk=profile_pk)
+                    context["profile"] = profile
+                permission_site = profile.sites_allowed.first()
+                context['permission_site'] = permission_site
+                context['permissions'], created = SiteProfilePermissions.objects.get_or_create(profile=profile, site=permission_site)
             elif template_name == 'add_phone_number':
                 site_pk = request.GET.get('site_pk', None)
                 if site_pk:

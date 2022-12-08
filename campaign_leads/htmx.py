@@ -215,7 +215,7 @@ def add_manual_booking(request, **kwargs):
                 lead=lead,
                 text=note,
                 user=request.user,
-                datetime=booking_datetime
+                datetime=datetime.now()
                 )
                 
         from channels.layers import get_channel_layer

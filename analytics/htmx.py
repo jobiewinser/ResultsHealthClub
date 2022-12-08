@@ -142,9 +142,11 @@ def get_calls_today_dataset(campaign=None, site=None):
     elif site:
         qs = qs.filter(lead__campaign__site=site)
     unique_users = list(qs.order_by('user').distinct('user').values_list('user', flat=True))
-    for user_pk in unique_users:
-        user = User.objects.get(pk=user_pk)
-        data_set.append((user.profile.name, qs.filter(user=user).count()))
+    if unique_users:
+        for user_pk in unique_users:
+            if user_pk:
+                user = User.objects.get(pk=user_pk)
+                data_set.append((user.profile.name, qs.filter(user=user).count()))
     return data_set, qs
 
 def get_sales_today_dataset(campaign=None, site=None):
@@ -155,9 +157,11 @@ def get_sales_today_dataset(campaign=None, site=None):
     elif site:
         qs = qs.filter(campaign__site=site)
     unique_users = list(qs.order_by('sold_by').distinct('sold_by').values_list('sold_by', flat=True))
-    for user_pk in unique_users:
-        user = User.objects.get(pk=user_pk)
-        data_set.append((user.profile.name, qs.filter(sold_by=user).count()))
+    if unique_users:
+        for user_pk in unique_users:
+            if user_pk:
+                user = User.objects.get(pk=user_pk)
+                data_set.append((user.profile.name, qs.filter(sold_by=user).count()))
     return data_set, qs
     
 @login_required
