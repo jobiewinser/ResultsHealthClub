@@ -33,8 +33,13 @@
                 <div class="col-md p-0">   
                     <div class="row ">
                         <div class="col-md-auto p-0">      
-                            <div class="form-floating m-1">  
-                                <input value="{{site.name}}" type="text" name="name" class="form-control site_configuration_input" id="site_name"  {%if not request.user.profile.role == 'a'%}disabled{%endif%}
+                            <div class="form-floating m-1" {%if not user_allowed_to_edit_site_configuration%}
+                                                                data-bs-html="true" 
+                                                                data-bs-toggle="popover" data-bs-placement="left" 
+                                                                data-bs-trigger="hover"
+                                                                title="Name of this site"
+                                                                data-bs-content="You do not have permission to edit this field: Edit Site Configuration"{%endif%}>  
+                                <input value="{{site.name}}" type="text" name="name" class="form-control site_configuration_input" id="site_name"  {%if not request.user.profile.role == 'a'%}disabled{%endif%} {%if not user_allowed_to_edit_site_configuration%}disabled{%endif%}
                                     hx-post="" hx-swap="none" hx-indicator="#htmx_indicator_site_form" hx-vals='{"site_pk": "{{site.pk}}"}' hx-trigger='input delay:0.5s' oninput="$('#htmx_indicator_site_form').addClass('htmx-request');">
                                 <label for="site_name">Name of this site</label>
                             </div>
@@ -85,19 +90,39 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-auto p-0">        
-                            <div class="form-floating m-1">
+                            <div class="form-floating m-1"
+                            {%if not user_allowed_to_edit_site_configuration%}
+                                data-bs-toggle="popover" 
+                                data-bs-trigger="hover" 
+                                data-bs-html="true" 
+                                data-bs-placement="top"
+                                data-bs-title="Site Calendly Organisation"
+                                data-bs-content="
+                                    You do not have permission to edit this field: Edit Site Configuration
+                                "
+                            {%endif%}>
                                 <input style="min-width:400px" id="calendly_organization" type="text" class="form-control" name="calendly_organization" {%if not request.user.profile.role == 'a'%}disabled{%endif%}
                                     hx-post="" hx-swap="none" hx-indicator="#htmx_indicator_site_form" hx-vals='{"site_pk": "{{site.pk}}"}' hx-trigger='input delay:0.3s'
-                                    value="{%if site.calendly_organization%}{{site.calendly_organization}}{%endif%}">
-                                <label for="calendly_organization">Site Calendly Organtisation</label>
+                                    value="{%if site.calendly_organization%}{{site.calendly_organization}}{%endif%}" {%if not user_allowed_to_edit_site_configuration%}disabled{%endif%}/>
+                                <label for="calendly_organization">Site Calendly Organisation</label>
                             </div>
                         </div>
                         <div class="col-md-auto p-0">   
-                            <div class="form-floating m-1">
+                            <div class="form-floating m-1"
+                            {%if not user_allowed_to_edit_site_configuration%}
+                                data-bs-toggle="popover" 
+                                data-bs-trigger="hover" 
+                                data-bs-html="true" 
+                                data-bs-placement="top"
+                                data-bs-title="Site Calendly Token"
+                                data-bs-content="
+                                    You do not have permission to edit this field: Edit Site Configuration
+                                "
+                            {%endif%}>
                                 <input name="calendly_token" type="password" class="form-control"
                                     hx-post="" hx-swap="none" hx-indicator="#htmx_indicator_site_form" hx-vals='{"site_pk": "{{site.pk}}"}' hx-trigger='input delay:0.3s'
-                                    value="{{site.calendly_token|censor}}"/>
-                                <label class="elipses-overflow">Calendly Token</label>
+                                    value="{{site.calendly_token|censor}}" {%if not user_allowed_to_edit_site_configuration%}disabled{%endif%}/>
+                                <label class="elipses-overflow">Site Calendly Token</label>
                             </div>
                         </div>
                         

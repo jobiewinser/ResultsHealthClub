@@ -78,7 +78,7 @@ def get_leads_board_context(request):
     request.GET._mutable = True 
     context = {}   
     context['campaigns'] = get_campaign_qs(request)
-    leads = Campaignlead.objects.filter(archived=False, campaign__site__in=request.user.profile.sites_allowed.all()).exclude(booking__archived=False)
+    leads = Campaignlead.objects.filter(archived=False, campaign__site__company=request.user.profile.company, campaign__site__in=request.user.profile.sites_allowed.all()).exclude(booking__archived=False)
     campaign_pk = request.GET.get('campaign_pk', None)
     campaign_category_pk = request.GET.get('campaign_category_pk', None)
     filtered = False
@@ -88,7 +88,7 @@ def get_leads_board_context(request):
             leads = leads.filter(campaign=Campaign.objects.get(pk=campaign_pk))
             filtered = True
             request.GET['campaign_pk'] = campaign_pk
-            context['campaign'] = Campaign.objects.get(pk=campaign_pk)
+            context['campaign'] = Campaign.objects.get(pk=campaign_pk, site__company=request.user.profile.company)
             request.GET['site_pk'] = context['campaign'].site.pk
         except Exception as e:
             pass
@@ -109,7 +109,7 @@ def get_leads_board_context(request):
                 leads = leads.filter(campaign__site__pk=site_pk)
                 filtered = True
                 request.GET['site_pk'] = site_pk    
-            context['site'] = Site.objects.get(pk=site_pk)
+            context['site'] = Site.objects.get(pk=site_pk, company=request.user.profile.company)
         except:
             pass
     leads = leads.annotate(calls=Count('call')).order_by('-last_dragged')
@@ -134,7 +134,7 @@ def get_leads_board_context(request):
     context['max_call_count'] = index
     context['company'] = request.user.profile.company
     return context
-
+@login_required
 def refresh_leads_board(request):
     return render(request, 'campaign_leads/htmx/leads_board.html', get_leads_board_context(request))
 # @method_decorator(campaign_leads_enabled_required, name='dispatch')
@@ -151,7 +151,7 @@ class CampaignBookingsOverviewView(TemplateView):
 def get_booking_table_context(request):
     request.GET._mutable = True     
     context = {}
-    leads = Campaignlead.objects.all()
+    leads = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, campaign__site__in=request.user.profile.sites_allowed.all()).exclude(booking__archived=False)
     campaign_pk = request.GET.get('campaign_pk', None)
     if campaign_pk:
         leads = leads.filter(campaign=Campaign.objects.get(pk=campaign_pk))
@@ -176,6 +176,7 @@ def get_booking_table_context(request):
     context['leads'] = leads
     context['company'] = request.user.profile.company
     return context
+@login_required
 def refresh_booking_table_htmx(request):
     return render(request, 'campaign_leads/htmx/campaign_bookings_table.html', get_booking_table_context(request))
 # @method_decorator(campaign_leads_enabled_required, name='dispatch')

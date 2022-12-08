@@ -6,7 +6,7 @@ import json
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from campaign_leads.models import Campaign, Campaignlead, Call
-from core.user_permission_functions import get_available_sites_for_user, get_user_allowed_to_edit_site, get_user_allowed_to_edit_template, get_user_allowed_to_edit_whatsappnumber, get_user_allowed_to_send_from_whatsappnumber
+from core.user_permission_functions import get_available_sites_for_user, get_user_allowed_to_edit_site_configuration, get_user_allowed_to_edit_template, get_user_allowed_to_edit_whatsappnumber, get_user_allowed_to_send_from_whatsappnumber
 from core.views import get_site_pk_from_request
 from messaging.models import Message
 from whatsapp.api import Whatsapp
@@ -492,8 +492,8 @@ def add_phone_number(request):
     phone_number = request.POST.get('phone_number', None)
     if whatsapp_business_account_pk and country_code and phone_number:
         whatsapp_business_account = WhatsappBusinessAccount.objects.get(pk=whatsapp_business_account_pk)
-        if get_user_allowed_to_edit_site(request.user, whatsapp_business_account.site):            
-            whatsapp = Whatsapp(site.whatsapp_access_token)
+        if get_user_allowed_to_edit_site_configuration(request.user.profile, whatsapp_business_account.site):            
+            whatsapp = Whatsapp(whatsapp_business_account.site.whatsapp_access_token)
             whatsapp.create_phone_number(whatsapp_business_account.whatsapp_business_account_id, country_code, phone_number)
             return HttpResponse("",status=200,headers={'HX-Refresh':True})
         return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
@@ -507,7 +507,7 @@ def add_whatsapp_business_account(request):
         if site_pk and whatsapp_business_account_id:
             site = Site.objects.get(pk=site_pk)
             whatsapp = Whatsapp(site.whatsapp_access_token) 
-            if get_user_allowed_to_edit_site(request.user, site):      
+            if get_user_allowed_to_edit_site_configuration(request.user.profile, site):      
                 if whatsapp.get_phone_numbers(whatsapp_business_account_id).get('data',[]):   
                     whatsapp_business_account = WhatsappBusinessAccount.objects.filter(whatsapp_business_account_id=whatsapp_business_account_id).first()
                     if whatsapp_business_account:

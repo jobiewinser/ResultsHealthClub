@@ -4,7 +4,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 import logging
 from django.http import HttpResponseRedirect
-from core.models import FreeTasterLink, FreeTasterLinkClick, Profile, Site, WhatsappNumber
+from core.models import FreeTasterLink, FreeTasterLinkClick, Profile, Site, WhatsappNumber, SiteProfilePermissions
 
 def get_available_sites_for_user(user):
     profile = user.profile
@@ -12,7 +12,7 @@ def get_available_sites_for_user(user):
         return Site.objects.filter(company=profile.company)
     if profile.sites_allowed.all():
         return profile.sites_allowed.all()
-    return Site.objects.filter(pk=profile.site.pk)
+    return Site.objects.none()
 
 def get_user_allowed_to_edit_whatsappnumber(user, whatsappnumber):
     #TODO
@@ -30,9 +30,21 @@ def get_user_allowed_to_use_site_analytics(user, site):
     #TODO
     return True
 
-def get_user_allowed_to_edit_site(user, site):
-    #TODO
-    return True
+def get_user_allowed_to_toggle_whatsapp_template_sending(profile, site):
+    permissions = SiteProfilePermissions.objects.filter(profile=profile, site=site).first()
+    if permissions:
+        return permissions.toggle_whatsapp_template_sending
+    return False
+def get_user_allowed_to_edit_site_configuration(profile, site):
+    permissions = SiteProfilePermissions.objects.filter(profile=profile, site=site).first()
+    if permissions:
+        return permissions.edit_site_configuration
+    return False
+def get_user_allowed_to_view_site_configuration(profile, site):
+    permissions = SiteProfilePermissions.objects.filter(profile=profile, site=site).first()
+    if permissions:
+        return permissions.view_site_configuration
+    return False
 
 def get_allowed_site_chats_for_user(user):
     #TODO

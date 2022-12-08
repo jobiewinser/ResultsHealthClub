@@ -12,7 +12,7 @@ from django.middleware.csrf import get_token
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views import View
-from core.user_permission_functions import get_available_sites_for_user, get_user_allowed_to_edit_other_user, get_user_allowed_to_edit_site 
+from core.user_permission_functions import get_available_sites_for_user, get_user_allowed_to_edit_other_user, get_user_allowed_to_edit_site_configuration 
 from core.views import get_site_pk_from_request
 from django.http import QueryDict
 from campaign_leads.models import Campaignlead
@@ -137,7 +137,7 @@ class ModifyUser(View):
 @login_required
 def create_calendly_webhook_subscription(request, **kwargs):
     site = Site.objects.get(pk=request.POST.get('site_pk'))    
-    if get_user_allowed_to_edit_site(request.user, site): 
+    if get_user_allowed_to_edit_site_configuration(request.user.profile, site): 
         calendly = Calendly(site.calendly_token)
         calendly_webhooks = calendly.list_webhook_subscriptions(organization = site.calendly_organization).get('collection')
         for webhook in calendly_webhooks:
@@ -153,7 +153,7 @@ def create_calendly_webhook_subscription(request, **kwargs):
 @login_required
 def delete_calendly_webhook_subscription(request, **kwargs):
     site = Site.objects.get(pk=request.POST.get('site_pk'))    
-    if get_user_allowed_to_edit_site(request.user, site): 
+    if get_user_allowed_to_edit_site_configuration(request.user.profile, site): 
         calendly = Calendly(site.calendly_token)
         calendly_webhooks = calendly.list_webhook_subscriptions(organization = site.calendly_organization).get('collection')
         for webhook in calendly_webhooks:

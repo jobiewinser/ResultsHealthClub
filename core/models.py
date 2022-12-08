@@ -9,7 +9,7 @@ from django.http import HttpResponse
 from calendly.api import Calendly
 
 from campaign_leads.models import Campaign, Campaignlead, ManualCampaign
-from twilio.models import TwilioMessage
+# from twilio.models import TwilioMessage
 from django.db.models import Q, Count
 from whatsapp.api import Whatsapp
 from django.contrib import messages
@@ -490,6 +490,7 @@ def execute_after_save(sender, instance, created, *args, **kwargs):
     #     instance.calendly_webhook_created = True 
     #     instance.save()
 # Extending User Model Using a One-To-One Link
+
 class Company(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     company_name = models.TextField(null=True, blank=True)
@@ -606,6 +607,10 @@ class Profile(models.Model):
         return f"{self.user.first_name} {self.user.last_name}"
 @receiver(models.signals.post_save, sender=Profile)
 def execute_after_save(sender, instance, created, *args, **kwargs):  
+    for site in instance.company.site_set.all():
+        permissions, created = SiteProfilePermissions.objects.get_or_create(profile=instance, site=site)
+@receiver(models.signals.post_save, sender=Profile)
+def execute_after_save(sender, instance, created, *args, **kwargs):  
     if not instance.site in instance.sites_allowed.all():
         instance.sites_allowed.add(instance.site)
 class FreeTasterLink(models.Model):
@@ -631,3 +636,9 @@ class ErrorModel(models.Model):
 #     version = models.FloatField(null=True, blank=True)
 #     content = models.TextField(null=True, blank=True)
 
+class SiteProfilePermissions(models.Model):
+    profile = models.ForeignKey("core.Profile", on_delete=models.CASCADE, null=True, blank=True)
+    site = models.ForeignKey("core.Site", on_delete=models.CASCADE, null=True, blank=True)
+    view_site_configuration = models.BooleanField(default=False)
+    edit_site_configuration = models.BooleanField(default=False)
+    toggle_whatsapp_template_sending = models.BooleanField(default=False)

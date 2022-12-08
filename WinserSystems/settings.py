@@ -122,7 +122,7 @@ INSTALLED_APPS = [
     'active_campaign',
     'whatsapp',
     'messaging',
-    'twilio',
+    # 'twilio',
     'calendly',
     'analytics',
     'core',

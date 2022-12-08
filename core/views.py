@@ -12,8 +12,8 @@ from core.core_decorators import check_core_profile_requirements_fulfilled
 from core.models import ROLE_CHOICES, Company, FreeTasterLink, FreeTasterLinkClick, Profile, Site  
 from django.contrib.auth import authenticate
 from django.contrib.auth import login
-
-from core.user_permission_functions import get_available_sites_for_user, get_user_allowed_to_edit_other_user
+from django.core.exceptions import PermissionDenied
+from core.user_permission_functions import *
 from whatsapp.api import Whatsapp
 from core.startup import run_debug_startup
 logger = logging.getLogger(__name__)
@@ -84,39 +84,60 @@ class ProfileIncorrectlyConfiguredView(TemplateView):
 class SiteConfigurationView(TemplateView):
     template_name='core/site_configuration.html'
 
-    def get_context_data(self, **kwargs):
-        self.request.GET._mutable = True       
+    def get(self, request, *args, **kwargs):
+        request.GET._mutable = True   
+        site_pk = get_site_pk_from_request(request)
+        request.GET['site_pk'] = site_pk      
+        site = Site.objects.get(pk=site_pk) 
+
+        # permissions
+        if get_user_allowed_to_view_site_configuration(request.user.profile, site):
+            return super(SiteConfigurationView, self).get(request, args, kwargs)
+        if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+            return HttpResponse("You don't have permission to access this page")
+        raise PermissionDenied()
+        # endpermissions
+
+    def get_context_data(self, **kwargs):    
         context = super(SiteConfigurationView, self).get_context_data(**kwargs)
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'core/htmx/site_configuration_htmx.html'
-        # context['site_list'] = get_available_sites_for_user(self.request.user)
-        site_pk = get_site_pk_from_request(self.request)
-        if site_pk:
-            self.request.GET['site_pk'] = site_pk      
-            site = Site.objects.get(pk=site_pk)     
-            context['whatsapp_numbers'] = site.get_live_whatsapp_phone_numbers()          
-            calendly = Calendly(site.calendly_token)
-            site_webhook_active = False
-            if site.calendly_organization:
-                calendly_webhooks = calendly.list_webhook_subscriptions(organization = site.calendly_organization).get('collection')
-                if calendly_webhooks:
-                    for webhook in calendly_webhooks:
-                        if webhook.get('state') == 'active' \
-                        and webhook.get('callback_url') == f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/" \
-                        and webhook.get('organization') == f"{os.getenv('CALENDLY_URL')}/organizations/{site.calendly_organization}":
-                            site_webhook_active = True
-                            break
-            context['site'] = site
-            context['site_webhook_active'] = site_webhook_active
-            if site.whatsapp_access_token:
-                whatsapp = Whatsapp(site.whatsapp_access_token)
-                context['whatsapp_business_details'] = whatsapp.get_business(site.company.whatsapp_app_business_id)
-            else:
-                context['whatsapp_business_details'] = {"error":True}
-            return context
+        site = Site.objects.get(pk=self.request.GET['site_pk'])     
+        context['whatsapp_numbers'] = site.get_live_whatsapp_phone_numbers()          
+        calendly = Calendly(site.calendly_token)
+        site_webhook_active = False
+        if site.calendly_organization:
+            calendly_webhooks = calendly.list_webhook_subscriptions(organization = site.calendly_organization).get('collection')
+            if calendly_webhooks:
+                for webhook in calendly_webhooks:
+                    if webhook.get('state') == 'active' \
+                    and webhook.get('callback_url') == f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/" \
+                    and webhook.get('organization') == f"{os.getenv('CALENDLY_URL')}/organizations/{site.calendly_organization}":
+                        site_webhook_active = True
+                        break
+        context['site'] = site
+        context['site_webhook_active'] = site_webhook_active
+        if site.whatsapp_access_token:
+            whatsapp = Whatsapp(site.whatsapp_access_token)
+            context['whatsapp_business_details'] = whatsapp.get_business(site.company.whatsapp_app_business_id)
+        else:
+            context['whatsapp_business_details'] = {"error":True}
+        context['user_allowed_to_edit_site_configuration'] = get_user_allowed_to_edit_site_configuration(self.request.user.profile, site)
+        context['user_allowed_to_toggle_whatsapp_template_sending'] = get_user_allowed_to_toggle_whatsapp_template_sending(self.request.user.profile, site)
+        
+        return context
     def post(self, request):
         self.request.POST._mutable = True 
         site = Site.objects.get(pk=request.POST.get('site_pk'))   
+
+        # permissions
+        if not get_user_allowed_to_edit_site_configuration(request.user.profile, site):
+            if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+                return HttpResponse("You don't have permission to edit this")
+            raise PermissionDenied()
+        # endpermissions
+
+
         response_text = ""     
         if 'name' in request.POST:
             site.name = request.POST['name']
