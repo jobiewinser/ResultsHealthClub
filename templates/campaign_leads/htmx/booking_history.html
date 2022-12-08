@@ -64,6 +64,7 @@
                 </thead>
                 <tbody class="noteBody">
                     {%for booking in lead.booking_set.all%}
+                    {%if booking.datetime%}
                     <tr>
                         <td colspan="2"
                         data-bs-html="true" 
@@ -97,6 +98,7 @@
                             </div>  
                         </td>
                     </tr>
+                    {%endif%}
                     {%endfor%}
                 </tbody>
               </table>
