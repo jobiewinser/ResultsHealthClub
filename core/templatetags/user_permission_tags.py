@@ -51,6 +51,10 @@ def get_user_allowed_to_edit_site_configuration_tag(profile, site):
     return get_user_allowed_to_edit_site_configuration(profile, site)
     
 @register.filter
+def get_profile_allowed_to_edit_profile_permissions_tag(user_profile, target_profile):
+    return get_profile_allowed_to_edit_profile_permissions(user_profile, target_profile)
+    
+@register.filter
 def get_user_allowed_to_view_site_configuration_tag(profile, site):
     return get_user_allowed_to_view_site_configuration(profile, site)
     
@@ -67,8 +71,8 @@ def get_allowed_number_chats_for_user_tag(site, user):
     return get_allowed_number_chats_for_user(site, user)
     
 @register.filter
-def get_user_allowed_to_edit_other_user_tag(request_user, other_user):
-    return get_user_allowed_to_edit_other_user(request_user, other_user)
+def get_profile_allowed_to_edit_profile_tag(request_profile, other_profile):
+    return get_profile_allowed_to_edit_other_profile(request_profile, other_profile)
         
 @register.filter
 def get_user_allowed_to_add_call_tag(request_user, lead):

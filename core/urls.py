@@ -33,7 +33,7 @@ urlpatterns = [
 
     path('configuration/change-profile-role/', coreviews.change_profile_role, name='change-profile-role'),
     path('configuration/change-profile-site/', coreviews.change_profile_site, name='change-profile-site'),
-    path('configuration/change-profile-sites-allowed/', coreviews.change_profile_sites_allowed, name='change-profile-sites-allowed'),
+    # path('configuration/change-profile-sites-allowed/', coreviews.change_profile_sites_allowed, name='change-profile-sites-allowed'),
 
     # path('switch-user/', corehtmx.switch_user, name='switch-user' ),
     path('get-modal-content/', corehtmx.get_modal_content, name='get-modal-content' ),
@@ -52,7 +52,9 @@ urlpatterns = [
     # path('configuration/', coreviews.ConfigurationView.as_view(), name='configuration'),  
 
     path('profile-incorrectly-configured/', coreviews.ProfileIncorrectlyConfiguredView.as_view(), name='profile-incorrectly-configured'),  
+    path('configuration/company-permissions/', coreviews.CompanyPermissionsView.as_view(), name='company-permissions'),  
     path('configuration/site-permissions/', coreviews.SitePermissionsView.as_view(), name='site-permissions'),  
+    path('configuration/change-sites-allowed/', coreviews.change_site_allowed, name='change-sites-allowed'),  
 
     
 ]

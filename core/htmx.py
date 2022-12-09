@@ -2,7 +2,7 @@ import json
 import os
 import uuid
 from calendly.api import Calendly
-from core.models import ROLE_CHOICES, FreeTasterLink, Profile, Site, WhatsappNumber, Contact, Company, SiteProfilePermissions
+from core.models import ROLE_CHOICES, FreeTasterLink, Profile, Site, WhatsappNumber, Contact, Company, SiteProfilePermissions, CompanyProfilePermissions
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import render
@@ -12,7 +12,7 @@ from django.middleware.csrf import get_token
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views import View
-from core.user_permission_functions import get_available_sites_for_user, get_user_allowed_to_edit_other_user, get_user_allowed_to_edit_site_configuration 
+from core.user_permission_functions import get_available_sites_for_user, get_profile_allowed_to_edit_other_profile, get_user_allowed_to_edit_site_configuration 
 from core.views import get_site_pk_from_request
 from django.http import QueryDict
 from campaign_leads.models import Campaignlead
@@ -42,9 +42,9 @@ def get_modal_content(request, **kwargs):
                 if profile_pk:
                     profile = Profile.objects.get(pk=profile_pk)
                     context["profile"] = profile
-                permission_site = profile.sites_allowed.first()
-                context['permission_site'] = permission_site
-                context['permissions'], created = SiteProfilePermissions.objects.get_or_create(profile=profile, site=permission_site)
+                    CompanyProfilePermissions.objects.get_or_create(profile=profile, company=profile.company)
+                    for site in profile.company.site_set.all():
+                        SiteProfilePermissions.objects.get_or_create(profile=profile, site=site)
             elif template_name == 'add_phone_number':
                 site_pk = request.GET.get('site_pk', None)
                 if site_pk:
@@ -110,7 +110,7 @@ class ModifyUser(View):
                 user = User.objects.get(pk=request.POST['user_pk'])   
                 profile = Profile.objects.get_or_create(user = user)[0] 
                 user.profile = profile     
-                if get_user_allowed_to_edit_other_user(request.user, user):
+                if get_profile_allowed_to_edit_other_profile(request.user.profile, user.profile):
                     first_name = request.POST.get('first_name', '')
                     last_name = request.POST.get('last_name', '')
                     site_pk = request.POST.get('site_pk', '')

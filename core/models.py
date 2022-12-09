@@ -493,7 +493,7 @@ def execute_after_save(sender, instance, created, *args, **kwargs):
 
 class Company(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    company_name = models.TextField(null=True, blank=True)
+    name = models.TextField(null=True, blank=True)
     company_logo_white = models.ImageField(default='default.png', upload_to='company_images')
     company_logo_black = models.ImageField(default='default.png', upload_to='company_images')
     company_logo_trans = models.ImageField(default='default.png', upload_to='company_images')
@@ -540,7 +540,7 @@ class Company(models.Model):
             return True
         return False
     def __str__(self):
-        return f"{self.company_name}"   
+        return f"{self.name}"   
 
     def get_and_generate_campaign_objects(self):
         if self.active_campaign_url:
@@ -636,6 +636,14 @@ class ErrorModel(models.Model):
 #     version = models.FloatField(null=True, blank=True)
 #     content = models.TextField(null=True, blank=True)
 
+class CompanyProfilePermissions(models.Model):
+    profile = models.ForeignKey("core.Profile", on_delete=models.CASCADE, null=True, blank=True)
+    company = models.ForeignKey("core.Company", on_delete=models.CASCADE, null=True, blank=True)
+    edit_user_permissions = models.BooleanField(default=False)
+    permissions_count = models.IntegerField(default = 0)
+    class Meta:
+        ordering = ['-pk']   
+
 class SiteProfilePermissions(models.Model):
     profile = models.ForeignKey("core.Profile", on_delete=models.CASCADE, null=True, blank=True)
     site = models.ForeignKey("core.Site", on_delete=models.CASCADE, null=True, blank=True)
@@ -643,5 +651,34 @@ class SiteProfilePermissions(models.Model):
     edit_site_configuration = models.BooleanField(default=False)
     edit_whatsapp_settings = models.BooleanField(default=False)
     toggle_active_campaign = models.BooleanField(default=False)
-    edit_user_permissions = models.BooleanField(default=False)
+    permissions_count = models.IntegerField(default = 0) 
+    class Meta:
+        ordering = ['-pk']   
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        # role = self.profile.role
+        # permission_count = 0
+        # for key in [
+        #     'view_site_configuration ',
+        #     'edit_site_configuration ',
+        #     'edit_whatsapp_settings ',
+        #     'toggle_active_campaign ',
+        #     ]:
+        #     if getattr(self, key, False):
+        #         permission_count +=1
+        #     elif role == 'a':
+        #         setattr(self, key, True)
+        #         permission_count +=1
+        # super(SiteProfilePermissions, self).save(force_insert, force_update, using, update_fields)
+        role = self.profile.role
+        self.permission_count = 0
+        for field in self._meta.fields:
+            if type(field) == models.BooleanField:
+                if getattr(self, field.attname, False):
+                    self.permission_count +=1
+                elif role == 'a':
+                    setattr(self, field.attname, True)
+                    self.permission_count +=1
+        return super(SiteProfilePermissions, self).save(force_insert, force_update, using, update_fields)
+    
     

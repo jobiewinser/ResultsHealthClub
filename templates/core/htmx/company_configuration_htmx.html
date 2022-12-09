@@ -31,7 +31,7 @@
                 hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
                 hx-vals='{"template_name": "add_user"}'
                 hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
-                hx-swap="innerHTML" hx-trigger="click"><i class="fa-light fa-plus"></i> Add User to {{company.company_name}}</button>
+                hx-swap="innerHTML" hx-trigger="click"><i class="fa-light fa-plus"></i> Add User to {{company.name}}</button>
         </div>
         <div class="col-md-auto">
             <span
@@ -69,20 +69,20 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>
+                        <th class="center">
                             User
                         </th>
-                        <th>
+                        <th class="center">
                             Main Site
                         </th>
-                        <th>
+                        <th class="center">
                             Role
                         </th>
-                        <th>
-                            
+                        <th class="center">
+                            Permissions
                         </th>
-                        <th>
-                            
+                        <th class="center">
+                            Configuration
                         </th>
                     </tr>
                 </thead>

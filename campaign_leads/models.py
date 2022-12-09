@@ -262,7 +262,7 @@ class Campaignlead(models.Model):
                                 #     params.append(           
                                 #         {
                                 #             "type": "text",
-                                #             "text":  self.campaign.company.company_name
+                                #             "text":  self.campaign.company.name
                                 #         }
                                 #     )
                                 # if '{{4}}' in text:

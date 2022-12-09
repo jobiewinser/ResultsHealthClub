@@ -21,7 +21,7 @@ def run_debug_startup():
             user.save()
             
             company, created = Company.objects.get_or_create(
-                company_name="Test Company",
+                name="Test Company",
                 defaults={
                     'active_campaign_url': os.getenv("DEFAULT_ACTIVE_CAMPAIGN_URL"),
                     'active_campaign_api_key': os.getenv("DEFAULT_ACTIVE_CAMPAIGN_API_KEY"),
