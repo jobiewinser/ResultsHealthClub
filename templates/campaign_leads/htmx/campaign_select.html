@@ -1,10 +1,10 @@
 {%load core_tags%}
 <div id="campaign_list_wrapper">    
     <select class="form-select select2 select2-styling overview_table_filters site_dependant_analytics_filters" oninput="$('#filter_campaign').click()" id="campaign_pk" name="campaign_pk">
-        <option value="">Show all campaigns for this site</option>
+        <option value="">Show All Campaigns</option>
         {%for campaign in campaigns%}
         {% comment %} {%if campaign.get_active_leads_qs.count%} {% endcomment %}
-            <option {%if request.GET.campaign_pk|str_to_int == campaign.pk%}selected{%endif%} value="{{campaign.pk}}">{{campaign.name}}
+            <option {%if request.GET.campaign_pk|str_to_int == campaign.pk%}selected{%endif%} value="{{campaign.pk}}">{{campaign.name}} ({{campaign.get_active_leads_qs.count}} Fresh/Booked Leads)
                  {% comment %} ({{campaign.get_active_leads_qs.count}} active) {% endcomment %}
                 </option>
         {% comment %} {%endif%} {% endcomment %}

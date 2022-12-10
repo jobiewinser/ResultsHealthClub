@@ -110,7 +110,7 @@ def edit_lead(request, **kwargs):
         
         country_code = request.POST.get('country_code', "")
         
-        product_cost = request.POST.get('product_cost')
+        product_cost = request.POST.get('product_cost', 0)
         
         lead_pk = request.POST.get('lead_pk')
         if lead_pk:
@@ -124,10 +124,12 @@ def edit_lead(request, **kwargs):
         lead.last_name = last_name
         lead.email = email
         lead.whatsapp_number = f"{country_code}{phone}"
-        lead.product_cost = product_cost
+        if product_cost:
+            lead.product_cost = product_cost
+        
         lead.save()
         lead.trigger_refresh_websocket(refresh_position=refresh_position)
-        return HttpResponse("", status=200)
+        return HttpResponse(str(lead.pk), status=200)
     # except Exception as e:
     #     # messages.add_message(request, messages.ERROR, f'Error with creating a campaign lead')
     #     logger.debug("create_campaign_lead Error "+str(e))

@@ -153,19 +153,22 @@ class SiteConfigurationView(TemplateView):
         site_pk = get_site_pk_from_request(request)
         request.GET['site_pk'] = site_pk      
         site = Site.objects.get(pk=site_pk) 
-
-        # permissions
-        if get_user_allowed_to_view_site_configuration(request.user.profile, site):
-            return super(SiteConfigurationView, self).get(request, args, kwargs)
-        if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
-            return HttpResponse("You don't have permission to access this page")
-        raise PermissionDenied()
-        # endpermissions
+        return super(SiteConfigurationView, self).get(request, args, kwargs)
+        # if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+        #     return HttpResponse("You don't have permission to access this page")
+        # raise PermissionDenied()
 
     def get_context_data(self, **kwargs):    
         context = super(SiteConfigurationView, self).get_context_data(**kwargs)
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'core/htmx/site_configuration_htmx.html'
+
+        # permissions
+        context['permitted'] = False
+        if get_user_allowed_to_view_site_configuration(request.user.profile, site):
+            context['permitted'] = True
+        # endpermissions
+
         site = Site.objects.get(pk=self.request.GET['site_pk'])     
         context['whatsapp_numbers'] = site.get_live_whatsapp_phone_numbers()          
         calendly = Calendly(site.calendly_token)

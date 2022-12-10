@@ -113,6 +113,10 @@ function basehandlehtmxafterRequest(evt){
             }else if (evt.detail.pathInfo.requestPath.includes("edit-lead")){
                 $('#generic_modal').modal('hide');
                 snackbarShow('Successfully changed/created a campaign lead', 'success')
+                var current_module = $('#current_page').val()
+                if (current_module == 'campaign_booking_overview'){
+                    htmx.ajax('GET', "/refresh-booking-row/"+evt.detail.xhr.response+"/", {swap:'innerHTML', target: '#row_'+evt.detail.xhr.response})
+                }
             }else if (evt.detail.pathInfo.requestPath.includes("add-campaign-category")){
                 $('#generic_modal').modal('hide');
                 snackbarShow('Successfully added a campaign category, reloading...', 'success')
