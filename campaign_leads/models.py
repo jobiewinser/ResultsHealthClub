@@ -415,24 +415,24 @@ class Campaignlead(models.Model):
                 print("CampaignleadDEBUG10")
                 if send_order == 1:
                     type = '1203'
-                elif send_order == 2:
-                    type = '1204'
-                elif send_order == 3:
-                    type = '1205'
-                elif send_order == 4:
-                    type = '1206'
-                elif send_order == 5:
-                    type = '1207'
-                print("errorhere no suitable template found")
-                attached_error, created = AttachedError.objects.get_or_create(
-                    type = type,
-                    attached_field = "campaign_lead",
-                    campaign_lead = self,
-                )
-                if not created:
-                    print("CampaignleadDEBUG11")
-                    attached_error.created = datetime.now()
-                    attached_error.save()
+                # elif send_order == 2:
+                #     type = '1204'
+                # elif send_order == 3:
+                #     type = '1205'
+                # elif send_order == 4:
+                #     type = '1206'
+                # elif send_order == 5:
+                #     type = '1207'
+                    print("errorhere no suitable template found")
+                    attached_error, created = AttachedError.objects.get_or_create(
+                        type = type,
+                        attached_field = "campaign_lead",
+                        campaign_lead = self,
+                    )
+                    if not created:
+                        print("CampaignleadDEBUG11")
+                        attached_error.created = datetime.now()
+                        attached_error.save()
         return HttpResponse("Message Error", status=400)
             
             

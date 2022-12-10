@@ -988,8 +988,8 @@ tr.odd td {
     font-size:10px;
 }
 
-#site_list_wrapper{
-    min-width:250px
+#site_list_wrapper, #phone_list_wrapper{
+    min-width:350px
 }
 
 #campaign_category_pk{
