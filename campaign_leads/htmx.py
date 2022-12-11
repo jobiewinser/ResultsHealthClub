@@ -33,8 +33,9 @@ def get_modal_content(request, **kwargs):
 
 
             site_pk = get_site_pk_from_request(request)
-            if site_pk:
+            if site_pk and not site_pk == 'all':
                 request.GET['site_pk'] = site_pk
+                context['site'] = Site.objects.get(pk=site_pk)
             whatsapp_template_pk = request.GET.get('whatsapp_template_pk')
             if whatsapp_template_pk:
                 context['template'] = WhatsappTemplate.objects.get(pk=whatsapp_template_pk)
@@ -52,8 +53,6 @@ def get_modal_content(request, **kwargs):
                 if lead_pk:
                     context['lead'] = Campaignlead.objects.get(pk=lead_pk)
                     context['site'] = context['lead'].campaign.site
-                else:
-                    context['site'] = Site.objects.get(pk=site_pk)
                 manual_campaign =  ManualCampaign.objects.filter(site=context['site']).first()
                 if not manual_campaign:
                     ManualCampaign.objects.create(site=context['site'], name = "Manually Created")
@@ -76,10 +75,15 @@ def add_campaign_category(request, **kwargs):
         if not name:
             return HttpResponse("Please enter a name", status=500)
         campaign_pk = request.POST.get('campaign_pk')
-        campaign = Campaign.objects.get(pk=campaign_pk)
-        campaign_category, created = CampaignCategory.objects.get_or_create(site=campaign.site, name=name)
-        campaign.campaign_category = campaign_category
-        campaign.save()
+        site_pk = request.POST.get('site_pk')
+        if campaign_pk:
+            campaign = Campaign.objects.get(pk=campaign_pk)
+            campaign_category, created = CampaignCategory.objects.get_or_create(site=campaign.site, name=name)
+            campaign.campaign_category = campaign_category
+            campaign.save()
+        else:
+            site = Site.objects.get(pk=site_pk)
+            campaign_category, created = CampaignCategory.objects.get_or_create(site=site, name=name)
         return HttpResponse("", status=200)
     # except Exception as e:
     #     # messages.add_message(request, messages.ERROR, f'Error with creating a campaign lead')
@@ -200,7 +204,10 @@ def add_manual_booking(request, **kwargs):
         #     booking_type = 'a'
         # else:
         #     booking_type = 'b'
-        booking_datetime = datetime.strptime(f"{booking_date} {booking_time}", '%Y-%m-%d %H:%M')
+        try:
+            booking_datetime = datetime.strptime(f"{booking_date} {booking_time}", '%Y-%m-%d %H:%M')
+        except:
+            return HttpResponse("Please enter a valid date and time", status=500)
         booking = Booking.objects.create(
             datetime = booking_datetime,
             lead = lead,

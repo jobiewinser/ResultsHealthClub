@@ -69,6 +69,7 @@ urlpatterns = [
     path('configuration/campaign-assign-color/', campaignleadsviews.campaign_assign_color_htmx, name='campaign-assign-color'), 
     path('configuration/refresh-campaign-configuration-row/', campaignleadsviews.refresh_campaign_configuration_row, name='refresh-campaign-configuration-row'), 
     
+    path('configuration/profile-assign-campaign-category/', campaignleadsviews.profile_assign_campaign_category_htmx, name='profile-assign-campaign-category'), 
     path('configuration/campaign-assign-campaign-category/', campaignleadsviews.campaign_assign_campaign_category_htmx, name='campaign-assign-campaign-category'), 
     path('configuration/campaign-assign-whatsapp-business-account/', campaignleadsviews.campaign_assign_whatsapp_business_account_htmx, name='campaign-assign-whatsapp-business-account'), 
     path('configuration/campaign-assign-product_cost/', campaignleadsviews.campaign_assign_product_cost_htmx, name='campaign-assign-product_cost'), 

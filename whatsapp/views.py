@@ -633,3 +633,4 @@ def set_whatsapp_site_config(request, **kwargs):
     except Exception as e:        
         logger.error(f"set_whatsapp_template_sending_status {str(e)}")
         return HttpResponse("Couldn't set_whatsapp_template_sending_status", status=500)
+

@@ -234,7 +234,8 @@ class CompanyConfigurationView(TemplateView):
         
         context['role_choices'] = ROLE_CHOICES
         context['company'] = self.request.user.profile.company
-        
+        for profile in context['company'].profile_set.all():
+            CompanyProfilePermissions.objects.get_or_create(profile=profile, company=profile.company)
         # context['site_list'] = get_available_sites_for_user(self.request.user)
         return context
 @login_required
@@ -347,10 +348,27 @@ def get_site_pk_from_request(request):
     site_pk = request_dict.get('site_pk', None)
     if site_pk:
         return site_pk
-    profiles = Profile.objects.filter(user=request.user)
-    if profiles:
-        if profiles.first().site:
+    profile = Profile.objects.filter(user=request.user).first()
+    if profile and not request_dict.get('campaign_category_pk', None) and not request_dict.get('campaign_pk', None):
+        if profile.site:
             return request.user.profile.site.pk
+    return 'all'
+    
+
+@login_required
+def get_campaign_category_pk_from_request(request):  
+    if request.method == 'GET':
+        request_dict = request.GET
+    elif request.method == 'POST':
+        request_dict = request.POST
+    campaign_category_pk = request_dict.get('campaign_category_pk', None)
+    if campaign_category_pk:
+        return campaign_category_pk
+    profile = Profile.objects.filter(user=request.user).first()
+    if profile and not request_dict.get('site_pk', None) and not request_dict.get('campaign_pk', None):
+        if profile.campaign_category:
+            return request.user.profile.campaign_category.pk
+    return 'all'
     
 
 from django.core.mail import send_mail

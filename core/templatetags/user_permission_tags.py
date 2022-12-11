@@ -77,3 +77,9 @@ def get_profile_allowed_to_edit_profile_tag(request_profile, other_profile):
 @register.filter
 def get_user_allowed_to_add_call_tag(request_user, lead):
     return get_user_allowed_to_add_call(request_user, lead)
+        
+@register.filter
+def companyprofilepermissions_for_company_tag(profile, company):
+    return companyprofilepermissions_for_company(profile, company)
+
+    

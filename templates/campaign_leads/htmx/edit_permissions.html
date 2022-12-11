@@ -9,7 +9,7 @@
         <div class="col">
             {% if request.user.profile|get_profile_allowed_to_edit_profile_permissions_tag:profile%}
             <ul class="nav flex-column">
-                {%for profile_company_permissions in profile.companyprofilepermissions_set.all%}                 
+                {%for profile_company_permissions in profile|companyprofilepermissions_for_company_tag:request.user.profile.company%}                 
                 <li class="m-1">
                     <div class="row">
                         <div class="col p-0">

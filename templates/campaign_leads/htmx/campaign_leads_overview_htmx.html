@@ -31,7 +31,7 @@
         hx-push-url="false" hx-swap="innerHTML" hx-include=".overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_campaign_category" class="btn btn-primary btn-sm"></button>
         
         <button hidden
-            hx-get="{%url 'refresh-leads-board'%}" onclick="$('#campaign_category_pk').val('').trigger('change')"
+            hx-get="{%url 'refresh-leads-board'%}" onclick="$('#campaign_category_pk').val('all').trigger('change')"
             hx-swap="outerHTML" hx-push-url="false" hx-include=".overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#leads_board_span_wrapper" id="filter_campaign"></button>
         {% comment %} <button hidden hx-get="{% url 'get-campaign'%}" hx-include=".overview_table_filters" id="refresh_campaign_list_wrapper" hx-indicator="#page_load_indicator" hx-target="#campaign_list_wrapper" hx-trigger="click" hx-swap="outerHTML"></button> {% endcomment %}
         <div class="col-md-auto m-1 p-0" hx-get="{% url 'get-campaign'%}" hx-trigger="load" hx-indicator="#page_load_indicator" hx-target="#campaign_list_wrapper" hx-swap="outerHTML" hx-vals='{"site_pk":"{{site.pk}}","campaign_pk":"{{request.GET.campaign_pk}}"}'>
