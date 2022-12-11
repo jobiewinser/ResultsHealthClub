@@ -1,4 +1,5 @@
 from datetime import datetime
+from django.conf import settings
 import uuid
 from django.db import models
 from django.contrib.auth.models import User
@@ -304,7 +305,10 @@ class Campaignlead(models.Model):
                 if not whatsappnumber and send_order:
                     whatsappnumber = self.campaign.whatsapp_business_account.whatsappnumber
                 customer_number = self.whatsapp_number
-                response = whatsapp.send_template_message(self.whatsapp_number, whatsappnumber, template, language, components)
+                if not settings.DEMO:
+                    response = whatsapp.send_template_message(self.whatsapp_number, whatsappnumber, template, language, components)
+                else:
+                    response = {} #TODO
                 print(str(response))
                 logger.debug(str(response))
                 
