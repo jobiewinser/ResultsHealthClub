@@ -6,23 +6,27 @@
                 
                 {%if user.profile.company%}
                 <div class="form-floating m-1">
-                    <input disabled name="company" value="{%if edit_user.profile.company%}{{edit_user.profile.company.name}}{%else%}Company not configured{%endif%}" class="form-control" id="company"/>
+                    <input disabled name="company"  {%if demo and not request.user.is_superuser%}disabled{%endif%}
+                    value="{%if edit_user.profile.company%}{{edit_user.profile.company.name}}{%else%}Company not configured{%endif%}" class="form-control" id="company"/>
                     <label for="company">Company</label>
                 </div>
                 {%endif%}
                 
                 <div class="form-floating m-1">
-                    <input name="first_name" value="{{edit_user.first_name}}" class="form-control modify_user_input" id="first_name"/>
+                    <input name="first_name"  {%if demo and not request.user.is_superuser%}disabled{%endif%}
+                    value="{{edit_user.first_name}}" class="form-control modify_user_input" id="first_name"/>
                     <label for="first_name">First Name</label>
                 </div>
                 
                 <div class="form-floating m-1">
-                    <input name="last_name" value="{{edit_user.last_name}}" class="form-control modify_user_input" id="last_name"/>
+                    <input name="last_name"  {%if demo and not request.user.is_superuser%}disabled{%endif%}
+                    value="{{edit_user.last_name}}" class="form-control modify_user_input" id="last_name"/>
                     <label for="last_name">Last Name</label>
                 </div>
                 
                 <div class="form-floating m-1">
-                    <input name="calendly_event_page_url" value="{{edit_user.profile.calendly_event_page_url}}" class="form-control modify_user_input" id="calendly_event_page_url"/>
+                    <input name="calendly_event_page_url"  {%if demo and not request.user.is_superuser%}disabled{%endif%}
+                    value="{{edit_user.profile.calendly_event_page_url}}" class="form-control modify_user_input" id="calendly_event_page_url"/>
                     <label for="calendly_event_page_url">Calendly Event Page Url</label>
                 </div>
                         
@@ -39,7 +43,7 @@
         <div class="row m-1">
             <div class="col center" >
                 <button class="btn btn-primary" type="button"
-                hx-encoding="multipart/form-data"
+                hx-encoding="multipart/form-data"  {%if demo and not request.user.is_superuser%}disabled{%endif%}
                     hx-post="{% url 'modify-user' %}" hx-include=".modify_user_input"
                     hx-swap="none"
                     hx-indicator=".top-htmx-indicator">

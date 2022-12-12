@@ -33,6 +33,7 @@
     <div class="row">
         <div class="col p-0">
             <select class="form-select reset_on_error" name="site_pk" id="profile_site_{{profile.pk}}" hx-post="{% url 'change-profile-site' %}" hx-swap="innerHTML" 
+            {%if demo and not request.user.is_superuser%}disabled{%endif%}
             data-value="" onfocus="this.setAttribute('data-value', this.value);"
             hx-indicator="#htmx_indicator_site_{{profile.pk}}"  hx-trigger="change" hx-target="#company_configuration_row_{{profile.pk}}"
             hx-vals='{"profile_pk": "{{profile.pk}}"}'>  
@@ -51,6 +52,7 @@
             {%if not request.user.profile|get_profile_allowed_to_edit_profile_tag:profile or profile == request.user.profile%}
             disabled
             {%endif%}
+            {%if demo and not request.user.is_superuser%}disabled{%endif%}
             data-value="" onfocus="this.setAttribute('data-value', this.value);"
             hx-indicator="#htmx_indicator_site_{{profile.pk}}"  hx-trigger="change" hx-target="#company_configuration_row_{{profile.pk}}"
             hx-vals='{"profile_pk": "{{profile.pk}}"}'>  
@@ -74,7 +76,7 @@
                 <div class="col p-0">
                     <span hidden>{{profile.campaign_category.name}}</span>           
                     <select class="form-select" name="campaign_category_pk" id="campaign_category_pk_{{profile.pk}}" 
-                        hx-post="{% url 'profile-assign-campaign-category' %}" hx-swap="innerHTML" 
+                        hx-post="{% url 'profile-assign-campaign-category' %}" hx-swap="innerHTML" {%if demo and not request.user.is_superuser%}disabled{%endif%}
                         hx-trigger="change"
                         hx-indicator=".top-htmx-indicator" 
                         hx-vals='{"profile_pk": "{{profile.pk}}"}'
@@ -101,7 +103,7 @@
 </td>
 <td class="center">   
     <button class="nowrap btn btn-light pointer" type="button"
-        {%if not request.user.profile|get_profile_allowed_to_edit_profile_permissions_tag:profile%}
+        {%if not request.user.profile|get_profile_allowed_to_edit_profile_permissions_tag:profile and not demo%}
         disabled
         {%endif%}
         hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
@@ -111,7 +113,7 @@
 </td>
 <td class="center">   
     <button class="nowrap btn btn-light pointer" type="button" 
-        {%if not request.user.profile|get_profile_allowed_to_edit_profile_tag:profile%}
+        {%if not request.user.profile|get_profile_allowed_to_edit_profile_tag:profile and not demo%}
         disabled
         {%endif%}
         hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
