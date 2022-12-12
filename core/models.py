@@ -571,6 +571,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True)
     avatar = models.ImageField(default='default.png', upload_to='profile_images')
     site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
+    campaign_category = models.ForeignKey("campaign_leads.CampaignCategory", on_delete=models.SET_NULL, null=True, blank=True)
     company = models.ForeignKey("core.Company", on_delete=models.SET_NULL, null=True, blank=True)
     sites_allowed = models.ManyToManyField("core.Site", related_name="profile_sites_allowed", null=True, blank=True)
     calendly_event_page_url = models.TextField(blank=True, null=True)
@@ -605,14 +606,17 @@ class Profile(models.Model):
     @property
     def name(self):
         return f"{self.user.first_name} {self.user.last_name}"
-@receiver(models.signals.post_save, sender=Profile)
-def execute_after_save(sender, instance, created, *args, **kwargs):  
-    for site in instance.company.site_set.all():
-        permissions, created = SiteProfilePermissions.objects.get_or_create(profile=instance, site=site)
-@receiver(models.signals.post_save, sender=Profile)
-def execute_after_save(sender, instance, created, *args, **kwargs):  
-    if not instance.site in instance.sites_allowed.all() and instance.site:
-        instance.sites_allowed.add(instance.site)
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        for site in self.company.site_set.all():
+            permissions, created = SiteProfilePermissions.objects.get_or_create(profile=self, site=site)
+        if self.campaign_category:
+            if not self.campaign_category.site == self.site:
+                self.campaign_category = None
+                self
+        if not self.site in self.sites_allowed.all() and self.site:
+            self.sites_allowed.add(self.site)   
+        super(Profile, self).save(force_insert, force_update, using, update_fields)
+        
 class FreeTasterLink(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)

@@ -71,14 +71,14 @@
                             </button>
                         </div>
                         <div class="col-md-auto m-1 p-0">
-                            <button {%if not request.user.profile.company.subscription == 'pro'%}disabled{%endif%}
+                            <button {%if not request.user.profile.company.subscription == 'pro' and not demo%}disabled{%endif%}
                                 class="btn btn-secondary btn-sm quick_filter_date_button {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_tag|add_months:-1|date_to_date_input_prefill%}active{%endif%}" 
                                 onclick="$('#start_date').val('{{''|today_date_tag|add_months:-1|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change'); $('.quick_filter_date_button').removeClass('active'); $(this).addClass('active');">
                                 <small>{{''|today_date_tag|add_months:-1|nice_date_tag}} (month) {%if not request.user.profile.company.subscription == 'pro'%}<i class="fa-solid fa-rectangle-pro"></i>{%endif%}</small>
                             </button>
                         </div>
                         <div class="col-md-auto m-1 p-0">
-                            <button {%if not request.user.profile.company.subscription == 'pro'%}disabled{%endif%}
+                            <button {%if not request.user.profile.company.subscription == 'pro' and not demo%}disabled{%endif%}
                                 class="btn btn-secondary btn-sm quick_filter_date_button {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_tag|add_years:-1|date_to_date_input_prefill%}active{%endif%}" 
                                 onclick="$('#start_date').val('{{''|today_date_tag|add_years:-1|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change'); $('.quick_filter_date_button').removeClass('active'); $(this).addClass('active');">
                                 <small>{{''|today_date_tag|add_years:-1|nice_date_tag}} (year) {%if not request.user.profile.company.subscription == 'pro'%}<i class="fa-solid fa-rectangle-pro"></i>{%endif%}</small>

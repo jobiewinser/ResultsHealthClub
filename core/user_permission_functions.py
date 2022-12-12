@@ -43,6 +43,9 @@ def get_profile_allowed_to_edit_profile_permissions(user_profile, target_profile
     if check_if_profile_is_higher_authority_than_profile(user_profile, target_profile):
         permissions = CompanyProfilePermissions.objects.filter(profile=user_profile, company=user_profile.company).first()
         if permissions:
+            if user_profile.role == 'a':
+                permissions.edit_user_permissions = True
+                permissions.save()
             return permissions.edit_user_permissions
     return False
 
@@ -112,3 +115,6 @@ def get_profile_allowed_to_edit_other_profile(request_profile, other_profile):
 def get_user_allowed_to_add_call(request_user, lead):
     return True
 
+
+def companyprofilepermissions_for_company(profile, company):
+    return profile.companyprofilepermissions_set.filter(company=company)

@@ -180,6 +180,17 @@ class WhatsappTemplate(models.Model):
         if self.site:
             return self.site.name
         return ''
+
+    def render_whatsapp_template_to_html(self):
+        rendered_html = f"""
+        <b>{self.components[0]}</b>
+        <br>
+        <br>
+        <p>{self.components[1]}</p>
+        <small>{self.components[2]}</small>
+        """
+        return rendered_html
+
     # def rendered_demo(self):
     #     return self.text.replace('{1}', 'Jobie')
 

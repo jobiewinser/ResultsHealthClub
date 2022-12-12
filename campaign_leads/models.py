@@ -1,4 +1,5 @@
 from datetime import datetime
+from django.conf import settings
 import uuid
 from django.db import models
 from django.contrib.auth.models import User
@@ -188,7 +189,7 @@ class Campaignlead(models.Model):
                 campaigntemplatelink = self.campaign.campaigntemplatelink_set.filter(send_order=send_order).first()
                 if campaigntemplatelink:
                     template = campaigntemplatelink.template
-                type = str(1202 + send_order)
+                type = str(1202)
             else:
                 type = None
             
@@ -249,29 +250,6 @@ class Campaignlead(models.Model):
                                         )
                                         text = text.replace('[[1]]',self.first_name)
                                         counter = counter + 1
-                                    if '[[2]]' in text:
-                                        params.append(              
-                                            {
-                                                "type": "text",
-                                                "text":  self.first_name
-                                            }
-                                        )
-                                        text = text.replace('[[2]]',self.first_name)
-                                        counter = counter + 1
-                                # if '{{3}}' in text:
-                                #     params.append(           
-                                #         {
-                                #             "type": "text",
-                                #             "text":  self.campaign.company.name
-                                #         }
-                                #     )
-                                # if '{{4}}' in text:
-                                #     params.append(                   
-                                #         {
-                                #             "type": "text",
-                                #             "text":  self.campaign.site.whatsapp_number
-                                #         }
-                                #     )
                                 whole_text = f"""
                                     {whole_text} 
                                     {text}
@@ -327,7 +305,10 @@ class Campaignlead(models.Model):
                 if not whatsappnumber and send_order:
                     whatsappnumber = self.campaign.whatsapp_business_account.whatsappnumber
                 customer_number = self.whatsapp_number
-                response = whatsapp.send_template_message(self.whatsapp_number, whatsappnumber, template, language, components)
+                if not settings.DEMO:
+                    response = whatsapp.send_template_message(self.whatsapp_number, whatsappnumber, template, language, components)
+                else:
+                    response = {} #TODO
                 print(str(response))
                 logger.debug(str(response))
                 
@@ -415,15 +396,6 @@ class Campaignlead(models.Model):
                 print("CampaignleadDEBUG10")
                 if send_order == 1:
                     type = '1203'
-                # elif send_order == 2:
-                #     type = '1204'
-                # elif send_order == 3:
-                #     type = '1205'
-                # elif send_order == 4:
-                #     type = '1206'
-                # elif send_order == 5:
-                #     type = '1207'
-                    print("errorhere no suitable template found")
                     attached_error, created = AttachedError.objects.get_or_create(
                         type = type,
                         attached_field = "campaign_lead",

@@ -99,7 +99,7 @@ else:
         os.path.join(BASE_DIR, "staticfiles"),
     )
     WSGI_APPLICATION = 'wsgi.application' #haven't testied this on prod yet, might be pointless?
-
+DEMO=os.getenv("DEMO", False)
 # if DEBUG:
 WHATSAPP_PHONE_OVERRIDE1=None
 WHATSAPP_PHONE_OVERRIDE2='447974214718'
@@ -131,7 +131,7 @@ INSTALLED_APPS = [
     'channels',
     'hijack',
     'hijack.contrib.admin',
-    "django_extensions",
+    # "django_extensions",
 ]
 
 MIDDLEWARE = [
@@ -161,6 +161,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'core.context_processors.demo',
             ],
         },
     },

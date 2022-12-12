@@ -1,18 +1,3 @@
-"""jobiewebsite URL Configuration
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/3.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.urls import path
 import campaign_leads.views as campaignleadsviews
 import campaign_leads.htmx as campaignleadshtmx
@@ -69,6 +54,7 @@ urlpatterns = [
     path('configuration/campaign-assign-color/', campaignleadsviews.campaign_assign_color_htmx, name='campaign-assign-color'), 
     path('configuration/refresh-campaign-configuration-row/', campaignleadsviews.refresh_campaign_configuration_row, name='refresh-campaign-configuration-row'), 
     
+    path('configuration/profile-assign-campaign-category/', campaignleadsviews.profile_assign_campaign_category_htmx, name='profile-assign-campaign-category'), 
     path('configuration/campaign-assign-campaign-category/', campaignleadsviews.campaign_assign_campaign_category_htmx, name='campaign-assign-campaign-category'), 
     path('configuration/campaign-assign-whatsapp-business-account/', campaignleadsviews.campaign_assign_whatsapp_business_account_htmx, name='campaign-assign-whatsapp-business-account'), 
     path('configuration/campaign-assign-product_cost/', campaignleadsviews.campaign_assign_product_cost_htmx, name='campaign-assign-product_cost'), 

@@ -72,10 +72,12 @@ function setDoubleTap(identifier){
 
 function basehandlehtmxafterSettle(evt){ 
     console.log("basehandlehtmxafterSettle")    
-    $('.select2:not([data-select2-id])').select2({
-        searchInputPlaceholder: '🔎 Search here...',        
-        theme: 'bootstrap-5',
-    })
+    try {
+        $('.select2:not([data-select2-id])').select2({
+            searchInputPlaceholder: '🔎 Search here...',        
+            theme: 'bootstrap-5',
+        })
+    }catch{}
 }
 
 function basehandlehtmxafterRequest(evt){   
@@ -210,27 +212,28 @@ function fallbackCopyTextToClipboard(text) {
     document.body.removeChild(textArea);
 }
 
+try{
+    (function($) {
 
-(function($) {
+        var Defaults = $.fn.select2.amd.require('select2/defaults');
 
-    var Defaults = $.fn.select2.amd.require('select2/defaults');
+        $.extend(Defaults.defaults, {
+            searchInputPlaceholder: ''
+        });
 
-    $.extend(Defaults.defaults, {
-        searchInputPlaceholder: ''
-    });
+        var SearchDropdown = $.fn.select2.amd.require('select2/dropdown/search');
 
-    var SearchDropdown = $.fn.select2.amd.require('select2/dropdown/search');
+        var _renderSearchDropdown = SearchDropdown.prototype.render;
 
-    var _renderSearchDropdown = SearchDropdown.prototype.render;
+        SearchDropdown.prototype.render = function(decorated) {
 
-    SearchDropdown.prototype.render = function(decorated) {
+            // invoke parent method
+            var $rendered = _renderSearchDropdown.apply(this, Array.prototype.slice.apply(arguments));
 
-        // invoke parent method
-        var $rendered = _renderSearchDropdown.apply(this, Array.prototype.slice.apply(arguments));
+            this.$search.attr('placeholder', this.options.get('searchInputPlaceholder'));
 
-        this.$search.attr('placeholder', this.options.get('searchInputPlaceholder'));
+            return $rendered;
+        };
 
-        return $rendered;
-    };
-
-})(window.jQuery);
+    })(window.jQuery);
+}catch{}

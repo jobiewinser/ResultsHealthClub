@@ -13,7 +13,7 @@ from active_campaign.models import ActiveCampaign
 # from core.core_decorators import campaign_leads_enabled_required
 from core.models import Profile, Site, WhatsappBusinessAccount
 from core.user_permission_functions import get_available_sites_for_user, get_user_allowed_to_add_call
-from core.views import get_site_pk_from_request
+from core.views import get_site_pk_from_request, get_campaign_category_pk_from_request
 from django.db.models import Q, Count
 from django.db.models import OuterRef, Subquery, Count
 from django.db.models import F
@@ -83,7 +83,6 @@ def get_leads_board_context(request):
     campaigns = get_campaign_qs(request)
     leads = Campaignlead.objects.filter(archived=False, campaign__site__company=request.user.profile.company, campaign__site__in=request.user.profile.sites_allowed.all()).exclude(booking__archived=False)
     campaign_pk = request.GET.get('campaign_pk', None)
-    campaign_category_pk = request.GET.get('campaign_category_pk', None)
     filtered = False
     
     if campaign_pk:
@@ -95,6 +94,7 @@ def get_leads_board_context(request):
             request.GET['site_pk'] = context['campaign'].site.pk
         except Exception as e:
             pass
+    campaign_category_pk = get_campaign_category_pk_from_request(request)
     if campaign_category_pk and not campaign_category_pk == 'all':
         try:
             context['campaign_category'] = CampaignCategory.objects.get(pk=campaign_category_pk)
@@ -210,15 +210,17 @@ class CampaignConfigurationView(TemplateView):
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'campaign_leads/campaign_configuration_htmx.html'  
         company = self.request.user.profile.company
-
-        for campaign_dict in ActiveCampaignApi(company.active_campaign_api_key, company.active_campaign_url).get_lists(company.active_campaign_url).get('lists',[]):
-            campaign, created = ActiveCampaign.objects.get_or_create(
-                active_campaign_id = campaign_dict.pop('id'),
-                name = campaign_dict.pop('name'),
-                company = company,
-            )
-            campaign.json_data = campaign_dict
-            campaign.save()
+        try:
+            for campaign_dict in ActiveCampaignApi(company.active_campaign_api_key, company.active_campaign_url).get_lists(company.active_campaign_url).get('lists',[]):
+                campaign, created = ActiveCampaign.objects.get_or_create(
+                    active_campaign_id = campaign_dict.pop('id'),
+                    name = campaign_dict.pop('name'),
+                    company = company,
+                )
+                campaign.json_data = campaign_dict
+                campaign.save()
+        except:
+            pass
         if company:
             campaigns = company.get_and_generate_campaign_objects()
 
@@ -333,6 +335,15 @@ def campaign_assign_campaign_category_htmx(request):
     campaign.campaign_category = CampaignCategory.objects.filter(pk=campaign_category_pk).first()
     campaign.save()
     return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign})
+@login_required
+def profile_assign_campaign_category_htmx(request):
+    context= {}
+    profile = Profile.objects.get(pk=request.POST.get('profile_pk'))
+    campaign_category_pk = request.POST.get('campaign_category_pk') or 0    
+    profile.campaign_category = CampaignCategory.objects.filter(pk=campaign_category_pk).first()
+    profile.save()
+    context['profile'] = profile
+    return render(request, 'core/htmx/company_configuration_row.html', context)
 
 @login_required
 def refresh_campaign_configuration_row(request):
