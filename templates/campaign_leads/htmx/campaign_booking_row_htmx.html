@@ -132,7 +132,7 @@
                     hx-get="{% url 'campaign-lead-get-modal-content' param1=lead.pk %}" 
                     hx-push-url="false"
                     hx-swap="innerHTML" hx-trigger="click" {% endcomment %}
-                    ><i class="fa-regular fa-plus" ></i> New</button>
+                    ><i class="fa-regular fa-plus" ></i> New Booking</button>
                 <button class="btn btn-secondary btn-sm" type="button"
                     data-bs-toggle="popover" 
                     data-bs-trigger="hover" 
@@ -176,6 +176,12 @@
                 <button class="btn btn-{%if lead.note_set.all%}dark{%else%}secondary{%endif%} btn-sm" type="button"
                     onclick="htmx.ajax('GET', '{% url 'campaign-lead-get-modal-content' param1=lead.pk %}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'note_history'}})">
                     <i class="fa-solid fa-notes"></i> <span style="color:Silver">{{lead.note_set.all.count}}</span></button>
+            </div>
+            
+            <div class="btn-group btn-space  mb-1">    
+                <button class="btn btn-warning btn-sm" type="button"
+                    onclick="htmx.ajax('GET', '{% url 'campaign-lead-get-modal-content'%}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'edit_lead','lead_pk':'{{lead.pk}}'}})">
+                    <i class="fa-solid fa-pencil"></i></button>
             </div>
         </span>
         <br>

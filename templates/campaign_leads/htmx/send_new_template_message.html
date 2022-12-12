@@ -5,7 +5,9 @@
             <select class="form-select send_new_template_message_input" name="template_pk">
                 <option value="">Choose a template</option>
                 {%for template in whatsappnumber.whatsapp_business_account.active_live_templates%} 
+                {%if template.name%}
                 <option value="{{template.pk}}">{{template.name}}</option>
+                {%endif%}
                 {%endfor%}
             </select>
             <br>

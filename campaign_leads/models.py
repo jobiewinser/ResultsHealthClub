@@ -54,7 +54,7 @@ class Campaign(PolymorphicModel):
     whatsapp_business_account = models.ForeignKey('core.WhatsappBusinessAccount', on_delete=models.SET_NULL, null=True, blank=True)
     color = models.CharField(max_length=15, null=False, blank=False, default="96,248,61")
     def get_active_leads_qs(self):
-        return self.campaignlead_set.filter(archived=False)
+        return self.campaignlead_set.exclude(archived=True).exclude(sold=True)
     def is_manual(self):
         return False
         
@@ -396,8 +396,6 @@ class Campaignlead(models.Model):
                 print("CampaignleadDEBUG10")
                 if send_order == 1:
                     type = '1203'
-                print("errorhere no suitable template found")
-                if send_order > 1:
                     attached_error, created = AttachedError.objects.get_or_create(
                         type = type,
                         attached_field = "campaign_lead",

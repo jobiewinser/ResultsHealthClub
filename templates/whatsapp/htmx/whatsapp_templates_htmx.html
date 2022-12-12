@@ -16,10 +16,10 @@
         {%with True as hide_show_all%}
         {%include 'core/htmx/site_selection.html'%}
         <div class="col-md-auto m-1 ps-0">
-            <div id="site_list_wrapper">  
+            <div id="phone_list_wrapper">  
                 <select class="form-select select2 select2-styling overview_table_filters"name="whatsapp_business_account_pk" id="whatsapp_business_account_pk" onchange="$('#change_site').click();">
                     {%for whatsapp_business_account in whatsapp_business_accounts%}
-                    <option {%if whatsapp_business_account.pk == request|get_key_in_get_or_post:'whatsapp_business_account_pk'|str_to_int %}selected{%endif%} value="{{whatsapp_business_account.pk}}">{{whatsapp_business_account.whatsappnumber}}</option>
+                    <option {%if whatsapp_business_account.pk == request|get_key_in_get_or_post:'whatsapp_business_account_pk'|str_to_int %}selected{%endif%} value="{{whatsapp_business_account.pk}}">Whatsapp Phone: {{whatsapp_business_account.whatsappnumber}}</option>
                     {%endfor%}
                 </select>
             </div>

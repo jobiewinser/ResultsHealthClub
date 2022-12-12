@@ -115,3 +115,12 @@ h2 {
     overflow-x: scroll;
     overflow-y: hidden;
 }
+
+.floating_drag_area_title{
+    color:white;
+    position:absolute;
+    top:40%;
+    /* left:50%; */
+    text-align:center;
+    width:100%
+}
