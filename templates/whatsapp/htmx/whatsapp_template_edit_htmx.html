@@ -7,8 +7,18 @@
             renderTemplate()
         });
     </script>
-    <link href="{% static 'css/phone.css' %}" rel="stylesheet" />
-
+    <style>
+        
+        .whatsapp_write_div{
+            width: calc(100vw - 450px);
+        }
+        #whatsapp_render_div {
+            width:400px;
+            position:fixed;
+            right:25px;
+            top:30%;
+        }
+    </style>
     <div class="row mt-0">
         {%block extra_top_left_buttons %}
         <div class="col-md-auto">
@@ -27,212 +37,199 @@
         </div>
         {%endblock extra_top_right_buttons %}    
     </div>   
-    <div class="row mt-2">
+    <div class="row mt-2 whatsapp_write_div">
         <div class="col">
             <div class="alert alert-info">
                 The information below does not reflect the real template on Whatsapp, this is an edited draft that can be sent to Whatsapp for approval later through the Template Table.
             </div>
         </div>
     </div>
-    <div class="row mt-2">
-        <div class="col">
-        </div>
-        <div class="col-md-auto">
-            <div class="row mt-2">
-                <div class="col">
+    <div class="row mt-2 whatsapp_write_div">
+        <div class="col text-center">
+            {%block template_name%}
+            <h5>Template Name</h5>
+            <div class="row">
+                <div class="col"
+                    data-bs-toggle="popover" 
+                    data-bs-trigger="hover focus" 
+                    data-bs-placement="top"
+                    data-bs-html="true"
+                    data-bs-title="{%if readonly or template.message_template_id%}Why is this input disabled?{%else%}Template Name Rules{%endif%}"
+                    data-bs-content="{%if readonly or template.message_template_id%}This input can't be changed for template edits. Please only make small changes, otherwise create a new template.{%else%}This it the name of the template sent to whatsapp. It must only use lowercase letters and underscores! <br><br><small>e.g <b>my_first_message_template</b></small>{%endif%}">
+                    <input {%if readonly or template.message_template_id%}disabled{%endif%} oninput="validateWhatsappText(this);" class="form-control" id="template_name" value="{%if template.name%}{{template.name}}{%elif not template.name and template.pending_name%}{{template.pending_name}}{%endif%}" name="template_name">
                 </div>
-                <div class="col-6 center card card-white p-3"  style="">                    
-                    {%block template_name%}
-                    <h5>Template Name</h5>
-                    <div class="row">
-                        <div class="col"
-                            data-bs-toggle="popover" 
-                            data-bs-trigger="hover" 
-                            data-bs-placement="top"
-                            data-bs-html="true"
-                            data-bs-title="{%if readonly or template.message_template_id%}Why is this input disabled?{%else%}Template Name Rules{%endif%}"
-                            data-bs-content="{%if readonly or template.message_template_id%}This input can't be changed for template edits. Please only make small changes, otherwise create a new template.{%else%}This it the name of the template sent to whatsapp. It must only use lowercase letters and underscores! <br><br><small>e.g <b>my_first_message_template</b></small>{%endif%}">
-                            <input {%if readonly or template.message_template_id%}disabled{%endif%} oninput="validateWhatsappText(this);" class="form-control" id="template_name" value="{%if template.name%}{{template.name}}{%elif not template.name and template.pending_name%}{{template.pending_name}}{%endif%}" name="template_name">
-                        </div>
-                    </div>
-                    {%endblock template_name%}
+            </div>
+            {%endblock template_name%}
+            
+            {%block template_category%}
+            <hr>
+            <h5>Category</h5>
+            <div class="row">
+                <div class="col"
+                data-bs-toggle="popover" 
+                data-bs-trigger="hover focus" 
+                data-bs-html="true"
+                data-bs-placement="top"
+                data-bs-title="{%if readonly or template.message_template_id%}Why is this input disabled?{%else%}What do these categories mean?{%endif%}"
+                data-bs-content="{%if readonly or template.message_template_id%}
+                                This input can't be changed for template edits. Please only make small changes, otherwise create a new template.
+                                {%else%}
+                                <b>Transactional</b>
+                                <p>
+                                    Send account updates, order updates, alerts and more to share important information.
+                                </p>
+                                <br>
+                                <b>Marketing</b>
+                                <p>
+                                    Send promotional offers, product announcements and more to increase awareness.
+                                </p>{%endif%}" >
+                    <select {%if readonly or template.message_template_id%}disabled{%endif%} id="template_category" name="template_category" class="form-select form-select-sm align-self-center m-1">
+                        {%for k,v in categories.items%}
+                        <option {%if template.category == k%}selected {%elif not template.category and template.pending_category == k%}selected {%endif%}value="{{k}}">{{k}}</option>
+                        {%endfor%}        
+                    </select>
+                </div>
+            </div>
+            {%endblock template_category%}
+            <hr>
+            <h5>Header </h5>
+            <small>
+                <p><b>Max 60 characters including any variables</b>. For example a header that is 55 characters long would fail to send to a customer with a name longer than 5 characters (if you include their name in the header).</p>
+            </small>
+            <div class="row">
+                <div class="col-md-3" style="min-width:170px">
+                    <select {%if readonly%}disabled{%endif%} {%if readonly%}disabled{%endif%} id="variable_choice"  onclick="$('#template_header').val($('#template_header').val()+$(this).val()).trigger('input'); $(this).val('');"
+                    name="variable_choice" class="form-select form-select-sm align-self-center m-1">
+                        {%for k,v in variables.items%}
+                        <option value="{{k}}">{{v.0}}</option>
+                        {%endfor%}     
+                        <option selected value="">Insert variable</option>     
+                    </select>
+                </div>
+                <div class="col">
+                    <input {%if readonly%}disabled{%endif%} type="text" style="width:300px;" maxlength="60"
                     
-                    {%block template_category%}
-                    <hr>
-                    <h5>Category</h5>
-                    <div class="row">
-                        <div class="col"
-                        data-bs-toggle="popover" 
-                        data-bs-trigger="hover" 
-                        data-bs-html="true"
-                        data-bs-placement="top"
-                        data-bs-title="{%if readonly or template.message_template_id%}Why is this input disabled?{%else%}What do these categories mean?{%endif%}"
-                        data-bs-content="{%if readonly or template.message_template_id%}
-                                        This input can't be changed for template edits. Please only make small changes, otherwise create a new template.
-                                        {%else%}
-                                        <b>Transactional</b>
-                                        <p>
-                                            Send account updates, order updates, alerts and more to share important information.
-                                        </p>
-                                        <br>
-                                        <b>Marketing</b>
-                                        <p>
-                                            Send promotional offers, product announcements and more to increase awareness.
-                                        </p>{%endif%}" >
-                            <select {%if readonly or template.message_template_id%}disabled{%endif%} id="template_category" name="template_category" class="form-select form-select-sm align-self-center m-1">
-                                {%for k,v in categories.items%}
-                                <option {%if template.category == k%}selected {%elif not template.category and template.pending_category == k%}selected {%endif%}value="{{k}}">{{k}}</option>
-                                {%endfor%}        
-                            </select>
-                        </div>
-                    </div>
-                    {%endblock template_category%}
-                    <hr>
-                    <h5>Header </h5>
-                    <small>
-                        <p><b>Max 60 characters including any variables</b>. For example a header that is 55 characters long would fail to send to a customer with a name longer than 5 characters (if you include their name in the header).</p>
-                    </small>
-                    <div class="row">
-                        <div class="col-md-3">
-                            <select {%if readonly%}disabled{%endif%} {%if readonly%}disabled{%endif%} id="variable_choice"  onclick="$('#template_header').val($('#template_header').val()+$(this).val()).trigger('input'); $(this).val('');" name="variable_choice" class="form-select form-select-sm align-self-center m-1">
-                                {%for k,v in variables.items%}
-                                <option value="{{k}}">{{v.0}}</option>
-                                {%endfor%}     
-                                <option selected value="">Insert a variable</option>     
-                            </select>
-                        </div>
-                        <div class="col">
-                            <input {%if readonly%}disabled{%endif%} type="text" style="width:300px;" maxlength="60"
-                            
-                            id="template_header" 
-                            name="template_header" 
-                            class="template_editor_input form-control" 
-                            oninput="renderTemplate();" value="{%if template.pending_components%}{%for component in template.pending_components%}{%if component.type == 'HEADER'%}{{component.text}}{%endif%}{%endfor%}{%else%}{%for component in template.components%}{%if component.type == 'HEADER'%}{{component.text}}{%endif%}{%endfor%}{%endif%}">
-                        </div>
-                    </div>
-                    <hr>
-
-                    <h5>Body</h5>
-                    <small>
-                        <p><b>Max 1024 characters including any variables</b>. Messages longer than 1024 characters will fail to send.</p>
-                    </small>
-                    <div class="row">
-                        <div class="col-md-3">
-                            <select {%if readonly%}disabled{%endif%} id="variable_choice"  onclick="$('#template_body').val($('#template_body').val()+$(this).val()).trigger('input'); $(this).val('');" name="variable_choice" class="form-select form-select-sm align-self-center m-1">
-                                {%for k,v in variables.items%}
-                                <option value="{{k}}">{{v.0}}</option>
-                                {%endfor%}     
-                                <option selected value="">Insert a variable</option>     
-                            </select>
-                        </div>
-                        <div class="col">
-                            <textarea {%if readonly%}disabled{%endif%} style="width:300px; height:340px;"  maxlength="1024"
-                                id="template_body" 
-                                name="template_body" 
-                                class="template_editor_input form-control" 
-                                oninput="renderTemplate();">{%if template.pending_components%}{%for component in template.pending_components%}{%if component.type == 'BODY'%}{{component.text}}{%endif%}{%endfor%}{%else%}{%for component in template.components%}{%if component.type == 'BODY'%}{{component.text}}{%endif%}{%endfor%}{%endif%}</textarea>
-                        </div>
-                    </div>
-                    <hr>
-
-                    <h5>Footer</h5>
-                    <small>
-                        <p><b>Max 60 characters including any variables</b>. For example a footer that is 55 characters long would fail to send to a customer with a name longer than 5 characters (if you include their name in the footer).</p>
-                    </small>
-                    <div class="row">
-                        <div class="col-md-3">
-                        </div>
-                        <div class="col">
-                            <input {%if readonly%}disabled{%endif%} type="text" style="width:300px;"  maxlength="60"
-                            id="template_footer" 
-                            name="template_footer" 
-                            class="template_editor_input form-control" 
-                            oninput="renderTemplate();" 
-                            value="{%if template.pending_components%}{%for component in template.pending_components%}{%if component.type == 'FOOTER'%}{{component.text}}{%endif%}{%endfor%}{%else%}{%for component in template.components%}{%if component.type == 'FOOTER'%}{{component.text}}{%endif%}{%endfor%}{%endif%}">
-                        </div>
-                    </div>
+                    id="template_header" 
+                    name="template_header" 
+                    class="template_editor_input form-control" 
+                    oninput="renderTemplate();" value="{%if template.pending_components%}{%for component in template.pending_components%}{%if component.type == 'HEADER'%}{{component.text}}{%endif%}{%endfor%}{%else%}{%for component in template.components%}{%if component.type == 'HEADER'%}{{component.text}}{%endif%}{%endfor%}{%endif%}">
                 </div>
-                <div class="col-md-auto d-flex justify-content-start ms-4 m-1">
-                    <i class="fa-solid fa-arrow-right align-self-center" style="font-size:40px"></i>                    
-                </div>
-                <div class="col-md-auto center">                    
-                    {%block submit_button%}
-                    <button {%if readonly%}disabled{%endif%} class="btn template_save_button btn-success m-3"
-                        onclick="saveTemplate('{{whatsapp_business_account.pk}}', '{{template.pk}}')"
-                        data-bs-toggle="popover" 
-                        data-bs-trigger="hover" 
-                        data-bs-placement="top"
-                        data-bs-title="What does this do?"
-                        data-bs-content="This saves your changes to this system, but does not push it to Whatsapp to review. You must request a review from the template table. You may save your work then come back to it later here before requesting approval from Whatsapp.">
-                        <i class="fa fa-save" aria-hidden="true"></i> 
-                        Save Changes
-                    </button>
-                    {%endblock submit_button%}
-                    <div class="marvel-device nexus5">
-                        <div class="screen">
-                            <div class="screen-container">
-                                <div class="status-bar">
-                                </div>
-                                <div class="chat">
-                                    <div class="chat-container">
-                                        <div class="user-bar">
-                                            <div class="back">
-                                                <i class="zmdi zmdi-arrow-left"></i>
-                                            </div>
-                                            <div class="avatar">
-                                                <img src="{%if request.user.profile.company.company_logo_black.url%}
-                                                {{request.user.profile.company.company_logo_black.url}}
-                                                {%else%}
-                                                {% static 'img/blank-profile-picture.png' %}
-                                                {%endif%}
-                                                " alt="{{request.user.profile.company}} Logo">
-                                            </div>
-                                            <div class="name">
-                                                <span>{%if request.user.profile.company.name%}{{request.user.profile.company.name}}{%else%}Company{%endif%}</span>
-                                                <span class="status">online</span>
-                                            </div>
-                                            <div class="actions more">
-                                                <i class="zmdi zmdi-more-vert"></i>
-                                            </div>
-                                            <div class="actions attachment">
-                                                <i class="zmdi zmdi-attachment-alt"></i>
-                                            </div>
-                                            <div class="actions">
-                                                <i class="zmdi zmdi-phone"></i>
-                                            </div>
-                                            </div>
-                                            <div class="conversation">
-                                            <div class="conversation-container">
-                                                <div class="message sent" id="template_render">
-                                                    Loading
-                                                <span class="metadata">
-                                                    <span class="time"></span><span class="tick"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="15" id="msg-dblcheck-ack" x="2063" y="2076"><path d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.88a.32.32 0 0 1-.484.032l-.358-.325a.32.32 0 0 0-.484.032l-.378.48a.418.418 0 0 0 .036.54l1.32 1.267a.32.32 0 0 0 .484-.034l6.272-8.048a.366.366 0 0 0-.064-.512zm-4.1 0l-.478-.372a.365.365 0 0 0-.51.063L4.566 9.88a.32.32 0 0 1-.484.032L1.892 7.77a.366.366 0 0 0-.516.005l-.423.433a.364.364 0 0 0 .006.514l3.255 3.185a.32.32 0 0 0 .484-.033l6.272-8.048a.365.365 0 0 0-.063-.51z" fill="#4fc3f7"/></svg></span>
-                                                </span>
-                                                </div>                            
-                                            </div>
-                                            <form class="conversation-compose">
-                                                <div class="emoji">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" id="smiley" x="3147" y="3209"><path fill-rule="evenodd" clip-rule="evenodd" d="M9.153 11.603c.795 0 1.44-.88 1.44-1.962s-.645-1.96-1.44-1.96c-.795 0-1.44.88-1.44 1.96s.645 1.965 1.44 1.965zM5.95 12.965c-.027-.307-.132 5.218 6.062 5.55 6.066-.25 6.066-5.55 6.066-5.55-6.078 1.416-12.13 0-12.13 0zm11.362 1.108s-.67 1.96-5.05 1.96c-3.506 0-5.39-1.165-5.608-1.96 0 0 5.912 1.055 10.658 0zM11.804 1.01C5.61 1.01.978 6.034.978 12.23s4.826 10.76 11.02 10.76S23.02 18.424 23.02 12.23c0-6.197-5.02-11.22-11.216-11.22zM12 21.355c-5.273 0-9.38-3.886-9.38-9.16 0-5.272 3.94-9.547 9.214-9.547a9.548 9.548 0 0 1 9.548 9.548c0 5.272-4.11 9.16-9.382 9.16zm3.108-9.75c.795 0 1.44-.88 1.44-1.963s-.645-1.96-1.44-1.96c-.795 0-1.44.878-1.44 1.96s.645 1.963 1.44 1.963z" fill="#7d8489"/></svg>
-                                                </div>
-                                                <input class="input-msg"  disabled name="input" placeholder="..." autocomplete="off" autofill="off" autofocus></input>
-                                                <button class="send" disabled>
-                                                    <div class="circle">
-                                                        <i class="fa-solid fa-paper-plane-top"></i>
-                                                    </div>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            </div>
+            <hr>
+
+            <h5>Body</h5>
+            <small>
+                <p><b>Max 1024 characters including any variables</b>. Messages longer than 1024 characters will fail to send.</p>
+            </small>
+            <div class="row">
+                <div class="col-md-3" style="min-width:170px">
+                    <select {%if readonly%}disabled{%endif%} id="variable_choice"  onclick="$('#template_body').val($('#template_body').val()+$(this).val()).trigger('input'); $(this).val('');" name="variable_choice" class="form-select form-select-sm align-self-center m-1">
+                        {%for k,v in variables.items%}
+                        <option value="{{k}}">{{v.0}}</option>
+                        {%endfor%}     
+                        <option selected value="">Insert variable</option>     
+                    </select>
                 </div>
                 <div class="col">
+                    <textarea {%if readonly%}disabled{%endif%} style="width:300px; height:340px;"  maxlength="1024"
+                        id="template_body" 
+                        name="template_body" 
+                        class="template_editor_input form-control" 
+                        oninput="renderTemplate();">{%if template.pending_components%}{%for component in template.pending_components%}{%if component.type == 'BODY'%}{{component.text}}{%endif%}{%endfor%}{%else%}{%for component in template.components%}{%if component.type == 'BODY'%}{{component.text}}{%endif%}{%endfor%}{%endif%}</textarea>
+                </div>
+            </div>
+            <hr>
+
+            <h5>Footer</h5>
+            <small>
+                <p><b>Max 60 characters including any variables</b>. For example a footer that is 55 characters long would fail to send to a customer with a name longer than 5 characters (if you include their name in the footer).</p>
+            </small>
+            <div class="row">
+                <div class="col-md-3">
+                </div>
+                <div class="col">
+                    <input {%if readonly%}disabled{%endif%} type="text" style="width:300px;"  maxlength="60"
+                    id="template_footer" 
+                    name="template_footer" 
+                    class="template_editor_input form-control" 
+                    oninput="renderTemplate();" 
+                    value="{%if template.pending_components%}{%for component in template.pending_components%}{%if component.type == 'FOOTER'%}{{component.text}}{%endif%}{%endfor%}{%else%}{%for component in template.components%}{%if component.type == 'FOOTER'%}{{component.text}}{%endif%}{%endfor%}{%endif%}">
+                </div>
+            </div>
+        </div>  
+    </div>
+</span>
+
+<div id="whatsapp_render_div">                   
+    {%block submit_button%}
+    <button {%if readonly%}disabled{%endif%} class="btn template_save_button btn-success m-3"
+        onclick="saveTemplate('{{whatsapp_business_account.pk}}', '{{template.pk}}')"
+        data-bs-toggle="popover" 
+        data-bs-trigger="hover focus" 
+        data-bs-placement="top"
+        data-bs-title="What does this do?"
+        data-bs-content="This saves your changes to this system, but does not push it to Whatsapp to review. You must request a review from the template table. You may save your work then come back to it later here before requesting approval from Whatsapp.">
+        <i class="fa fa-save" aria-hidden="true"></i> 
+        Save Changes
+    </button>
+    {%endblock submit_button%}
+    <div class="marvel-device nexus5">
+        <div class="screen">
+            <div class="screen-container">
+                <div class="status-bar">
+                </div>
+                <div class="chat">
+                    <div class="chat-container">
+                        <div class="user-bar">
+                            <div class="back">
+                                <i class="zmdi zmdi-arrow-left"></i>
+                            </div>
+                            <div class="avatar">
+                                <img src="{%if request.user.profile.company.company_logo_black.url%}
+                                {{request.user.profile.company.company_logo_black.url}}
+                                {%else%}
+                                {% static 'img/blank-profile-picture.png' %}
+                                {%endif%}
+                                " alt="{{request.user.profile.company}} Logo">
+                            </div>
+                            <div class="name">
+                                <span>{%if request.user.profile.company.name%}{{request.user.profile.company.name}}{%else%}Company{%endif%}</span>
+                                <span class="status">online</span>
+                            </div>
+                            <div class="actions more">
+                                <i class="zmdi zmdi-more-vert"></i>
+                            </div>
+                            <div class="actions attachment">
+                                <i class="zmdi zmdi-attachment-alt"></i>
+                            </div>
+                            <div class="actions">
+                                <i class="zmdi zmdi-phone"></i>
+                            </div>
+                            </div>
+                            <div class="conversation">
+                            <div class="conversation-container">
+                                <div class="message sent" id="template_render">
+                                    Loading
+                                <span class="metadata">
+                                    <span class="time"></span><span class="tick"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="15" id="msg-dblcheck-ack" x="2063" y="2076"><path d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.88a.32.32 0 0 1-.484.032l-.358-.325a.32.32 0 0 0-.484.032l-.378.48a.418.418 0 0 0 .036.54l1.32 1.267a.32.32 0 0 0 .484-.034l6.272-8.048a.366.366 0 0 0-.064-.512zm-4.1 0l-.478-.372a.365.365 0 0 0-.51.063L4.566 9.88a.32.32 0 0 1-.484.032L1.892 7.77a.366.366 0 0 0-.516.005l-.423.433a.364.364 0 0 0 .006.514l3.255 3.185a.32.32 0 0 0 .484-.033l6.272-8.048a.365.365 0 0 0-.063-.51z" fill="#4fc3f7"/></svg></span>
+                                </span>
+                                </div>                            
+                            </div>
+                            <form class="conversation-compose">
+                                <div class="emoji">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" id="smiley" x="3147" y="3209"><path fill-rule="evenodd" clip-rule="evenodd" d="M9.153 11.603c.795 0 1.44-.88 1.44-1.962s-.645-1.96-1.44-1.96c-.795 0-1.44.88-1.44 1.96s.645 1.965 1.44 1.965zM5.95 12.965c-.027-.307-.132 5.218 6.062 5.55 6.066-.25 6.066-5.55 6.066-5.55-6.078 1.416-12.13 0-12.13 0zm11.362 1.108s-.67 1.96-5.05 1.96c-3.506 0-5.39-1.165-5.608-1.96 0 0 5.912 1.055 10.658 0zM11.804 1.01C5.61 1.01.978 6.034.978 12.23s4.826 10.76 11.02 10.76S23.02 18.424 23.02 12.23c0-6.197-5.02-11.22-11.216-11.22zM12 21.355c-5.273 0-9.38-3.886-9.38-9.16 0-5.272 3.94-9.547 9.214-9.547a9.548 9.548 0 0 1 9.548 9.548c0 5.272-4.11 9.16-9.382 9.16zm3.108-9.75c.795 0 1.44-.88 1.44-1.963s-.645-1.96-1.44-1.96c-.795 0-1.44.878-1.44 1.96s.645 1.963 1.44 1.963z" fill="#7d8489"/></svg>
+                                </div>
+                                <input class="input-msg"  disabled name="input" placeholder="..." autocomplete="off" autofill="off" autofocus></input>
+                                <button class="send" disabled>
+                                    <div class="circle">
+                                        <i class="fa-solid fa-paper-plane-top"></i>
+                                    </div>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col">
-        </div>
     </div>
-</span>
+</div>

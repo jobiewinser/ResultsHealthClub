@@ -961,7 +961,7 @@ tr.odd td {
 }
 
 .analytics-card {
-    min-width: 350px;
+    /* min-width: 350px; */
     margin: 10px;
 }
 .chart_wrapper {

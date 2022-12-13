@@ -8,7 +8,7 @@
             {%if campaign.warnings %}
                 <span class="help"
                 data-bs-toggle="popover" 
-                data-bs-trigger="hover" 
+                data-bs-trigger="hover focus" 
                 data-bs-html="true" 
                 data-bs-placement="top"
                 data-bs-title="Warnings"
@@ -27,7 +27,7 @@
 </td>
 <td
 data-bs-toggle="popover" 
-data-bs-trigger="hover" 
+data-bs-trigger="hover focus" 
 data-bs-html="true" 
 data-bs-placement="top"
 data-bs-title="What does this do?"
@@ -86,7 +86,7 @@ id="submit_site_pk_{{campaign.pk}}"></button>
         <div class="col-md-auto p-0 ps-1 mt-1">
             <button class="btn btn-primary btn-sm" type="button"
                 data-bs-toggle="popover" 
-                data-bs-trigger="hover" 
+                data-bs-trigger="hover focus" 
                 data-bs-placement="top"
                 data-bs-title="What does this do?"
                 data-bs-content="Add a new campaign category"
@@ -99,7 +99,7 @@ id="submit_site_pk_{{campaign.pk}}"></button>
     <span hidden>{{campaign.whatsapp_business_account.pk}}</span>                   
     <span  
         data-bs-toggle="popover" 
-        data-bs-trigger="hover" 
+        data-bs-trigger="hover focus" 
         data-bs-html="true" 
         data-bs-placement="top"
         data-bs-title="What does this do?"

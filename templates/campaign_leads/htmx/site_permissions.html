@@ -2,7 +2,7 @@
 <div class="card-header center"
     {%if not site_permissions.site in site_permissions.profile.sites_allowed.all%}
     data-bs-toggle="popover" 
-    data-bs-trigger="hover" 
+    data-bs-trigger="hover focus" 
     data-bs-html="true" 
     data-bs-placement="top"
     data-bs-title="Warnings"
@@ -11,7 +11,7 @@
     "
     {%elif site_permissions.profile.role == 'a'%}
     data-bs-toggle="popover" 
-    data-bs-trigger="hover" 
+    data-bs-trigger="hover focus" 
     data-bs-html="true" 
     data-bs-placement="top"
     data-bs-title="You are an owner"

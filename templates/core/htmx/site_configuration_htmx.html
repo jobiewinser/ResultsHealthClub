@@ -99,7 +99,7 @@
                                         <div class="form-floating m-1"
                                         {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}
                                             data-bs-toggle="popover" 
-                                            data-bs-trigger="hover" 
+                                            data-bs-trigger="hover focus" 
                                             data-bs-html="true" 
                                             data-bs-placement="top"
                                             data-bs-title="Site Calendly Organisation"
@@ -117,7 +117,7 @@
                                         <div class="form-floating m-1"
                                         {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}
                                             data-bs-toggle="popover" 
-                                            data-bs-trigger="hover" 
+                                            data-bs-trigger="hover focus" 
                                             data-bs-html="true" 
                                             data-bs-placement="top"
                                             data-bs-title="Site Calendly Token"
