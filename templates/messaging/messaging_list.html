@@ -21,7 +21,6 @@
     </script>
 
     <link href="{% static 'css/chat.css' %}" rel="stylesheet" />
-
     {%for customer_number in customer_numbers%}
     {%if customer_number and whatsappnumber%}
     <span hx-get="{%url 'message-window' customer_number=customer_number whatsappnumber_pk=whatsappnumber.pk%}"

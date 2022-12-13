@@ -16,6 +16,7 @@ from django.core.exceptions import PermissionDenied
 from core.user_permission_functions import *
 from whatsapp.api import Whatsapp
 from core.startup import run_debug_startup
+from django.conf import settings
 logger = logging.getLogger(__name__)
 
 run_debug_startup()
@@ -34,6 +35,8 @@ class HomeView(TemplateView):
     
 
 
+@method_decorator(login_required, name='dispatch')
+@method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
 class ChangeLogView(TemplateView):
     template_name='core/change_log.html'
     def get(self, request, *args, **kwargs):
@@ -80,7 +83,9 @@ class ProfileIncorrectlyConfiguredView(TemplateView):
         context['errors'] = errors
         return context
 
+
 @method_decorator(login_required, name='dispatch')
+@method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
 class CompanyPermissionsView(TemplateView):
     template_name='campaign_leads/htmx/edit_permissions.html'
 
@@ -96,6 +101,8 @@ class CompanyPermissionsView(TemplateView):
         # context['permission_company'] = permission_company
         return context
     def post(self, request):
+        if settings.DEMO and not request.user.is_superuser:
+            return HttpResponse(status=500)
         company_permissions = CompanyProfilePermissions.objects.get(pk = request.POST.get('company_permissions_pk'))
         context = {'company_permissions':company_permissions}
         if get_profile_allowed_to_edit_other_profile_permissions(request.user.profile, company_permissions.company):
@@ -111,9 +118,8 @@ class CompanyPermissionsView(TemplateView):
         context['error'] = "You do not have permission to do this"
         return render(request, 'campaign_leads/htmx/company_permissions.html', context)
 
-
-
 @method_decorator(login_required, name='dispatch')
+@method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
 class SitePermissionsView(TemplateView):
     template_name='campaign_leads/htmx/edit_permissions.html'
 
@@ -128,6 +134,8 @@ class SitePermissionsView(TemplateView):
         # context['permission_site'] = permission_site
         return context
     def post(self, request):
+        if settings.DEMO and not request.user.is_superuser:
+            return HttpResponse(status=500)
         site_permissions = SiteProfilePermissions.objects.get(pk = request.POST.get('site_permissions_pk'))
         context = {'site_permissions':site_permissions}
         if get_profile_allowed_to_edit_other_profile_permissions(request.user.profile, site_permissions.site.company):
@@ -144,7 +152,38 @@ class SitePermissionsView(TemplateView):
         context['error'] = "You do not have permission to do this"
         return render(request, 'campaign_leads/htmx/site_permissions.html', context)
 
+def get_site_coonfiguration_context(request):
+    context = {}
+    site_pk = request.GET.get('site_pk', None) or request.POST.get('site_pk', None)
+    site = Site.objects.get(pk=site_pk)     
+
+    # permissions
+    context['permitted'] = False
+    if get_user_allowed_to_view_site_configuration(request.user.profile, site):
+        context['permitted'] = True
+    # endpermissions
+    context['whatsapp_numbers'] = site.get_live_whatsapp_phone_numbers()          
+    calendly = Calendly(site.calendly_token)
+    site_webhook_active = False
+    if site.calendly_organization:
+        calendly_webhooks = calendly.list_webhook_subscriptions(organization = site.calendly_organization).get('collection')
+        if calendly_webhooks:
+            for webhook in calendly_webhooks:
+                if webhook.get('state') == 'active' \
+                and webhook.get('callback_url') == f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/" \
+                and webhook.get('organization') == f"{os.getenv('CALENDLY_URL')}/organizations/{site.calendly_organization}":
+                    site_webhook_active = True
+                    break
+    context['site'] = site
+    context['site_webhook_active'] = site_webhook_active
+    if site.whatsapp_access_token:
+        whatsapp = Whatsapp(site.whatsapp_access_token)
+        context['whatsapp_business_details'] = whatsapp.get_business(site.company.whatsapp_app_business_id)
+    else:
+        context['whatsapp_business_details'] = {"error":True}
+    return context
 @method_decorator(login_required, name='dispatch')
+@method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
 class SiteConfigurationView(TemplateView):
     template_name='core/site_configuration.html'
 
@@ -153,48 +192,21 @@ class SiteConfigurationView(TemplateView):
         site_pk = get_site_pk_from_request(request)
         request.GET['site_pk'] = site_pk      
         site = Site.objects.get(pk=site_pk) 
+        if request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+            self.template_name = 'core/htmx/site_configuration_htmx.html'
         return super(SiteConfigurationView, self).get(request, args, kwargs)
         # if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
         #     return HttpResponse("You don't have permission to access this page")
         # raise PermissionDenied()
 
-    def get_context_data(self, **kwargs):    
-        context = super(SiteConfigurationView, self).get_context_data(**kwargs)
-        if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
-            self.template_name = 'core/htmx/site_configuration_htmx.html'
-
-        # permissions
-        context['permitted'] = False
-        if get_user_allowed_to_view_site_configuration(request.user.profile, site):
-            context['permitted'] = True
-        # endpermissions
-
-        site = Site.objects.get(pk=self.request.GET['site_pk'])     
-        context['whatsapp_numbers'] = site.get_live_whatsapp_phone_numbers()          
-        calendly = Calendly(site.calendly_token)
-        site_webhook_active = False
-        if site.calendly_organization:
-            calendly_webhooks = calendly.list_webhook_subscriptions(organization = site.calendly_organization).get('collection')
-            if calendly_webhooks:
-                for webhook in calendly_webhooks:
-                    if webhook.get('state') == 'active' \
-                    and webhook.get('callback_url') == f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/" \
-                    and webhook.get('organization') == f"{os.getenv('CALENDLY_URL')}/organizations/{site.calendly_organization}":
-                        site_webhook_active = True
-                        break
-        context['site'] = site
-        context['site_webhook_active'] = site_webhook_active
-        if site.whatsapp_access_token:
-            whatsapp = Whatsapp(site.whatsapp_access_token)
-            context['whatsapp_business_details'] = whatsapp.get_business(site.company.whatsapp_app_business_id)
-        else:
-            context['whatsapp_business_details'] = {"error":True}
-        # context['user_allowed_to_edit_site_configuration'] = get_user_allowed_to_edit_site_configuration(self.request.user.profile, site)
-        # context['user_allowed_to_edit_whatsapp_settings'] = get_user_allowed_to_edit_whatsapp_settings(self.request.user.profile, site)
-        # context['user_allowed_to_toggle_active_campaign'] = get_user_allowed_to_toggle_active_campaign(self.request.user.profile, site)
-        
+    def get_context_data(self):    
+        context = super(SiteConfigurationView, self).get_context_data()
+        context.update(get_site_coonfiguration_context(self.request))
         return context
+        
     def post(self, request):
+        if settings.DEMO and not request.user.is_superuser:
+            return HttpResponse(status=500)
         self.request.POST._mutable = True 
         site = Site.objects.get(pk=request.POST.get('site_pk'))   
 
@@ -209,22 +221,24 @@ class SiteConfigurationView(TemplateView):
         response_text = ""     
         if 'name' in request.POST:
             site.name = request.POST['name']
-            response_text = f"{response_text} <span hx-swap-oob='innerHTML:.name_display_{site.pk}'>{site.name}</span>"
+            response_text = f"{response_text} <span hx-swap-oob='innerHTML:.name_display_{site.pk}'>{site.name}</span>"            
+            site.save()
+            return HttpResponse(response_text, status=200)
             
         if 'calendly_organization' in request.POST:
-            site.calendly_organization = request.POST['calendly_organization']
-            response_text = f"""{response_text} 
-                <span hx-swap-oob='innerHTML:#calendly_webhook_status_wrapper'><br><div class="mt-3"><b>Organization changed, please refresh page</b></div></span>"""
+            site.calendly_organization = request.POST['calendly_organization']        
+            site.save()            
+            return render(request, 'core/htmx/site_configuration_htmx.html', get_site_coonfiguration_context(request))
             
         if 'calendly_token' in request.POST:
-            site.calendly_token = request.POST['calendly_token']
-            response_text = f"""{response_text} 
-                <span hx-swap-oob='innerHTML:#calendly_webhook_status_wrapper'><br><div class="mt-3"><b>Organization changed, please refresh page</b></div></span>"""
+            site.calendly_token = request.POST['calendly_token']        
+            site.save()
+            return render(request, 'core/htmx/site_configuration_htmx.html', get_site_coonfiguration_context(request))
+        return HttpResponse("", status=200)
             
-        site.save()
-        return HttpResponse(response_text, status=200)
 
 @method_decorator(login_required, name='dispatch')
+@method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
 class CompanyConfigurationView(TemplateView):
     template_name='core/company_configuration.html'
 
@@ -243,6 +257,8 @@ class CompanyConfigurationView(TemplateView):
         return context
 @login_required
 def change_profile_role(request):
+    if settings.DEMO and not request.user.is_superuser:
+        return HttpResponse(status=500)
     profile = Profile.objects.get(pk=request.POST.get('profile_pk'))
     if (not request.user == profile.user and get_profile_allowed_to_edit_other_profile(request.user.profile, profile)):
         role = request.POST.get('role', None)
@@ -257,6 +273,8 @@ def change_profile_role(request):
     return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
 @login_required
 def change_profile_site(request):
+    if settings.DEMO and not request.user.is_superuser:
+        return HttpResponse(status=500)
     profile = Profile.objects.get(pk=request.POST.get('profile_pk'))
     if get_profile_allowed_to_edit_other_profile(request.user.profile, profile):
         site_pk = request.POST.get('site_pk', None)
@@ -271,6 +289,8 @@ def change_profile_site(request):
     return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
 @login_required
 def change_site_allowed(request):
+    if settings.DEMO and not request.user.is_superuser:
+        return HttpResponse(status=500)
     profile = Profile.objects.get(pk=request.POST.get('profile_pk'))
     context = {}
     site_pk = int(request.POST.get('site_pk', 0))
@@ -293,19 +313,18 @@ def change_site_allowed(request):
     return render(request, 'campaign_leads/htmx/edit_permissions.html', context)
 
 
-class CampaignLeadsProductPageView(TemplateView):
-    template_name='core/campaign_leads_product_page.html'
 
 
+# def custom_login_post(request):    
+#     user = authenticate(username=request.POST.get('username', ''), email=request.POST.get('email', ''), password=request.POST.get('password', ''))
+#     if user:
+#         login(request, user)
+#         return HttpResponse(status=200)
+#     return HttpResponse("Account not found", status=404)
 
-def custom_login_post(request):    
-    user = authenticate(username=request.POST.get('username', ''), email=request.POST.get('email', ''), password=request.POST.get('password', ''))
-    if user:
-        login(request, user)
-        return HttpResponse(status=200)
-    return HttpResponse("Account not found", status=404)
 
 @method_decorator(login_required, name='dispatch')
+@method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
 class FreeTasterOverviewView(TemplateView):
     template_name='core/free_taster_overview.html'
 

@@ -19,7 +19,7 @@
         </div>
         <div class="col-md-auto p-0 pe-1 ps-1 ps-1 m-1 card card-white borderless chat_row_{{message.customer_number}} bg-secondary-trans-80 text-white" style="max-width:70%">
             {%if message.message%}
-                {{message.message}}
+                {{message.message|safe}}
             {%endif%}
             {%if message.image.all%}
                 {% for image in message.image.all%}
@@ -67,7 +67,7 @@
                 <span>
                     {%if message.message%}
                     {%if message.failed%}<i class="fa-solid fa-triangle-exclamation" style="color:red"></i>{%endif%} 
-                    {{message.message}}
+                    {{message.message|safe}}
                     {%endif%}
                     {%if message.image.all%}
                         {% for image in message.image.all%}

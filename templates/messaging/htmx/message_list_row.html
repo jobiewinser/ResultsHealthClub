@@ -84,10 +84,10 @@
             </div>
         </div>
         <div class="row chat_message_row">
-            <div class="col p-0" id="message_list_row_{{message.customer_number}}_{{whatsappnumber.pk}}">
+            <div style="height:18px" class="col p-0" id="message_list_row_{{message.customer_number}}_{{whatsappnumber.pk}}">
                 {%if message.failed%}<i class="fa-solid fa-triangle-exclamation" style="color:red"></i>{%endif%}  {%if message.inbound%}Them{%else%}You{%endif%}:
                 {%if message.message%}
-                    {{message.message}}
+                    {{message.message|safe}}
                 {%elif message.image.all%}
                     [Image]
                 {%endif%}

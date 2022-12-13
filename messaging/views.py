@@ -11,6 +11,7 @@ from whatsapp.models import WhatsAppMessage, WhatsappMessageImage
 from django.contrib.auth.decorators import login_required
 from core.templatetags.core_tags import seconds_until_hours_passed
 from django.utils.decorators import method_decorator
+from core.core_decorators import check_core_profile_requirements_fulfilled
 import logging
 logger = logging.getLogger(__name__)
 
@@ -92,7 +93,7 @@ def send_first_template_whatsapp_booking_row_htmx(request, **kwargs):
 def send_first_template_whatsapp(request, kwargs):
     lead = Campaignlead.objects.get(pk=kwargs.get('lead_pk'))
     if not lead.message_set.all():
-        lead.send_template_whatsapp_message(send_order=1)
+        lead.send_template_whatsapp_message(whatsappnumber=lead.campaign.whatsapp_business_account.whatsappnumber, send_order=1)
     messages = WhatsAppMessage.objects.filter(customer_number=kwargs.get('customer_number'), whatsappnumber__number=kwargs.get('messaging_phone_number')).order_by('-datetime')
     context = {}
     context["messages"] = messages
@@ -190,17 +191,19 @@ def get_more_message_chat_rows(request):
         raise e
         
 
-@login_required
-def clear_chat_from_session(request):
-    try:
-        request.session['open_chat_conversation_customer_number'] = request.session.get('open_chat_conversation_customer_number', []).remove(request.POST.get('customer_number'))
-    except Exception as e:
-        print("clear_chat_from_session error", str(e))
-    return HttpResponse("", "text", 200)
+# @login_required
+# def clear_chat_from_session(request):
+#     try:
+#         request.session['open_chat_conversation_customer_number'] = request.session.get('open_chat_conversation_customer_number', []).remove(request.POST.get('customer_number'))
+#     except Exception as e:
+#         print("clear_chat_from_session error", str(e))
+#     return HttpResponse("", "text", 200)
     
 
 
+
 @method_decorator(login_required, name='dispatch')
+@method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
 class MessagingView(TemplateView):
     template_name='messaging/messaging.html'
     def get(self, request, *args, **kwargs):        

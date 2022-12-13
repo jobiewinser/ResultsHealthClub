@@ -4,7 +4,6 @@ from active_campaign.api import ActiveCampaignApi
 from django.dispatch import receiver
 from django.conf import settings
 from campaign_leads.models import Campaign
-
 from core.models import Site
 class ActiveCampaignWebhookRequest(models.Model):
     json_data = models.JSONField(default=dict)
@@ -15,6 +14,8 @@ class ActiveCampaign(Campaign):
     pass
     active_campaign_id = models.TextField(null=True, blank=True)
     def create_webhook(self):
+        if settings.DEMO:
+            return
         if self.name and self.guid and not self.webhook_id and not settings.DEBUG and not 'manually' in self.name.lower():
             response = ActiveCampaignApi(self.company.active_campaign_api_key, self.company.active_campaign_url).create_webhook(str(self.name), str(self.guid), str(self.active_campaign_id))
             if response.status_code in [200, 201]:
@@ -28,6 +29,8 @@ def execute_after_save(sender, instance, created, *args, **kwargs):
         instance.guid = str(uuid.uuid4())[:16]
         instance.save()
     if instance.webhook_enabled and not instance.webhook_id:
+        if settings.DEMO:
+            return
         instance.create_webhook()
 
 

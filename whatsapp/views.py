@@ -18,6 +18,7 @@ from django.views import View
 from django.utils.decorators import method_decorator
 from core.models import ErrorModel, Site, WhatsappBusinessAccount, WhatsappNumber, Contact
 from random import randrange
+from core.core_decorators import check_core_profile_requirements_fulfilled
 from django.contrib.auth.decorators import login_required
 from whatsapp.models import WhatsappTemplate
 # def random_date(start,l):
@@ -50,6 +51,8 @@ class Webhooks(View):
         return response
 
     def post(self, request, *args, **kwargs):
+        if settings.DEMO and not request.user.is_superuser:
+            return HttpResponse(status=200)
         from core.models import AttachedError
         body = json.loads(request.body)
         # meta = request.META
@@ -277,8 +280,10 @@ def new_message_to_websocket(whatsapp_message, whatsapp_number):
     )
     logger.debug("webhook sending text to chat end")   
         
-# @method_decorator(campaign_leads_enabled_required, name='dispatch')
+
+
 @method_decorator(login_required, name='dispatch')
+@method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
 class WhatsappTemplatesView(TemplateView):
     template_name='whatsapp/whatsapp_templates.html'
 
@@ -318,7 +323,10 @@ class WhatsappTemplatesView(TemplateView):
         context['WHATSAPP_ORDER_CHOICES'] = WHATSAPP_ORDER_CHOICES
         return context
         
+
 def refresh_template_data(whatsapp_business_account):
+    if settings.DEMO:
+        return
     whatsapp = Whatsapp(whatsapp_business_account.site.whatsapp_access_token)
     templates = whatsapp.get_templates(whatsapp_business_account.whatsapp_business_account_id)
     if templates:
@@ -349,8 +357,10 @@ def refresh_template_data(whatsapp_business_account):
                 except Exception as e:
                     pass
                 print()
-# @method_decorator(campaign_leads_enabled_required, name='dispatch')
+
+
 @method_decorator(login_required, name='dispatch')
+@method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
 class WhatsappTemplatesEditView(TemplateView):
     template_name='whatsapp/whatsapp_template_edit.html'
 
@@ -368,7 +378,9 @@ class WhatsappTemplatesEditView(TemplateView):
                 "MARKETING":"Marketing",
             }
             return context
+
 @method_decorator(login_required, name='dispatch')
+@method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
 class WhatsappTemplatesReadOnlyView(WhatsappTemplatesEditView):
     def get_context_data(self, **kwargs):  
         context = super(WhatsappTemplatesReadOnlyView, self).get_context_data(**kwargs)
@@ -376,7 +388,9 @@ class WhatsappTemplatesReadOnlyView(WhatsappTemplatesEditView):
         if self.request.user.profile.company == template.company:
             context['readonly'] = True
             return context
+
 @method_decorator(login_required, name='dispatch')
+@method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
 class WhatsappTemplatesCreateView(TemplateView):
     template_name='whatsapp/whatsapp_template_create.html'
 
@@ -396,6 +410,8 @@ class WhatsappTemplatesCreateView(TemplateView):
     
 @login_required
 def whatsapp_approval_htmx(request):
+    if settings.DEMO and not request.user.is_superuser:
+        return HttpResponse(status=500)
     template = WhatsappTemplate.objects.get(pk=request.POST.get('template_pk'))
     if request.user.profile.company == template.company:
         whatsapp = Whatsapp(template.whatsapp_business_account.site.whatsapp_access_token)
@@ -407,6 +423,8 @@ def whatsapp_approval_htmx(request):
 
 @login_required
 def delete_whatsapp_template_htmx(request):
+    if settings.DEMO and not request.user.is_superuser:
+        return HttpResponse(status=500)
     body = QueryDict(request.body)
     template = WhatsappTemplate.objects.get(pk=body.get('template_pk'))
     whatsapp_business_account = template.whatsapp_business_account
@@ -421,6 +439,8 @@ def delete_whatsapp_template_htmx(request):
          
 @login_required
 def whatsapp_clear_changes_htmx(request):
+    if settings.DEMO and not request.user.is_superuser:
+        return HttpResponse(status=500)
     template = WhatsappTemplate.objects.get(pk=request.POST.get('template_pk'))
     if request.user.profile.company == template.company:
         template.pending_category = None
@@ -433,6 +453,8 @@ def whatsapp_clear_changes_htmx(request):
 
 @login_required
 def whatsapp_number_change_alias(request):
+    if settings.DEMO and not request.user.is_superuser:
+        return HttpResponse(status=500)
     whatsappnumber = WhatsappNumber.objects.get(pk=request.POST.get('whatsappnumber_pk'))
     if get_user_allowed_to_edit_whatsappnumber(request.user, whatsappnumber):
         alias = request.POST.get('alias', None)
@@ -487,6 +509,8 @@ def whatsapp_number_change_alias(request):
 
 @login_required
 def add_phone_number(request):
+    if settings.DEMO and not request.user.is_superuser:
+        return HttpResponse(status=500)
     whatsapp_business_account_pk = request.POST.get('whatsapp_business_account_pk', None)
     country_code = request.POST.get('country_code', None)
     phone_number = request.POST.get('phone_number', None)
@@ -501,6 +525,8 @@ def add_phone_number(request):
 
 @login_required
 def add_whatsapp_business_account(request):
+    if settings.DEMO and not request.user.is_superuser:
+        return HttpResponse(status=500)
     try: 
         site_pk = request.POST.get('site_pk', None)
         whatsapp_business_account_id = request.POST.get('whatsapp_business_account_id', None)
@@ -528,6 +554,8 @@ def add_whatsapp_business_account(request):
 
 @login_required
 def save_whatsapp_template_ajax(request):
+    if settings.DEMO and not request.user.is_superuser:
+        return HttpResponse(status=500)
     changes_made = False
     if request.POST.get('created', False):
         template = WhatsappTemplate(
@@ -623,6 +651,8 @@ def send_new_template_message(request):
 #     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 @login_required
 def set_whatsapp_site_config(request, **kwargs):
+    if settings.DEMO and not request.user.is_superuser:
+        return HttpResponse(status=500)
     try:
         site = Site.objects.get(pk=request.POST.get('site_pk',None))
         site.whatsapp_access_token = request.POST.get('whatsapp_access_token')

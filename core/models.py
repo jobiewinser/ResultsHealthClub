@@ -26,6 +26,7 @@ class SiteUsersOnline(models.Model):
     site = models.ForeignKey("core.Site", on_delete=models.SET_NULL, null=True, blank=True)
     feature = models.CharField(max_length=50, default="leads")
 
+SiteUsersOnline.objects.all().update(users_online="")
 
 class AttachedError(models.Model): 
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -77,6 +78,27 @@ class Contact(models.Model):
         return self.first_name
     def send_template_whatsapp_message(self, whatsappnumber=None, template=None, communication_method = 'a'):
         print("Contact send_template_whatsapp_message", whatsappnumber, template, communication_method)
+        customer_number = self.customer_number
+        if settings.DEMO:
+            whatsapp_message, created = WhatsAppMessage.objects.get_or_create(
+                wamid="",
+                datetime=datetime.now(),
+                contact=self,
+                message=f"""
+                <b>Hi {self.first_name}</b>
+                <br>
+                <br>
+                <p>This is a demonstration of the whatsapp system! With the Pro subscription, you can add your own whatsapp accounts and automate sending templates here!</p>
+                <small>Thanks from Winser Systems!</small>
+                """,
+                site=self.site,
+                whatsappnumber=whatsappnumber,
+                customer_number=customer_number,
+                template=template,
+                inbound=False,
+            )
+            send_message_to_websocket(whatsappnumber, customer_number, whatsapp_message, self.site)
+            return HttpResponse(status=200)
         from core.models import AttachedError
         if communication_method == 'a' and whatsappnumber:
             print("ContactDEBUG1")
@@ -184,7 +206,6 @@ class Contact(models.Model):
                     "code":template.language
                 }
                 site = self.site
-                customer_number = self.customer_number
                 response = whatsapp.send_template_message(self.customer_number, whatsappnumber, template, language, components)
                 reponse_messages = response.get('messages',[])
                 if reponse_messages:
@@ -202,44 +223,45 @@ class Contact(models.Model):
                             inbound=False,
                         )
                         if created:                        
-                            channel_layer = get_channel_layer()                            
-                            message_context = {
-                                "message": whatsapp_message,
-                                "site": site,
-                                "whatsappnumber": whatsappnumber,
-                            }
-                            rendered_message_list_row = loader.render_to_string('messaging/htmx/message_list_row.html', message_context)
-                            rendered_message_chat_row = loader.render_to_string('messaging/htmx/message_chat_row.html', message_context)
-                            rendered_html = f"""
-
-                            <span id='latest_message_row_{customer_number}' hx-swap-oob='delete'></span>
-                            <span id='messageCollapse_{whatsappnumber.pk}' hx-swap-oob='afterbegin'>{rendered_message_list_row}</span>
-
-                            <span id='messageWindowInnerBody_{customer_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>
-                            """
-                            
-                            async_to_sync(channel_layer.group_send)(
-                                f"messaging_{whatsappnumber.pk}",
-                                {
-                                    'type': 'chatbox_message',
-                                    "message": rendered_html,
-                                }
-                            )
-                            channel_layer = get_channel_layer()   
-                            
-                            async_to_sync(channel_layer.group_send)(
-                                f"message_count_{whatsappnumber.site.company.pk}",
-                                {
-                                    'type': 'messages_count_update',
-                                    'data':{
-                                        'rendered_html':f"""<span hx-swap-oob="afterbegin:.company_message_count"><span hx-trigger="load" hx-swap="none" hx-get="/update-message-counts/"></span>""",
-                                    }
-                                }
-                            )
+                            send_message_to_websocket(whatsappnumber, customer_number, whatsapp_message, whatsappnumber.whatsapp_business_account )
                     logger.debug("site.send_template_whatsapp_message success") 
                     return HttpResponse("Message Sent", status=200)
         # return HttpResponse("No Communication method specified", status=500)
+def send_message_to_websocket(whatsappnumber, customer_number, whatsapp_message, site):
+    channel_layer = get_channel_layer()          
+    message_context = {
+        "message": whatsapp_message,
+        "site": site,
+        "whatsappnumber": whatsappnumber,
+    }
+    rendered_message_list_row = loader.render_to_string('messaging/htmx/message_list_row.html', message_context)
+    rendered_message_chat_row = loader.render_to_string('messaging/htmx/message_chat_row.html', message_context)
+    rendered_html = f"""
 
+    <span id='latest_message_row_{customer_number}' hx-swap-oob='delete'></span>
+    <span id='messageCollapse_{whatsappnumber.pk}' hx-swap-oob='afterbegin'>{rendered_message_list_row}</span>
+
+    <span id='messageWindowInnerBody_{customer_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>
+    """
+    
+    async_to_sync(channel_layer.group_send)(
+        f"messaging_{whatsappnumber.pk}",
+        {
+            'type': 'chatbox_message',
+            "message": rendered_html,
+        }
+    )
+    channel_layer = get_channel_layer()   
+    
+    async_to_sync(channel_layer.group_send)(
+        f"message_count_{whatsappnumber.site.company.pk}",
+        {
+            'type': 'messages_count_update',
+            'data':{
+                'rendered_html':f"""<span hx-swap-oob="afterbegin:.company_message_count"><span hx-trigger="load" hx-swap="none" hx-get="/update-message-counts/"></span>""",
+            }
+        }
+    )
 # class AttachedWarning(models.Model): 
 #     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 #     ERROR_TYPES = (
@@ -342,7 +364,8 @@ class WhatsappNumber(PhoneNumber):
         if after_datetime_timestamp:
             after_datetime = datetime.fromtimestamp(int(float(after_datetime_timestamp)))
             qs = qs.filter(datetime__lt=after_datetime)
-        
+        for temp in qs.order_by('customer_number','-datetime'):
+            print()
         for dict in qs.order_by('customer_number','-datetime').distinct('customer_number').values('pk'):
             message_pk_list.append(dict.get('pk'))
         qs = WhatsAppMessage.objects.filter(pk__in=message_pk_list).order_by('-datetime')
@@ -607,15 +630,15 @@ class Profile(models.Model):
     def name(self):
         return f"{self.user.first_name} {self.user.last_name}"
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-        for site in self.company.site_set.all():
-            permissions, created = SiteProfilePermissions.objects.get_or_create(profile=self, site=site)
         if self.campaign_category:
             if not self.campaign_category.site == self.site:
                 self.campaign_category = None
                 self
+        super(Profile, self).save(force_insert, force_update, using, update_fields)
         if not self.site in self.sites_allowed.all() and self.site:
             self.sites_allowed.add(self.site)   
-        super(Profile, self).save(force_insert, force_update, using, update_fields)
+        for site in self.company.site_set.all():
+            permissions, created = SiteProfilePermissions.objects.get_or_create(profile=self, site=site)
         
 class FreeTasterLink(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -660,20 +683,6 @@ class SiteProfilePermissions(models.Model):
         ordering = ['-pk']   
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-        # role = self.profile.role
-        # permission_count = 0
-        # for key in [
-        #     'view_site_configuration ',
-        #     'edit_site_configuration ',
-        #     'edit_whatsapp_settings ',
-        #     'toggle_active_campaign ',
-        #     ]:
-        #     if getattr(self, key, False):
-        #         permission_count +=1
-        #     elif role == 'a':
-        #         setattr(self, key, True)
-        #         permission_count +=1
-        # super(SiteProfilePermissions, self).save(force_insert, force_update, using, update_fields)
         role = self.profile.role
         self.permission_count = 0
         for field in self._meta.fields:

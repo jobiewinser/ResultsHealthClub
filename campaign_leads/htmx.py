@@ -16,6 +16,7 @@ from django.contrib import messages
 from asgiref.sync import async_to_sync
 from campaign_leads.views import get_campaign_qs
 from whatsapp.models import WhatsappTemplate
+from django.conf import settings
 logger = logging.getLogger(__name__) 
 
 @login_required
@@ -69,22 +70,24 @@ def get_modal_content(request, **kwargs):
 
 @login_required
 def add_campaign_category(request, **kwargs):
+    if settings.DEMO and not request.user.is_superuser:
+        return HttpResponse(status=500)
     # logger.debug(str(request.user))
     # try:        
-        name = request.POST.get('category_name')
-        if not name:
-            return HttpResponse("Please enter a name", status=500)
-        campaign_pk = request.POST.get('campaign_pk')
-        site_pk = request.POST.get('site_pk')
-        if campaign_pk:
-            campaign = Campaign.objects.get(pk=campaign_pk)
-            campaign_category, created = CampaignCategory.objects.get_or_create(site=campaign.site, name=name)
-            campaign.campaign_category = campaign_category
-            campaign.save()
-        else:
-            site = Site.objects.get(pk=site_pk)
-            campaign_category, created = CampaignCategory.objects.get_or_create(site=site, name=name)
-        return HttpResponse("", status=200)
+    name = request.POST.get('category_name')
+    if not name:
+        return HttpResponse("Please enter a name", status=500)
+    campaign_pk = request.POST.get('campaign_pk')
+    site_pk = request.POST.get('site_pk')
+    if campaign_pk:
+        campaign = Campaign.objects.get(pk=campaign_pk)
+        campaign_category, created = CampaignCategory.objects.get_or_create(site=campaign.site, name=name)
+        campaign.campaign_category = campaign_category
+        campaign.save()
+    else:
+        site = Site.objects.get(pk=site_pk)
+        campaign_category, created = CampaignCategory.objects.get_or_create(site=site, name=name)
+    return HttpResponse("", status=200)
     # except Exception as e:
     #     # messages.add_message(request, messages.ERROR, f'Error with creating a campaign lead')
     #     logger.debug("create_campaign_lead Error "+str(e))
@@ -93,47 +96,49 @@ def add_campaign_category(request, **kwargs):
 
 @login_required
 def edit_lead(request, **kwargs):
+    if settings.DEMO and not request.user.is_superuser:
+        return HttpResponse(status=500)
     # logger.debug(str(request.user))
     # try:        
-        campaign_pk = request.POST.get('campaign_pk')
-        if not campaign_pk:
-            return HttpResponse("Please choose a campaign", status=500)
-        campaign = Campaign.objects.get(pk=campaign_pk)    
-        
-        first_name = request.POST.get('first_name')
-        if not first_name:
-            return HttpResponse("Please provide a first name", status=500)
+    campaign_pk = request.POST.get('campaign_pk')
+    if not campaign_pk:
+        return HttpResponse("Please choose a campaign", status=500)
+    campaign = Campaign.objects.get(pk=campaign_pk)    
+    
+    first_name = request.POST.get('first_name')
+    if not first_name:
+        return HttpResponse("Please provide a first name", status=500)
 
-        last_name = request.POST.get('last_name')
+    last_name = request.POST.get('last_name')
 
-        email = request.POST.get('email')
-        
-        phone = request.POST.get('phone')
-        if not phone:
-            return HttpResponse("Please provide a valid Phone Number", status=500)
-        
-        country_code = request.POST.get('country_code', "")
-        
-        product_cost = request.POST.get('product_cost', 0)
-        
-        lead_pk = request.POST.get('lead_pk')
-        if lead_pk:
-            lead = Campaignlead.objects.get(pk=lead_pk)
-            refresh_position = False
-        else:
-            lead = Campaignlead()
-            refresh_position = True
-        lead.campaign = campaign
-        lead.first_name = first_name
-        lead.last_name = last_name
-        lead.email = email
-        lead.whatsapp_number = f"{country_code}{phone}"
-        if product_cost:
-            lead.product_cost = product_cost
-        
-        lead.save()
-        lead.trigger_refresh_websocket(refresh_position=refresh_position)
-        return HttpResponse(str(lead.pk), status=200)
+    email = request.POST.get('email')
+    
+    phone = request.POST.get('phone')
+    if not phone:
+        return HttpResponse("Please provide a valid Phone Number", status=500)
+    
+    country_code = request.POST.get('country_code', "")
+    
+    product_cost = request.POST.get('product_cost', 0)
+    
+    lead_pk = request.POST.get('lead_pk')
+    if lead_pk:
+        lead = Campaignlead.objects.get(pk=lead_pk)
+        refresh_position = False
+    else:
+        lead = Campaignlead()
+        refresh_position = True
+    lead.campaign = campaign
+    lead.first_name = first_name
+    lead.last_name = last_name
+    lead.email = email
+    lead.whatsapp_number = f"{country_code}{phone}"
+    if product_cost:
+        lead.product_cost = product_cost
+    
+    lead.save()
+    lead.trigger_refresh_websocket(refresh_position=refresh_position)
+    return HttpResponse(str(lead.pk), status=200)
     # except Exception as e:
     #     # messages.add_message(request, messages.ERROR, f'Error with creating a campaign lead')
     #     logger.debug("create_campaign_lead Error "+str(e))
@@ -219,6 +224,8 @@ def add_manual_booking(request, **kwargs):
 
         note = request.POST.get('note','')
         if note:
+            if settings.DEMO and not request.user.is_superuser:
+                note = "Demo mode active, note text replaced!"
             Note.objects.create(
                 booking=booking,
                 lead=lead,
@@ -347,6 +354,8 @@ def create_lead_note(request, **kwargs):
             lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'))
             note = request.POST.get('note','')
             if note:
+                if settings.DEMO and not request.user.is_superuser:
+                    note = "Demo mode active, note text replaced!"
                 Note.objects.create(                    
                     lead=lead,
                     text=note,

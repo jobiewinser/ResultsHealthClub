@@ -16,6 +16,7 @@ from core.user_permission_functions import get_available_sites_for_user, get_pro
 from core.views import get_site_pk_from_request
 from django.http import QueryDict
 from campaign_leads.models import Campaignlead
+from django.conf import settings
 logger = logging.getLogger(__name__)
 
 
@@ -76,6 +77,8 @@ def get_modal_content(request, **kwargs):
 @method_decorator(login_required, name="dispatch")
 class ModifyUser(View):
     def post(self, request, **kwargs):
+        if settings.DEMO and not request.user.is_superuser:
+            return HttpResponse(status=500)
         try:
             action = request.POST.get('action', '')
             if action == 'add':
@@ -140,6 +143,8 @@ class ModifyUser(View):
             raise e
 @login_required
 def create_calendly_webhook_subscription(request, **kwargs):
+    if settings.DEMO and not request.user.is_superuser:
+        return HttpResponse(status=500)
     site = Site.objects.get(pk=request.POST.get('site_pk'))    
     if get_user_allowed_to_edit_site_configuration(request.user.profile, site): 
         calendly = Calendly(site.calendly_token)
@@ -156,6 +161,8 @@ def create_calendly_webhook_subscription(request, **kwargs):
     
 @login_required
 def delete_calendly_webhook_subscription(request, **kwargs):
+    if settings.DEMO and not request.user.is_superuser:
+        return HttpResponse(status=500)
     site = Site.objects.get(pk=request.POST.get('site_pk'))    
     if get_user_allowed_to_edit_site_configuration(request.user.profile, site): 
         calendly = Calendly(site.calendly_token)
@@ -171,6 +178,8 @@ def delete_calendly_webhook_subscription(request, **kwargs):
 
 @login_required
 def add_site(request, **kwargs):
+    if settings.DEMO and not request.user.is_superuser:
+        return HttpResponse(status=500)
     company = Company.objects.get(pk=request.POST.get('company_pk'))
     if not company.subscription == 'pro':
         site = Site.objects.create(
@@ -185,6 +194,8 @@ def add_site(request, **kwargs):
 
 @login_required
 def generate_free_taster_link(request, **kwargs):
+    if settings.DEMO and not request.user.is_superuser:
+        return HttpResponse(status=500)
     try:
         if request.user.is_authenticated:
             customer_name = request.POST.get('customer_name', '')
@@ -203,6 +214,8 @@ def generate_free_taster_link(request, **kwargs):
 
 @login_required
 def delete_free_taster_link(request, **kwargs):
+    if settings.DEMO and not request.user.is_superuser:
+        return HttpResponse(status=500)
     logger.debug(str(request.user))
     try:
         if request.user.is_authenticated:

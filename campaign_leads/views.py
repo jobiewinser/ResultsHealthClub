@@ -10,7 +10,6 @@ from calendly.api import Calendly
 from campaign_leads.models import Call, Campaign, Campaignlead, CampaignTemplateLink, CampaignCategory
 from active_campaign.api import ActiveCampaignApi
 from active_campaign.models import ActiveCampaign
-# from core.core_decorators import campaign_leads_enabled_required
 from core.models import Profile, Site, WhatsappBusinessAccount
 from core.user_permission_functions import get_available_sites_for_user, get_user_allowed_to_add_call
 from core.views import get_site_pk_from_request, get_campaign_category_pk_from_request
@@ -20,6 +19,7 @@ from django.db.models import F
 from whatsapp.api import Whatsapp
 from whatsapp.models import WhatsappTemplate
 from django.template import loader
+from core.core_decorators import check_core_profile_requirements_fulfilled
 logger = logging.getLogger(__name__)
 
 def hex_to_rgb_tuple(hex):
@@ -55,8 +55,10 @@ def get_campaign_qs(request):
         campaign_qs = campaign_qs.filter(campaign_category__pk=campaign_category_pk)
     return campaign_qs.order_by('first_model_count')
 
-# @method_decorator(campaign_leads_enabled_required, name='dispatch')
+
+
 @method_decorator(login_required, name='dispatch')
+@method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
 class CampaignleadsOverviewView(TemplateView):
     template_name='campaign_leads/campaign_leads_overview.html'
     def get(self, request, *args, **kwargs):
@@ -142,8 +144,10 @@ def get_leads_board_context(request):
 @login_required
 def refresh_leads_board(request):
     return render(request, 'campaign_leads/htmx/leads_board.html', get_leads_board_context(request))
-# @method_decorator(campaign_leads_enabled_required, name='dispatch')
+
+
 @method_decorator(login_required, name='dispatch')
+@method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
 class CampaignBookingsOverviewView(TemplateView):
     template_name='campaign_leads/campaign_bookings_overview.html'
     def get_context_data(self, **kwargs):
@@ -199,8 +203,10 @@ def get_booking_table_context(request):
 @login_required
 def refresh_booking_table_htmx(request):
     return render(request, 'campaign_leads/htmx/campaign_bookings_table.html', get_booking_table_context(request))
-# @method_decorator(campaign_leads_enabled_required, name='dispatch')
+
+
 @method_decorator(login_required, name='dispatch')
+@method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
 class CampaignConfigurationView(TemplateView):
     template_name='campaign_leads/campaign_configuration.html'
 
@@ -300,6 +306,8 @@ def new_call(request, **kwargs):
 
 @login_required
 def campaign_assign_auto_send_template_htmx(request):
+    if settings.DEMO and not request.user.is_superuser:
+        return HttpResponse(status=500)
     campaign = Campaign.objects.get(pk=request.POST.get('campaign_pk'))
     send_order = send_order = request.POST['send_order']
     template_pk = request.POST.get('template_pk')
@@ -320,7 +328,9 @@ def campaign_assign_auto_send_template_htmx(request):
     return render(request, 'campaign_leads/htmx/choose_auto_templates.html', {'campaign':campaign})
 
 @login_required
-def campaign_assign_whatsapp_business_account_htmx(request):
+def campaign_assign_whatsapp_business_account_htmx(request):    
+    if settings.DEMO and not request.user.is_superuser:
+        return HttpResponse(status=500)
     campaign = Campaign.objects.get(pk=request.POST.get('campaign_pk'))
     whatsapp_business_account_pk = request.POST.get('whatsapp_business_account_pk') or 0
     
@@ -330,6 +340,8 @@ def campaign_assign_whatsapp_business_account_htmx(request):
     return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign})
 @login_required
 def campaign_assign_campaign_category_htmx(request):
+    if settings.DEMO and not request.user.is_superuser:
+        return HttpResponse(status=500)
     campaign = Campaign.objects.get(pk=request.POST.get('campaign_pk'))
     campaign_category_pk = request.POST.get('campaign_category_pk') or 0    
     campaign.campaign_category = CampaignCategory.objects.filter(pk=campaign_category_pk).first()
@@ -337,6 +349,8 @@ def campaign_assign_campaign_category_htmx(request):
     return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign})
 @login_required
 def profile_assign_campaign_category_htmx(request):
+    if settings.DEMO and not request.user.is_superuser:
+        return HttpResponse(status=500)
     context= {}
     profile = Profile.objects.get(pk=request.POST.get('profile_pk'))
     campaign_category_pk = request.POST.get('campaign_category_pk') or 0    
@@ -361,6 +375,8 @@ def campaign_assign_color_htmx(request):
 
 @login_required
 def campaign_assign_product_cost_htmx(request):
+    if settings.DEMO and not request.user.is_superuser:
+        return HttpResponse(status=500)
     campaign = Campaign.objects.get(pk=request.POST.get('campaign_pk'))
     product_cost = request.POST.get('product_cost')
     if product_cost:

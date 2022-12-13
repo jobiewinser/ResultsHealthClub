@@ -182,7 +182,31 @@ class Campaignlead(models.Model):
 
     def send_template_whatsapp_message(self, whatsappnumber=None, send_order=None, template=None, communication_method = 'a'):
         print("Campaignlead send_template_whatsapp_message", whatsappnumber, send_order, template, communication_method)
-        from core.models import AttachedError
+        if not whatsappnumber:
+            whatsappnumber = self.campaign.whatsapp_business_account.whatsappnumber
+        from core.models import AttachedError, send_message_to_websocket
+        customer_number = self.whatsapp_number
+        if settings.DEMO:
+            whatsapp_message, created = WhatsAppMessage.objects.get_or_create(
+                wamid="",
+                datetime=datetime.now(),
+                lead=self,
+                message=f"""
+                <b>Hi {self.first_name}</b>
+                <br>
+                <br>
+                <p>This is a demonstration of the whatsapp system! With the Pro subscription, you can add your own whatsapp accounts and automate sending templates here!</p>
+                <small>Thanks from Winser Systems!</small>
+                """,
+                site=self.campaign.site,
+                whatsappnumber=whatsappnumber,
+                customer_number=customer_number,
+                template=template,
+                inbound=False,
+            )
+            send_message_to_websocket(whatsappnumber, customer_number, whatsapp_message, self.campaign.site)
+            self.trigger_refresh_websocket(refresh_position=False)
+            return HttpResponse(status=200)
         if communication_method == 'a':
             print("CampaignleadDEBUG1")
             if send_order:
@@ -304,7 +328,6 @@ class Campaignlead(models.Model):
                 site = self.campaign.site
                 if not whatsappnumber and send_order:
                     whatsappnumber = self.campaign.whatsapp_business_account.whatsappnumber
-                customer_number = self.whatsapp_number
                 if not settings.DEMO:
                     response = whatsapp.send_template_message(self.whatsapp_number, whatsappnumber, template, language, components)
                 else:
@@ -334,41 +357,8 @@ class Campaignlead(models.Model):
                             inbound=False,
                             send_order=send_order
                         )
-                        if created:                        
-                            channel_layer = get_channel_layer()                            
-                            message_context = {
-                                "message": whatsapp_message,
-                                "site": site,
-                                "whatsappnumber": whatsappnumber,
-                            }
-                            rendered_message_list_row = loader.render_to_string('messaging/htmx/message_list_row.html', message_context)
-                            rendered_message_chat_row = loader.render_to_string('messaging/htmx/message_chat_row.html', message_context)
-                            rendered_html = f"""
-
-                            <span id='latest_message_row_{customer_number}' hx-swap-oob='delete'></span>
-                            <span id='messageCollapse_{whatsappnumber.pk}' hx-swap-oob='afterbegin'>{rendered_message_list_row}</span>
-
-                            <span id='messageWindowInnerBody_{customer_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>
-                            """
-                            
-                            async_to_sync(channel_layer.group_send)(
-                                f"messaging_{whatsappnumber.pk}",
-                                {
-                                    'type': 'chatbox_message',
-                                    "message": rendered_html,
-                                }
-                            )
-                            channel_layer = get_channel_layer()   
-                            
-                            async_to_sync(channel_layer.group_send)(
-                                f"message_count_{whatsappnumber.site.company.pk}",
-                                {
-                                    'type': 'messages_count_update',
-                                    'data':{
-                                        'rendered_html':f"""<span hx-swap-oob="afterbegin:.company_message_count"><span hx-trigger="load" hx-swap="none" hx-get="/update-message-counts/"></span>""",
-                                    }
-                                }
-                            )
+                        if created:                 
+                            send_message_to_websocket(whatsappnumber, customer_number, whatsapp_message, whatsappnumber.whatsapp_business_account )                           
                     logger.debug("site.send_template_whatsapp_message success") 
                     self.trigger_refresh_websocket(refresh_position=False)
                     return HttpResponse("Message Sent", status=200)

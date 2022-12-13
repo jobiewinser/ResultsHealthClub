@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
+import bleach
 from django.db.models import JSONField
 
 from messaging.models import Message, MessageImage
@@ -79,6 +80,7 @@ class WhatsAppMessage(Message):
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         unique = None
+        self.message = bleach.clean(self.message, settings.BLEACH_VALID_TAGS, settings.BLEACH_VALID_ATTRS, settings.BLEACH_VALID_STYLES)
         while not unique:
             qs = WhatsAppMessage.objects.filter(datetime=self.datetime)
             if self.pk:

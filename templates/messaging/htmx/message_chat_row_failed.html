@@ -17,7 +17,7 @@ id="message_chat_row_{{message.pk}}"
     </ul>"
     {%endif%}>
     <div class="col p-0 ps-1 m-1 card card-white chat_row_{{customer_number}}">
-        {{message.message}}
+        {{message.message|safe}}
     </div>
 </div>
 {%endwith%}
