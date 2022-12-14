@@ -7,7 +7,8 @@ urlpatterns = [
     # path('login-htmx', coreviews.custom_login_post, name='login-htmx' ),
 
     path('', coreviews.HomeView.as_view(), name='customer-home'),
-    path('customer-login/', coreviews.CustomerLoginView.as_view(), name='customer-login'),
+    # path('customer-login/', coreviews.CustomerLoginView.as_view(), name='customer-login'),
+    path('login-demo/', coreviews.LoginDemoView.as_view(), name='login-demo'),
     
     path('change-log/', coreviews.ChangeLogView.as_view(), name='change-log'),
 

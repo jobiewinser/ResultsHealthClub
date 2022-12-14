@@ -7,7 +7,7 @@
         data-bs-placement="top"
         data-bs-html="true"
         data-bs-title="Template Whatsapp sending"
-        {%if not request.user.profile|get_user_allowed_to_edit_whatsapp_settings_tag:site%}
+        {%if not request.user.profile|get_user_allowed_to_toggle_whatsapp_sending_tag:site%}
         data-bs-content="You do not have permission to edit this field: Edit Whatsapp Settings"
         {%else%} 
         data-bs-content="Disabling this toggle will stop template whatsapps sending, including follow up messages, initial lead messages. The messages can then be sent after turning this back on freely.
@@ -20,7 +20,7 @@
         <div class="form-check form-switch">
             <label> Template Whatsapp sending <i class="fa-solid fa-circle-info help"></i></label> 
             <input hx-post="{%url 'set-whatsapp-template-sending-status'%}" hx-target="#whatsapp_template_sending_wrapper" hx-swap="innerHTML" hx-trigger="input delay:0.1s" hx-indicator="#htmx_indicator_site_form" hx-vals='{"site_pk": "{{site.pk}}"}'
-            {%if not request.user.profile|get_user_allowed_to_edit_whatsapp_settings_tag:site%}disabled{%endif%} 
+            {%if not request.user.profile|get_user_allowed_to_toggle_whatsapp_sending_tag:site%}disabled{%endif%} 
             class="form-check-input" name="whatsapp_template_sending_enabled" {%if site.whatsapp_template_sending_enabled%}checked{%endif%} type="checkbox">
         </div>
     </div>

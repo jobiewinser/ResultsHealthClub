@@ -49,7 +49,8 @@ id="submit_site_pk_{{campaign.pk}}"></button>
 </td>
 <td>
     <span hidden>{{campaign.product_cost|floatformat:2}}</span>   
-    <input type="number" min="0.00" max="10000.00" step="0.01" value="{{campaign.product_cost|floatformat:2}}" name="product_cost"
+    <input {%if not demo%}type="number" min="0.00" max="10000.00" step="0.01"{%endif%} value="{{campaign.product_cost|floatformat:2}} {%if demo and not request.user.is_superuser%}(Demo){%endif%}" name="product_cost"
+        {%if demo and not request.user.is_superuser%}disabled{%endif%}
         class="form-control"
         hx-post="{% url 'campaign-assign-product_cost' %}" hx-swap="innerHTML" 
         hx-trigger="change delay:0.5s"
@@ -72,6 +73,7 @@ id="submit_site_pk_{{campaign.pk}}"></button>
         <div class="col p-0">
             <span hidden>{{campaign.campaign_category.name}}</span>           
             <select class="form-select" name="campaign_category_pk" id="campaign_category_pk_{{campaign.pk}}" 
+                {%if demo and not request.user.is_superuser%}disabled{%endif%}            
                 hx-post="{% url 'campaign-assign-campaign-category' %}" hx-swap="innerHTML" 
                 hx-trigger="change"
                 hx-indicator=".top-htmx-indicator" 
@@ -79,7 +81,7 @@ id="submit_site_pk_{{campaign.pk}}"></button>
                 hx-target="#row_{{campaign.pk}}" >
                 <option value="">🚫</option>
                 {%for campaign_category in campaign.site.campaigncategory_set.all%}
-                <option {%if campaign.campaign_category.pk == campaign_category.pk %}selected{%endif%} value="{{campaign_category.pk}}">{{campaign_category.name}}</option>
+                <option {%if campaign.campaign_category.pk == campaign_category.pk %}selected{%endif%} value="{{campaign_category.pk}}">{{campaign_category.name}} {%if demo and not request.user.is_superuser%}(Demo){%endif%}</option>
                 {%endfor%}
             </select>
         </div>  
@@ -109,6 +111,7 @@ id="submit_site_pk_{{campaign.pk}}"></button>
         </p>
         '>                  
         <select class="form-select" name="whatsapp_business_account_pk" id="whatsapp_business_account_pk_{{campaign.pk}}" 
+            {%if demo and not request.user.is_superuser%}disabled{%endif%}
             hx-post="{% url 'campaign-assign-whatsapp-business-account' %}" hx-swap="innerHTML" 
             hx-trigger="change"
             hx-indicator=".top-htmx-indicator" 
@@ -116,7 +119,7 @@ id="submit_site_pk_{{campaign.pk}}"></button>
             hx-target="#row_{{campaign.pk}}" >
             <option value="">🚫</option>
             {%for whatsapp_business_account in campaign.site.whatsappbusinessaccount_set.all%}
-            <option {%if campaign.whatsapp_business_account.pk == whatsapp_business_account.pk %}selected{%endif%} value="{{whatsapp_business_account.pk}}">{{whatsapp_business_account.whatsappnumber}}</option>
+            <option {%if campaign.whatsapp_business_account.pk == whatsapp_business_account.pk %}selected{%endif%} value="{{whatsapp_business_account.pk}}">{{whatsapp_business_account.whatsappnumber}} {%if demo and not request.user.is_superuser%}(Demo){%endif%}</option>
             {%endfor%}
         </select>
     </span> 

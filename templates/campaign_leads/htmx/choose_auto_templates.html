@@ -1,5 +1,8 @@
 {%load static%}
 <span>
+    {%if demo and not request.user.is_superuser%}
+    <div class="alert alert-info"><b>Demo Mode</b>, not editable</div>
+    {%endif%}
     <div class="row">
         <div class="col">
             <table class="table">

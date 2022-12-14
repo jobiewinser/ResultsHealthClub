@@ -1,4 +1,9 @@
-{% extends 'whatsapp/whatsapp_template_edit.html' %}
+{% extends 'core/base.html' %}
+{%block content%}   
+    {%include 'whatsapp/htmx/whatsapp_template_create_htmx.html'%}
+{%endblock content%}
+
+{% comment %} {% extends 'whatsapp/whatsapp_template_edit.html' %}
 {%load static%}
 
 
@@ -62,4 +67,4 @@ data-bs-content="
     <i class="fa fa-save" aria-hidden="true"></i> 
     Create Template
 </button>
-{%endblock submit_button%}
+{%endblock submit_button%} {% endcomment %}

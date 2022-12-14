@@ -20,6 +20,12 @@
                 <h5 class="mb-0">Welcome Back !</h5>
                 <p class="text-muted mt-2">Sign in to manage your leads.</p>
               </div>
+              {%if demo and not request.user.is_superuser%}
+              <form action="/login-demo/" id="login-form"method="post">
+                {% csrf_token %}
+                <button class="btn btn-primary w-100 waves-effect waves-light" type="submit">View Demo</button>
+              </form>
+              {%else%}
               <form class="mt-4 pt-2" action="/accounts/login/" id="login-form"method="post">
                 {% csrf_token %}
                 <div class="form-floating form-floating-custom mb-4">
@@ -85,6 +91,7 @@
                   Don't have an account? <a href="/accounts/register/" class="text-primary fw-semibold">Signup now</a>
                 </p>
               </div>
+              {%endif%}
             </div>
           </div>
         </div>

@@ -103,13 +103,15 @@
 </td>
 <td class="center">   
     <button class="nowrap btn btn-light pointer" type="button"
-        {%if not request.user.profile|get_profile_allowed_to_edit_profile_permissions_tag:profile and not demo%}
+    {%if demo and not request.user.is_superuser%}disabled{%endif%}
+        {%if not request.user.profile|get_profile_allowed_to_edit_profile_permissions_tag:profile%}
         disabled
         {%endif%}
+        {%if demo and not request.user.is_superuser%}disabled{%endif%}
         hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
         hx-vals='{"template_name": "edit_permissions", "profile_pk": "{{profile.pk}}"}'
         hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
-        hx-swap="innerHTML" hx-trigger="click"><i class="fa-light fa-ballot-check"></i> Edit Permissions</button>
+        hx-swap="innerHTML" hx-trigger="click"><i class="fa-light fa-ballot-check"></i> Edit Permissions {%if demo and not request.user.is_superuser%}(Demo){%endif%}</button>
 </td>
 <td class="center">   
     <button class="nowrap btn btn-light pointer" type="button" 

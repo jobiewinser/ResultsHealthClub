@@ -9,6 +9,7 @@
         hx-include='#template_pk_{{forloop.counter}}'
         hx-post="{% url 'campaign-assign-auto-send-template' %}"></button>
     <select class="form-select" name="template_pk" id="template_pk_{{forloop.counter}}"
+    {%if demo and not request.user.is_superuser%}disabled{%endif%}
         onchange="$('#choose_auto_template_{{forloop.counter}}').click();"
         data-bs-toggle="popover" 
         data-bs-trigger="hover focus" 

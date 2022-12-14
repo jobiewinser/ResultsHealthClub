@@ -637,8 +637,9 @@ class Profile(models.Model):
         super(Profile, self).save(force_insert, force_update, using, update_fields)
         if not self.site in self.sites_allowed.all() and self.site:
             self.sites_allowed.add(self.site)   
-        for site in self.company.site_set.all():
-            permissions, created = SiteProfilePermissions.objects.get_or_create(profile=self, site=site)
+        if self.company:
+            for site in self.company.site_set.all():
+                permissions, created = SiteProfilePermissions.objects.get_or_create(profile=self, site=site)
         
 class FreeTasterLink(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -678,6 +679,7 @@ class SiteProfilePermissions(models.Model):
     edit_site_configuration = models.BooleanField(default=False)
     edit_whatsapp_settings = models.BooleanField(default=False)
     toggle_active_campaign = models.BooleanField(default=False)
+    toggle_whatsapp_sending = models.BooleanField(default=False)
     permissions_count = models.IntegerField(default = 0) 
     class Meta:
         ordering = ['-pk']   

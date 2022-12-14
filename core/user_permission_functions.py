@@ -24,6 +24,11 @@ def get_user_allowed_to_edit_whatsapp_settings(profile, site):
     if permissions:
         return permissions.edit_whatsapp_settings
     return False
+def get_user_allowed_to_toggle_whatsapp_sending(profile, site):
+    permissions = SiteProfilePermissions.objects.filter(profile=profile, site=site).first()
+    if permissions:
+        return permissions.toggle_whatsapp_sending
+    return False
 def get_user_allowed_to_edit_site_configuration(profile, site):
     permissions = SiteProfilePermissions.objects.filter(profile=profile, site=site).first()
     if permissions:

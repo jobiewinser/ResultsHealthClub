@@ -1,11 +1,12 @@
 import os
 import sys
 import traceback
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, View
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 import logging
 from django.http import HttpResponse, HttpResponseRedirect
+from django.contrib.sessions.models import Session
 from django.contrib.auth.models import User
 from calendly.api import Calendly
 from core.core_decorators import check_core_profile_requirements_fulfilled
@@ -15,11 +16,16 @@ from django.contrib.auth import login
 from django.core.exceptions import PermissionDenied
 from core.user_permission_functions import *
 from whatsapp.api import Whatsapp
-from core.startup import run_debug_startup
 from django.conf import settings
 logger = logging.getLogger(__name__)
 
-run_debug_startup()
+class LoginDemoView(View):
+    template_name='core/customer_login.html'
+    def post(self, request, *args, **kwargs):
+        user = User.objects.filter(groups__name='demo').order_by('last_login').first()
+        [s.delete() for s in Session.objects.all() if s.get_decoded().get('_auth_user_id') == user.id]
+        login(request, user, backend='core.backends.CustomBackend')
+        return redirect("/")
 
 @method_decorator(login_required, name='dispatch')
 @method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
@@ -43,18 +49,7 @@ class ChangeLogView(TemplateView):
         if request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'core/change_log_htmx.html'
         return super().get(request, *args, **kwargs)
-class CustomerLoginView(TemplateView):
-    template_name='core/customer_login.html'
-    def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return redirect('/')
-        return super(CustomerLoginView, self).get(request, args, kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super(CustomerLoginView, self).get_context_data(**kwargs)
-        if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
-            self.template_name = 'registration/login.html'
-        return context
+        
     
 PROFILE_ERROR_OPTIONS = {
     '1':"No profile set up for your user account.",

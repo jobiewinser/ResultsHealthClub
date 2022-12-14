@@ -18,7 +18,9 @@
         <div class="row">
             <div class="col center p-0">
                 <div class="form-floating m-1">
-                    <input name="category_name" class="form-control" id="modal_category_name" {%if demo and not request.user.is_superuser%}disabled{%endif%}/>
+                    <input name="category_name" 
+                    {%if demo and not request.user.is_superuser%}disabled{%endif%}
+                    class="form-control" id="modal_category_name"/>
                     <label for="modal_category_name">Category Name<span class="required">*</span></label>
                 </div>            
             </div>
@@ -26,7 +28,7 @@
         <div class="row m-1">
             <div class="col center" >
                 <button class="btn btn-primary" type="submit" {%if demo and not request.user.is_superuser%}disabled{%endif%}>
-                    Create
+                    Create {%if demo and not request.user.is_superuser%}(Demo){%endif%}
                 </button>
             </div>
         </div>

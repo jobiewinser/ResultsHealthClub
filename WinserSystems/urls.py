@@ -40,3 +40,7 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 if settings.DEBUG:
     urlpatterns += staticfiles_urlpatterns()
+    
+from core.startup import run_debug_startup, run_demo_startup, animals
+run_debug_startup()
+run_demo_startup()
