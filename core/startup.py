@@ -7,71 +7,75 @@ from active_campaign.models import *
 from messaging.models import *
 from django.contrib.auth.models import Group
 
+import sys
 def run_debug_startup():
-    try:
-        if settings.DEBUG:
-            from django.contrib.auth.models import User
-            user, created = User.objects.get_or_create(
-                username="jobie",
-                defaults={
-                    'first_name': "jobie",
-                    'last_name': "winser",
-                }
-            )
-            user.set_password(os.getenv("DEFAULT_USER_PASSWORD"))
-            user.save()
-            
-            company, created = Company.objects.get_or_create(
-                name="Test Company",
-                defaults={
-                    'active_campaign_url': os.getenv("DEFAULT_ACTIVE_CAMPAIGN_URL"),
-                    'active_campaign_api_key': os.getenv("DEFAULT_ACTIVE_CAMPAIGN_API_KEY"),
-                }
-            )
+    if not sys.argv[1] in ["makemigrations", "migrate", "collectstatic", "random_leads"]:
+        try:
+            if settings.DEBUG:
+                from django.contrib.auth.models import User
+                user, created = User.objects.get_or_create(
+                    username="jobie",
+                    defaults={
+                        'first_name': "jobie",
+                        'last_name': "winser",
+                    }
+                )
+                user.set_password(os.getenv("DEFAULT_USER_PASSWORD"))
+                user.save()
+                
+                company, created = Company.objects.get_or_create(
+                    name="Test Company",
+                    defaults={
+                        'active_campaign_url': os.getenv("DEFAULT_ACTIVE_CAMPAIGN_URL"),
+                        'active_campaign_api_key': os.getenv("DEFAULT_ACTIVE_CAMPAIGN_API_KEY"),
+                    }
+                )
 
-            site, created = Site.objects.get_or_create(
-                name="Test Site",
-                defaults={
-                    'company': company,
-                    'whatsapp_access_token': os.getenv("DEFAULT_WHATSAPP_ACCESS_TOKEN"),
-                    'whatsapp_app_secret_key': os.getenv("DEFAULT_WHATSAPP_SECRET_KEY"),
-                    'calendly_token': os.getenv("DEFAULT_CALENDLY_TOKEN"),
-                    'calendly_organization': os.getenv("DEFAULT_CALENDLY_ORGANIZATION"),
-                    'guid': "6325bcde-feb9-4c",
-                }
-            )
+                site, created = Site.objects.get_or_create(
+                    name="Test Site",
+                    defaults={
+                        'company': company,
+                        'whatsapp_access_token': os.getenv("DEFAULT_WHATSAPP_ACCESS_TOKEN"),
+                        'whatsapp_app_secret_key': os.getenv("DEFAULT_WHATSAPP_SECRET_KEY"),
+                        'calendly_token': os.getenv("DEFAULT_CALENDLY_TOKEN"),
+                        'calendly_organization': os.getenv("DEFAULT_CALENDLY_ORGANIZATION"),
+                        'guid': "6325bcde-feb9-4c",
+                    }
+                )
 
-            profile, created = Profile.objects.get_or_create(
-                user=user,
-                defaults={
-                    'company': company,
-                    'site': site,
-                }      
-            )
-    except:
-        pass
+                profile, created = Profile.objects.get_or_create(
+                    user=user,
+                    defaults={
+                        'company': company,
+                        'site': site,
+                    }      
+                )
+        except:
+            pass
 animals = [
-            'cat',
-            'cow',
-            'crow',
-            'dog',
-            'dove',
-            'dragon',
-            'fish',
-            'frog',
-            'hippo',
-            'horse',
-            'kiwi-bird',
-            'locust',
-            'mosquito',
-            'otter',
-            'shrimp',
-            'spider',
-            'worm'
+            ('cat','0, 0, 255','blue'),
+            ('cow','255, 0, 0','red'),
+            ('crow','0, 255, 0','green'),
+            ('dog','255, 255, 0','yellow'),
+            ('dove','255, 0, 255','magenta'),
+            ('dragon','255, 128, 128','pink'),
+            ('fish','128, 128, 128','grey'),
+            ('frog','128, 0, 0','brown'),
+            ('hippo','255, 128, 0','orange'),
+            ('horse','0, 0, 255','blue'),
+            ('kiwi-bird','255, 0, 0','red'),
+            ('locust','0, 255, 0','green'),
+            ('mosquito','255, 255, 0','yellow'),
+            ('otter','255, 0, 255','magenta'),
+            ('shrimp','255, 128, 128','pink'),
+            ('spider','128, 128, 128','grey'),
+            ('worm', '255, 128, 0','brown')
         ]
+        
 def run_demo_startup():
     if settings.DEMO:
-        for index in ['one', 'two']:
+        #TODO change the line below to only run for runserver, runserver_plus and whatever gunicorn runs
+        if not sys.argv[1] in ["makemigrations", "migrate", "collectstatic", "random_leads"]:
             for animal in animals:
                 group, created = Group.objects.get_or_create(
                     name="demo"
@@ -128,19 +132,20 @@ def run_demo_startup():
                     company=company,
                 )
                 user, created = User.objects.get_or_create(
-                    username=f"{animal}{index}",
+                    username=f"{animal[2]}{animal[0]}",
                 )
                 if created:
-                    user.first_name=animal.capitalize()
-                    user.last_name=index.capitalize()
+                    user.first_name=animal[2].capitalize()
+                    user.last_name=animal[0].capitalize()
                     user.set_password(os.getenv("DEFAULT_USER_PASSWORD"))
                     user.save()
                 group.user_set.add(user)
                 profile, created = Profile.objects.get_or_create(
                     user=user
                 )
-                if created:
-                    profile.avatar = "demo-profiles/{animal}-solid.svg"
-                    profile.company = company
-                    profile.site = site1
-                    profile.save()
+                # if created:
+                profile.avatar = f"demo-profiles/{animal[0]}-solid.svg"
+                profile.theme_colour = animal[1]
+                profile.company = company
+                profile.site = site1
+                profile.save()
