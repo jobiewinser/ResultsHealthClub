@@ -230,13 +230,34 @@ class LeadsConsumer(AsyncWebsocketConsumer):
                 {
                     'type': 'lead_update',
                     'data':{
-                        'rendered_html':f"""<div hx-swap-oob="outerHTML:.leads_disconnected_indicator">
-                                                <div class="htmx-indicator whole_page_disconnected_indicator leads_disconnected_indicator">
-                                                    <div class="whole_page_disconnected_indicator_content">
-                                                        <b>Connecting</b> <img class="invert" src="https://htmx.org/img/bars.svg">
-                                                    </div>
-                                                </div>
-                                            </div>""",
+                        'rendered_html':"""
+                                            <div hx-swap-oob="innerHTML:#reconnect_div">
+                                            <script>
+                                                var elem = $('#leads_disconnected_indicator');
+                                                if (elem.hasClass('htmx-request')){
+                                                    elem.removeClass('htmx-request');
+                                                    htmx.ajax('GET', "/refresh-leads-board/", {include:'.overview_table_filters', indicator:'#page_load_indicator', swap:'outerHTML', target: '#leads_board_span_wrapper'})
+                                                }
+                                            </script>  
+                                            </div>                                        
+                                            """,
+                                            # <div hx-swap-oob="outerHTML:.leads_disconnected_indicator">
+                                            #     <div class="htmx-indicator whole_page_disconnected_indicator leads_disconnected_indicator" id="leads_disconnected_indicator">
+                                            #         <div class="whole_page_disconnected_indicator_content">
+                                            #             <b>Connecting</b> <img class="invert" src="https://htmx.org/img/bars.svg">
+                                            #         </div>
+                                            #     </div>
+                                            # </div>  
+
+
+
+                                                # <div hx-swap-oob="afterBegin:#leads_board_span_wrapper"><button hidden
+                                                #     hx-trigger="load"
+                                                #     hx-get="/refresh-leads-board/"
+                                                #     hx-swap="outerHTML" hx-push-url="false" 
+                                                #     hx-include=".overview_table_filters" hx-indicator="#page_load_indicator" 
+                                                #     hx-target="#leads_board_span_wrapper"></button>
+                                                # </div>
                     }
                 }
             )

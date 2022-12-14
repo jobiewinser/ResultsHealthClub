@@ -88,7 +88,9 @@
                 {%else%}
                 {% static 'img/blank-profile-picture.png' %}
                 {%endif%}
-                " alt="" width="22" height="22" class="rounded-circle">
+                " 
+                style="{%if message.user.profile.theme_colour%}background-color:rgba({{message.user.profile.theme_colour}}, 0.6){%endif%}"
+                alt="" width="22" height="22" class="rounded-circle">
             </div>
         </div>
 {%endif%}

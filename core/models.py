@@ -525,14 +525,15 @@ class Company(models.Model):
     # free_taster_enabled = models.BooleanField(default=False)
     # whatsapp_enabled = models.BooleanField(default=False)
     # active_campaign_enabled = models.BooleanField(default=False)
+    demo = models.BooleanField(default=False)
     whatsapp_app_secret_key = models.TextField(blank=True, null=True)
     whatsapp_app_business_id = models.TextField(blank=True, null=True)
     SUBSCRIPTION_CHOICES = (
                     ('free', 'Free'),
-                    ('lite', 'Lite'),
+                    ('basic', 'Basic'),
                     ('pro', 'Pro'),
                 )
-    subscription = models.CharField(choices=SUBSCRIPTION_CHOICES, max_length=5, default="lite")
+    subscription = models.CharField(choices=SUBSCRIPTION_CHOICES, max_length=5, default="free")
     active_campaign_url = models.TextField(null=True, blank=True)
     active_campaign_api_key = models.TextField(null=True, blank=True)
     

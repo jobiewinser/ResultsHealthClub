@@ -1,7 +1,7 @@
 {%load core_tags static%}
 {%with chat_object.users_online|split_tag:';' as user_pk_list%}
 {%for user in user_pk_list|get_users_with_pks_tag%}
-<span class="" 
+<span class=""     
     data-bs-toggle="popover" 
     data-bs-trigger="hover focus" 
     data-bs-html="true" 
@@ -12,7 +12,12 @@
         {{user.profile.name}} is working here!
     </p>
     ">
-    <img src="{%if user.profile.avatar%}/media/{{user.profile.avatar}}{%else%}{% static 'img/blank-profile-picture.png' %}{%endif%}" alt="" style="width:50px; height:50px;" class="rounded-circle m-1">
+    <img src="{%if user.profile.avatar%}/media/{{user.profile.avatar}}{%else%}{% static 'img/blank-profile-picture.png' %}{%endif%}" 
+    alt="" 
+    style="width:50px; height:50px;
+    {%if user.profile.theme_colour%}background-color:rgba({{user.profile.theme_colour}}, 0.6){%endif%}
+    " 
+    class="rounded-circle m-1">
 </span>
 {%endfor%}
 {%endwith%}

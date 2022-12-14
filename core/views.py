@@ -17,14 +17,17 @@ from django.core.exceptions import PermissionDenied
 from core.user_permission_functions import *
 from whatsapp.api import Whatsapp
 from django.conf import settings
+from datetime import datetime
 logger = logging.getLogger(__name__)
 
 class LoginDemoView(View):
     template_name='core/customer_login.html'
     def post(self, request, *args, **kwargs):
-        user = User.objects.filter(groups__name='demo').order_by('last_login').first()
+        user = User.objects.filter(groups__name='demo').order_by('last_login').last()
         [s.delete() for s in Session.objects.all() if s.get_decoded().get('_auth_user_id') == user.id]
         login(request, user, backend='core.backends.CustomBackend')
+        user.last_login = datetime.now()
+        user.save()
         return redirect("/")
 
 @method_decorator(login_required, name='dispatch')

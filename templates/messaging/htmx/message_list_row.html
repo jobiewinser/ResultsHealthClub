@@ -70,7 +70,9 @@
     id="latest_message_row_{{message.customer_number}}"
     >
     <div class="col-auto p-0">
-        <img id="latest_message_avatar_{{message.customer_number}}" src="{%if message.inbound%}{% static 'img/blank-profile-picture.png' %}{%else%}{%if message.user.profile.avatar.url%}{{message.user.profile.avatar.url}}{%else%}{{message.site.company.company_logo_black.url}}{%endif%}{%endif%}" alt="" width="38" height="38" class="rounded-circle">
+        <img id="latest_message_avatar_{{message.customer_number}}" 
+        style="{%if message.user.profile.theme_colour%}background-color:rgba({{message.user.profile.theme_colour}}, 0.6){%endif%}"
+        src="{%if message.inbound%}{% static 'img/blank-profile-picture.png' %}{%else%}{%if message.user.profile.avatar.url%}{{message.user.profile.avatar.url}}{%else%}{{message.site.company.company_logo_black.url}}{%endif%}{%endif%}" alt="" width="38" height="38" class="rounded-circle">
     </div>
     <div class="col p-0 ps-1 hidden-overflow">
         <div class="row chat_lead_name_row">

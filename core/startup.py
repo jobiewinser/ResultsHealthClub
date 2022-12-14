@@ -83,8 +83,9 @@ def run_demo_startup():
             
                 company, created = Company.objects.get_or_create(
                     name="Demo Company",
+                    demo=True,
                 )   
-
+                company.subscription = 'pro'
                 site1, created = Site.objects.get_or_create(
                     name="Abingdon Site",
                     company=company,
@@ -110,12 +111,17 @@ def run_demo_startup():
                     name="PT Training Courses",
                     site=site1
                 )
+                whatsapp_business_account1, created = WhatsappBusinessAccount.objects.get_or_create(
+                    site = site1,
+                    whatsapp_business_account_id="111",
+                )
 
                 campaign1, created = Campaign.objects.get_or_create(
                     name="Group Strength Training",
                     campaign_category=campaign_category1,
                     site=site1,
                     company=company,
+                    whatsapp_business_account=whatsapp_business_account1,
                 )
 
                 campaign2, created = Campaign.objects.get_or_create(
@@ -123,6 +129,7 @@ def run_demo_startup():
                     campaign_category=campaign_category1,
                     site=site1,
                     company=company,
+                    whatsapp_business_account=whatsapp_business_account1,
                 )
 
                 campaign3, created = Campaign.objects.get_or_create(
@@ -130,6 +137,7 @@ def run_demo_startup():
                     campaign_category=campaign_category2,
                     site=site1,
                     company=company,
+                    whatsapp_business_account=whatsapp_business_account1,
                 )
                 user, created = User.objects.get_or_create(
                     username=f"{animal[2]}{animal[0]}",
