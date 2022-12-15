@@ -26,8 +26,6 @@ class SiteUsersOnline(models.Model):
     site = models.ForeignKey("core.Site", on_delete=models.SET_NULL, null=True, blank=True)
     feature = models.CharField(max_length=50, default="leads")
 
-SiteUsersOnline.objects.all().update(users_online="")
-
 class AttachedError(models.Model): 
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     ERROR_TYPES = (

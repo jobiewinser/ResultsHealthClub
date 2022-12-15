@@ -72,6 +72,12 @@ animals = [
             ('worm', '255, 128, 0','brown')
         ]
         
+def run_startup():
+    try:
+        if not sys.argv[1] in ["makemigrations", "migrate", "collectstatic", "random_leads"]:
+            SiteUsersOnline.objects.all().update(users_online="")
+    except:
+        pass
 def run_demo_startup():
     if settings.DEMO:
         #TODO change the line below to only run for runserver, runserver_plus and whatever gunicorn runs
