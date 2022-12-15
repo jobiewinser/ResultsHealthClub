@@ -15,7 +15,9 @@ function leadshandlehtmxafterSwap(evt){
             } else if (evt.detail.pathInfo.requestPath.includes("refresh-lead-article") || evt.detail.pathInfo.requestPath.includes("leads-and-calls") || evt.detail.pathInfo.requestPath.includes("refresh-leads-board")){
                 document.getElementById('notification2').play();
                 set_total_costs();
-                set_lead_counts();                
+                set_lead_counts();  
+                var elem = $('#leads_disconnected_indicator');              
+                elem.removeClass('htmx-request');
             }
         }             
     }

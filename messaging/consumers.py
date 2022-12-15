@@ -235,7 +235,6 @@ class LeadsConsumer(AsyncWebsocketConsumer):
                                             <script>
                                                 var elem = $('#leads_disconnected_indicator');
                                                 if (elem.hasClass('htmx-request')){
-                                                    elem.removeClass('htmx-request');
                                                     htmx.ajax('GET', "/refresh-leads-board/", {include:'.overview_table_filters', indicator:'#page_load_indicator', swap:'outerHTML', target: '#leads_board_span_wrapper'})
                                                 }
                                             </script>  
