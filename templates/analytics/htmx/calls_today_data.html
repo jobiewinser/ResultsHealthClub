@@ -48,18 +48,18 @@
 
 
 <script>
+    {%if data_set%}
+    var dynamicColors = function() {
+        var r = Math.floor(Math.random() * 255);
+        var g = Math.floor(Math.random() * 255);
+        var b = Math.floor(Math.random() * 255);
+        return "rgba(" + r + "," + g + "," + b + ", {%if graph_type == 'polarArea'%}0.5{%else%}0.8{%endif%})";
+    };
+    var color_random_list = []
+    {%for data_set_tuple in data_set%}
+    color_random_list.push(dynamicColors());
+    {%endfor%}
     $(document).ready(function() {
-        {%if data_set%}
-        var dynamicColors = function() {
-            var r = Math.floor(Math.random() * 255);
-            var g = Math.floor(Math.random() * 255);
-            var b = Math.floor(Math.random() * 255);
-            return "rgba(" + r + "," + g + "," + b + ", {%if graph_type == 'polarArea'%}0.5{%else%}0.8{%endif%})";
-        };
-        var color_random_list = []
-        {%for data_set_tuple in data_set%}
-        color_random_list.push(dynamicColors());
-        {%endfor%}
         setTimeout(function(){
             calls_today_chart_var = document.getElementById('calls_today_chart');
             calls_today_chart = new Chart(calls_today_chart_var, {
