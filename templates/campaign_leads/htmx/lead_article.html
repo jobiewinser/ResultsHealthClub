@@ -113,10 +113,10 @@
             ">
             
             {%if lead.assigned_user.profile.demo_account_theme_colour%}
-            <div class="rounded-circle m-1" style="width:50px; height:50px;background-color:rgba({{lead.assigned_user.profile.demo_account_theme_colour}}, 0.5)">
+            <div class="rounded-circle m-1" style="width:25px; height:25px;background-color:rgba({{lead.assigned_user.profile.demo_account_theme_colour}}, 0.5)">
                 <img src="/media/{{lead.assigned_user.profile.avatar}}" 
                 alt="" 
-                style="width:30px; height:30px; position:relative; right:10px; top:10px; filter: invert(100%);" 
+                style="padding:4px; filter: invert(100%);" 
                 class="">
             </div>
             {%else%}

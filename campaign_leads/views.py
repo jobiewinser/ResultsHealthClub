@@ -281,7 +281,7 @@ def new_call(request, **kwargs):
                             lead = lead,                        
                             user=request.user
                         )
-                        lead = Campaignlead.objects.filter(pk=kwargs.get('lead_pk')).annotate(calls=Count('call')).first()
+                        lead = Campaignlead.objects.filter(pk= kwargs.get('lead_pk')).annotate(calls=Count('call')).first()
                 elif lead.calls > call_count:
                     while lead.calls > call_count:
                         Call.objects.filter(
@@ -289,11 +289,8 @@ def new_call(request, **kwargs):
                         ).order_by('-datetime').first().delete()
                         lead = Campaignlead.objects.filter(pk=kwargs.get('lead_pk')).annotate(calls=Count('call')).first()
                 lead.last_dragged = datetime.now()
-                lead.save()
-
-                
-                lead.trigger_refresh_websocket(refresh_position=True)
-                
+                lead.save()                
+                lead.trigger_refresh_websocket(refresh_position=True)                
                 return HttpResponse("", status=200)
             return HttpResponse("", status=500)
             # return render(request, 'campaign_leads/htmx/lead_article.html', {'lead':lead,'max_call_count':kwargs.get('max_call_count', 1), 'call_count':call_count})

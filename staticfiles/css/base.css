@@ -1009,3 +1009,7 @@ tr.odd td {
     margin:0px;
     padding:0px;
 }
+
+#users_online_leads{
+    min-width:300px;
+}
