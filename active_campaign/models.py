@@ -4,7 +4,6 @@ from active_campaign.api import ActiveCampaignApi
 from django.dispatch import receiver
 from django.conf import settings
 from campaign_leads.models import Campaign
-from core.models import Site
 class ActiveCampaignWebhookRequest(models.Model):
     json_data = models.JSONField(default=dict)
     meta_data = models.JSONField(default=dict)
