@@ -231,10 +231,11 @@ class LeadsConsumer(AsyncWebsocketConsumer):
                     'type': 'lead_update',
                     'data':{
                         'rendered_html':"""
-                                            <div hx-swap-oob="innerHTML:#reconnect_div">
+                                            <div hx-swap-oob="innerHTML:#leads_reconnect_div">
                                             <script>
                                                 var elem = $('#leads_disconnected_indicator');
                                                 if (elem.hasClass('htmx-request')){
+                                                    elem.removeClass('htmx-request');
                                                     htmx.ajax('GET', "/refresh-leads-board/", {include:'.overview_table_filters', indicator:'#page_load_indicator', swap:'outerHTML', target: '#leads_board_span_wrapper'})
                                                 }
                                             </script>  
@@ -289,6 +290,7 @@ class LeadsConsumer(AsyncWebsocketConsumer):
                     "message": text_data_json["rendered_html"],
                 }
             )
+            await add_user_to_users_online(self)
 
     # Receive message from room group.    
     async def lead_update(self, event):
