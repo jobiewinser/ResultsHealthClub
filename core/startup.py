@@ -92,6 +92,7 @@ def run_demo_startup():
                     demo=True,
                 )   
                 company.subscription = 'pro'
+                company.save()
                 site1, created = Site.objects.get_or_create(
                     name="Abingdon Site",
                     company=company,
