@@ -41,7 +41,3 @@ if settings.DEBUG:
 if settings.DEBUG:
     urlpatterns += staticfiles_urlpatterns()
     
-from core.startup import run_debug_startup, run_demo_startup, run_startup
-run_startup()
-run_debug_startup()
-run_demo_startup()

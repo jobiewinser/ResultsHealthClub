@@ -28,7 +28,7 @@
         <div class="row m-1">
             <div class="col center" >
                 <button class="btn btn-primary" type="submit" {%if demo and not request.user.is_superuser%}disabled{%endif%}>
-                    Create {%if demo and not request.user.is_superuser%}(Demo){%endif%}
+                    Create {%if demo and not request.user.is_superuser%}(Demo, Disabled){%endif%}
                 </button>
             </div>
         </div>

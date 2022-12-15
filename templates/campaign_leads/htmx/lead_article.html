@@ -55,7 +55,7 @@
             <div class="col-md-auto p-0">
                 
                 {%if not lead.message_set.all%}
-                <button class="btn btn-sm btn-success text-white position-relative" 
+                <button class="btn btn-sm btn-secondary position-relative" 
                     hx-get="{%url 'send-first-template-whatsapp-lead-article' lead_pk=lead.pk%}"
                     hx-indicator="#page_load_indicator" 
                     hx-include="#max_call_count"
@@ -64,7 +64,7 @@
                     hx-push-url="false"
                     hx-trigger="click delay:0.5s"  
                     data-customer-number="{{lead.whatsapp_number}}">
-                        1st <i class="fa fa-whatsapp"></i>
+                        Start <i class="fa fa-whatsapp"></i>
                 </button>
                 {%else%}
                     <button class="btn btn-sm btn-success text-white position-relative"                     
@@ -76,7 +76,7 @@
                         hx-trigger="click"                        
                         onclick="$('#chat_card_{{lead.whatsapp_number}}').remove(); $('#chat_list_bottom_window').remove();"
                         data-customer-number="{{lead.whatsapp_number}}">
-                            Chat
+                            Chat <i class="fa fa-whatsapp"></i>
                     </button>
                 {%endif%}
             </div>
@@ -111,10 +111,20 @@
                 {{lead.assigned_user.profile.name}} has claimed this lead!
             </p>
             ">
-            <img src="{%if lead.assigned_user.profile.avatar%}/media/{{lead.assigned_user.profile.avatar}}{%else%}{% static 'img/blank-profile-picture.png' %}{%endif%}" alt="" 
-            style="width:25px; height:25px;
-            {%if lead.assigned_user.profile.theme_colour%}background-color:rgba({{lead.assigned_user.profile.theme_colour}}, 0.6){%endif%}
-            " class="rounded-circle m-1">
+            
+            {%if lead.assigned_user.profile.demo_account_theme_colour%}
+            <div class="rounded-circle m-1" style="width:50px; height:50px;background-color:rgba({{lead.assigned_user.profile.demo_account_theme_colour}}, 0.5)">
+                <img src="/media/{{lead.assigned_user.profile.avatar}}" 
+                alt="" 
+                style="width:30px; height:30px; position:relative; right:10px; top:10px; filter: invert(100%);" 
+                class="">
+            </div>
+            {%else%}
+            <div class="m-1">
+                <img src="{%if lead.assigned_user.profile.avatar%}/media/{{lead.assigned_user.profile.avatar}}{%else%}{% static 'img/blank-profile-picture.png' %}{%endif%}" alt="" 
+                    style="width:25px; height:25px;" class="rounded-circle">
+            </div>
+            {%endif%}
         </span>
         {%endif%}
         <span class="lead_edit_button_wrapper" 

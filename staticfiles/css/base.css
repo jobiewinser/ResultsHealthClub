@@ -1004,3 +1004,8 @@ tr.odd td {
 .sortable_drag{
     height:100%;
 }
+.lead-hidden{
+    height:0px;
+    margin:0px;
+    padding:0px;
+}

@@ -10,4 +10,4 @@ data-bs-content="{%if lead.arrived%}Mark this lead as not arrived{%else%}Mark th
     hx-push-url="false"
     hx-swap="outerHTML" hx-trigger="click"      {% endcomment %}
 onclick="htmx.ajax('POST', '{% url 'mark-arrived' %}', {target:'#row_{{lead.pk}}', swap:'outerHTML', values:htmx.values(htmx.find('#lead_pk_{{lead.pk}}'))})"
-><i class="fa-regular fa-house-person-return"></i> Arrived {%if demo and not request.user.is_superuser%}(Demo){%endif%}</button>
+><i class="fa-regular fa-house-person-return"></i> Arrived {%if demo and not request.user.is_superuser%}(Demo, Disabled){%endif%}</button>

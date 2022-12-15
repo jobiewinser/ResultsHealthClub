@@ -5,8 +5,9 @@
         <a class="nav-link dropdown-toggle text-white p-0 pointer" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             <img src="{%if user.profile.avatar%}/media/{{user.profile.avatar}}{%else%}{% static 'img/blank-profile-picture.png' %}{%endif%}" width="32" height="32" 
             class="rounded-circle m-1"
-            style="{%if user.profile.theme_colour%}background-color:rgba({{user.profile.theme_colour}}, 0.6){%endif%}">
+            style="{%if user.profile.demo_account_theme_colour%}background-color:rgba({{user.profile.demo_account_theme_colour}}, 0.6){%endif%}">
             <strong style="font-size:1.5vh">{{user.profile}}</strong>
+            <input hidden id="user_id" value="{{user.pk}}"/>
         </a>
         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
             <li><a class="dropdown-item pointer"

@@ -301,8 +301,10 @@ class PhoneNumber(PolymorphicModel):
     
     def __str__(self):
         if self.alias:
-            return self.alias
-        return self.number
+            return str(self.alias)
+        elif self.number:
+            return str(self.number)
+        return f"PhoneNumber {str(self.pk)}"
     @property
     def is_whatsapp(self):
         return False
@@ -429,7 +431,7 @@ class Site(models.Model):
     # calendly_webhook_created = models.BooleanField(default=False)  
     guid = models.TextField(null=True, blank=True) 
     def __str__(self):
-        return f"({self.pk}) {self.name}"
+        return f"({str(self.pk)}) {str(self.name)}"
         
     def outstanding_whatsapp_messages(self, user):
         # Readdress this, I can't find a good way to get latest message for each conversation, then filter based on the last message being inbound...
@@ -562,7 +564,7 @@ class Company(models.Model):
             return True
         return False
     def __str__(self):
-        return f"{self.name}"   
+        return f"{str(self.name)}"   
 
     def get_and_generate_campaign_objects(self):
         if self.active_campaign_url:
@@ -589,7 +591,7 @@ ROLE_CHOICES = (
 class Profile(models.Model):
     ROLE_CHOICES_PROFILE = ROLE_CHOICES
     role = models.CharField(choices=ROLE_CHOICES_PROFILE, default='c', max_length=1)
-    theme_colour = models.CharField(default="0, 0, 255", max_length=20)
+    demo_account_theme_colour = models.CharField(default="0, 0, 255", max_length=20)
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True)
     avatar = models.ImageField(default='default.png', upload_to='profile_images')

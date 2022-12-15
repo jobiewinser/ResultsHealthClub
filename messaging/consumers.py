@@ -234,7 +234,9 @@ class LeadsConsumer(AsyncWebsocketConsumer):
                                             <div hx-swap-oob="innerHTML:#leads_reconnect_div">
                                             <script>
                                                 var elem = $('#leads_disconnected_indicator');
-                                                if (elem.hasClass('htmx-request')){
+                                                var user_id = $('#user_id').val();
+                                                
+                                                if (elem.hasClass('htmx-request') && user_id == """+self.user.pk+"""){
                                                     elem.removeClass('htmx-request');
                                                     htmx.ajax('GET', "/refresh-leads-board/", {include:'.overview_table_filters', indicator:'#page_load_indicator', swap:'outerHTML', target: '#leads_board_span_wrapper'})
                                                 }

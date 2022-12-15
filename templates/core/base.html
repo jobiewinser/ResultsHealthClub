@@ -126,7 +126,7 @@
                 }
             };
             
-            setDoubleTap(".lead_card")
+            {% comment %} setDoubleTap(".lead_card") {% endcomment %}
 
             function handlehtmxafterSwap(evt){
                 var current_module = $('#current_page').val()
@@ -175,6 +175,7 @@
 
             
             function handlehtmxwsError(evt){
+                console.log("handlehtmxwsError", evt)
                 if(evt.detail.socket.url.includes("ws/message_count")){
                     $('.message_count_disconnected_indicator').addClass('htmx-request');
                 }else if(evt.detail.socket.url.includes("ws/messaging")){
@@ -187,7 +188,7 @@
             document.body.addEventListener('htmx:wsError', handlehtmxwsError);
 
             function handlehtmxbeforeRequest(evt){
-                var current_module = $('#current_page').val();
+                var current_module = $('#current_page').val(); 
                 if (current_module == 'campaign_leads_overview'){
                     leadshandlehtmxbeforeRequest(evt);
                 } else if (current_module == 'free_tasters'){

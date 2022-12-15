@@ -16,7 +16,7 @@ class Command(BaseCommand):
             rukp = RandomUkPhone()
             for campaign in Campaign.objects.filter(company__demo=True):
                 existing_campaigns = Campaignlead.objects.filter(archived=False).filter(campaign=campaign).exclude(booking__archived=False)
-                if existing_campaigns.count() < 20:
+                if existing_campaigns.count() < 10:
                     lead = Campaignlead()
                     refresh_position = True
                     lead.campaign = campaign

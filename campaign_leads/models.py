@@ -115,7 +115,9 @@ class Campaignlead(models.Model):
     assigned_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     product_cost = models.FloatField(null=True, blank=True)
     def __str__(self):
-        return self.name
+        if self.name:
+            return str(self.name)
+        return f"CampaignLead {str(self.pk)}"
     @property
     def get_product_cost(self):  
         if self.product_cost:

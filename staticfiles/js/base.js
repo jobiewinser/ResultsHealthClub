@@ -52,22 +52,37 @@ function basehandlehtmxafterSwap(evt){
         }
     });
 }
-var tapped=false
+// var tapped=false
+
+// function setDoubleTap(identifier){
+    // $(identifier).on("touchstart",function(e){
+//         if(!tapped){ //if tap is not set, set up single tap
+//             tapped=setTimeout(function(){
+//                 tapped=null
+//                 //insert things you want to do when single tapped
+//             },300);   //wait 300ms then run single click code
+//         } else {    //tapped within 300ms of last tap. double tap
+//           clearTimeout(tapped); //stop single tap callback
+//           tapped=null
+//           htmx.ajax('GET', '/toggle-claim-lead/'+$(e.currentTarget).data('id')+'/', {swap:"none"})
+//         }
+//         e.preventDefault()
+    // });
+// }
 
 function setDoubleTap(identifier){
+    var tapedTwice = false;
+    console.log(identifier)
     $(identifier).on("touchstart",function(e){
-        if(!tapped){ //if tap is not set, set up single tap
-            tapped=setTimeout(function(){
-                tapped=null
-                //insert things you want to do when single tapped
-            },300);   //wait 300ms then run single click code
-        } else {    //tapped within 300ms of last tap. double tap
-          clearTimeout(tapped); //stop single tap callback
-          tapped=null
-          htmx.ajax('GET', '/toggle-claim-lead/'+$(e.currentTarget).data('id')+'/', {swap:"none"})
+        if(!tapedTwice) {
+            tapedTwice = true;
+            setTimeout( function() { tapedTwice = false; }, 300 );
+            return false;
         }
-        e.preventDefault()
+        event.preventDefault();
+        htmx.ajax('GET', '/toggle-claim-lead/'+$(e.currentTarget).data('id')+'/', {swap:"none"})
     });
+    
 }
 
 function basehandlehtmxafterSettle(evt){ 

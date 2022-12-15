@@ -61,6 +61,6 @@ data-bs-content="
     data-bs-title="What does this do?"
     data-bs-content="This saves your changes to this system, but does not push it to Whatsapp to review. You must request a review from the template table. You may save your work then come back to it later here before requesting approval from Whatsapp.">
     <i class="fa fa-save" aria-hidden="true"></i> 
-    Create Template {%if demo and not request.user.is_superuser%}(Demo){%endif%}
+    Create Template {%if demo and not request.user.is_superuser%}(Demo, Disabled){%endif%}
 </button>
 {%endblock submit_button%}
