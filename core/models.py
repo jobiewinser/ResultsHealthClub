@@ -591,7 +591,7 @@ ROLE_CHOICES = (
 class Profile(models.Model):
     ROLE_CHOICES_PROFILE = ROLE_CHOICES
     role = models.CharField(choices=ROLE_CHOICES_PROFILE, default='c', max_length=1)
-    demo_account_theme_colour = models.CharField(default="0, 0, 255", max_length=20)
+    demo_account_theme_colour = models.CharField(null=True, blank=True, default="", max_length=20)
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True)
     avatar = models.ImageField(default='default.png', upload_to='profile_images')
