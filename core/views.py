@@ -142,6 +142,7 @@ class SitePermissionsView(TemplateView):
                             'edit_site_configuration',
                             'edit_whatsapp_settings',
                             'toggle_active_campaign',                            
+                            'toggle_whatsapp_sending',                            
                             ] :
                     if key in request.POST:
                         setattr(site_permissions, key, (request.POST.get(key, 'off') == 'on'))
