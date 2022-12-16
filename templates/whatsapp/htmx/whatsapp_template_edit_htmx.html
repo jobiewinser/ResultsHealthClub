@@ -94,7 +94,7 @@
             <hr>
             <h5>Header </h5>
             <small>
-                <p><b>Max 60 characters including any variables</b>. For example a header that is 55 characters long would fail to send to a customer with a name longer than 5 characters (if you include their name in the header).</p>
+                <p style="max-width:600px"><b>Max 60 characters including any variables</b>. For example a header that is 55 characters long would fail to send to a customer with a name longer than 5 characters (if you include their name in the header).</p>
             </small>
             <div class="row">
                 <div class="col">
@@ -123,7 +123,7 @@
 
             <h5>Body</h5>
             <small>
-                <p><b>Max 1024 characters including any variables</b>. Messages longer than 1024 characters will fail to send.</p>
+                <p style="max-width:600px"><b>Max 1024 characters including any variables</b>. Messages longer than 1024 characters will fail to send.</p>
             </small>
             <div class="row">
                 <div class="col">
@@ -150,7 +150,7 @@
 
             <h5>Footer</h5>
             <small>
-                <p><b>Max 60 characters including any variables</b>. For example a footer that is 55 characters long would fail to send to a customer with a name longer than 5 characters (if you include their name in the footer).</p>
+                <p style="max-width:600px"><b>Max 60 characters including any variables</b>. For example a footer that is 55 characters long would fail to send to a customer with a name longer than 5 characters (if you include their name in the footer).</p>
             </small>
             <div class="row">
                 <div class="col">
@@ -174,7 +174,7 @@
 
 <div id="whatsapp_render_div">                   
     {%block submit_button%}
-    <button {%if readonly%}disabled{%endif%} class="btn template_save_button btn-success m-3"
+    <button {%if readonly%}disabled{%endif%} {%if demo and not request.user.is_superuser%}(Demo, Disabled){%endif%} class="btn template_save_button btn-success m-3"
         onclick="saveTemplate('{{whatsapp_business_account.pk}}', '{{template.pk}}')"
         data-bs-toggle="popover" 
         data-bs-trigger="hover focus" 
@@ -182,7 +182,7 @@
         data-bs-title="What does this do?"
         data-bs-content="This saves your changes to this system, but does not push it to Whatsapp to review. You must request a review from the template table. You may save your work then come back to it later here before requesting approval from Whatsapp.">
         <i class="fa fa-save" aria-hidden="true"></i> 
-        Save Changes
+        Save Changes {%if demo and not request.user.is_superuser%}(Demo, Disabled){%endif%}
     </button>
     {%endblock submit_button%}
     <div class="marvel-device nexus5">
