@@ -145,16 +145,20 @@ class ModifyUser(View):
 def create_calendly_webhook_subscription(request, **kwargs):
     if settings.DEMO and not request.user.is_superuser:
         return HttpResponse(status=500)
-    site = Site.objects.get(pk=request.POST.get('site_pk'))    
+    site = Site.objects.get(pk=request.POST.get('site_pk')) 
     if get_user_allowed_to_edit_site_configuration(request.user.profile, site): 
         calendly = Calendly(site.calendly_token)
+        print("calendly", calendly)
         calendly_webhooks = calendly.list_webhook_subscriptions(organization = site.calendly_organization).get('collection')
+        print("calendly_webhooks", site)
         for webhook in calendly_webhooks:
             if webhook.get('state') == 'active' \
             and webhook.get('callback_url') == f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/" \
             and webhook.get('organization') == f"{os.getenv('CALENDLY_URL')}/organizations/{site.calendly_organization}":
                 active_webhook_uuid = webhook.get('uri').replace(f"{os.getenv('CALENDLY_URL')}/webhook_subscriptions/", "")
                 calendly.delete_webhook_subscriptions(webhook_guuid = active_webhook_uuid)
+        print("site.guid", site.guid)
+        print("site.calendly_organization", site.calendly_organization)
         response = calendly.create_webhook_subscription(site.guid, organization = site.calendly_organization)
         print("create_calendly_webhook_subscription response", response)
     return render(request, "core/htmx/calendly_webhook_status_wrapper.html", {'site':site, 'site_webhook_active':(response.get('resource',{}).get('state')=='active')})

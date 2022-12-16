@@ -193,15 +193,11 @@ class SiteConfigurationView(TemplateView):
         if request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'core/htmx/site_configuration_htmx.html'
         return super(SiteConfigurationView, self).get(request, args, kwargs)
-        # if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
-        #     return HttpResponse("You don't have permission to access this page")
-        # raise PermissionDenied()
 
     def get_context_data(self):    
         context = super(SiteConfigurationView, self).get_context_data()
         context.update(get_site_coonfiguration_context(self.request))
         return context
-        
     def post(self, request):
         if settings.DEMO and not request.user.is_superuser:
             return HttpResponse(status=500)
