@@ -32,12 +32,12 @@
                     
                     <div class="form-floating m-1">
                         <input name="phone" type="text" value="{{lead.whatsapp_number|or_empty_string}}" class="form-control edit_lead_input" id="modal_phone"/>
-                        <label for="modal_phone">Whatsapp Number</label>
+                        <label for="modal_phone">Whatsapp Number<span class="required">*</span></label>
                     </div>
                     
                     <div class="form-floating m-1">
                         <input name="product_cost" type="number" min="0" step="0.01" value="{{lead.product_cost|or_empty_string}}" class="form-control edit_lead_input" id="modal_product_cost"/>
-                        <label for="modal_product_cost">Campaign Cost</label>
+                        <label for="modal_product_cost">Campaign Cost<span class="required">*</span></label>
                     </div>
                     {%if not lead%}
                     <div class="alert alert-warning m-1">
@@ -49,12 +49,12 @@
             </div>
             <div class="row m-1">
                 <div class="col center" >
-                    <button class="btn btn-primary" type="submit">
+                    <button class="btn btn-primary" type="submit" {%if demo and not request.user.is_superuser%}disabled{%endif%}>
                         {%if lead%}
                         Save   
                         {%else%}
                         Create
-                        {%endif%} Lead
+                        {%endif%} Lead {%if demo and not request.user.is_superuser%}(Demo, Disabled){%endif%}
                     </button>
                 </div>
             </div>

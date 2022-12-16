@@ -1,16 +1,35 @@
-{%load static%}
-<td>
-    
+{%load static user_permission_tags core_tags%}
+<td>    
     <div class="row">
         <div class="col p-0">
-            <img src="{%if profile.avatar%}/media/{{profile.avatar}}{%else%}{% static 'img/blank-profile-picture.png' %}{%endif%}" alt="" width="45" height="45" class="rounded-circle m-1"> 
-            {{profile.name}}
+            <div class="row m-0">
+                {%if profile.demo_account_theme_colour%}
+                <div class="col-auto p-0 rounded-circle m-1" style="width:32px; height:32px;background-color:rgba({{profile.demo_account_theme_colour}}, 0.5)">
+                    <img src="/media/{{profile.avatar}}" 
+                    alt="" 
+                    style="padding:4px; filter: invert(100%);" 
+                    class="">
+                </div>
+                {%else%}
+                <div class="col-auto p-0 m-1">
+                    <img src="{%if profile.avatar%}/media/{{profile.avatar}}{%else%}{% static 'img/blank-profile-picture.png' %}{%endif%}" alt="" 
+                        style="width:32px; height:32px;" class="rounded-circle">
+                </div>
+                {%endif%}
+                <div class="col p-0 m-1 nowrap">
+                    <strong style="font-size:1.5vh">{{profile}}</strong>
+                    <input hidden id="user_id" value="{{pk}}"/>
+                </div>
+            </div>
         </div>
-        <div class="col-md-auto p-0" >
+        <div class="col-md-auto pe-0">
+            <img  class="htmx-indicator invert" id="htmx_indicator_site_{{profile.pk}}" src="https://htmx.org/img/bars.svg"/>
+        </div>
+        <div class="col-md-auto p-0">
             {%if profile.warnings %}
                 <span class="help"
                 data-bs-toggle="popover" 
-                data-bs-trigger="hover" 
+                data-bs-trigger="hover focus" 
                 data-bs-html="true" 
                 data-bs-placement="top"
                 data-bs-title="Warnings"
@@ -27,10 +46,11 @@
         </div>
     </div>
 </td>
-<td>
+<td class="center">
     <div class="row">
         <div class="col p-0">
             <select class="form-select reset_on_error" name="site_pk" id="profile_site_{{profile.pk}}" hx-post="{% url 'change-profile-site' %}" hx-swap="innerHTML" 
+            {%if demo and not request.user.is_superuser%}disabled{%endif%}
             data-value="" onfocus="this.setAttribute('data-value', this.value);"
             hx-indicator="#htmx_indicator_site_{{profile.pk}}"  hx-trigger="change" hx-target="#company_configuration_row_{{profile.pk}}"
             hx-vals='{"profile_pk": "{{profile.pk}}"}'>  
@@ -40,22 +60,23 @@
                 {%endfor%}
             </select>
         </div>
-        <div class="col-md-auto pe-0">
-            <img  class="htmx-indicator invert" id="htmx_indicator_site_{{profile.pk}}" src="https://htmx.org/img/bars.svg"/>
-        </div>
     </div>
 </td>
-<td>
+<td class="center">
     <div class="row">
         <div class="col p-0">
-            <select class="form-select reset_on_error" name="role" id="profile_role_{{profile.pk}}" hx-post="{% url 'change-profile-role' %}" hx-swap="innerHTML" {%if profile.role == 'a'%}disabled{%endif%} 
+            <select class="form-select reset_on_error" name="role" id="profile_role_{{profile.pk}}" hx-post="{% url 'change-profile-role' %}" hx-swap="innerHTML" 
+            {%if not request.user.profile|get_profile_allowed_to_edit_profile_tag:profile or profile == request.user.profile%}
+            disabled
+            {%endif%}
+            {%if demo and not request.user.is_superuser%}disabled{%endif%}
             data-value="" onfocus="this.setAttribute('data-value', this.value);"
-            hx-indicator="#htmx_indicator_role_{{profile.pk}}"  hx-trigger="change" hx-target="#company_configuration_row_{{profile.pk}}"
+            hx-indicator="#htmx_indicator_site_{{profile.pk}}"  hx-trigger="change" hx-target="#company_configuration_row_{{profile.pk}}"
             hx-vals='{"profile_pk": "{{profile.pk}}"}'>  
                 {%if profile.role == 'a'%}
                 <option selected>Owner</option>
                 {%else%}
-                {%for role_choice in role_choices%}
+                {%for role_choice in profile.ROLE_CHOICES_PROFILE%}
                     {%if not role_choice.0 == 'a'%}
                         <option {%if profile.role == role_choice.0%}selected{%endif%} value="{{role_choice.0}}">{{role_choice.1}}</option>
                     {%endif%}
@@ -63,24 +84,59 @@
                 {%endif%}
             </select>
         </div>
-        <div class="col-md-auto pe-0">
-            <img  class="htmx-indicator invert" id="htmx_indicator_role_{{profile.pk}}" src="https://htmx.org/img/bars.svg"/>
+    </div>
+</td>
+<td class="center">
+    <div class="row">
+        <div class="col p-0">
+            <div class="row">
+                <div class="col p-0">
+                    <span hidden>{{profile.campaign_category.name}}</span>           
+                    <select class="form-select" name="campaign_category_pk" id="campaign_category_pk_{{profile.pk}}" 
+                        hx-post="{% url 'profile-assign-campaign-category' %}" hx-swap="innerHTML" {%if demo and not request.user.is_superuser%}disabled{%endif%}
+                        hx-trigger="change"
+                        hx-indicator=".top-htmx-indicator" 
+                        hx-vals='{"profile_pk": "{{profile.pk}}"}'
+                        hx-target="#company_configuration_row_{{profile.pk}}" >
+                        <option value="">🚫</option>
+                        {%for campaign_category in profile.site.campaigncategory_set.all%}
+                        <option {%if profile.campaign_category.pk == campaign_category.pk %}selected{%endif%} value="{{campaign_category.pk}}">{{campaign_category.name}}</option>
+                        {%endfor%}
+                    </select>
+                </div>  
+                <div class="col-md-auto p-0 ps-1 mt-1">
+                    <button class="btn btn-primary btn-sm" type="button"
+                        data-bs-toggle="popover" 
+                        data-bs-trigger="hover focus" 
+                        data-bs-placement="top"
+                        data-bs-title="What does this do?"
+                        data-bs-content="Add a new campaign category"
+                        onclick="htmx.ajax('GET', '{% url 'campaign-lead-get-modal-content' %}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'add_campaign_category', 'campaign_pk':'{{campaign.pk}}'}})"
+                        >Add</button> 
+                </div>  
+            </div>  
         </div>
     </div>
 </td>
-<td>   
-    {%if not profile.role == 'a' and not request.user.profile.role == 'c' or profile == request.user.profile%}
-        <a class="nowrap btn btn-light pointer" type="button" 
-            hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
-            hx-vals='{"template_name": "edit_user", "user_pk": "{{profile.user.pk}}"}'
-            hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
-            hx-swap="innerHTML" hx-trigger="click"><i class="fa-light fa-gear"></i> Config</a>
-    {%endif%}
-    {%if not profile.role == 'a' and not request.user.profile.role == 'c'%}
-    <a class="nowrap btn btn-light pointer" type="button"
+<td class="center">   
+    <button class="nowrap btn btn-light pointer" type="button"
+    {%if demo and not request.user.is_superuser%}disabled{%endif%}
+        {%if not request.user.profile|get_profile_allowed_to_edit_profile_permissions_tag:profile%}
+        disabled
+        {%endif%}
+        {%if demo and not request.user.is_superuser%}disabled{%endif%}
         hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
         hx-vals='{"template_name": "edit_permissions", "profile_pk": "{{profile.pk}}"}'
         hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
-        hx-swap="innerHTML" hx-trigger="click"><i class="fa-light fa-ballot-check"></i> Edit Permissions</a>
-    {%endif%}
+        hx-swap="innerHTML" hx-trigger="click"><i class="fa-light fa-ballot-check"></i> Edit Permissions {%if demo and not request.user.is_superuser%}(Demo, Disabled){%endif%}</button>
+</td>
+<td class="center">   
+    <button class="nowrap btn btn-light pointer" type="button" 
+        {%if not request.user.profile|get_profile_allowed_to_edit_profile_tag:profile and not demo%}
+        disabled
+        {%endif%}
+        hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
+        hx-vals='{"template_name": "edit_user", "user_pk": "{{profile.user.pk}}"}'
+        hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
+        hx-swap="innerHTML" hx-trigger="click"><i class="fa-light fa-gear"></i> Config</button>
 </td>

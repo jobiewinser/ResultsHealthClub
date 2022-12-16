@@ -9,9 +9,10 @@
         hx-include='#template_pk_{{forloop.counter}}'
         hx-post="{% url 'campaign-assign-auto-send-template' %}"></button>
     <select class="form-select" name="template_pk" id="template_pk_{{forloop.counter}}"
+    {%if demo and not request.user.is_superuser%}disabled{%endif%}
         onchange="$('#choose_auto_template_{{forloop.counter}}').click();"
         data-bs-toggle="popover" 
-        data-bs-trigger="hover" 
+        data-bs-trigger="hover focus" 
         data-bs-html="true" 
         data-bs-placement="top"
         data-bs-title="What does this do?"
@@ -25,7 +26,7 @@
             '>
         <option value=""></option>
         {%for template in campaign.whatsapp_business_account.whatsapptemplate_set.all%}
-        {%if not 'sample_' in template.name%}
+        {%if template.name and not 'sample_' in template.name%}
         <option {%if campaign_template_link.template.pk == template.pk %}selected{%endif%} value="{{template.pk}}">{{template.name}}</option>
         {%endif%}
         {%endfor%}

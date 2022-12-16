@@ -1,10 +1,10 @@
 {%load static%}
 <span>
     <div class="card p-3" style="overflow-y:scroll; max-height:250px">
-        Existing templates for <b>{{campaign.site.name}}</b>
+        Existing categories for <b>{{site.name}}</b>
         <br>
         <ul>
-            {%for campaign_category in campaign.site.campaigncategory_set.all%}
+            {%for campaign_category in site.campaigncategory_set.all%}
                 <li>{{campaign_category.name}}</li>
             {%empty%}
                 <li>No Templates to show</li>
@@ -14,18 +14,21 @@
     <form hx-post="{%url 'add-campaign-category'%}" hx-trigger="submit" hx-indicator="#page_load_indicator" hx-swap="none">
         {% csrf_token %}
         <input hidden name="campaign_pk" value="{{campaign.pk}}"/>
+        <input hidden name="site_pk" value="{{site.pk}}"/>
         <div class="row">
             <div class="col center p-0">
                 <div class="form-floating m-1">
-                    <input name="category_name" class="form-control" id="modal_category_name"/>
+                    <input name="category_name" 
+                    {%if demo and not request.user.is_superuser%}disabled{%endif%}
+                    class="form-control" id="modal_category_name"/>
                     <label for="modal_category_name">Category Name<span class="required">*</span></label>
                 </div>            
             </div>
         </div>
         <div class="row m-1">
             <div class="col center" >
-                <button class="btn btn-primary" type="submit">
-                    Create
+                <button class="btn btn-primary" type="submit" {%if demo and not request.user.is_superuser%}disabled{%endif%}>
+                    Create {%if demo and not request.user.is_superuser%}(Demo, Disabled){%endif%}
                 </button>
             </div>
         </div>

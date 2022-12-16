@@ -1,0 +1,128 @@
+{%load static user_permission_tags%}
+<div class="card-header center"
+    {%if not site_permissions.site in site_permissions.profile.sites_allowed.all%}
+    data-bs-toggle="popover" 
+    data-bs-trigger="hover focus" 
+    data-bs-html="true" 
+    data-bs-placement="top"
+    data-bs-title="Warnings"
+    data-bs-content="
+    This user does not have access to this site (the toggle next to buttons to the left is unchecked)
+    "
+    {%elif site_permissions.profile.role == 'a'%}
+    data-bs-toggle="popover" 
+    data-bs-trigger="hover focus" 
+    data-bs-html="true" 
+    data-bs-placement="top"
+    data-bs-title="You are an owner"
+    data-bs-content="
+    As an owner, you have access to all functions within the system for your company and sites. You may however turn off your access to individual sites for simplify how you use the system.
+    "
+    {%endif%}>     
+    {%if not site_permissions.site in site_permissions.profile.sites_allowed.all or site_permissions.profile.role == 'a'%}<i class="fa-solid fa-circle-info"></i>{%endif%}Permissions for <b>{{site_permissions.site.name}}</b>
+    <br>
+    <span class="secondary_td_layer">{{site_permissions.profile}}</span>
+</div>
+<div class="card-body">     
+    <div class="row" style="min-height:60px">      
+        {%if site_permissions.site == site_permissions.profile.site%}  
+        <div class="col center mb-2">
+            <b class="card"><small><i class="fa-solid fa-circle-info"></i> This is this user's main site<br> It can't be removed from their allowed sites</small></b>
+        </div>
+        {%endif%}
+    </div>
+    <div class="row">        
+        <div class="col">
+            <div class="form-check form-switch">
+                <label><small>Allowed to view site configuration</small></label> 
+                <input class="form-check-input" type="checkbox" 
+                {% if not request.user.profile|get_profile_allowed_to_edit_profile_permissions_tag:site_permissions.profile%}disabled{%endif%}
+                {%if not site_permissions.site in site_permissions.profile.sites_allowed.all or site_permissions.profile.role == 'a'%}disabled{%endif%}
+                    hx-post="{%url 'site-permissions'%}"  {%if demo and not request.user.is_superuser%}disabled{%endif%}
+                    hx-target="#permissions_wrapper" 
+                    hx-trigger="input delay:0.1s" 
+                    hx-indicator="#htmx-indicator-permissions" 
+                    hx-vals='{"site_permissions_pk": "{{site_permissions.pk}}", "view_site_configuration":"{%if site_permissions.view_site_configuration%}off{%else%}on{%endif%}"}'               
+                    {%if site_permissions.view_site_configuration and site_permissions.site in site_permissions.profile.sites_allowed.all%}checked{%endif%}/>
+            </div>
+        </div>
+    </div>
+    <div class="row">        
+        <div class="col">
+            <div class="form-check form-switch">
+                <label><small>Allowed to edit site configuration</small></label> 
+                <input class="form-check-input" type="checkbox" 
+                {% if not request.user.profile|get_profile_allowed_to_edit_profile_permissions_tag:site_permissions.profile%}disabled{%endif%}
+                {%if not site_permissions.site in site_permissions.profile.sites_allowed.all or site_permissions.profile.role == 'a'%}disabled{%endif%}
+                    hx-post="{%url 'site-permissions'%}" 
+                    hx-target="#permissions_wrapper"  {%if demo and not request.user.is_superuser%}disabled{%endif%}
+                    hx-trigger="input delay:0.1s" 
+                    hx-indicator="#htmx-indicator-permissions" 
+                    hx-vals='{"site_permissions_pk": "{{site_permissions.pk}}", "edit_site_configuration":"{%if site_permissions.edit_site_configuration%}off{%else%}on{%endif%}"}'               
+                    {%if site_permissions.edit_site_configuration and site_permissions.site in site_permissions.profile.sites_allowed.all%}checked{%endif%}/>
+            </div>
+        </div>
+    </div>
+    <div class="row">        
+        <div class="col">
+            <div class="form-check form-switch">
+                <label><small>Allowed to edit whatsapp settings</small></label> 
+                <input class="form-check-input" type="checkbox"
+                {% if not request.user.profile|get_profile_allowed_to_edit_profile_permissions_tag:site_permissions.profile%}disabled{%endif%}
+                {%if not site_permissions.site in site_permissions.profile.sites_allowed.all or site_permissions.profile.role == 'a'%}disabled{%endif%}
+                    hx-post="{%url 'site-permissions'%}" 
+                    hx-target="#permissions_wrapper"  {%if demo and not request.user.is_superuser%}disabled{%endif%}
+                    hx-trigger="input delay:0.1s" 
+                    hx-indicator="#htmx-indicator-permissions" 
+                    hx-vals='{"site_permissions_pk": "{{site_permissions.pk}}", "edit_whatsapp_settings":"{%if site_permissions.edit_whatsapp_settings%}off{%else%}on{%endif%}"}'               
+                    {%if site_permissions.edit_whatsapp_settings and site_permissions.site in site_permissions.profile.sites_allowed.all%}checked{%endif%}/>
+            </div>
+        </div>
+    </div>
+    <div class="row">        
+        <div class="col">
+            <div class="form-check form-switch">
+                <label><small>Allowed to toggle whatsapp template sending</small></label> 
+                <input class="form-check-input" type="checkbox" 
+                {% if not request.user.profile|get_profile_allowed_to_edit_profile_permissions_tag:site_permissions.profile%}disabled{%endif%}
+                {%if not site_permissions.site in site_permissions.profile.sites_allowed.all or site_permissions.profile.role == 'a'%}disabled{%endif%}
+                    hx-post="{%url 'site-permissions'%}" 
+                    hx-target="#permissions_wrapper"  {%if demo and not request.user.is_superuser%}disabled{%endif%}
+                    hx-trigger="input delay:0.1s" 
+                    hx-indicator="#htmx-indicator-permissions" 
+                    hx-vals='{"site_permissions_pk": "{{site_permissions.pk}}", "toggle_whatsapp_sending":"{%if site_permissions.toggle_whatsapp_sending%}off{%else%}on{%endif%}"}'               
+                    {%if site_permissions.toggle_whatsapp_sending and site_permissions.site in site_permissions.profile.sites_allowed.all%}checked{%endif%}/>
+            </div>
+        </div>
+    </div>
+    <div class="row">        
+        <div class="col">
+            <div class="form-check form-switch">
+                <label><small>Allowed to toggle the active campaign leads</small></label> 
+                <input class="form-check-input" type="checkbox" 
+                {% if not request.user.profile|get_profile_allowed_to_edit_profile_permissions_tag:site_permissions.profile%}disabled{%endif%}
+                {%if not site_permissions.site in site_permissions.profile.sites_allowed.all or site_permissions.profile.role == 'a'%}disabled{%endif%}
+                    hx-post="{%url 'site-permissions'%}" 
+                    hx-target="#permissions_wrapper"  {%if demo and not request.user.is_superuser%}disabled{%endif%}
+                    hx-trigger="input" 
+                    hx-indicator="#htmx-indicator-permissions" 
+                    hx-vals='{"site_permissions_pk": "{{site_permissions.pk}}", "toggle_active_campaign":"{%if site_permissions.toggle_active_campaign%}off{%else%}on{%endif%}"}'               
+                    {%if site_permissions.toggle_active_campaign and site_permissions.site in site_permissions.profile.sites_allowed.all%}checked{%endif%}/>
+            </div>
+        </div>
+    </div>
+    <div class="row pt-1" style="">  
+        <div class="col card">
+            <small>
+                    The above permissions are in addition to being able to create/manage leads, create/manage bookings, message customers, view analytics etc. 
+            </small>
+        </div>
+    </div>
+    <div class="row" style="min-height:100px">  
+    {%if error%}          
+        <div class="col">
+            <p class="alert alert-danger">{{error}}</p>
+        </div>
+    {%endif%}  
+    </div>
+</div>

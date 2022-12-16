@@ -6,7 +6,7 @@
 <h5>Template Name</h5>
 <div class="row"
 data-bs-toggle="popover" 
-data-bs-trigger="hover" 
+data-bs-trigger="hover focus" 
 data-bs-html="true" 
 data-bs-placement="top"
 data-bs-title="What does this do?"
@@ -25,7 +25,7 @@ data-bs-content="
 <h5>Category</h5>
 <div class="row"
 data-bs-toggle="popover" 
-data-bs-trigger="hover" 
+data-bs-trigger="hover focus" 
 data-bs-html="true" 
 data-bs-placement="top"
 data-bs-title="What do these categories mean?"
@@ -53,13 +53,14 @@ data-bs-content="
 
 {%block submit_button%}
 <button class="btn btn-success m-3"
+    {%if demo and not request.user.is_superuser%}disabled{%endif%}
     onclick="saveTemplate('{{whatsapp_business_account.pk}}', '{{template.pk}}', create=true)"
     data-bs-toggle="popover" 
-    data-bs-trigger="hover" 
+    data-bs-trigger="hover focus" 
     data-bs-placement="top"
     data-bs-title="What does this do?"
     data-bs-content="This saves your changes to this system, but does not push it to Whatsapp to review. You must request a review from the template table. You may save your work then come back to it later here before requesting approval from Whatsapp.">
     <i class="fa fa-save" aria-hidden="true"></i> 
-    Create Template
+    Create Template {%if demo and not request.user.is_superuser%}(Demo, Disabled){%endif%}
 </button>
 {%endblock submit_button%}

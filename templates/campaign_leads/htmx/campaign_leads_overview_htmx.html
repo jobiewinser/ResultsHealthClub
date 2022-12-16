@@ -11,7 +11,7 @@
         }
     </style>
     <div class="row mt-0" style="padding:10px">
-        <div class="htmx-indicator whole_page_disconnected_indicator leads_disconnected_indicator">
+        <div class="htmx-indicator whole_page_disconnected_indicator leads_disconnected_indicator" id="leads_disconnected_indicator">
             <div class="whole_page_disconnected_indicator_content">
                 <b>Connecting</b> <img class="invert" src="https://htmx.org/img/bars.svg">
             </div>
@@ -25,22 +25,26 @@
             <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
         </div> {% endcomment %}
         {%include 'core/htmx/site_selection.html'%}
+        {%if site%}
         {%include 'campaign_leads/htmx/campaign_category_selection.html'%}
+        {%endif%}
         <button hidden hx-get="{%url 'campaign-leads-overview'%}" hx-push-url="false" hx-swap="innerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
         <button hidden hx-get="{%url 'campaign-leads-overview'%}" onclick="$('#campaign_pk').val('').trigger('change')"
         hx-push-url="false" hx-swap="innerHTML" hx-include=".overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_campaign_category" class="btn btn-primary btn-sm"></button>
         
         <button hidden
-            hx-get="{%url 'refresh-leads-board'%}" onclick="$('#campaign_category_pk').val('').trigger('change')"
+            hx-get="{%url 'refresh-leads-board'%}" onclick="$('#campaign_category_pk').val('all').trigger('change')"
             hx-swap="outerHTML" hx-push-url="false" hx-include=".overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#leads_board_span_wrapper" id="filter_campaign"></button>
         {% comment %} <button hidden hx-get="{% url 'get-campaign'%}" hx-include=".overview_table_filters" id="refresh_campaign_list_wrapper" hx-indicator="#page_load_indicator" hx-target="#campaign_list_wrapper" hx-trigger="click" hx-swap="outerHTML"></button> {% endcomment %}
-        <div class="col-md-auto m-1 p-0" hx-get="{% url 'get-campaign'%}" hx-trigger="load" hx-indicator="#page_load_indicator" hx-target="#campaign_list_wrapper" hx-swap="outerHTML" hx-vals='{"site_pk":"{{site.pk}}","campaign_pk":"{{request.GET.campaign_pk}}"}'>
-            <div id="campaign_list_wrapper">   
+        {%if site%}
+        <div class="col-md-auto m-1 p-0">
+            <div id="campaign_list_wrapper" hx-get="{% url 'get-campaign'%}" hx-trigger="load" hx-indicator="#page_load_indicator" hx-target="#campaign_list_wrapper" hx-swap="outerHTML"  hx-include=".overview_table_filters" >   
                 <select class="form-select select2-styling">
                     <option>Loading</option>
                 </select>    
             </div>
         </div>
+        {%endif%}
         {%endblock extra_top_left_buttons %}
 
         <div class="col">
@@ -48,7 +52,7 @@
 
         {%block extra_top_right_buttons %}
         <input id="current_page" hidden value="campaign_leads_overview"></input>
-        <div class="col-md-auto">
+        <div class="col-md-auto p-0 m-1">
             <span class="badge bg-dark text-white"><h6 class="m-1">Campaign Leads</h6></span>               
         </div> 
         {%endblock extra_top_right_buttons %}
@@ -110,23 +114,29 @@
     </script>
     <div id="add_booking_area" class="">        
         <div class="card h-100" id="add_booking_area_card">
-            <div class="card-header center text-white">
+            {% comment %} <div class="card-header center text-white">
                 <h3>
                     <i class="fa-duotone fa-calendar-days"></i> Add Booking
                 </h3>
-            </div>
+            </div> {% endcomment %}
             <div class="card-body draggable-card-area static" id="add_booking_area_body">
+                <div class="floating_drag_area_title">
+                    <i class="fa-duotone fa-calendar-days"></i> Add Booking
+                </div>
             </div>
         </div>
     </div>
     <div id="archive_area" class="">        
         <div class="card h-100" id="archive_area_card">
-            <div class="card-header center text-white">
+            {% comment %} <div class="card-header center text-white">
                 <h3>
                     <i class="fa-duotone fa-trash"></i> Archive
                 </h3>
-            </div>
+            </div> {% endcomment %}
             <div class="card-body draggable-card-area static" id="archive_area_body">
+                <div class="floating_drag_area_title">
+                    <i class="fa-duotone fa-trash"></i> Archive
+                </div>
             </div>
         </div>
     </div>

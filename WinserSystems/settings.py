@@ -99,7 +99,7 @@ else:
         os.path.join(BASE_DIR, "staticfiles"),
     )
     WSGI_APPLICATION = 'wsgi.application' #haven't testied this on prod yet, might be pointless?
-
+DEMO=os.getenv("DEMO", False)=='True'
 # if DEBUG:
 WHATSAPP_PHONE_OVERRIDE1=None
 WHATSAPP_PHONE_OVERRIDE2='447974214718'
@@ -122,7 +122,7 @@ INSTALLED_APPS = [
     'active_campaign',
     'whatsapp',
     'messaging',
-    'twilio',
+    # 'twilio',
     'calendly',
     'analytics',
     'core',
@@ -161,6 +161,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'core.context_processors.demo',
             ],
         },
     },
@@ -279,3 +280,13 @@ HIJACK_LOGOUT_REDIRECT_URL = '/customer-login/'
 HIJACK_USE_BOOTSTRAP = True
 HIJACK_ALLOW_GET_REQUESTS = True
 HIJACK_PERMISSION_CHECK = "core.hijack.permissions.superusers_hijack"
+
+BLEACH_VALID_TAGS = ['p', 'b', 'i', 'strike', 'ul', 'li', 'ol', 'br',
+                     'span', 'blockquote', 'hr', 'a', 'img', 'small']
+BLEACH_VALID_ATTRS = {
+    'span': ['style', ],
+    'p': ['align', ],
+    'a': ['href', 'rel'],
+    'img': ['src', 'alt', 'style'],
+}
+BLEACH_VALID_STYLES = ['color', 'cursor', 'float', 'margin']

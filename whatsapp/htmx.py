@@ -6,7 +6,7 @@ import json
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from campaign_leads.models import Campaign, Campaignlead, Call
-from core.user_permission_functions import get_available_sites_for_user, get_user_allowed_to_edit_site, get_user_allowed_to_edit_template, get_user_allowed_to_edit_whatsappnumber
+
 from core.views import get_site_pk_from_request
 from messaging.models import Message
 from whatsapp.api import Whatsapp
@@ -38,4 +38,5 @@ def get_modal_content(request, **kwargs):
             return render(request, f"whatsapp/htmx/{template_name}.html", context)   
     except Exception as e:
         logger.debug("get_modal_content Error "+str(e))
-        return HttpResponse(e, status=500)
+        #return HttpResponse(e, status=500)
+        raise e

@@ -1,5 +1,6 @@
 {%load core_tags%}
 {%load static tz core_tags%}
+{%load user_permission_tags%}
 <span>    
     <script>
         $(document).ready(function() {
@@ -20,7 +21,7 @@
         </div>
         {%block extra_top_right_buttons %}
         <input id="current_page" hidden value="site_configuration"></input>
-        <div class="col-md-auto">
+        <div class="col-md-auto p-0 m-1">
             <span class="badge bg-dark text-white"><h6 class="m-1">Site Configuration</h6></span>           
         </div>
         {%endblock extra_top_right_buttons %}
@@ -33,8 +34,13 @@
                 <div class="col-md p-0">   
                     <div class="row ">
                         <div class="col-md-auto p-0">      
-                            <div class="form-floating m-1">  
-                                <input value="{{site.name}}" type="text" name="name" class="form-control site_configuration_input" id="site_name"  {%if not request.user.profile.role == 'a'%}disabled{%endif%}
+                            <div class="form-floating m-1" {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}
+                                                                data-bs-html="true" 
+                                                                data-bs-toggle="popover" data-bs-placement="left" 
+                                                                data-bs-trigger="hover"
+                                                                title="Name of this site"
+                                                                data-bs-content="You do not have permission to edit this field: Edit Site Configuration"{%endif%}>  
+                                <input value="{{site.name}}" type="text" name="name" class="form-control site_configuration_input" id="site_name"  {%if not request.user.profile.role == 'a'%}disabled{%endif%} {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}disabled{%endif%}
                                     hx-post="" hx-swap="none" hx-indicator="#htmx_indicator_site_form" hx-vals='{"site_pk": "{{site.pk}}"}' hx-trigger='input delay:0.5s' oninput="$('#htmx_indicator_site_form').addClass('htmx-request');">
                                 <label for="site_name">Name of this site</label>
                             </div>
@@ -84,27 +90,59 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-auto p-0">        
-                            <div class="form-floating m-1">
-                                <input style="min-width:400px" id="calendly_organization" type="text" class="form-control" name="calendly_organization" {%if not request.user.profile.role == 'a'%}disabled{%endif%}
-                                    hx-post="" hx-swap="none" hx-indicator="#htmx_indicator_site_form" hx-vals='{"site_pk": "{{site.pk}}"}' hx-trigger='input delay:0.3s'
-                                    value="{%if site.calendly_organization%}{{site.calendly_organization}}{%endif%}">
-                                <label for="calendly_organization">Site Calendly Organtisation</label>
-                            </div>
-                        </div>
-                        <div class="col-md-auto p-0">   
-                            <div class="form-floating m-1">
-                                <input name="calendly_token" type="password" class="form-control"
-                                    hx-post="" hx-swap="none" hx-indicator="#htmx_indicator_site_form" hx-vals='{"site_pk": "{{site.pk}}"}' hx-trigger='input delay:0.3s'
-                                    value="{{site.calendly_token|censor}}"/>
-                                <label class="elipses-overflow">Calendly Token</label>
-                            </div>
+                        <div class="col-md-auto p-0 card card-light">      
+                            <form class="" hx-post="" hx-swap="innerHTML" hx-indicator="#page_load_indicator " 
+                            hx-vals='{"site_pk": "{{site.pk}}"}' 
+                            hx-trigger='submit delay:0.3s' autocomplete="off" autofill="off" hx-target="#content">
+                                <div class="row mt-1">
+                                    <div class="col-md-auto">   
+                                        <div class="form-floating m-1"
+                                        {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}
+                                            data-bs-toggle="popover" 
+                                            data-bs-trigger="hover focus" 
+                                            data-bs-html="true" 
+                                            data-bs-placement="top"
+                                            data-bs-title="Site Calendly Organisation"
+                                            data-bs-content="
+                                                You do not have permission to edit this field: Edit Site Configuration
+                                            "
+                                        {%endif%}>
+                                            <input style="min-width:400px" id="calendly_organization" type="text" class="form-control" name="calendly_organization" {%if not request.user.profile.role == 'a'%}disabled{%endif%}
+                                                oninput="$('#calendly_config_submit').attr('disabled', false)"
+                                                value="{%if site.calendly_organization%}{{site.calendly_organization}}{%endif%}" {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}disabled{%endif%}/>
+                                            <label for="calendly_organization">Site Calendly Organisation</label>
+                                        </div>
+                                    </div>
+                                    <div class="col">   
+                                        <div class="form-floating m-1"
+                                        {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}
+                                            data-bs-toggle="popover" 
+                                            data-bs-trigger="hover focus" 
+                                            data-bs-html="true" 
+                                            data-bs-placement="top"
+                                            data-bs-title="Site Calendly Token"
+                                            data-bs-content="
+                                                You do not have permission to edit this field: Edit Site Configuration
+                                            "
+                                        {%endif%}>
+                                            <input name="calendly_token" type="password" class="form-control"
+                                                oninput="$('#calendly_config_submit').attr('disabled', false)"
+                                                value="{{site.calendly_token|censor}}" {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}disabled{%endif%}/>
+                                            <label class="elipses-overflow">Site Calendly Token</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col center">  
+                                        {%if request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}<button type='submit' class="btn btn-primary btn-sm m-3" id="calendly_config_submit" disabled>Submit</button>{%endif%}  
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                         
                         <div class="col-md p-0">   
                         </div>
-                        <div class="col-md-auto m-1 p-2 alert alert-dark center" style="min-width:350px;min-height:100px;">  
-                        
+                        <div class="col-md-auto m-1 p-2 alert alert-light center" style="min-width:350px;min-height:100px;">                          
                             <div>   
                                 Calendly Webhook for <span class="name_display_{{site.pk}}">{{site.name}}</span>: 
                                 {%include 'core/htmx/calendly_webhook_status_wrapper.html'%}  
@@ -119,16 +157,8 @@
                 </div>
                 <div class="card-body">
                     <div class="row mt-2">
-                        <div class="col-md-auto">
-                            <div class="row">
-                                <div class="col-md-auto p-0" id="active_campaign_leads_wrapper">   
-                                    {%include 'core/htmx/active_campaign_enabled_htmx.html'%}
-                                </div>
-                                <div class="col-md p-0">   
-                                </div>
-                                <div class="col-md-auto p-0">   
-                                </div>
-                            </div>
+                        <div class="col-md-auto" id="active_campaign_leads_wrapper">
+                            {%include 'core/htmx/active_campaign_enabled_htmx.html'%}
                         </div>
                         <div class="col">
                         </div>

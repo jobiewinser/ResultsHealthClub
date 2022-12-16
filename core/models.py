@@ -9,7 +9,7 @@ from django.http import HttpResponse
 from calendly.api import Calendly
 
 from campaign_leads.models import Campaign, Campaignlead, ManualCampaign
-from twilio.models import TwilioMessage
+# from twilio.models import TwilioMessage
 from django.db.models import Q, Count
 from whatsapp.api import Whatsapp
 from django.contrib import messages
@@ -26,7 +26,6 @@ class SiteUsersOnline(models.Model):
     site = models.ForeignKey("core.Site", on_delete=models.SET_NULL, null=True, blank=True)
     feature = models.CharField(max_length=50, default="leads")
 
-
 class AttachedError(models.Model): 
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     ERROR_TYPES = (
@@ -40,16 +39,17 @@ class AttachedError(models.Model):
                         ('1201', "Whatsapp Template not found Whatsapp's system"),
                         ('1202', "There is no Whatsapp Business linked to this Lead's assosciated Site"),
                         ('1203', "Couldn't auto-send, there is no 1st Whatsapp Template linked to this Lead's Campaign"),
-                        ('1204', "Couldn't auto-send, there is no 2nd Whatsapp Template linked to this Lead's Campaign"),
-                        ('1205', "Couldn't auto-send, there is no 3rd Whatsapp Template linked to this Lead's Campaign"),
-                        ('1206', "Couldn't auto-send, there is no 4th Whatsapp Template linked to this Lead's Campaign"),
-                        ('1207', "Couldn't auto-send, there is no 5th Whatsapp Template linked to this Lead's Campaign"),
-                        ('1208', "Couldn't auto-send, there is no 6th Whatsapp Template linked to this Lead's Campaign"),
-                        ('1209', "Couldn't auto-send, there is no 7th Whatsapp Template linked to this Lead's Campaign"),
-                        ('1210', "Couldn't auto-send, there is no 8th Whatsapp Template linked to this Lead's Campaign"),
-                        ('1211', "Couldn't auto-send, there is no 9th Whatsapp Template linked to this Lead's Campaign"),
-                        ('1212', "Couldn't auto-send, there is no 10th Whatsapp Template linked to this Lead's Campaign"),
+                        # ('1204', "Couldn't auto-send, there is no 2nd Whatsapp Template linked to this Lead's Campaign"),
+                        # ('1205', "Couldn't auto-send, there is no 3rd Whatsapp Template linked to this Lead's Campaign"),
+                        # ('1206', "Couldn't auto-send, there is no 4th Whatsapp Template linked to this Lead's Campaign"),
+                        # ('1207', "Couldn't auto-send, there is no 5th Whatsapp Template linked to this Lead's Campaign"),
+                        # ('1208', "Couldn't auto-send, there is no 6th Whatsapp Template linked to this Lead's Campaign"),
+                        # ('1209', "Couldn't auto-send, there is no 7th Whatsapp Template linked to this Lead's Campaign"),
+                        # ('1210', "Couldn't auto-send, there is no 8th Whatsapp Template linked to this Lead's Campaign"),
+                        # ('1211', "Couldn't auto-send, there is no 9th Whatsapp Template linked to this Lead's Campaign"),
+                        # ('1212', "Couldn't auto-send, there is no 10th Whatsapp Template linked to this Lead's Campaign"),
                         ('1220', "This site has template messaging currently disabled, reenable it on the site configuration page"),
+                        ('1230', "This lead's campaign has no whatsapp number linked to it. Couldn't send first message."),
                     )
     type = models.CharField(choices=ERROR_TYPES, default='c', max_length=5)
     attached_field = models.CharField(null=True, blank=True, max_length=50)
@@ -77,6 +77,27 @@ class Contact(models.Model):
         return self.first_name
     def send_template_whatsapp_message(self, whatsappnumber=None, template=None, communication_method = 'a'):
         print("Contact send_template_whatsapp_message", whatsappnumber, template, communication_method)
+        customer_number = self.customer_number
+        if settings.DEMO:
+            whatsapp_message, created = WhatsAppMessage.objects.get_or_create(
+                wamid="",
+                datetime=datetime.now(),
+                contact=self,
+                message=f"""
+                <b>Hi {self.first_name}</b>
+                <br>
+                <br>
+                <p>This is a demonstration of the whatsapp system! With the Pro subscription, you can add your own whatsapp accounts and automate sending templates here!</p>
+                <small>Thanks from Winser Systems!</small>
+                """,
+                site=self.site,
+                whatsappnumber=whatsappnumber,
+                customer_number=customer_number,
+                template=template,
+                inbound=False,
+            )
+            send_message_to_websocket(whatsappnumber, customer_number, whatsapp_message, self.site)
+            return HttpResponse(status=200)
         from core.models import AttachedError
         if communication_method == 'a' and whatsappnumber:
             print("ContactDEBUG1")
@@ -184,7 +205,6 @@ class Contact(models.Model):
                     "code":template.language
                 }
                 site = self.site
-                customer_number = self.customer_number
                 response = whatsapp.send_template_message(self.customer_number, whatsappnumber, template, language, components)
                 reponse_messages = response.get('messages',[])
                 if reponse_messages:
@@ -202,44 +222,45 @@ class Contact(models.Model):
                             inbound=False,
                         )
                         if created:                        
-                            channel_layer = get_channel_layer()                            
-                            message_context = {
-                                "message": whatsapp_message,
-                                "site": site,
-                                "whatsappnumber": whatsappnumber,
-                            }
-                            rendered_message_list_row = loader.render_to_string('messaging/htmx/message_list_row.html', message_context)
-                            rendered_message_chat_row = loader.render_to_string('messaging/htmx/message_chat_row.html', message_context)
-                            rendered_html = f"""
-
-                            <span id='latest_message_row_{customer_number}' hx-swap-oob='delete'></span>
-                            <span id='messageCollapse_{whatsappnumber.pk}' hx-swap-oob='afterbegin'>{rendered_message_list_row}</span>
-
-                            <span id='messageWindowInnerBody_{customer_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>
-                            """
-                            
-                            async_to_sync(channel_layer.group_send)(
-                                f"messaging_{whatsappnumber.pk}",
-                                {
-                                    'type': 'chatbox_message',
-                                    "message": rendered_html,
-                                }
-                            )
-                            channel_layer = get_channel_layer()   
-                            
-                            async_to_sync(channel_layer.group_send)(
-                                f"message_count_{whatsappnumber.site.company.pk}",
-                                {
-                                    'type': 'messages_count_update',
-                                    'data':{
-                                        'rendered_html':f"""<span hx-swap-oob="afterbegin:.company_message_count"><span hx-trigger="load" hx-swap="none" hx-get="/update-message-counts/"></span>""",
-                                    }
-                                }
-                            )
+                            send_message_to_websocket(whatsappnumber, customer_number, whatsapp_message, whatsappnumber.whatsapp_business_account )
                     logger.debug("site.send_template_whatsapp_message success") 
                     return HttpResponse("Message Sent", status=200)
         # return HttpResponse("No Communication method specified", status=500)
+def send_message_to_websocket(whatsappnumber, customer_number, whatsapp_message, site):
+    channel_layer = get_channel_layer()          
+    message_context = {
+        "message": whatsapp_message,
+        "site": site,
+        "whatsappnumber": whatsappnumber,
+    }
+    rendered_message_list_row = loader.render_to_string('messaging/htmx/message_list_row.html', message_context)
+    rendered_message_chat_row = loader.render_to_string('messaging/htmx/message_chat_row.html', message_context)
+    rendered_html = f"""
 
+    <span id='latest_message_row_{customer_number}' hx-swap-oob='delete'></span>
+    <span id='messageCollapse_{whatsappnumber.pk}' hx-swap-oob='afterbegin'>{rendered_message_list_row}</span>
+
+    <span id='messageWindowInnerBody_{customer_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>
+    """
+    
+    async_to_sync(channel_layer.group_send)(
+        f"messaging_{whatsappnumber.pk}",
+        {
+            'type': 'chatbox_message',
+            "message": rendered_html,
+        }
+    )
+    channel_layer = get_channel_layer()   
+    
+    async_to_sync(channel_layer.group_send)(
+        f"message_count_{whatsappnumber.site.company.pk}",
+        {
+            'type': 'messages_count_update',
+            'data':{
+                'rendered_html':f"""<span hx-swap-oob="afterbegin:.company_message_count"><span hx-trigger="load" hx-swap="none" hx-get="/update-message-counts/"></span>""",
+            }
+        }
+    )
 # class AttachedWarning(models.Model): 
 #     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 #     ERROR_TYPES = (
@@ -281,8 +302,10 @@ class PhoneNumber(PolymorphicModel):
     
     def __str__(self):
         if self.alias:
-            return self.alias
-        return self.number
+            return str(self.alias)
+        elif self.number:
+            return str(self.number)
+        return f"PhoneNumber {str(self.pk)}"
     @property
     def is_whatsapp(self):
         return False
@@ -342,7 +365,8 @@ class WhatsappNumber(PhoneNumber):
         if after_datetime_timestamp:
             after_datetime = datetime.fromtimestamp(int(float(after_datetime_timestamp)))
             qs = qs.filter(datetime__lt=after_datetime)
-        
+        for temp in qs.order_by('customer_number','-datetime'):
+            print()
         for dict in qs.order_by('customer_number','-datetime').distinct('customer_number').values('pk'):
             message_pk_list.append(dict.get('pk'))
         qs = WhatsAppMessage.objects.filter(pk__in=message_pk_list).order_by('-datetime')
@@ -408,7 +432,7 @@ class Site(models.Model):
     # calendly_webhook_created = models.BooleanField(default=False)  
     guid = models.TextField(null=True, blank=True) 
     def __str__(self):
-        return f"({self.pk}) {self.name}"
+        return f"({str(self.pk)}) {str(self.name)}"
         
     def outstanding_whatsapp_messages(self, user):
         # Readdress this, I can't find a good way to get latest message for each conversation, then filter based on the last message being inbound...
@@ -490,9 +514,10 @@ def execute_after_save(sender, instance, created, *args, **kwargs):
     #     instance.calendly_webhook_created = True 
     #     instance.save()
 # Extending User Model Using a One-To-One Link
+
 class Company(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    company_name = models.TextField(null=True, blank=True)
+    name = models.TextField(null=True, blank=True)
     company_logo_white = models.ImageField(default='default.png', upload_to='company_images')
     company_logo_black = models.ImageField(default='default.png', upload_to='company_images')
     company_logo_trans = models.ImageField(default='default.png', upload_to='company_images')
@@ -501,14 +526,15 @@ class Company(models.Model):
     # free_taster_enabled = models.BooleanField(default=False)
     # whatsapp_enabled = models.BooleanField(default=False)
     # active_campaign_enabled = models.BooleanField(default=False)
+    demo = models.BooleanField(default=False)
     whatsapp_app_secret_key = models.TextField(blank=True, null=True)
     whatsapp_app_business_id = models.TextField(blank=True, null=True)
     SUBSCRIPTION_CHOICES = (
                     ('free', 'Free'),
-                    ('lite', 'Lite'),
+                    ('basic', 'Basic'),
                     ('pro', 'Pro'),
                 )
-    subscription = models.CharField(choices=SUBSCRIPTION_CHOICES, max_length=5, default="lite")
+    subscription = models.CharField(choices=SUBSCRIPTION_CHOICES, max_length=5, default="free")
     active_campaign_url = models.TextField(null=True, blank=True)
     active_campaign_api_key = models.TextField(null=True, blank=True)
     
@@ -539,7 +565,7 @@ class Company(models.Model):
             return True
         return False
     def __str__(self):
-        return f"{self.company_name}"   
+        return f"{str(self.name)}"   
 
     def get_and_generate_campaign_objects(self):
         if self.active_campaign_url:
@@ -566,10 +592,12 @@ ROLE_CHOICES = (
 class Profile(models.Model):
     ROLE_CHOICES_PROFILE = ROLE_CHOICES
     role = models.CharField(choices=ROLE_CHOICES_PROFILE, default='c', max_length=1)
+    demo_account_theme_colour = models.CharField(null=True, blank=True, default="", max_length=20)
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True)
     avatar = models.ImageField(default='default.png', upload_to='profile_images')
     site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
+    campaign_category = models.ForeignKey("campaign_leads.CampaignCategory", on_delete=models.SET_NULL, null=True, blank=True)
     company = models.ForeignKey("core.Company", on_delete=models.SET_NULL, null=True, blank=True)
     sites_allowed = models.ManyToManyField("core.Site", related_name="profile_sites_allowed", null=True, blank=True)
     calendly_event_page_url = models.TextField(blank=True, null=True)
@@ -604,10 +632,21 @@ class Profile(models.Model):
     @property
     def name(self):
         return f"{self.user.first_name} {self.user.last_name}"
-@receiver(models.signals.post_save, sender=Profile)
-def execute_after_save(sender, instance, created, *args, **kwargs):  
-    if not instance.site in instance.sites_allowed.all():
-        instance.sites_allowed.add(instance.site)
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        if self.campaign_category:
+            if not self.campaign_category.site == self.site:
+                self.campaign_category = None
+                self
+        super(Profile, self).save(force_insert, force_update, using, update_fields)
+        if not self.site in self.sites_allowed.all() and self.site:
+            self.sites_allowed.add(self.site)   
+        if self.company:
+            for site in self.company.site_set.all():
+                try:
+                    permissions, created = SiteProfilePermissions.objects.get_or_create(profile=self, site=site)
+                except:
+                    pass
+        
 class FreeTasterLink(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
@@ -631,3 +670,36 @@ class ErrorModel(models.Model):
 #     version = models.FloatField(null=True, blank=True)
 #     content = models.TextField(null=True, blank=True)
 
+class CompanyProfilePermissions(models.Model):
+    profile = models.ForeignKey("core.Profile", on_delete=models.CASCADE, null=True, blank=True)
+    company = models.ForeignKey("core.Company", on_delete=models.CASCADE, null=True, blank=True)
+    edit_user_permissions = models.BooleanField(default=False)
+    permissions_count = models.IntegerField(default = 0)
+    class Meta:
+        ordering = ['-pk']   
+
+class SiteProfilePermissions(models.Model):
+    profile = models.ForeignKey("core.Profile", on_delete=models.CASCADE, null=True, blank=True)
+    site = models.ForeignKey("core.Site", on_delete=models.CASCADE, null=True, blank=True)
+    view_site_configuration = models.BooleanField(default=False)
+    edit_site_configuration = models.BooleanField(default=False)
+    edit_whatsapp_settings = models.BooleanField(default=False)
+    toggle_active_campaign = models.BooleanField(default=False)
+    toggle_whatsapp_sending = models.BooleanField(default=False)
+    permissions_count = models.IntegerField(default = 0) 
+    class Meta:
+        ordering = ['-pk']   
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        role = self.profile.role
+        self.permission_count = 0
+        for field in self._meta.fields:
+            if type(field) == models.BooleanField:
+                if getattr(self, field.attname, False):
+                    self.permission_count +=1
+                elif role == 'a':
+                    setattr(self, field.attname, True)
+                    self.permission_count +=1
+        return super(SiteProfilePermissions, self).save(force_insert, force_update, using, update_fields)
+    
+    

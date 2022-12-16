@@ -193,13 +193,13 @@ def add_user_to_users_online(consumer):
     chat_object, created = SiteUsersOnline.objects.get_or_create(feature="leads", site=consumer.user.profile.site)
     chat_object.users_online = chat_object.users_online.replace(f";{consumer.user.pk};", ';')+(str(consumer.user.pk)+";")
     chat_object.save()
-    return f"""<span hx-swap-oob="true" id="users_online_leads">{loader.render_to_string('campaign_leads/htmx/connected_users.html', {'chat_object':chat_object})}</span> """
+    return f"""<div hx-swap-oob="true" id="users_online_leads">{loader.render_to_string('campaign_leads/htmx/connected_users.html', {'chat_object':chat_object})}</div> """
 @sync_to_async
 def remove_user_from_users_online(consumer):              
     chat_object = SiteUsersOnline.objects.get(feature="leads", site=consumer.user.profile.site)
     chat_object.users_online = chat_object.users_online.replace(f";{consumer.user.pk};", ';')
     chat_object.save()
-    return f"""<span hx-swap-oob="true" id="users_online_leads">{loader.render_to_string('campaign_leads/htmx/connected_users.html', {'chat_object':chat_object})}</span> """
+    return f"""<div hx-swap-oob="true" id="users_online_leads">{loader.render_to_string('campaign_leads/htmx/connected_users.html', {'chat_object':chat_object})}</div> """
 class LeadsConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.company_pk = self.scope["url_route"]["kwargs"]["company_pk"]
@@ -230,13 +230,29 @@ class LeadsConsumer(AsyncWebsocketConsumer):
                 {
                     'type': 'lead_update',
                     'data':{
-                        'rendered_html':f"""<div hx-swap-oob="outerHTML:.leads_disconnected_indicator">
+                        'rendered_html':"""
+
+                                            <div hx-swap-oob="outerHTML:.leads_disconnected_indicator">
                                                 <div class="htmx-indicator whole_page_disconnected_indicator leads_disconnected_indicator">
                                                     <div class="whole_page_disconnected_indicator_content">
                                                         <b>Connecting</b> <img class="invert" src="https://htmx.org/img/bars.svg">
+                                                        
+                                                        <script>
+                                                            var elem = $('#leads_disconnected_indicator');
+                                                            var user_id = $('#user_id').val();
+                                                            
+                                                            if (elem.hasClass('htmx-request')){
+                                                                elem.removeClass('htmx-request');
+                                                                htmx.ajax('GET', "/refresh-leads-board/", {include:'.overview_table_filters', indicator:'#page_load_indicator', swap:'outerHTML', target: '#leads_board_span_wrapper'})
+                                                            }
+                                                        </script>  
                                                     </div>
+                                                    
                                                 </div>
-                                            </div>""",
+                                            </div>
+                                            
+                                            
+                                            """,                        
                     }
                 }
             )

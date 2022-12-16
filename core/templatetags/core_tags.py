@@ -48,7 +48,6 @@ def get_env_var(key):
 @register.filter
 def settings_value(name):
     return getattr(settings, name, "")
-
 @register.filter
 def roundup_tag(number, round_target):
     try:
@@ -269,9 +268,10 @@ def site_outstanding_whatsapp_messages_tag(site, user):
     return 0
 @register.filter
 def whatsappnumber_outstanding_whatsapp_messages_tag(whatsappnumber, user):
-    if whatsappnumber.whatsapp_business_account.site in user.profile.sites_allowed.all():
-        return whatsappnumber.outstanding_whatsapp_messages(user)
-    return 0
+    if whatsappnumber:
+        if whatsappnumber.whatsapp_business_account.site in user.profile.sites_allowed.all():
+            return whatsappnumber.outstanding_whatsapp_messages(user)
+        return 0
 
 @register.filter
 def active_errors_for_customer_number_tag(whatsappnumber, customer_number):

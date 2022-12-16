@@ -4,7 +4,7 @@
 id="message_chat_row_{{message.pk}}"
     {%if errors%}
     data-bs-toggle="popover" 
-    data-bs-trigger="hover" 
+    data-bs-trigger="hover focus" 
     data-bs-html="true" 
     data-bs-placement="top"
     data-bs-title="Errors"
@@ -17,7 +17,7 @@ id="message_chat_row_{{message.pk}}"
     </ul>"
     {%endif%}>
     <div class="col p-0 ps-1 m-1 card card-white chat_row_{{customer_number}}">
-        {{message.message}}
+        {{message.message|safe}}
     </div>
 </div>
 {%endwith%}

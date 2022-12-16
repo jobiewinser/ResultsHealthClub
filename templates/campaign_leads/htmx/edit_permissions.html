@@ -1,25 +1,89 @@
-{%load static%}
-<span>
-    {% comment %} <div class="row">
-        <div class="col center">
-            {%for permission in permissions%}test
-            {%endfor%}
+{%load static user_permission_tags%}
+<div style="min-height:650px;">
+    <div class="row">
+        <div class="col alert alert-info">
+            <small>On this page you can assign your employees permissions to perform tasks on behalf of your company within the Leads Management system. <br>For more employees, this may just be access to the site that they work at with no additional permissions.</small>
         </div>
     </div>
-    <br> {% endcomment %}
-    <div class="row mt-3">
-        <div class="col center" >
-            <small>More coming soon</small>
+    <div class="row">
+        <div class="col">
+            {% if request.user.profile|get_profile_allowed_to_edit_profile_permissions_tag:profile%}
+            <ul class="nav flex-column">
+                {%for profile_company_permissions in profile|companyprofilepermissions_for_company_tag:request.user.profile.company%}                 
+                <li class="m-1">
+                    <div class="row">
+                        <div class="col p-0">
+                            <a class="btn btn-sm pointer btn-permissions {% if profile_company_permissions == company_permissions %}btn-primary{%else%}btn-secondary{%endif%} w-100" 
+                            hx-get="{% url 'company-permissions' %}"
+                            hx-indicator="#htmx-indicator-permissions" 
+                            hx-target="#generic_modal_body"
+                            hx-vals='{"company_permissions_pk": "{{profile_company_permissions.pk}}"}' hx-trigger="click" hx-push-url="false">
+                            Company Permissions: {{profile_company_permissions.company.name}}
+                            </a>
+                        </div>
+                        <div class="col-auto p-0" style="min-width:45px">
+                            <img  class="htmx-indicator invert" id="htmx-indicator-permissions" src="https://htmx.org/img/bars.svg"/>
+                        </div>
+                    </div>
+                </li>
+                {%endfor%}
+                {%for profile_site_permissions in profile.siteprofilepermissions_set.all%}                
+                <li class="m-1">
+                    <div class="row">
+                        <div class="col p-0">
+                            <div class="row">
+                                <div class="col p-0">
+                                    <a 
+                                        class="btn btn-sm pointer btn-permissions {% if profile_site_permissions == site_permissions %}btn-primary{%else%}btn-secondary{%endif%} w-100" hx-indicator="#htmx-indicator-permissions" hx-target="#generic_modal_body"
+                                        hx-vals='{"site_permissions_pk": "{{profile_site_permissions.pk}}"}' hx-trigger="click"
+                                        hx-get="{% url 'site-permissions' %}" hx-push-url="false">
+                                        Site Permissions: {{profile_site_permissions.site.name}}
+                                    </a>
+                                </div>
+                                <div class="col-md-auto right p-0 ps-2">
+                                    <small>Allowed? {%if demo and not request.user.is_superuser%}{Demo}{%endif%}</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-auto p-0 ps-1" style="min-width:45px">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" 
+                                    {%if demo and not request.user.is_superuser%}disabled{%endif%}
+                                    {% if not request.user.profile|get_profile_allowed_to_edit_profile_permissions_tag:profile%}disabled{%endif%}
+                                    hx-post="{%url 'change-sites-allowed'%}" 
+                                    hx-indicator="#htmx-indicator-permissions" 
+                                    hx-target="#generic_modal_body" 
+                                    hx-trigger="input delay:0.1s" 
+                                    hx-vals='{"profile_pk": "{{profile.pk}}", "site_pk":"{{profile_site_permissions.site.pk}}", "site_allowed":"{%if profile_site_permissions.site in profile.sites_allowed.all%}off{%else%}on{%endif%}"}'               
+                                    {%if profile_site_permissions.site in profile.sites_allowed.all%}checked{%endif%}/>
+                            </div>
+                        </div>
+
+                    </div>
+                </li>
+                {%endfor%}
+            </ul>
+            {%else%}            
+            <div class="row" style="min-height:100px">        
+                <div class="col">
+                    <p class="alert alert-danger">You do not have permission to do this</p>
+                </div>
+            </div>
+            {%endif%}
         </div>
-    </div>
-    <div class="row mt-3">
-        <div class="col p-0">
+        <div class="col card p-0" id="permissions_wrapper">
+            {%if site_permissions%}
+            {%include 'campaign_leads/htmx/site_permissions.html'%}
+            {%elif company_permissions%}
+            {%include 'campaign_leads/htmx/company_permissions.html'%}
+            {%endif%}
+        </div>
+        {% comment %} <div class="col p-0">
             Sites the user is allowed to access
             <select class="form-select reset_on_error" name="sites_allowed" id="profile_sites_allowed_{{profile.pk}}" hx-post="{% url 'change-profile-sites-allowed' %}" hx-swap="innerHTML" 
             data-value="" onfocus="this.setAttribute('data-value', this.value);"
             hx-indicator="#htmx_indicator_sites_allowed_{{profile.pk}}"  hx-trigger="change" hx-target="#company_configuration_row_{{profile.pk}}"
             hx-vals='{"profile_pk": "{{profile.pk}}"}' multiple>  
-                {%if not profile.site%}<option value="" selected>None</option>{%endif%}
                 {%for site in profile.company.site_set.all%}
                     <option value="{{site.pk}}" {%if site in profile.sites_allowed.all%}selected{%endif%}>{{site.name}}</option>
                 {%endfor%}
@@ -27,9 +91,9 @@
         </div>
         <div class="col-md-auto pe-0">
             <img  class="htmx-indicator invert" id="htmx_indicator_sites_allowed_{{profile.pk}}" src="https://htmx.org/img/bars.svg"/>
-        </div>
+        </div> {% endcomment %}
     </div>
-</span>
+</div>
 <span hx-swap-oob="true" id="generic_modal_title">    
     Edit Permissions - {{profile.user.first_name}} {{profile.user.last_name}}
 </span>

@@ -1,4 +1,5 @@
 from datetime import datetime
+from django.conf import settings
 import uuid
 from django.db import models
 from django.contrib.auth.models import User
@@ -53,7 +54,7 @@ class Campaign(PolymorphicModel):
     whatsapp_business_account = models.ForeignKey('core.WhatsappBusinessAccount', on_delete=models.SET_NULL, null=True, blank=True)
     color = models.CharField(max_length=15, null=False, blank=False, default="96,248,61")
     def get_active_leads_qs(self):
-        return self.campaignlead_set.filter(archived=False)
+        return self.campaignlead_set.exclude(archived=True).exclude(sold=True)
     def is_manual(self):
         return False
         
@@ -114,7 +115,9 @@ class Campaignlead(models.Model):
     assigned_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     product_cost = models.FloatField(null=True, blank=True)
     def __str__(self):
-        return self.name
+        if self.name:
+            return str(self.name)
+        return f"CampaignLead {str(self.pk)}"
     @property
     def ordered_bookings(self):  
         return self.booking_set.all().order_by('-datetime')
@@ -184,14 +187,38 @@ class Campaignlead(models.Model):
 
     def send_template_whatsapp_message(self, whatsappnumber=None, send_order=None, template=None, communication_method = 'a'):
         print("Campaignlead send_template_whatsapp_message", whatsappnumber, send_order, template, communication_method)
-        from core.models import AttachedError
+        if not whatsappnumber:
+            whatsappnumber = self.campaign.whatsapp_business_account.whatsappnumber
+        from core.models import AttachedError, send_message_to_websocket
+        customer_number = self.whatsapp_number
+        if settings.DEMO:
+            whatsapp_message, created = WhatsAppMessage.objects.get_or_create(
+                wamid="",
+                datetime=datetime.now(),
+                lead=self,
+                message=f"""
+                <b>Hi {self.first_name}</b>
+                <br>
+                <br>
+                <p>This is a demonstration of the whatsapp system! With the Pro subscription, you can add your own whatsapp accounts and automate sending templates here!</p>
+                <small>Thanks from Winser Systems!</small>
+                """,
+                site=self.campaign.site,
+                whatsappnumber=whatsappnumber,
+                customer_number=customer_number,
+                template=template,
+                inbound=False,
+            )
+            send_message_to_websocket(whatsappnumber, customer_number, whatsapp_message, self.campaign.site)
+            self.trigger_refresh_websocket(refresh_position=False)
+            return HttpResponse(status=200)
         if communication_method == 'a':
             print("CampaignleadDEBUG1")
             if send_order:
                 campaigntemplatelink = self.campaign.campaigntemplatelink_set.filter(send_order=send_order).first()
                 if campaigntemplatelink:
                     template = campaigntemplatelink.template
-                type = str(1202 + send_order)
+                type = str(1202)
             else:
                 type = None
             
@@ -252,29 +279,6 @@ class Campaignlead(models.Model):
                                         )
                                         text = text.replace('[[1]]',self.first_name)
                                         counter = counter + 1
-                                    if '[[2]]' in text:
-                                        params.append(              
-                                            {
-                                                "type": "text",
-                                                "text":  self.first_name
-                                            }
-                                        )
-                                        text = text.replace('[[2]]',self.first_name)
-                                        counter = counter + 1
-                                # if '{{3}}' in text:
-                                #     params.append(           
-                                #         {
-                                #             "type": "text",
-                                #             "text":  self.campaign.company.company_name
-                                #         }
-                                #     )
-                                # if '{{4}}' in text:
-                                #     params.append(                   
-                                #         {
-                                #             "type": "text",
-                                #             "text":  self.campaign.site.whatsapp_number
-                                #         }
-                                #     )
                                 whole_text = f"""
                                     {whole_text} 
                                     {text}
@@ -329,8 +333,10 @@ class Campaignlead(models.Model):
                 site = self.campaign.site
                 if not whatsappnumber and send_order:
                     whatsappnumber = self.campaign.whatsapp_business_account.whatsappnumber
-                customer_number = self.whatsapp_number
-                response = whatsapp.send_template_message(self.whatsapp_number, whatsappnumber, template, language, components)
+                if not settings.DEMO:
+                    response = whatsapp.send_template_message(self.whatsapp_number, whatsappnumber, template, language, components)
+                else:
+                    response = {} #TODO
                 print(str(response))
                 logger.debug(str(response))
                 
@@ -356,41 +362,8 @@ class Campaignlead(models.Model):
                             inbound=False,
                             send_order=send_order
                         )
-                        if created:                        
-                            channel_layer = get_channel_layer()                            
-                            message_context = {
-                                "message": whatsapp_message,
-                                "site": site,
-                                "whatsappnumber": whatsappnumber,
-                            }
-                            rendered_message_list_row = loader.render_to_string('messaging/htmx/message_list_row.html', message_context)
-                            rendered_message_chat_row = loader.render_to_string('messaging/htmx/message_chat_row.html', message_context)
-                            rendered_html = f"""
-
-                            <span id='latest_message_row_{customer_number}' hx-swap-oob='delete'></span>
-                            <span id='messageCollapse_{whatsappnumber.pk}' hx-swap-oob='afterbegin'>{rendered_message_list_row}</span>
-
-                            <span id='messageWindowInnerBody_{customer_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>
-                            """
-                            
-                            async_to_sync(channel_layer.group_send)(
-                                f"messaging_{whatsappnumber.pk}",
-                                {
-                                    'type': 'chatbox_message',
-                                    "message": rendered_html,
-                                }
-                            )
-                            channel_layer = get_channel_layer()   
-                            
-                            async_to_sync(channel_layer.group_send)(
-                                f"message_count_{whatsappnumber.site.company.pk}",
-                                {
-                                    'type': 'messages_count_update',
-                                    'data':{
-                                        'rendered_html':f"""<span hx-swap-oob="afterbegin:.company_message_count"><span hx-trigger="load" hx-swap="none" hx-get="/update-message-counts/"></span>""",
-                                    }
-                                }
-                            )
+                        if created:                 
+                            send_message_to_websocket(whatsappnumber, customer_number, whatsapp_message, whatsappnumber.whatsapp_business_account )                           
                     logger.debug("site.send_template_whatsapp_message success") 
                     self.trigger_refresh_websocket(refresh_position=False)
                     return HttpResponse("Message Sent", status=200)
@@ -418,24 +391,15 @@ class Campaignlead(models.Model):
                 print("CampaignleadDEBUG10")
                 if send_order == 1:
                     type = '1203'
-                elif send_order == 2:
-                    type = '1204'
-                elif send_order == 3:
-                    type = '1205'
-                elif send_order == 4:
-                    type = '1206'
-                elif send_order == 5:
-                    type = '1207'
-                print("errorhere no suitable template found")
-                attached_error, created = AttachedError.objects.get_or_create(
-                    type = type,
-                    attached_field = "campaign_lead",
-                    campaign_lead = self,
-                )
-                if not created:
-                    print("CampaignleadDEBUG11")
-                    attached_error.created = datetime.now()
-                    attached_error.save()
+                    attached_error, created = AttachedError.objects.get_or_create(
+                        type = type,
+                        attached_field = "campaign_lead",
+                        campaign_lead = self,
+                    )
+                    if not created:
+                        print("CampaignleadDEBUG11")
+                        attached_error.created = datetime.now()
+                        attached_error.save()
         return HttpResponse("Message Error", status=400)
             
             

@@ -11,7 +11,7 @@
 
     {%if message.active_errors%}
     data-bs-toggle="popover_delay" 
-    data-bs-trigger="hover" 
+    data-bs-trigger="hover focus" 
     data-bs-html="true" 
     data-bs-placement="right"
     data-bs-title="Message Details"
@@ -38,7 +38,7 @@
 
 
     {% comment %} data-bs-toggle="popover_delay" 
-    data-bs-trigger="hover" 
+    data-bs-trigger="hover focus" 
     data-bs-html="true" 
     data-bs-placement="right"
     data-bs-title="Message Details"
@@ -70,7 +70,9 @@
     id="latest_message_row_{{message.customer_number}}"
     >
     <div class="col-auto p-0">
-        <img id="latest_message_avatar_{{message.customer_number}}" src="{%if message.inbound%}{% static 'img/blank-profile-picture.png' %}{%else%}{%if message.user.profile.avatar.url%}{{message.user.profile.avatar.url}}{%else%}{{message.site.company.company_logo_black.url}}{%endif%}{%endif%}" alt="" width="38" height="38" class="rounded-circle">
+        <img id="latest_message_avatar_{{message.customer_number}}" 
+        style="{%if message.user.profile.demo_account_theme_colour%}background-color:rgba({{message.user.profile.demo_account_theme_colour}}, 0.6){%endif%}"
+        src="{%if message.inbound%}{% static 'img/blank-profile-picture.png' %}{%else%}{%if message.user.profile.avatar.url%}{{message.user.profile.avatar.url}}{%else%}{{message.site.company.company_logo_black.url}}{%endif%}{%endif%}" alt="" width="38" height="38" class="rounded-circle">
     </div>
     <div class="col p-0 ps-1 hidden-overflow">
         <div class="row chat_lead_name_row">
@@ -84,10 +86,10 @@
             </div>
         </div>
         <div class="row chat_message_row">
-            <div class="col p-0" id="message_list_row_{{message.customer_number}}_{{whatsappnumber.pk}}">
+            <div style="height:18px" class="col p-0" id="message_list_row_{{message.customer_number}}_{{whatsappnumber.pk}}">
                 {%if message.failed%}<i class="fa-solid fa-triangle-exclamation" style="color:red"></i>{%endif%}  {%if message.inbound%}Them{%else%}You{%endif%}:
                 {%if message.message%}
-                    {{message.message}}
+                    {{message.message|safe}}
                 {%elif message.image.all%}
                     [Image]
                 {%endif%}

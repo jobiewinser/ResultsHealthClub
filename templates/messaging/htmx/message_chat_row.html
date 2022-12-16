@@ -3,7 +3,7 @@
     <div class="row {%if message.pending%}pending_message{%endif%}"
         id="message_chat_row_{{message.pk}}"
         data-bs-toggle="popover_delay" 
-        data-bs-trigger="hover" 
+        data-bs-trigger="hover focus" 
         data-bs-html="true" 
         data-bs-placement="right"
         data-bs-title="Message Details"
@@ -19,7 +19,7 @@
         </div>
         <div class="col-md-auto p-0 pe-1 ps-1 ps-1 m-1 card card-white borderless chat_row_{{message.customer_number}} bg-secondary-trans-80 text-white" style="max-width:70%">
             {%if message.message%}
-                {{message.message}}
+                {{message.message|safe}}
             {%endif%}
             {%if message.image.all%}
                 {% for image in message.image.all%}
@@ -40,7 +40,7 @@
     <div class="row {%if message.pending%}pending_message{%endif%} {%if message.failed%}bg-danger-trans-20{%endif%}"
         id="message_chat_row_{{message.pk}}"
         data-bs-toggle="popover_delay" 
-        data-bs-trigger="hover" 
+        data-bs-trigger="hover focus" 
         data-bs-html="true" 
         data-bs-placement="right"
         data-bs-title="Message Details"
@@ -67,7 +67,7 @@
                 <span>
                     {%if message.message%}
                     {%if message.failed%}<i class="fa-solid fa-triangle-exclamation" style="color:red"></i>{%endif%} 
-                    {{message.message}}
+                    {{message.message|safe}}
                     {%endif%}
                     {%if message.image.all%}
                         {% for image in message.image.all%}
@@ -88,7 +88,9 @@
                 {%else%}
                 {% static 'img/blank-profile-picture.png' %}
                 {%endif%}
-                " alt="" width="22" height="22" class="rounded-circle">
+                " 
+                style="{%if message.user.profile.demo_account_theme_colour%}background-color:rgba({{message.user.profile.demo_account_theme_colour}}, 0.6){%endif%}"
+                alt="" width="22" height="22" class="rounded-circle">
             </div>
         </div>
 {%endif%}

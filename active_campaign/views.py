@@ -16,6 +16,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.conf import settings
 from datetime import datetime, timedelta, time
+from core.user_permission_functions import *
 @method_decorator(csrf_exempt, name="dispatch")
 class Webhooks(View):
     def get(self, request, *args, **kwargs):
@@ -89,9 +90,11 @@ def set_campaign_site(request, **kwargs):
 def set_whatsapp_template_sending_status(request, **kwargs):
     try:
         site = Site.objects.get(pk=request.POST.get('site_pk',None))
-        site.whatsapp_template_sending_enabled = request.POST.get('whatsapp_template_sending_enabled', 'off') == 'on'
-        site.save()
-        return render(request, 'core/htmx/whatsapp_template_sending_enabled_htmx.html', {'site':site,})
+        if get_user_allowed_to_toggle_whatsapp_sending(request.user.profile, site):
+            site.whatsapp_template_sending_enabled = request.POST.get('whatsapp_template_sending_enabled', 'off') == 'on'
+            site.save()
+            return render(request, 'core/htmx/whatsapp_template_sending_enabled_htmx.html', {'site':site,})
+        return HttpResponse(status=403)
     except Exception as e:        
         logger.error(f"set_whatsapp_template_sending_status {str(e)}")
         return HttpResponse("Couldn't set_whatsapp_template_sending_status", status=500)
@@ -100,9 +103,11 @@ def set_whatsapp_template_sending_status(request, **kwargs):
 def set_active_campaign_leads_status(request, **kwargs):
     try:
         site = Site.objects.get(pk=request.POST.get('site_pk',None))
-        site.active_campaign_leads_enabled = request.POST.get('active_campaign_leads_enabled', 'off') == 'on'
-        site.save()
-        return render(request, 'core/htmx/active_campaign_enabled_htmx.html', {'site':site,})
+        if get_user_allowed_to_toggle_active_campaign(request.user.profile, site):
+            site.active_campaign_leads_enabled = request.POST.get('active_campaign_leads_enabled', 'off') == 'on'
+            site.save()
+            return render(request, 'core/htmx/active_campaign_enabled_htmx.html', {'site':site,})
+        return HttpResponse(status=403)
     except Exception as e:        
         logger.error(f"set_active_campaign_leads_status {str(e)}")
         return HttpResponse("Couldn't set_active_campaign_leads_status", status=500)

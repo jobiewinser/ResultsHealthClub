@@ -8,13 +8,16 @@ from campaign_leads.views import get_campaign_qs
 from core.models import FreeTasterLink, FreeTasterLinkClick, Profile, Site
 from core.user_permission_functions import get_available_sites_for_user
 from core.views import get_site_pk_from_request  
+from core.core_decorators import check_core_profile_requirements_fulfilled
 # Create your views here.
 logger = logging.getLogger(__name__)
 
 
 from campaign_leads.models import Call, Campaign, Campaignlead
         
+
 @method_decorator(login_required, name='dispatch')
+@method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
 class AnalyticsOverviewView(TemplateView):
     template_name='analytics/analytics_overview.html'
 

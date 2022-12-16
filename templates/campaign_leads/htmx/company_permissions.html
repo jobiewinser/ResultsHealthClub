@@ -1,0 +1,30 @@
+{%load static%}
+<div class="card-header center">     
+    Permissions for <b>{{company_permissions.company.name}}</b>
+    <br>
+    <span class="secondary_td_layer">{{company_permissions.profile}}</span>
+</div>
+<div class="card-body"> 
+    <div class="row">        
+        <div class="col">
+            <div class="form-check form-switch">
+                <label><small>Allowed to edit other user permissions</small></label> 
+                <input class="form-check-input" type="checkbox"
+                    hx-post="{%url 'company-permissions'%}" 
+                    hx-target="#permissions_wrapper" 
+                    hx-trigger="input delay:0.1s" 
+                    hx-indicator="#htmx-indicator-permissions" 
+                    hx-vals='{"company_permissions_pk": "{{company_permissions.pk}}", "edit_user_permissions":"{%if company_permissions.edit_user_permissions%}off{%else%}on{%endif%}"}' 
+                    {%if company_permissions.profile.role == 'a'%}disabled{%endif%}              
+                    {%if company_permissions.edit_user_permissions or company_permissions.profile.role == 'a'%}checked{%endif%}/>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="min-height:100px">  
+    {%if error%}          
+        <div class="col">
+            <p class="alert alert-danger">{{error}}</p>
+        </div>
+    {%endif%}  
+</div>
+</div>

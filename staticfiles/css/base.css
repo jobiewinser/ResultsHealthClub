@@ -5,6 +5,10 @@
     font-style: normal;
 }
 
+body{
+    margin:0px !important;
+}
+
 body, #generic_modal_body {
     /* font-family: Arial, Helvetica, sans-serif; */
     background-color: #f4f5f8;
@@ -69,8 +73,8 @@ body * {
     bottom: 0;
     right: 0;
     position: absolute;
-    width: 95vw;
-    height: 95vh;
+    width: 100vw;
+    height: 100vh;
     z-index: 1071;
 }
 
@@ -957,7 +961,7 @@ tr.odd td {
 }
 
 .analytics-card {
-    min-width: 350px;
+    /* min-width: 350px; */
     margin: 10px;
 }
 .chart_wrapper {
@@ -984,8 +988,8 @@ tr.odd td {
     font-size:10px;
 }
 
-#site_list_wrapper{
-    min-width:250px
+#site_list_wrapper, #phone_list_wrapper{
+    min-width:350px
 }
 
 #campaign_category_pk{
@@ -999,4 +1003,13 @@ tr.odd td {
 
 .sortable_drag{
     height:100%;
+}
+.lead-hidden{
+    height:0px;
+    margin:0px;
+    padding:0px;
+}
+
+#users_online_leads{
+    min-width:300px;
 }

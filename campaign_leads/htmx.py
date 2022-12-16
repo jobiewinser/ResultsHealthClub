@@ -16,6 +16,7 @@ from django.contrib import messages
 from asgiref.sync import async_to_sync
 from campaign_leads.views import get_campaign_qs
 from whatsapp.models import WhatsappTemplate
+from django.conf import settings
 logger = logging.getLogger(__name__) 
 
 @login_required
@@ -33,8 +34,9 @@ def get_modal_content(request, **kwargs):
 
 
             site_pk = get_site_pk_from_request(request)
-            if site_pk:
+            if site_pk and not site_pk == 'all':
                 request.GET['site_pk'] = site_pk
+                context['site'] = Site.objects.get(pk=site_pk)
             whatsapp_template_pk = request.GET.get('whatsapp_template_pk')
             if whatsapp_template_pk:
                 context['template'] = WhatsappTemplate.objects.get(pk=whatsapp_template_pk)
@@ -52,8 +54,6 @@ def get_modal_content(request, **kwargs):
                 if lead_pk:
                     context['lead'] = Campaignlead.objects.get(pk=lead_pk)
                     context['site'] = context['lead'].campaign.site
-                else:
-                    context['site'] = Site.objects.get(pk=site_pk)
                 manual_campaign =  ManualCampaign.objects.filter(site=context['site']).first()
                 if not manual_campaign:
                     ManualCampaign.objects.create(site=context['site'], name = "Manually Created")
@@ -62,23 +62,32 @@ def get_modal_content(request, **kwargs):
             return render(request, f"campaign_leads/htmx/{template_name}.html", context)   
     except Exception as e:
         logger.debug("get_modal_content Error "+str(e))
-        return HttpResponse(e, status=500)
+        #return HttpResponse(e, status=500)
+        raise e
+        
 
 
 
 @login_required
 def add_campaign_category(request, **kwargs):
+    if settings.DEMO and not request.user.is_superuser:
+        return HttpResponse(status=500)
     # logger.debug(str(request.user))
     # try:        
-        name = request.POST.get('category_name')
-        if not name:
-            return HttpResponse("Please enter a name", status=500)
-        campaign_pk = request.POST.get('campaign_pk')
+    name = request.POST.get('category_name')
+    if not name:
+        return HttpResponse("Please enter a name", status=500)
+    campaign_pk = request.POST.get('campaign_pk')
+    site_pk = request.POST.get('site_pk')
+    if campaign_pk:
         campaign = Campaign.objects.get(pk=campaign_pk)
         campaign_category, created = CampaignCategory.objects.get_or_create(site=campaign.site, name=name)
         campaign.campaign_category = campaign_category
         campaign.save()
-        return HttpResponse("", status=200)
+    else:
+        site = Site.objects.get(pk=site_pk)
+        campaign_category, created = CampaignCategory.objects.get_or_create(site=site, name=name)
+    return HttpResponse("", status=200)
     # except Exception as e:
     #     # messages.add_message(request, messages.ERROR, f'Error with creating a campaign lead')
     #     logger.debug("create_campaign_lead Error "+str(e))
@@ -87,45 +96,49 @@ def add_campaign_category(request, **kwargs):
 
 @login_required
 def edit_lead(request, **kwargs):
+    if settings.DEMO and not request.user.is_superuser:
+        return HttpResponse(status=500)
     # logger.debug(str(request.user))
     # try:        
-        campaign_pk = request.POST.get('campaign_pk')
-        if not campaign_pk:
-            return HttpResponse("Please choose a campaign", status=500)
-        campaign = Campaign.objects.get(pk=campaign_pk)    
-        
-        first_name = request.POST.get('first_name')
-        if not first_name:
-            return HttpResponse("Please provide a first name", status=500)
+    campaign_pk = request.POST.get('campaign_pk')
+    if not campaign_pk:
+        return HttpResponse("Please choose a campaign", status=500)
+    campaign = Campaign.objects.get(pk=campaign_pk)    
+    
+    first_name = request.POST.get('first_name')
+    if not first_name:
+        return HttpResponse("Please provide a first name", status=500)
 
-        last_name = request.POST.get('last_name')
+    last_name = request.POST.get('last_name')
 
-        email = request.POST.get('email')
-        
-        phone = request.POST.get('phone')
-        if not phone:
-            return HttpResponse("Please provide a valid Phone Number", status=500)
-        
-        country_code = request.POST.get('country_code', "")
-        
-        product_cost = request.POST.get('product_cost')
-        
-        lead_pk = request.POST.get('lead_pk')
-        if lead_pk:
-            lead = Campaignlead.objects.get(pk=lead_pk)
-            refresh_position = False
-        else:
-            lead = Campaignlead()
-            refresh_position = True
-        lead.campaign = campaign
-        lead.first_name = first_name
-        lead.last_name = last_name
-        lead.email = email
-        lead.whatsapp_number = f"{country_code}{phone}"
+    email = request.POST.get('email')
+    
+    phone = request.POST.get('phone')
+    if not phone:
+        return HttpResponse("Please provide a valid Phone Number", status=500)
+    
+    country_code = request.POST.get('country_code', "")
+    
+    product_cost = request.POST.get('product_cost', 0)
+    
+    lead_pk = request.POST.get('lead_pk')
+    if lead_pk:
+        lead = Campaignlead.objects.get(pk=lead_pk)
+        refresh_position = False
+    else:
+        lead = Campaignlead()
+        refresh_position = True
+    lead.campaign = campaign
+    lead.first_name = first_name
+    lead.last_name = last_name
+    lead.email = email
+    lead.whatsapp_number = f"{country_code}{phone}"
+    if product_cost:
         lead.product_cost = product_cost
-        lead.save()
-        lead.trigger_refresh_websocket(refresh_position=refresh_position)
-        return HttpResponse("", status=200)
+    
+    lead.save()
+    lead.trigger_refresh_websocket(refresh_position=refresh_position)
+    return HttpResponse(str(lead.pk), status=200)
     # except Exception as e:
     #     # messages.add_message(request, messages.ERROR, f'Error with creating a campaign lead')
     #     logger.debug("create_campaign_lead Error "+str(e))
@@ -163,7 +176,8 @@ def get_leads_column_meta_data(request, **kwargs):
         return render(request, 'campaign_leads/htmx/column_metadata_htmx.html', {'querysets':querysets})
     except Exception as e:
         logger.debug("get_leads_column_meta_data Error "+str(e))
-        return HttpResponse(e, status=500)
+        #return HttpResponse(e, status=500)
+        raise e
 @login_required
 def refresh_lead_article(request, **kwargs):
     logger.debug(str(request.user))
@@ -172,7 +186,8 @@ def refresh_lead_article(request, **kwargs):
         return render(request, 'campaign_leads/htmx/lead_article.html', {'lead':lead, 'max_call_count':0})
     except Exception as e:
         logger.debug("get_leads_column_meta_data Error "+str(e))
-        return HttpResponse(e, status=500)
+        #return HttpResponse(e, status=500)
+        raise e
 @login_required
 def refresh_booking_row(request, **kwargs):
     logger.debug(str(request.user))
@@ -181,7 +196,8 @@ def refresh_booking_row(request, **kwargs):
         return render(request, 'campaign_leads/htmx/campaign_booking_row_htmx.html', {'lead':lead})
     except Exception as e:
         logger.debug("get_leads_column_meta_data Error "+str(e))
-        return HttpResponse(e, status=500)
+        #return HttpResponse(e, status=500)
+        raise e
 
 
 @login_required
@@ -195,7 +211,10 @@ def add_manual_booking(request, **kwargs):
         #     booking_type = 'a'
         # else:
         #     booking_type = 'b'
-        booking_datetime = datetime.strptime(f"{booking_date} {booking_time}", '%Y-%m-%d %H:%M')
+        try:
+            booking_datetime = datetime.strptime(f"{booking_date} {booking_time}", '%Y-%m-%d %H:%M')
+        except:
+            return HttpResponse("Please enter a valid date and time", status=500)
         booking = Booking.objects.create(
             datetime = booking_datetime,
             lead = lead,
@@ -205,12 +224,14 @@ def add_manual_booking(request, **kwargs):
 
         note = request.POST.get('note','')
         if note:
+            if settings.DEMO and not request.user.is_superuser:
+                note = "Demo mode active, note text replaced!"
             Note.objects.create(
                 booking=booking,
                 lead=lead,
                 text=note,
                 user=request.user,
-                datetime=booking_datetime
+                datetime=datetime.now()
                 )
                 
         from channels.layers import get_channel_layer
@@ -231,7 +252,8 @@ def add_manual_booking(request, **kwargs):
         return HttpResponse("", status=200)
     except Exception as e:
         logger.debug("add_manual_booking Error "+str(e))
-        return HttpResponse(e, status=500)
+        #return HttpResponse(e, status=500)
+        raise e
 
 
 @login_required
@@ -252,7 +274,8 @@ def mark_archived(request, **kwargs):
             return render(request, "campaign_leads/htmx/campaign_booking_row.html", {'lead':lead}) 
     except Exception as e:
         logger.debug("mark_archived Error "+str(e))
-        return HttpResponse(e, status=500)
+        #return HttpResponse(e, status=500)
+        raise e
 
 
 @login_required
@@ -267,7 +290,8 @@ def new_leads_column(request, **kwargs):
             return render(request, 'campaign_leads/htmx/lead_columns.html', {'querysets':querysets, 'max_call_count':max_call_count-1})
     except Exception as e:
         logger.debug("new_call Error "+str(e))
-        return HttpResponse(e, status=500)
+        #return HttpResponse(e, status=500)
+        raise e
 
 
 @login_required
@@ -281,7 +305,8 @@ def delete_lead(request, **kwargs):
             return HttpResponse("", "text", 200)
     except Exception as e:
         logger.debug("mark_archived Error "+str(e))
-        return HttpResponse(e, status=500)
+        #return HttpResponse(e, status=500)
+        raise e
 
 @login_required
 def mark_arrived(request, **kwargs):
@@ -294,7 +319,8 @@ def mark_arrived(request, **kwargs):
             return render(request, "campaign_leads/htmx/campaign_booking_row.html", {'lead':lead}) 
     except Exception as e:
         logger.debug("mark_archived Error "+str(e))
-        return HttpResponse(e, status=500)
+        #return HttpResponse(e, status=500)
+        raise e
 
 
 @login_required
@@ -317,7 +343,8 @@ def mark_sold(request, **kwargs):
             return render(request, "campaign_leads/htmx/campaign_booking_row.html", {'lead':lead}) 
     except Exception as e:
         logger.debug("mark_archived Error "+str(e))
-        return HttpResponse(e, status=500)
+        #return HttpResponse(e, status=500)
+        raise e
 
 @login_required
 def create_lead_note(request, **kwargs):
@@ -327,6 +354,8 @@ def create_lead_note(request, **kwargs):
             lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'))
             note = request.POST.get('note','')
             if note:
+                if settings.DEMO and not request.user.is_superuser:
+                    note = "Demo mode active, note text replaced!"
                 Note.objects.create(                    
                     lead=lead,
                     text=note,
@@ -338,41 +367,6 @@ def create_lead_note(request, **kwargs):
             return HttpResponse(str(lead.pk), status=200)
     except Exception as e:
         logger.debug("mark_archived Error "+str(e))
-        return HttpResponse(e, status=500)
-        
-# @login_required
-# def test_whatsapp_message(request, **kwargs):
-#     logger.debug(str(request.user))
-#     try:
-#         if request.user.is_authenticated:
-#             lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'))
-#             lead.send_whatsapp_message('testing api', request.user)
-#             return render(request, "campaign_leads/htmx/campaign_booking_row.html", {'lead':lead}) 
-#     except Exception as e:
-#         logger.debug("mark_archived Error "+str(e))
-# #         return HttpResponse(e, status=500)
-# @login_required
-# def template_editor(request, **kwargs):
-#     logger.debug(str(request.user))
-#     try:
-#         if request.user.is_authenticated:
-#             template = WhatsappTemplate.objects.get(pk=request.GET.get('template_pk'))
-#             return render(request, "campaign_leads/htmx/template_editor.html", {'template':template}) 
-#     except Exception as e:
-#         logger.debug("mark_archived Error "+str(e))
-#         return HttpResponse(e, status=500)
-
-# @login_required
-# def template_save(request, **kwargs):
-#     logger.debug(str(request.user))
-#     try:
-#         if request.user.is_authenticated:
-#             template = WhatsappTemplate.objects.get(pk=request.POST.get('template_pk'))
-#             template.text = request.POST.get('template_text')
-#             template.save()
-#             return render(request, "campaign_leads/htmx/template_editor.html", {'template':template}) 
-#     except Exception as e:
-#         logger.debug("mark_archived Error "+str(e))
-#         return HttpResponse(e, status=500)
-
+        #return HttpResponse(e, status=500)
+        raise e
         

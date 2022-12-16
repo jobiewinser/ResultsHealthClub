@@ -1,28 +1,14 @@
-"""jobiewebsite URL Configuration
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/3.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.urls import path
 import core.views as coreviews
 import core.htmx as corehtmx
 urlpatterns = [
     # Public Facing
     # path('products/campaign-leads-product-page', coreviews.CampaignLeadsProductPageView.as_view(), name='campaign-leads-product-page' ),
-    path('login-htmx', coreviews.custom_login_post, name='login-htmx' ),
+    # path('login-htmx', coreviews.custom_login_post, name='login-htmx' ),
 
     path('', coreviews.HomeView.as_view(), name='customer-home'),
-    path('customer-login/', coreviews.CustomerLoginView.as_view(), name='customer-login'),
+    # path('customer-login/', coreviews.CustomerLoginView.as_view(), name='customer-login'),
+    path('login-demo/', coreviews.LoginDemoView.as_view(), name='login-demo'),
     
     path('change-log/', coreviews.ChangeLogView.as_view(), name='change-log'),
 
@@ -33,7 +19,7 @@ urlpatterns = [
 
     path('configuration/change-profile-role/', coreviews.change_profile_role, name='change-profile-role'),
     path('configuration/change-profile-site/', coreviews.change_profile_site, name='change-profile-site'),
-    path('configuration/change-profile-sites-allowed/', coreviews.change_profile_sites_allowed, name='change-profile-sites-allowed'),
+    # path('configuration/change-profile-sites-allowed/', coreviews.change_profile_sites_allowed, name='change-profile-sites-allowed'),
 
     # path('switch-user/', corehtmx.switch_user, name='switch-user' ),
     path('get-modal-content/', corehtmx.get_modal_content, name='get-modal-content' ),
@@ -52,6 +38,9 @@ urlpatterns = [
     # path('configuration/', coreviews.ConfigurationView.as_view(), name='configuration'),  
 
     path('profile-incorrectly-configured/', coreviews.ProfileIncorrectlyConfiguredView.as_view(), name='profile-incorrectly-configured'),  
+    path('configuration/company-permissions/', coreviews.CompanyPermissionsView.as_view(), name='company-permissions'),  
+    path('configuration/site-permissions/', coreviews.SitePermissionsView.as_view(), name='site-permissions'),  
+    path('configuration/change-sites-allowed/', coreviews.change_site_allowed, name='change-sites-allowed'),  
 
     
 ]

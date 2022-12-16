@@ -52,30 +52,47 @@ function basehandlehtmxafterSwap(evt){
         }
     });
 }
-var tapped=false
+// var tapped=false
+
+// function setDoubleTap(identifier){
+    // $(identifier).on("touchstart",function(e){
+//         if(!tapped){ //if tap is not set, set up single tap
+//             tapped=setTimeout(function(){
+//                 tapped=null
+//                 //insert things you want to do when single tapped
+//             },300);   //wait 300ms then run single click code
+//         } else {    //tapped within 300ms of last tap. double tap
+//           clearTimeout(tapped); //stop single tap callback
+//           tapped=null
+//           htmx.ajax('GET', '/toggle-claim-lead/'+$(e.currentTarget).data('id')+'/', {swap:"none"})
+//         }
+//         e.preventDefault()
+    // });
+// }
 
 function setDoubleTap(identifier){
+    var tapedTwice = false;
+    console.log(identifier)
     $(identifier).on("touchstart",function(e){
-        if(!tapped){ //if tap is not set, set up single tap
-            tapped=setTimeout(function(){
-                tapped=null
-                //insert things you want to do when single tapped
-            },300);   //wait 300ms then run single click code
-        } else {    //tapped within 300ms of last tap. double tap
-          clearTimeout(tapped); //stop single tap callback
-          tapped=null
-          htmx.ajax('GET', '/toggle-claim-lead/'+$(e.currentTarget).data('id')+'/', {swap:"none"})
+        if(!tapedTwice) {
+            tapedTwice = true;
+            setTimeout( function() { tapedTwice = false; }, 300 );
+            return false;
         }
-        e.preventDefault()
+        event.preventDefault();
+        htmx.ajax('GET', '/toggle-claim-lead/'+$(e.currentTarget).data('id')+'/', {swap:"none"})
     });
+    
 }
 
 function basehandlehtmxafterSettle(evt){ 
     console.log("basehandlehtmxafterSettle")    
-    $('.select2:not([data-select2-id])').select2({
-        searchInputPlaceholder: '🔎 Search here...',        
-        theme: 'bootstrap-5',
-    })
+    try {
+        $('.select2:not([data-select2-id])').select2({
+            searchInputPlaceholder: '🔎 Search here...',        
+            theme: 'bootstrap-5',
+        })
+    }catch{}
 }
 
 function basehandlehtmxafterRequest(evt){   
@@ -113,6 +130,10 @@ function basehandlehtmxafterRequest(evt){
             }else if (evt.detail.pathInfo.requestPath.includes("edit-lead")){
                 $('#generic_modal').modal('hide');
                 snackbarShow('Successfully changed/created a campaign lead', 'success')
+                var current_module = $('#current_page').val()
+                if (current_module == 'campaign_booking_overview'){
+                    htmx.ajax('GET', "/refresh-booking-row/"+evt.detail.xhr.response+"/", {swap:'innerHTML', target: '#row_'+evt.detail.xhr.response})
+                }
             }else if (evt.detail.pathInfo.requestPath.includes("add-campaign-category")){
                 $('#generic_modal').modal('hide');
                 snackbarShow('Successfully added a campaign category, reloading...', 'success')
@@ -131,6 +152,8 @@ function basehandlehtmxafterRequest(evt){
         snackbarShow('Error: '+evt.detail.xhr.response, 'danger', display_ms=5000)           
     }else if (status == 400){
         snackbarShow('Error: '+evt.detail.xhr.response, 'danger', display_ms=5000)           
+    }else if (status == 403){
+        snackbarShow('You are not permitted to perform this action: '+evt.detail.xhr.response, 'danger', display_ms=5000)           
     }
 }
 
@@ -204,27 +227,28 @@ function fallbackCopyTextToClipboard(text) {
     document.body.removeChild(textArea);
 }
 
+try{
+    (function($) {
 
-(function($) {
+        var Defaults = $.fn.select2.amd.require('select2/defaults');
 
-    var Defaults = $.fn.select2.amd.require('select2/defaults');
+        $.extend(Defaults.defaults, {
+            searchInputPlaceholder: ''
+        });
 
-    $.extend(Defaults.defaults, {
-        searchInputPlaceholder: ''
-    });
+        var SearchDropdown = $.fn.select2.amd.require('select2/dropdown/search');
 
-    var SearchDropdown = $.fn.select2.amd.require('select2/dropdown/search');
+        var _renderSearchDropdown = SearchDropdown.prototype.render;
 
-    var _renderSearchDropdown = SearchDropdown.prototype.render;
+        SearchDropdown.prototype.render = function(decorated) {
 
-    SearchDropdown.prototype.render = function(decorated) {
+            // invoke parent method
+            var $rendered = _renderSearchDropdown.apply(this, Array.prototype.slice.apply(arguments));
 
-        // invoke parent method
-        var $rendered = _renderSearchDropdown.apply(this, Array.prototype.slice.apply(arguments));
+            this.$search.attr('placeholder', this.options.get('searchInputPlaceholder'));
 
-        this.$search.attr('placeholder', this.options.get('searchInputPlaceholder'));
+            return $rendered;
+        };
 
-        return $rendered;
-    };
-
-})(window.jQuery);
+    })(window.jQuery);
+}catch{}

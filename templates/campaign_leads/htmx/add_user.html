@@ -1,22 +1,39 @@
 {%load static%}
 <div class="generic_modal_contents">
     <form autocomplete="off" autofill="off"
-        hx-encoding="multipart/form-data"
-        hx-post="{% url 'modify-user' %}" hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
+        hx-encoding="multipart/form-data" hx-trigger="submit delay:0.5s" onsubmit="$('#htmx-indicator-add-user').addClass('htmx-request');"
+        hx-post="{% url 'modify-user' %}" hx-indicator="#htmx-indicator-add-user" hx-target="#generic_modal_body"
+        hx-vals='{"site_pk":"{{site.pk}}"}'
         hx-swap="innerHTML">
         <div class="row">
             <div class="col center" >
                 
                 {%if user.profile.company%}
-                <div class="form-floating m-1">
-                    <input disabled name="company" value="{{request.user.profile.company.company_name}}" class="form-control" id="company"/>
-                    <label for="company">Company</label>
+                <div class="row">
+                    <div class="col center p-0">
+                        <div class="form-floating m-1">
+                            <input disabled name="company" value="{{request.user.profile.company.name}}" class="form-control" id="company"/>
+                            <label for="company">Company</label>
+                        </div>
+                    </div>
+                    <div class="col center p-0">
+                        <div class="form-floating m-1">
+                            <select class="form-select" name="role" id="profile_role_new">  
+                                    {%for role_choice in role_choices%}
+                                        {%if not role_choice.0 == 'a'%}
+                                            <option {%if role_choice.0 == 'c'%}selected{%endif%} value="{{role_choice.0}}">{{role_choice.1}}</option>
+                                        {%endif%}
+                                    {%endfor%}
+                            </select>
+                            <label for="profile_role_new">Role<span class="required">*</span></label>
+                        </div>
+                    </div>
                 </div>
                 {%endif%}
                 
                 <div class="form-floating m-1">
                     <input name="first_name" class="form-control modify_user_input" id="first_name"/>
-                    <label for="first_name">First Name</label>
+                    <label for="first_name">First Name<span class="required">*</span></label>
                 </div>
                 
                 <div class="form-floating m-1">
@@ -26,7 +43,7 @@
                 
                 <div class="form-floating m-1">
                     <input name="password" class="form-control modify_user_input" type="password" id="password"/>
-                    <label for="password">Password</label>
+                    <label for="password">Password<span class="required">*</span></label>
                 </div>
                         
                 <br>
@@ -39,10 +56,15 @@
         </div>
         <br>
         <div class="row">
-            <div class="col center" >
-                <button class="btn btn-light" type="submit">
+            <div class="col">
+            </div>
+            <div class="col-md-auto center" >
+                <button class="btn btn-primary" type="submit">
                     Add User
                 </button>
+            </div>
+            <div class="col">
+                <img  class="htmx-indicator invert" id="htmx-indicator-add-user" src="https://htmx.org/img/bars.svg"/>
             </div>
         </div>
     </form>

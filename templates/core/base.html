@@ -21,46 +21,32 @@
             <link href="{% static 'css/datatables.css' %}" rel="stylesheet" />
             <script src="{% static 'js/datatables.js' %}"></script> 
             <script src="{% static 'js/Sortable.js' %}"></script> 
-            
-            <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-            <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.0/font/bootstrap-icons.css" />
 
-            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />            
-            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.rtl.min.css" />
-           {%endblock cdn%}
+            <link rel="stylesheet" href="{% static 'css/select2.4.1.0.min.css' %}" />
+            <script src="{% static 'js/select2.4.1.0.min.js' %}"></script>
+            <link rel="stylesheet" href="{% static 'css/bootstrap-icons.1.4.0.css' %}" />
+            
+            <link rel="stylesheet" href="{% static 'css/select2-bootstrap-5-theme.1.3.0.min.css' %}"/>
+            <link rel="stylesheet" href="{% static 'css/select2-bootstrap-5-theme.1.3.0.rtl.min.css' %}"/>
+            {%endblock cdn%}
         
         
-        <link href="{% static 'css/drag_drop.css' %}?0.51" rel="stylesheet" />
-        <link rel="stylesheet" type="text/css"  href="{% static 'css/base.css' %}?0.51">
-        <script src="{% static 'js/drag_drop.js' %}?0.51"></script> 
-        <script src="{% static 'js/base.js' %}?0.51"></script>
-        <script src="{% static 'js/chat.js' %}?0.51"></script>        
-        <script src="{% static 'js/modules/leads.js' %}?0.51"></script>
-        <script src="{% static 'js/modules/booking.js' %}?0.51"></script>
-        <script src="{% static 'js/modules/graphs.js' %}?0.51"></script>
-        <script src="{% static 'js/modules/free_tasters.js' %}?0.51"></script>
-        <script src="{% static 'js/modules/campaign_configuration.js' %}?0.51"></script>
-        <script src="{% static 'js/modules/company_configuration.js' %}?0.51"></script>
-        <script src="{% static 'js/modules/whatsapp_templates.js' %}?0.51"></script>
-        <script src="{% static 'js/modules/whatsapp_template_edit.js' %}?0.51"></script>
-        <audio id="notification1" src="{% static 'audio/notification1.wav' %}?0.51" preload="auto"></audio>
-        <audio id="notification2" src="{% static 'audio/notification2.mp3' %}?0.51" preload="auto"></audio>
-        
-        {%comment%}<link href="{% static 'css/drag_drop.css' %}?0.4" rel="stylesheet" />
-        <link rel="stylesheet" type="text/css"  href="{% static 'css/base.css' %}?0.4">
-        <script src="{% static 'js/drag_drop.js' %}?0.4"></script> 
-        <script src="{% static 'js/base.js' %}?0.4"></script>
-        <script src="{% static 'js/modules/leads.js' %}?0.4"></script>
-        <script src="{% static 'js/modules/booking.js' %}?0.4"></script>
-        <script src="{% static 'js/modules/graphs.js' %}?0.4"></script>
-        <script src="{% static 'js/modules/free_tasters.js' %}?0.4"></script>
-        <script src="{% static 'js/modules/campaign_configuration.js' %}?0.4"></script>
-        <script src="{% static 'js/modules/company_configuration.js' %}?0.4"></script>
-        <script src="{% static 'js/modules/whatsapp_templates.js' %}?0.4"></script>
-        <script src="{% static 'js/modules/whatsapp_template_edit.js' %}?0.4"></script>
-        <audio id="notification1" src="{% static 'audio/notification1.wav' %}?0.4" preload="auto"></audio>
-        <audio id="notification2" src="{% static 'audio/notification2.mp3' %}?0.4" preload="auto"></audio>{%endcomment%}
+        <link href="{% static 'css/phone.css' %}?0.61" rel="stylesheet" />
+        <link href="{% static 'css/drag_drop.css' %}?0.61" rel="stylesheet" />
+        <link rel="stylesheet" type="text/css"  href="{% static 'css/base.css' %}?0.61">
+        <script src="{% static 'js/drag_drop.js' %}?0.61"></script> 
+        <script src="{% static 'js/base.js' %}?0.61"></script>
+        <script src="{% static 'js/chat.js' %}?0.61"></script>        
+        <script src="{% static 'js/modules/leads.js' %}?0.61"></script>
+        <script src="{% static 'js/modules/booking.js' %}?0.61"></script>
+        <script src="{% static 'js/modules/graphs.js' %}?0.61"></script>
+        <script src="{% static 'js/modules/free_tasters.js' %}?0.61"></script>
+        <script src="{% static 'js/modules/campaign_configuration.js' %}?0.61"></script>
+        <script src="{% static 'js/modules/company_configuration.js' %}?0.61"></script>
+        <script src="{% static 'js/modules/whatsapp_templates.js' %}?0.61"></script>
+        <script src="{% static 'js/modules/whatsapp_template_edit.js' %}?0.61"></script>
+        <audio id="notification1" src="{% static 'audio/notification1.wav' %}?0.61" preload="auto"></audio>
+        <audio id="notification2" src="{% static 'audio/notification2.mp3' %}?0.61" preload="auto"></audio>
         
         {%block styles%}
         <style>
@@ -125,7 +111,7 @@
                 }
             };
             
-            setDoubleTap(".lead_card")
+            {% comment %} setDoubleTap(".lead_card") {% endcomment %}
 
             function handlehtmxafterSwap(evt){
                 var current_module = $('#current_page').val()
@@ -174,6 +160,7 @@
 
             
             function handlehtmxwsError(evt){
+                console.log("handlehtmxwsError", evt)
                 if(evt.detail.socket.url.includes("ws/message_count")){
                     $('.message_count_disconnected_indicator').addClass('htmx-request');
                 }else if(evt.detail.socket.url.includes("ws/messaging")){
@@ -186,7 +173,7 @@
             document.body.addEventListener('htmx:wsError', handlehtmxwsError);
 
             function handlehtmxbeforeRequest(evt){
-                var current_module = $('#current_page').val();
+                var current_module = $('#current_page').val(); 
                 if (current_module == 'campaign_leads_overview'){
                     leadshandlehtmxbeforeRequest(evt);
                 } else if (current_module == 'free_tasters'){

@@ -5,7 +5,7 @@
         <select class="form-select select2 select2-styling overview_table_filters site_dependant_analytics_filters" name="campaign_category_pk" id="campaign_category_pk" oninput="$('#change_campaign_category').click();">
             {%if not hide_show_all%}<option value="all">Show All Campaign Categories</option>{%endif%}
             {%for campaign_category in site.campaigncategory_set.all%}
-            <option {%if campaign_category.pk == request|get_key_in_get_or_post:'campaign_category_pk'|str_to_int %}selected{%endif%} value="{{campaign_category.pk}}">{{campaign_category.name}}</option>
+            <option {%if campaign_category.pk == request|get_key_in_get_or_post:'campaign_category_pk'|str_to_int %}selected{%endif%} value="{{campaign_category.pk}}">{{campaign_category.name}} ({{campaign_category.campaign_set.all.count}} Campaigns)</option>
             {%endfor%}
         </select>
     </div>

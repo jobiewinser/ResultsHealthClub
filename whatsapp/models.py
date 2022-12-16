@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
+import bleach
 from django.db.models import JSONField
 
 from messaging.models import Message, MessageImage
@@ -79,6 +80,7 @@ class WhatsAppMessage(Message):
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         unique = None
+        self.message = bleach.clean(self.message, settings.BLEACH_VALID_TAGS, settings.BLEACH_VALID_ATTRS, settings.BLEACH_VALID_STYLES)
         while not unique:
             qs = WhatsAppMessage.objects.filter(datetime=self.datetime)
             if self.pk:
@@ -116,7 +118,8 @@ WHATSAPP_ORDER_CHOICES = (
     (3, 'Send 48 Hrs after Lead Creation')
 )
 template_variables = {
-    '[[1]]': ["First Name", "Jobie"],    
+    '[[1]]': ["First Name", "Eleanor"],    
+    # '[[2]]': ["Campaign Alias", "Jobie"],    
 }
 class WhatsappTemplate(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -180,6 +183,17 @@ class WhatsappTemplate(models.Model):
         if self.site:
             return self.site.name
         return ''
+
+    def render_whatsapp_template_to_html(self):
+        rendered_html = f"""
+        <b>{self.components[0]}</b>
+        <br>
+        <br>
+        <p>{self.components[1]}</p>
+        <small>{self.components[2]}</small>
+        """
+        return rendered_html
+
     # def rendered_demo(self):
     #     return self.text.replace('{1}', 'Jobie')
 

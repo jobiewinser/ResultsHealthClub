@@ -29,7 +29,7 @@ urlpatterns = [
     path('', include('analytics.urls')),
     path('', include('calendly.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
-    path('twilio/', include('twilio.urls')),
+    # path('twilio/', include('twilio.urls')),
     url(r'^hijack/', include('hijack.urls', namespace='hijack')),
 ]
 from django.conf import settings
@@ -40,3 +40,4 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 if settings.DEBUG:
     urlpatterns += staticfiles_urlpatterns()
+    
