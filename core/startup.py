@@ -136,7 +136,7 @@ def run_demo_startup():
             whatsapp_template_1.last_approval = datetime.now()
             whatsapp_template_1.components = [
                     {
-                        "text": "Hi [1]",
+                        "text": "Hi [[1]]",
                         "type": "HEADER",
                         "format": "TEXT"
                     },
