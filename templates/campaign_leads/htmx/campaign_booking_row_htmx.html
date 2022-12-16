@@ -96,7 +96,13 @@
         {%with lead.active_bookings.0.datetime as latest_booking%}
         <span hidden>{%if latest_booking%}{{latest_booking|timestamp}}{%else%}9999999999{%endif%}</span>
         <span class="primary_td_layer">
-            {{latest_booking.date}} 
+            {%if latest_booking%}
+            {{latest_booking.date}}
+            {%elif demo%}
+            Date hidden in demo
+            {%else%}
+            Getting date from Calendly, please refresh later
+            {%endif%} 
             {% comment %} {%if lead.active_bookings.0.type == 'a'%}
                 <i class="fa-solid fa-person"
                 data-bs-toggle="popover" 

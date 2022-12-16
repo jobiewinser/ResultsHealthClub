@@ -49,6 +49,7 @@ class AttachedError(models.Model):
                         # ('1211', "Couldn't auto-send, there is no 9th Whatsapp Template linked to this Lead's Campaign"),
                         # ('1212', "Couldn't auto-send, there is no 10th Whatsapp Template linked to this Lead's Campaign"),
                         ('1220', "This site has template messaging currently disabled, reenable it on the site configuration page"),
+                        ('1230', "This lead's campaign has no whatsapp number linked to it. Couldn't send first message."),
                     )
     type = models.CharField(choices=ERROR_TYPES, default='c', max_length=5)
     attached_field = models.CharField(null=True, blank=True, max_length=50)

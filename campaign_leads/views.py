@@ -53,7 +53,7 @@ def get_campaign_qs(request):
     campaign_category_pk = request.GET.get('campaign_category_pk', 'all')
     if not campaign_category_pk == 'all':
         campaign_qs = campaign_qs.filter(campaign_category__pk=campaign_category_pk)
-    return campaign_qs.order_by('first_model_count')
+    return campaign_qs.filter(site__company=request.user.profile.company).order_by('first_model_count')
 
 
 

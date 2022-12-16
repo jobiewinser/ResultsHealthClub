@@ -47,7 +47,9 @@ class Webhooks(View):
                 try:
                     event_url = body.get('payload').get('event')
                     event_uuid = event_url.split('/')[-1]
-                    booking = Booking.objects.get(calendly_event_uri__icontains=event_uuid)
+                    booking = Booking.objects.filter(calendly_event_uri__icontains=event_uuid).last()
+                    if not booking:
+                        return HttpResponse(status=200)
                     calendly = Calendly(booking.lead.campaign.site.calendly_token)
                     updated_booking_details = calendly.get_from_uri(event_url)
                     print("CALENDLY Webhooks updated_booking_details", str(updated_booking_details))
@@ -69,7 +71,9 @@ class Webhooks(View):
             elif body.get('event') == "invitee.canceled":
                 try:
                     event_url = body.get('payload').get('event')
-                    booking = Booking.objects.get(calendly_event_uri=event_url)                    
+                    booking = Booking.objects.filter(calendly_event_uri=event_url).last()
+                    if not booking:
+                        return HttpResponse(status=200)                 
                     booking.archived = True
                     booking.save()     
                     # TODO Notification here                           
@@ -95,6 +99,7 @@ def calendly_booking_success(request):
     channel_layer = get_channel_layer()          
     lead = booking.lead
     company_pk = lead.campaign.site.company.pk   
+
     rendered_html = f"<span hx-swap-oob='delete' id='lead-{lead.pk}'></span> <span hx-swap-oob='outerHTML:.booking-lead-{lead.pk}'><span hx-get='/refresh-booking-row/{lead.pk}/' hx-swap='innerHTML' hx-target='#row_{lead.pk}' hx-indicator='#top-htmx-indicator' hx-trigger='load'></span></span>"
     async_to_sync(channel_layer.group_send)(
         f"lead_{company_pk}",

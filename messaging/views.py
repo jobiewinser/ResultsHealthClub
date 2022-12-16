@@ -4,7 +4,7 @@ from django.views.generic import TemplateView
 from django.shortcuts import render
 
 from campaign_leads.models import Campaignlead
-from core.models import Site, WhatsappNumber, Contact
+from core.models import Site, WhatsappNumber, Contact, AttachedError
 from core.user_permission_functions import get_allowed_site_chats_for_user, get_user_allowed_to_use_site_messaging
 from core.views import get_site_pk_from_request
 from whatsapp.models import WhatsAppMessage, WhatsappMessageImage
@@ -93,7 +93,26 @@ def send_first_template_whatsapp_booking_row_htmx(request, **kwargs):
 def send_first_template_whatsapp(request, kwargs):
     lead = Campaignlead.objects.get(pk=kwargs.get('lead_pk'))
     if not lead.message_set.all():
-        lead.send_template_whatsapp_message(whatsappnumber=lead.campaign.whatsapp_business_account.whatsappnumber, send_order=1)
+        if not lead.campaign.whatsapp_business_account:
+            AttachedError.objects.get_or_create(
+                    type = '1230',
+                    attached_field = "campaign_lead",
+                    campaign_lead = lead,
+                )
+        elif not lead.campaign.whatsapp_business_account.whatsappnumber:
+            AttachedError.objects.get_or_create(
+                    type = '1230',
+                    attached_field = "campaign_lead",
+                    campaign_lead = lead,
+                )
+        else:
+            AttachedError.objects.filter(
+                    type = '1230', 
+                    attached_field = "campaign_lead",
+                    campaign_lead = lead,
+                    archived = False,
+                ).update(archived = True) 
+            lead.send_template_whatsapp_message(whatsappnumber=lead.campaign.whatsapp_business_account.whatsappnumber, send_order=1)
     messages = WhatsAppMessage.objects.filter(customer_number=kwargs.get('customer_number'), whatsappnumber__number=kwargs.get('messaging_phone_number')).order_by('-datetime')
     context = {}
     context["messages"] = messages
@@ -101,6 +120,7 @@ def send_first_template_whatsapp(request, kwargs):
     context["customer_number"] = lead.whatsapp_number
     context["site_pk"] = lead.campaign.site
     context['max_call_count'] = request.POST.get('max_call_count')
+    lead.trigger_refresh_websocket(refresh_position=False)
     return context
 @login_required
 def get_modal_content(request, **kwargs):
