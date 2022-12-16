@@ -112,3 +112,28 @@ def calendly_booking_success(request):
         }
     )
     return HttpResponse("", status=200)
+@login_required
+def get_latest_calendly_booking_info(request):
+    try:
+        booking = Booking.objects.get(pk = request.GET['booking_pk'])
+        calendly = Calendly(booking.lead.campaign.site.calendly_token)
+        updated_booking_details = calendly.get_from_uri(booking.calendly_event_uri)
+        print("CALENDLY Webhooks updated_booking_details", str(updated_booking_details))
+        start_time = datetime.strptime(updated_booking_details['resource']['start_time'][0:19], '%Y-%m-%dT%H:%M:%S')
+        
+        timezone = pytz.timezone('Europe/London')
+        start_time = timezone.localize(start_time)
+
+        booking.datetime = start_time
+        booking.save() 
+        context = {
+            'booking':booking
+        }
+        if booking.datetime:
+            return render(request, 'campaign_leads/htmx/calendly_booking_datetime_snippet.html', context)
+        else:
+            return HttpResponse("Couldn't find Calendly booking, try again later" ,status=200)
+    except:
+        return HttpResponse("Couldn't find Calendly booking, your calendly might be configured incorrectly" ,status=500)
+
+    

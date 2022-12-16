@@ -1,0 +1,17 @@
+{%load static core_tags tz%}
+<span id="booking_datetime_{{booking.pk}}">
+    <span class="primary_td_layer">
+        {%if booking.datetime%}
+        {{booking.datetime}}
+        {%elif demo%}
+        Date hidden in demo
+        {%else%}
+        Getting date from Calendly...
+        <img class="htmx-indicator invert" id="booking_datetime_indicator_{{booking.pk}}" src="https://htmx.org/img/bars.svg"/>
+        {%endif%} 
+    </span>
+    <br>
+    <span class="secondary_td_layer">
+        {{booking.time}}
+    </span>    
+</span>

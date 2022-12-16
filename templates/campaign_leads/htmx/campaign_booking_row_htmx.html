@@ -93,34 +93,18 @@
         <span class="primary_td_layer">£{{lead.get_product_cost|floatformat:2}}</span>
     </td>
     <td>                 
-        {%with lead.active_bookings.0.datetime as latest_booking%}
-        <span hidden>{%if latest_booking%}{{latest_booking|timestamp}}{%else%}9999999999{%endif%}</span>
-        <span class="primary_td_layer">
-            {%if latest_booking%}
-            {{latest_booking.date}}
-            {%elif demo%}
-            Date hidden in demo
-            {%else%}
-            Getting date from Calendly, please refresh later
-            {%endif%} 
-            {% comment %} {%if lead.active_bookings.0.type == 'a'%}
-                <i class="fa-solid fa-person"
-                data-bs-toggle="popover" 
-                data-bs-trigger="hover focus" 
-                data-bs-placement="top"
-                data-bs-content="This appointment is in person"></i>
-            {%elif lead.active_bookings.0.type == 'b'%}
-                <i class="fa-solid fa-phone"
-                data-bs-toggle="popover" 
-                data-bs-trigger="hover focus" 
-                data-bs-placement="top"
-                data-bs-content="This appointment is over the phone"></i>
-            {%endif%} {% endcomment %}
-        </span>
-        <br>
-        <span class="secondary_td_layer">
-            {{latest_booking.time}}
-        </span>       
+        {%with lead.active_bookings.0 as booking%}
+        <span hidden>{%if booking%}{{booking|timestamp}}{%else%}9999999999{%endif%}</span>
+        {%if not booking.datetime and not demo%}
+            <button hidden
+                hx-trigger="load"
+                hx-get="{%url 'get-latest-calendly-booking-info'%}"
+                hx-target="#booking_datetime_{{booking.pk}}" 
+                hx-swap="innerHTML" 
+                hx-vals='{"booking_pk":"{{booking.pk}}"}' 
+                hx-indicator="#booking_datetime_indicator_{{booking.pk}}"></button>
+        {%endif%}
+        {%include 'campaign_leads/htmx/calendly_booking_datetime_snippet.html'%}   
         {%endwith%}  
     </td>
     
