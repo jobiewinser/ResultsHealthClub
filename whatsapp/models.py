@@ -187,7 +187,7 @@ class WhatsappTemplate(models.Model):
     def render_whatsapp_template_to_html(self, lead=None, contact=None, first_name=None):
         rendered_html = ""
         try:
-            text = self.components[0]['text']
+            text = f"<b>{self.components[0]['text']}</b>"
             if '[[1]]' in text:
                 if lead:                
                     text = text.replace('[[1]]',lead.first_name)
