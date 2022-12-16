@@ -94,7 +94,7 @@
     </td>
     <td>                 
         {%with lead.active_bookings.0 as booking%}
-        <span hidden>{%if booking%}{{booking|timestamp}}{%else%}9999999999{%endif%}</span>
+        <span hidden>{%if booking.datetime%}{{booking.datetime|timestamp}}{%else%}9999999999{%endif%}</span>
         {%if not booking.datetime and not demo%}
             <button hidden
                 hx-trigger="load"

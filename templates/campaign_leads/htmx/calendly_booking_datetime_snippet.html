@@ -2,7 +2,7 @@
 <span id="booking_datetime_{{booking.pk}}">
     <span class="primary_td_layer">
         {%if booking.datetime%}
-        {{booking.datetime}}
+        {{booking.datetime.date}}
         {%elif demo%}
         Date hidden in demo
         {%else%}
@@ -12,6 +12,6 @@
     </span>
     <br>
     <span class="secondary_td_layer">
-        {{booking.time}}
+        {{booking.datetime.time}}
     </span>    
 </span>
