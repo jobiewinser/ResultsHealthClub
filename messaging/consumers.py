@@ -191,7 +191,7 @@ def get_rendered_html_failed(messaging_customer_number, whatsappnumber):
 @sync_to_async
 def add_user_to_users_online(consumer):  
     chat_object, created = SiteUsersOnline.objects.get_or_create(feature="leads", site=consumer.user.profile.site)
-    chat_object.users_online = chat_object.users_online.replace(f";{consumer.user.pk};", ';')+(str(consumer.user.pk)+";")
+    chat_object.users_online = chat_object.users_online.replace(f"{consumer.user.pk};", '')+(str(consumer.user.pk)+";")
     chat_object.save()
     return f"""<div hx-swap-oob="true" id="users_online_leads">{loader.render_to_string('campaign_leads/htmx/connected_users.html', {'chat_object':chat_object})}</div> """
 @sync_to_async
