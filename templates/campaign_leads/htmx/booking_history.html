@@ -64,7 +64,7 @@
                 </thead>
                 <tbody class="noteBody">
                     {%for booking in lead.ordered_bookings%}
-                    {%if booking.datetime%}
+                    
                     <tr>
                         <td colspan="2"
                         data-bs-html="true" 
@@ -72,7 +72,7 @@
                         data-bs-trigger="hover focus" 
                         data-bs-placement="right"
                         data-bs-content="
-                        <b>Created:</b> {{booking.created}}
+                        <b>Created at:</b> {{booking.created}}
                         {%if booking.note_set.all%}
                         <br>
                         <br>
@@ -86,7 +86,13 @@
                         " class="double_layer_td">                         
                             <div class="row">   
                                 <div class="col p-0">                            
-                                    <span class="primary_td_layer">{%if booking.archived%}<b>Archived</b> {%endif%}{{booking.datetime}}</span>
+                                    <span class="primary_td_layer">{%if booking.archived%}<b>Archived</b> {%endif%}
+                                        {%if booking.datetime%}
+                                        {{booking.datetime}}
+                                        {%else%}     
+                                        Getting date from Calendly, please refresh later      
+                                        {%endif%}           
+                                    </span>
                                     <br>
                                     <span class="secondary_td_layer">Booked by: {{booking.user.first_name}} {{booking.user.last_name}}</span>  
                                 </div>
@@ -98,7 +104,6 @@
                             </div>  
                         </td>
                     </tr>
-                    {%endif%}
                     {%endfor%}
                 </tbody>
               </table>
