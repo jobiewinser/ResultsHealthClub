@@ -30,6 +30,37 @@ def run_debug_startup():
                         'active_campaign_api_key': os.getenv("DEFAULT_ACTIVE_CAMPAIGN_API_KEY"),
                     }
                 )
+                for whatsapp_business_account in WhatsappBusinessAccount.objects.all():
+                    try:
+                        whatsapp_template_1, created = WhatsappTemplate.objects.get_or_create(
+                            whatsapp_business_account = whatsapp_business_account,    
+                            company = company,
+                        )
+                        whatsapp_template_1.name = "demo_whatsapp_template"
+                        whatsapp_template_1.edited = datetime.now()
+                        whatsapp_template_1.status = "APPROVED"
+                        whatsapp_template_1.message_template_id = "1"
+                        whatsapp_template_1.category = "ACCOUNT_UPDATE"
+                        whatsapp_template_1.language = "en_US"
+                        whatsapp_template_1.last_approval = datetime.now()
+                        whatsapp_template_1.components = [
+                                {
+                                    "text": "Hi [[1]]",
+                                    "type": "HEADER",
+                                    "format": "TEXT"
+                                },
+                                {
+                                    "text": "This is a demonstration of the whatsapp system! With the Pro subscription, you can add your own whatsapp accounts and automate sending templates here!",
+                                    "type": "BODY"
+                                },
+                                {
+                                    "text": "Thanks from Winser Systems!",
+                                    "type": "FOOTER"
+                                }
+                            ]
+                        whatsapp_template_1.save()
+                    except Exception as e:
+                        pass
 
                 site, created = Site.objects.get_or_create(
                     name="Test Site",
@@ -174,8 +205,7 @@ def run_demo_startup():
                 company=company,
                 whatsapp_business_account=whatsapp_business_account1,
             )
-            for animal in animals:
-                
+            for animal in animals:                
                 user, created = User.objects.get_or_create(
                     username=f"{animal[2]}{animal[0]}",
                 )

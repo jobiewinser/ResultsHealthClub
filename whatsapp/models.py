@@ -184,18 +184,43 @@ class WhatsappTemplate(models.Model):
             return self.site.name
         return ''
 
-    def render_whatsapp_template_to_html(self):
-        rendered_html = f"""
-        <b>{self.components[0]}</b>
-        <br>
-        <br>
-        <p>{self.components[1]}</p>
-        <small>{self.components[2]}</small>
-        """
+    def render_whatsapp_template_to_html(self, lead=None, contact=None, first_name=None):
+        rendered_html = ""
+        try:
+            text = self.components[0]['text']
+            if '[[1]]' in text:
+                if lead:                
+                    text = text.replace('[[1]]',lead.first_name)
+                elif contact:
+                    text = text.replace('[[1]]',contact.first_name)
+                elif first_name:
+                    text = text.replace('[[1]]',first_name)
+            rendered_html = rendered_html + text
+        except:
+            pass
+        try:
+            text = f"<br> <br> <p>{self.components[1]['text']}</p>"
+            if '[[1]]' in text:
+                if lead:                
+                    text = text.replace('[[1]]',lead.first_name)
+                elif contact:
+                    text = text.replace('[[1]]',contact.first_name)
+                elif first_name:
+                    text = text.replace('[[1]]',first_name)
+            rendered_html = rendered_html + text
+        except:
+            pass
+        try:
+            text = f"<small>{self.components[2]['text']}</small>"
+            if '[[1]]' in text:
+                if lead:                
+                    text = text.replace('[[1]]',lead.first_name)
+                elif contact:
+                    text = text.replace('[[1]]',contact.first_name)
+                elif first_name:
+                    text = text.replace('[[1]]',first_name)
+            rendered_html = rendered_html + text
+        except:
+            pass        
+        
         return rendered_html
-
-    # def rendered_demo(self):
-    #     return self.text.replace('{1}', 'Jobie')
-
-    # def rendered(self, lead):
-    #     return self.text.replace('{1}', str(lead.first_name))

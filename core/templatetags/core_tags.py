@@ -290,3 +290,18 @@ def rgb_to_hex_tuple_tag(rgb_string):
 @register.filter
 def queryset_last_x(qs, x):
     return qs.order_by('-pk')[:x]
+
+@register.filter
+def render_whatsapp_template_with_lead_to_html_tag(whatsapp_template, lead):
+    return whatsapp_template.render_whatsapp_template_to_html(lead=lead)
+
+
+@register.filter
+def render_whatsapp_template_with_contact_to_html_tag(whatsapp_template, contact):
+    return whatsapp_template.render_whatsapp_template_to_html(contact=contact)
+
+
+@register.filter
+def render_whatsapp_template_to_html_tag(whatsapp_template):
+    return whatsapp_template.render_whatsapp_template_to_html()
+
