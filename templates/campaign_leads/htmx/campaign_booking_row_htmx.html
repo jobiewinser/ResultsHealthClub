@@ -95,7 +95,7 @@
     <td>                 
         {%with lead.active_bookings.0 as booking%}
         <span hidden>{%if booking.datetime%}{{booking.datetime|timestamp}}{%else%}9999999999{%endif%}</span>
-        {%if not booking.datetime and not demo%}
+        {%if booking and not booking.datetime and not demo%}
             <button hidden
                 hx-trigger="load"
                 hx-get="{%url 'get-latest-calendly-booking-info'%}"

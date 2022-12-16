@@ -86,7 +86,7 @@
                         " class="double_layer_td">                         
                             <div class="row">   
                                 <div class="col p-0">     
-                                    {%if not booking.datetime and not demo%}
+                                    {%if booking and not booking.datetime and not demo%}
                                         <button hidden
                                             hx-trigger="load"
                                             hx-get="{%url 'get-latest-calendly-booking-info'%}"
