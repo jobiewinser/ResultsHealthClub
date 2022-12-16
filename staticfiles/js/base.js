@@ -72,7 +72,6 @@ function basehandlehtmxafterSwap(evt){
 
 function setDoubleTap(identifier){
     var tapedTwice = false;
-    console.log(identifier)
     $(identifier).on("touchstart",function(e){
         if(!tapedTwice) {
             tapedTwice = true;
