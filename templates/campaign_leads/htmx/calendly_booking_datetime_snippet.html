@@ -5,7 +5,7 @@
         {{booking.datetime.date}}
         {%elif demo%}
         Date hidden in demo
-        {%else%}
+        {%elif booking%}
         Getting date from Calendly...
         <img class="htmx-indicator invert" id="booking_datetime_indicator_{{booking.pk}}" src="https://htmx.org/img/bars.svg"/>
         {%endif%} 
