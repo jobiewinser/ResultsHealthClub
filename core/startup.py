@@ -179,11 +179,10 @@ def run_demo_startup():
                 user, created = User.objects.get_or_create(
                     username=f"{animal[2]}{animal[0]}",
                 )
-                if created:
-                    user.first_name=animal[2].capitalize()
-                    user.last_name=animal[0].capitalize()
-                    user.set_password(os.getenv("DEFAULT_USER_PASSWORD"))
-                    user.save()
+                user.first_name=animal[2].capitalize()
+                user.last_name=f"{animal[0].capitalize()} (Demo User)"
+                user.set_password(os.getenv("DEFAULT_USER_PASSWORD"))
+                user.save()
                 group.user_set.add(user)
                 profile, created = Profile.objects.get_or_create(
                     user=user
