@@ -190,7 +190,9 @@ def run_demo_startup():
                 )
                 # if created:
                 profile.avatar = f"demo-profiles/{animal[0]}-solid.svg"
+                profile.calendly_event_page_url = "https://calendly.com/winsersystems"
                 profile.demo_account_theme_colour = animal[1]
                 profile.company = company
                 profile.site = site1
                 profile.save()
+                profile.sites_allowed.set([site1])
