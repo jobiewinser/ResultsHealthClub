@@ -2,7 +2,19 @@
 <td>    
     <div class="row">
         <div class="col p-0">
-            <img src="{%if profile.avatar%}/media/{{profile.avatar}}{%else%}{% static 'img/blank-profile-picture.png' %}{%endif%}" alt="" width="45" height="45" class="rounded-circle m-1"> 
+            {%if profile.demo_account_theme_colour%}
+            <div class="rounded-circle m-1" style="width:25px; height:25px;background-color:rgba({{profile.demo_account_theme_colour}}, 0.5)">
+                <img src="/media/{{profile.avatar}}" 
+                alt="" 
+                style="padding:4px; filter: invert(100%);" 
+                class="">
+            </div>
+            {%else%}
+            <div class="m-1">
+                <img src="{%if profile.avatar%}/media/{{profile.avatar}}{%else%}{% static 'img/blank-profile-picture.png' %}{%endif%}" alt="" 
+                    style="width:25px; height:25px;" class="rounded-circle">
+            </div>
+            {%endif%}
             {{profile.name}}
         </div>
         <div class="col-md-auto pe-0">
