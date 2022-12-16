@@ -97,7 +97,7 @@
                 <p><b>Max 60 characters including any variables</b>. For example a header that is 55 characters long would fail to send to a customer with a name longer than 5 characters (if you include their name in the header).</p>
             </small>
             <div class="row">
-                <div class="col-md-3" style="min-width:170px">
+                <div class="col-auto" style="width:200px">
                     <select {%if readonly%}disabled{%endif%} {%if readonly%}disabled{%endif%} id="variable_choice"  onclick="$('#template_header').val($('#template_header').val()+$(this).val()).trigger('input'); $(this).val('');"
                     name="variable_choice" class="form-select form-select-sm align-self-center m-1">
                         {%for k,v in variables.items%}
@@ -106,8 +106,8 @@
                         <option selected value="">Insert variable</option>     
                     </select>
                 </div>
-                <div class="col">
-                    <input {%if readonly%}disabled{%endif%} type="text" style="width:300px;" maxlength="60"
+                <div class="col-auto" style="width:400px">
+                    <input {%if readonly%}disabled{%endif%} type="text" style="width:100%" maxlength="60"
                     
                     id="template_header" 
                     name="template_header" 
@@ -122,7 +122,7 @@
                 <p><b>Max 1024 characters including any variables</b>. Messages longer than 1024 characters will fail to send.</p>
             </small>
             <div class="row">
-                <div class="col-md-3" style="min-width:170px">
+                <div class="col-auto" style="width:200px">
                     <select {%if readonly%}disabled{%endif%} id="variable_choice"  onclick="$('#template_body').val($('#template_body').val()+$(this).val()).trigger('input'); $(this).val('');" name="variable_choice" class="form-select form-select-sm align-self-center m-1">
                         {%for k,v in variables.items%}
                         <option value="{{k}}">{{v.0}}</option>
@@ -130,8 +130,8 @@
                         <option selected value="">Insert variable</option>     
                     </select>
                 </div>
-                <div class="col">
-                    <textarea {%if readonly%}disabled{%endif%} style="width:300px; height:340px;"  maxlength="1024"
+                <div class="col-auto" style="width:400px">
+                    <textarea {%if readonly%}disabled{%endif%} style="width:100%; height:340px;"  maxlength="1024"
                         id="template_body" 
                         name="template_body" 
                         class="template_editor_input form-control" 
@@ -145,10 +145,10 @@
                 <p><b>Max 60 characters including any variables</b>. For example a footer that is 55 characters long would fail to send to a customer with a name longer than 5 characters (if you include their name in the footer).</p>
             </small>
             <div class="row">
-                <div class="col-md-3">
+                <div class="col-auto" style="width:200px">
                 </div>
-                <div class="col">
-                    <input {%if readonly%}disabled{%endif%} type="text" style="width:300px;"  maxlength="60"
+                <div class="col-auto" style="width:400px">
+                    <input {%if readonly%}disabled{%endif%} type="text" style="width:100%"  maxlength="60"
                     id="template_footer" 
                     name="template_footer" 
                     class="template_editor_input form-control" 
