@@ -97,6 +97,8 @@
                 <p><b>Max 60 characters including any variables</b>. For example a header that is 55 characters long would fail to send to a customer with a name longer than 5 characters (if you include their name in the header).</p>
             </small>
             <div class="row">
+                <div class="col">
+                </div>
                 <div class="col-auto" style="width:200px">
                     <select {%if readonly%}disabled{%endif%} {%if readonly%}disabled{%endif%} id="variable_choice"  onclick="$('#template_header').val($('#template_header').val()+$(this).val()).trigger('input'); $(this).val('');"
                     name="variable_choice" class="form-select form-select-sm align-self-center m-1">
@@ -114,6 +116,8 @@
                     class="template_editor_input form-control" 
                     oninput="renderTemplate();" value="{%if template.pending_components%}{%for component in template.pending_components%}{%if component.type == 'HEADER'%}{{component.text}}{%endif%}{%endfor%}{%else%}{%for component in template.components%}{%if component.type == 'HEADER'%}{{component.text}}{%endif%}{%endfor%}{%endif%}">
                 </div>
+                <div class="col">
+                </div>
             </div>
             <hr>
 
@@ -122,6 +126,8 @@
                 <p><b>Max 1024 characters including any variables</b>. Messages longer than 1024 characters will fail to send.</p>
             </small>
             <div class="row">
+                <div class="col">
+                </div>
                 <div class="col-auto" style="width:200px">
                     <select {%if readonly%}disabled{%endif%} id="variable_choice"  onclick="$('#template_body').val($('#template_body').val()+$(this).val()).trigger('input'); $(this).val('');" name="variable_choice" class="form-select form-select-sm align-self-center m-1">
                         {%for k,v in variables.items%}
@@ -137,6 +143,8 @@
                         class="template_editor_input form-control" 
                         oninput="renderTemplate();">{%if template.pending_components%}{%for component in template.pending_components%}{%if component.type == 'BODY'%}{{component.text}}{%endif%}{%endfor%}{%else%}{%for component in template.components%}{%if component.type == 'BODY'%}{{component.text}}{%endif%}{%endfor%}{%endif%}</textarea>
                 </div>
+                <div class="col">
+                </div>
             </div>
             <hr>
 
@@ -145,6 +153,8 @@
                 <p><b>Max 60 characters including any variables</b>. For example a footer that is 55 characters long would fail to send to a customer with a name longer than 5 characters (if you include their name in the footer).</p>
             </small>
             <div class="row">
+                <div class="col">
+                </div>
                 <div class="col-auto" style="width:200px">
                 </div>
                 <div class="col-auto" style="width:400px">
@@ -154,6 +164,8 @@
                     class="template_editor_input form-control" 
                     oninput="renderTemplate();" 
                     value="{%if template.pending_components%}{%for component in template.pending_components%}{%if component.type == 'FOOTER'%}{{component.text}}{%endif%}{%endfor%}{%else%}{%for component in template.components%}{%if component.type == 'FOOTER'%}{{component.text}}{%endif%}{%endfor%}{%endif%}">
+                </div>
+                <div class="col">
                 </div>
             </div>
         </div>  
