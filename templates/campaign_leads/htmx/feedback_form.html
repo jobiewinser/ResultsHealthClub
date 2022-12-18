@@ -7,8 +7,7 @@
             <div class="row">
                 <div class="col center">
                     <div class="form-floating m-1">
-                        <textarea style="width:100%; height:340px;
-                        margin-top: 60px;"
+                        <textarea style="width:100%; height:340px;"
                             name="comment" 
                             class="form-control"></textarea>
                     
@@ -19,7 +18,7 @@
             </div>
             <div class="row m-1">
                 <div class="col center" >
-                    <button class="btn btn-primary" type="submit" {%if demo and not request.user.is_superuser%}disabled{%endif%}>
+                    <button class="btn btn-primary" type="submit">
                         Submit
                     </button>
                 </div>
