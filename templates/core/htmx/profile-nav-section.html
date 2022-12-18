@@ -1,9 +1,9 @@
 {%load static%}
-<ul class="navbar-nav mb-lg-0" >
+<ul class="navbar-nav mb-lg-0 ms-1"  style="height:54px">
     {%if request.user.is_authenticated%} 
-    <li class="nav-item dropstart p-2">
+    <li class="nav-item dropstart p-1">
         <a class="nav-link text-white p-0 pointer" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <div class="row m-0">
+            <div class="row m-0" style="overflow:hidden">
                 {%if user.profile.demo_account_theme_colour%}
                 <div class="col-auto p-0 rounded-circle m-1" style="width:32px; height:32px;background-color:rgba({{user.profile.demo_account_theme_colour}}, 0.7)">
                     <img src="/media/{{user.profile.avatar}}" 
@@ -17,10 +17,10 @@
                         style="width:32px; height:32px;" class="rounded-circle">
                 </div>
                 {%endif%}
-                <div class="col p-0 m-1 nowrap">
-                    <strong style="font-size:1.5vh">{{user.profile}}</strong>
-                    <input hidden id="user_id" value="{{user.pk}}"/>
+                <div class="col-sm p-0 ms-1 nowrap elipses-overflow" style="">
+                    <strong style="font-size:14px;">{{user.profile}}</strong>
                 </div>
+                <input hidden id="user_id" value="{{user.pk}}"/>
             </div>
         </a>
         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">

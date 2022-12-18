@@ -46,7 +46,7 @@ def get_modal_content(request, **kwargs):
                     profile = Profile.objects.get(pk=profile_pk)
                     context["profile"] = profile
                     CompanyProfilePermissions.objects.get_or_create(profile=profile, company=profile.company)
-                    for site in profile.company.site_set.all():
+                    for site in profile.company.active_sites:
                         SiteProfilePermissions.objects.get_or_create(profile=profile, site=site)
             elif template_name == 'add_phone_number':
                 site_pk = request.GET.get('site_pk', None)

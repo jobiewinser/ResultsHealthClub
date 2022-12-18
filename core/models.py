@@ -414,6 +414,7 @@ class WhatsappNumber(PhoneNumber):
 
 class Site(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    active = models.BooleanField(default=True)
     name = models.TextField(blank=True, null=True)
     company = models.ForeignKey("core.Company", on_delete=models.SET_NULL, null=True, blank=True)
     # whatsapp_number = models.CharField(max_length=50, null=True, blank=True)
@@ -538,7 +539,7 @@ class Company(models.Model):
     def outstanding_whatsapp_messages(self, user):
         # Readdress this, I can't find a good way to get latest message for each conversation, then filter based on the last message being inbound...
         count = 0
-        for site in self.site_set.all():
+        for site in self.active_sites:
             if site in user.profile.sites_allowed.all():
                 for whatsappnumber in site.return_phone_numbers():
                     for message in  WhatsAppMessage.objects.filter(whatsappnumber=whatsappnumber).order_by('customer_number', '-datetime').distinct('customer_number'):
@@ -579,6 +580,9 @@ class Company(models.Model):
             #     campaign.json_data = campaign_dict
             #     campaign.save()
         return Campaign.objects.all()
+    @property
+    def active_sites(self):
+        return self.site_set.filter(active=True)
  
 # Extending User Model Using a One-To-One Link
 ROLE_CHOICES = (
@@ -639,7 +643,7 @@ class Profile(models.Model):
         if not self.site in self.sites_allowed.all() and self.site:
             self.sites_allowed.add(self.site)   
         if self.company:
-            for site in self.company.site_set.all():
+            for site in self.company.active_sites:
                 try:
                     permissions, created = SiteProfilePermissions.objects.get_or_create(profile=self, site=site)
                 except:

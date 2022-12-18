@@ -1,17 +1,17 @@
 {%load static core_tags%}
 <nav class="navbar navbar-expand-lg bg-{%if debug%}primary{%else%}dark{%endif%} navbar-dark" id="topnav">
-        <a class="navbar-brand ps-2 top-nav-link" href="#" data-active-selector="#leads-top-nav-link" hx-indicator="#page_load_indicator" 
+        {% comment %} <a class="navbar-brand ps-2 top-nav-link" href="#" data-active-selector="#leads-top-nav-link" hx-indicator="#page_load_indicator" 
         hx-get="{%url 'customer-home'%}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML">
             <img src="{% static 'img/logo-dark-back-img.png' %}" alt="winser systems logo" width="32" height="32">
-        </a>
-        <a class="navbar-brand p-0 pointer top-nav-link" hx-indicator="#page_load_indicator" data-active-selector="#leads-top-nav-link"
+        </a> {% endcomment %}
+        <a class="navbar-brand p-0 pointer top-nav-link ps-2" hx-indicator="#page_load_indicator" data-active-selector="#leads-top-nav-link"
             hx-get="{%url 'customer-home'%}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML">
             <img class="" src="{% static 'img/logo-dark-back-text.png' %}" height="32" alt="winser systems logo">
         </a>
         <button class="navbar-toggler btn-sm me-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse bg-{%if debug%}primary{%else%}dark{%endif%} ps-2 pe-2" id="navbarSupportedContent">
+        <div class="collapse navbar-collapse ps-2 pe-2" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-lg-0">
                 {%if request.user.is_authenticated%}
                 <li class="nav-item">
@@ -31,9 +31,9 @@
                         hx-get="{%url 'messaging'%}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML"><i class="fa-light fa-chart-line-up"></i> Messaging</a>
                 </li> {% endcomment %}
 
-                <li class="nav-item dropdown bg-{%if debug%}primary{%else%}dark{%endif%}">
+                <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle {%if 'configuration/' in request.path%}active{%endif%}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" id="configuration-top-nav-dropdown-toggle">
-                    <i class="fa-light fa-gear"></i> Configuration
+                        <i class="fa-light fa-gear"></i> Configuration
                     </a>
                     <ul class="dropdown-menu">
                     <li><a class="dropdown-item pointer top-nav-link" hx-indicator="#page_load_indicator" data-active-selector="#configuration-top-nav-dropdown-toggle" 
@@ -48,40 +48,39 @@
                         hx-get="{%url 'whatsapp-templates'%}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML">Whatsapp Templates</a></li>
                     </ul>
                 </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle {%if 'change-log' in request.path or 'feedback-forms' in request.path%}active{%endif%}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" id="extra-top-nav-dropdown-toggle">
+                        <i class="fa-solid fa-star"></i> Extra
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item pointer" 
+                                hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
+                                hx-vals='{"template_name": "feedback_form"}'
+                                hx-get="{% url 'campaign-lead-get-modal-content'%}" 
+                                hx-push-url="false"
+                                hx-swap="innerHTML" hx-trigger="click">
+                                Feedback
+                            </a>
+                        </li> 
+                        <li>
+                            <a class="dropdown-item pointer top-nav-link" hx-indicator="#page_load_indicator" data-active-selector="#extra-top-nav-dropdown-toggle"
+                            hx-get="{%url 'change-log'%}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML"><b>v0.7</b> Change Log</a>
+                        </li> 
+                        {%if user.is_superuser%}       
+                            <li>
+                                <a class="dropdown-item pointer top-nav-link" hx-indicator="#page_load_indicator" data-active-selector="#extra-top-nav-dropdown-toggle"
+                                    hx-get="{%url 'feedback-forms'%}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML">Feedback Forms</a>
+                            </li>   
+                        {%endif%} 
+                    </ul>
+                </li>
                 {%endif%}
                 <li class="nav-item">
                     <img  class="top-htmx-indicator htmx-indicator invert" id="top-htmx-indicator" src="https://htmx.org/img/bars.svg"/>
                 </li>            
-            </ul>
-            <ul class="navbar-nav ms-auto mb-lg-0" >      
-                {%if user.is_superuser%}      
-                <li class="nav-item">
-                    <small>
-                        <a class="nav-link top-nav-link pointer nowrap {%if 'feedback-forms' in request.path%}active{%endif%}" hx-indicator="#page_load_indicator" data-active-selector="#feedback-forms-top-nav-link" id="feedback-forms-top-nav-link"
-                        hx-get="{%url 'feedback-forms'%}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML">Feedback Forms</a>
-                    </small>
-                </li>           
-                {%else%}  
-                <li class="nav-item">
-                    <small>
-                        <a class="nav-link top-nav-link pointer nowrap" 
-                            hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
-                            hx-vals='{"template_name": "feedback_form"}'
-                            hx-get="{% url 'campaign-lead-get-modal-content'%}" 
-                            hx-push-url="false"
-                            hx-swap="innerHTML" hx-trigger="click">
-                            Feedback
-                        </a>
-                    </small>
-                </li>      
-                {%endif%} 
-                <li class="nav-item">
-                    <small>
-                        <a class="nav-link top-nav-link pointer nowrap {%if 'change-log' in request.path%}active{%endif%}" hx-indicator="#page_load_indicator" data-active-selector="#change-log-top-nav-link" id="change-log-top-nav-link"
-                            hx-get="{%url 'change-log'%}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML"><b>v0.6</b> Change Log</a>
-                    </small>
-                </li> 
-            </ul>
+            </ul>    
+            {%include 'core/htmx/company-nav-section.html'%}
             {%include 'core/htmx/profile-nav-section.html'%}
         </div>
     

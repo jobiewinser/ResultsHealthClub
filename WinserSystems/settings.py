@@ -121,6 +121,7 @@ INSTALLED_APPS = [
     'campaign_leads',
     'active_campaign',
     'whatsapp',
+    'stripe_integration',
     'messaging',
     # 'twilio',
     'calendly',

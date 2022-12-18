@@ -62,6 +62,9 @@ def get_modal_content(request, **kwargs):
                 lead = Campaignlead.objects.get(pk=lead_pk)
                 context['lead'] = lead
                 context['users'] = User.objects.filter(profile__sites_allowed=lead.campaign.site)
+            elif template_name == 'switch_subscription':
+                context['company'] = request.user.profile.company
+                context['switch_subscription'] = request.GET.get('switch_subscription')
                     
             return render(request, f"campaign_leads/htmx/{template_name}.html", context)   
     except Exception as e:

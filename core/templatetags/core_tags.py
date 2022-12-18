@@ -14,6 +14,13 @@ import math
 
 def roundup(x, round_target):
     return int(int(math.ceil(x / round_target)) * round_target)
+    
+@register.filter
+def prettify_variable(value):
+    separated_string = value.replace('_', ' ')
+    pretty_string = separated_string.capitalize()
+    return pretty_string 
+
 
 @register.filter
 def generate_uuid_tag(anything):
@@ -208,6 +215,12 @@ def division(num, divider):
 def multiplication(num1, num2):  
     try:
         return int(num1) * int(num2)
+    except Exception as e:
+        return 0
+@register.filter
+def addition(num1, num2):  
+    try:
+        return int(num1) + int(num2)
     except Exception as e:
         return 0
 @register.filter

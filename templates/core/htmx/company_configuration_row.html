@@ -55,7 +55,7 @@
             hx-indicator="#htmx_indicator_site_{{profile.pk}}"  hx-trigger="change" hx-target="#company_configuration_row_{{profile.pk}}"
             hx-vals='{"profile_pk": "{{profile.pk}}"}'>  
                 {%if not profile.site%}<option value="" selected>None</option>{%endif%}
-                {%for site in profile.company.site_set.all%}
+                {%for site in profile.company.active_sites%}
                     <option value="{{site.pk}}" {%if profile.site == site%}selected{%endif%}>{{site.name}}</option>
                 {%endfor%}
             </select>

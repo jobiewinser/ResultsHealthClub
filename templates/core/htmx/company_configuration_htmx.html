@@ -23,82 +23,191 @@
         </div>
         {%endblock extra_top_right_buttons %}
     </div>
-    <div class="row mt-2">
+    <div class="row mt-0">
         <div class="col">
         </div>
-        <div class="col-md-auto">
-            <button class="nowrap btn btn-success btn-sm pointer" type="button" {%if request.user.profile.role == 'c'%}disabled{%endif%}
-                hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
-                hx-vals='{"template_name": "add_user"}'
-                hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
-                hx-swap="innerHTML" hx-trigger="click"><i class="fa-light fa-plus"></i> Add User to {{company.name}}</button>
-        </div>
-        <div class="col-md-auto">
-            <span
-                title="Existing Sites"
-                data-bs-toggle="popover" 
-                data-bs-trigger="hover focus" 
-                data-bs-placement="right"
-                data-bs-html="true"
-                data-bs-content="
-                    <ul>
-                        {%for site in company.site_set.all%}
-                        <li>{{site.name}}</li>
-                        {%endfor%}
-                    </ul>
-                    <br>
-                    <b> To add another site to your company please contact Winser Systems!</b>
-                ">
-                <button class="nowrap btn btn-success btn-sm pointer" type="button" {%if request.user.profile.role == 'c'%}disabled{%endif%}
-                    {%if not company.subscription == 'pro'%}disabled{%endif%}
-                    disabled
-                    hx-confirm="Are you sure you want to add another site?" 
-                    hx-indicator=".top-htmx-indicator" 
-                    hx-vals='{"company_pk": "{{company.pk}}"}'
-                    hx-post="{% url 'add-site' %}" hx-push-url="true"
-                    hx-swap="none" hx-trigger="click"><i class="fa-solid fa-circle-info help"></i> Add Another Site {%if not company.subscription == 'pro'%}<i class="fa-solid fa-rectangle-pro"></i>{%endif%}</button> 
-            </span>
-        </div>
-        <div class="col">
-        </div>
-    </div>
-    <div class="row mt-2">
-        <div class="col">
-        </div>
-        <div class="col-md-auto card card-white p-2">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th class="center">
-                            User
-                        </th>
-                        <th class="center">
-                            Main Site
-                        </th>
-                        <th class="center">
-                            Role
-                        </th>
-                        <th class="center">
-                            Default Campaign Category
-                        </th>
-                        <th class="center">
-                            Permissions
-                        </th>
-                        <th class="center">
-                            Configuration
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {%for temp_user in company.users%}
-                    {%with temp_user.profile as profile%}
-                    <tr id="company_configuration_row_{{profile.pk}}">
-                        {%include 'core/htmx/company_configuration_row.html'%}
-                    </tr>
-                    {%endwith%}
-                    {%endfor%}
-                </tbody>
-            </table>
+        <div class="col-auto">
+            <div class="row mt-2">
+                <div class="col card card-white m-2">
+                    <div class="card-header">
+                        <i class="fa-light fa-gear"></i> <b>{{company.name}}</b> Settings
+                    </div>
+                    <div class="card-body">
+                        <p>
+                            To see the different subscription levels: <a target="_blank" href="https://www.winser.uk/index.php/leads-management-pricing/">https://www.winser.uk</a>.
+                        </p>
+                        {%if request.user.profile.role == 'a'%}
+                        <button class="btn btn-{% if company.subscription == 'free'%}secondary{% elif company.subscription == 'basic'%}primary{% elif company.subscription == 'pro'%}success{%endif%}" 
+                            type="button" data-bs-toggle="collapse" data-bs-target="#collapseSubscription" aria-expanded="false" aria-controls="collapseSubscription">
+                            You have a <b>{{company.get_subscription_display}}</b> subscription {% if company.subscription == 'free'%}£0 p/m{% elif company.subscription == 'basic'%}£9.99 p/m (per facility/site){% elif company.subscription == 'pro'%}£34.99 p/m (per facility/site){%endif%}
+                        </button>
+                        <span class="ms-3">You have {{company.active_sites.count}} active site(s) within this company</span>
+                        <div class="collapse mt-2" id="collapseSubscription">
+                            <div class="card card-body">  
+                                <div class="row">  
+                                    {% if company.subscription == 'free'%}
+                                    <div class="col-auto">
+                                        <button class="btn btn-primary"
+                                            hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
+                                            hx-vals='{"template_name": "switch_subscription","switch_subscription":"basic"}'
+                                            hx-get="{% url 'campaign-lead-get-modal-content'%}" 
+                                            hx-push-url="false"
+                                            hx-swap="innerHTML" hx-trigger="click">
+                                            Switch to Basic Subscription £9.99 p/m (per facility/site)
+                                        </button>
+                                    </div>
+                                    <div class="col-auto">
+                                        <button class="btn btn-success"
+                                            hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
+                                            hx-vals='{"template_name": "switch_subscription","switch_subscription":"pro"}'
+                                            hx-get="{% url 'campaign-lead-get-modal-content'%}" 
+                                            hx-push-url="false"
+                                            hx-swap="innerHTML" hx-trigger="click">
+                                            Switch to Pro Subscription £34.99 p/m (per facility/site)
+                                        </button>
+                                    </div>
+                                    {% elif company.subscription == 'basic'%}
+                                    <div class="col-auto">
+                                        <button class="btn btn-secondary"
+                                            hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
+                                            hx-vals='{"template_name": "switch_subscription","switch_subscription":"free"}'
+                                            hx-get="{% url 'campaign-lead-get-modal-content'%}" 
+                                            hx-push-url="false"
+                                            hx-swap="innerHTML" hx-trigger="click">
+                                            Switch to Free Subscription £0 p/m
+                                        </button>
+                                    </div>
+                                    <div class="col-auto">
+                                        <button class="btn btn-success"
+                                            hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
+                                            hx-vals='{"template_name": "switch_subscription","switch_subscription":"pro"}'
+                                            hx-get="{% url 'campaign-lead-get-modal-content'%}" 
+                                            hx-push-url="false"
+                                            hx-swap="innerHTML" hx-trigger="click">
+                                            Switch to Pro Subscription £34.99 p/m (per facility/site)
+                                        </button>
+                                    </div>
+                                    {% elif company.subscription == 'pro'%}
+                                    <div class="col-auto">
+                                        <button class="btn btn-secondary"
+                                            hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
+                                            hx-vals='{"template_name": "switch_subscription","switch_subscription":"free"}'
+                                            hx-get="{% url 'campaign-lead-get-modal-content'%}" 
+                                            hx-push-url="false"
+                                            hx-swap="innerHTML" hx-trigger="click">
+                                            Switch to Free Subscription £0 p/m
+                                        </button>
+                                    </div>
+                                    <div class="col-auto">
+                                        <button class="btn btn-primary"
+                                            hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
+                                            hx-vals='{"template_name": "switch_subscription","switch_subscription":"basic"}'
+                                            hx-get="{% url 'campaign-lead-get-modal-content'%}" 
+                                            hx-push-url="false"
+                                            hx-swap="innerHTML" hx-trigger="click">
+                                            Switch to Basic Subscription £9.99 p/m (per facility/site)
+                                        </button>
+                                    </div>
+                                    {%endif%}
+                                </div>
+                            </div>
+                        </div>
+                        {%else%}
+                        <p>
+                            To change your company's subscription level you must be an <b>Owner</b>. Your role is <b>{{request.user.profile.get_role_display}}</b>.
+                        </p>
+                        {%endif%}
+                        {% comment %} <p class="mt-3"> 
+                            <i>
+                                <small>
+                                    Note: Changing to/from a <b>Pro</b> subscription requires a small wait while we transfer your data and help you to configure your Whatsapp settings. 
+                                    <br>
+                                    For this reason we don't yet offer automatic subscribing to the <b>Pro</b> tier. 
+                                    <br>
+                                    If you are interested in upgrading, please contact: <a href='mailto:jobiewinser@gmail.com'>jobiewinser@gmail.com</a> or <a href='tel:+447872000364'>+44 7872 000364</a>.
+                                </small>
+                            </i>
+                        </p> {% endcomment %}
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="row mt-2">
+                <div class="col">
+                </div>
+                <div class="col-md-auto">
+                    <button class="nowrap btn btn-success btn-sm pointer" type="button" {%if request.user.profile.role == 'c'%}disabled{%endif%}
+                        hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
+                        hx-vals='{"template_name": "add_user"}'
+                        hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
+                        hx-swap="innerHTML" hx-trigger="click"><i class="fa-light fa-plus"></i> Add User to {{company.name}}</button>
+                </div>
+                <div class="col-md-auto">
+                    <span
+                        title="Existing Sites"
+                        data-bs-toggle="popover" 
+                        data-bs-trigger="hover focus" 
+                        data-bs-placement="right"
+                        data-bs-html="true"
+                        data-bs-content="
+                            <ul>
+                                {%for site in company.active_sites%}
+                                <li>{{site.name}}</li>
+                                {%endfor%}
+                            </ul>
+                            <br>
+                            <b> To add another site to your company please contact Winser Systems!</b>
+                        ">
+                        <button class="nowrap btn btn-success btn-sm pointer" type="button" {%if request.user.profile.role == 'c'%}disabled{%endif%}
+                            {%if not company.subscription == 'pro'%}disabled{%endif%}
+                            disabled
+                            hx-confirm="Are you sure you want to add another site?" 
+                            hx-indicator=".top-htmx-indicator" 
+                            hx-vals='{"company_pk": "{{company.pk}}"}'
+                            hx-post="{% url 'add-site' %}" hx-push-url="true"
+                            hx-swap="none" hx-trigger="click"><i class="fa-solid fa-circle-info help"></i> Add Another Site {%if not company.subscription == 'pro'%}<i class="fa-solid fa-rectangle-pro"></i>{%endif%}</button> 
+                    </span>
+                </div>
+                <div class="col">
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col card card-white p-2">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th class="center">
+                                    User
+                                </th>
+                                <th class="center">
+                                    Main Site
+                                </th>
+                                <th class="center">
+                                    Role
+                                </th>
+                                <th class="center">
+                                    Default Campaign Category
+                                </th>
+                                <th class="center">
+                                    Permissions
+                                </th>
+                                <th class="center">
+                                    Configuration
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {%for temp_user in company.users%}
+                            {%with temp_user.profile as profile%}
+                            <tr id="company_configuration_row_{{profile.pk}}">
+                                {%include 'core/htmx/company_configuration_row.html'%}
+                            </tr>
+                            {%endwith%}
+                            {%endfor%}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
         <div class="col">
         </div>
