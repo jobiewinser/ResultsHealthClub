@@ -1013,3 +1013,7 @@ tr.odd td {
 #users_online_leads{
     min-width:300px;
 }
+
+.generic_modal_body_dropdown {
+    z-index: 10050;
+}

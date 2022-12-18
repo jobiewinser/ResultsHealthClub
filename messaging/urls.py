@@ -8,6 +8,7 @@ urlpatterns = [
     
 
     path("message-list/", message_list, name="message-list"),
+    path("mark-read/", mark_read, name="mark-read"),
 
     path("message-window/<str:customer_number>/<str:whatsappnumber_pk>/", message_window, name="message-window"),
     path("message-window/<str:customer_number>/", message_window, name="message-window"),

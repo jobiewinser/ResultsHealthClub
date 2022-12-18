@@ -1,0 +1,32 @@
+{%load core_tags%}
+<div class="generic_modal_contents">
+    <div class="card card-white m-1 p-3">
+        <form hx-post="{%url 'mark-sold'%}" hx-trigger="submit" hx-indicator="#page_load_indicator" hx-swap="none">
+            <input type="text" style="display:None" id="modal_lead_pk" name="lead_pk" value="{{lead.pk}}"/>
+            {% csrf_token %}
+            <div class="row">
+                <div class="col">
+                    <div class="m-1">
+                        <label for="modal_user_pk">User who made the sale<span class="required">*</span></label>
+                        <br>
+                        <select name="user_pk" class="form-select generic_modal_body_select edit_lead_input" id="modal_user_pk" style="width:400px">  
+                            {%for user in users%}
+                            <option value="{{user.pk}}">{{user.profile.name}}</option>
+                            {%endfor%}
+                        </select>
+                    </div>                    
+                </div>
+            </div>
+            <div class="row m-1">
+                <div class="col center" >
+                    <button class="btn btn-primary" type="submit" {%if demo and not request.user.is_superuser%}disabled{%endif%}>
+                        Submit
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<span hx-swap-oob="true" id="generic_modal_title">
+    Add sale for {{lead.name}}   
+</span>

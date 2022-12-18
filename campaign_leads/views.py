@@ -291,8 +291,8 @@ def new_call(request, **kwargs):
                 lead.last_dragged = datetime.now()
                 lead.save()                
                 lead.trigger_refresh_websocket(refresh_position=True)                
-                return HttpResponse("", status=200)
-            return HttpResponse("", status=500)
+                return HttpResponse( status=200)
+            return HttpResponse( status=500)
             # return render(request, 'campaign_leads/htmx/lead_article.html', {'lead':lead,'max_call_count':kwargs.get('max_call_count', 1), 'call_count':call_count})
     except Exception as e:
         logger.debug("new_call Error "+str(e))
@@ -395,9 +395,9 @@ def toggle_claim_lead(request, **kwargs):
             lead.save()
             lead.trigger_refresh_websocket()
         
-            return HttpResponse("", status=200)
+            return HttpResponse( status=200)
             # return render(request, 'campaign_leads/htmx/lead_article.html', {'lead':lead, 'max_call_count':0})
-        return HttpResponse("", status=500)
+        return HttpResponse( status=500)
     except Exception as e:
         logger.debug("get_leads_column_meta_data Error "+str(e))
         #return HttpResponse(e, status=500)

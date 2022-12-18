@@ -68,8 +68,7 @@ function saveTemplate(whatsapp_business_account_pk, template_pk, create=false){
             data: post_data,
             success: function (data) {
                 $(window).unbind('beforeunload');                
-                $('#page_load_indicator').removeClass('htmx-request')
-                htmx.ajax('GET', '/configuration/whatsapp-templates/', {target:'#content'})
+                $('#whatsapp_templates_link').click();
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                 $('#page_load_indicator').removeClass('htmx-request')

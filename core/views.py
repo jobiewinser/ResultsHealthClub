@@ -10,14 +10,17 @@ from django.contrib.sessions.models import Session
 from django.contrib.auth.models import User
 from calendly.api import Calendly
 from core.core_decorators import check_core_profile_requirements_fulfilled
-from core.models import ROLE_CHOICES, Company, FreeTasterLink, FreeTasterLinkClick, Profile, Site, CompanyProfilePermissions, SiteProfilePermissions
+from core.models import ROLE_CHOICES, Company, FreeTasterLink, FreeTasterLinkClick, Profile, Site, CompanyProfilePermissions, SiteProfilePermissions, Feedback
 from django.contrib.auth import authenticate
 from django.contrib.auth import login
 from django.core.exceptions import PermissionDenied
 from core.user_permission_functions import *
 from whatsapp.api import Whatsapp
 from django.conf import settings
-from datetime import datetime
+from datetime import datetime, timedelta
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import UserPassesTestMixin
+from django.views.generic.list import ListView
 logger = logging.getLogger(__name__)
 
 class LoginDemoView(View):
@@ -229,7 +232,7 @@ class SiteConfigurationView(TemplateView):
             site.calendly_token = request.POST['calendly_token']        
             site.save()
             return render(request, 'core/htmx/site_configuration_htmx.html', get_site_coonfiguration_context(request))
-        return HttpResponse("", status=200)
+        return HttpResponse( status=200)
             
 
 @method_decorator(login_required, name='dispatch')
@@ -306,6 +309,20 @@ def change_site_allowed(request):
         return render(request, 'campaign_leads/htmx/edit_permissions.html', context)
     context['error'] = "You do not have permission to do this"
     return render(request, 'campaign_leads/htmx/edit_permissions.html', context)
+@login_required
+def submit_feedback_form(request):
+    existing_feedback = Feedback.objects.filter(user=request.user).order_by('created').last()
+    if existing_feedback:
+        if existing_feedback.created > (datetime.now() - timedelta(seconds = 5)):
+            return HttpResponse(status=400)
+    comment = request.POST.get('comment')
+    if comment:
+        feedback, created = Feedback.objects.get_or_create(
+            user=request.user,
+            comment=comment,
+        )
+
+    return HttpResponse(status=200)
 
 
 
@@ -339,6 +356,16 @@ class FreeTasterOverviewView(TemplateView):
 
         return context
         
+ 
+class FeedbackListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    model = Feedback
+    # template_name = "core/feedback_list.html"
+    def get(self, request, *args, **kwargs):
+        if request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+            self.template_name = 'core/htmx/feedback_list_htmx.html'
+        return super().get(request, *args, **kwargs)
+    def test_func(self):
+        return self.request.user.is_superuser
         
 # @method_decorator(login_required, name='dispatch')
 # class ConfigurationView(TemplateView):

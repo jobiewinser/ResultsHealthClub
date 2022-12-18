@@ -44,7 +44,7 @@
                     hx-push-url="false"
                     hx-swap="innerHTML" hx-trigger="click"  
                     data-customer-number="{{lead.whatsapp_number}}">
-                        Start <i class="fa fa-whatsapp"></i>
+                        Send <i class="fa fa-whatsapp"></i>
                 </button>
             {%else%}
                 <button class="btn btn-sm btn-success text-white position-relative"                     
@@ -178,7 +178,12 @@
         <span class="secondary_td_layer">     
             <div class="btn-group btn-space mt-1">     
                 {%include 'campaign_leads/htmx/arrived_button.html'%}
+            </div>
+            <div class="btn-group btn-space mt-1 dropdown">     
                 {%include 'campaign_leads/htmx/sold_button.html'%}
+            </div>
+
+            <div class="btn-group btn-space mt-1">     
                 {%if not lead.sold%}
                     {%if lead.archived%}
                         <button class="btn btn-danger btn-sm nowrap"

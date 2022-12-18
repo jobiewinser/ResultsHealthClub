@@ -109,7 +109,7 @@ function basehandlehtmxafterRequest(evt){
                 snackbarShow('Successfully logged in', 'success');
                 location.reload();
             }else if (evt.detail.pathInfo.requestPath.includes("modify-user")){
-                snackbarShow('Successfully logged in', 'success');
+                snackbarShow('Successfully added/modified user', 'success');
                 location.reload();
             }else if (evt.detail.pathInfo.requestPath.includes("update-message-counts")){
                 document.getElementById('notification1').play();
@@ -137,7 +137,11 @@ function basehandlehtmxafterRequest(evt){
                 $('#generic_modal').modal('hide');
                 snackbarShow('Successfully added a campaign category, reloading...', 'success')
                 location.reload();
+            }else if (evt.detail.pathInfo.requestPath.includes("submit-feedback-form")){
+                $('#generic_modal').modal('hide');
+                snackbarShow('Successfully submitted feedback', 'success')
             }
+            
             
             
         }
@@ -183,7 +187,6 @@ function inlinePreventDefault(e) {
 }
 function inlineStopPropagation(e) {
     e.stopPropagation();
-    console.log("test")
 }
 
 

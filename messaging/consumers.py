@@ -48,8 +48,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         
         if(user.is_authenticated):
             message = await send_whatsapp_message_to_number(input_message, messaging_customer_number, user, self.scope["url_route"]["kwargs"]["whatsappnumber_pk"])
-
             whatsappnumber = await get_whatsappnumber(self.scope["url_route"]["kwargs"]["whatsappnumber_pk"])
+            
             if message:
                 message_context = {
                     "message": message,
@@ -85,6 +85,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         "message": rendered_html,                       
                     }
                 )
+            await mark_past_messages_as_read(whatsappnumber, user, messaging_customer_number)
     # Receive message from room group.    
     async def chatbox_message(self, event):
         await self.send(
@@ -119,6 +120,14 @@ def message_details_user(user):
 @sync_to_async
 def get_whatsappnumber(whatsappnumber_pk):   
     return WhatsappNumber.objects.get(pk=whatsappnumber_pk)
+@sync_to_async
+def mark_past_messages_as_read(whatsappnumber, user, messaging_customer_number):   
+    WhatsAppMessage.objects.filter(
+        site=whatsappnumber.whatsapp_business_account.site,
+        user=user,
+        customer_number=messaging_customer_number,
+        whatsappnumber=whatsappnumber,
+    ).update(read=True)
 @sync_to_async
 def get_user_company_pk(user):   
     print(user.profile.company.pk)

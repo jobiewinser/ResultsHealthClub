@@ -17,6 +17,8 @@ from core.views import get_site_pk_from_request
 from django.http import QueryDict
 from campaign_leads.models import Campaignlead
 from django.conf import settings
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 logger = logging.getLogger(__name__)
 
 
@@ -82,6 +84,7 @@ class ModifyUser(View):
         try:
             action = request.POST.get('action', '')
             if action == 'add':
+                username = request.POST.get('username', '')
                 first_name = request.POST.get('first_name', '')
                 last_name = request.POST.get('last_name', '')
                 password = request.POST.get('password', '')
@@ -90,20 +93,30 @@ class ModifyUser(View):
                     return HttpResponse("Please enter a First Name", status=400)
                 if not password:
                     return HttpResponse("Please enter a Password", status=400)
+                try:
+                    validate_password(password)
+                    # if 'passw0rd' in password.lower():
+                    #     raise ValidationError("The word password is not allowed as a password")
+                except ValidationError as e:
+                    return HttpResponse(e, status=400)
                 if not role:
                     return HttpResponse("Please enter a Role", status=400)
                 profile_picture = request.FILES.get('profile_picture')
                 site = Site.objects.get(pk=request.POST.get('site_pk', ''))
                 # calendly_event_page_url = request.POST.get('calendly_event_page_url', '')
-                username = f"{first_name}{last_name}"
-                index = 0
-                while User.objects.filter(username=username):
-                    index = index + 1
-                    username = f"{first_name}{last_name}_{index}"
+                if not username:
+                    username = f"{first_name}{last_name}"
+                    index = 0
+                    while User.objects.filter(username=username):
+                        index = index + 1
+                        username = f"{first_name}{last_name}_{index}"
+                if User.objects.filter(username=username):
+                    return HttpResponse("Username already taken", status=400)
                 user = User.objects.create(username=username, 
                                             first_name=first_name,
-                                            last_name=last_name,
-                                            password=password)
+                                            last_name=last_name)
+                user.set_password(password)
+                user.save()
                 Profile.objects.create(user = user, 
                                         avatar = profile_picture, 
                                         company = request.user.profile.company, 
@@ -191,7 +204,7 @@ def add_site(request, **kwargs):
             company = company,
         )
 
-        response = HttpResponse("", status=200)
+        response = HttpResponse( status=200)
         response["HX-Redirect"] = f"/site-configuration/?site_pk={site.pk}"
         return response
     return HttpResponse("This feature requires a Pro subscription", status=403)
@@ -226,7 +239,7 @@ def delete_free_taster_link(request, **kwargs):
             link_pk = request.POST.get('link_pk','')
             if link_pk:
                 FreeTasterLink.objects.get(pk=link_pk).delete()
-            return HttpResponse("", "text", 200)
+            return HttpResponse( "text", 200)
     except Exception as e:
         logger.debug("delete_free_taster_link Error "+str(e))
         #return HttpResponse(e, status=500)

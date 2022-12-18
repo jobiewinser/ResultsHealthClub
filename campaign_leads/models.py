@@ -262,7 +262,7 @@ class Campaignlead(models.Model):
 
                             components =   [] 
 
-                            whole_text = ""
+                            whole_text = template.render_whatsapp_template_to_html(lead=self)
                             counter = 1
                             for component in template.components:
                                 params = []
@@ -279,10 +279,6 @@ class Campaignlead(models.Model):
                                         )
                                         text = text.replace('[[1]]',self.first_name)
                                         counter = counter + 1
-                                whole_text = f"""
-                                    {whole_text} 
-                                    {text}
-                                """
                                 if params:
                                     components.append(
                                         {

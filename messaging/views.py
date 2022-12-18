@@ -57,7 +57,7 @@ def message_window(request, **kwargs):
         context["customer_number"] = kwargs.get('customer_number')
         context['whatsappnumber'] = whatsappnumber
         return render(request, "messaging/message_window_htmx.html", context)
-    return HttpResponse("", status=500)
+    return HttpResponse( status=500)
 
 @login_required
 def get_messaging_list_row(request, **kwargs):
@@ -209,6 +209,15 @@ def get_more_message_chat_rows(request):
         logger.debug("get_more_messages Error "+str(e))
         #return HttpResponse(e, status=500)
         raise e
+@login_required
+def mark_read(request):
+    try:
+        WhatsAppMessage.objects.filter(pk=request.POST.get('message_pk')).update(read=True)
+        return HttpResponse("", status=200) 
+    except Exception as e:
+        logger.debug("mark_read Error "+str(e))
+        #return HttpResponse(e, status=500)
+        raise e
         
 
 # @login_required
@@ -217,7 +226,7 @@ def get_more_message_chat_rows(request):
 #         request.session['open_chat_conversation_customer_number'] = request.session.get('open_chat_conversation_customer_number', []).remove(request.POST.get('customer_number'))
 #     except Exception as e:
 #         print("clear_chat_from_session error", str(e))
-#     return HttpResponse("", "text", 200)
+#     return HttpResponse( "text", 200)
     
 
 

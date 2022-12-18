@@ -10,6 +10,8 @@ class CustomBackend(ModelBackend):
         except UserModel.DoesNotExist:
             UserModel().set_password(password)
         else:
+            temp = user.check_password(password)
+            temp2 =  self.user_can_authenticate(user)
             if user.check_password(password) and self.user_can_authenticate(user):
                 return user
 

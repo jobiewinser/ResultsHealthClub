@@ -85,14 +85,33 @@
                 <i>{{message.datetime|nice_message_datetime_tag}}</i>
             </div>
         </div>
-        <div class="row chat_message_row">
-            <div style="height:18px" class="col p-0" id="message_list_row_{{message.customer_number}}_{{whatsappnumber.pk}}">
+        <div class="row chat_lead_name_row">
+            <div class="col p-0 elipses-overflow" id="message_list_row_{{message.customer_number}}_{{whatsappnumber.pk}}" style="height:18px">
                 {%if message.failed%}<i class="fa-solid fa-triangle-exclamation" style="color:red"></i>{%endif%}  {%if message.inbound%}Them{%else%}You{%endif%}:
                 {%if message.message%}
                     {{message.message|safe}}
                 {%elif message.image.all%}
                     [Image]
                 {%endif%}
+            </div>
+            <div class="col-md-auto p-0 m-0" id="latest_message_mark_read_{{message.customer_number}}">
+                {%if message.inbound and not message.read%}
+                <span class="badge bg-secondary badge-sm"
+                
+                    data-bs-toggle="popover" 
+                    data-bs-trigger="hover focus" 
+                    data-bs-placement="top"
+                    data-bs-content="Mark this message as read"
+
+                    hx-post="{%url 'mark-read'%}"
+                    hx-indicator="#page_load_indicator" 
+                    hx-target="#latest_message_mark_read_{{message.customer_number}}"
+                    hx-push-url="false"
+                    hx-vals='{"message_pk":"{{message.pk}}"}'
+                    hx-swap="innerHTML" hx-trigger="click">
+                    <i class="fa-brands fa-readme"></i>
+                </span>
+                    {%endif%}
             </div>
         </div>
     </div>

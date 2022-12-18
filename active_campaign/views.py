@@ -21,7 +21,7 @@ from core.user_permission_functions import *
 class Webhooks(View):
     def get(self, request, *args, **kwargs):
         logger.debug(str(request.GET))
-        return HttpResponse("", "text", 200)
+        return HttpResponse( "text", 200)
 
     def post(self, request, *args, **kwargs): 
         # try:
@@ -63,7 +63,7 @@ class Webhooks(View):
                                         email = data.get('contact[email]', "")
                                     )
                                     lead.trigger_refresh_websocket(refresh_position=True)
-            return HttpResponse("", "text", 200)
+            return HttpResponse( "text", 200)
      
 logger = logging.getLogger(__name__)
     

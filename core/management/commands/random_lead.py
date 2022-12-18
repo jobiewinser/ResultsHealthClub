@@ -12,9 +12,10 @@ import names
 random_name = []
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        if settings.DEMO:
+        if settings.DEMO or settings.DEBUG:
             rukp = RandomUkPhone()
-            for campaign in Campaign.objects.filter(company__demo=True):
+            for campaign in Campaign.objects.filter():
+            # for campaign in Campaign.objects.filter(company__demo=True):
                 existing_campaigns = Campaignlead.objects.filter(archived=False).filter(campaign=campaign).exclude(booking__archived=False)
                 if existing_campaigns.count() < 5:
                     lead = Campaignlead()

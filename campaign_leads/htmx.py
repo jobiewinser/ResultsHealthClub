@@ -58,6 +58,10 @@ def get_modal_content(request, **kwargs):
                 if not manual_campaign:
                     ManualCampaign.objects.create(site=context['site'], name = "Manually Created")
                 context['campaigns'] = get_campaign_qs(request)         
+            elif template_name == 'mark_sold':
+                lead = Campaignlead.objects.get(pk=lead_pk)
+                context['lead'] = lead
+                context['users'] = User.objects.filter(profile__sites_allowed=lead.campaign.site)
                     
             return render(request, f"campaign_leads/htmx/{template_name}.html", context)   
     except Exception as e:
@@ -87,7 +91,7 @@ def add_campaign_category(request, **kwargs):
     else:
         site = Site.objects.get(pk=site_pk)
         campaign_category, created = CampaignCategory.objects.get_or_create(site=site, name=name)
-    return HttpResponse("", status=200)
+    return HttpResponse( status=200)
     # except Exception as e:
     #     # messages.add_message(request, messages.ERROR, f'Error with creating a campaign lead')
     #     logger.debug("create_campaign_lead Error "+str(e))
@@ -249,7 +253,7 @@ def add_manual_booking(request, **kwargs):
                 }
             }
         )
-        return HttpResponse("", status=200)
+        return HttpResponse( status=200)
     except Exception as e:
         logger.debug("add_manual_booking Error "+str(e))
         #return HttpResponse(e, status=500)
@@ -302,7 +306,7 @@ def delete_lead(request, **kwargs):
             lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'))
             lead.delete()
 
-            return HttpResponse("", "text", 200)
+            return HttpResponse( "text", 200)
     except Exception as e:
         logger.debug("mark_archived Error "+str(e))
         #return HttpResponse(e, status=500)
@@ -328,8 +332,9 @@ def mark_sold(request, **kwargs):
     logger.debug(str(request.user))
     try:
         if request.user.is_authenticated:
+            user_pk = request.POST.get('user_pk')
             lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'))
-            if lead.sold:
+            if lead.sold and not user_pk:
                 lead.archived = False
                 lead.sold = False
                 lead.marked_sold = None
@@ -338,7 +343,10 @@ def mark_sold(request, **kwargs):
                 lead.archived = False
                 lead.sold = True
                 lead.marked_sold = datetime.now()
-                lead.sold_by = request.user
+                if user_pk:
+                    lead.sold_by = User.objects.get(pk=user_pk)
+                else:
+                    lead.sold_by = request.user
             lead.save()
             return render(request, "campaign_leads/htmx/campaign_booking_row.html", {'lead':lead}) 
     except Exception as e:

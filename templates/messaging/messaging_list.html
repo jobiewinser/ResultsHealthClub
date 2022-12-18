@@ -38,12 +38,12 @@
     {%endif%}
     <div class="card p-0 messaging_site_accordion" id="" style="margin-top: auto;" hx-ws="connect:/ws/message_count/{{request.user.profile.company.pk}}/">
 
-        <div class="card-header chat_bottom_header ps-2 collapsed" data-bs-toggle="collapse" data-bs-target="#siteCollapse" aria-expanded="false" aria-controls="siteCollapse">
+        <div class="card-header chat_bottom_header ps-2 {%if not whatsappnumber%}collapsed{%endif%}" data-bs-toggle="collapse" data-bs-target="#siteCollapse" aria-expanded="false" aria-controls="siteCollapse">
             <span class="primary_td_layer text-white">
                 <span class="badge bg-light badge-sm me-1"><i class="fa fa-whatsapp me-1"></i><span class="company_message_count">{{request.user|company_outstanding_whatsapp_messages_tag}}</span></span>Whatsapp 
             </span>
         </div>
-        <div class="card-body collapse p-0" id="siteCollapse">
+        <div class="card-body collapse p-0 {%if whatsappnumber%}show{%endif%}" id="siteCollapse">
             <div class="htmx-indicator disconnected_indicator message_count_disconnected_indicator">
                 <b>Connecting</b> <img class="invert" src="https://htmx.org/img/bars.svg">
             </div>

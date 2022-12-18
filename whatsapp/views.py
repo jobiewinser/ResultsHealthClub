@@ -72,7 +72,9 @@ class Webhooks(View):
                 if not field == 'message_template_status_update':
                     site = Site.objects.filter(whatsappbusinessaccount__whatsappnumber__number=metadata.get('display_phone_number')).first()
                     if site:
-                        signature = 'sha256=' + hmac.new(site.company.whatsapp_app_secret_key.encode('utf-8'), bytes(request.body), digestmod=hashlib.sha256).hexdigest()
+                        signature = ""
+                        if not settings.DEBUG:
+                            signature = 'sha256=' + hmac.new(site.company.whatsapp_app_secret_key.encode('utf-8'), bytes(request.body), digestmod=hashlib.sha256).hexdigest()
                         if signature == request.META.get('HTTP_X_HUB_SIGNATURE_256') or settings.DEBUG:
                             if site:
                                 if field == 'messages':
@@ -434,7 +436,7 @@ def delete_whatsapp_template_htmx(request):
     template.status="PENDING_DELETION"
     template.archived = True
     template.save()
-    return HttpResponse("", status=200)
+    return HttpResponse( status=200)
 
          
 @login_required
@@ -489,7 +491,7 @@ def whatsapp_number_change_alias(request):
 #                 Campaign.objects.filter(first_send_template=template).update(first_send_template=None)
 #                 Campaign.objects.filter(second_send_template=template).update(second_send_template=None)
 #                 Campaign.objects.filter(third_send_template=template).update(third_send_template=None)
-#                 return HttpResponse("",status=200)
+#                 return HttpResponse(status=200)
 #     return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
 
 # @login_required
@@ -504,7 +506,7 @@ def whatsapp_number_change_alias(request):
 #                 whatsappnumber.save()
 #                 Site.objects.filter(default_number=whatsappnumber).update(default_number=None)
 #                 WhatsAppMessage.objects.filter(whatsappnumber=whatsappnumber).update(site=site)
-#                 return HttpResponse("",status=200)
+#                 return HttpResponse(status=200)
 #     return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
 
 @login_required
@@ -519,7 +521,7 @@ def add_phone_number(request):
         if get_user_allowed_to_edit_site_configuration(request.user.profile, whatsapp_business_account.site):            
             whatsapp = Whatsapp(whatsapp_business_account.site.whatsapp_access_token)
             whatsapp.create_phone_number(whatsapp_business_account.whatsapp_business_account_id, country_code, phone_number)
-            return HttpResponse("",status=200,headers={'HX-Refresh':True})
+            return HttpResponse(status=200,headers={'HX-Refresh':True})
         return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
     return HttpResponse("Incorrect values entered, please try again.",status=500)
 
@@ -544,7 +546,7 @@ def add_whatsapp_business_account(request):
                         else:
                             whatsapp_business_account.delete()
                     WhatsappBusinessAccount.objects.create(site=site, whatsapp_business_account_id=whatsapp_business_account_id)
-                    return HttpResponse("",status=200,headers={'HX-Refresh':True})
+                    return HttpResponse(status=200,headers={'HX-Refresh':True})
                 else:
                     return HttpResponse("There are no phone numbers assosciated with that Whatsapp Business Account ID.",status=500)
             return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
@@ -593,7 +595,7 @@ def save_whatsapp_template_ajax(request):
             template.edited_by = request.user
             template.edited = datetime.now()
             template.save()
-    return HttpResponse("", status=200)
+    return HttpResponse( status=200)
 
 @login_required
 def send_new_template_message(request):
@@ -638,9 +640,9 @@ def send_new_template_message(request):
             response = contact.send_template_whatsapp_message(whatsappnumber=whatsappnumber, template=template)
             if response:
                 return response
-        return HttpResponse("", status=500)
+        return HttpResponse( status=500)
 
-    return HttpResponse("", status=403)
+    return HttpResponse( status=403)
 
     
 # class Contact(Message):

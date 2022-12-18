@@ -28,7 +28,7 @@ import time
 class Webhooks(View):
     def get(self, request, *args, **kwargs):
         logger.debug(str(request.GET))
-        return HttpResponse("", status = 200)
+        return HttpResponse( status = 200)
 
     def post(self, request, *args, **kwargs):
         time.sleep(5)
@@ -61,7 +61,7 @@ class Webhooks(View):
                     booking.datetime = start_time
                     booking.save()            
                     
-                    return HttpResponse("", status=200)
+                    return HttpResponse( status=200)
                 except Exception as e:            
                     print("CALENDLY Webhooks post except Exception as e", str(e)) 
                     error = ErrorModel.objects.create(json_data={'error':str(e)})
@@ -77,18 +77,18 @@ class Webhooks(View):
                     booking.archived = True
                     booking.save()     
                     # TODO Notification here                           
-                    return HttpResponse("", status=200)
+                    return HttpResponse( status=200)
                 except Exception as e:            
                     print("CALENDLY Webhooks post except Exception as e", str(e)) 
                     error = ErrorModel.objects.create(json_data={'error':str(e)})
                     webhook.errors.add(error)
                     webhook.save()
                     # raise Exception                
-            return HttpResponse("", status=400)
+            return HttpResponse( status=400)
             
         except ObjectDoesNotExist:               
             print("CALENDLY Webhooks post ObjectDoesNotExist body", str(body)) 
-            return HttpResponse("", status=400)
+            return HttpResponse( status=400)
 @login_required
 def calendly_booking_success(request):
     lead = Campaignlead.objects.get(pk = request.POST['lead_pk'])
@@ -111,7 +111,7 @@ def calendly_booking_success(request):
             }
         }
     )
-    return HttpResponse("", status=200)
+    return HttpResponse( status=200)
 @login_required
 def get_latest_calendly_booking_info(request):
     try:

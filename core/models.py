@@ -136,7 +136,8 @@ class Contact(models.Model):
                             template.language = template_live['language']
                             template.save()
                             components =   [] 
-                            whole_text = ""
+                            
+                            whole_text = template.render_whatsapp_template_to_html(contact=self)
                             counter = 1
                             for component in template.components:
                                 params = []
@@ -153,10 +154,6 @@ class Contact(models.Model):
                                         )
                                         text = text.replace('[[1]]',self.first_name)
                                         counter = counter + 1
-                                whole_text = f"""
-                                    {whole_text} 
-                                    {text}
-                                """
                                 if params:
                                     components.append(
                                         {
@@ -372,7 +369,7 @@ class WhatsappNumber(PhoneNumber):
         qs = WhatsAppMessage.objects.filter(pk__in=message_pk_list).order_by('-datetime')
         received = query.get('received')
         if received:
-            qs = qs.filter(inbound=True)
+            qs = qs.filter(inbound=True).filter(read=False)
         return qs[:10]
 
     def send_whatsapp_message(self, customer_number=None, lead=None, message="", user=None):  
@@ -601,6 +598,7 @@ class Profile(models.Model):
     company = models.ForeignKey("core.Company", on_delete=models.SET_NULL, null=True, blank=True)
     sites_allowed = models.ManyToManyField("core.Site", related_name="profile_sites_allowed", null=True, blank=True)
     calendly_event_page_url = models.TextField(blank=True, null=True)
+    
     @property
     def name(self):
         if self.user.last_name:
@@ -703,3 +701,10 @@ class SiteProfilePermissions(models.Model):
         return super(SiteProfilePermissions, self).save(force_insert, force_update, using, update_fields)
     
     
+
+class Feedback(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    comment = models.TextField()
+    created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    class Meta:
+        ordering = ['-created']
