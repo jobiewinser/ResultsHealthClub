@@ -96,6 +96,17 @@
                 There is additional configuration needed with this subscription, hence the additional setup time and needing to get in touch with us. <u>We promise that it's worth it!</u>
             </small>
         {%endif%}
+        {% if not switch_subscription == 'pro'%}
+        <div class="row mt-3">
+            <div class="col">
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-{% if switch_subscription == 'free'%}secondary{% elif switch_subscription == 'basic'%}primary{% elif switch_subscription == 'pro'%}success{%endif%}">Proceed</button>
+            </div>
+            <div class="col">
+            </div>
+        </div>
+        {%endif%}
     </div>
 </div>
 <span hx-swap-oob="true" id="generic_modal_title">
