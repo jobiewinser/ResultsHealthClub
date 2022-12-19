@@ -41,6 +41,8 @@ urlpatterns = [
     path('configuration/company-permissions/', coreviews.CompanyPermissionsView.as_view(), name='company-permissions'),  
     path('configuration/site-permissions/', coreviews.SitePermissionsView.as_view(), name='site-permissions'),  
     path('configuration/change-sites-allowed/', coreviews.change_site_allowed, name='change-sites-allowed'),  
+    path('configuration/deactivate-profile/', coreviews.deactivate_profile, name='deactivate-profile'),  
+    path('configuration/reactivate-profile/', coreviews.reactivate_profile, name='reactivate-profile'),  
     path('submit-feedback-form/', coreviews.submit_feedback_form, name='submit-feedback-form'),  
     path('feedback-forms/', coreviews.FeedbackListView.as_view(), name='feedback-forms'),  
 

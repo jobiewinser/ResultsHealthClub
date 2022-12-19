@@ -133,7 +133,7 @@
                                         <div class="form-floating m-1"
                                         {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}
                                             data-bs-toggle="popover" 
-                                            data-bs-trigger="hover focus" 
+                                            data-bs-trigger="hover" 
                                             data-bs-html="true" 
                                             data-bs-placement="top"
                                             data-bs-title="Site Calendly Organisation"
@@ -151,7 +151,7 @@
                                         <div class="form-floating m-1"
                                         {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}
                                             data-bs-toggle="popover" 
-                                            data-bs-trigger="hover focus" 
+                                            data-bs-trigger="hover" 
                                             data-bs-html="true" 
                                             data-bs-placement="top"
                                             data-bs-title="Site Calendly Token"
@@ -190,17 +190,10 @@
                 <div class="col">
                 </div>
                 <div class="col-md-auto">
-                    <button class="nowrap btn btn-success btn-sm pointer" type="button" {%if request.user.profile.role == 'c'%}disabled{%endif%}
-                        hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
-                        hx-vals='{"template_name": "add_user"}'
-                        hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
-                        hx-swap="innerHTML" hx-trigger="click"><i class="fa-light fa-plus"></i> Add User to {{company.name}}</button>
-                </div>
-                <div class="col-md-auto">
                     <span
                         title="Existing Sites"
                         data-bs-toggle="popover" 
-                        data-bs-trigger="hover focus" 
+                        data-bs-trigger="hover" 
                         data-bs-placement="right"
                         data-bs-html="true"
                         data-bs-content="
@@ -253,12 +246,14 @@
                                     <th class="center">
                                         Configuration
                                     </th>
+                                    <th class="center">
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {%for temp_user in company.users%}
                                 {%with temp_user.profile as profile%}
-                                <tr id="company_configuration_row_{{profile.pk}}">
+                                <tr id="user_configuration_row_{{profile.pk}}">
                                     {%include 'core/htmx/company_configuration_row.html'%}
                                 </tr>
                                 {%endwith%}

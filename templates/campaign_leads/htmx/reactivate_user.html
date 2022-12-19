@@ -1,0 +1,51 @@
+{%load static%}
+<div class="generic_modal_contents">
+    <form hx-indicator="#htmx-indicator-reactivate-user"
+        hx-post="{% url 'reactivate-profile' %}" hx-push-url="false"
+        hx-swap="none" hx-trigger="submit">
+        <div class="row">
+            <div class="col">
+            </div>
+            <div class="col-md-auto center" >            
+                <label>
+                    Which site should this user be added to?<br>
+                    <select style="width:100%" class="form-control generic_modal_body_select" name="site_pk">
+                        {%for site_available in request.user.profile.sites_allowed.all%}
+                        <option {%if site == site_available%}selected{%endif%} value="{{site_available.pk}}">{{site_available.name}}</option>
+                        {%endfor%}
+                    </select>
+                </label>
+            </div>
+            <div class="col">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+            </div>
+            <div class="col-md-auto center" >
+                <select style="width:100%" class="form-control generic_modal_body_select" name="user_pk">
+                    {%for user in site.inactive_users%}
+                    <option value="{{user.pk}}">{{user.profile}}</option>
+                    {%endfor%}
+                </select>
+            </div>
+            <div class="col">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+            </div>
+            <div class="col-md-auto center" >
+                <button class="btn btn-primary" type="submit">
+                    Reactivate Profile
+                </button>
+            </div>
+            <div class="col">
+                <img  class="htmx-indicator invert" id="htmx-indicator-reactivate-user" src="https://htmx.org/img/bars.svg"/>
+            </div>
+        </div>
+    </form>
+</div>
+<span hx-swap-oob="true" id="generic_modal_title">
+    Reactivate Profile for {{site.name}}
+</span>

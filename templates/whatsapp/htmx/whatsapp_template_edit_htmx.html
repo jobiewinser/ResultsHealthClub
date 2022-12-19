@@ -4,6 +4,7 @@
         var variables = {{variables|safe}}  
         $(document).ready(function() {  
             $("[data-toggle='popover']").popover('destroy');
+            $(".popover").remove();    
             $('[data-bs-toggle=popover]').popover({
                 animation:false
             });
@@ -55,7 +56,7 @@
             <div class="row">
                 <div class="col"
                     data-bs-toggle="popover" 
-                    data-bs-trigger="hover focus" 
+                    data-bs-trigger="hover" 
                     data-bs-placement="top"
                     data-bs-html="true"
                     data-bs-title="{%if readonly or template.message_template_id%}Why is this input disabled?{%else%}Template Name Rules{%endif%}"
@@ -71,7 +72,7 @@
             <div class="row">
                 <div class="col"
                 data-bs-toggle="popover" 
-                data-bs-trigger="hover focus" 
+                data-bs-trigger="hover" 
                 data-bs-html="true"
                 data-bs-placement="top"
                 data-bs-title="{%if readonly or template.message_template_id%}Why is this input disabled?{%else%}What do these categories mean?{%endif%}"
@@ -205,7 +206,7 @@
     <button {%if readonly%}disabled{%endif%} {%if demo and not request.user.is_superuser%}(Demo, Disabled){%endif%} class="btn template_save_button btn-success m-3"
         onclick="saveTemplate('{{whatsapp_business_account.pk}}', '{{template.pk}}')"
         data-bs-toggle="popover" 
-        data-bs-trigger="hover focus" 
+        data-bs-trigger="hover" 
         data-bs-placement="top"
         data-bs-title="What does this do?"
         data-bs-content="This saves your changes to this system, but does not push it to Whatsapp to review. You must request a review from the template table. You may save your work then come back to it later here before requesting approval from Whatsapp.">

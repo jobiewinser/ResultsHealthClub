@@ -81,6 +81,13 @@ function select2stuff(){
         searchInputPlaceholder: '🔎 Search here...',        
         theme: 'bootstrap-5',
     })
+    
+    $('.generic_modal_body_select').select2({
+        dropdownCssClass: "generic_modal_body_dropdown",
+        searchInputPlaceholder: '🔎 Search here...',        
+        theme: 'bootstrap-5',
+      });
+
     $('.select2tag:not([data-select2-id])').select2({     
         tags: true,
         createTag: function (tag) {
@@ -103,7 +110,9 @@ function basehandlehtmxafterSettle(evt){
 }
 
 function basehandlehtmxafterRequest(evt){   
+    flash()
     $("[data-toggle='popover']").popover('destroy');
+    $(".popover").remove();    
     $('[data-bs-toggle=popover]').popover({
         animation:false
     });
@@ -117,11 +126,25 @@ function basehandlehtmxafterRequest(evt){
         }
         if (![undefined, ''].includes(evt.detail.pathInfo.requestPath)){
             if (evt.detail.pathInfo.requestPath.includes("login-htmx")){
+                $('#generic_modal').modal('hide');
                 snackbarShow('Successfully logged in', 'success');
+                $('#page_load_indicator').addClass('htmx-request')
                 location.reload();
             }else if (evt.detail.pathInfo.requestPath.includes("modify-user")){
-                snackbarShow('Successfully added/modified user', 'success');
+                $('#generic_modal').modal('hide');
+                snackbarShow('Successfully added/modified profile', 'success');
+                $('#page_load_indicator').addClass('htmx-request')
                 location.reload();
+            }else if (evt.detail.pathInfo.requestPath.includes("deactivate-profile")){
+                $('#generic_modal').modal('hide');
+                snackbarShow('Successfully deactivated profile', 'success');
+                $('#page_load_indicator').addClass('htmx-request')
+                location.reload();               
+            }else if (evt.detail.pathInfo.requestPath.includes("reactivate-profile")){
+                $('#generic_modal').modal('hide');
+                snackbarShow('Successfully reactivated profile', 'success');
+                $('#page_load_indicator').addClass('htmx-request')
+                location.reload();                
             }else if (evt.detail.pathInfo.requestPath.includes("update-message-counts")){
                 document.getElementById('notification1').play();
                 // PageTitleNotification.On("Message Sent/Received!", 1000);         
@@ -147,6 +170,7 @@ function basehandlehtmxafterRequest(evt){
             }else if (evt.detail.pathInfo.requestPath.includes("add-campaign-category")){
                 $('#generic_modal').modal('hide');
                 snackbarShow('Successfully added a campaign category, reloading...', 'success')
+                $('#page_load_indicator').addClass('htmx-request')
                 location.reload();
             }else if (evt.detail.pathInfo.requestPath.includes("submit-feedback-form")){
                 $('#generic_modal').modal('hide');
@@ -263,3 +287,22 @@ try{
 
     })(window.jQuery);
 }catch{}
+
+
+
+function flash() {
+    let flash = document.querySelector('.flashme');
+    try{
+        flash.style.animation = '2s flash infinite';
+    }catch{}
+    try{
+        [].forEach.call(flash, function(el) {
+            el.classList.remove("flashme");
+        });
+    }catch{}
+    setTimeout(function(){
+        try{
+            flash.style.animation = 'unset';
+        }catch{}
+    }, 2000); 
+}

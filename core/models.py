@@ -438,7 +438,18 @@ class Site(models.Model):
     
     @property
     def users(self):
-        return User.objects.filter(profile__sites_allowed=self).order_by('profile__role')
+        return User.objects.filter(profile__sites_allowed=self, is_active=True).order_by('profile__role')
+    @property
+    def inactive_users(self):
+        return User.objects.filter(profile__sites_allowed=self, is_active=False).order_by('profile__role')
+    @property
+    def allowed_user_count(self):
+        if self.subscription == 'free':
+            return 5
+        if self.subscription == 'basic':
+            return 10
+        if self.subscription == 'pro':
+            return 999
 
         
     def check_if_allowed_to_get_analytics(self, start_date):
@@ -560,7 +571,7 @@ class Company(models.Model):
         return count
     @property
     def users(self):
-        return User.objects.filter(profile__company=self).order_by('profile__site', 'profile__role')
+        return User.objects.filter(profile__company=self, is_active=True).order_by('profile__site', 'profile__role')
     @property
     def has_pro_subscription_site(self):
         return self.site_set.filter(subscription="pro").exists()

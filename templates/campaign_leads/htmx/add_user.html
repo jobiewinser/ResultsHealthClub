@@ -4,16 +4,16 @@
         hx-encoding="multipart/form-data" hx-trigger="submit delay:0.5s" onsubmit="$('#htmx-indicator-add-user').addClass('htmx-request');"
         hx-post="{% url 'modify-user' %}" hx-indicator="#htmx-indicator-add-user" hx-target="#generic_modal_body"
         hx-vals='{"site_pk":"{{site.pk}}"}'
-        hx-swap="innerHTML">
+        hx-swap="none">
         <div class="row">
             <div class="col center" >
                 
-                {%if user.profile.company%}
+                {%if site%}
                 <div class="row">
                     <div class="col center p-0">
                         <div class="form-floating m-1">
-                            <input disabled name="company" value="{{request.user.profile.company.name}}" class="form-control" id="company"/>
-                            <label for="company">Company</label>
+                            <input disabled name="site" value="{{site.name}}" class="form-control" id="site"/>
+                            <label for="company">Site</label>
                         </div>
                     </div>
                     <div class="col center p-0">
@@ -75,5 +75,5 @@
     </form>
 </div>
 <span hx-swap-oob="true" id="generic_modal_title">
-    Add User
+    Add User to {{site.name}}
 </span>

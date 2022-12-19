@@ -47,7 +47,7 @@
                     <div class="col p-0"
                         {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}
                             data-bs-toggle="popover" 
-                            data-bs-trigger="hover focus" 
+                            data-bs-trigger="hover" 
                             data-bs-html="true" 
                             data-bs-placement="top"
                             data-bs-title="Change Whatsapp Alias"

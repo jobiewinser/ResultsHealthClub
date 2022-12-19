@@ -6,7 +6,7 @@
         <span 
             {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}
             data-bs-toggle="popover" 
-            data-bs-trigger="hover focus" 
+            data-bs-trigger="hover" 
             data-bs-html="true" 
             data-bs-placement="top"
             data-bs-title="Delete Calendly Webhook"
@@ -29,7 +29,7 @@
         <span 
             {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}disabled
             data-bs-toggle="popover" 
-            data-bs-trigger="hover focus" 
+            data-bs-trigger="hover" 
             data-bs-html="true" 
             data-bs-placement="top"
             data-bs-title="Create Calendly Webhook"

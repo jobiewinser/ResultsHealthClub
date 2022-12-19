@@ -17,8 +17,7 @@
                 </div>
                 {%endif%}
                 <div class="col p-0 m-1 nowrap">
-                    <strong style="font-size:1.5vh">{{profile}}</strong>
-                    <input hidden id="user_id" value="{{pk}}"/>
+                    <strong style="font-size:1.5vh">{%if profile == request.user.profile%}(You) {%endif%}{{profile}}</strong>
                 </div>
             </div>
         </div>
@@ -29,7 +28,7 @@
             {%if profile.warnings %}
                 <span class="help"
                 data-bs-toggle="popover" 
-                data-bs-trigger="hover focus" 
+                data-bs-trigger="hover" 
                 data-bs-html="true" 
                 data-bs-placement="top"
                 data-bs-title="Warnings"
@@ -52,7 +51,7 @@
             <select class="form-select reset_on_error" name="site_pk" id="profile_site_{{profile.pk}}" hx-post="{% url 'change-profile-site' %}" hx-swap="innerHTML" 
             {%if demo and not request.user.is_superuser%}disabled{%endif%}
             data-value="" onfocus="this.setAttribute('data-value', this.value);"
-            hx-indicator="#htmx_indicator_site_{{profile.pk}}"  hx-trigger="change" hx-target="#company_configuration_row_{{profile.pk}}"
+            hx-indicator="#htmx_indicator_site_{{profile.pk}}"  hx-trigger="change" hx-target="#user_configuration_row_{{profile.pk}}"
             hx-vals='{"profile_pk": "{{profile.pk}}"}'>  
                 {%if not profile.site%}<option value="" selected>None</option>{%endif%}
                 {%for site in profile.company.active_sites%}
@@ -66,12 +65,12 @@
     <div class="row">
         <div class="col p-0">
             <select class="form-select reset_on_error" name="role" id="profile_role_{{profile.pk}}" hx-post="{% url 'change-profile-role' %}" hx-swap="innerHTML" 
-            {%if not request.user.profile|get_profile_allowed_to_edit_profile_tag:profile or profile == request.user.profile%}
+            {%if not request.user.profile|get_profile_allowed_to_edit_other_profile_tag:profile or profile == request.user.profile%}
             disabled
             {%endif%}
             {%if demo and not request.user.is_superuser%}disabled{%endif%}
             data-value="" onfocus="this.setAttribute('data-value', this.value);"
-            hx-indicator="#htmx_indicator_site_{{profile.pk}}"  hx-trigger="change" hx-target="#company_configuration_row_{{profile.pk}}"
+            hx-indicator="#htmx_indicator_site_{{profile.pk}}"  hx-trigger="change" hx-target="#user_configuration_row_{{profile.pk}}"
             hx-vals='{"profile_pk": "{{profile.pk}}"}'>  
                 {%if profile.role == 'a'%}
                 <option selected>Owner</option>
@@ -97,7 +96,7 @@
                         hx-trigger="change"
                         hx-indicator=".top-htmx-indicator" 
                         hx-vals='{"profile_pk": "{{profile.pk}}"}'
-                        hx-target="#company_configuration_row_{{profile.pk}}" >
+                        hx-target="#user_configuration_row_{{profile.pk}}" >
                         <option value="">🚫</option>
                         {%for campaign_category in profile.site.campaigncategory_set.all%}
                         <option {%if profile.campaign_category.pk == campaign_category.pk %}selected{%endif%} value="{{campaign_category.pk}}">{{campaign_category.name}}</option>
@@ -107,7 +106,7 @@
                 <div class="col-md-auto p-0 ps-1 mt-1">
                     <button class="btn btn-primary btn-sm" type="button"
                         data-bs-toggle="popover" 
-                        data-bs-trigger="hover focus" 
+                        data-bs-trigger="hover" 
                         data-bs-placement="top"
                         data-bs-title="What does this do?"
                         data-bs-content="Add a new campaign category"
@@ -132,11 +131,21 @@
 </td>
 <td class="center">   
     <button class="nowrap btn btn-light pointer" type="button" 
-        {%if not request.user.profile|get_profile_allowed_to_edit_profile_tag:profile and not demo%}
+        {%if not request.user.profile|get_profile_allowed_to_edit_other_profile_tag:profile and not demo%}
         disabled
         {%endif%}
         hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
         hx-vals='{"template_name": "edit_user", "user_pk": "{{profile.user.pk}}"}'
         hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
         hx-swap="innerHTML" hx-trigger="click"><i class="fa-light fa-gear"></i> Config</button>
+</td>
+<td class="center">   
+    {%if request.user.profile|get_profile_allowed_to_edit_other_profile_tag:profile%}
+    <button class="nowrap btn btn-dark pointer" type="button"
+        hx-indicator=".top-htmx-indicator"
+        hx-vals='{"user_pk": "{{profile.user.pk}}"}'
+        hx-post="{% url 'deactivate-profile' %}" hx-push-url="false"
+        hx-confirm="Are you sure you want to deactivate this account? They won't be able to login and use the system."
+        hx-swap="none" hx-trigger="click"><i class="fa-light fa-trash"></i> Deactivate</button>
+    {%endif%}
 </td>

@@ -10,7 +10,7 @@
                         <label for="modal_user_pk">User who made the sale<span class="required">*</span></label>
                         <br>
                         <select name="user_pk" class="form-select generic_modal_body_select edit_lead_input" id="modal_user_pk" style="width:400px">  
-                            {%for user in users%}
+                            {%for user in lead.campaign.site.users%}
                             <option value="{{user.pk}}">{{user.profile.name}}</option>
                             {%endfor%}
                         </select>

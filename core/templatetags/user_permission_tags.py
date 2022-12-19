@@ -74,7 +74,7 @@ def get_allowed_number_chats_for_user_tag(site, user):
     return get_allowed_number_chats_for_user(site, user)
     
 @register.filter
-def get_profile_allowed_to_edit_profile_tag(request_profile, other_profile):
+def get_profile_allowed_to_edit_other_profile_tag(request_profile, other_profile):
     return get_profile_allowed_to_edit_other_profile(request_profile, other_profile)
         
 @register.filter

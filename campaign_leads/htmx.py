@@ -49,14 +49,14 @@ def get_modal_content(request, **kwargs):
                 if lead_pk:
                     context['lead'] = Campaignlead.objects.get(pk=lead_pk)
                     context['site'] = context['lead'].campaign.site
-                manual_campaign =  ManualCampaign.objects.filter(site=context['site']).first()
+                manual_campaign =  ManualCampaign.objects.filter(site__in=context['sites']).first()
                 if not manual_campaign:
                     ManualCampaign.objects.create(site=context['site'], name = "Manually Created")
                 context['campaigns'] = get_campaign_qs(request)         
             elif template_name == 'mark_sold':
                 lead = Campaignlead.objects.get(pk=lead_pk)
                 context['lead'] = lead
-                context['users'] = User.objects.filter(profile__sites_allowed=lead.campaign.site)
+                # context['users'] = User.objects.filter(profile__sites_allowed=lead.campaign.site)
             elif template_name == 'switch_subscription':
                 context['company'] = request.user.profile.company
                 context['switch_subscription'] = request.GET.get('switch_subscription')

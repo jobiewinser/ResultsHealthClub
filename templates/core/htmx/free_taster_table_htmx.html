@@ -41,7 +41,7 @@
                 
                 <span class="badge bg-success" 
                     data-bs-toggle="popover" 
-                    data-bs-trigger="hover focus" 
+                    data-bs-trigger="hover" 
                     data-bs-placement="top"
                     data-bs-html="true"
                     data-bs-content="<ol>{%for click in link.freetasterlinkclick_set.all%}{%with click.created|timezone:'Europe/London' as created%}<li>{{created}}</li>{%endwith%}{%endfor%}</ol>">

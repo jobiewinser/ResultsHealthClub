@@ -29,6 +29,7 @@ def get_modal_content(request, **kwargs):
         context = {}
         context["sites"] = get_site_pks_from_request_and_return_sites(request)
         if request.user.is_authenticated:
+            site_pk = request.GET.get('site_pk', None)
             template_name = request.GET.get('template_name', '')
             # context = {'site_list':get_available_sites_for_user(request.user)}
             # if template_name == 'switch_user':
@@ -46,11 +47,15 @@ def get_modal_content(request, **kwargs):
                     for site in profile.company.active_sites:
                         SiteProfilePermissions.objects.get_or_create(profile=profile, site=site)
             elif template_name == 'add_phone_number':
-                site_pk = request.GET.get('site_pk', None)
                 if site_pk:
                     context["site"] = Site.objects.get(pk=site_pk)
             elif template_name == 'add_user':
-                context['role_choices'] = ROLE_CHOICES                 
+                context['role_choices'] = ROLE_CHOICES    
+                if site_pk:
+                    context["site"] = Site.objects.get(pk=site_pk) 
+            elif template_name == 'reactivate_user':
+                if site_pk:
+                    context["site"] = Site.objects.get(pk=site_pk)            
             elif template_name == 'send_new_template_message':
                 whatsappnumber_pk = request.GET.get('whatsappnumber_pk', None)
                 context['whatsappnumber'] = WhatsappNumber.objects.get(pk=whatsappnumber_pk)
@@ -81,6 +86,9 @@ class ModifyUser(View):
         try:
             action = request.POST.get('action', '')
             if action == 'add':
+                site = Site.objects.get(pk=request.POST.get('site_pk', ''))
+                if site.users.count() >= site.allowed_user_count:
+                    return HttpResponse("You already have the maximum number of users", status=400)
                 username = request.POST.get('username', '')
                 first_name = request.POST.get('first_name', '')
                 last_name = request.POST.get('last_name', '')
@@ -99,7 +107,6 @@ class ModifyUser(View):
                 if not role:
                     return HttpResponse("Please enter a Role", status=400)
                 profile_picture = request.FILES.get('profile_picture')
-                site = Site.objects.get(pk=request.POST.get('site_pk', ''))
                 # calendly_event_page_url = request.POST.get('calendly_event_page_url', '')
                 if not username:
                     username = f"{first_name}{last_name}"
