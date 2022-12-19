@@ -206,7 +206,7 @@ def add_user_to_users_online(consumer):
 @sync_to_async
 def remove_user_from_users_online(consumer):              
     chat_object = SiteUsersOnline.objects.get(feature="leads", site=consumer.user.profile.site)
-    chat_object.users_online = chat_object.users_online.replace(f";{consumer.user.pk};", ';')
+    chat_object.users_online = chat_object.users_online.replace(f"{consumer.user.pk};", '')
     chat_object.save()
     return f"""<div hx-swap-oob="true" id="users_online_leads">{loader.render_to_string('campaign_leads/htmx/connected_users.html', {'chat_object':chat_object})}</div> """
 class LeadsConsumer(AsyncWebsocketConsumer):

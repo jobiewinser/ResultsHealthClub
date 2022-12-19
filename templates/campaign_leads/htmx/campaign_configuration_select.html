@@ -8,9 +8,9 @@
     </select>
     
     <button hidden 
-    hx-post="{% url 'set-campaign-site' campaign_pk=campaign.pk %}" 
-    hx-swap="innerHTML" hx-indicator=".top-htmx-indicator" 
-    hx-target="#row_{{campaign.pk}}"
-    hx-include="#site_pk_{{campaign.pk}}" 
-    id="submit_site_pk_{{campaign.pk}}"></button>
+        hx-post="{% url 'set-campaign-site' campaign_pk=campaign.pk %}" 
+        hx-swap="innerHTML" hx-indicator=".top-htmx-indicator" 
+        hx-target="#row_{{campaign.pk}}"
+        hx-include="#site_pk_{{campaign.pk}}" 
+        id="submit_site_pk_{{campaign.pk}}"></button>
 </span>

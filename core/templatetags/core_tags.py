@@ -182,6 +182,13 @@ def str_to_int(value):
         return value
 
 @register.filter
+def to_str(value):
+    try:
+        return str(value)
+    except:
+        return value
+
+@register.filter
 def or_empty_string(value):
     try:
         return value or ""

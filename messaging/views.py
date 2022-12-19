@@ -6,7 +6,7 @@ from django.shortcuts import render
 from campaign_leads.models import Campaignlead
 from core.models import Site, WhatsappNumber, Contact, AttachedError
 from core.user_permission_functions import get_allowed_site_chats_for_user, get_user_allowed_to_use_site_messaging
-from core.views import get_site_pk_from_request
+from core.views import get_site_pks_from_request_and_return_sites
 from whatsapp.models import WhatsAppMessage, WhatsappMessageImage
 from django.contrib.auth.decorators import login_required
 from core.templatetags.core_tags import seconds_until_hours_passed
@@ -127,9 +127,7 @@ def get_modal_content(request, **kwargs):
     try:
         request.GET._mutable = True
         context = {}
-        site_pk = get_site_pk_from_request(request)
-        if site_pk:
-            request.GET['site_pk'] = site_pk
+        conetxt['sites'] = get_site_pks_from_request_and_return_sites(request)
 
 
         whatsapp_message_image_pk = request.GET.get('whatsapp_message_image_pk')
@@ -140,12 +138,12 @@ def get_modal_content(request, **kwargs):
         if lead_pk:
             lead = Campaignlead.objects.get(pk=lead_pk)
             context['lead'] = lead
-            if request.GET.get('template_name', None) == "message_window_modal":
+            # if request.GET.get('template_name', None) == "message_window_modal":
                 # whatsappnumber = lead.campaign.site.default_number
-                customer_number = lead.whatsapp_number
-                context['customer_number'] = customer_number
-                context['whatsappnumber'] = whatsappnumber
-                context['messages'] = WhatsAppMessage.objects.filter(customer_number=customer_number, whatsappnumber=whatsappnumber).order_by('datetime')
+                # customer_number = lead.whatsapp_number
+                # context['customer_number'] = customer_number
+                # context['whatsappnumber'] = whatsappnumber
+                # context['messages'] = WhatsAppMessage.objects.filter(customer_number=customer_number, whatsappnumber=whatsappnumber).order_by('datetime')
                 # context['messages'] = WhatsAppMessage.objects.filter(customer_number=customer_number, whatsappnumber=whatsappnumber).order_by('-datetime')[:20:-1]
         
         if request.user.is_authenticated:

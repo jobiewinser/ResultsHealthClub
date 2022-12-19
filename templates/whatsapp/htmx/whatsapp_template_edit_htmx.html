@@ -3,7 +3,11 @@
     <script>
         var variables = {{variables|safe}}  
         $(document).ready(function() {  
-            $("[data-bs-toggle=popover]").popover();
+            $("[data-toggle='popover']").popover('destroy');
+            $('[data-bs-toggle=popover]').popover({
+                animation:false
+            });
+            
             renderTemplate()
         });
     </script>

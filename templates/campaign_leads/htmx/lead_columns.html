@@ -2,7 +2,7 @@
 {%for queryset_title, queryset, call_count in querysets%} 
 <script>
   $(document).ready(function() {
-    new Sortable(document.getElementById('{%if campaign.pk%}campaign_column_{{campaign.pk}}_calls_{{call_count}}{%elif site.pk%}site_column_{{site.pk}}_calls_{{call_count}}{%else%}company_column_{{request.user.profile.company.pk}}_calls_{{call_count}}{%endif%}'), {
+    new Sortable(document.getElementById('{%if request.GET.campaign_pks%}{%for campaign_pk in request.GET.campaign_pks%}campaign_column_{{campaign_pk}}_calls_{{call_count}}{%endfor%}{%elif request.GET.campaign_category_pks%}{%for campaign_category_pk in request.GET.campaign_category_pks%}campaign_category_column_{{campaign_category_pk}}_calls_{{call_count}}{%endfor%}{%elif request.GET.site_pks%}{%for site_pk in request.GET.site_pks%}site_column_{{site_pk}}_calls_{{call_count}}{%endfor%}{%else%}company_column_{{request.user.profile.company.pk}}_calls_{{call_count}}{%endif%}'), {
             
         group: {
             name: 'leads-columns',
@@ -47,8 +47,8 @@
     {%include 'campaign_leads/htmx/column_metadata.html'%}
     </div>
     <div 
-    id="{%if campaign.pk%}campaign_column_{{campaign.pk}}_calls_{{call_count}}{%elif site.pk%}site_column_{{site.pk}}_calls_{{call_count}}{%else%}company_column_{{request.user.profile.company.pk}}_calls_{{call_count}}{%endif%}" 
-    class="sortable_drag column_{{call_count}} column {%if campaign.pk%}campaign_column_{{campaign.pk}}_calls_{{call_count}}{%elif site.pk%}site_column_{{site.pk}}_calls_{{call_count}}{%else%}company_column_{{request.user.profile.company.pk}}_calls_{{call_count}}{%endif%}"
+    id="{%if request.GET.campaign_pks%}{%for campaign_pk in request.GET.campaign_pks%}campaign_column_{{campaign_pk}}_calls_{{call_count}}{%endfor%}{%elif request.GET.campaign_category_pks%}{%for campaign_category_pk in request.GET.campaign_category_pks%}campaign_category_column_{{campaign_category_pk}}_calls_{{call_count}}{%endfor%}{%elif request.GET.site_pks%}{%for site_pk in request.GET.site_pks%}site_column_{{site_pk}}_calls_{{call_count}}{%endfor%}{%else%}company_column_{{request.user.profile.company.pk}}_calls_{{call_count}}{%endif%}" 
+    class="sortable_drag column_{{call_count}} column {%if request.GET.campaign_pks%}{%for campaign_pk in request.GET.campaign_pks%}campaign_column_{{campaign_pk}}_calls_{{call_count}}{% if not forloop.last %} {%endif%}{%endfor%}{%elif request.GET.campaign_category_pks%}{%for campaign_category_pk in request.GET.campaign_category_pks%}campaign_category_column_{{campaign_category_pk}}_calls_{{call_count}}{% if not forloop.last %} {%endif%}{%endfor%}{%elif request.GET.site_pks%}{%for site_pk in request.GET.site_pks%}site_column_{{site_pk}}_calls_{{call_count}}{% if not forloop.last %} {%endif%}{%endfor%}{%else%}company_column_{{request.user.profile.company.pk}}_calls_{{call_count}}{%endif%}"
     data-call-count="{{ call_count }}">
         <article class="" >  </article>
         {%for lead in queryset%}

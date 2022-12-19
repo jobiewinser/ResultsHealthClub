@@ -19,7 +19,7 @@
                         </div>
                         <div class="col m-1 right p-0">
                             <input id="start_date" value="{%if start_date%}{{start_date}}{%else%}{{''|today_date_tag|add_days:-7|date_to_date_input_prefill}}{%endif%}" 
-                                min="{%if not request.user.profile.company.subscription == 'pro'%}{{''|today_date_tag|add_days:-7|date_to_date_input_prefill}}{%else%}{{''|today_date_tag|add_years:-3|date_to_date_input_prefill}}{%endif%}" 
+                                min="{%if minimum_site_subscription_level_in_query == 'free'%}{{''|today_date_tag|add_days:-7|date_to_date_input_prefill}}{%elif minimum_site_subscription_level_in_query == 'basic'%}{{''|today_date_tag|add_months:-1|date_to_date_input_prefill}}{%endif%}" 
                                 max="{{''|today_date_input_tag}}" class="form-control form-control-sm non_site_dependant_analytics_filters" type="date" name="start_date"
                                 onchange="$('#refresh_analytics').click();"/>
                         </div>
@@ -71,22 +71,22 @@
                             </button>
                         </div>
                         <div class="col-md-auto m-1 p-0">
-                            <button {%if not request.user.profile.company.subscription == 'pro' and not demo%}disabled{%endif%}
+                            <button {%if not minimum_site_subscription_level_in_query == 'pro' and not demo%}disabled{%endif%}
                                 class="btn btn-secondary btn-sm quick_filter_date_button {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_tag|add_months:-1|date_to_date_input_prefill%}active{%endif%}" 
                                 onclick="$('#start_date').val('{{''|today_date_tag|add_months:-1|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change'); $('.quick_filter_date_button').removeClass('active'); $(this).addClass('active');">
-                                <small>{{''|today_date_tag|add_months:-1|nice_date_tag}} (month) {%if not request.user.profile.company.subscription == 'pro'%}<i class="fa-solid fa-rectangle-pro"></i>{%endif%}</small>
+                                <small>{{''|today_date_tag|add_months:-1|nice_date_tag}} (month) {%if not minimum_site_subscription_level_in_query == 'pro'%}<i class="fa-solid fa-rectangle-pro"></i>{%endif%}</small>
                             </button>
                         </div>
                         <div class="col-md-auto m-1 p-0">
-                            <button {%if not request.user.profile.company.subscription == 'pro' and not demo%}disabled{%endif%}
+                            <button {%if not minimum_site_subscription_level_in_query == 'pro' and not demo%}disabled{%endif%}
                                 class="btn btn-secondary btn-sm quick_filter_date_button {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_tag|add_years:-1|date_to_date_input_prefill%}active{%endif%}" 
                                 onclick="$('#start_date').val('{{''|today_date_tag|add_years:-1|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change'); $('.quick_filter_date_button').removeClass('active'); $(this).addClass('active');">
-                                <small>{{''|today_date_tag|add_years:-1|nice_date_tag}} (year) {%if not request.user.profile.company.subscription == 'pro'%}<i class="fa-solid fa-rectangle-pro"></i>{%endif%}</small>
+                                <small>{{''|today_date_tag|add_years:-1|nice_date_tag}} (year) {%if not minimum_site_subscription_level_in_query == 'pro'%}<i class="fa-solid fa-rectangle-pro"></i>{%endif%}</small>
                             </button>
                         </div>
                     </div>
                 </div>
-                {%if not request.user.profile.company.subscription == 'pro'%}
+                {%if not minimum_site_subscription_level_in_query == 'pro'%}
                 <hr>
                 <div class="row">
                     <div class="col p-0 m-0 center">
@@ -214,7 +214,7 @@
                         data-bs-trigger="hover focus" 
                         data-bs-placement="right"
                         data-bs-html="true"
-                        data-bs-content="This shows the potential monetary value of leads <b>created</b> between the shown dates that were successfully marked as sold, still live or closed without being sold (filtered by site and campaign above)."><i class="fa-solid fa-circle-info"></i> Pipeline & Conversion Rate  {%if not request.user.profile.company.subscription == 'pro'%}<i class="fa-solid fa-rectangle-pro"></i>{%endif%}
+                        data-bs-content="This shows the potential monetary value of leads <b>created</b> between the shown dates that were successfully marked as sold, still live or closed without being sold (filtered by site and campaign above)."><i class="fa-solid fa-circle-info"></i> Pipeline & Conversion Rate  {%if not minimum_site_subscription_level_in_query == 'pro'%}<i class="fa-solid fa-rectangle-pro"></i>{%endif%}
                         <img  class="htmx-indicator invert" id="htmx-indicator-pipeline" src="https://htmx.org/img/bars.svg"/>
                     </h6> 
                 </div>
@@ -224,7 +224,7 @@
             </div> 
         </div>
         <div class="col analytics_col">
-            {%if request.user.profile.company.subscription == 'pro'%}
+            {%if minimum_site_subscription_level_in_query == 'pro'%}
             <button hidden id="refresh_current_call_count_distribution" hx-trigger="load, click delay:0.5s"
                 class="refresh_non_date_specific_analytic"
                 hx-get="{%url 'get-current-call-count-distribution' %}"
@@ -241,13 +241,13 @@
                         data-bs-trigger="hover focus" 
                         data-bs-placement="right"
                         data-bs-html="true"
-                        data-bs-content="This shows the <b>current</b> distribution of leads in each call count column on the <b>Leads</b> page (filtered by site and campaign above)."><i class="fa-solid fa-circle-info"></i> Current Call Count Distribution  {%if not request.user.profile.company.subscription == 'pro'%}<i class="fa-solid fa-rectangle-pro"></i>{%endif%}
+                        data-bs-content="This shows the <b>current</b> distribution of leads in each call count column on the <b>Leads</b> page (filtered by site and campaign above)."><i class="fa-solid fa-circle-info"></i> Current Call Count Distribution  {%if not minimum_site_subscription_level_in_query == 'pro'%}<i class="fa-solid fa-rectangle-pro"></i>{%endif%}
                         <img class="htmx-indicator invert" id="htmx-indicator-current-call-count-distribution" src="https://htmx.org/img/bars.svg"/>
                     </h6> 
                         
                 </div>
-                <div class="card-body" id="{%if request.user.profile.company.subscription == 'pro'%}current_call_count_distribution_card_body{%endif%}">                    
-                    {%if not request.user.profile.company.subscription == 'pro'%}<small>Extra analytics can be unlocked through a <i class="fa-solid fa-rectangle-pro"></i> subscription!</small>{%endif%}
+                <div class="card-body" id="{%if minimum_site_subscription_level_in_query == 'pro'%}current_call_count_distribution_card_body{%endif%}">                    
+                    One of the sites in your query has a <b>{{minimum_site_subscription_level_in_query|prettify_variable}}</b> subscription. This analytics metric required a <b><i class="fa-solid fa-rectangle-pro"></i></b> subscription for all sites in the query.
                 </div>
             </div>
         </div>

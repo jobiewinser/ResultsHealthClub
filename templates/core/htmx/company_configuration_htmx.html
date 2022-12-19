@@ -1,6 +1,4 @@
-{%load core_tags%}
-{%load static tz core_tags%}
-
+{%load static tz core_tags user_permission_tags%}
 <span>    
     <script>
         $(document).ready(function() {
@@ -27,7 +25,7 @@
         <div class="col">
         </div>
         <div class="col-auto">
-            <div class="row mt-2">
+            {% comment %} <div class="row mt-2">
                 <div class="col card card-white m-2">
                     <div class="card-header">
                         <i class="fa-light fa-gear"></i> <b>{{company.name}}</b> Settings
@@ -117,17 +115,73 @@
                             To change your company's subscription level you must be an <b>Owner</b>. Your role is <b>{{request.user.profile.get_role_display}}</b>.
                         </p>
                         {%endif%}
-                        {% comment %} <p class="mt-3"> 
-                            <i>
-                                <small>
-                                    Note: Changing to/from a <b>Pro</b> subscription requires a small wait while we transfer your data and help you to configure your Whatsapp settings. 
-                                    <br>
-                                    For this reason we don't yet offer automatic subscribing to the <b>Pro</b> tier. 
-                                    <br>
-                                    If you are interested in upgrading, please contact: <a href='mailto:jobiewinser@gmail.com'>jobiewinser@gmail.com</a> or <a href='tel:+447872000364'>+44 7872 000364</a>.
-                                </small>
-                            </i>
-                        </p> {% endcomment %}
+                    </div>
+                </div>
+            </div> {% endcomment %}
+            <div class="card card-white m-2">
+                <div class="card-header">
+                    <i class="fa-regular fa-calendar-days"></i> <b class="name_display_{{site.pk}}">{{company.name}}</b> sites
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-auto p-0 card card-light">      
+                            <form class="" hx-post="" hx-swap="innerHTML" hx-indicator="#page_load_indicator " 
+                            hx-vals='{"site_pk": "{{site.pk}}"}' 
+                            hx-trigger='submit delay:0.3s' autocomplete="off" autofill="off" hx-target="#content">
+                                <div class="row mt-1">
+                                    <div class="col-md-auto">   
+                                        <div class="form-floating m-1"
+                                        {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}
+                                            data-bs-toggle="popover" 
+                                            data-bs-trigger="hover focus" 
+                                            data-bs-html="true" 
+                                            data-bs-placement="top"
+                                            data-bs-title="Site Calendly Organisation"
+                                            data-bs-content="
+                                                You do not have permission to edit this field: Edit Site Configuration
+                                            "
+                                        {%endif%}>
+                                            <input style="min-width:400px" id="calendly_organization" type="text" class="form-control" name="calendly_organization" {%if not request.user.profile.role == 'a'%}disabled{%endif%}
+                                                oninput="$('#calendly_config_submit').attr('disabled', false)"
+                                                value="{%if site.calendly_organization%}{{site.calendly_organization}}{%endif%}" {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}disabled{%endif%}/>
+                                            <label for="calendly_organization">Site Calendly Organisation</label>
+                                        </div>
+                                    </div>
+                                    <div class="col">   
+                                        <div class="form-floating m-1"
+                                        {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}
+                                            data-bs-toggle="popover" 
+                                            data-bs-trigger="hover focus" 
+                                            data-bs-html="true" 
+                                            data-bs-placement="top"
+                                            data-bs-title="Site Calendly Token"
+                                            data-bs-content="
+                                                You do not have permission to edit this field: Edit Site Configuration
+                                            "
+                                        {%endif%}>
+                                            <input name="calendly_token" type="password" class="form-control"
+                                                oninput="$('#calendly_config_submit').attr('disabled', false)"
+                                                value="{{site.calendly_token|censor}}" {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}disabled{%endif%}/>
+                                            <label class="elipses-overflow">Site Calendly Token</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col center">  
+                                        {%if request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}<button type='submit' class="btn btn-primary btn-sm m-3" id="calendly_config_submit" disabled>Submit</button>{%endif%}  
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <div class="col-md p-0">   
+                        </div>
+                        <div class="col-md-auto m-1 p-2 alert alert-light center" style="min-width:350px;min-height:100px;">                          
+                            <div>   
+                                Calendly Webhook for <span class="name_display_{{site.pk}}">{{site.name}}</span>: 
+                                {%include 'core/htmx/calendly_webhook_status_wrapper.html'%}  
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -164,7 +218,8 @@
                             hx-confirm="Are you sure you want to add another site?" 
                             hx-indicator=".top-htmx-indicator" 
                             hx-vals='{"company_pk": "{{company.pk}}"}'
-                            hx-post="{% url 'add-site' %}" hx-push-url="true"
+                            {% comment %} hx-post="{% url 'add-site' %}"  {% endcomment %}
+                            hx-push-url="true"
                             hx-swap="none" hx-trigger="click"><i class="fa-solid fa-circle-info help"></i> Add Another Site {%if not company.subscription == 'pro'%}<i class="fa-solid fa-rectangle-pro"></i>{%endif%}</button> 
                     </span>
                 </div>
@@ -173,39 +228,44 @@
             </div>
             <div class="row mt-2">
                 <div class="col card card-white p-2">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th class="center">
-                                    User
-                                </th>
-                                <th class="center">
-                                    Main Site
-                                </th>
-                                <th class="center">
-                                    Role
-                                </th>
-                                <th class="center">
-                                    Default Campaign Category
-                                </th>
-                                <th class="center">
-                                    Permissions
-                                </th>
-                                <th class="center">
-                                    Configuration
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {%for temp_user in company.users%}
-                            {%with temp_user.profile as profile%}
-                            <tr id="company_configuration_row_{{profile.pk}}">
-                                {%include 'core/htmx/company_configuration_row.html'%}
-                            </tr>
-                            {%endwith%}
-                            {%endfor%}
-                        </tbody>
-                    </table>
+                    <div class="card-header">
+                        <i class="fa-regular fa-calendar-days"></i> <b class="name_display_{{site.pk}}">{{company.name}}</b> users
+                    </div>
+                    <div class="card-body">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th class="center">
+                                        User
+                                    </th>
+                                    <th class="center">
+                                        Main Site
+                                    </th>
+                                    <th class="center">
+                                        Role
+                                    </th>
+                                    <th class="center">
+                                        Default Campaign Category
+                                    </th>
+                                    <th class="center">
+                                        Permissions
+                                    </th>
+                                    <th class="center">
+                                        Configuration
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {%for temp_user in company.users%}
+                                {%with temp_user.profile as profile%}
+                                <tr id="company_configuration_row_{{profile.pk}}">
+                                    {%include 'core/htmx/company_configuration_row.html'%}
+                                </tr>
+                                {%endwith%}
+                                {%endfor%}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

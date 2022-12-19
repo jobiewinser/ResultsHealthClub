@@ -43,14 +43,6 @@ function basehandlehtmxafterSwap(evt){
     } else {
         snackbarShow(evt.detail.xhr.responseText, 'danger')
     }
-    $('.popover').remove()
-    $('[data-bs-toggle=popover]').popover();
-    $('[data-bs-toggle=popover_delay]').popover({
-        delay: { 
-           show: "350", 
-           hide: "100"
-        }
-    });
 }
 // var tapped=false
 
@@ -84,18 +76,37 @@ function setDoubleTap(identifier){
     
 }
 
+function select2stuff(){
+    $('.select2:not([data-select2-id])').select2({
+        searchInputPlaceholder: '🔎 Search here...',        
+        theme: 'bootstrap-5',
+    })
+    $('.select2tag:not([data-select2-id])').select2({     
+        tags: true,
+        createTag: function (tag) {
+            return {id: tag.term, text: tag.term, tag: true};
+        }
+    })
+    $('.select2tag').on('select2:open', function (e) {
+        const evt = "scroll.select2";
+        $(e.target).parents().off(evt);
+        $(window).off(evt);
+    });
+}
+
 function basehandlehtmxafterSettle(evt){ 
-    console.log("basehandlehtmxafterSettle")    
-    try {
-        $('.select2:not([data-select2-id])').select2({
-            searchInputPlaceholder: '🔎 Search here...',        
-            theme: 'bootstrap-5',
-        })
-    }catch{}
+    console.log("base.js basehandlehtmxafterSettle")    
+    var current_module = $('#current_page').val()
+    if (current_module != 'campaign_booking_overview'){
+        select2stuff()
+    }
 }
 
 function basehandlehtmxafterRequest(evt){   
-    $('.popover').remove()
+    $("[data-toggle='popover']").popover('destroy');
+    $('[data-bs-toggle=popover]').popover({
+        animation:false
+    });
     let status = evt.detail.xhr.status;
     let srcElement = $(evt.srcElement);
     if(status == 200) {
@@ -166,14 +177,12 @@ function basehandlehtmxoobAfterSwap(evt){
             scrollTop: $(evt.detail.target)[0].scrollHeight - $(evt.detail.target)[0].clientHeight
         }, 100);
     }
-    $("[data-bs-toggle=popover]").popover();
 }
 
 function basehandlehtmxoobBeforeSwap(evt){    
     if ($(evt.target).hasClass('message_list_body')){
         htmx.ajax('GET', "/update-message-counts/", {swap:'none'})
     }
-    $("[data-bs-toggle=popover]").popover();
 }
 
 

@@ -427,8 +427,26 @@ class Site(models.Model):
     calendly_token = models.TextField(blank=True, null=True)
     calendly_user = models.TextField(blank=True, null=True)
     calendly_organization = models.TextField(blank=True, null=True)   
+    SUBSCRIPTION_CHOICES = (
+                    ('free', 'Free'),
+                    ('basic', 'Basic'),
+                    ('pro', 'Pro'),
+                )
+    subscription = models.CharField(choices=SUBSCRIPTION_CHOICES, max_length=5, default="free")
     # calendly_webhook_created = models.BooleanField(default=False)  
     guid = models.TextField(null=True, blank=True) 
+    
+    @property
+    def users(self):
+        return User.objects.filter(profile__sites_allowed=self).order_by('profile__role')
+
+        
+    def check_if_allowed_to_get_analytics(self, start_date):
+        if self.subscription == 'pro':
+            return True
+        if (datetime.now() - timedelta(days=8)) < start_date:
+            return True
+        return False
     def __str__(self):
         return f"({str(self.pk)}) {str(self.name)}"
         
@@ -527,12 +545,6 @@ class Company(models.Model):
     demo = models.BooleanField(default=False)
     whatsapp_app_secret_key = models.TextField(blank=True, null=True)
     whatsapp_app_business_id = models.TextField(blank=True, null=True)
-    SUBSCRIPTION_CHOICES = (
-                    ('free', 'Free'),
-                    ('basic', 'Basic'),
-                    ('pro', 'Pro'),
-                )
-    subscription = models.CharField(choices=SUBSCRIPTION_CHOICES, max_length=5, default="free")
     active_campaign_url = models.TextField(null=True, blank=True)
     active_campaign_api_key = models.TextField(null=True, blank=True)
     
@@ -550,18 +562,15 @@ class Company(models.Model):
     def users(self):
         return User.objects.filter(profile__company=self).order_by('profile__site', 'profile__role')
     @property
+    def has_pro_subscription_site(self):
+        return self.site_set.filter(subscription="pro").exists()
+    
+    @property
     def get_campaign_leads_enabled(self):
         return self.campaign_leads_enabled
     @property
     def get_calendly_enabled(self):
         return self.calendly_enabled
-    
-    def check_if_allowed_to_get_analytics(self, start_date):
-        if self.subscription == 'pro':
-            return True
-        if (datetime.now() - timedelta(days=8)) < start_date:
-            return True
-        return False
     def __str__(self):
         return f"{str(self.name)}"   
 

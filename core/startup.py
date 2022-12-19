@@ -28,7 +28,6 @@ def run_debug_startup():
             )
             company.active_campaign_url = os.getenv("DEFAULT_ACTIVE_CAMPAIGN_URL")
             company.active_campaign_api_key = os.getenv("DEFAULT_ACTIVE_CAMPAIGN_API_KEY")
-            company.subscription = 'pro'
             company.save()
 
             site, created = Site.objects.get_or_create(
@@ -39,6 +38,7 @@ def run_debug_startup():
             site.calendly_token = os.getenv("DEFAULT_CALENDLY_TOKEN")
             site.calendly_organization = os.getenv("DEFAULT_CALENDLY_ORGANIZATION")
             site.guid = "6325bcde-feb9-4c"
+            site.subscription = 'pro'
             site.save()
 
             whatsapp_business_account, created = WhatsappBusinessAccount.objects.get_or_create(
@@ -130,12 +130,12 @@ def run_demo_startup():
                 name="Demo Company",
                 demo=True,
             )   
-            company.subscription = 'pro'
             company.save()
             site1, created = Site.objects.get_or_create(
                 name="Abingdon Site",
                 company=company,
             )
+            site1.subscription = 'pro'
             site1.calendly_token = os.getenv("DEFAULT_CALENDLY_TOKEN")
             site1.calendly_organization = os.getenv("DEFAULT_CALENDLY_ORGANIZATION")
             site1.save()

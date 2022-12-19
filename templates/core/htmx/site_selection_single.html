@@ -1,0 +1,12 @@
+
+{%load core_tags%}
+<div class="col-md-auto m-1 ps-0">
+    <div id="site_list_wrapper">  
+        <select class="form-select select2 select2-styling overview_table_filters non_site_dependant_overview_table_filters non_site_dependant_analytics_filters" name="site_pk" id="site_pk" onchange="$('#change_site').click();">
+            {% comment %} {%if not hide_show_all%}<option value="all">Show All Sites</option>{%endif%} {% endcomment %}
+            {%for site in request.user.profile.sites_allowed.all%}
+            <option {%if site.pk == request|get_key_in_get_or_post:'site_pk'|str_to_int %}selected{%endif%} value="{{site.pk}}">{{site.name}}</option>
+            {%endfor%}
+        </select>
+    </div>
+</div>

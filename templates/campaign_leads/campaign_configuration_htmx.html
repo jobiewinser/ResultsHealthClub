@@ -10,12 +10,12 @@
         {% comment %} <div class="col-md-auto">
             <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
         </div> {% endcomment %}
-        {%include 'core/htmx/site_selection.html'%}
-        {%include 'campaign_leads/htmx/campaign_category_selection.html'%}
-        <button hidden hx-get="" hx-push-url="false" hx-swap="innerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
+        {%include 'core/htmx/site_selection_single.html'%}
+        {% comment %} {%include 'campaign_leads/htmx/campaign_category_selection.html'%} {% endcomment %}
+        <button hidden hx-get="{%url 'campaign-configuration'%}" hx-push-url="false" hx-swap="innerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
         
         <button hidden
-            hx-get="" onclick="$('#campaign_pk').val('').trigger('change')"
+            hx-get="{%url 'campaign-configuration'%}" onclick="$('#campaign_pk').val('').trigger('change')"
             hx-swap="innerHTML" hx-push-url="false" hx-include=".overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_campaign_category"></button>
         {%endblock extra_top_left_buttons %}
 

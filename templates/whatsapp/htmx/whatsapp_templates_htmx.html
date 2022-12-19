@@ -3,7 +3,10 @@
     <script>
         $(document).ready(function() {
             document.title = "Whatsapp Templates";
-            $("[data-bs-toggle=popover]").popover();
+            $("[data-toggle='popover']").popover('destroy');
+            $('[data-bs-toggle=popover]').popover({
+                animation:false
+            });
         });
         var SearchTerm = ""
     </script>
@@ -14,12 +17,12 @@
             <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
         </div> {% endcomment %}
         {%with True as hide_show_all%}
-        {%include 'core/htmx/site_selection.html'%}
+        {%include 'core/htmx/site_selection_single.html'%}
         <div class="col-md-auto m-1 ps-0">
             <div id="phone_list_wrapper">  
                 <select class="form-select select2 select2-styling overview_table_filters"name="whatsapp_business_account_pk" id="whatsapp_business_account_pk" onchange="$('#change_site').click();">
                     {%for whatsapp_business_account in whatsapp_business_accounts%}
-                    <option {%if whatsapp_business_account.pk == request|get_key_in_get_or_post:'whatsapp_business_account_pk'|str_to_int %}selected{%endif%} value="{{whatsapp_business_account.pk}}">Whatsapp Phone: {{whatsapp_business_account.whatsappnumber}}</option>
+                    <option {%if whatsapp_business_account.pk|to_str == request|get_key_in_get_or_post:'whatsapp_business_account_pk' %}selected{%endif%} value="{{whatsapp_business_account.pk}}">Whatsapp Phone: {{whatsapp_business_account.whatsappnumber}}</option>
                     {%endfor%}
                 </select>
             </div>
@@ -29,7 +32,7 @@
         <div class="col-md-auto m-1 ps-0">
         </div>
 
-        <button hidden hx-get="" hx-push-url="false" hx-swap="innerHTML" hx-include=".overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
+        <button hidden hx-get="{%url 'whatsapp-templates'%}" hx-push-url="false" hx-swap="innerHTML" hx-include=".overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
         {%endwith%}    
         {%endblock extra_top_left_buttons %}
         

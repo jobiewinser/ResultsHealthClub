@@ -13,7 +13,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views import View
 from core.user_permission_functions import get_available_sites_for_user, get_profile_allowed_to_edit_other_profile, get_user_allowed_to_edit_site_configuration 
-from core.views import get_site_pk_from_request
+from core.views import get_site_pks_from_request_and_return_sites
 from django.http import QueryDict
 from campaign_leads.models import Campaignlead
 from django.conf import settings
@@ -27,10 +27,7 @@ def get_modal_content(request, **kwargs):
     try:
         request.GET._mutable = True
         context = {}
-        site_pk = get_site_pk_from_request(request)
-        if site_pk:
-            request.GET['site_pk'] = site_pk
-            context["site"] = Site.objects.get(pk=site_pk)
+        context["sites"] = get_site_pks_from_request_and_return_sites(request)
         if request.user.is_authenticated:
             template_name = request.GET.get('template_name', '')
             # context = {'site_list':get_available_sites_for_user(request.user)}
@@ -193,21 +190,21 @@ def delete_calendly_webhook_subscription(request, **kwargs):
                 break
     return render(request, "core/htmx/calendly_webhook_status_wrapper.html", {'site':site, 'site_webhook_active':False})
 
-@login_required
-def add_site(request, **kwargs):
-    if settings.DEMO and not request.user.is_superuser:
-        return HttpResponse(status=500)
-    company = Company.objects.get(pk=request.POST.get('company_pk'))
-    if not company.subscription == 'pro':
-        site = Site.objects.create(
-            name = "New Site",
-            company = company,
-        )
+# @login_required
+# def add_site(request, **kwargs):
+#     if settings.DEMO and not request.user.is_superuser:
+#         return HttpResponse(status=500)
+#     company = Company.objects.get(pk=request.POST.get('company_pk'))
+#     if not company.subscription == 'pro':
+#         site = Site.objects.create(
+#             name = "New Site",
+#             company = company,
+#         )
 
-        response = HttpResponse( status=200)
-        response["HX-Redirect"] = f"/site-configuration/?site_pk={site.pk}"
-        return response
-    return HttpResponse("This feature requires a Pro subscription", status=403)
+#         response = HttpResponse( status=200)
+#         response["HX-Redirect"] = f"/site-configuration/?site_pk={site.pk}"
+#         return response
+#     return HttpResponse("This feature requires a Pro subscription", status=403)
 
 @login_required
 def generate_free_taster_link(request, **kwargs):

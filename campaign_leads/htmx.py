@@ -10,7 +10,7 @@ from campaign_leads.models import Campaign, Campaignlead, Booking, Call, Note, M
 from campaign_leads.views import CampaignBookingsOverviewView
 from core.models import Site, WhatsappNumber
 from core.user_permission_functions import get_available_sites_for_user, get_user_allowed_to_add_call
-from core.views import get_site_pk_from_request
+from core.views import get_site_pks_from_request_and_return_sites
 from django.db.models import Q, Count
 from django.contrib import messages
 from asgiref.sync import async_to_sync
@@ -30,13 +30,8 @@ def get_modal_content(request, **kwargs):
             param1 = kwargs.get('param1', '')
             if param1:
                 context['lead'] = Campaignlead.objects.get(pk=param1)
-
-
-
-            site_pk = get_site_pk_from_request(request)
-            if site_pk and not site_pk == 'all':
-                request.GET['site_pk'] = site_pk
-                context['site'] = Site.objects.get(pk=site_pk)
+                
+            context['sites'] = get_site_pks_from_request_and_return_sites(request)
             whatsapp_template_pk = request.GET.get('whatsapp_template_pk')
             if whatsapp_template_pk:
                 context['template'] = WhatsappTemplate.objects.get(pk=whatsapp_template_pk)
@@ -155,16 +150,15 @@ def edit_lead(request, **kwargs):
 def get_leads_column_meta_data(request, **kwargs):
     logger.debug(str(request.user))
     try:
-        leads = Campaignlead.objects.filter(archived=False, booking=None, campaign__site__in=request.user.profile.sites_allowed.all())
+        leads = Campaignlead.objects
         campaign_pk = request.GET.get('campaign_pk', None)
+            # request.GET['campaign_pk'] = campaign_pk
+        sites = get_site_pks_from_request_and_return_sites(request).filter(archived=False, booking=None, campaign__site__in=request.user.profile.sites_allowed.all())
+        if request.GET['site_pks']:
+            leads = leads.filter(campaign__site__pk__in=request.GET['site_pks'])
+            
         if campaign_pk:
             leads = leads.filter(campaign=Campaign.objects.get(pk=campaign_pk))
-            # request.GET['campaign_pk'] = campaign_pk
-        site_pk = get_site_pk_from_request(request)
-        if site_pk and not site_pk == 'all':
-            leads = leads.filter(campaign__site__pk=site_pk)
-            # request.GET['site_pk'] = site_pk 
-            
         leads = leads.annotate(calls=Count('call'))
         querysets = [
             ('Fresh', leads.filter(calls=0), 0)

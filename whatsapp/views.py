@@ -1,14 +1,12 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 import logging
 from django.conf import settings
 from django.http import HttpResponse, QueryDict
 import json
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from campaign_leads.models import Campaign, Campaignlead, Call
-from core.user_permission_functions import get_available_sites_for_user, get_user_allowed_to_edit_site_configuration, get_user_allowed_to_edit_template, get_user_allowed_to_edit_whatsappnumber, get_user_allowed_to_send_from_whatsappnumber
-from core.views import get_site_pk_from_request
-from messaging.models import Message
+from campaign_leads.models import Campaignlead
+from core.user_permission_functions import get_user_allowed_to_edit_site_configuration, get_user_allowed_to_edit_template, get_user_allowed_to_edit_whatsappnumber, get_user_allowed_to_send_from_whatsappnumber
 from whatsapp.api import Whatsapp
 from django.views.generic import TemplateView
 from whatsapp.models import WHATSAPP_ORDER_CHOICES, WhatsAppMessage, WhatsAppMessageStatus, WhatsAppWebhookRequest, WhatsappMessageImage, WhatsappTemplate, template_variables
@@ -16,20 +14,11 @@ from django.template import loader
 logger = logging.getLogger(__name__)
 from django.views import View 
 from django.utils.decorators import method_decorator
-from core.models import ErrorModel, Site, WhatsappBusinessAccount, WhatsappNumber, Contact
-from random import randrange
+from core.models import Site, WhatsappBusinessAccount, WhatsappNumber, Contact
 from core.core_decorators import check_core_profile_requirements_fulfilled
 from django.contrib.auth.decorators import login_required
 from whatsapp.models import WhatsappTemplate
-# def random_date(start,l):
-#     current = start
-#     while l >= 0:
-#         current = current + timedelta(minutes=randrange(10))
-#         l-=1
-#     return current
 
-# startDate = datetime(2013, 9, 20,13,00)
-# temp1 = random_date(startDate,10)
 import hmac
 import hashlib
 import pickle

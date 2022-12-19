@@ -154,7 +154,7 @@ class SitePermissionsView(TemplateView):
         context['error'] = "You do not have permission to do this"
         return render(request, 'campaign_leads/htmx/site_permissions.html', context)
 
-def get_site_coonfiguration_context(request):
+def get_site_configuration_context(request):
     context = {}
     site_pk = request.GET.get('site_pk', None) or request.POST.get('site_pk', None)
     site = Site.objects.get(pk=site_pk)     
@@ -191,7 +191,7 @@ class SiteConfigurationView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         request.GET._mutable = True   
-        site_pk = get_site_pk_from_request(request)
+        site_pk = get_single_site_pk_from_request(request)
         request.GET['site_pk'] = site_pk      
         site = Site.objects.get(pk=site_pk) 
         if request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
@@ -200,7 +200,7 @@ class SiteConfigurationView(TemplateView):
 
     def get_context_data(self):    
         context = super(SiteConfigurationView, self).get_context_data()
-        context.update(get_site_coonfiguration_context(self.request))
+        context.update(get_site_configuration_context(self.request))
         return context
     def post(self, request):
         if settings.DEMO and not request.user.is_superuser:
@@ -226,12 +226,12 @@ class SiteConfigurationView(TemplateView):
         if 'calendly_organization' in request.POST:
             site.calendly_organization = request.POST['calendly_organization']        
             site.save()            
-            return render(request, 'core/htmx/site_configuration_htmx.html', get_site_coonfiguration_context(request))
+            return render(request, 'core/htmx/site_configuration_htmx.html', get_site_configuration_context(request))
             
         if 'calendly_token' in request.POST:
             site.calendly_token = request.POST['calendly_token']        
             site.save()
-            return render(request, 'core/htmx/site_configuration_htmx.html', get_site_coonfiguration_context(request))
+            return render(request, 'core/htmx/site_configuration_htmx.html', get_site_configuration_context(request))
         return HttpResponse( status=200)
             
 
@@ -335,26 +335,26 @@ def submit_feedback_form(request):
 #     return HttpResponse("Account not found", status=404)
 
 
-@method_decorator(login_required, name='dispatch')
-@method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
-class FreeTasterOverviewView(TemplateView):
-    template_name='core/free_taster_overview.html'
+# @method_decorator(login_required, name='dispatch')
+# @method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
+# class FreeTasterOverviewView(TemplateView):
+#     template_name='core/free_taster_overview.html'
 
-    def get_context_data(self, **kwargs):
-        self.request.GET._mutable = True       
-        context = super(FreeTasterOverviewView, self).get_context_data(**kwargs)
-        if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
-            self.template_name = 'core/htmx/free_taster_table_htmx.html'
-        # context['site_list'] = get_available_sites_for_user(self.request.user)
-        free_taster_links = FreeTasterLink.objects.all()
+#     def get_context_data(self, **kwargs):
+#         self.request.GET._mutable = True       
+#         context = super(FreeTasterOverviewView, self).get_context_data(**kwargs)
+#         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+#             self.template_name = 'core/htmx/free_taster_table_htmx.html'
+#         # context['site_list'] = get_available_sites_for_user(self.request.user)
+#         free_taster_links = FreeTasterLink.objects.all()
 
-        site_pk = get_site_pk_from_request(self.request)
-        if site_pk:
-            free_taster_links = free_taster_links.filter(site__pk=site_pk)
-            self.request.GET['site_pk'] = site_pk                    
-        context['free_taster_links'] = free_taster_links
+#         site_pks = get_site_pks_from_request_and_return_sites(self.request)
+#         if site_pk:
+#             free_taster_links = free_taster_links.filter(site__pk=site_pk)
+#             self.request.GET['site_pk'] = site_pk                    
+#         context['free_taster_links'] = free_taster_links
 
-        return context
+#         return context
         
  
 class FeedbackListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
@@ -384,7 +384,29 @@ def free_taster_redirect(request, **kwargs):
     return HttpResponseRedirect("https://WinserSystemss.co.uk/book-free-taster-sessions-abingdon/")
 
 @login_required
-def get_site_pk_from_request(request):  
+def get_site_pks_from_request_and_return_sites(request):
+    request.GET._mutable = True 
+    if request.method == 'GET':
+        request_dict = request.GET
+    elif request.method == 'POST':
+        request_dict = request.POST
+    temp_site_pks = request.GET.get('site_pks', None)
+    if type(temp_site_pks) == list:
+        site_pks = temp_site_pks
+    else:
+        site_pks = request.GET.getlist('site_pks',request.user.profile.sites_allowed.all().values_list('pk', flat=True))
+    while "" in site_pks:
+        site_pks.pop(site_pks.index(""))
+    if not site_pks:
+        profile = Profile.objects.filter(user=request.user).first()
+        if profile and not request_dict.get('campaign_category_pk', None) and not request_dict.get('campaign_pk', None):
+            if profile.site:
+                site_pks == [request.user.profile.site.pk]
+    request.GET['site_pks'] = list(site_pks)
+    return Site.objects.filter(pk__in=site_pks)
+
+@login_required
+def get_single_site_pk_from_request(request):  
     if request.method == 'GET':
         request_dict = request.GET
     elif request.method == 'POST':
@@ -396,23 +418,20 @@ def get_site_pk_from_request(request):
     if profile and not request_dict.get('campaign_category_pk', None) and not request_dict.get('campaign_pk', None):
         if profile.site:
             return request.user.profile.site.pk
-    return 'all'
-    
 
 @login_required
-def get_campaign_category_pk_from_request(request):  
+def get_campaign_category_pks_from_request(request):  
     if request.method == 'GET':
         request_dict = request.GET
     elif request.method == 'POST':
         request_dict = request.POST
-    campaign_category_pk = request_dict.get('campaign_category_pk', None)
-    if campaign_category_pk:
-        return campaign_category_pk
-    profile = Profile.objects.filter(user=request.user).first()
-    if profile and not request_dict.get('site_pk', None) and not request_dict.get('campaign_pk', None):
-        if profile.campaign_category:
-            return request.user.profile.campaign_category.pk
-    return 'all'
+    campaign_category_pks = request_dict.getlist('campaign_category_pks', None)
+    if type(campaign_category_pks) == list:
+        campaign_category_pks = campaign_category_pks
+    else:
+        campaign_category_pks = []
+        
+    return campaign_category_pks
     
 
 from django.core.mail import send_mail

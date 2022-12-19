@@ -19,6 +19,8 @@
                 {%endif%}
                 <div class="col-sm p-0 ms-1 nowrap elipses-overflow" style="">
                     <strong style="font-size:14px;">{{user.profile}}</strong>
+                    <hr style="margin:0px; margin-bottom:-3px">
+                    <span style="font-size:12px; line-height: 0.75em; ">{{user.profile.site.name}} ({{user.profile.site.get_subscription_display}})</span>
                 </div>
                 <input hidden id="user_id" value="{{user.pk}}"/>
             </div>

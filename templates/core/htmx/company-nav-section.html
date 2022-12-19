@@ -13,7 +13,7 @@
                 <div class="col-sm p-0 ms-1 nowrap elipses-overflow" style="">
                     <strong style="font-size:14px; margin:0px; margin-top:-3px">{{user.profile.company}}</strong>
                     <hr style="margin:0px; margin-bottom:-3px">
-                    <span style="font-size:12px; line-height: 0.75em; ">{{user.profile.company.get_subscription_display}} subscription</span>
+                    {% comment %} <span style="font-size:12px; line-height: 0.75em; ">{{user.profile.company.get_subscription_display}} subscription</span> {% endcomment %}
                 </div>
                 <input hidden id="user_id" value="{{user.pk}}"/>
             </div>

@@ -1,5 +1,5 @@
 {%load core_tags%}
-{%if request.user.profile.company.subscription == 'pro'%}
+{%if minimum_site_subscription_level_in_query == 'pro'%}
 <div class="row">
     <div class="col p-0">
     </div>
@@ -76,5 +76,5 @@
     </div>
 </div>
 {%else%}
-<small>Extra analytics can be unlocked through a <i class="fa-solid fa-rectangle-pro"></i> subscription!</small>
+One of the sites in your query has a <b>{{minimum_site_subscription_level_in_query|prettify_variable}}</b> subscription. This analytics metric required a <b><i class="fa-solid fa-rectangle-pro"></i></b> subscription for all sites in the query.
 {%endif%}

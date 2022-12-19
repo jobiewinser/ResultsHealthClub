@@ -12,7 +12,7 @@ from active_campaign.api import ActiveCampaignApi
 from active_campaign.models import ActiveCampaign
 from core.models import Profile, Site, WhatsappBusinessAccount
 from core.user_permission_functions import get_available_sites_for_user, get_user_allowed_to_add_call
-from core.views import get_site_pk_from_request, get_campaign_category_pk_from_request
+from core.views import get_site_pks_from_request_and_return_sites, get_campaign_category_pks_from_request, get_single_site_pk_from_request
 from django.db.models import Q, Count
 from django.db.models import OuterRef, Subquery, Count
 from django.db.models import F
@@ -47,13 +47,16 @@ def get_campaign_qs(request):
     campaign_qs = Campaign.objects.annotate(
         first_model_count=Subquery(first_model_query)
     )
-    site_pk = get_site_pk_from_request(request)
-    if site_pk and not site_pk == 'all':
-        campaign_qs = campaign_qs.filter(site__pk=site_pk)
-    campaign_category_pk = request.GET.get('campaign_category_pk', 'all')
-    if not campaign_category_pk == 'all':
-        campaign_qs = campaign_qs.filter(campaign_category__pk=campaign_category_pk)
+    sites = get_site_pks_from_request_and_return_sites(request)
+    if sites:
+        campaign_qs = campaign_qs.filter(site__in=sites)
+    campaign_category_pks = request.GET.getlist('campaign_category_pks', [])
+    if campaign_category_pks:
+        campaign_qs = campaign_qs.filter(campaign_category__pk__in=campaign_category_pks)
     return campaign_qs.filter(site__company=request.user.profile.company).order_by('first_model_count')
+def get_campaign_category_qs(request):
+    sites = get_site_pks_from_request_and_return_sites(request)
+    return CampaignCategory.objects.filter(site__in=sites)
 
 
 
@@ -82,40 +85,38 @@ class CampaignleadsOverviewView(TemplateView):
 def get_leads_board_context(request):
     request.GET._mutable = True 
     context = {}   
+    context['sites'] = get_site_pks_from_request_and_return_sites(request)
     campaigns = get_campaign_qs(request)
     leads = Campaignlead.objects.filter(archived=False, campaign__site__company=request.user.profile.company, campaign__site__in=request.user.profile.sites_allowed.all()).exclude(booking__archived=False)
-    campaign_pk = request.GET.get('campaign_pk', None)
+    campaign_pks = request.GET.getlist('campaign_pks', None)
     filtered = False
     
-    if campaign_pk:
+    if campaign_pks:
         try:
-            leads = leads.filter(campaign=Campaign.objects.get(pk=campaign_pk))
+            leads = leads.filter(campaign__in=Campaign.objects.filter(pk__in=campaign_pks))
             filtered = True
-            request.GET['campaign_pk'] = campaign_pk
-            context['campaign'] = Campaign.objects.get(pk=campaign_pk, site__company=request.user.profile.company)
-            request.GET['site_pk'] = context['campaign'].site.pk
+            request.GET['campaign_pks'] = campaign_pks
+            context['campaigns'] = Campaign.objects.filter(pk__in=campaign_pks, site__company=request.user.profile.company)
+            # request.GET['site_pks'] = [context['campaign'].site.pk]
         except Exception as e:
             pass
-    campaign_category_pk = get_campaign_category_pk_from_request(request)
-    if campaign_category_pk and not campaign_category_pk == 'all':
+    campaign_category_pks = get_campaign_category_pks_from_request(request)
+    if campaign_category_pks:
         try:
-            context['campaign_category'] = CampaignCategory.objects.get(pk=campaign_category_pk)
+            context['campaign_categorys'] = CampaignCategory.objects.filter(pk__in=campaign_category_pks)
             if not filtered:
-                leads = leads.filter(campaign__campaign_category=context['campaign_category'])
-                campaigns = campaigns.filter(campaign_category=context['campaign_category'])
+                leads = leads.filter(campaign__campaign_category__in=context['campaign_categorys'])
+                campaigns = campaigns.filter(campaign_category__in=context['campaign_categorys'])
                 filtered = True
-                request.GET['site_pk'] = context['campaign_category'].site.pk
-            request.GET['campaign_category_pk'] = campaign_category_pk
+                # request.GET['site_pk'] = context['campaign_category'].site.pk
+            request.GET['campaign_category_pks'] = campaign_category_pks
         except Exception as e:
             pass
-    site_pk = get_site_pk_from_request(request)
-    if site_pk and not site_pk == 'all':
+    if request.GET['site_pks']:
         try:
             if not filtered:
-                leads = leads.filter(campaign__site__pk=site_pk)
-                filtered = True
-                request.GET['site_pk'] = site_pk    
-            context['site'] = Site.objects.get(pk=site_pk, company=request.user.profile.company)
+                leads = leads.filter(campaign__site__in=context['sites'])
+                filtered = True    
         except:
             pass
     leads = leads.annotate(calls=Count('call')).order_by('-last_dragged')
@@ -140,6 +141,7 @@ def get_leads_board_context(request):
     context['max_call_count'] = index
     context['company'] = request.user.profile.company
     context['campaigns'] = campaigns
+    context['campaign_categorys'] = get_campaign_category_qs(request)
     return context
 @login_required
 def refresh_leads_board(request):
@@ -155,35 +157,32 @@ class CampaignBookingsOverviewView(TemplateView):
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'campaign_leads/htmx/campaign_bookings_overview_htmx.html'   
             context['campaigns'] = get_campaign_qs(self.request)
+            context['campaign_categorys'] = get_campaign_category_qs(self.request)
         context.update(get_booking_table_context(self.request))
         return context
 def get_booking_table_context(request):
     request.GET._mutable = True     
     context = {}
     leads = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, campaign__site__in=request.user.profile.sites_allowed.all()).exclude(booking__archived=True)
-    campaign_pk = request.GET.get('campaign_pk', None)
-    campaign_category_pk = request.GET.get('campaign_category_pk', None)
+    campaign_pks = request.GET.getlist('campaign_pks', None)
+    campaign_category_pks = request.GET.getlist('campaign_category_pks', None)
+    context['sites'] = get_site_pks_from_request_and_return_sites(request)
     campaigns = get_campaign_qs(request)
-    site_pk = get_site_pk_from_request(request)
-    if site_pk and not site_pk == 'all':
-        request.GET['site_pk'] = site_pk 
-        context['site'] = Site.objects.get(pk=site_pk)      
-    if campaign_pk:
-        leads = leads.filter(campaign=Campaign.objects.get(pk=campaign_pk))
-        request.GET['campaign_pk'] = campaign_pk
-        
+    if campaign_pks:
+        leads = leads.filter(campaign__pk__in=campaign_pks)
+        request.GET['campaign_pks'] = campaign_pks       
 
-    elif campaign_category_pk and not campaign_category_pk == 'all':
+    elif campaign_category_pks:
         try:
-            context['campaign_category'] = CampaignCategory.objects.get(pk=campaign_category_pk)
-            leads = leads.filter(campaign__campaign_category=context['campaign_category'])
-            campaigns = campaigns.filter(campaign_category=context['campaign_category'])
-            request.GET['site_pk'] = context['campaign_category'].site.pk
-            request.GET['campaign_category_pk'] = campaign_category_pk
+            context['campaign_categorys'] = CampaignCategory.objects.filter(pk__in=campaign_category_pks)
+            leads = leads.filter(campaign__campaign_category__in=context['campaign_categorys'])
+            campaigns = campaigns.filter(campaign_category__in=context['campaign_categorys'])
+            # request.GET['site_pks'] = context['campaign_category'].site.pk
+            # request.GET['campaign_category_pks'] = campaign_category_pks
         except Exception as e:
             pass
-    elif site_pk and not site_pk == 'all':
-        leads = leads.filter(campaign__site__pk=site_pk)      
+    elif context['sites']:
+        leads = leads.filter(campaign__site__in=context['sites'])
     # context['archived_count'] = leads.filter(archived=True).count()
     archived_filter = (request.GET.get('archived', '').lower() =='true')
     if not archived_filter:
@@ -199,6 +198,7 @@ def get_booking_table_context(request):
     context['leads'] = leads
     context['company'] = request.user.profile.company
     context['campaigns'] = campaigns
+    context['campaign_categorys'] = get_campaign_category_qs(request)
     return context
 @login_required
 def refresh_booking_table_htmx(request):
@@ -230,17 +230,16 @@ class CampaignConfigurationView(TemplateView):
         if company:
             campaigns = company.get_and_generate_campaign_objects()
 
-        campaign_category_pk = self.request.GET.get('campaign_category_pk', None)
-        if campaign_category_pk and not campaign_category_pk == 'all':
-            try:
-                context['campaign_category'] = CampaignCategory.objects.get(pk=campaign_category_pk)
-                if not filtered:
-                    campaigns = campaigns.filter(campaign_category=context['campaign_category'])
-                    self.request.GET['site_pk'] = context['campaign_category'].site.pk
-                self.request.GET['campaign_category_pk'] = campaign_category_pk
-            except Exception as e:
-                pass
-        site_pk = get_site_pk_from_request(self.request)
+        # campaign_category_pk = self.request.GET.get('campaign_category_pk', None)
+        # if campaign_category_pk and not campaign_category_pk == 'all':
+        #     try:
+        #         context['campaign_category'] = CampaignCategory.objects.get(pk=campaign_category_pk)
+        #         campaigns = campaigns.filter(campaign_category=context['campaign_category'])
+        #         self.request.GET['site_pk'] = context['campaign_category'].site.pk
+        #         self.request.GET['campaign_category_pk'] = campaign_category_pk
+        #     except Exception as e:
+        #         pass
+        site_pk = get_single_site_pk_from_request(self.request)
         if site_pk and not site_pk == 'all':
             try:
                 campaigns = campaigns.filter(site__pk=site_pk)

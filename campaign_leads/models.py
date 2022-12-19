@@ -181,7 +181,7 @@ class Campaignlead(models.Model):
                 return rendered_html
             else:
                 delete_htmx = f"<span hx-swap-oob='delete' id='lead-{self.pk}'></span>"
-                rendered_html = f"<span hx-swap-oob='afterbegin:.campaign_column_{self.campaign.pk}_calls_{new_position},.site_column_{self.campaign.site.pk}_calls_{new_position},.company_column_{self.campaign.site.company.pk}_calls_{new_position}'><a hx-get='/refresh-lead-article/{self.pk}/' hx-swap='outerHTML' hx-indicator='#top-htmx-indicator' hx-trigger='load' href='#'></a> </span>"
+                rendered_html = f"<span hx-swap-oob='afterbegin:.campaign_column_{self.campaign.pk}_calls_{new_position},.campaign_category_column_{self.campaign.campaign_category.pk}_calls_{new_position},.site_column_{self.campaign.site.pk}_calls_{new_position},.company_column_{self.campaign.site.company.pk}_calls_{new_position}'><a hx-get='/refresh-lead-article/{self.pk}/' hx-swap='outerHTML' hx-indicator='#top-htmx-indicator' hx-trigger='load' href='#'></a> </span>"
                 from django.utils.safestring import mark_safe
                 return mark_safe(f"{rendered_html} {delete_htmx}")
 

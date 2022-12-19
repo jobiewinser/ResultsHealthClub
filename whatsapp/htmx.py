@@ -7,7 +7,7 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from campaign_leads.models import Campaign, Campaignlead, Call
 
-from core.views import get_site_pk_from_request
+from core.views import get_site_pks_from_request_and_return_sites
 from messaging.models import Message
 from whatsapp.api import Whatsapp
 from django.views.generic import TemplateView
@@ -25,9 +25,7 @@ def get_modal_content(request, **kwargs):
     try:
         request.GET._mutable = True
         context = {}
-        site_pk = get_site_pk_from_request(request)
-        if site_pk:
-            request.GET['site_pk'] = site_pk
+        context['sites'] = get_site_pks_from_request_and_return_sites(request)
         if request.user.is_authenticated:
             template_name = request.GET.get('template_name', '')
             if template_name == 'add_phone_number':

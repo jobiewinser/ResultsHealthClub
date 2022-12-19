@@ -2,7 +2,7 @@
 {%if message.inbound%}
     <div class="row {%if message.pending%}pending_message{%endif%}"
         id="message_chat_row_{{message.pk}}"
-        data-bs-toggle="popover_delay" 
+        data-bs-toggle="popover" 
         data-bs-trigger="hover focus" 
         data-bs-html="true" 
         data-bs-placement="right"
@@ -39,7 +39,7 @@
 {%else%}
     <div class="row {%if message.pending%}pending_message{%endif%} {%if message.failed%}bg-danger-trans-20{%endif%}"
         id="message_chat_row_{{message.pk}}"
-        data-bs-toggle="popover_delay" 
+        data-bs-toggle="popover" 
         data-bs-trigger="hover focus" 
         data-bs-html="true" 
         data-bs-placement="right"

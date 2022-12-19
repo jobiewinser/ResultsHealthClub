@@ -1,16 +1,16 @@
 {% extends 'core/base.html' %}
 {%load static tz core_tags%}
 
-{%block scripts%}
+{% comment %} {%block scripts%}
 {{block.super}}
 <script>
     $(document).ready(function() {
         initDataTable();
     });
-    {% comment %} function initDataTable() {
+     function initDataTable() {
         dt = $('#overview_table').DataTable(
         );
-    } {% endcomment %}
+    }
 </script>
 {%endblock scripts%}
 
@@ -46,4 +46,4 @@
         </div>
     </main>
 </div>
-{%endblock content%}
+{%endblock content%} {% endcomment %}

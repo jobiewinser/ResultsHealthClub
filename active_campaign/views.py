@@ -2,15 +2,10 @@ import logging
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from campaign_leads.models import Campaign, Campaignlead
-from campaign_leads.views import get_campaign_qs
-from core.user_permission_functions import get_available_sites_for_user
-from core.views import get_site_pk_from_request
-from active_campaign.api import ActiveCampaignApi
 from active_campaign.models import ActiveCampaignWebhookRequest, ActiveCampaign
 from core.models import Site
 logger = logging.getLogger(__name__)
 from django.views import View 
-from whatsapp.api import Whatsapp
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render

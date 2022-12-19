@@ -31,7 +31,7 @@ class Webhooks(View):
         return HttpResponse( status = 200)
 
     def post(self, request, *args, **kwargs):
-        time.sleep(5)
+        time.sleep(10)
         try:
             body = json.loads(request.body)
             # meta = request.META

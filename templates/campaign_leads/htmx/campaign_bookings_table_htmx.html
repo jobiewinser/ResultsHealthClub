@@ -4,9 +4,9 @@
 {%include 'campaign_leads/htmx/campaign_bookings_table_sold_toggle_div.html'%}
 {%include 'campaign_leads/htmx/campaign_bookings_table_archived_toggle_div.html'%}
 
-<span hx-swap-oob="true" id="site_pk_span">   
+{% comment %} <span hx-swap-oob="true" id="site_pk_span">   
     <input type="text" style="display:None" id="site_pk" name="site_pk" value="{{request|get_key_in_get_or_post:'site_pk'}}"/>
-</span>
+</span> {% endcomment %}
 <div hx-swap-oob="true" id="campaign_list_wrapper">    
     {%include 'campaign_leads/htmx/campaign_select.html'%}
 </div>
