@@ -89,8 +89,14 @@ class WhatsAppMessage(Message):
                 self.datetime = self.datetime + datetime.timedelta(seconds=1)
             else:
                 unique = True
+        self.customer_number = normalize_phone_number(self.customer_number)
         super(WhatsAppMessage, self).save(force_insert, force_update, using, update_fields)
+        
 
+def normalize_phone_number(number):
+    if number[:2] == '44':
+        number = '0' + number[2:]
+    return number
 # class WhatsAppMessage(models.Model):
 #     pass 
     
