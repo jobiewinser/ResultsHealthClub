@@ -28,7 +28,45 @@
                     When sending a template manually <i class="fa fa-pencil" aria-hidden="true"></i> buttons, a preview is now show before sending.
                 </li>
                 <li>
-                    Started on payment system so public can actually use for the system.
+                    Started on payment system so public can actually use the system.
+                </li>
+                <li>
+                    Made site, campaign category and campaign select boxes allow multiple queries where applicable.
+                </li>
+                {% comment %} <li>
+                    Made warning - such as message failed to send - flash the warning triangle, to make it more clear.
+                </li> {% endcomment %}
+                <li>
+                    Added warning to booking row, similar to lead cards.
+                </li>
+                <li>
+                    HUGE overhaul on the leads board that was needed for switching the select boxes to allow choosing multiple sites etc (instead of just show all sites).
+                </li>
+                <li>
+                    A sites users can now be deactivated and reactivated (not deleted, unless specifically requested by the company).
+                </li>
+                <li>
+                    Added a top nav section similar to profile for the company you're a part of. Also added the site under your profile name.
+                </li>
+                <li>
+                    Changed the subscription concept. Each site now has a subscription, allowing companies to mix and match (this also makes the payment subscriptions easier to set up).                
+                    <ul>
+                        <li>
+                            This means that the Pro only analytics are disabled unless only a pro subscription sites are chosen in the query (it gives a warning if incorrectly used).
+                        </li>
+                        <li>
+                            Inline with this change, profiles are now site focussed, not company focussed. Meaning that users can be managed through the site configuration (this is due to the different site subscriptions being allowed different numbers of profiles).
+                        </li>
+                        <li>
+                            Subscriptions are now managed through the site configuration page. The subscription level change wizard details the changes that will occur when you swap tier. It will also prompt you to deactivate accounts to meet the new limit if lower.
+                        </li>
+                        <li>
+                            Each company is only allowed 1 Free site. Technically a company could abuse this to created lots of companies with free sites instead of paying for a basic subscription. They will however lose the ability to compare sites with analytics easily a dn management tools will be harder to use.
+                        </li>
+                        <li>
+                            Previously available site configuration tools are now moved to an advanced settings card on the same page.
+                        </li>
+                    </ul>
                 </li>
                 <li>
                     <small>

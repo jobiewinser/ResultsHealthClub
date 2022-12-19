@@ -25,6 +25,8 @@
                             hx-target="#generic_modal_body"
                             hx-vals='{"company_permissions_pk": "{{profile_company_permissions.pk}}"}' hx-trigger="click" hx-push-url="false">
                             Company Permissions: {{profile_company_permissions.company.name}}
+                            <br>
+                            ({{profile_company_permissions.permissions_count}} permissions)
                             </a>
                         </div>
                         <div class="col-auto p-0" style="min-width:45px">
@@ -45,7 +47,7 @@
                                         hx-get="{% url 'site-permissions' %}" hx-push-url="false">
                                         Site Permissions: {{profile_site_permissions.site.name}} 
                                         <br>
-                                        ({{profile_site_permissions.permissions_count}} permissions)
+                                        ({%if profile_site_permissions.site in profile.sites_allowed.all%}{{profile_site_permissions.permissions_count}}{%else%}0{%endif%} permissions)
                                     </a>
                                 </div>
                                 <div class="col-md-auto p-0 ps-2">

@@ -84,8 +84,8 @@ function select2stuff(){
     
     $('.generic_modal_body_select').select2({
         dropdownCssClass: "generic_modal_body_dropdown",
-        searchInputPlaceholder: '🔎 Search here...',        
-        theme: 'bootstrap-5',
+        // searchInputPlaceholder: '🔎 Search here...',        
+        // theme: 'bootstrap-5',
       });
 
     $('.select2tag:not([data-select2-id])').select2({     
@@ -101,21 +101,26 @@ function select2stuff(){
     });
 }
 
-function basehandlehtmxafterSettle(evt){ 
-    console.log("base.js basehandlehtmxafterSettle")    
-    var current_module = $('#current_page').val()
-    if (current_module != 'campaign_booking_overview'){
-        select2stuff()
-    }
-}
-
-function basehandlehtmxafterRequest(evt){   
-    flash()
+function popoverstuff(){
     $("[data-toggle='popover']").popover('destroy');
     $(".popover").remove();    
     $('[data-bs-toggle=popover]').popover({
         animation:false
     });
+}
+
+function basehandlehtmxafterSettle(evt){ 
+    var current_module = $('#current_page').val()
+    if (current_module != 'campaign_booking_overview'){
+        select2stuff()
+        // flash()   
+        popoverstuff()
+    }
+}
+
+function basehandlehtmxafterRequest(evt){   
+    // flash()   
+    popoverstuff()
     let status = evt.detail.xhr.status;
     let srcElement = $(evt.srcElement);
     if(status == 200) {
@@ -196,6 +201,8 @@ function basehandlehtmxafterRequest(evt){
 }
 
 function basehandlehtmxoobAfterSwap(evt){
+    // flash()   
+    popoverstuff()
     if ($(evt.detail.target).hasClass('chat_card_body')){                        
         $(evt.detail.target).animate({
             scrollTop: $(evt.detail.target)[0].scrollHeight - $(evt.detail.target)[0].clientHeight
@@ -290,19 +297,19 @@ try{
 
 
 
-function flash() {
-    let flash = document.querySelector('.flashme');
-    try{
-        flash.style.animation = '2s flash infinite';
-    }catch{}
-    try{
-        [].forEach.call(flash, function(el) {
-            el.classList.remove("flashme");
-        });
-    }catch{}
-    setTimeout(function(){
-        try{
-            flash.style.animation = 'unset';
-        }catch{}
-    }, 2000); 
-}
+// function flash() {
+//     // try{
+//         setTimeout(function(){
+//         $('.flashme').each(function(flash) {
+//             console.log("test")
+//             $(flash).css('animation', '2s flash infinite');
+//             $(flash).removeClass('flashme');
+//             setTimeout(function(){
+//                 try{
+//                     $(flash).css('animation', 'unset');
+//                 }catch{}
+//             }, 2000); 
+//         });
+//     }, 100); 
+//     // }catch{}
+// }

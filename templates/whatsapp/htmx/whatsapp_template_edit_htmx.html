@@ -3,11 +3,8 @@
     <script>
         var variables = {{variables|safe}}  
         $(document).ready(function() {  
-            $("[data-toggle='popover']").popover('destroy');
-            $(".popover").remove();    
-            $('[data-bs-toggle=popover]').popover({
-                animation:false
-            });
+            {% comment %} flash()    {% endcomment %}
+            popoverstuff()
             
             renderTemplate()
         });

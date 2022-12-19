@@ -47,7 +47,7 @@ function filterLeads(searchInput){
 
 function handleDraggedItem(dragged_elem, drag_target){
     // dragged_elem = $('#'+dragged_elem_id)
-    console.log(dragged_elem)
+    console.log(dragged_elem, drag_target)
     var respStatus = $.ajax({
         type:'POST',
         url:'/new-call/'+dragged_elem.data('id')+'/'+$(drag_target).data("call-count")+'/'+$('#max_call_count').val()+'/',

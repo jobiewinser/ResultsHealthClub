@@ -3,7 +3,7 @@
     <form hx-indicator="#htmx-indicator-reactivate-user"
         hx-post="{% url 'reactivate-profile' %}" hx-push-url="false"
         hx-swap="none" hx-trigger="submit">
-        <div class="row">
+        <div class="row m-3">
             <div class="col">
             </div>
             <div class="col-md-auto center" >            
@@ -19,20 +19,23 @@
             <div class="col">
             </div>
         </div>
-        <div class="row">
+        <div class="row m-3">
             <div class="col">
             </div>
-            <div class="col-md-auto center" >
-                <select style="width:100%" class="form-control generic_modal_body_select" name="user_pk">
-                    {%for user in site.inactive_users%}
-                    <option value="{{user.pk}}">{{user.profile}}</option>
-                    {%endfor%}
-                </select>
+            <div class="col-md-auto center" >   
+                <label>
+                    Which user should be reactivated?<br>
+                    <select style="width:100%" class="form-control generic_modal_body_select" name="user_pk">
+                        {%for user in site.inactive_users%}
+                        <option value="{{user.pk}}">{{user.profile}}</option>
+                        {%endfor%}
+                    </select>  
+                </label>
             </div>
             <div class="col">
             </div>
         </div>
-        <div class="row">
+        <div class="row m-3">
             <div class="col">
             </div>
             <div class="col-md-auto center" >

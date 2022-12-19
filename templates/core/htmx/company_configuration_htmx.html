@@ -124,63 +124,43 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-auto p-0 card card-light">      
-                            <form class="" hx-post="" hx-swap="innerHTML" hx-indicator="#page_load_indicator " 
-                            hx-vals='{"site_pk": "{{site.pk}}"}' 
-                            hx-trigger='submit delay:0.3s' autocomplete="off" autofill="off" hx-target="#content">
-                                <div class="row mt-1">
-                                    <div class="col-md-auto">   
-                                        <div class="form-floating m-1"
-                                        {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}
-                                            data-bs-toggle="popover" 
-                                            data-bs-trigger="hover" 
-                                            data-bs-html="true" 
-                                            data-bs-placement="top"
-                                            data-bs-title="Site Calendly Organisation"
-                                            data-bs-content="
-                                                You do not have permission to edit this field: Edit Site Configuration
-                                            "
-                                        {%endif%}>
-                                            <input style="min-width:400px" id="calendly_organization" type="text" class="form-control" name="calendly_organization" {%if not request.user.profile.role == 'a'%}disabled{%endif%}
-                                                oninput="$('#calendly_config_submit').attr('disabled', false)"
-                                                value="{%if site.calendly_organization%}{{site.calendly_organization}}{%endif%}" {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}disabled{%endif%}/>
-                                            <label for="calendly_organization">Site Calendly Organisation</label>
-                                        </div>
-                                    </div>
-                                    <div class="col">   
-                                        <div class="form-floating m-1"
-                                        {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}
-                                            data-bs-toggle="popover" 
-                                            data-bs-trigger="hover" 
-                                            data-bs-html="true" 
-                                            data-bs-placement="top"
-                                            data-bs-title="Site Calendly Token"
-                                            data-bs-content="
-                                                You do not have permission to edit this field: Edit Site Configuration
-                                            "
-                                        {%endif%}>
-                                            <input name="calendly_token" type="password" class="form-control"
-                                                oninput="$('#calendly_config_submit').attr('disabled', false)"
-                                                value="{{site.calendly_token|censor}}" {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}disabled{%endif%}/>
-                                            <label class="elipses-overflow">Site Calendly Token</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col center">  
-                                        {%if request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}<button type='submit' class="btn btn-primary btn-sm m-3" id="calendly_config_submit" disabled>Submit</button>{%endif%}  
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                        
-                        <div class="col-md p-0">   
-                        </div>
-                        <div class="col-md-auto m-1 p-2 alert alert-light center" style="min-width:350px;min-height:100px;">                          
-                            <div>   
-                                Calendly Webhook for <span class="name_display_{{site.pk}}">{{site.name}}</span>: 
-                                {%include 'core/htmx/calendly_webhook_status_wrapper.html'%}  
-                            </div>
+                        <div class="col p-0 card card-light">      
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <a>
+                                                Name
+                                            </a>
+                                        </th>
+                                        <th>
+                                            Subscription
+                                        </th>
+                                        <th>
+                                            Profiles
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {%for site in company.active_sites%}
+                                    <tr>
+                                        <td>
+                                            <a href="#"
+                                                hx-indicator="#page_load_indicator" data-active-selector="#configuration-top-nav-dropdown-toggle"
+                                                hx-get="{%url 'site-configuration'%}?site_pk={{site.pk}}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML">
+                                                {{site.name}}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            {{site.get_subscription_display}}
+                                        </td>
+                                        <td>
+                                            <b>{{site.users.count}}</b> of <b>{% if site.subscription == 'free'%}5{% elif site.subscription == 'basic'%}10{% elif site.subscription == 'pro'%}Unlimited{%endif%}</b> allowed profiles
+                                        </td>
+                                    </tr>
+                                    {%endfor%}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -213,7 +193,7 @@
                             hx-vals='{"company_pk": "{{company.pk}}"}'
                             {% comment %} hx-post="{% url 'add-site' %}"  {% endcomment %}
                             hx-push-url="true"
-                            hx-swap="none" hx-trigger="click"><i class="fa-solid fa-circle-info help"></i> Add Another Site {%if not company.subscription == 'pro'%}<i class="fa-solid fa-rectangle-pro"></i>{%endif%}</button> 
+                            hx-swap="none" hx-trigger="click"><i class="fa-solid fa-circle-info help"></i> Add Another Site (coming soon)</button> 
                     </span>
                 </div>
                 <div class="col">

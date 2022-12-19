@@ -114,8 +114,7 @@ animals = [
         
 def run_startup():
     try:
-        if not sys.argv[1] in ["makemigrations", "migrate", "collectstatic", "random_leads"]:
-            SiteUsersOnline.objects.all().update(users_online="")
+        pass
     except:
         pass
 def run_demo_startup():

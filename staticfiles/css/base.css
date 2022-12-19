@@ -948,6 +948,12 @@ tr.odd td {
     bottom: 40.5%;
     right: 4%;
 }
+.lead_card_warning_wrapper {
+    position: absolute;
+    bottom: 43%;
+    right: 20.3%;
+}
+
 .lead_notes_button_wrapper {
     position: absolute;
     bottom: 25%;
@@ -1019,7 +1025,7 @@ tr.odd td {
 }
 
 .generic_modal_body_dropdown {
-    z-index: 10050;
+    z-index: 10050 !important;
 }
 
 @media (max-width: 992px) {

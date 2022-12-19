@@ -3,11 +3,8 @@
     <script>
         $(document).ready(function() {
             document.title = "Whatsapp Templates";
-            $("[data-toggle='popover']").popover('destroy');
-            $(".popover").remove();    
-            $('[data-bs-toggle=popover]').popover({
-                animation:false
-            });
+            {% comment %} flash()    {% endcomment %}
+            popoverstuff()
         });
         var SearchTerm = ""
     </script>

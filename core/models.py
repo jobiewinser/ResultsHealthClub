@@ -20,12 +20,13 @@ from whatsapp.models import WhatsAppMessage
 from django.template import loader
 from asgiref.sync import async_to_sync, sync_to_async
 from channels.layers import get_channel_layer
-
+import sys
 class SiteUsersOnline(models.Model):
     users_online = models.CharField(max_length=1500, default=";")
     site = models.ForeignKey("core.Site", on_delete=models.SET_NULL, null=True, blank=True)
     feature = models.CharField(max_length=50, default="leads")
-
+if not sys.argv[1] in ["makemigrations", "migrate", "collectstatic", "random_leads"]:
+    SiteUsersOnline.objects.all().update(users_online="")
 class AttachedError(models.Model): 
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     ERROR_TYPES = (
@@ -700,6 +701,18 @@ class CompanyProfilePermissions(models.Model):
     class Meta:
         ordering = ['-pk']   
 
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        role = self.profile.role
+        self.permissions_count = 0
+        for field in self._meta.fields:
+            if type(field) == models.BooleanField:
+                if getattr(self, field.attname, False):
+                    self.permissions_count +=1
+                elif role == 'a':
+                    setattr(self, field.attname, True)
+                    self.permissions_count +=1
+        return super(CompanyProfilePermissions, self).save(force_insert, force_update, using, update_fields)
+
 class SiteProfilePermissions(models.Model):
     profile = models.ForeignKey("core.Profile", on_delete=models.CASCADE, null=True, blank=True)
     site = models.ForeignKey("core.Site", on_delete=models.CASCADE, null=True, blank=True)
@@ -711,17 +724,16 @@ class SiteProfilePermissions(models.Model):
     permissions_count = models.IntegerField(default = 0) 
     class Meta:
         ordering = ['-pk']   
-
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         role = self.profile.role
-        self.permission_count = 0
+        self.permissions_count = 0
         for field in self._meta.fields:
             if type(field) == models.BooleanField:
                 if getattr(self, field.attname, False):
-                    self.permission_count +=1
+                    self.permissions_count +=1
                 elif role == 'a':
                     setattr(self, field.attname, True)
-                    self.permission_count +=1
+                    self.permissions_count +=1
         return super(SiteProfilePermissions, self).save(force_insert, force_update, using, update_fields)
     
     

@@ -97,6 +97,7 @@ class CompanyPermissionsView(TemplateView):
         # profile = Profile.objects.get(pk=self.request.GET.get('profile_pk'))
         # context['company_permissions'], created = CompanyProfilePermissions.objects.get_or_create(profile=profile, company=permission_company)
         company_permissions = CompanyProfilePermissions.objects.get(pk=self.request.GET.get('company_permissions_pk'))
+        company_permissions.save()
         context['company_permissions'] = company_permissions
         context['profile'] = company_permissions.profile
         # context['permission_company'] = permission_company
@@ -130,6 +131,7 @@ class SitePermissionsView(TemplateView):
         # context['site'] = Site.objects.get(pk=self.request.GET.get('site_pk'))
         # profile = Profile.objects.get(pk=self.request.GET.get('profile_pk'))
         site_permissions = SiteProfilePermissions.objects.get(pk=self.request.GET.get('site_permissions_pk'))
+        site_permissions.save()
         context['site_permissions'] = site_permissions
         context['profile'] = site_permissions.profile
         # context['permission_site'] = permission_site
@@ -343,6 +345,9 @@ def reactivate_profile(request):
             return HttpResponse("You already have the maximum number of users", status=400)
         user.is_active = True
         user.save()
+        user.profile.sites_allowed.set([site])
+        user.profile.site = site
+        user.profile.save()
         return HttpResponse(status=200)
     return HttpResponse(status=403)
 
