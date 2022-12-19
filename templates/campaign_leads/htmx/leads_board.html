@@ -21,7 +21,7 @@
         <div class="col-md-auto m-1 p-0">
             <button class="btn btn-primary btn-sm" 
                 data-bs-toggle="popover" 
-                data-bs-trigger="hover" 
+                data-bs-trigger="hover focus" 
                 data-bs-placement="top"
                 data-bs-content="Manually create a campaign lead."
                 onclick="htmx.ajax('GET', '{% url 'campaign-lead-get-modal-content'%}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'edit_lead'}})">

@@ -28,7 +28,17 @@ class Message(PolymorphicModel):
             return self.contact
         self.contact = Contact.objects.filter(customer_number=self.customer_number).last()
         self.save()
-        return self.contact
+        return self.contact    
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        self.customer_number = normalize_phone_number(self.customer_number)
+        super(Message, self).save(force_insert, force_update, using, update_fields)
+        
+
+def normalize_phone_number(number):
+    if number[:2] == '44':
+        number = '0' + number[2:]
+    return number
 
 class MessageImage(PolymorphicModel):  
     image = models.ImageField(upload_to="secure/message_images", null=True, blank=True)    

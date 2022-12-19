@@ -53,7 +53,7 @@
             <div class="row">
                 <div class="col"
                     data-bs-toggle="popover" 
-                    data-bs-trigger="hover" 
+                    data-bs-trigger="hover focus" 
                     data-bs-placement="top"
                     data-bs-html="true"
                     data-bs-title="{%if readonly or template.message_template_id%}Why is this input disabled?{%else%}Template Name Rules{%endif%}"
@@ -69,7 +69,7 @@
             <div class="row">
                 <div class="col"
                 data-bs-toggle="popover" 
-                data-bs-trigger="hover" 
+                data-bs-trigger="hover focus" 
                 data-bs-html="true"
                 data-bs-placement="top"
                 data-bs-title="{%if readonly or template.message_template_id%}Why is this input disabled?{%else%}What do these categories mean?{%endif%}"
@@ -137,7 +137,7 @@
                 </div>
                 <div class="col-auto" style="max-width:600px">
                     <small>
-                        <p><b>Max 1024 characters including any variables</b>. Messages longer than 1024 characters will fail to send.</p>
+                        <p><b>Max 1024 characters including any variables</b>. Messages longer than 1024 characters will fail to send. Your body content can't end in a variable (even with a full stop after it), as Whatsapp won't allow it.</p>
                     </small>
                 </div>
                 <div class="col">
@@ -203,7 +203,7 @@
     <button {%if readonly%}disabled{%endif%} {%if demo and not request.user.is_superuser%}(Demo, Disabled){%endif%} class="btn template_save_button btn-success m-3"
         onclick="saveTemplate('{{whatsapp_business_account.pk}}', '{{template.pk}}')"
         data-bs-toggle="popover" 
-        data-bs-trigger="hover" 
+        data-bs-trigger="hover focus" 
         data-bs-placement="top"
         data-bs-title="What does this do?"
         data-bs-content="This saves your changes to this system, but does not push it to Whatsapp to review. You must request a review from the template table. You may save your work then come back to it later here before requesting approval from Whatsapp.">

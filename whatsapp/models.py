@@ -170,7 +170,8 @@ class WhatsappTemplate(models.Model):
     
     @property
     def active_errors(self):
-        return self.errors.filter(archived=False)
+        from core.models import AttachedError
+        return AttachedError.objects.filter(whatsapp_template=self).filter(archived=False)
     # @property
     # def company_sites_with_same_whatsapp_business_details(self):
     #     try:

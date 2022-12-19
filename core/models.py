@@ -21,6 +21,13 @@ from django.template import loader
 from asgiref.sync import async_to_sync, sync_to_async
 from channels.layers import get_channel_layer
 import sys
+
+
+def normalize_phone_number(number):
+    if number[:2] == '44':
+        number = '0' + number[2:]
+    return number
+
 class SiteUsersOnline(models.Model):
     users_online = models.CharField(max_length=1500, default=";")
     site = models.ForeignKey("core.Site", on_delete=models.SET_NULL, null=True, blank=True)
@@ -37,6 +44,7 @@ class AttachedError(models.Model):
                         ('1105', "Message failed to send because the Whatsapp account is not yet registered (contact Winser Systems)"),
                         ('1106', "The requested phone number has been deleted"),
                         ('1107', "Parameter Invalid - They probably aren't on Whatsapp"),
+                        ('1108', "The message sent was too long (including any variables). Please edit the whatsapp template to make the offending section shorter or edit the lead/contact's name to be shorter for example."),
                         ('1201', "Whatsapp Template not found Whatsapp's system"),
                         ('1202', "There is no Whatsapp Business linked to this Lead's assosciated Site"),
                         ('1203', "Couldn't auto-send, there is no 1st Whatsapp Template linked to this Lead's Campaign"),
@@ -50,7 +58,11 @@ class AttachedError(models.Model):
                         # ('1211', "Couldn't auto-send, there is no 9th Whatsapp Template linked to this Lead's Campaign"),
                         # ('1212', "Couldn't auto-send, there is no 10th Whatsapp Template linked to this Lead's Campaign"),
                         ('1220', "This site has template messaging currently disabled, reenable it on the site configuration page"),
-                        ('1230', "This lead's campaign has no whatsapp number linked to it. Couldn't send first message."),
+                        ('1230', "This lead's campaign has no whatsapp number linked to it. Couldn't send first message"),
+                        ('1300', "Unknown Error (We will investigate)"),
+                        ('1301', "This template is missing a component"),
+                        ('1302', "This template needs a name"),
+                        ('1303', "One of this template's sections is too long"),
                     )
     type = models.CharField(choices=ERROR_TYPES, default='c', max_length=5)
     attached_field = models.CharField(null=True, blank=True, max_length=50)
@@ -59,11 +71,13 @@ class AttachedError(models.Model):
     contact = models.ForeignKey("core.Contact", related_name="errors", on_delete=models.SET_NULL, null=True, blank=True)
     whatsapp_number = models.ForeignKey("core.WhatsappNumber", related_name="errors", on_delete=models.SET_NULL, null=True, blank=True)
     whatsapp_message = models.ForeignKey("whatsapp.WhatsappMessage", related_name="attached_errors", on_delete=models.SET_NULL, null=True, blank=True)
+    whatsapp_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="attached_errors", on_delete=models.SET_NULL, null=True, blank=True)
     site = models.ForeignKey("core.Site", related_name="errors", on_delete=models.SET_NULL, null=True, blank=True)
     customer_number = models.TextField(blank=True, null=True)    
     admin_action_required = models.BooleanField(default=False)
     archived = models.BooleanField(default=False)
     archived_time = models.DateTimeField(null=True, blank=True)
+    additional_info = models.TextField(blank=True, null=True)  
     
 class Contact(models.Model):
     first_name = models.TextField(null=True, blank=True)
@@ -169,6 +183,7 @@ class Contact(models.Model):
                                 type = '1201',
                                 attached_field = "contact",
                                 contact = self,
+                                archived = False,
                             )
                             if not created:
                                 attached_error.created = datetime.now()
@@ -181,6 +196,7 @@ class Contact(models.Model):
                             type = '1220',
                             attached_field = "contact",
                             contact = self,
+                            archived = False,
                         )
                         if not created:
                             attached_error.created = datetime.now()
@@ -193,6 +209,7 @@ class Contact(models.Model):
                         type = '1202',
                         attached_field = "contact",
                         contact = self,
+                        archived = False,
                     )
                     if not created:
                         attached_error.created = datetime.now()
@@ -223,6 +240,11 @@ class Contact(models.Model):
                             send_message_to_websocket(whatsappnumber, customer_number, whatsapp_message, whatsappnumber.whatsapp_business_account )
                     logger.debug("site.send_template_whatsapp_message success") 
                     return HttpResponse("Message Sent", status=200)
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        self.customer_number = normalize_phone_number(self.customer_number)
+        super(Contact, self).save(force_insert, force_update, using, update_fields)
+
         # return HttpResponse("No Communication method specified", status=500)
 def send_message_to_websocket(whatsappnumber, customer_number, whatsapp_message, site):
     channel_layer = get_channel_layer()          
@@ -377,11 +399,11 @@ class WhatsappNumber(PhoneNumber):
         try:
             logger.debug("site.send_whatsapp_message start") 
             if lead:
-                customer_number = lead.whatsapp_number
+                customer_number = normalize_phone_number(lead.whatsapp_number)
             if self.whatsapp_business_phone_number_id and self.site.whatsapp_access_token and message:
                 whatsapp = Whatsapp(self.site.whatsapp_access_token)
                 if '+' in self.number:
-                    customer_number = f"{self.number.split('+')[-1]}"
+                    customer_number = normalize_phone_number(f"{self.number.split('+')[-1]}")
                 response_body, attached_errors = whatsapp.send_free_text_message(customer_number, message, self)
                 if not attached_errors:
                     reponse_messages = response_body.get('messages',[])

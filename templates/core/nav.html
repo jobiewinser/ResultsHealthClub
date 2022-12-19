@@ -44,7 +44,7 @@
                         hx-get="{%url 'campaign-configuration'%}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML">Campaign Configuration</a></li>
                     <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item pointer top-nav-link" hx-indicator="#page_load_indicator" data-active-selector="#configuration-top-nav-dropdown-toggle"
-                        id="whatsapp_templates_link"
+                        id="whatsapp_templates_link" hx-trigger="click"
                         hx-get="{%url 'whatsapp-templates'%}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML">Whatsapp Templates</a></li>
                     </ul>
                 </li>

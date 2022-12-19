@@ -3,7 +3,7 @@
 <td
     class="help"
     data-bs-toggle="popover" 
-    data-bs-trigger="hover" 
+    data-bs-trigger="hover focus" 
     data-bs-html="true" 
     data-bs-placement="top"
     data-bs-title="Additional Information"
@@ -48,7 +48,7 @@
 <td class="double_layer_td"
 {%if template.latest_reason%}
     data-bs-toggle="popover" 
-    data-bs-trigger="hover" 
+    data-bs-trigger="hover focus" 
     data-bs-placement="right"
     data-bs-html="true"
     data-bs-title="Reason for latest status"
@@ -59,7 +59,7 @@
         {%if template.active_errors%}
         <span 
             data-bs-toggle="popover" 
-            data-bs-trigger="hover" 
+            data-bs-trigger="hover focus" 
             data-bs-html="true" 
             data-bs-placement="top"
             data-bs-title="Errors"
@@ -82,6 +82,11 @@
             {%if not template.status == 'AWAITING_APPROVAL' and not template.status == 'PENDING'%}Draft awaiting submission <i class="fa-solid fa-arrow-right"></i>{%else%}Waiting for Whatsapp approval{%endif%}          
     </span>   
     {%endif%}
+    {%if '{{' in template.components|to_str%}
+    <span class="secondary_td_layer nowrap">
+            Needs configuring (coming soon)         
+    </span>   
+    {%endif%}
 </td>
 <td>
     {%if not template.name == 'hello_world' and not template.status == 'PENDING' and not template.status == 'AWAITING_APPROVAL'%}
@@ -95,7 +100,7 @@
     {%if ''|today_date_tag|timestamp < template.last_approval|add_days:1|timestamp and not template.status == 'REJECTED'%}
     <span
         data-bs-toggle="popover" 
-        data-bs-trigger="hover" 
+        data-bs-trigger="hover focus" 
         data-bs-html="true" 
         data-bs-placement="top"
         data-bs-title="What does this do?"
@@ -121,7 +126,7 @@
                     hx-indicator="#page_load_indicator"
                     hx-get="{%url 'whatsapp-template' template_pk=template.pk %}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML"
                     data-bs-toggle="popover" 
-                    data-bs-trigger="hover" 
+                    data-bs-trigger="hover focus" 
                     data-bs-html="true" 
                     data-bs-placement="top"
                     data-bs-title="What does this do?"
@@ -138,7 +143,7 @@
                 hx-indicator="#page_load_indicator"
                 hx-get="{%url 'whatsapp-template-readonly' template_pk=template.pk %}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML"
                 data-bs-toggle="popover" 
-                data-bs-trigger="hover" 
+                data-bs-trigger="hover focus" 
                 data-bs-html="true" 
                 data-bs-placement="top"
                 data-bs-title="What does this do?"
@@ -151,13 +156,14 @@
         </span>
     
     <button class="btn btn-dark btn-sm m-1" 
+        {%if demo or debug%}disabled{%endif%}
         hx-post="{%url 'whatsapp-template-delete'%}"
         hx-vals='{"template_pk": "{{template.pk}}"}'
         hx-confirm="Are you sure you want to delete this template?" hx-target="#template_row_{{template.pk}}" hx-swap="outerHTML" hx-indicator=".top-htmx-indicator"
         hx-include="#site_pk_{{template.pk}}" hx-indicator=".top-htmx-indicator" 
         hx-target="#template_row_{{template.pk}}" id="delete_template_{{template.pk}}"
         data-bs-toggle="popover" 
-        data-bs-trigger="hover" 
+        data-bs-trigger="hover focus" 
         data-bs-html="true" 
         data-bs-placement="top"
         data-bs-title="What does this do?"
@@ -170,7 +176,7 @@
     </button>
     <span
         data-bs-toggle="popover" 
-        data-bs-trigger="hover" 
+        data-bs-trigger="hover focus" 
         data-bs-html="true" 
         data-bs-placement="top"
         data-bs-title="What does this do?"

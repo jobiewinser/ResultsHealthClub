@@ -95,9 +95,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
         
 
 
+def normalize_phone_number(number):
+    if number[:2] == '44':
+        number = '0' + number[2:]
+    return number
+
 
 @sync_to_async
 def send_whatsapp_message_to_number(message, customer_number, user, whatsappnumber_pk):  
+    customer_number = normalize_phone_number(customer_number)
     whatsappnumber = WhatsappNumber.objects.get(pk=whatsappnumber_pk)
     logger.debug("send_whatsapp_message_to_number start") 
     lead = Campaignlead.objects.filter(whatsapp_number=customer_number).first()  

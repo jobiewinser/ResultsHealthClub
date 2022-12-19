@@ -171,6 +171,8 @@ class Whatsapp():
             potential_error = response_body.get('error', None)
             if potential_error:
                 code = potential_error.get('code')
+                details = potential_error.get('details', "")
+                
                 campaign_lead = Campaignlead.objects.filter(whatsapp_number=non_overwritten_customer_number).last()
                 if str(code) == '132000':
                     AttachedError.objects.create(
@@ -181,6 +183,7 @@ class Whatsapp():
                         customer_number = non_overwritten_customer_number,
                         whatsapp_number = whatsapp_number,
                         admin_action_required = True,
+                        additional_info = details,
                     )
                 elif str(code) == '133010':
                     AttachedError.objects.create(
@@ -191,10 +194,23 @@ class Whatsapp():
                         customer_number = non_overwritten_customer_number,
                         whatsapp_number = whatsapp_number,
                         admin_action_required = True,
+                        additional_info = details,
                     )
+                elif str(code) == '132005':
+                    AttachedError.objects.create(
+                        type = '1108',
+                        attached_field = "whatsapp_template",
+                        whatsapp_template = template_object,
+                        campaign_lead=campaign_lead,
+                        customer_number = non_overwritten_customer_number,
+                        whatsapp_number = whatsapp_number,
+                        admin_action_required = False,
+                        additional_info = details,
+                    )
+                    
             else:
                 AttachedError.objects.filter(
-                    type__in = ['0103','1105'],
+                    type__in = ['0103','1105','1108'],
                     whatsapp_template = template_object,
                     archived = False,
                     whatsapp_number = whatsapp_number,
@@ -215,16 +231,23 @@ class Whatsapp():
             )
     #POST
     def create_template(self, template_object):   
+        from core.models import AttachedError
         url = f"{self.whatsapp_url}/{template_object.whatsapp_business_account.whatsapp_business_account_id}/message_templates"
         headers = self._get_headers()
         pending_components = template_object.pending_components
         for component in pending_components:
             counter = 1
             text = component.get('text', '')
-            if '[[1]]' in text:
-                text = text.replace('[[1]]','{{'+str(counter)+'}}')
-                counter = counter + 1
-            component['text'] = text
+            if text:
+                if '[[1]]' in text:
+                    text = text.replace('[[1]]','{{'+str(counter)+'}}')
+                    counter = counter + 1
+                component['text'] = text
+
+        for i in range(len(pending_components)):
+            if not pending_components[i].get('text', ''):
+                del pending_components[i]
+
             
         body = { 
             "name": template_object.pending_name,
@@ -247,7 +270,39 @@ class Whatsapp():
         print(response_body)
         template_object = WhatsappTemplate.objects.get(pk=template_object.pk)
         message_template_id = response_body.get('id')
-        if message_template_id:
+        error = response_body.get('error')
+        if error:
+            error_types = {
+                '2388043':'1301',
+                '100':'1302',
+                '2388040':'1303',
+            }
+            code = str(error.get('code', ""))
+            error_subcode = str(error.get('error_subcode', ""))
+            if error_subcode:
+                type = error_types.get(error_subcode, None)
+            elif code:
+                type = error_types.get(code, None)
+            if not type:                
+                send_mail(
+                    subject='Winser Systems Prod - create template error unknown type ',
+                    message=f"unknown error for template {str(template_object.pk)}: {str(error)}",
+                    from_email='jobiewinser@gmail.com',
+                    recipient_list=['jobiewinser@gmail.com'])
+                type = '1300'
+            attached_error, created = AttachedError.objects.get_or_create(
+                type = type,
+                whatsapp_template = template_object,
+                attached_field = "whatsapp_template",
+                archived = False,
+            )
+        elif message_template_id:
+            AttachedError.objects.filter(
+                type__in = ['1300', '1301', '1302', '1303'],
+                whatsapp_template = template_object,
+                attached_field = "whatsapp_template",
+                archived = False,
+            ).update(archived = True)
             template_object.message_template_id = message_template_id
             template_object.save()
             return response_body

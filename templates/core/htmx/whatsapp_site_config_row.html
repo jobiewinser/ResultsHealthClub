@@ -13,7 +13,7 @@ hx-swap="innerHTML" hx-trigger="submit delay:0.3s" hx-indicator="#htmx_indicator
                     <div class="form-floating mt-1" 
                                                     data-bs-html="true" 
                                                     data-bs-toggle="popover" data-bs-placement="left" 
-                                                    data-bs-trigger="hover"
+                                                    data-bs-trigger="hover focus"
                                                     title="Whatsapp Access Token"
                                                     {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}
                                                     data-bs-content="You do not have permission to edit this field: Edit Site Configuration"
@@ -44,7 +44,7 @@ hx-swap="innerHTML" hx-trigger="submit delay:0.3s" hx-indicator="#htmx_indicator
                 {%if whatsapp_business_details.id%}
                 <span class="badge bg-success help"
                     data-bs-toggle="popover" 
-                    data-bs-trigger="hover" 
+                    data-bs-trigger="hover focus" 
                     data-bs-html="true" 
                     data-bs-placement="top"
                     data-bs-title="Valid Config"
@@ -54,7 +54,7 @@ hx-swap="innerHTML" hx-trigger="submit delay:0.3s" hx-indicator="#htmx_indicator
                 {%else%}
                 <span class="badge bg-danger help"
                     data-bs-toggle="popover" 
-                    data-bs-trigger="hover" 
+                    data-bs-trigger="hover focus" 
                     data-bs-html="true" 
                     data-bs-placement="top"
                     data-bs-title="Invalid Config"

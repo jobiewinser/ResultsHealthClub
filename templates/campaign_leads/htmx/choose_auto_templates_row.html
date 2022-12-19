@@ -12,7 +12,7 @@
     {%if demo and not request.user.is_superuser%}disabled{%endif%}
         onchange="$('#choose_auto_template_{{forloop.counter}}').click();"
         data-bs-toggle="popover" 
-        data-bs-trigger="hover" 
+        data-bs-trigger="hover focus" 
         data-bs-html="true" 
         data-bs-placement="top"
         data-bs-title="What does this do?"

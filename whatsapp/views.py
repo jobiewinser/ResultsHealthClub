@@ -128,14 +128,14 @@ class Webhooks(View):
                             if signature == request.META.get('HTTP_X_HUB_SIGNATURE_256'):
                                 if template:
                                     event = value.get('event')
+                                    reason = str(value.get('reason', ''))
                                     if event == 'PENDING_DELETION':
                                         template.delete()
                                     else:
                                         template.status=event
-                                        reason = value.get('reason', None)
                                         
-                                        if reason and not reason.lower() == 'none':
-                                            template.latest_reason=value.get('reason')
+                                        if reason:
+                                            template.latest_reason=reason
                                         else:
                                             template.latest_reason=None
                                         template.name=value.get('message_template_name')
@@ -198,11 +198,15 @@ def handle_received_whatsapp_image_message(message_json, metadata, webhook_objec
     whatsapp_message.image.set([image_object])
     new_message_to_websocket(whatsapp_message, whatsappnumber)
 
+def normalize_phone_number(number):
+    if number[:2] == '44':
+        number = '0' + number[2:]
+    return number
 
 def handle_received_whatsapp_text_message(message_json, metadata, webhook_object):
     wamid = message_json.get('id')
-    to_number = metadata.get('display_phone_number')
-    from_number = message_json.get('from')
+    to_number =  normalize_phone_number(metadata.get('display_phone_number'))
+    from_number = normalize_phone_number(message_json.get('from'))
     lead = Campaignlead.objects.filter(whatsapp_number=from_number).last()
     whatsappnumber = WhatsappNumber.objects.get(number=to_number)
     site = whatsappnumber.whatsapp_business_account.site
@@ -333,16 +337,16 @@ def refresh_template_data(whatsapp_business_account):
                 template.name = api_template.get('name')
                 template.language = api_template.get('language')
                 template.category = api_template.get('category')
-                # if created:
-                # # if not template.components and not template.pending_components:
-                #     components = []
-                #     for dict in api_template.get('components', []):
-                #         json_dict = {}
-                #         for k,v in dict.items():
-                #             json_dict[k] = str(v)
-                #         components.append(json_dict)
+                if created:
+                # if not template.components and not template.pending_components:
+                    components = []
+                    for dict in api_template.get('components', []):
+                        json_dict = {}
+                        for k,v in dict.items():
+                            json_dict[k] = str(v)
+                        components.append(json_dict)
                     
-                #     template.components = components
+                    template.components = components
                 try:
                     template.save()
                 except Exception as e:
@@ -584,7 +588,7 @@ def save_whatsapp_template_ajax(request):
             template.edited_by = request.user
             template.edited = datetime.now()
             template.save()
-    return HttpResponse( status=200)
+    return HttpResponse(status=200)
 
 @login_required
 def send_new_template_message(request):

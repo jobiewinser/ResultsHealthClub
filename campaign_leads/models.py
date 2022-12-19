@@ -293,6 +293,7 @@ class Campaignlead(models.Model):
                                 type = '1201',
                                 attached_field = "campaign_lead",
                                 campaign_lead = self,
+                                archived = False,
                             )
                             if not created:
                                 attached_error.created = datetime.now()
@@ -305,6 +306,7 @@ class Campaignlead(models.Model):
                             type = '1220',
                             attached_field = "campaign_lead",
                             campaign_lead = self,
+                            archived = False,
                         )
                         if not created:
                             attached_error.created = datetime.now()
@@ -317,6 +319,7 @@ class Campaignlead(models.Model):
                         type = '1202',
                         attached_field = "campaign_lead",
                         campaign_lead = self,
+                        archived = False,
                     )
                     if not created:
                         attached_error.created = datetime.now()
@@ -377,12 +380,13 @@ class Campaignlead(models.Model):
                         type = '1107',
                         attached_field = "campaign_lead",
                         campaign_lead = self,
+                        archived = False,
                     )
                     self.trigger_refresh_websocket(refresh_position=False)
                     return HttpResponse("Message Not Sent", status=400)
                 else:     
                     self.trigger_refresh_websocket(refresh_position=False)
-                    return HttpResponse("Message Sent", status=500)
+                    return HttpResponse("Message Failed", status=500)
             else:
                 print("CampaignleadDEBUG10")
                 if send_order == 1:
@@ -391,18 +395,24 @@ class Campaignlead(models.Model):
                         type = type,
                         attached_field = "campaign_lead",
                         campaign_lead = self,
+                        archived = False,
                     )
                     if not created:
                         print("CampaignleadDEBUG11")
                         attached_error.created = datetime.now()
                         attached_error.save()
         return HttpResponse("Message Error", status=400)
-            
-            
 
-            
-        # return HttpResponse("No Communication method specified", status=500)
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        self.whatsapp_number = normalize_phone_number(self.whatsapp_number)
+        super(Campaignlead, self).save(force_insert, force_update, using, update_fields)
+        
 
+def normalize_phone_number(number):
+    if number[:2] == '44':
+        number = '0' + number[2:]
+    return number
+    
 @receiver(models.signals.post_save, sender=Campaignlead)
 def execute_after_save(sender, instance, created, *args, **kwargs):
     if created and not instance.archived:

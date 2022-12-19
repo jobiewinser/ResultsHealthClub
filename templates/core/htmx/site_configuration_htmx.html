@@ -30,7 +30,7 @@
                             <div class="form-floating m-1" {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}
                                                                 data-bs-html="true" 
                                                                 data-bs-toggle="popover" data-bs-placement="left" 
-                                                                data-bs-trigger="hover"
+                                                                data-bs-trigger="hover focus"
                                                                 title="Name of this site"
                                                                 data-bs-content="You do not have permission to edit this field: Edit Site Configuration"{%endif%}>  
                                 <input value="{{site.name}}" type="text" name="name" class="form-control site_configuration_input" id="site_name"  {%if not request.user.profile.role == 'a'%}disabled{%endif%} {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}disabled{%endif%}
@@ -65,7 +65,7 @@
                             <span 
                                 {%if site.users.count >=  site.allowed_user_count%}
                                     data-bs-toggle="popover" 
-                                    data-bs-trigger="hover" 
+                                    data-bs-trigger="hover focus" 
                                     data-bs-placement="top"
                                     data-bs-content="You already have the maximum number of profiles for this site's subscription, please deactivate one before clicking this."
                                 {%endif%}>                         
@@ -83,7 +83,7 @@
                             <span 
                                 {%if site.users.count >=  site.allowed_user_count%}
                                     data-bs-toggle="popover" 
-                                    data-bs-trigger="hover" 
+                                    data-bs-trigger="hover focus" 
                                     data-bs-placement="top"
                                     data-bs-content="You already have the maximum number of profiles for this site's subscription, please deactivate one before clicking this."
                                 {%endif%}>                         
@@ -188,7 +188,7 @@
                                                 <div class="form-floating m-1"
                                                 {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}
                                                     data-bs-toggle="popover" 
-                                                    data-bs-trigger="hover" 
+                                                    data-bs-trigger="hover focus" 
                                                     data-bs-html="true" 
                                                     data-bs-placement="top"
                                                     data-bs-title="Site Calendly Organisation"
@@ -206,7 +206,7 @@
                                                 <div class="form-floating m-1"
                                                 {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}
                                                     data-bs-toggle="popover" 
-                                                    data-bs-trigger="hover" 
+                                                    data-bs-trigger="hover focus" 
                                                     data-bs-html="true" 
                                                     data-bs-placement="top"
                                                     data-bs-title="Site Calendly Token"

@@ -7,7 +7,7 @@
             <span 
             class="help"
             data-bs-toggle="popover" 
-            data-bs-trigger="hover" 
+            data-bs-trigger="hover focus" 
             data-bs-html="true" 
             data-bs-placement="top"
             data-bs-title="Full Information"
@@ -28,7 +28,7 @@
             {%if lead.active_errors%}
                 <span 
                 data-bs-toggle="popover" 
-                data-bs-trigger="hover" 
+                data-bs-trigger="hover focus" 
                 data-bs-html="true" 
                 data-bs-placement="top"
                 data-bs-title="Errors"
@@ -47,7 +47,7 @@
            
             {%if lead.possible_duplicate%}<i class="fa-solid fa-triangle-exclamation"
             data-bs-toggle="popover" 
-            data-bs-trigger="hover" 
+            data-bs-trigger="hover focus" 
             data-bs-placement="top"
             data-bs-content="This is a possible duplicate"></i>{%endif%}
             
@@ -132,7 +132,7 @@
             <div class="btn-group btn-space btn-space-with-history mb-1">
                 <button class="btn btn-secondary btn-sm" type="button"
                     data-bs-toggle="popover" 
-                    data-bs-trigger="hover" 
+                    data-bs-trigger="hover focus" 
                     data-bs-placement="top"
                     data-bs-content="Add new booking for this lead."
                     onclick="htmx.ajax('GET', '{% url 'campaign-lead-get-modal-content' param1=lead.pk %}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'add_booking'}})"
@@ -144,7 +144,7 @@
                     ><i class="fa-regular fa-plus" ></i> New Booking</button>
                 <button class="btn btn-secondary btn-sm" type="button"
                     data-bs-toggle="popover" 
-                    data-bs-trigger="hover" 
+                    data-bs-trigger="hover focus" 
                     data-bs-placement="top"
                     data-bs-content="See booking history for this lead."
                     onclick="htmx.ajax('GET', '{% url 'campaign-lead-get-modal-content' param1=lead.pk %}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'booking_history'}})"
@@ -159,7 +159,7 @@
             </div>
             <div class="btn-group btn-space btn-space-with-history mb-1"
                 data-bs-toggle="popover" 
-                data-bs-trigger="hover" 
+                data-bs-trigger="hover focus" 
                 data-bs-html="true" 
                 data-bs-placement="top"
                 data-bs-title="Create and View Notes."
@@ -208,7 +208,7 @@
                         <button class="btn btn-danger btn-sm nowrap"
                         {%if demo and not request.user.is_superuser%}disabled{%endif%}
                             data-bs-toggle="popover" 
-                            data-bs-trigger="hover" 
+                            data-bs-trigger="hover focus" 
                             data-bs-placement="top"
                             data-bs-content="Unarchive this lead"
                             onclick="htmx.ajax('POST', '{% url 'mark-archived' %}', {target:'#row_{{lead.pk}}', swap:'outerHTML', values:htmx.values(htmx.find('#lead_pk_{{lead.pk}}'))})"
@@ -217,7 +217,7 @@
                             ><i class="fa-regular fa-box-archive"></i> Archive {%if demo and not request.user.is_superuser%}(Demo, Disabled){%endif%}</button>
                         <button class="btn btn-dark btn-sm nowrap" 
                             data-bs-toggle="popover" 
-                            data-bs-trigger="hover" 
+                            data-bs-trigger="hover focus" 
                             data-bs-placement="top"
                             data-bs-content="Delete this lead"
                             onclick="if (confirm('Are you sure you want to PERMANENTLY DELETE this archived lead')){htmx.ajax('POST', '{% url 'delete-lead' %}', {target:'#row_{{lead.pk}}', values:htmx.values(htmx.find('#lead_pk_{{lead.pk}}'))})}"
@@ -229,7 +229,7 @@
                         <button class="btn btn-light btn-sm nowrap" 
                         {%if demo and not request.user.is_superuser%}disabled{%endif%}
                         data-bs-toggle="popover" 
-                        data-bs-trigger="hover" 
+                        data-bs-trigger="hover focus" 
                         data-bs-placement="top"
                         data-bs-content="Archive this lead"
                         onclick="htmx.ajax('POST', '{% url 'mark-archived' %}', {target:'#row_{{lead.pk}}', swap:'outerHTML', values:htmx.values(htmx.find('#lead_pk_{{lead.pk}}'))})"

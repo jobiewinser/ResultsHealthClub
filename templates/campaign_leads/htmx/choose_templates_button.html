@@ -1,7 +1,7 @@
 {%with campaign.campaigntemplatelinks_with_templates.count as campaigntemplatelink_count%}
 <button class="btn btn-{%if campaigntemplatelink_count%}primary{%else%}secondary{%endif%} btn-sm" type="button"
     data-bs-toggle="popover" 
-    data-bs-trigger="hover" 
+    data-bs-trigger="hover focus" 
     data-bs-placement="top"
     data-bs-title="What does this do?"
     data-bs-content="Choose the templates to auto send to this campaign's leads."
