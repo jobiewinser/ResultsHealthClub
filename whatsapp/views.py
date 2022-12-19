@@ -205,7 +205,7 @@ def normalize_phone_number(number):
 
 def handle_received_whatsapp_text_message(message_json, metadata, webhook_object):
     wamid = message_json.get('id')
-    to_number =  normalize_phone_number(metadata.get('display_phone_number'))
+    to_number =  metadata.get('display_phone_number')
     from_number = normalize_phone_number(message_json.get('from'))
     lead = Campaignlead.objects.filter(whatsapp_number=from_number).last()
     whatsappnumber = WhatsappNumber.objects.get(number=to_number)
