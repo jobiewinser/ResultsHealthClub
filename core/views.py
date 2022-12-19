@@ -328,6 +328,8 @@ def submit_feedback_form(request):
 
 @login_required
 def deactivate_profile(request):
+    if settings.DEMO and not request.user.is_superuser:
+        return HttpResponse(status=403)
     user = User.objects.get(pk=request.POST.get('user_pk'))
     if get_profile_allowed_to_edit_other_profile(request.user.profile, user.profile):
         user.is_active = False
@@ -338,6 +340,8 @@ def deactivate_profile(request):
 
 @login_required
 def reactivate_profile(request):
+    if settings.DEMO and not request.user.is_superuser:
+        return HttpResponse(status=403)
     site = Site.objects.get(pk=request.POST.get('site_pk'))
     user = User.objects.get(pk=request.POST.get('user_pk'))
     if get_profile_allowed_to_edit_other_profile(request.user.profile, user.profile):
