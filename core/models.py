@@ -353,7 +353,7 @@ class WhatsappNumber(PhoneNumber):
         count = 0
         if self.whatsapp_business_account.site in user.profile.sites_allowed.all():
             for message in  WhatsAppMessage.objects.filter(whatsappnumber=self).order_by('customer_number', '-datetime').distinct('customer_number'):
-                if message.inbound:
+                if message.inbound and not message.read:
                     count = count + 1
         return count
 
@@ -490,7 +490,7 @@ class Site(models.Model):
         if self in user.profile.sites_allowed.all():
             for whatsappnumber in self.return_phone_numbers():
                 for message in WhatsAppMessage.objects.filter(whatsappnumber=whatsappnumber).order_by('customer_number', '-datetime').distinct('customer_number'):
-                    if message.inbound:
+                    if message.inbound and not message.read:
                         count = count + 1
         return count
     def get_live_whatsapp_phone_numbers(self):
@@ -589,7 +589,7 @@ class Company(models.Model):
             if site in user.profile.sites_allowed.all():
                 for whatsappnumber in site.return_phone_numbers():
                     for message in  WhatsAppMessage.objects.filter(whatsappnumber=whatsappnumber).order_by('customer_number', '-datetime').distinct('customer_number'):
-                        if message.inbound:
+                        if message.inbound and not message.read:
                             count = count + 1
         return count
     @property
