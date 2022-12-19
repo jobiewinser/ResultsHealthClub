@@ -196,9 +196,9 @@
                                                         You do not have permission to edit this field: Edit Site Configuration
                                                     "
                                                 {%endif%}>
-                                                    <input style="min-width:400px" id="calendly_organization" type="text" class="form-control" name="calendly_organization" {%if not request.user.profile.role == 'a'%}disabled{%endif%}
+                                                    <input style="min-width:400px" id="calendly_organization" type="password" type="text" class="form-control" name="calendly_organization" {%if not request.user.profile.role == 'a'%}disabled{%endif%}
                                                         oninput="$('#calendly_config_submit').attr('disabled', false)"
-                                                        value="{%if site.calendly_organization%}{{site.calendly_organization}}{%endif%}" {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}disabled{%endif%}/>
+                                                        value="{%if site.calendly_organization%}{{site.calendly_organization|censor}}{%endif%}" {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}disabled{%endif%}/>
                                                     <label for="calendly_organization">Site Calendly Organisation</label>
                                                 </div>
                                             </div>
