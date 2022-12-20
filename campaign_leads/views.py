@@ -77,11 +77,11 @@ class CampaignleadsOverviewView(TemplateView):
         context = super(CampaignleadsOverviewView, self).get_context_data(**kwargs)  
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'campaign_leads/htmx/campaign_leads_overview_htmx.html'   
-        else:
-            context['use_defaults'] = True
+        # else:
+        #     context['use_defaults'] = True
         
-        if self.request.GET.get('use_defaults', None):
-            context['use_defaults'] = True
+        # if self.request.GET.get('use_defaults', None):
+        #     context['use_defaults'] = True
 
         context.update(get_leads_board_context(self.request))
             
@@ -177,7 +177,13 @@ def get_booking_table_context(request):
     context = {}
     leads = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, campaign__site__in=request.user.profile.sites_allowed.all()).exclude(booking__archived=True)
     campaign_pks = request.GET.getlist('campaign_pks', None)
+
     campaign_category_pks = request.GET.getlist('campaign_category_pks', None)
+    if request.META.get("HTTP_HX_REQUEST", 'false') == 'false' or request.GET.get('use_defaults', None):
+        context['use_defaults'] = True
+        if request.user.profile.campaign_category:
+            campaign_category_pks = [request.user.profile.campaign_category.pk]
+
     context['sites'] = get_site_pks_from_request_and_return_sites(request)
     campaigns = get_campaign_qs(request)
     if campaign_pks:
@@ -195,6 +201,7 @@ def get_booking_table_context(request):
             pass
     elif context['sites']:
         leads = leads.filter(campaign__site__in=context['sites'])
+
     # context['archived_count'] = leads.filter(archived=True).count()
     archived_filter = (request.GET.get('archived', '').lower() =='true')
     if not archived_filter:

@@ -27,6 +27,8 @@ class AnalyticsOverviewView(TemplateView):
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'analytics/htmx/analytics_overview_htmx.html'
         context.update(get_analytics_context(self.request))
+        if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'false' or self.request.GET.get('use_defaults', None):
+            context['use_defaults'] = True
         return context
 
 def get_analytics_context(request):

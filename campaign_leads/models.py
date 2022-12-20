@@ -286,6 +286,15 @@ class Campaignlead(models.Model):
                                         )
                                         text = text.replace('[[1]]',self.first_name)
                                         counter = counter + 1
+                                    if '[[2]]' in text:
+                                        params.append(              
+                                            {
+                                                "type": "text",
+                                                "text":  self.campaign.name
+                                            }
+                                        )
+                                        text = text.replace('[[2]]',self.first_name)
+                                        counter = counter + 1
                                 if params:
                                     components.append(
                                         {

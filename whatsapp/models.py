@@ -127,7 +127,7 @@ WHATSAPP_ORDER_CHOICES = (
 )
 template_variables = {
     '[[1]]': ["First Name", "Eleanor"],    
-    # '[[2]]': ["Campaign Alias", "Jobie"],    
+    '[[2]]': ["Campaign Alias", "Example"],    
 }
 class WhatsappTemplate(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
