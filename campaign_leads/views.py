@@ -77,6 +77,12 @@ class CampaignleadsOverviewView(TemplateView):
         context = super(CampaignleadsOverviewView, self).get_context_data(**kwargs)  
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'campaign_leads/htmx/campaign_leads_overview_htmx.html'   
+        else:
+            context['use_defaults'] = True
+        
+        if self.request.GET.get('use_defaults', None):
+            context['use_defaults'] = True
+
         context.update(get_leads_board_context(self.request))
             
         # whatsapp = Whatsapp()
@@ -101,6 +107,11 @@ def get_leads_board_context(request):
         except Exception as e:
             pass
     campaign_category_pks = get_campaign_category_pks_from_request(request)
+
+    if request.META.get("HTTP_HX_REQUEST", 'false') == 'false' or request.GET.get('use_defaults', None):
+        context['use_defaults'] = True
+        campaign_category_pks = [request.user.profile.campaign_category.pk]
+
     if campaign_category_pks:
         try:
             context['campaign_categorys'] = CampaignCategory.objects.filter(pk__in=campaign_category_pks)

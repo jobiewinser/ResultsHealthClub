@@ -51,8 +51,104 @@
                 </div>
             </div>
 
-
             <div class="card card-white p-2">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-auto ps-0">
+                            <i class="fa-regular fa-calendar-days"></i> <b class="name_display_{{site.pk}}">{{site.name}}</b> subscription
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p>
+                        To see the different subscription levels: <a target="_blank" href="https://www.winser.uk/index.php/leads-management-pricing/">https://www.winser.uk</a>.
+                    </p>
+                    {%if request.user.profile.role == 'a'%}
+                    <button class="btn btn-{% if site.subscription == 'free'%}secondary{% elif site.subscription == 'basic'%}primary{% elif site.subscription == 'pro'%}success{%endif%}" 
+                        type="button" data-bs-toggle="collapse" data-bs-target="#collapseSubscription" aria-expanded="false" aria-controls="collapseSubscription">
+                        You have a <b>{{site.get_subscription_display}}</b> subscription {% if site.subscription == 'free'%}£0 p/m{% elif site.subscription == 'basic'%}£9.99 p/m (per facility/site){% elif site.subscription == 'pro'%}£34.99 p/m (per facility/site){%endif%} (click to change)
+                    </button>
+                    {% comment %} <span class="ms-3">You have {{company.active_sites.count}} active site(s) within this company</span> {% endcomment %}
+                    <div class="collapse mt-2" id="collapseSubscription">
+                        <div class="card card-body">  
+                            <div class="row">  
+                                {% if site.subscription == 'free'%}
+                                <div class="col-auto">
+                                    <button class="btn btn-primary"
+                                        hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
+                                        hx-vals='{"template_name": "switch_subscription","switch_subscription":"basic","site_pk":"{{site.pk}}"}'
+                                        hx-get="{% url 'campaign-lead-get-modal-content'%}" 
+                                        hx-push-url="false"
+                                        hx-swap="innerHTML" hx-trigger="click">
+                                        Switch to Basic Subscription £9.99 p/m (per facility/site)
+                                    </button>
+                                </div>
+                                <div class="col-auto">
+                                    <button class="btn btn-success"
+                                        hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
+                                        hx-vals='{"template_name": "switch_subscription","switch_subscription":"pro","site_pk":"{{site.pk}}"}'
+                                        hx-get="{% url 'campaign-lead-get-modal-content'%}" 
+                                        hx-push-url="false"
+                                        hx-swap="innerHTML" hx-trigger="click">
+                                        Switch to Pro Subscription £34.99 p/m (per facility/site)
+                                    </button>
+                                </div>
+                                {% elif site.subscription == 'basic'%}
+                                <div class="col-auto">
+                                    <button class="btn btn-secondary"
+                                        hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
+                                        hx-vals='{"template_name": "switch_subscription","switch_subscription":"free","site_pk":"{{site.pk}}"}'
+                                        hx-get="{% url 'campaign-lead-get-modal-content'%}" 
+                                        hx-push-url="false"
+                                        hx-swap="innerHTML" hx-trigger="click">
+                                        Switch to Free Subscription £0 p/m
+                                    </button>
+                                </div>
+                                <div class="col-auto">
+                                    <button class="btn btn-success"
+                                        hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
+                                        hx-vals='{"template_name": "switch_subscription","switch_subscription":"pro","site_pk":"{{site.pk}}"}'
+                                        hx-get="{% url 'campaign-lead-get-modal-content'%}" 
+                                        hx-push-url="false"
+                                        hx-swap="innerHTML" hx-trigger="click">
+                                        Switch to Pro Subscription £34.99 p/m (per facility/site)
+                                    </button>
+                                </div>
+                                {% elif site.subscription == 'pro'%}
+                                <div class="col-auto">
+                                    <button class="btn btn-secondary"
+                                        hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
+                                        hx-vals='{"template_name": "switch_subscription","switch_subscription":"free","site_pk":"{{site.pk}}"}'
+                                        hx-get="{% url 'campaign-lead-get-modal-content'%}" 
+                                        hx-push-url="false"
+                                        hx-swap="innerHTML" hx-trigger="click">
+                                        Switch to Free Subscription £0 p/m
+                                    </button>
+                                </div>
+                                <div class="col-auto">
+                                    <button class="btn btn-primary"
+                                        hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
+                                        hx-vals='{"template_name": "switch_subscription","switch_subscription":"basic","site_pk":"{{site.pk}}"}'
+                                        hx-get="{% url 'campaign-lead-get-modal-content'%}" 
+                                        hx-push-url="false"
+                                        hx-swap="innerHTML" hx-trigger="click">
+                                        Switch to Basic Subscription £9.99 p/m (per facility/site)
+                                    </button>
+                                </div>
+                                {%endif%}
+                            </div>
+                        </div>
+                    </div>
+                    {%else%}
+                    <p>
+                        To change your site's subscription level you must be an <b>Owner</b>. Your role is <b>{{request.user.profile.get_role_display}}</b>.
+                    </p>
+                    {%endif%}
+                </div>
+            </div>
+
+
+            <div class="card card-white p-2 mt-3">
                 <div class="card-header">
                     <div class="row">
                         <div class="col-auto ps-0">
@@ -138,7 +234,7 @@
                     </table>
                 </div>
             </div>
-
+            
 
             <div class="card  w-100 mt-3">
                 <div class="card-header pointer" data-bs-toggle="collapse" data-bs-target="#collapseAdvancedSettings">

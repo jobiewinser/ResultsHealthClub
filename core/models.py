@@ -63,6 +63,7 @@ class AttachedError(models.Model):
                         ('1301', "This template is missing a component"),
                         ('1302', "This template needs a name"),
                         ('1303', "One of this template's sections is too long"),
+                        ('1304', "A template with this name was recently deleted, please change the template name then try again"),
                     )
     type = models.CharField(choices=ERROR_TYPES, default='c', max_length=5)
     attached_field = models.CharField(null=True, blank=True, max_length=50)
@@ -595,6 +596,9 @@ class Company(models.Model):
     @property
     def users(self):
         return User.objects.filter(profile__company=self, is_active=True).order_by('profile__site', 'profile__role')
+    @property
+    def free_sites(self):
+        return self.site_set.filter(subscription="free")
     @property
     def has_pro_subscription_site(self):
         return self.site_set.filter(subscription="pro").exists()

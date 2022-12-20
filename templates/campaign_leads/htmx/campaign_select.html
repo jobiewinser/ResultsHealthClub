@@ -1,8 +1,8 @@
 {%load core_tags%}
 <div class="col-md-auto m-1 ps-2 pe-0 border-start">
     <div id="campaign_list_wrapper">    
-        <label for="campaign_pks">
-            Filter <b>Campaigns</b> <small>(default all)</small><br>
+        <label for="campaign_pks" style="width:300px">
+            Filter <b>Campaigns</b><br>
           <select multiple="multiple" class="form-control select2tag select2-styling overview_table_filters site_dependant_analytics_filters" oninput="$('#filter_campaign').click()" id="campaign_pks" name="campaign_pks">
               {% comment %} <option value="">Show All Campaigns</option> {% endcomment %}
                 {%if request|get_key_in_get_or_post:'campaign_category_pks'%}

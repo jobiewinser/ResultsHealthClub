@@ -2,22 +2,29 @@
 <div class="generic_modal_contents">
     <div class="card card-white m-1 p-3" style="min-width:600px">
         <p>
-            You currently have a <b>{{company.get_subscription_display}}</b> subscription {% if company.subscription == 'free'%}£0 p/m{% elif company.subscription == 'basic'%}£9.99 p/m (per facility/site){% elif company.subscription == 'pro'%}£34.99 p/m (per facility/site){%endif%}
+            You currently have a <b>{{site.get_subscription_display}}</b> subscription {% if site.subscription == 'free'%}£0 p/m{% elif site.subscription == 'basic'%}£9.99 p/m (per facility/site){% elif site.subscription == 'pro'%}£34.99 p/m (per facility/site){%endif%}
         </p>
         <p class="text-{% if switch_subscription == 'free'%}secondary{% elif switch_subscription == 'basic'%}primary{% elif switch_subscription == 'pro'%}success{%endif%}">
             You are going to switch to a {% if switch_subscription == 'free'%}<b>Free</b> subscription £0 p/m{% elif switch_subscription == 'basic'%}<b>Basic</b> subscription £9.99 p/m (per facility/site){% elif switch_subscription == 'pro'%}<b>Pro</b> subscription £34.99 p/m (per facility/site){%endif%} 
         </p>
         <hr>
         {% if switch_subscription == 'free'%}
+            {%if site.company.free_sites%}
+            <p class="text-danger">
+                You already have a Free site for your company, you will have to deactivate that site or this one. as you are only allowed 1.
+                {%if site.subscription == 'pro'%}
+                Alternatively <a hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
+                                    hx-vals='{"template_name": "switch_subscription","switch_subscription":"basic","site_pk":"{{site.pk}}"}'
+                                    hx-get="{% url 'campaign-lead-get-modal-content'%}" 
+                                    hx-push-url="false" href='#'
+                                    hx-swap="innerHTML" hx-trigger="click">switch to a basic subscription instead</a>.
+                {%endif%}
+            </p>
+            {%else%}
             <p>
                 This means you will be prompted to:
             </p>
             <ul>
-                {% if company.active_sites.count > 1%}
-                    <li>
-                        Deactivate {{company.active_sites.count|addition:-1}} of your company's sites.
-                    </li>
-                {%endif%}
                 <li>
                     Deactivate user accounts until you have a maximum of 5.
                 </li>
@@ -30,20 +37,21 @@
                 <li>
                     Be restricted to simple analytics (up to a week of data, fewer metrics).
                 </li>
-                {% if company.subscription == 'pro'%}
+                {% if site.subscription == 'pro'%}
                     <li>
                         Need to deactivate your Whatsapp integration for Winser Systems. If you need help with this, please contact: <a href='mailto:jobiewinser@gmail.com'>jobiewinser@gmail.com</a>. Your phone number won't be available to use within Whatsapp until it is removed from your "Whatsapp Business Account" <a target="_blank" href="https://business.facebook.com/settings/whatsapp-business-accounts/">Here</a>
                     </li>
                 {%endif%}
             </ul>
+            {%endif%}
         {% elif switch_subscription == 'basic'%}
-            {% if company.subscription == 'pro'%}
+            {% if site.subscription == 'pro'%}
                 <p>
                     This means you will be prompted to:
                 </p>
                 <ul>
                     <li>
-                        Deactivate user accounts until you have a maximum of 10 per site.
+                        Deactivate user accounts until you have a maximum of 10.
                     </li>
                 </ul>
             {%endif%}
@@ -52,17 +60,14 @@
                 You will:
             </p>
             <ul>
-                {% if company.subscription == 'free'%}
+                {% if site.subscription == 'free'%}
                 <li>
                     Gain access to more analytics (up to a month of data).
                 </li>
                 <li>
-                    Be allowed to have more profiles, up to 10 per site.
+                    Be allowed to have more profiles, up to 10.
                 </li>
-                <li>
-                    Be allowed to add more facilities/sites (for additional monthly fee).
-                </li>
-                {% elif company.subscription == 'pro'%}
+                {% elif site.subscription == 'pro'%}
                     <li>
                         Be restricted to basic analytics (up to a month of data, fewer metrics).
                     </li>
@@ -110,5 +115,5 @@
     </div>
 </div>
 <span hx-swap-oob="true" id="generic_modal_title">
-    Switch subscription for {{company.name}}
+    Switch subscription for {{site.name}}
 </span>

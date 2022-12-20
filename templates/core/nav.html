@@ -16,7 +16,7 @@
                 {%if request.user.is_authenticated%}
                 <li class="nav-item">
                     <a class="nav-link top-nav-link pointer nowrap {%if 'leads-and-calls' in request.path%}active{%endif%}" hx-indicator="#page_load_indicator" data-active-selector="#leads-top-nav-link" id="leads-top-nav-link"
-                        hx-get="{%url 'campaign-leads-overview'%}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML"><i class="fa-light fa-magnifying-glass"></i> Leads</a>
+                        hx-get="{%url 'campaign-leads-overview'%}?use_defaults=True" hx-target="#content" hx-push-url="true" hx-swap="innerHTML"><i class="fa-light fa-magnifying-glass"></i> Leads</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link top-nav-link pointer nowrap {%if 'booking-overview' in request.path%}active{%endif%}" hx-indicator="#page_load_indicator" data-active-selector="#bookings-top-nav-link" id="bookings-top-nav-link"

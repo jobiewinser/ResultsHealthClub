@@ -26,6 +26,7 @@ def get_modal_content(request, **kwargs):
         if request.user.is_authenticated:
             context = {}
             template_name = request.GET.get('template_name', '')
+            site_pk = request.GET.get('site_pk', None)
             # context['site_list'] = get_available_sites_for_user(request.user)
             param1 = kwargs.get('param1', '')
             if param1:
@@ -58,7 +59,7 @@ def get_modal_content(request, **kwargs):
                 context['lead'] = lead
                 # context['users'] = User.objects.filter(profile__sites_allowed=lead.campaign.site)
             elif template_name == 'switch_subscription':
-                context['company'] = request.user.profile.company
+                context["site"] = Site.objects.get(pk=site_pk)     
                 context['switch_subscription'] = request.GET.get('switch_subscription')
                     
             return render(request, f"campaign_leads/htmx/{template_name}.html", context)   

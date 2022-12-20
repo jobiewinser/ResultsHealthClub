@@ -2,13 +2,19 @@
 {%load core_tags%}
 <div class="col-md-auto m-1 ps-2 pe-0 border-start">
     <div id="campaign_category_list_wrapper">  
-        <label for="campaign_category_pks">
-          Filter <b>Campaign Categories</b> <small>(default all)</small><br>
+        <label for="campaign_category_pks" style="width:300px">
+          Filter <b>Campaign Categories</b><br>
           <select multiple="multiple" class="form-control select2tag select2-styling overview_table_filters site_dependant_analytics_filters" name="campaign_category_pks" id="campaign_category_pks" oninput="$('#change_campaign_category').click();">
               {% comment %} {%if not hide_show_all%}<option value="all">Show All Campaign Categories</option>{%endif%} {% endcomment %}
               {%for site in sites%}
               {%for campaign_category in site.campaigncategory_set.all%}
-              <option {%if campaign_category.pk|to_str in request|get_key_in_get_or_post:'campaign_category_pks' or campaign_category.pk|str_to_int in request|get_key_in_get_or_post:'campaign_category_pks' %}selected{%endif%} value="{{campaign_category.pk}}">{{campaign_category.name}} ({{campaign_category.site.name}})</option>
+              <option 
+              {% if use_defaults%}
+                {%if campaign_category == request.user.profile.campaign_category %}selected{%endif%}
+              {%else%} 
+                {%if campaign_category.pk|to_str in request|get_key_in_get_or_post:'campaign_category_pks' or campaign_category.pk|str_to_int in request|get_key_in_get_or_post:'campaign_category_pks' %}selected{%endif%}
+              {%endif%} 
+              value="{{campaign_category.pk}}">{{campaign_category.name}} ({{campaign_category.site.name}})</option>
               {%endfor%}
               {%endfor%}
           </select>

@@ -276,6 +276,8 @@ class Whatsapp():
                 '2388043':'1301',
                 '100':'1302',
                 '2388040':'1303',
+                '2388023':'1304',
+                
             }
             code = str(error.get('code', ""))
             error_subcode = str(error.get('error_subcode', ""))
