@@ -23,6 +23,9 @@ function basehandlehtmxafterSwap(evt){
     if (evt.detail.target.id == 'generic_modal_body'){
         $('#generic_modal').modal('show');
     }
+    if (evt.detail.target.id == 'content'){
+        $('#generic_modal').modal('hide');
+    }
     
     if (![undefined, ''].includes(evt.detail.pathInfo.requestPath)){
         if (evt.detail.pathInfo.requestPath.includes("message-window")){

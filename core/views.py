@@ -308,8 +308,11 @@ def change_site_allowed(request):
                 sites_allowed_pk_list.remove(site_pk)
         profile.sites_allowed.set(Site.objects.filter(pk__in=sites_allowed_pk_list))
         profile.save()
-        return render(request, 'campaign_leads/htmx/edit_permissions.html', context)
-    context['error'] = "You do not have permission to do this"
+    else:
+        context['error'] = "You do not have permission to do this"
+    if request.POST.get('add_user', False):
+        context['site'] = Site.objects.get(pk=site_pk)
+        return render(request, 'core/htmx/site_configuration_htmx.html', context)
     return render(request, 'campaign_leads/htmx/edit_permissions.html', context)
 @login_required
 def submit_feedback_form(request):

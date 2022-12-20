@@ -51,7 +51,7 @@
                                     </a>
                                 </div>
                                 <div class="col-md-auto p-0 ps-2">
-                                    <small>Site Enabled for user? {%if demo and not request.user.is_superuser%}{Demo}{%endif%}</small>
+                                    <small>Site enabled for user? {%if demo and not request.user.is_superuser%}{Demo}{%endif%}</small>
                                     <div class="form-check form-switch ">
                                         <input class="form-check-input" type="checkbox" 
                                             {%if demo and not request.user.is_superuser%}disabled{%endif%}
