@@ -110,7 +110,8 @@ def get_leads_board_context(request):
 
     if request.META.get("HTTP_HX_REQUEST", 'false') == 'false' or request.GET.get('use_defaults', None):
         context['use_defaults'] = True
-        campaign_category_pks = [request.user.profile.campaign_category.pk]
+        if request.user.profile.campaign_category:
+            campaign_category_pks = [request.user.profile.campaign_category.pk]
 
     if campaign_category_pks:
         try:

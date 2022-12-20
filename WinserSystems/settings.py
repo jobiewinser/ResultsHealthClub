@@ -75,6 +75,7 @@ LOGGING = {
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("SECRET_KEY")
 if os.getenv('ENVIRONMENT') == 'development':
+    RUNSERVERPLUS_POLLER_RELOADER_INTERVAL = 999
     ALLOWED_HOSTS = ['*']
     DEBUG = True
     CSRF_COOKIE_SECURE = False
