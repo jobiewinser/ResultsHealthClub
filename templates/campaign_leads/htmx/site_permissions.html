@@ -1,6 +1,6 @@
 {%load static user_permission_tags%}
 <div class="card-header center"
-    {%if not site_permissions.site in site_permissions.profile.sites_allowed.all%}
+    {%if not site_permissions.site in site_permissions.profile.active_sites_allowed%}
     data-bs-toggle="popover" 
     data-bs-trigger="hover focus" 
     data-bs-html="true" 
@@ -19,7 +19,7 @@
     As an owner, you have access to all functions within the system for your company and sites. You may however turn off your access to individual sites for simplify how you use the system.
     "
     {%endif%}>     
-    {%if not site_permissions.site in site_permissions.profile.sites_allowed.all or site_permissions.profile.role == 'a'%}<i class="fa-solid fa-circle-info"></i>{%endif%}Permissions for <b>{{site_permissions.site.name}}</b>
+    {%if not site_permissions.site in site_permissions.profile.active_sites_allowed or site_permissions.profile.role == 'a'%}<i class="fa-solid fa-circle-info"></i>{%endif%}Permissions for <b>{{site_permissions.site.name}}</b>
     <br>
     <span class="secondary_td_layer">{{site_permissions.profile}}</span>
 </div>
@@ -37,13 +37,13 @@
                 <label><small>Allowed to view site configuration</small></label> 
                 <input class="form-check-input" type="checkbox" 
                 {% if not request.user.profile|get_profile_allowed_to_edit_profile_permissions_tag:site_permissions.profile%}disabled{%endif%}
-                {%if not site_permissions.site in site_permissions.profile.sites_allowed.all or site_permissions.profile.role == 'a'%}disabled{%endif%}
+                {%if not site_permissions.site in site_permissions.profile.active_sites_allowed or site_permissions.profile.role == 'a'%}disabled{%endif%}
                     hx-post="{%url 'site-permissions'%}"  {%if demo and not request.user.is_superuser%}disabled{%endif%}
                     hx-target="#permissions_wrapper" 
                     hx-trigger="input delay:0.1s" 
                     hx-indicator="#htmx-indicator-permissions" 
                     hx-vals='{"site_permissions_pk": "{{site_permissions.pk}}", "view_site_configuration":"{%if site_permissions.view_site_configuration%}off{%else%}on{%endif%}"}'               
-                    {%if site_permissions.view_site_configuration and site_permissions.site in site_permissions.profile.sites_allowed.all%}checked{%endif%}/>
+                    {%if site_permissions.view_site_configuration and site_permissions.site in site_permissions.profile.active_sites_allowed%}checked{%endif%}/>
             </div>
         </div>
     </div>
@@ -53,13 +53,13 @@
                 <label><small>Allowed to edit site configuration</small></label> 
                 <input class="form-check-input" type="checkbox" 
                 {% if not request.user.profile|get_profile_allowed_to_edit_profile_permissions_tag:site_permissions.profile%}disabled{%endif%}
-                {%if not site_permissions.site in site_permissions.profile.sites_allowed.all or site_permissions.profile.role == 'a'%}disabled{%endif%}
+                {%if not site_permissions.site in site_permissions.profile.active_sites_allowed or site_permissions.profile.role == 'a'%}disabled{%endif%}
                     hx-post="{%url 'site-permissions'%}" 
                     hx-target="#permissions_wrapper"  {%if demo and not request.user.is_superuser%}disabled{%endif%}
                     hx-trigger="input delay:0.1s" 
                     hx-indicator="#htmx-indicator-permissions" 
                     hx-vals='{"site_permissions_pk": "{{site_permissions.pk}}", "edit_site_configuration":"{%if site_permissions.edit_site_configuration%}off{%else%}on{%endif%}"}'               
-                    {%if site_permissions.edit_site_configuration and site_permissions.site in site_permissions.profile.sites_allowed.all%}checked{%endif%}/>
+                    {%if site_permissions.edit_site_configuration and site_permissions.site in site_permissions.profile.active_sites_allowed%}checked{%endif%}/>
             </div>
         </div>
     </div>
@@ -69,13 +69,13 @@
                 <label><small>Allowed to edit whatsapp settings</small></label> 
                 <input class="form-check-input" type="checkbox"
                 {% if not request.user.profile|get_profile_allowed_to_edit_profile_permissions_tag:site_permissions.profile%}disabled{%endif%}
-                {%if not site_permissions.site in site_permissions.profile.sites_allowed.all or site_permissions.profile.role == 'a'%}disabled{%endif%}
+                {%if not site_permissions.site in site_permissions.profile.active_sites_allowed or site_permissions.profile.role == 'a'%}disabled{%endif%}
                     hx-post="{%url 'site-permissions'%}" 
                     hx-target="#permissions_wrapper"  {%if demo and not request.user.is_superuser%}disabled{%endif%}
                     hx-trigger="input delay:0.1s" 
                     hx-indicator="#htmx-indicator-permissions" 
                     hx-vals='{"site_permissions_pk": "{{site_permissions.pk}}", "edit_whatsapp_settings":"{%if site_permissions.edit_whatsapp_settings%}off{%else%}on{%endif%}"}'               
-                    {%if site_permissions.edit_whatsapp_settings and site_permissions.site in site_permissions.profile.sites_allowed.all%}checked{%endif%}/>
+                    {%if site_permissions.edit_whatsapp_settings and site_permissions.site in site_permissions.profile.active_sites_allowed%}checked{%endif%}/>
             </div>
         </div>
     </div>
@@ -85,13 +85,13 @@
                 <label><small>Allowed to toggle whatsapp template sending</small></label> 
                 <input class="form-check-input" type="checkbox" 
                 {% if not request.user.profile|get_user_allowed_to_toggle_whatsapp_sending_tag:site_permissions.profile%}disabled{%endif%}
-                {%if not site_permissions.site in site_permissions.profile.sites_allowed.all or site_permissions.profile.role == 'a'%}disabled{%endif%}
+                {%if not site_permissions.site in site_permissions.profile.active_sites_allowed or site_permissions.profile.role == 'a'%}disabled{%endif%}
                     hx-post="{%url 'site-permissions'%}" 
                     hx-target="#permissions_wrapper"  {%if demo and not request.user.is_superuser%}disabled{%endif%}
                     hx-trigger="input delay:0.1s" 
                     hx-indicator="#htmx-indicator-permissions" 
                     hx-vals='{"site_permissions_pk": "{{site_permissions.pk}}", "toggle_whatsapp_sending":"{%if site_permissions.toggle_whatsapp_sending%}off{%else%}on{%endif%}"}'               
-                    {%if site_permissions.toggle_whatsapp_sending and site_permissions.site in site_permissions.profile.sites_allowed.all%}checked{%endif%}/>
+                    {%if site_permissions.toggle_whatsapp_sending and site_permissions.site in site_permissions.profile.active_sites_allowed%}checked{%endif%}/>
             </div>
         </div>
     </div>
@@ -101,13 +101,13 @@
                 <label><small>Allowed to toggle the active campaign leads</small></label> 
                 <input class="form-check-input" type="checkbox" 
                 {% if not request.user.profile|get_profile_allowed_to_edit_profile_permissions_tag:site_permissions.profile%}disabled{%endif%}
-                {%if not site_permissions.site in site_permissions.profile.sites_allowed.all or site_permissions.profile.role == 'a'%}disabled{%endif%}
+                {%if not site_permissions.site in site_permissions.profile.active_sites_allowed or site_permissions.profile.role == 'a'%}disabled{%endif%}
                     hx-post="{%url 'site-permissions'%}" 
                     hx-target="#permissions_wrapper"  {%if demo and not request.user.is_superuser%}disabled{%endif%}
                     hx-trigger="input" 
                     hx-indicator="#htmx-indicator-permissions" 
                     hx-vals='{"site_permissions_pk": "{{site_permissions.pk}}", "toggle_active_campaign":"{%if site_permissions.toggle_active_campaign%}off{%else%}on{%endif%}"}'               
-                    {%if site_permissions.toggle_active_campaign and site_permissions.site in site_permissions.profile.sites_allowed.all%}checked{%endif%}/>
+                    {%if site_permissions.toggle_active_campaign and site_permissions.site in site_permissions.profile.active_sites_allowed%}checked{%endif%}/>
             </div>
         </div>
     </div>

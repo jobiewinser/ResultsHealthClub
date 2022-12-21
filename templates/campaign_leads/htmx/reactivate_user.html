@@ -10,7 +10,7 @@
                 <label>
                     Which site should this user be added to?<br>
                     <select style="width:100%" class="form-control generic_modal_body_select" name="site_pk">
-                        {%for site_available in request.user.profile.sites_allowed.all%}
+                        {%for site_available in request.user.profile.active_sites_allowed%}
                         <option {%if site == site_available%}selected{%endif%} value="{{site_available.pk}}">{{site_available.name}}</option>
                         {%endfor%}
                     </select>

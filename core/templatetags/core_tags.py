@@ -14,6 +14,9 @@ import math
 
 def roundup(x, round_target):
     return int(int(math.ceil(x / round_target)) * round_target)
+
+def roundup(x, round_target):
+    return int(int(math.ceil(x / round_target)) * round_target)
     
 @register.filter
 def prettify_variable(value):
@@ -175,7 +178,7 @@ def get_type(value):
     return type(value)
 
 @register.filter
-def str_to_int(value):
+def to_int(value):
     try:
         return int(value)
     except:
@@ -255,6 +258,12 @@ def add_days(date, x):
         return date + relativedelta.relativedelta(days=x)
     except Exception as e:
         return "Error"
+@register.filter
+def subtract_seconds_to_days_rounded_up(date, seconds):  
+    try:
+        return date - relativedelta.relativedelta(days = round(seconds/86400))
+    except Exception as e:
+        return "Error"
 
 @register.filter
 def date_to_date_input_prefill(date):
@@ -283,13 +292,13 @@ def company_outstanding_whatsapp_messages_tag(user):
     return user.profile.company.outstanding_whatsapp_messages(user)
 @register.filter
 def site_outstanding_whatsapp_messages_tag(site, user):
-    if site in user.profile.sites_allowed.all():
+    if site in user.profile.active_sites_allowed:
         return site.outstanding_whatsapp_messages(user)
     return 0
 @register.filter
 def whatsappnumber_outstanding_whatsapp_messages_tag(whatsappnumber, user):
     if whatsappnumber:
-        if whatsappnumber.whatsapp_business_account.site in user.profile.sites_allowed.all():
+        if whatsappnumber.whatsapp_business_account.site in user.profile.active_sites_allowed:
             return whatsappnumber.outstanding_whatsapp_messages(user)
         return 0
 
@@ -325,3 +334,12 @@ def render_whatsapp_template_with_contact_to_html_tag(whatsapp_template, contact
 def render_whatsapp_template_to_html_tag(whatsapp_template):
     return whatsapp_template.render_whatsapp_template_to_html()
 
+
+
+@register.filter
+def get_subscription_sites_tag(company, numerical):
+    return company.get_subscription_sites(numerical)
+
+# @register.filter
+# def earliest_site_tag(site_qs):
+#     return site_qs.order_by('created').first()

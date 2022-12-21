@@ -10,8 +10,8 @@ def get_available_sites_for_user(user):
     profile = user.profile
     if profile.role == 'a':
         return Site.objects.filter(company=profile.company)
-    if profile.sites_allowed.all():
-        return profile.sites_allowed.all()
+    if profile.active_sites_allowed:
+        return profile.active_sites_allowed
     return Site.objects.none()
 
 def get_user_allowed_to_toggle_active_campaign(profile, site):
@@ -94,7 +94,7 @@ def get_allowed_site_chats_for_user(user):
     #TODO
     # return Site.objects.filter(pk__in=[user.profile.site.pk])
     # return Site.objects.filter(company=user.profile.site.company)
-    return user.profile.sites_allowed.all()
+    return user.profile.active_sites_allowed
 
 def get_user_allowed_to_send_from_whatsappnumber(user, whatsappnumber):
     #TODO

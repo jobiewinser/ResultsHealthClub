@@ -77,7 +77,7 @@ class ProfileIncorrectlyConfiguredView(TemplateView):
         else:
             if not self.request.user.profile.company:
                 errors.append(PROFILE_ERROR_OPTIONS['2'])
-            if not self.request.user.profile.sites_allowed.all():
+            if not self.request.user.profile.active_sites_allowed:
                 errors.append(PROFILE_ERROR_OPTIONS['3'])
             if not self.request.user.profile.site:
                 errors.append(PROFILE_ERROR_OPTIONS['4'])
@@ -298,7 +298,7 @@ def change_site_allowed(request):
     # context['role_choices'] = ROLE_CHOICES
     context['site_permissions'] = SiteProfilePermissions.objects.get(profile=profile, site=Site.objects.get(pk=site_pk))
     if get_profile_allowed_to_edit_other_profile(request.user.profile, profile):
-        sites_allowed_pk_list = list(profile.sites_allowed.all().values_list('pk', flat=True))
+        sites_allowed_pk_list = list(profile.active_sites_allowed.values_list('pk', flat=True))
         site_allowed = request.POST.get('site_allowed', 'off') == 'on'
         if site_allowed:
             if not site_pk in sites_allowed_pk_list:
@@ -428,7 +428,7 @@ def get_site_pks_from_request_and_return_sites(request):
     if type(temp_site_pks) == list:
         site_pks = temp_site_pks
     else:
-        site_pks = request.GET.getlist('site_pks',request.user.profile.sites_allowed.all().values_list('pk', flat=True))
+        site_pks = request.GET.getlist('site_pks',request.user.profile.active_sites_allowed.values_list('pk', flat=True))
     while "" in site_pks:
         site_pks.pop(site_pks.index(""))
     if not site_pks:

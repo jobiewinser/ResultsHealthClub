@@ -15,7 +15,7 @@ def check_core_profile_requirements_fulfilled(function=None, redirect_field_name
     Decorator for views that checks that the user has a profile, a company and at least 1 site allowed
     """
     actual_decorator = user_passes_test(
-        lambda u: u.profile and u.profile.company and u.profile.sites_allowed.all() and u.profile.site,
+        lambda u: u.profile and u.profile.company and u.profile.active_sites_allowed and u.profile.site,
         login_url=login_url,
         redirect_field_name=redirect_field_name
     )

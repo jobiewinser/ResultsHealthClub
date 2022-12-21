@@ -59,10 +59,10 @@
                                             </a>
                                         </td>
                                         <td>
-                                            {{site.get_subscription_display}}
+                                            {{site.subscription.get_name_display}}
                                         </td>
                                         <td>
-                                            <b>{{site.users.count}}</b> of <b>{% if site.subscription == 'free'%}5{% elif site.subscription == 'basic'%}10{% elif site.subscription == 'pro'%}Unlimited{%endif%}</b> allowed profiles
+                                            <b>{{site.users.count}}</b> of <b>{{site.subscription_new.max_profiles_string}}</b> allowed profiles
                                         </td>
                                     </tr>
                                     {%endfor%}
@@ -93,7 +93,6 @@
                             <b> To add another site to your company please contact Winser Systems!</b>
                         ">
                         <button class="nowrap btn btn-success btn-sm pointer" type="button" {%if request.user.profile.role == 'c'%}disabled{%endif%}
-                            {%if not company.subscription == 'pro'%}disabled{%endif%}
                             disabled
                             hx-confirm="Are you sure you want to add another site?" 
                             hx-indicator=".top-htmx-indicator" 

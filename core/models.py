@@ -28,6 +28,44 @@ def normalize_phone_number(number):
         number = '0' + number[2:]
     return number
 
+class Subscription(models.Model):
+    NAME_CHOICES = (
+                    ('free', 'Free'),
+                    ('basic', 'Basic'),
+                    ('pro', 'Pro'),
+                )
+    name = models.CharField(choices=NAME_CHOICES, max_length=5, default="free")
+    max_profiles = models.IntegerField(default = 0)
+    max_profiles_string = models.TextField(null=True, blank=True)
+    analytics_seconds = models.IntegerField(default = 0) #32 days 2764800 #7 days 604800
+    subscription_link = models.TextField(null=True, blank=True)
+    numerical = models.FloatField(default = 0) #this is a float as all uses of it call |to_int to turn 2.7 to 2 for example. Different prices can therefor be used for the same tier (grandfathered pricing)
+    cost = models.FloatField(default = 0)
+    whatsapp_enabled = models.BooleanField(default=False)
+    bootstrap_colour = models.TextField(null=True, blank=True)
+    max_of_this_type = models.IntegerField(default = 0)
+    analytics_string = models.TextField(null=True, blank=True)
+    analytics_numerical = models.FloatField(default = 0)
+    visible_to_all = models.BooleanField(default=True)
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        if self.max_profiles:
+            self.max_profiles_string == str(self.max_profiles)
+        else:
+            self.max_profiles_string == "Unlimited"
+        super(Subscription, self).save(force_insert, force_update, using, update_fields)
+
+class SiteSubscriptionChange(models.Model):
+    created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    completed = models.DateTimeField(null=True, blank=True)
+    canceled = models.DateTimeField(null=True, blank=True)
+    profiles_to_keep = models.ManyToManyField("core.Profile", related_name="site_subscription_change_profiles_to_keep", null=True, blank=True)
+    subscription_from = models.ForeignKey("core.Subscription", related_name="site_subscription_change_subscription_from", on_delete=SET_NULL, null=True, blank=True)
+    subscription_from_text = models.TextField(null=True, blank=True)
+    subscription_to = models.ForeignKey("core.Subscription", related_name="site_subscription_change_subscription_to", on_delete=SET_NULL, null=True, blank=True)
+    subscription_to_text = models.TextField(null=True, blank=True)
+    site = models.ForeignKey("core.Site", on_delete=SET_NULL, null=True, blank=True)
+
 class SiteUsersOnline(models.Model):
     users_online = models.CharField(max_length=1500, default=";")
     site = models.ForeignKey("core.Site", on_delete=models.SET_NULL, null=True, blank=True)
@@ -352,7 +390,7 @@ class WhatsappNumber(PhoneNumber):
     def outstanding_whatsapp_messages(self, user):
         # Readdress this, I can't find a good way to get latest message for each conversation, then filter based on the last message being inbound...
         count = 0
-        if self.whatsapp_business_account.site in user.profile.sites_allowed.all():
+        if self.whatsapp_business_account.site in user.profile.active_sites_allowed:
             for message in  WhatsAppMessage.objects.filter(whatsappnumber=self).order_by('customer_number', '-datetime').distinct('customer_number'):
                 if message.inbound and not message.read:
                     count = count + 1
@@ -451,14 +489,22 @@ class Site(models.Model):
     calendly_token = models.TextField(blank=True, null=True)
     calendly_user = models.TextField(blank=True, null=True)
     calendly_organization = models.TextField(blank=True, null=True)   
-    SUBSCRIPTION_CHOICES = (
-                    ('free', 'Free'),
-                    ('basic', 'Basic'),
-                    ('pro', 'Pro'),
-                )
-    subscription = models.CharField(choices=SUBSCRIPTION_CHOICES, max_length=5, default="free")
+    # SUBSCRIPTION_CHOICES = (
+    #                 ('free', 'Free'),
+    #                 ('basic', 'Basic'),
+    #                 ('pro', 'Pro'),
+    #             )
+    subscription_new = models.ForeignKey("core.Subscription", on_delete=models.SET_NULL, null=True, blank=True) #temp called new
+    subscription_old = models.CharField(max_length=5, default="free") #temp
     # calendly_webhook_created = models.BooleanField(default=False)  
     guid = models.TextField(null=True, blank=True) 
+    
+    @property
+    def subscription(self):
+        if not self.subscription_new and self.subscription_old:
+            self.subscription_new = Subscription.objects.filter(name=self.subscription_old).first()
+            self.save()
+        return self.subscription_new
     
     @property
     def users(self):
@@ -466,20 +512,22 @@ class Site(models.Model):
     @property
     def inactive_users(self):
         return User.objects.filter(profile__sites_allowed=self, is_active=False).order_by('profile__role')
-    @property
-    def allowed_user_count(self):
-        if self.subscription == 'free':
-            return 5
-        if self.subscription == 'basic':
-            return 10
-        if self.subscription == 'pro':
-            return 999
+    # @property
+    # def allowed_user_count(self):
+    #     if self.subscription == 'free':
+    #         return 5
+    #     if self.subscription == 'basic':
+    #         return 10
+    #     if self.subscription == 'pro':
+    #         return 999
 
         
     def check_if_allowed_to_get_analytics(self, start_date):
-        if self.subscription == 'pro':
+        if not self.subscription_new:
+            self.save()
+        if not self.subscription_new.analytics_seconds:
             return True
-        if (datetime.now() - timedelta(days=8)) < start_date:
+        if (datetime.now() - timedelta(seconds=self.subscription_new.analytics_seconds)) < start_date:
             return True
         return False
     def __str__(self):
@@ -488,7 +536,7 @@ class Site(models.Model):
     def outstanding_whatsapp_messages(self, user):
         # Readdress this, I can't find a good way to get latest message for each conversation, then filter based on the last message being inbound...
         count = 0
-        if self in user.profile.sites_allowed.all():
+        if self in user.profile.active_sites_allowed:
             for whatsappnumber in self.return_phone_numbers():
                 for message in WhatsAppMessage.objects.filter(whatsappnumber=whatsappnumber).order_by('customer_number', '-datetime').distinct('customer_number'):
                     if message.inbound and not message.read:
@@ -523,34 +571,15 @@ class Site(models.Model):
         return self.return_phone_numbers()
     def return_phone_numbers(self):
         return WhatsappNumber.objects.filter(whatsapp_business_account__site=self, archived=False).order_by('pk')
-    # def create_calendly_webhook(self):
-    #     calendly = Calendly(self.calendly_token)
-    #     if self.calendly_user:
-    #         calendly.create_webhook_subscription(self.guid, user = self.calendly_user)
-    #     elif self.calendly_organization:
-    #         calendly.create_webhook_subscription(self.guid, organization = self.calendly_organization)
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        if not self.subscription_new and self.subscription_old:
+            self.subscription_new = Subscription.objects.filter(name=self.subscription_old).first()
+        super(Site, self).save(force_insert, force_update, using, update_fields)
+        
+        
 
-    # def generate_lead(self, first_name, email, phone_number, lead_generation_app='a', request=None):
-    #     if lead_generation_app == 'a':
-    #         manually_created_campaign, created = ManualCampaign.objects.get_or_create(site=self, name=f"Manually Created")
-    #         lead = Campaignlead.objects.create(
-    #             first_name=first_name,
-    #             email=email,
-    #             whatsapp_number=phone_number,
-    #             campaign=manually_created_campaign
-    #         )
-    #         return lead
+        
 
-
-    # def get_leads_created_in_month_and_year(self, date):
-    #     return Campaignlead.objects.filter(campaign__site=self, created__month=date.month, created__year=date.year)
-
-    # def get_leads_created_between_dates(self, start_date, end_date):
-    #     return Campaignlead.objects.filter(campaign__site=self, created__gte=start_date, created__lte=end_date)
-
-    # def get_(self, date):
-    #     return Campaignlead.objects.filter(campaign__site=self, created__month=date.month, created__year=date.year)
- 
 
 @receiver(models.signals.post_save, sender=Site)
 def execute_after_save(sender, instance, created, *args, **kwargs):  
@@ -583,11 +612,13 @@ class Company(models.Model):
     active_campaign_url = models.TextField(null=True, blank=True)
     active_campaign_api_key = models.TextField(null=True, blank=True)
     
+    def get_subscription_sites(self, numerical):
+        return self.site_set.filter(subscription_new__numerical=numerical)
     def outstanding_whatsapp_messages(self, user):
         # Readdress this, I can't find a good way to get latest message for each conversation, then filter based on the last message being inbound...
         count = 0
         for site in self.active_sites:
-            if site in user.profile.sites_allowed.all():
+            if site in user.profile.active_sites_allowed:
                 for whatsappnumber in site.return_phone_numbers():
                     for message in  WhatsAppMessage.objects.filter(whatsappnumber=whatsappnumber).order_by('customer_number', '-datetime').distinct('customer_number'):
                         if message.inbound and not message.read:
@@ -598,10 +629,10 @@ class Company(models.Model):
         return User.objects.filter(profile__company=self, is_active=True).order_by('profile__site', 'profile__role')
     @property
     def free_sites(self):
-        return self.site_set.filter(subscription="free")
+        return self.site_set.filter(subscription_new__numerical=0)
     @property
     def has_pro_subscription_site(self):
-        return self.site_set.filter(subscription="pro").exists()
+        return self.site_set.filter(subscription_new__numerical=2).exists()
     
     @property
     def get_campaign_leads_enabled(self):
@@ -651,6 +682,10 @@ class Profile(models.Model):
     calendly_event_page_url = models.TextField(blank=True, null=True)
     
     @property
+    def active_sites_allowed(self):
+        return self.sites_allowed.filter(active=True).order_by('created')
+    
+    @property
     def name(self):
         if self.user.last_name:
             return f"{self.user.first_name} {self.user.last_name}"
@@ -661,7 +696,7 @@ class Profile(models.Model):
         if not self.company:
             warnings["no_company_warning"] = "This profile has no company assigned to it"
         else:
-            if not self.sites_allowed.all():
+            if not self.active_sites_allowed:
                 warnings["no_company_warning"] = "This profile has no sites that they are allowed to access"
             if not self.site:
                 warnings["no_site_warning"] = "This profile has no main site assigned to it"
@@ -687,7 +722,7 @@ class Profile(models.Model):
                 self.campaign_category = None
                 self
         super(Profile, self).save(force_insert, force_update, using, update_fields)
-        if not self.site in self.sites_allowed.all() and self.site:
+        if not self.site in self.active_sites_allowed and self.site:
             self.sites_allowed.add(self.site)   
         if self.company:
             for site in self.company.active_sites:

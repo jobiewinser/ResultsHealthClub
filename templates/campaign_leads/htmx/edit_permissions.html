@@ -47,7 +47,7 @@
                                         hx-get="{% url 'site-permissions' %}" hx-push-url="false">
                                         Site Permissions: {{profile_site_permissions.site.name}} 
                                         <br>
-                                        ({%if profile_site_permissions.site in profile.sites_allowed.all%}{{profile_site_permissions.permissions_count}}{%else%}0{%endif%} permissions)
+                                        ({%if profile_site_permissions.site in profile.active_sites_allowed%}{{profile_site_permissions.permissions_count}}{%else%}0{%endif%} permissions)
                                     </a>
                                 </div>
                                 <div class="col-md-auto p-0 ps-2">
@@ -60,8 +60,8 @@
                                             hx-indicator="#htmx-indicator-permissions" 
                                             hx-target="#generic_modal_body" 
                                             hx-trigger="input delay:0.1s" 
-                                            hx-vals='{"profile_pk": "{{profile.pk}}", "site_pk":"{{profile_site_permissions.site.pk}}", "site_allowed":"{%if profile_site_permissions.site in profile.sites_allowed.all%}off{%else%}on{%endif%}"}'               
-                                            {%if profile_site_permissions.site in profile.sites_allowed.all%}checked{%endif%}/>
+                                            hx-vals='{"profile_pk": "{{profile.pk}}", "site_pk":"{{profile_site_permissions.site.pk}}", "site_allowed":"{%if profile_site_permissions.site in profile.active_sites_allowed%}off{%else%}on{%endif%}"}'               
+                                            {%if profile_site_permissions.site in profile.active_sites_allowed%}checked{%endif%}/>
                                     </div>
                                 </div>
                             </div>

@@ -12,7 +12,7 @@
               {% if use_defaults%}
                 {%if campaign_category == request.user.profile.campaign_category %}selected{%endif%}
               {%else%} 
-                {%if campaign_category.pk|to_str in request|get_key_in_get_or_post:'campaign_category_pks' or campaign_category.pk|str_to_int in request|get_key_in_get_or_post:'campaign_category_pks' %}selected{%endif%}
+                {%if campaign_category.pk|to_str in request|get_key_in_get_or_post:'campaign_category_pks' or campaign_category.pk|to_int in request|get_key_in_get_or_post:'campaign_category_pks' %}selected{%endif%}
               {%endif%} 
               value="{{campaign_category.pk}}">{{campaign_category.name}} ({{campaign_category.site.name}})</option>
               {%endfor%}

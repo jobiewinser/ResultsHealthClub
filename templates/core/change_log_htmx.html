@@ -4,6 +4,44 @@
     </div>
     <div class="col-8">
         <div class="m-3 card p-2">
+            <h5>V0.8 - 22? December 2022</h5>
+            <ul>
+                <li>
+                    Added payment system using stripe. Companies can now officially start signing up once I put the site live.
+                </li>              
+                <li>
+                    Added lots of backend work around subscriptions.
+                </li>                
+                <li>
+                    Analytics now bases what you are allowed to do on which sites you've queried (permissions and when the sites were created).
+                </li>           
+                <li>
+                    Further work on the site/company config pages. Getting ready for potential subscriptions coming in eventually (hopefully).
+                </li>                   
+                <li>
+                    Added backend code for grandfathering in prices. If i decide to honor the original prices for an extended period of time, the system can handle that.
+                </li>                  
+                <li>
+                    When opening the leads board, bookings or analytics, it correctly fills the query with your default site, campaign category (if you have one) and campaign (if you have one).
+                </li>                
+                <li>
+                    Much less wording is hardcoded around subscriptions and how many profiles you are allowed etc due to the backend work on subscriptions.
+                </li>                    
+                <li>                            
+                    <small>
+                        Bugs:                    
+                        <ul>
+                            <li>
+                               More whatsap template error messages sent from Meta are now handled correctly (still more work needed to handle all possible errors).
+                            </li>
+                            <li>
+                               UNRESOLVED. Found a bug where dragging and selecting text over the leads board then dragging at the same time as a lead moving from another user's actions causes the board to break. This will likely be fixed when I get around to remaking the websockets for the board. 
+                            </li>
+                        </ul>
+                    </small>
+                </li>
+            </ul>
+            <hr>
             <h5>V0.7 - 19 December 2022</h5>
             <ul>
                 <li>

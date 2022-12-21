@@ -8,7 +8,7 @@ from django.middleware.csrf import get_token
 from django.contrib.auth.decorators import login_required
 from campaign_leads.models import Campaign, Campaignlead, Booking, Call, Note, ManualCampaign, CampaignCategory
 from campaign_leads.views import CampaignBookingsOverviewView
-from core.models import Site, WhatsappNumber
+from core.models import Site, WhatsappNumber,Subscription
 from core.user_permission_functions import get_available_sites_for_user, get_user_allowed_to_add_call
 from core.views import get_site_pks_from_request_and_return_sites
 from django.db.models import Q, Count
@@ -60,7 +60,7 @@ def get_modal_content(request, **kwargs):
                 # context['users'] = User.objects.filter(profile__sites_allowed=lead.campaign.site)
             elif template_name == 'switch_subscription':
                 context["site"] = Site.objects.get(pk=site_pk)     
-                context['switch_subscription'] = request.GET.get('switch_subscription')
+                context['switch_subscription'] = Subscription.objects.filter(numerical=request.GET.get('switch_subscription')).first()
                     
             return render(request, f"campaign_leads/htmx/{template_name}.html", context)   
     except Exception as e:
@@ -154,7 +154,7 @@ def get_leads_column_meta_data(request, **kwargs):
         leads = Campaignlead.objects
         campaign_pk = request.GET.get('campaign_pk', None)
             # request.GET['campaign_pk'] = campaign_pk
-        sites = get_site_pks_from_request_and_return_sites(request).filter(archived=False, booking=None, campaign__site__in=request.user.profile.sites_allowed.all())
+        sites = get_site_pks_from_request_and_return_sites(request).filter(archived=False, booking=None, campaign__site__in=request.user.profile.active_sites_allowed)
         if request.GET['site_pks']:
             leads = leads.filter(campaign__site__pk__in=request.GET['site_pks'])
             

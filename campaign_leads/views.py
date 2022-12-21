@@ -93,7 +93,7 @@ def get_leads_board_context(request):
     context = {}   
     context['sites'] = get_site_pks_from_request_and_return_sites(request)
     campaigns = get_campaign_qs(request)
-    leads = Campaignlead.objects.filter(archived=False, campaign__site__company=request.user.profile.company, campaign__site__in=request.user.profile.sites_allowed.all()).exclude(booking__archived=False)
+    leads = Campaignlead.objects.filter(archived=False, campaign__site__company=request.user.profile.company, campaign__site__in=request.user.profile.active_sites_allowed).exclude(booking__archived=False)
     campaign_pks = request.GET.getlist('campaign_pks', None)
     filtered = False
     
@@ -175,7 +175,7 @@ class CampaignBookingsOverviewView(TemplateView):
 def get_booking_table_context(request):
     request.GET._mutable = True     
     context = {}
-    leads = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, campaign__site__in=request.user.profile.sites_allowed.all()).exclude(booking__archived=True)
+    leads = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, campaign__site__in=request.user.profile.active_sites_allowed).exclude(booking__archived=True)
     campaign_pks = request.GET.getlist('campaign_pks', None)
 
     campaign_category_pks = request.GET.getlist('campaign_category_pks', None)
