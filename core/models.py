@@ -50,21 +50,29 @@ class Subscription(models.Model):
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         if self.max_profiles:
-            self.max_profiles_string == str(self.max_profiles)
+            self.max_profiles_string = str(self.max_profiles)
         else:
-            self.max_profiles_string == "Unlimited"
+            self.max_profiles_string = "Unlimited"
         super(Subscription, self).save(force_insert, force_update, using, update_fields)
 
 class SiteSubscriptionChange(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    completed = models.DateTimeField(null=True, blank=True)
-    canceled = models.DateTimeField(null=True, blank=True)
-    profiles_to_keep = models.ManyToManyField("core.Profile", related_name="site_subscription_change_profiles_to_keep", null=True, blank=True)
+    completed = models.DateTimeField(null=True, blank=True, default=None)
+    canceled = models.DateTimeField(null=True, blank=True, default=None)
+    users_to_keep = models.ManyToManyField(User, related_name="site_subscription_change_users_to_keep", null=True, blank=True)
     subscription_from = models.ForeignKey("core.Subscription", related_name="site_subscription_change_subscription_from", on_delete=SET_NULL, null=True, blank=True)
-    subscription_from_text = models.TextField(null=True, blank=True)
+    subscription_from_text = models.CharField(max_length=20, null=True, blank=True)
     subscription_to = models.ForeignKey("core.Subscription", related_name="site_subscription_change_subscription_to", on_delete=SET_NULL, null=True, blank=True)
-    subscription_to_text = models.TextField(null=True, blank=True)
+    subscription_to_text = models.CharField(max_length=20, null=True, blank=True)
+    version_started = models.CharField(max_length=20, null=True, blank=True)
     site = models.ForeignKey("core.Site", on_delete=SET_NULL, null=True, blank=True)
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        if self.subscription_from:
+            self.subscription_from_text = str(self.subscription_from.name)
+        if self.subscription_to:
+            self.subscription_to_text = str(self.subscription_to.name)
+        super(SiteSubscriptionChange, self).save(force_insert, force_update, using, update_fields)
 
 class SiteUsersOnline(models.Model):
     users_online = models.CharField(max_length=1500, default=";")
@@ -779,9 +787,12 @@ class SiteProfilePermissions(models.Model):
     site = models.ForeignKey("core.Site", on_delete=models.CASCADE, null=True, blank=True)
     view_site_configuration = models.BooleanField(default=False)
     edit_site_configuration = models.BooleanField(default=False)
+    edit_site_calendly_configuration = models.BooleanField(default=False)
+    
     edit_whatsapp_settings = models.BooleanField(default=False)
     toggle_active_campaign = models.BooleanField(default=False)
     toggle_whatsapp_sending = models.BooleanField(default=False)
+    change_subscription = models.BooleanField(default=False)
     permissions_count = models.IntegerField(default = 0) 
     class Meta:
         ordering = ['-pk']   

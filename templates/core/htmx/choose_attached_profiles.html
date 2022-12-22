@@ -1,0 +1,115 @@
+{%load core_tags%}
+
+<div class="generic_modal_contents">
+    <div class="card card-white m-1 p-3" style="min-width:600px">
+        <button class="btn btn-light"
+            hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
+            hx-vals='{"template_name": "switch_subscription","switch_subscription":"{{site_subscription_change.subscription_to.numerical}}","site_pk":"{{site.pk}}"}'
+            hx-get="{% url 'campaign-lead-get-modal-content'%}" 
+            hx-push-url="false"
+            hx-swap="innerHTML" hx-trigger="click">
+            Back
+        </button>
+        <br>
+        <p>
+            You currently have a <b>{{site_subscription_change.subscription_from.get_name_display}}</b> subscription £{{site_subscription_change.subscription_from.cost|floatformat:2}} p/m (per facility/site)
+        </p>
+        <p class="text-{{site_subscription_change.subscription_from.bootstrap_colour}}">
+            You are going to switch to a <b>{{site_subscription_change.subscription_to.get_name_display}}</b> subscription £{{site_subscription_change.subscription_to.cost|floatformat:2}} p/m (per facility/site)
+        </p>
+
+        <div class="row mt-3">
+            <div class="col-auto">
+                <div>
+                    <input type="button" value="Output Selected" onclick="outputSelectedRows()">
+                  </div>
+                  <table id="example" class="table display" style="width:100%">
+                    <thead>
+                      <tr>
+                        <th>Select</th>
+                        <th>Name</th>
+                        <th>Role</th>
+                        <th>Role</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        {%for user in site_subscription_change.site.users%}
+                        <tr>
+                            <td><input type="checkbox" class="selectrow" data-id="{{user.pk}}"></td>
+                            <td>{{user.profile}}</td>
+                            <td>{{user.profile.get_role_display}}</td>
+                        </tr>           
+                        {%endfor%}           
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        <th></th>
+                        <th>Name</th>
+                      </tr>
+                    </tfoot>
+                  </table>
+                  <script>
+                    $(document).ready(function() {
+                      $('#example').DataTable({
+                        "columnDefs": [{
+                          "targets": [6],
+                          "orderable": false
+                        }]
+                      });
+                    });
+                  
+                    let selectedRows = [];
+                    $(".selectrow").click(function() {
+                      let rowId = $(this).data("id");
+                      if ($(this).prop("checked") == true) {
+                        selectedRows.push(rowId);
+                        if (selectedRows.length > 5) {
+                          alert("Maximum 5 rows can be selected!");
+                          $(this).prop("checked", false);
+                          let index = selectedRows.indexOf(rowId);
+                          if (index > -1) {
+                            selectedRows.splice(index, 1);
+                          }
+                          return;
+                        }
+                      } else {
+                        let index = selectedRows.indexOf(rowId);
+                        if (index > -1) {
+                          selectedRows.splice(index, 1);
+                        }
+                      }
+                  
+                      // Move selected rows to top
+                      let table = $('#example').DataTable();
+                      table.rows().every(function() {
+                        if (selectedRows.indexOf(this.data()[6]) > -1) {
+                          this.move('top');
+                        }
+                      });
+                    });
+                  
+                    // Output selected rows
+                    function outputSelectedRows() {
+                      if (selectedRows.length == 0) {
+                        alert("No rows selected!");
+                        return;
+                      }
+                  
+                      let selectedRowsData = [];
+                      let table = $('#example').DataTable();
+                      table.rows().every(function() {
+                        if (selectedRows.indexOf(this.data()[6]) > -1) {
+                          selectedRowsData.push(this.data());
+                        }
+                      });
+                  
+                      console.log(selectedRowsData);
+                    }
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
+<span hx-swap-oob="true" id="generic_modal_title">
+    Choose Active Profiles for {{site_subscription_change.site.name}}
+</span>

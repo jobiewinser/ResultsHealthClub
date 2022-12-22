@@ -10,7 +10,7 @@ from django.contrib.sessions.models import Session
 from django.contrib.auth.models import User
 from calendly.api import Calendly
 from core.core_decorators import check_core_profile_requirements_fulfilled
-from core.models import ROLE_CHOICES, Company, FreeTasterLink, FreeTasterLinkClick, Profile, Site, CompanyProfilePermissions, SiteProfilePermissions, Feedback
+from core.models import ROLE_CHOICES, FreeTasterLink, FreeTasterLinkClick, Profile, Site, CompanyProfilePermissions, SiteProfilePermissions, Feedback, Subscription,SiteSubscriptionChange
 from django.contrib.auth import authenticate
 from django.contrib.auth import login
 from django.core.exceptions import PermissionDenied
@@ -59,7 +59,7 @@ class ChangeLogView(TemplateView):
     
 PROFILE_ERROR_OPTIONS = {
     '1':"No profile set up for your user account.",
-    '2':"No company assigned to your profile (please contact: <a href='mailto:jobiewinser@gmail.com'>jobiewinser@gmail.com</a> or <a href='tel:+447872000364'>+44 7872 000364</a>).",
+    '2':"No company assigned to your profile (please contact: <a href='mailto:jobie@winser.uk'>jobie@winser.uk</a> or <a href='tel:+447872000364'>+44 7872 000364</a>).",
     '3':"You have not been granted permission to access any sites.",
     '4':"You have not been allocated a main site.",
 }
@@ -145,9 +145,11 @@ class SitePermissionsView(TemplateView):
             if request.user.profile.role == 'a' or (request.user.profile.role == 'b' and site_permissions.profile.role == 'c'):      
                 for key in ['view_site_configuration',
                             'edit_site_configuration',
+                            'edit_site_calendly_configuration',                            
                             'edit_whatsapp_settings',
                             'toggle_active_campaign',                            
                             'toggle_whatsapp_sending',                            
+                            'change_subscription',                            
                             ] :
                     if key in request.POST:
                         setattr(site_permissions, key, (request.POST.get(key, 'off') == 'on'))
@@ -157,13 +159,15 @@ class SitePermissionsView(TemplateView):
         return render(request, 'campaign_leads/htmx/site_permissions.html', context)
 
 def get_site_configuration_context(request):
+    request.GET._mutable = True   
     context = {}
-    site_pk = request.GET.get('site_pk', None) or request.POST.get('site_pk', None)
+    site_pk = get_single_site_pk_from_request(request)   
+    request.GET['site_pk'] = site_pk   
     site = Site.objects.get(pk=site_pk)     
 
     # permissions
     context['permitted'] = False
-    if get_user_allowed_to_view_site_configuration(request.user.profile, site):
+    if get_profile_allowed_to_view_site_configuration(request.user.profile, site):
         context['permitted'] = True
     # endpermissions
     context['whatsapp_numbers'] = site.get_live_whatsapp_phone_numbers()          
@@ -191,11 +195,8 @@ def get_site_configuration_context(request):
 class SiteConfigurationView(TemplateView):
     template_name='core/site_configuration.html'
 
-    def get(self, request, *args, **kwargs):
-        request.GET._mutable = True   
-        site_pk = get_single_site_pk_from_request(request)
-        request.GET['site_pk'] = site_pk      
-        site = Site.objects.get(pk=site_pk) 
+    def get(self, request, *args, **kwargs):   
+        # site = Site.objects.get(pk=site_pk) 
         if request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'core/htmx/site_configuration_htmx.html'
         return super(SiteConfigurationView, self).get(request, args, kwargs)
@@ -211,29 +212,41 @@ class SiteConfigurationView(TemplateView):
         site = Site.objects.get(pk=request.POST.get('site_pk'))   
 
         # permissions
-        if not get_user_allowed_to_edit_site_configuration(request.user.profile, site):
-            if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
-                return HttpResponse("You don't have permission to edit this")
-            raise PermissionDenied()
+        # if not get_profile_allowed_to_edit_site_configuration(request.user.profile, site):
+        #     if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+        #         return HttpResponse("You don't have permission to edit this")
+        #     raise PermissionDenied()
         # endpermissions
 
 
         response_text = ""     
         if 'name' in request.POST:
+            if not get_profile_allowed_to_edit_site_configuration(request.user.profile, site):
+                if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+                    return HttpResponse("You don't have the edit site configuration permission", status=403)
+                raise PermissionDenied()
             site.name = request.POST['name']
             response_text = f"{response_text} <span hx-swap-oob='innerHTML:.name_display_{site.pk}'>{site.name}</span>"            
             site.save()
             return HttpResponse(response_text, status=200)
             
-        if 'calendly_organization' in request.POST:
-            site.calendly_organization = request.POST['calendly_organization']        
-            site.save()            
-            return render(request, 'core/htmx/site_configuration_htmx.html', get_site_configuration_context(request))
-            
-        if 'calendly_token' in request.POST:
-            site.calendly_token = request.POST['calendly_token']        
-            site.save()
-            return render(request, 'core/htmx/site_configuration_htmx.html', get_site_configuration_context(request))
+        if 'calendly_organization' in request.POST or 'calendly_token' in request.POST:
+            if not get_profile_allowed_to_edit_site_calendly_configuration(request.user.profile, site):
+                if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+                    return HttpResponse("You don't have the edit Calendly configuration permission", status=403)
+                raise PermissionDenied()
+            if 'calendly_organization' in request.POST:
+                if request.POST['calendly_organization'] == '' or request.POST['calendly_organization'].replace('*', ''): #stops the **** input submitting!
+                    site.calendly_organization = request.POST['calendly_organization']        
+                    site.save()            
+                
+            if 'calendly_token' in request.POST:
+                if request.POST['calendly_token'] == '' or request.POST['calendly_token'].replace('*', ''): #stops the **** input submitting!
+                    site.calendly_token = request.POST['calendly_token']        
+                    site.save()
+            context = get_site_configuration_context(request)
+            context.update({'advanced_settings_open':True})
+            return render(request, 'core/htmx/site_configuration_htmx.html',context)
         return HttpResponse( status=200)
             
 
@@ -348,7 +361,7 @@ def reactivate_profile(request):
     site = Site.objects.get(pk=request.POST.get('site_pk'))
     user = User.objects.get(pk=request.POST.get('user_pk'))
     if get_profile_allowed_to_edit_other_profile(request.user.profile, user.profile):
-        if site.users.count() >= site.allowed_user_count:
+        if site.users.count() >= site.subscription_new.max_profiles:
             return HttpResponse("You already have the maximum number of users", status=400)
         user.is_active = True
         user.save()
@@ -516,3 +529,42 @@ def handler500(request):
     if request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
         template_name = '500_snackbar.html'  
     return render(request, template_name, status=500)
+
+@method_decorator(login_required, name='dispatch')
+@method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
+class SwitchSubscriptionBeginView(TemplateView):
+    template_name='core/htmx/choose_attached_profiles.html'
+
+    def get(self, request, *args, **kwargs):
+        request.GET._mutable = True   
+        site_pk = request.GET.get('site_pk')
+        site = Site.objects.filter(pk=site_pk).first()
+        if site:  
+            if get_profile_allowed_to_change_subscription(request.user.profile, site):
+                return super(SwitchSubscriptionBeginView, self).get(request, args, kwargs)
+
+    def get_context_data(self):    
+        context = super(SwitchSubscriptionBeginView, self).get_context_data()
+        site_pk = self.request.GET.get('site_pk')
+        site = Site.objects.get(pk=site_pk)
+        switch_subscription = Subscription.objects.get(numerical=self.request.GET.get('numerical'))
+        
+        SiteSubscriptionChange.objects.filter(subscription_to=switch_subscription, subscription_from = site.subscription_new, site=site, canceled=None, completed=None).exclude(version_started=str(settings.VERSION)).update(canceled=datetime.now())
+        existing_site_subscription_changes = SiteSubscriptionChange.objects.filter(subscription_to=switch_subscription, subscription_from = site.subscription_new, site=site, canceled=None, completed=None).order_by('created')
+        if existing_site_subscription_changes:
+            latest_existing_site_subscription_change = existing_site_subscription_changes.last()
+            existing_site_subscription_changes.exclude(pk=latest_existing_site_subscription_change.pk).update(canceled=datetime.now())
+        site_subscription_change, created = SiteSubscriptionChange.objects.get_or_create(
+            subscription_to=switch_subscription, 
+            subscription_from = site.subscription_new, 
+            site=site, 
+            canceled=None, 
+            completed=None
+        )
+        context['site'] = site
+        context['switch_subscription'] = switch_subscription
+        context['site_subscription_change'] = site_subscription_change
+        
+        return context
+    def post(self, request):       
+        return HttpResponse( status=200)

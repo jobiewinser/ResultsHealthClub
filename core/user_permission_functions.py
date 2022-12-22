@@ -14,27 +14,41 @@ def get_available_sites_for_user(user):
         return profile.active_sites_allowed
     return Site.objects.none()
 
-def get_user_allowed_to_toggle_active_campaign(profile, site):
+def get_profile_allowed_to_toggle_active_campaign(profile, site):
     permissions = SiteProfilePermissions.objects.filter(profile=profile, site=site).first()
     if permissions:
         return permissions.toggle_active_campaign
     return False
-def get_user_allowed_to_edit_whatsapp_settings(profile, site):
+def get_profile_allowed_to_edit_whatsapp_settings(profile, site):
     permissions = SiteProfilePermissions.objects.filter(profile=profile, site=site).first()
     if permissions:
         return permissions.edit_whatsapp_settings
     return False
-def get_user_allowed_to_toggle_whatsapp_sending(profile, site):
+def get_profile_allowed_to_toggle_whatsapp_sending(profile, site):
     permissions = SiteProfilePermissions.objects.filter(profile=profile, site=site).first()
     if permissions:
         return permissions.toggle_whatsapp_sending
     return False
-def get_user_allowed_to_edit_site_configuration(profile, site):
+def get_profile_allowed_to_change_subscription(profile, site):
+    permissions = SiteProfilePermissions.objects.filter(profile=profile, site=site).first()
+    if permissions:
+        return permissions.change_subscription
+    return False
+    
+def get_profile_allowed_to_edit_site_configuration(profile, site):
     permissions = SiteProfilePermissions.objects.filter(profile=profile, site=site).first()
     if permissions:
         return permissions.edit_site_configuration
     return False
-def get_user_allowed_to_view_site_configuration(profile, site):
+    
+def get_profile_allowed_to_edit_site_calendly_configuration(profile, site):
+    permissions = SiteProfilePermissions.objects.filter(profile=profile, site=site).first()
+    if permissions:
+        return permissions.edit_site_calendly_configuration
+    return False
+
+    
+def get_profile_allowed_to_view_site_configuration(profile, site):
     permissions = SiteProfilePermissions.objects.filter(profile=profile, site=site).first()
     if permissions:
         return permissions.view_site_configuration
@@ -74,21 +88,21 @@ def check_if_profile_is_higher_authority_than_profile(user_profile, target_profi
 
 
 
-def get_user_allowed_to_edit_whatsappnumber(user, whatsappnumber):
-    #TODO
-    return True
+# def get_user_allowed_to_edit_whatsappnumber(user, whatsappnumber):
+#     #TODO
+#     return True
 
-def get_user_allowed_to_edit_template(user, template):
-    #TODO
-    return True
+# def get_user_allowed_to_edit_template(user, template):
+#     #TODO
+#     return True
 
 def get_user_allowed_to_use_site_messaging(user, site):
     #TODO
     return True
 
-def get_user_allowed_to_use_site_analytics(user, site):
-    #TODO
-    return True
+# def get_user_allowed_to_use_site_analytics(user, site):
+#     #TODO
+#     return True
 
 def get_allowed_site_chats_for_user(user):
     #TODO

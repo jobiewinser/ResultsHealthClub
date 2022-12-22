@@ -1,18 +1,13 @@
 from datetime import datetime
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import render
 import logging
-from django.contrib.auth import login
-from django.middleware.csrf import get_token
 from django.contrib.auth.decorators import login_required
-from campaign_leads.models import Campaign, Campaignlead, Booking, Call, Note, ManualCampaign, CampaignCategory
-from campaign_leads.views import CampaignBookingsOverviewView
+from campaign_leads.models import Campaign, Campaignlead, Booking, Note, ManualCampaign, CampaignCategory
 from core.models import Site, WhatsappNumber,Subscription
-from core.user_permission_functions import get_available_sites_for_user, get_user_allowed_to_add_call
 from core.views import get_site_pks_from_request_and_return_sites
-from django.db.models import Q, Count
-from django.contrib import messages
+from django.db.models import Count
 from asgiref.sync import async_to_sync
 from campaign_leads.views import get_campaign_qs
 from whatsapp.models import WhatsappTemplate

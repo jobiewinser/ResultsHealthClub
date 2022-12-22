@@ -6,7 +6,7 @@ import json
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from campaign_leads.models import Campaignlead
-from core.user_permission_functions import get_user_allowed_to_edit_site_configuration, get_user_allowed_to_edit_template, get_user_allowed_to_edit_whatsappnumber, get_user_allowed_to_send_from_whatsappnumber
+from core.user_permission_functions import *
 from whatsapp.api import Whatsapp
 from django.views.generic import TemplateView
 from whatsapp.models import WHATSAPP_ORDER_CHOICES, WhatsAppMessage, WhatsAppMessageStatus, WhatsAppWebhookRequest, WhatsappMessageImage, WhatsappTemplate, template_variables
@@ -451,7 +451,7 @@ def whatsapp_number_change_alias(request):
     if settings.DEMO and not request.user.is_superuser:
         return HttpResponse(status=500)
     whatsappnumber = WhatsappNumber.objects.get(pk=request.POST.get('whatsappnumber_pk'))
-    if get_user_allowed_to_edit_whatsappnumber(request.user, whatsappnumber):
+    if get_profile_allowed_to_edit_whatsapp_settings(request.user.profile, whatsappnumber.whatsapp_business_account.site):
         alias = request.POST.get('alias', None)
         if alias or alias == '':
             whatsappnumber.alias = alias
@@ -511,7 +511,7 @@ def add_phone_number(request):
     phone_number = request.POST.get('phone_number', None)
     if whatsapp_business_account_pk and country_code and phone_number:
         whatsapp_business_account = WhatsappBusinessAccount.objects.get(pk=whatsapp_business_account_pk)
-        if get_user_allowed_to_edit_site_configuration(request.user.profile, whatsapp_business_account.site):            
+        if get_profile_allowed_to_edit_site_configuration(request.user.profile, whatsapp_business_account.site):            
             whatsapp = Whatsapp(whatsapp_business_account.site.whatsapp_access_token)
             whatsapp.create_phone_number(whatsapp_business_account.whatsapp_business_account_id, country_code, phone_number)
             return HttpResponse(status=200,headers={'HX-Refresh':True})
@@ -528,7 +528,7 @@ def add_whatsapp_business_account(request):
         if site_pk and whatsapp_business_account_id:
             site = Site.objects.get(pk=site_pk)
             whatsapp = Whatsapp(site.whatsapp_access_token) 
-            if get_user_allowed_to_edit_site_configuration(request.user.profile, site):      
+            if get_profile_allowed_to_edit_site_configuration(request.user.profile, site):      
                 if whatsapp.get_phone_numbers(whatsapp_business_account_id).get('data',[]):   
                     whatsapp_business_account = WhatsappBusinessAccount.objects.filter(whatsapp_business_account_id=whatsapp_business_account_id).first()
                     if whatsapp_business_account:
@@ -650,6 +650,8 @@ def set_whatsapp_site_config(request, **kwargs):
         return HttpResponse(status=500)
     try:
         site = Site.objects.get(pk=request.POST.get('site_pk',None))
+        if not get_profile_allowed_to_edit_whatsapp_settings(request.user.profile, site):
+            return HttpResponse("You need the edit Whatsapp Settings permission", status=403)
         site.whatsapp_access_token = request.POST.get('whatsapp_access_token')
         site.save()
         whatsapp = Whatsapp(site.whatsapp_access_token)
@@ -657,5 +659,5 @@ def set_whatsapp_site_config(request, **kwargs):
         return render(request, 'core/htmx/whatsapp_site_config_row.html', {'site':site, 'whatsapp_business_details':whatsapp_business_details})
     except Exception as e:        
         logger.error(f"set_whatsapp_template_sending_status {str(e)}")
-        return HttpResponse("Couldn't set_whatsapp_template_sending_status", status=500)
+        return HttpResponse("Couldn't set Whatsapp configuration", status=500)
 

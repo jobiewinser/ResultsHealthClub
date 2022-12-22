@@ -1,20 +1,16 @@
-import json
 import os
 import uuid
 from calendly.api import Calendly
-from core.models import ROLE_CHOICES, FreeTasterLink, Profile, Site, WhatsappNumber, Contact, Company, SiteProfilePermissions, CompanyProfilePermissions
+from core.models import ROLE_CHOICES, FreeTasterLink, Profile, Site, WhatsappNumber, Contact, SiteProfilePermissions, CompanyProfilePermissions
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import render
 import logging
-from django.contrib.auth import login
-from django.middleware.csrf import get_token
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views import View
-from core.user_permission_functions import get_available_sites_for_user, get_profile_allowed_to_edit_other_profile, get_user_allowed_to_edit_site_configuration 
+from core.user_permission_functions import get_profile_allowed_to_edit_other_profile, get_profile_allowed_to_edit_site_configuration 
 from core.views import get_site_pks_from_request_and_return_sites
-from django.http import QueryDict
 from campaign_leads.models import Campaignlead
 from django.conf import settings
 from django.contrib.auth.password_validation import validate_password
@@ -87,7 +83,7 @@ class ModifyUser(View):
             action = request.POST.get('action', '')
             if action == 'add':
                 site = Site.objects.get(pk=request.POST.get('site_pk', ''))
-                if site.users.count() >= site.allowed_user_count:
+                if site.users.count() >= site.subscription_new.max_profiles:
                     return HttpResponse("You already have the maximum number of users", status=400)
                 username = request.POST.get('username', '')
                 first_name = request.POST.get('first_name', '')
@@ -163,11 +159,14 @@ def create_calendly_webhook_subscription(request, **kwargs):
     if settings.DEMO and not request.user.is_superuser:
         return HttpResponse(status=500)
     site = Site.objects.get(pk=request.POST.get('site_pk')) 
-    if get_user_allowed_to_edit_site_configuration(request.user.profile, site): 
+    if get_profile_allowed_to_edit_site_configuration(request.user.profile, site): 
         calendly = Calendly(site.calendly_token)
         print("calendly", calendly)
         calendly_webhooks = calendly.list_webhook_subscriptions(organization = site.calendly_organization).get('collection')
         print("calendly_webhooks", site)
+        if calendly_webhooks == None:
+            if site.users.count() >= site.subscription_new.max_profiles:
+                return HttpResponse("Invalid Calendly details", status=400)
         for webhook in calendly_webhooks:
             if webhook.get('state') == 'active' \
             and webhook.get('callback_url') == f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/" \
@@ -185,7 +184,7 @@ def delete_calendly_webhook_subscription(request, **kwargs):
     if settings.DEMO and not request.user.is_superuser:
         return HttpResponse(status=500)
     site = Site.objects.get(pk=request.POST.get('site_pk'))    
-    if get_user_allowed_to_edit_site_configuration(request.user.profile, site): 
+    if get_profile_allowed_to_edit_site_configuration(request.user.profile, site): 
         calendly = Calendly(site.calendly_token)
         calendly_webhooks = calendly.list_webhook_subscriptions(organization = site.calendly_organization).get('collection')
         for webhook in calendly_webhooks:

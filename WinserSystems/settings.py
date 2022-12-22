@@ -164,7 +164,9 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.demo',
-                'core.context_processors.subscription_options',                
+                'core.context_processors.version',      
+                'core.context_processors.subscription_options',     
+                         
             ],
         },
     },
@@ -293,3 +295,4 @@ BLEACH_VALID_ATTRS = {
     'img': ['src', 'alt', 'style'],
 }
 BLEACH_VALID_STYLES = ['color', 'cursor', 'float', 'margin']
+VERSION=0.8

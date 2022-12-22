@@ -25,6 +25,7 @@ def get_modal_content(request, **kwargs):
     try:
         request.GET._mutable = True
         context = {}
+        site_pk = None
         context['sites'] = get_site_pks_from_request_and_return_sites(request)
         if request.user.is_authenticated:
             template_name = request.GET.get('template_name', '')

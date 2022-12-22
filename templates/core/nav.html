@@ -65,7 +65,7 @@
                         </li> 
                         <li>
                             <a class="dropdown-item pointer top-nav-link" hx-indicator="#page_load_indicator" data-active-selector="#extra-top-nav-dropdown-toggle"
-                            hx-get="{%url 'change-log'%}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML"><b>v0.8</b> Change Log</a>
+                            hx-get="{%url 'change-log'%}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML"><b>v{{version}}</b> Change Log</a>
                         </li> 
                         {%if user.is_superuser%}       
                             <li>

@@ -38,7 +38,7 @@ def run_startup():
         subscription.save()
         
         subscription, created = Subscription.objects.get_or_create(name="pro")
-        subscription.max_profiles = 999
+        subscription.max_profiles = 0
         subscription.analytics_seconds = 0
         subscription.subscription_link = ""
         subscription.numerical = 2

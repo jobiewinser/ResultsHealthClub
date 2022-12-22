@@ -15,16 +15,16 @@ hx-swap="innerHTML" hx-trigger="submit delay:0.3s" hx-indicator="#htmx_indicator
                                                     data-bs-toggle="popover" data-bs-placement="left" 
                                                     data-bs-trigger="hover focus"
                                                     title="Whatsapp Access Token"
-                                                    {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}
+                                                    {%if not request.user.profile|get_profile_allowed_to_edit_whatsapp_settings_tag:site%}
                                                     data-bs-content="You do not have permission to edit this field: Edit Site Configuration"
                                                     {%else%}
                                                     data-bs-content="This is the token found for a system user at https://business.facebook.com/settings/system-users/ (This may change)"
                                                     {%endif%}>
-                        <input name="whatsapp_access_token" type="password" class="form-control" oninput="$('#whatsapp_config_submit').attr('disabled', false)"
-                        value="{{site.whatsapp_access_token|censor}}" {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}disabled{%endif%}/>
+                        <input name="whatsapp_access_token" type="password" class="form-control" oninput="$('#whatsapp_config_submit').attr('disabled', false)" onfocus="this.value=''; this.removeAttribute('onfocus');"
+                        value="{{site.whatsapp_access_token|censor}}" {%if not request.user.profile|get_profile_allowed_to_edit_whatsapp_settings_tag:site%}disabled{%endif%}/>
                         <label class="elipses-overflow">Whatsapp Access Token</label>
                     </div>
-                    {%if request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}
+                    {%if request.user.profile|get_profile_allowed_to_edit_whatsapp_settings_tag:site%}
                         <br>
                         <button class="btn btn-primary btn-sm m-3" id="whatsapp_config_submit" disabled>Submit</button>
                     {%endif%} 

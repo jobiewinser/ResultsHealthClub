@@ -45,6 +45,9 @@ urlpatterns = [
     path('configuration/reactivate-profile/', coreviews.reactivate_profile, name='reactivate-profile'),  
     path('submit-feedback-form/', coreviews.submit_feedback_form, name='submit-feedback-form'),  
     path('feedback-forms/', coreviews.FeedbackListView.as_view(), name='feedback-forms'),  
+    path('feedback-forms/', coreviews.FeedbackListView.as_view(), name='feedback-forms'),  
+
+    path('switch-subscription-begin/', coreviews.SwitchSubscriptionBeginView.as_view(), name='switch-subscription-begin'),  
 
     
 ]

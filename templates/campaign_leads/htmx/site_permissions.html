@@ -7,7 +7,7 @@
     data-bs-placement="top"
     data-bs-title="Warnings"
     data-bs-content="
-    This user does not have access to this site (the toggle next to buttons to the left is unchecked)
+    This user does not have access to this site (the toggle below is unchecked)
     "
     {%elif site_permissions.profile.role == 'a'%}
     data-bs-toggle="popover" 
@@ -24,17 +24,31 @@
     <span class="secondary_td_layer">{{site_permissions.profile}}</span>
 </div>
 <div class="card-body">     
-    <div class="row" style="min-height:60px">      
+    <div class="form-check form-switch ">
+        <label><small><b>{{site_permissions.site.name}}</b> enabled for user? {%if demo and not request.user.is_superuser%}{Demo}{%endif%}</small>
+        <input class="form-check-input" type="checkbox" 
+            {%if demo and not request.user.is_superuser%}disabled{%endif%}
+            {% if not request.user.profile|get_profile_allowed_to_edit_profile_permissions_tag:site_permissions.profile%}disabled{%endif%}
+            {% if site_permissions.site == site_permissions.profile.site%}disabled{%endif%}
+            hx-post="{%url 'change-sites-allowed'%}" 
+            hx-indicator="#htmx-indicator-permissions" 
+            hx-target="#generic_modal_body" 
+            hx-trigger="input delay:0.1s" 
+            hx-vals='{"profile_pk": "{{site_permissions.profile.pk}}", "site_pk":"{{site_permissions.site.pk}}", "site_allowed":"{%if site_permissions.site in site_permissions.profile.active_sites_allowed%}off{%else%}on{%endif%}"}'               
+            {%if site_permissions.site in site_permissions.profile.active_sites_allowed%}checked{%endif%}/>
+        </label>
+    </div>
+    <div class="row" >      
         {%if site_permissions.site == site_permissions.profile.site%}  
-        <div class="col center mb-2">
-            <b class="card"><small><i class="fa-solid fa-circle-info"></i> This is this user's main site<br> It can't be removed from their allowed sites</small></b>
+        <div class="col center mb-2 alert alert-danger p-0">
+            <small><i class="fa-solid fa-circle-info"></i> This is this user's main site<br> It can't be removed from their allowed sites</small>
         </div>
         {%endif%}
     </div>
     <div class="row">        
         <div class="col">
             <div class="form-check form-switch">
-                <label><small>Allowed to view site configuration</small></label> 
+                <label><small>For {{site_permissions.site.name}}: Allowed to view site configuration</small></label> 
                 <input class="form-check-input" type="checkbox" 
                 {% if not request.user.profile|get_profile_allowed_to_edit_profile_permissions_tag:site_permissions.profile%}disabled{%endif%}
                 {%if not site_permissions.site in site_permissions.profile.active_sites_allowed or site_permissions.profile.role == 'a'%}disabled{%endif%}
@@ -50,7 +64,7 @@
     <div class="row">        
         <div class="col">
             <div class="form-check form-switch">
-                <label><small>Allowed to edit site configuration</small></label> 
+                <label><small>For {{site_permissions.site.name}}: Allowed to edit site configuration</small></label> 
                 <input class="form-check-input" type="checkbox" 
                 {% if not request.user.profile|get_profile_allowed_to_edit_profile_permissions_tag:site_permissions.profile%}disabled{%endif%}
                 {%if not site_permissions.site in site_permissions.profile.active_sites_allowed or site_permissions.profile.role == 'a'%}disabled{%endif%}
@@ -66,7 +80,24 @@
     <div class="row">        
         <div class="col">
             <div class="form-check form-switch">
-                <label><small>Allowed to edit whatsapp settings</small></label> 
+                <label><small>For {{site_permissions.site.name}}: Allowed to edit Calendly configuration</small></label> 
+                <input class="form-check-input" type="checkbox" 
+                {% if not request.user.profile|get_profile_allowed_to_edit_profile_permissions_tag:site_permissions.profile%}disabled{%endif%}
+                {%if not site_permissions.site in site_permissions.profile.active_sites_allowed or site_permissions.profile.role == 'a'%}disabled{%endif%}
+                    hx-post="{%url 'site-permissions'%}" 
+                    hx-target="#permissions_wrapper"  {%if demo and not request.user.is_superuser%}disabled{%endif%}
+                    hx-trigger="input delay:0.1s" 
+                    hx-indicator="#htmx-indicator-permissions" 
+                    hx-vals='{"site_permissions_pk": "{{site_permissions.pk}}", "edit_site_calendly_configuration":"{%if site_permissions.edit_site_calendly_configuration%}off{%else%}on{%endif%}"}'               
+                    {%if site_permissions.edit_site_calendly_configuration and site_permissions.site in site_permissions.profile.active_sites_allowed%}checked{%endif%}/>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">        
+        <div class="col">
+            <div class="form-check form-switch">
+                <label><small>For {{site_permissions.site.name}}: Allowed to edit Whatsapp settings</small></label> 
                 <input class="form-check-input" type="checkbox"
                 {% if not request.user.profile|get_profile_allowed_to_edit_profile_permissions_tag:site_permissions.profile%}disabled{%endif%}
                 {%if not site_permissions.site in site_permissions.profile.active_sites_allowed or site_permissions.profile.role == 'a'%}disabled{%endif%}
@@ -82,9 +113,9 @@
     <div class="row">        
         <div class="col">
             <div class="form-check form-switch">
-                <label><small>Allowed to toggle whatsapp template sending</small></label> 
+                <label><small>For {{site_permissions.site.name}}: Allowed to toggle Whatsapp template sending</small></label> 
                 <input class="form-check-input" type="checkbox" 
-                {% if not request.user.profile|get_user_allowed_to_toggle_whatsapp_sending_tag:site_permissions.profile%}disabled{%endif%}
+                {% if not request.user.profile|get_profile_allowed_to_edit_profile_permissions_tag:site_permissions.profile%}disabled{%endif%}
                 {%if not site_permissions.site in site_permissions.profile.active_sites_allowed or site_permissions.profile.role == 'a'%}disabled{%endif%}
                     hx-post="{%url 'site-permissions'%}" 
                     hx-target="#permissions_wrapper"  {%if demo and not request.user.is_superuser%}disabled{%endif%}
@@ -98,7 +129,24 @@
     <div class="row">        
         <div class="col">
             <div class="form-check form-switch">
-                <label><small>Allowed to toggle the active campaign leads</small></label> 
+                <label><small>For {{site_permissions.site.name}}: Allowed to change subscription</small></label> 
+                <input class="form-check-input" type="checkbox" 
+                {% if not request.user.profile|get_profile_allowed_to_edit_profile_permissions_tag:site_permissions.profile%}disabled{%endif%}
+                {%if not site_permissions.site in site_permissions.profile.active_sites_allowed or site_permissions.profile.role == 'a'%}disabled{%endif%}
+                    hx-post="{%url 'site-permissions'%}" 
+                    hx-target="#permissions_wrapper"  {%if demo and not request.user.is_superuser%}disabled{%endif%}
+                    hx-trigger="input delay:0.1s" 
+                    hx-indicator="#htmx-indicator-permissions" 
+                    hx-vals='{"site_permissions_pk": "{{site_permissions.pk}}", "change_subscription":"{%if site_permissions.change_subscription%}off{%else%}on{%endif%}"}'               
+                    {%if site_permissions.change_subscription and site_permissions.site in site_permissions.profile.active_sites_allowed%}checked{%endif%}/>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">        
+        <div class="col">
+            <div class="form-check form-switch">
+                <label><small>For {{site_permissions.site.name}}: Allowed to toggle the active campaign leads</small></label> 
                 <input class="form-check-input" type="checkbox" 
                 {% if not request.user.profile|get_profile_allowed_to_edit_profile_permissions_tag:site_permissions.profile%}disabled{%endif%}
                 {%if not site_permissions.site in site_permissions.profile.active_sites_allowed or site_permissions.profile.role == 'a'%}disabled{%endif%}
@@ -112,7 +160,7 @@
         </div>
     </div>
     <div class="row pt-1" style="">  
-        <div class="col card">
+        <div class="col alert alert-info center">
             <small>
                     The above permissions are in addition to being able to create/manage leads, create/manage bookings, message customers, view analytics etc. 
             </small>
