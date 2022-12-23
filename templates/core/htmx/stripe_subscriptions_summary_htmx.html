@@ -62,7 +62,7 @@
             </table>
         </div> {% endcomment %}
         <div class="col p-2"> 
-            <img id="payment_methods_htmx_indicator" class="htmx-indicator" src="/img/bars.svg"/>
+            <img id="payment_methods_htmx_indicator" class="htmx-indicator" src="/static/img/bars.svg"/>
             <span id="payment_methods_wrapper">
                 {%include 'core/htmx/payment_methods.html'%}
             </span>
@@ -71,12 +71,17 @@
             <img id="subscriptions_htmx_indicator" class="htmx-indicator" src="/img/bars.svg"/>
             <div class="card card-white">
                 <div class="card-header">
-                    Your Subscriptions
+                    Your Subscriptions for {{site.name}}
                 </div>
                 <div class="card-body">
                     <table class="table">
                         <thead>
                             <tr>
+                                {%if debug%}
+                                <th>
+                                    DEV id
+                                </th>
+                                {%endif%}
                                 <th>
                                     Subscription
                                 </th>
@@ -84,7 +89,7 @@
                                     Status
                                 </th>
                                 <th>
-                                    Next Payment
+                                    Subscribed Until
                                 </th>
                                 <th>
                                     Price
@@ -98,6 +103,12 @@
                             {%for stripe_subscription in site.get_stripe_subscriptions_and_update_models%}
                             {%with stripe_subscription.plan.id|get_subscription_by_stripe_price_id as subscription_object%}
                             <tr>
+                                {%if debug%}
+                                <td>
+                                    {{stripe_subscription.id}}
+                                    {% comment %} {{stripe_subscription}} {% endcomment %}
+                                </td>
+                                {%endif%}
                                 <td>
                                     {{subscription_object.get_name_display}}
                                 </td>
@@ -105,13 +116,14 @@
                                     {{stripe_subscription.status}}
                                 </td>
                                 <td>
-                                    {{stripe_subscription.current_period_end|from_timestamp|nice_date_tag}}
+                                    {{stripe_subscription.current_period_end|from_timestamp|nice_date_tag}} {%if not stripe_subscription.cancel_at_period_end == True%}(renewing monthly){%endif%}
                                 </td>
                                 <td>
                                     {{stripe_subscription.plan.amount|division:100|floatformat:2}} {{stripe_subscription.currency}}
                                 </td>
                                 <td>
-                                    <button class="btn btn-xs btn-primary">
+                                    <button class="btn btn-xs btn-primary top-nav-link" hx-indicator="#page_load_indicator" data-active-selector="#configuration-top-nav-dropdown-toggle"
+                                        hx-get="{%url 'site-configuration'%}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML">
                                         <i class="fa-regular fa-pencil"></i> Modify
                                     </button>
                                 </td>

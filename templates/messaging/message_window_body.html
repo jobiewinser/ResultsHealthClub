@@ -7,7 +7,7 @@
     </script>
     <div class="card-body p-0" id="messageWindowCollapse_{{customer_number}}">
         <div class="htmx-indicator disconnected_indicator messaging_disconnected_indicator">
-            <b>Connecting</b> <img class="invert" src="https://htmx.org/img/bars.svg">
+            <b>Connecting</b> <img class="invert" src="{% static 'img/bars.svg' %}">
         </div>
         <div class="chat_card_body  p-0" id="messageWindowInnerBody_{{customer_number}}" style="overflow-anchor: none">
             {%include 'messaging/message_window_message_rows.html'%}

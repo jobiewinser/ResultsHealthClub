@@ -43,7 +43,7 @@
 {%with call_count as counter%}
 <div class="column-done">
     <div class="m-2 manually_add_lead_div">
-    <h2 class="m-0">{{queryset_title}} <img  class="htmx-indicator invert column-htmx-indicator" src="https://htmx.org/img/bars.svg"/></h2> 
+    <h2 class="m-0">{{queryset_title}} <img  class="htmx-indicator invert column-htmx-indicator" src="{% static 'img/bars.svg' %}"/></h2> 
     {%include 'campaign_leads/htmx/column_metadata.html'%}
     </div>
     <div 

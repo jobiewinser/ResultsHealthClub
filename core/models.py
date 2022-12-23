@@ -489,16 +489,16 @@ class WhatsappNumber(PhoneNumber):
             return None
 
 
-class StripeSubscriptionSnapshot(models.Model):
-    created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    site = models.ForeignKey("core.Site", on_delete=models.SET_NULL, null=True, blank=True)
-    json_data = models.JSONField(null=True, blank=True)
+# class StripeSubscriptionSnapshot(models.Model):
+#     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+#     site = models.ForeignKey("core.Site", on_delete=models.SET_NULL, null=True, blank=True)
+#     json_data = models.JSONField(null=True, blank=True)
 
 class SubscriptionOverride(models.Model): #can give a site extra basic/pro subscription incase of stripe breaking or bad implementation
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     end = models.DateTimeField(null=True, blank=True)
-    site = models.ForeignKey("core.Site", on_delete=models.SET_NULL, null=True, blank=True)
-    subscription = models.ForeignKey("core.Subscription", on_delete=models.SET_NULL, null=True, blank=True)
+    site = models.OneToOneField("core.Site", on_delete=models.SET_NULL, null=True, blank=True)
+    subscription = models.OneToOneField("core.Subscription", on_delete=models.SET_NULL, null=True, blank=True)
 
 class StripeCustomer(models.Model): #can give a site extra basic/pro subscription incase of stripe breaking or bad implementation
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -542,14 +542,33 @@ class Site(models.Model):
     def get_stripe_subscriptions_and_update_models(self):
         stripe_subscriptions = list_subscriptions(self.stripecustomer.customer_id)
         sub_ids = []
+        subscription = None
         for subscription in  stripe_subscriptions:
             sub_ids.append(subscription['id'])
-        if len(stripe_subscriptions) > 1:
+            subscription_objects = Subscription.objects.filter(stripe_price_id=subscription['plan'].stripe_id)
+            if subscription_objects.exists():
+                subscription = subscription_objects.first()
+                
+                
+        subscription_override = SubscriptionOverride.objects.filter(
+            created__lte = datetime.now(),
+            end__gte = datetime.now(),
+            site = self,
+        ).first()
+        if subscription_override:
+            self.subscription_new = subscription_override.subscription
+        else:
+            self.subscription_new = subscription
+            
+            
+        if len(stripe_subscriptions) > 1 and not settings.DEMO and not settings.DEBUG:
             send_mail(
                 subject=f'Winser Systems {os.getenv("SITE_URL")} - 500 error ',
                 message=f"detected 2 subscriptions for a customer, this probably isn't right: #{str(self.pk)}, stripe sub ids: {str(sub_ids)}",
                 from_email='jobiewinser@gmail.com',
                 recipient_list=['jobiewinser@gmail.com'])
+        self.stripe_subscription_id = sub_ids
+        self.save()
         return stripe_subscriptions
     
     @property

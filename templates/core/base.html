@@ -255,7 +255,7 @@
             {%block content%} 
             {%endblock content%}
         </div>
-        <img class="htmx-indicator" id="page_load_indicator" src="https://htmx.org/img/bars.svg"/>
+        <img class="htmx-indicator" id="page_load_indicator" src="{% static 'img/bars.svg' %}"/>
 
         <div class="modal fade" id="generic_modal" role="dialog" style="overflow:hidden;display: none;">
             <div class="modal-dialog modal-lg">
@@ -278,7 +278,7 @@
         {%if request.user.is_authenticated%}
         <span id="chat_bottom_wrapper">
             
-            <img  class="htmx-indicator invert" id="chat_bottom_htmx_indicator" src="https://htmx.org/img/bars.svg"/>
+            <img  class="htmx-indicator invert" id="chat_bottom_htmx_indicator" src="{% static 'img/bars.svg' %}"/>
             <span
             hx-get="{%url 'message-list'%}"
             hx-target="#chat_bottom_wrapper"

@@ -8,14 +8,14 @@
                 </div> 
             </div>
             <div class="col-auto p-0 pointer">
-                <img class="htmx-indicator invert" style="height:100%" id="htmx_indicator_messageCollapse_{{whatsappnumber.pk}}" src="https://htmx.org/img/bars.svg"/>
+                <img class="htmx-indicator invert" style="height:100%" id="htmx_indicator_messageCollapse_{{whatsappnumber.pk}}" src="{% static 'img/bars.svg' %}"/>
             </div>
         </div>
     </div>
     <div class="collapse show" id="messageCollapse_{{whatsappnumber.pk}}_wrapper">
         <div class="card-body p-0 bg-secondary text-white" id="messageFilters_{{whatsappnumber.pk}}">
             <div class="htmx-indicator disconnected_indicator message_count_disconnected_indicator">
-                <b>Connecting</b> <img class="invert" src="https://htmx.org/img/bars.svg">
+                <b>Connecting</b> <img class="invert" src="{% static 'img/bars.svg' %}">
             </div>
             <div class="row ps-2">
                 <div class="col-md-auto p-1 right">

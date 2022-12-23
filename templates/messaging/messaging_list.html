@@ -45,7 +45,7 @@
         </div>
         <div class="card-body collapse p-0 {%if whatsappnumber%}show{%endif%}" id="siteCollapse">
             <div class="htmx-indicator disconnected_indicator message_count_disconnected_indicator">
-                <b>Connecting</b> <img class="invert" src="https://htmx.org/img/bars.svg">
+                <b>Connecting</b> <img class="invert" src="{% static 'img/bars.svg' %}">
             </div>
             <div class="accordion accordion-flush" id="accordionFlushExample" style="margin-top: auto;">
                 {%with request.user|get_allowed_site_chats_for_user_tag as chat_sites%}

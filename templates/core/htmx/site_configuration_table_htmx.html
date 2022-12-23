@@ -62,7 +62,7 @@
                             />
                     </div>
                     <div class="col-md-auto pe-0">
-                        <img  class="htmx-indicator invert" id="htmx_indicator_alias_{{number.pk}}" src="https://htmx.org/img/bars.svg"/>
+                        <img  class="htmx-indicator invert" id="htmx_indicator_alias_{{number.pk}}" src="{% static 'img/bars.svg' %}"/>
                     </div>
                 </div>
             </td>
@@ -91,7 +91,7 @@
                     hx-post="{% url 'whatsapp-number-make-default' %}" hx-swap="innerHTML" 
                     hx-include="this" hx-indicator="#htmx_indicator_default_number_{{number.pk}}" 
                     hx-vals='{"whatsappnumber_pk": "{{number.pk}}"}' hx-target="#overview_table">
-                <img  class="htmx-indicator invert" id="htmx_indicator_default_number_{{number.pk}}" src="https://htmx.org/img/bars.svg"/>
+                <img  class="htmx-indicator invert" id="htmx_indicator_default_number_{{number.pk}}" src="{% static 'img/bars.svg' %}"/>
             </td> {% endcomment %}
         </tr>
         {%endfor%}

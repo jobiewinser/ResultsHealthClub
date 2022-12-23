@@ -30,7 +30,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'type': 'chatbox_message',
                 'message': f"""<span hx-swap-oob="outerHTML:.messaging_disconnected_indicator">
                                             <div class="htmx-indicator disconnected_indicator messaging_disconnected_indicator">
-                                                <b>Connecting</b> <img class="invert" src="https://htmx.org/img/bars.svg">
+                                                <b>Connecting</b> <img class="invert" src="/staticfiles/img/bars.svg">
                                             </div>
                                         </span>""",
             }
@@ -250,7 +250,7 @@ class LeadsConsumer(AsyncWebsocketConsumer):
                                             <div hx-swap-oob="outerHTML:.leads_disconnected_indicator">
                                                 <div class="htmx-indicator whole_page_disconnected_indicator leads_disconnected_indicator">
                                                     <div class="whole_page_disconnected_indicator_content">
-                                                        <b>Connecting</b> <img class="invert" src="https://htmx.org/img/bars.svg">
+                                                        <b>Connecting</b> <img class="invert" src="/staticfiles/img/bars.svg">
                                                         
                                                         <script>
                                                             var elem = $('#leads_disconnected_indicator');
@@ -332,7 +332,7 @@ class CompanyMessageCountConsumer(AsyncWebsocketConsumer):
                     'data':{
                         'rendered_html':f"""<span hx-swap-oob="outerHTML:.message_count_disconnected_indicator">
                                                 <div class="htmx-indicator disconnected_indicator message_count_disconnected_indicator">
-                                                    <b>Connecting</b> <img class="invert" src="https://htmx.org/img/bars.svg">
+                                                    <b>Connecting</b> <img class="invert" src="/staticfiles/img/bars.svg">
                                                 </div>
                                             </span>""",
                     }
