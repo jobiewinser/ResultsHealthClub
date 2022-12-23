@@ -83,8 +83,9 @@ class ModifyUser(View):
             action = request.POST.get('action', '')
             if action == 'add':
                 site = Site.objects.get(pk=request.POST.get('site_pk', ''))
-                if site.users.count() >= site.subscription_new.max_profiles:
-                    return HttpResponse("You already have the maximum number of users", status=400)
+                if site.subscription_new.max_profiles:
+                    if site.users.count() >= site.subscription_new.max_profiles:
+                        return HttpResponse("You already have the maximum number of users", status=400)
                 username = request.POST.get('username', '')
                 first_name = request.POST.get('first_name', '')
                 last_name = request.POST.get('last_name', '')
@@ -165,8 +166,9 @@ def create_calendly_webhook_subscription(request, **kwargs):
         calendly_webhooks = calendly.list_webhook_subscriptions(organization = site.calendly_organization).get('collection')
         print("calendly_webhooks", site)
         if calendly_webhooks == None:
-            if site.users.count() >= site.subscription_new.max_profiles:
-                return HttpResponse("Invalid Calendly details", status=400)
+            if site.subscription_new.max_profiles:
+                if site.users.count() >= site.subscription_new.max_profiles:
+                    return HttpResponse("Invalid Calendly details", status=400)
         for webhook in calendly_webhooks:
             if webhook.get('state') == 'active' \
             and webhook.get('callback_url') == f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/" \

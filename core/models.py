@@ -38,7 +38,8 @@ class Subscription(models.Model):
     max_profiles = models.IntegerField(default = 0)
     max_profiles_string = models.TextField(null=True, blank=True)
     analytics_seconds = models.IntegerField(default = 0) #32 days 2764800 #7 days 604800
-    subscription_link = models.TextField(null=True, blank=True)
+    stripe_product_id = models.TextField(null=True, blank=True)
+    stripe_price_id = models.TextField(null=True, blank=True)
     numerical = models.FloatField(default = 0) #this is a float as all uses of it call |to_int to turn 2.7 to 2 for example. Different prices can therefor be used for the same tier (grandfathered pricing)
     cost = models.FloatField(default = 0)
     whatsapp_enabled = models.BooleanField(default=False)
@@ -47,6 +48,7 @@ class Subscription(models.Model):
     analytics_string = models.TextField(null=True, blank=True)
     analytics_numerical = models.FloatField(default = 0)
     visible_to_all = models.BooleanField(default=True)
+    active = models.BooleanField(default=True)
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         if self.max_profiles:
@@ -66,6 +68,7 @@ class SiteSubscriptionChange(models.Model):
     subscription_to_text = models.CharField(max_length=20, null=True, blank=True)
     version_started = models.CharField(max_length=20, null=True, blank=True)
     site = models.ForeignKey("core.Site", on_delete=SET_NULL, null=True, blank=True)
+    stripe_session_id = models.TextField(blank=True, null=True)  
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         if self.subscription_from:
@@ -481,6 +484,24 @@ class WhatsappNumber(PhoneNumber):
         except Exception as e:
             logger.debug("site.send_whatsapp_message error: "+str(e)) 
             return None
+
+
+class StripeSubscriptionSnapshot(models.Model):
+    created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    site = models.ForeignKey("core.Site", on_delete=models.SET_NULL, null=True, blank=True)
+    json_data = models.JSONField(null=True, blank=True)
+
+class SubscriptionOverride(models.Model): #can give a site extra basic/pro subscription incase of stripe breaking or bad implementation
+    created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    end = models.DateTimeField(null=True, blank=True)
+    site = models.ForeignKey("core.Site", on_delete=models.SET_NULL, null=True, blank=True)
+    subscription = models.ForeignKey("core.Subscription", on_delete=models.SET_NULL, null=True, blank=True)
+
+class StripeCustomer(models.Model): #can give a site extra basic/pro subscription incase of stripe breaking or bad implementation
+    created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    site = models.OneToOneField("core.Site", on_delete=models.SET_NULL, null=True, blank=True)
+    customer_id = models.TextField(blank=True, null=True)
+    json_data = models.JSONField(null=True, blank=True)
 
 class Site(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)

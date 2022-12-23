@@ -10,17 +10,19 @@ from django.contrib.sessions.models import Session
 from django.contrib.auth.models import User
 from calendly.api import Calendly
 from core.core_decorators import check_core_profile_requirements_fulfilled
-from core.models import ROLE_CHOICES, FreeTasterLink, FreeTasterLinkClick, Profile, Site, CompanyProfilePermissions, SiteProfilePermissions, Feedback, Subscription,SiteSubscriptionChange
+from core.models import ROLE_CHOICES, StripeCustomer, FreeTasterLink, FreeTasterLinkClick, Profile, Site, CompanyProfilePermissions, SiteProfilePermissions, Feedback, Subscription,SiteSubscriptionChange
 from django.contrib.auth import authenticate
 from django.contrib.auth import login
 from django.core.exceptions import PermissionDenied
 from core.user_permission_functions import *
 from whatsapp.api import Whatsapp
+from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from datetime import datetime, timedelta
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.views.generic.list import ListView
+from stripe_integration.api import *
 logger = logging.getLogger(__name__)
 
 class LoginDemoView(View):
@@ -361,8 +363,9 @@ def reactivate_profile(request):
     site = Site.objects.get(pk=request.POST.get('site_pk'))
     user = User.objects.get(pk=request.POST.get('user_pk'))
     if get_profile_allowed_to_edit_other_profile(request.user.profile, user.profile):
-        if site.users.count() >= site.subscription_new.max_profiles:
-            return HttpResponse("You already have the maximum number of users", status=400)
+        if site.subscription_new.max_profiles:
+            if site.users.count() >= site.subscription_new.max_profiles:
+                return HttpResponse("You already have the maximum number of users", status=400)
         user.is_active = True
         user.save()
         user.profile.sites_allowed.set([site])
@@ -550,11 +553,12 @@ class SwitchSubscriptionBeginView(TemplateView):
         switch_subscription = Subscription.objects.get(numerical=self.request.GET.get('numerical'))
         
         SiteSubscriptionChange.objects.filter(subscription_to=switch_subscription, subscription_from = site.subscription_new, site=site, canceled=None, completed=None).exclude(version_started=str(settings.VERSION)).update(canceled=datetime.now())
-        existing_site_subscription_changes = SiteSubscriptionChange.objects.filter(subscription_to=switch_subscription, subscription_from = site.subscription_new, site=site, canceled=None, completed=None).order_by('created')
+        existing_site_subscription_changes = SiteSubscriptionChange.objects.filter(version_started=str(settings.VERSION), subscription_to=switch_subscription, subscription_from = site.subscription_new, site=site, canceled=None, completed=None).order_by('created')
         if existing_site_subscription_changes:
             latest_existing_site_subscription_change = existing_site_subscription_changes.last()
             existing_site_subscription_changes.exclude(pk=latest_existing_site_subscription_change.pk).update(canceled=datetime.now())
         site_subscription_change, created = SiteSubscriptionChange.objects.get_or_create(
+            version_started=str(settings.VERSION),
             subscription_to=switch_subscription, 
             subscription_from = site.subscription_new, 
             site=site, 
@@ -566,5 +570,84 @@ class SwitchSubscriptionBeginView(TemplateView):
         context['site_subscription_change'] = site_subscription_change
         
         return context
-    def post(self, request):       
-        return HttpResponse( status=200)
+
+@login_required
+@check_core_profile_requirements_fulfilled
+def choose_attached_profiles(request):
+    site_subscription_change_pk = request.POST.get('site_subscription_change_pk')
+    # del request.POST['site_subscription_change_pk']
+    site_subscription_change = SiteSubscriptionChange.objects.get(pk=site_subscription_change_pk)
+    user_pks = []
+    for k,v in request.POST.items():
+        if 'choose_profile_' in k and v == 'on':
+            user_pks.append(k.replace('choose_profile_', ''))
+    if len(user_pks) > site_subscription_change.subscription_to.max_profiles:
+        return HttpResponse("Too many profiles chosen", status=400)
+
+    site_subscription_change.users_to_keep.set(User.objects.filter(pk__in=user_pks, profile__company=site_subscription_change.site.company))
+    site_subscription_change.stripe_session_id = f"{site_subscription_change.site.guid}_{str(datetime.timestamp(datetime.now()))}"
+    site_subscription_change.save()
+    # if site_subscription_change.subscription_to.whatsapp_enabled:
+    #     return render(request, 'templates/core/htmx/setup_payment.html', {'site_subscription_change':site_subscription_change})
+    # else:
+    
+    
+    
+    try:
+        stripe_customer = get_or_create_customer(site_subscription_change.site.stripecustomer.customer_id)
+    except Site.stripecustomer.RelatedObjectDoesNotExist:
+        stripe_customer = get_or_create_customer("")
+    customer_id = stripe_customer['id']
+    stripe_customer_object, created = StripeCustomer.objects.get_or_create(
+        customer_id=customer_id
+    )
+    stripe_customer_object.json_data = stripe_customer
+    stripe_customer_object.site = site_subscription_change.site
+    stripe_customer_object.save()
+    
+    
+    
+    session = create_checkout_session(site_subscription_change.stripe_session_id, site_subscription_change.subscription_to.stripe_price_id, site_subscription_change.site.stripecustomer.customer_id)
+    return HttpResponse(status=200,headers={'HX-Redirect':session.url})
+    # temp = create_subscription(stripe_customer_object.customer_id, [site_subscription_change.subscription_to.stripe_price_id])
+    # return render(request, 'core/htmx/setup_payment.html', {'site_subscription_change':site_subscription_change})
+
+@method_decorator(login_required, name='dispatch')
+@method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
+class StripeSubscriptionsSummaryView(TemplateView):
+    template_name='core/stripe_subscriptions_summary.html'
+
+    def get(self, request, *args, **kwargs):   
+        # site = Site.objects.get(pk=site_pk) 
+        if request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+            self.template_name = 'core/htmx/stripe_subscriptions_summary_htmx.html'
+        return super(StripeSubscriptionsSummaryView, self).get(request, args, kwargs)
+
+    def get_context_data(self, **kwargs):
+        self.request.GET._mutable = True   
+        context = {}
+        site_pk = get_single_site_pk_from_request(self.request)   
+        self.request.GET['site_pk'] = site_pk   
+        site = Site.objects.get(pk=site_pk)     
+
+        # permissions
+        context['permitted'] = False
+        if get_profile_allowed_to_view_site_configuration(self.request.user.profile, site):
+            context['permitted'] = True
+        # end permissions
+        
+        context['site'] = site
+        context['stripe_subscriptions'] = list_subscriptions(site.stripecustomer.customer_id)
+        return context
+    
+@method_decorator(login_required, name='dispatch')
+@method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
+class StripeSubscriptionCanceledView(TemplateView):
+    template_name='core/stripe_subscription_canceled.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(StripeSubscriptionCanceledView, self).get_context_data(**kwargs)       
+        return context
+
+
+    

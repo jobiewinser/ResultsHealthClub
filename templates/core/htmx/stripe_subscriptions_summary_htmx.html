@@ -1,0 +1,62 @@
+{%load static tz core_tags user_permission_tags%}
+<span>    
+    <script>
+        $(document).ready(function() {
+            document.title = "Site Configuration";
+        });
+    </script>
+    {%if site%}
+    <div class="row mt-0">
+        {%block extra_top_left_buttons %}
+        {%with True as hide_show_all%}
+        {%include 'core/htmx/site_selection_single.html'%}
+        {%endwith%}
+        <button hidden hx-get="{%url 'stripe-subscription-summary'%}" hx-push-url="false" hx-swap="innerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
+        {%endblock extra_top_left_buttons %}
+        <div class="col">
+        </div>
+        {%block extra_top_right_buttons %}
+        <input id="current_page" hidden value="site_configuration"></input>
+        <div class="col-md-auto p-0 m-1">
+            <span class="badge bg-dark text-white"><h6 class="m-1">Stripe Summary</h6></span>           
+        </div>
+        {%endblock extra_top_right_buttons %}
+    </div>
+    <div class="row mt-2">
+        <div class="col p-2"> 
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            Status
+                        </th>
+                        <th>
+                            Next Payment
+                        </th>
+                        <th>
+                            Price
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {%for stripe_subscription in stripe_subscriptions%}
+                    <tr>
+                        <td>
+                            {{stripe_subscription.status}}
+                        </td>
+                        <td>
+                            {{stripe_subscription.current_period_end|from_timestamp}}
+                        </td>
+                        <td>
+                            {{stripe_subscription.plan.amount|division:100|floatformat:2}} {{stripe_subscription.currency}}
+                        </td>
+                    </tr>
+                    {%endfor%}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {%else%}
+    Something went wrong, please let us know if this problem persists: <a href="mailto:jobie@winser.uk">jobie@winser.uk</a>
+    {%endif%}
+</span>

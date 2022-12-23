@@ -48,6 +48,10 @@ urlpatterns = [
     path('feedback-forms/', coreviews.FeedbackListView.as_view(), name='feedback-forms'),  
 
     path('switch-subscription-begin/', coreviews.SwitchSubscriptionBeginView.as_view(), name='switch-subscription-begin'),  
+    path('choose-attached-profiles/', coreviews.choose_attached_profiles, name='choose-attached-profiles'),  
+    # path('stripe-subscription-success/', coreviews.StripeSubscriptionSuccessView.as_view(), name='stripe-subscription-success'),  
+    path('stripe-subscription-summary/', coreviews.StripeSubscriptionsSummaryView.as_view(), name='stripe-subscription-summary'),  
+    path('stripe-subscription-canceled/', coreviews.StripeSubscriptionCanceledView.as_view(), name='stripe-subscription-cancelled'),  
 
     
 ]

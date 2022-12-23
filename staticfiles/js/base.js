@@ -225,11 +225,11 @@ function isCalendlyEvent(e) {
     return e.origin === "https://calendly.com" && e.data.event && e.data.event.indexOf("calendly.") === 0;
 };
 
-function inlinePreventDefault(e) {
-    e.preventDefault();
+function inlinePreventDefault(event) {
+    event.preventDefault();
 }
-function inlineStopPropagation(e) {
-    e.stopPropagation();
+function inlineStopPropagation(event) {
+    event.stopPropagation();
 }
 
 
@@ -316,3 +316,18 @@ try{
 //     }, 100); 
 //     // }catch{}
 // }
+// Output selected rows
+function outputSubscriptionProfileChoice(site_subscription_change_pk) {
+    // if (selectedRows.length == 0) {
+    //   alert("No rows selected!");
+    //   return;
+    // }
+    var submission_dict = {};
+    $('.profile_choice_select').each(function(){
+        if ($(this).is(':checked')) {
+            submission_dict[$(this).attr('name')] = $(this).val();
+        }        
+    });
+    submission_dict['site_subscription_change_pk'] = site_subscription_change_pk
+    htmx.ajax('POST', '/choose-attached-profiles/', {target:'#generic_modal_body', swap:'innerHTML', values:submission_dict})
+}

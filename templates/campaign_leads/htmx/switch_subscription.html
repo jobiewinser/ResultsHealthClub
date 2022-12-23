@@ -3,9 +3,9 @@
 {% with site.company|get_subscription_sites_tag:switch_subscription.numerical|to_int as subscription_sites %}
 <div class="generic_modal_contents">
     <div class="card card-white m-1 p-3" style="min-width:600px">
-        <p>
+        {% comment %} <p>
             You currently have a <b>{{site.subscription_new.get_name_display}}</b> subscription £{{site.subscription_new.cost|floatformat:2}} p/m (per facility/site)
-        </p>
+        </p> {% endcomment %}
         <p class="text-{{switch_subscription.bootstrap_colour}}">
             You are going to switch to a <b>{{switch_subscription.get_name_display}}</b> subscription £{{switch_subscription.cost|floatformat:2}} p/m (per facility/site)
         </p>

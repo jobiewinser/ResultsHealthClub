@@ -14,7 +14,6 @@ def run_startup():
         subscription, created = Subscription.objects.get_or_create(name="free")
         subscription.max_profiles = 5
         subscription.analytics_seconds = 604800
-        subscription.subscription_link = ""
         subscription.numerical = 0
         subscription.cost = 0
         subscription.whatsapp_enabled = False
@@ -22,12 +21,14 @@ def run_startup():
         subscription.max_of_this_type = 1
         subscription.analytics_string = "simple analytics (query back to a week of data, some metrics)"        
         subscription.analytics_numerical = 0  
+        subscription.stripe_price_id = ""
+        subscription.stripe_product_id = ""
+        
         subscription.save()
         
         subscription, created = Subscription.objects.get_or_create(name="basic")
         subscription.max_profiles = 10
         subscription.analytics_seconds = 2764800
-        subscription.subscription_link = ""
         subscription.numerical = 1
         subscription.cost = 9.99
         subscription.whatsapp_enabled = False
@@ -35,12 +36,13 @@ def run_startup():
         subscription.max_of_this_type = 0
         subscription.analytics_string = "basic analytics (query back to a month of data, most metrics)"
         subscription.analytics_numerical = 1
+        subscription.stripe_price_id = ""
+        subscription.stripe_product_id = ""
         subscription.save()
         
         subscription, created = Subscription.objects.get_or_create(name="pro")
         subscription.max_profiles = 0
         subscription.analytics_seconds = 0
-        subscription.subscription_link = ""
         subscription.numerical = 2
         subscription.cost = 34.99
         subscription.whatsapp_enabled = True
@@ -48,6 +50,8 @@ def run_startup():
         subscription.max_of_this_type = 0
         subscription.analytics_string = "Advanced analytics (query back to when your site was created on our system, all metrics)"
         subscription.analytics_numerical = 2 
+        subscription.stripe_price_id = ""
+        subscription.stripe_product_id = ""
         subscription.save()
     # except Exception as e:
     #     pass
@@ -255,6 +259,14 @@ def run_debug_startup():
                     if type(field) == models.BooleanField:
                         setattr(siteprofilepermissions, field.attname, True)
                 siteprofilepermissions.save()
+
+            numerical_subscription_stripe_links = {
+                # "0":"",
+                "1":["price_1MGCO1AxPlf4eeSj21jDTekS","prod_N0CnsUOe6BGyXm"],
+                # "2":["",""],
+            }
+            for k,v in numerical_subscription_stripe_links.items():
+                Subscription.objects.filter(numerical=k).update(stripe_price_id=v[0], stripe_product_id=v[1])
 animals = [
             ('cat','0, 0, 255','blue'),
             ('cow','255, 0, 0','red'),

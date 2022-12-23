@@ -110,14 +110,14 @@
                         </div>
                         <div class="col-auto border-start">   
                             <span 
-                                {%if site.users.count >=  site.subscription_new.max_profiles%}
+                                {%if site.users.count >= site.subscription_new.max_profiles and site.subscription_new.max_profiles%}
                                     data-bs-toggle="popover" 
                                     data-bs-trigger="hover focus" 
                                     data-bs-placement="top"
                                     data-bs-content="You already have the maximum number of profiles for this site's subscription, please deactivate one before clicking this."
                                 {%endif%}>                         
                                 <button class="nowrap btn btn-success btn-sm pointer" type="button" {%if request.user.profile.role == 'c'%}disabled{%endif%}
-                                    {%if site.users.count >=  site.subscription_new.max_profiles%}
+                                    {%if site.users.count >=  site.subscription_new.max_profiles and site.subscription_new.max_profiles%}
                                         disabled
                                     {%endif%}
                                     hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
@@ -128,14 +128,14 @@
                         </div>
                         <div class="col-auto border-start">   
                             <span 
-                                {%if site.users.count >=  site.subscription_new.max_profiles%}
+                                {%if site.users.count >=  site.subscription_new.max_profiles and site.subscription_new.max_profiles%}
                                     data-bs-toggle="popover" 
                                     data-bs-trigger="hover focus" 
                                     data-bs-placement="top"
                                     data-bs-content="You already have the maximum number of profiles for this site's subscription, please deactivate one before clicking this."
                                 {%endif%}>                         
                                 <button class="nowrap btn btn-warning btn-sm pointer" type="button" {%if request.user.profile.role == 'c'%}disabled{%endif%}
-                                    {%if site.users.count >=  site.subscription_new.max_profiles%}
+                                    {%if site.users.count >=  site.subscription_new.max_profiles and site.subscription_new.max_profiles%}
                                         disabled
                                     {%endif%}
                                     hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"

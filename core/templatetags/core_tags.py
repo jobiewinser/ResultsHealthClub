@@ -172,6 +172,13 @@ def timestamp(date):
         return time.mktime(date.timetuple())        
     except Exception as e:
         return 0000000000.0
+    
+@register.filter
+def from_timestamp(timestamp):
+    try:
+        return datetime.fromtimestamp(timestamp)  
+    except Exception as e:
+        return timestamp
 
 @register.filter
 def get_type(value):

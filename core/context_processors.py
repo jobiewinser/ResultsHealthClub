@@ -36,7 +36,7 @@ def subscription_options(request):
     Shows all currently subscriptions on offer
     """
     context_extras = {}
-    context_extras['subscription_options'] = Subscription.objects.filter(visible_to_all=True)
+    context_extras['subscription_options'] = Subscription.objects.filter(visible_to_all=True, active=True)
     from django.db import connections
     # Return a lazy reference that computes connection.queries on access,
     # to ensure it contains queries triggered after this function runs.
