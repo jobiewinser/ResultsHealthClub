@@ -56,6 +56,9 @@ def get_modal_content(request, **kwargs):
             elif template_name == 'switch_subscription':
                 context["site"] = Site.objects.get(pk=site_pk)     
                 context['switch_subscription'] = Subscription.objects.filter(numerical=request.GET.get('switch_subscription')).first()
+            elif template_name == 'add_stripe_payment_method':
+                context["site"] = Site.objects.get(pk=site_pk)     
+                context['switch_subscription'] = Subscription.objects.filter(numerical=request.GET.get('switch_subscription')).first()
                     
             return render(request, f"campaign_leads/htmx/{template_name}.html", context)   
     except Exception as e:

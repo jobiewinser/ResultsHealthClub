@@ -152,6 +152,10 @@ body * {
     text-overflow: hidden;
 }
 
+.fa-light {
+    min-width:16px
+}
+
 
 .btn-primary {
     color: #fff;

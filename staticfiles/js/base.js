@@ -143,6 +143,11 @@ function basehandlehtmxafterRequest(evt){
                 snackbarShow('Successfully added/modified profile', 'success');
                 $('#page_load_indicator').addClass('htmx-request')
                 location.reload();
+            }else if (evt.detail.pathInfo.requestPath.includes("add-stripe-payment-method")){
+                $('#generic_modal').modal('hide');
+                // snackbarShow('Successfully added/modified profile', 'success');
+                $('#payment_methods_htmx_indicator').addClass('htmx-request')
+                location.reload();                
             }else if (evt.detail.pathInfo.requestPath.includes("deactivate-profile")){
                 $('#generic_modal').modal('hide');
                 snackbarShow('Successfully deactivated profile', 'success');

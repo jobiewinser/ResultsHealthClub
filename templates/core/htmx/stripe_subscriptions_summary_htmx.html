@@ -11,14 +11,14 @@
         {%with True as hide_show_all%}
         {%include 'core/htmx/site_selection_single.html'%}
         {%endwith%}
-        <button hidden hx-get="{%url 'stripe-subscription-summary'%}" hx-push-url="false" hx-swap="innerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
+        <button hidden hx-get="{%url 'payments-and-billing'%}" hx-push-url="false" hx-swap="innerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
         {%endblock extra_top_left_buttons %}
         <div class="col">
         </div>
         {%block extra_top_right_buttons %}
-        <input id="current_page" hidden value="site_configuration"></input>
+        <input id="current_page" hidden value="payments_and_billing"></input>
         <div class="col-md-auto p-0 m-1">
-            <span class="badge bg-dark text-white"><h6 class="m-1">Stripe Summary</h6></span>           
+            <span class="badge bg-dark text-white"><h6 class="m-1">Payments and Billing</h6></span>           
         </div>
         {%endblock extra_top_right_buttons %}
     </div>
@@ -62,70 +62,13 @@
             </table>
         </div> {% endcomment %}
         <div class="col p-2"> 
-            <div class="card card-white">
-                <div class="card-header">
-                    Payment Methods on Stripe
-                </div>
-                <div class="card-body">
-                    <div class="alert alert-warning">
-                        These payment methods are not stored in any way on Winser Systems Leads Management, they are kept with Stripe.
-                    </div>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>
-                                    Type
-                                </th>
-                                <th>
-                                    Card ending
-                                </th>
-                                <th>
-                                    Name on card
-                                </th>
-                                <th>
-                                    
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="center" colspan="4">
-                                    <button class="btn btn-xs btn-success" type="button"
-                                        {%if not request.user.profile|get_profile_allowed_to_change_subscription_tag:site%}
-                                            disabled
-                                        {%endif%}
-                                        hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
-                                        hx-vals='{"template_name": "add_stripe_payment_method", "site_pk": "{{site.pk}}"}'
-                                        hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
-                                        hx-swap="innerHTML" hx-trigger="click">
-                                        <i class="fa-regular fa-plus"></i> Add
-                                    </button>               
-                                </td>
-                            </tr>
-                            {%for stripe_payment_method in site.stripe_payment_methods%}
-                            <tr>
-                                <td>
-                                    {{stripe_payment_method.type}}
-                                </td>
-                                <td>
-                                    **** {{stripe_payment_method.card.last4}}
-                                </td>
-                                <td>
-                                    {{stripe_payment_method.billing_details.name}}
-                                </td> 
-                                <td>
-                                    <button class="btn btn-xs btn-dark">
-                                        <i class="fa-regular fa-trash"></i> Delete
-                                    </button>
-                                </td> 
-                            </tr>
-                            {%endfor%}
-                        </tbody>
-                    </table>
-                </div>                
-            </div>
+            <img id="payment_methods_htmx_indicator" class="htmx-indicator" src="/img/bars.svg"/>
+            <span id="payment_methods_wrapper">
+                {%include 'core/htmx/payment_methods.html'%}
+            </span>
         </div>
         <div class="col p-2"> 
+            <img id="subscriptions_htmx_indicator" class="htmx-indicator" src="/img/bars.svg"/>
             <div class="card card-white">
                 <div class="card-header">
                     Your Subscriptions

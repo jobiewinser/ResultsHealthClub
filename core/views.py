@@ -613,14 +613,14 @@ def choose_attached_profiles(request):
 
 @method_decorator(login_required, name='dispatch')
 @method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
-class StripeSubscriptionsSummaryView(TemplateView):
+class PaymentsAndBillingView(TemplateView):
     template_name='core/stripe_subscriptions_summary.html'
 
     def get(self, request, *args, **kwargs):   
         # site = Site.objects.get(pk=site_pk) 
         if request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'core/htmx/stripe_subscriptions_summary_htmx.html'
-        return super(StripeSubscriptionsSummaryView, self).get(request, args, kwargs)
+        return super(PaymentsAndBillingView, self).get(request, args, kwargs)
 
     def get_context_data(self, **kwargs):
         self.request.GET._mutable = True   
@@ -650,3 +650,37 @@ class StripeSubscriptionCanceledView(TemplateView):
 
 
     
+
+@login_required
+@check_core_profile_requirements_fulfilled
+def add_stripe_payment_method(request): 
+    site_pk = request.POST.get('site_pk')
+    site = Site.objects.get(pk=site_pk)
+    if get_profile_allowed_to_change_subscription(request.user.profile, site):
+        payment_method, error = add_payment_method(
+            request.POST['cardNumber'], 
+            request.POST['expiryMonth'],
+            request.POST['expiryYear'],
+            request.POST['cvc'])
+        if error:
+            return HttpResponse(str(error), status=400)
+        payment_method = attach_payment_method(
+            site.stripecustomer.customer_id, 
+            payment_method['id']
+        )
+        return render(request, 'core/htmx/payment_methods.html', {'site':site})
+    return HttpResponse(status=403)
+@login_required
+@check_core_profile_requirements_fulfilled
+def detach_stripe_payment_method(request): 
+    site_pk = request.POST.get('site_pk')
+    site = Site.objects.get(pk=site_pk)
+    if get_profile_allowed_to_change_subscription(request.user.profile, site):
+        payment_method, error = detach_payment_method(
+            request.POST['payment_method_id']
+        )
+        if error:
+            return HttpResponse(str(error), status=400)
+        return render(request, 'core/htmx/payment_methods.html', {'site':site})
+    return HttpResponse(status=403)
+

@@ -37,15 +37,18 @@
                     </a>
                     <ul class="dropdown-menu">
                     <li><a class="dropdown-item pointer top-nav-link" hx-indicator="#page_load_indicator" data-active-selector="#configuration-top-nav-dropdown-toggle" 
-                        hx-get="{%url 'company-configuration'%}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML">Company Configuration</a></li>
+                        hx-get="{%url 'company-configuration'%}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML"><i class="fa-light fa-gear"></i> Company Configuration</a></li>
                     <li><a class="dropdown-item pointer top-nav-link" hx-indicator="#page_load_indicator" data-active-selector="#configuration-top-nav-dropdown-toggle"
-                        hx-get="{%url 'site-configuration'%}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML">Site Configuration</a></li>
+                        hx-get="{%url 'site-configuration'%}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML"><i class="fa-light fa-gear"></i> Site Configuration</a></li>
                     <li><a class="dropdown-item pointer top-nav-link" hx-indicator="#page_load_indicator" data-active-selector="#configuration-top-nav-dropdown-toggle"
-                        hx-get="{%url 'campaign-configuration'%}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML">Campaign Configuration</a></li>
+                        hx-get="{%url 'campaign-configuration'%}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML"><i class="fa-light fa-gear"></i> Campaign Configuration</a></li>
                     <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item pointer top-nav-link" hx-indicator="#page_load_indicator" data-active-selector="#configuration-top-nav-dropdown-toggle"
                         id="whatsapp_templates_link" hx-trigger="click"
-                        hx-get="{%url 'whatsapp-templates'%}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML">Whatsapp Templates</a></li>
+                        hx-get="{%url 'whatsapp-templates'%}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML"><i class="fa-light fa-pencil"></i> Whatsapp Templates</a></li>
+                    <li><a class="dropdown-item pointer top-nav-link" hx-indicator="#page_load_indicator" data-active-selector="#configuration-top-nav-dropdown-toggle"
+                        id="payments_and_billing_link" hx-trigger="click"
+                        hx-get="{%url 'payments-and-billing'%}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML"><i class="fa-light fa-sterling-sign"></i> Payments and Billing</a></li>
                     </ul>
                 </li>
                 <li class="nav-item dropdown">

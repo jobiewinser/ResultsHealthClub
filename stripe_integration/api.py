@@ -55,18 +55,39 @@ def list_payment_methods(customer_id):
     )
     return payment_methods
 
-# Create a function to retrieve all existing subscription links
-def add_payment_method(customer_id, number, exp_month, exp_year, cvc):
+
+def add_payment_method(number, exp_month, exp_year, cvc):
+    try:
+        # Create a PaymentMethod object
+        payment_method = stripe.PaymentMethod.create(
+            type='card',
+            card={
+                'number': number,
+                'exp_month': exp_month,
+                'exp_year': exp_year,
+                'cvc': cvc
+            },
+        )
+        return payment_method, None
+    except Exception as e:
+        return None, e.user_message  
+
+def detach_payment_method(payment_method_id):
+    try:
+        # Create a PaymentMethod object
+        payment_method = stripe.PaymentMethod.detach(
+            payment_method=payment_method_id
+        )
+        return payment_method, None
+    except Exception as e:
+        return None, e.user_message  
+
+
+def attach_payment_method(customer_id, payment_method_id):
     # Create a PaymentMethod object
-    payment_method = stripe.PaymentMethod.create(
-        type='card',
-        card={
-            'number': number,
-            'exp_month': exp_month,
-            'exp_year': exp_year,
-            'cvc': cvc
-        },
-        customer=customer_id
+    payment_method = stripe.PaymentMethod.attach(
+        customer=customer_id,
+        payment_method=payment_method_id,
     )
     return payment_method
 
@@ -100,7 +121,7 @@ def create_checkout_session(checkout_session_id, price_id, customer_id):
     try:
         session = stripe.checkout.Session.create(
             customer=customer_id,
-            success_url=f'{str(os.getenv("SITE_URL"))}/stripe-subscription-summary/?session_id={checkout_session_id}',
+            success_url=f'{str(os.getenv("SITE_URL"))}/configuration/payments-and-billing/?session_id={checkout_session_id}',
             cancel_url=f'{str(os.getenv("SITE_URL"))}/stripe-subscription-canceled/',
             mode='subscription',
             line_items=[{

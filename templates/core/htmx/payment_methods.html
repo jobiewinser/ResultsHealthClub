@@ -1,0 +1,70 @@
+{%load static tz core_tags user_permission_tags%}
+<div class="card card-white">
+    <div class="card-header">
+        Payment Methods on Stripe
+    </div>
+    <div class="card-body">
+        <div class="alert alert-warning">
+            These payment methods are not stored in any way on Winser Systems Leads Management, they are kept with Stripe.
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        Type
+                    </th>
+                    <th>
+                        Card ending
+                    </th>
+                    {% comment %} <th>
+                        Name on card
+                    </th> {% endcomment %}
+                    <th>
+                        
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="center" colspan="4">
+                        <button class="btn btn-xs btn-success" type="button"
+                            {%if not request.user.profile|get_profile_allowed_to_change_subscription_tag:site%}
+                                disabled
+                            {%endif%}
+                            hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
+                            hx-vals='{"template_name": "add_stripe_payment_method", "site_pk": "{{site.pk}}"}'
+                            hx-get="{% url 'campaign-lead-get-modal-content' %}" hx-push-url="false"
+                            hx-swap="innerHTML" hx-trigger="click">
+                            <i class="fa-regular fa-plus"></i> Add
+                        </button>               
+                    </td>
+                </tr>
+                {%for stripe_payment_method in site.stripe_payment_methods%}
+                <tr>
+                    <td>
+                        {{stripe_payment_method.type}}
+                    </td>
+                    <td>
+                        **** {{stripe_payment_method.card.last4}}
+                    </td>
+                    {% comment %} <td>
+                        {{stripe_payment_method.billing_details.name}}
+                    </td>  {% endcomment %}
+                    <td>
+                        <button class="btn btn-xs btn-dark" 
+                            {%if not request.user.profile|get_profile_allowed_to_change_subscription_tag:site%}
+                                disabled
+                            {%endif%}
+                            hx-indicator="#payment_methods_htmx_indicator" hx-target="#payment_methods_wrapper"
+                            hx-vals='{"payment_method_id": "{{stripe_payment_method.id}}", "site_pk": "{{site.pk}}"}'
+                            hx-post="{% url 'detach-stripe-payment-method' %}" hx-push-url="false"
+                            hx-swap="innerHTML" hx-trigger="click" hx-confirm="Are you sure you want to detach this payment method? You may lose access to some your subscription tier if you haven't got another method active.">
+                            <i class="fa-regular fa-trash"></i> Detach
+                        </button>
+                    </td> 
+                </tr>
+                {%endfor%}
+            </tbody>
+        </table>
+    </div>                
+</div>
