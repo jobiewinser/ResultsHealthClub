@@ -20,6 +20,9 @@ from whatsapp.models import WhatsAppMessage
 from django.template import loader
 from asgiref.sync import async_to_sync, sync_to_async
 from channels.layers import get_channel_layer
+from django.contrib.postgres.fields import ArrayField
+from stripe_integration.api import *
+from django.core.mail import send_mail
 import sys
 
 
@@ -525,8 +528,34 @@ class Site(models.Model):
     #             )
     subscription_new = models.ForeignKey("core.Subscription", on_delete=models.SET_NULL, null=True, blank=True) #temp called new
     subscription_old = models.CharField(max_length=5, default="free") #temp
+    
+    stripe_subscription_id = ArrayField(
+        models.TextField(null=True, blank=True),
+        null=True,
+        blank=True,
+        default=[]
+    )
     # calendly_webhook_created = models.BooleanField(default=False)  
     guid = models.TextField(null=True, blank=True) 
+    
+    @property
+    def get_stripe_subscriptions_and_update_models(self):
+        stripe_subscriptions = list_subscriptions(self.stripecustomer.customer_id)
+        sub_ids = []
+        for subscription in  stripe_subscriptions:
+            sub_ids.append(subscription['id'])
+        if len(stripe_subscriptions) > 1:
+            send_mail(
+                subject=f'Winser Systems {os.getenv("SITE_URL")} - 500 error ',
+                message=f"detected 2 subscriptions for a customer, this probably isn't right: #{str(self.pk)}, stripe sub ids: {str(sub_ids)}",
+                from_email='jobiewinser@gmail.com',
+                recipient_list=['jobiewinser@gmail.com'])
+        return stripe_subscriptions
+    
+    @property
+    def stripe_payment_methods(self):
+        return list_payment_methods(self.stripecustomer.customer_id)       
+         
     
     @property
     def subscription(self):

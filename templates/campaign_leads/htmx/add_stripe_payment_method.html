@@ -1,0 +1,45 @@
+{%load core_tags%}
+
+<div class="generic_modal_contents">
+    <div class="card card-white m-1 p-3" style="min-width:600px">
+      <div class="row">
+        <div class="col">
+            
+        <div class="card-form">
+            <div class="card-body">
+                <form>
+                    <div class="row">
+                        <div class="form-group col-md-auto">
+                            <label for="cardNumber">Card Number</label>
+                            <input type="text" class="form-control" id="cardNumber" placeholder="0000 0000 0000 0000" />
+                        </div>
+                
+                        <div class="form-group col-md-auto">
+                            <label for="expiryMonth">Expiry Month</label>
+                            <input type="text" class="form-control" id="expiryMonth" placeholder="MM" />
+                        </div>
+                
+                        <div class="form-group col-md-auto">
+                            <label for="expiryYear">Expiry Year</label>
+                            <input type="text" class="form-control" id="expiryYear" placeholder="YYYY" />
+                        </div>
+                        <div class="form-group col-md-auto">
+                            <label for="cvc">CVC</label>
+                            <input type="text" class="form-control" id="cvc" placeholder="000" />
+                        </div>
+                    </div>
+                
+                    <div class="row">
+                        <div class="form-group col-md-4">
+                            <button type="submit" class="btn btn-primary btn-block">Submit</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+<span hx-swap-oob="true" id="generic_modal_title">
+    Set up Payment
+</span>

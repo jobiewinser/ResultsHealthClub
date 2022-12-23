@@ -23,10 +23,13 @@
         {%endblock extra_top_right_buttons %}
     </div>
     <div class="row mt-2">
-        <div class="col p-2"> 
+        {% comment %} <div class="col p-2"> 
             <table class="table">
                 <thead>
                     <tr>
+                        <th>
+                            Reference
+                        </th>
                         <th>
                             Status
                         </th>
@@ -39,8 +42,11 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {%for stripe_subscription in stripe_subscriptions%}
+                    {%for stripe_subscription in site.get_stripe_subscriptions_and_update_models%}
                     <tr>
+                        <td>
+                            {{stripe_subscription.id}}
+                        </td>
                         <td>
                             {{stripe_subscription.status}}
                         </td>
@@ -54,6 +60,125 @@
                     {%endfor%}
                 </tbody>
             </table>
+        </div> {% endcomment %}
+        <div class="col p-2"> 
+            <div class="card card-white">
+                <div class="card-header">
+                    Payment Methods on Stripe
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        These payment methods are not stored in any way on Winser Systems Leads Management, they are kept with Stripe.
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Type
+                                </th>
+                                <th>
+                                    Card ending
+                                </th>
+                                <th>
+                                    Name on card
+                                </th>
+                                <th>
+                                    
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="center" colspan="4">
+                                    <button class="btn btn-xs btn-success" type="button"
+                                        {%if not request.user.profile|get_profile_allowed_to_change_subscription_tag:site%}
+                                            disabled
+                                        {%endif%}
+                                        hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
+                                        hx-vals='{"template_name": "add_stripe_payment_method", "site_pk": "{{site.pk}}"}'
+                                        hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
+                                        hx-swap="innerHTML" hx-trigger="click">
+                                        <i class="fa-regular fa-plus"></i> Add
+                                    </button>               
+                                </td>
+                            </tr>
+                            {%for stripe_payment_method in site.stripe_payment_methods%}
+                            <tr>
+                                <td>
+                                    {{stripe_payment_method.type}}
+                                </td>
+                                <td>
+                                    **** {{stripe_payment_method.card.last4}}
+                                </td>
+                                <td>
+                                    {{stripe_payment_method.billing_details.name}}
+                                </td> 
+                                <td>
+                                    <button class="btn btn-xs btn-dark">
+                                        <i class="fa-regular fa-trash"></i> Delete
+                                    </button>
+                                </td> 
+                            </tr>
+                            {%endfor%}
+                        </tbody>
+                    </table>
+                </div>                
+            </div>
+        </div>
+        <div class="col p-2"> 
+            <div class="card card-white">
+                <div class="card-header">
+                    Your Subscriptions
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Subscription
+                                </th>
+                                <th>
+                                    Status
+                                </th>
+                                <th>
+                                    Next Payment
+                                </th>
+                                <th>
+                                    Price
+                                </th>
+                                <th>
+                                    
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {%for stripe_subscription in site.get_stripe_subscriptions_and_update_models%}
+                            {%with stripe_subscription.plan.id|get_subscription_by_stripe_price_id as subscription_object%}
+                            <tr>
+                                <td>
+                                    {{subscription_object.get_name_display}}
+                                </td>
+                                <td>
+                                    {{stripe_subscription.status}}
+                                </td>
+                                <td>
+                                    {{stripe_subscription.current_period_end|from_timestamp|nice_date_tag}}
+                                </td>
+                                <td>
+                                    {{stripe_subscription.plan.amount|division:100|floatformat:2}} {{stripe_subscription.currency}}
+                                </td>
+                                <td>
+                                    <button class="btn btn-xs btn-primary">
+                                        <i class="fa-regular fa-pencil"></i> Modify
+                                    </button>
+                                </td>
+                            </tr>
+                            {%endwith%}
+                            {%endfor%}
+                        </tbody>
+                    </table>
+                </div>                
+            </div>
         </div>
     </div>
     {%else%}

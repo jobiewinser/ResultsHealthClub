@@ -23,6 +23,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.views.generic.list import ListView
 from stripe_integration.api import *
+from django.core.mail import send_mail
+from django.shortcuts import redirect, render
 logger = logging.getLogger(__name__)
 
 class LoginDemoView(View):
@@ -483,9 +485,6 @@ def get_campaign_category_pks_from_request(request):
         
     return campaign_category_pks
     
-
-from django.core.mail import send_mail
-from django.shortcuts import redirect, render
 def handler500(request):
     template_name = '500.html'
     known_errors = []
@@ -522,7 +521,7 @@ def handler500(request):
                 
             error_description = f"<p>user id: {str(id)} <br> user name: {str(name)} <br> url: {str(path)}  <br> Error type: {str(value)}  <br> Request Body: {str(body)}  <br> Request Headers: {str(headers)} <br><br><br> Traceback: {str(traceback.format_exception(type, value, tb))}</p>"
             send_mail(
-                subject='Winser Systems Prod - 500 error ',
+                subject=f'Winser Systems {os.getenv("SITE_URL")} - 500 error ',
                 message=error_description,
                 from_email='jobiewinser@gmail.com',
                 recipient_list=['jobiewinser@gmail.com'])
@@ -637,7 +636,7 @@ class StripeSubscriptionsSummaryView(TemplateView):
         # end permissions
         
         context['site'] = site
-        context['stripe_subscriptions'] = list_subscriptions(site.stripecustomer.customer_id)
+        # context['stripe_subscriptions'] = list_subscriptions(site.stripecustomer.customer_id)
         return context
     
 @method_decorator(login_required, name='dispatch')

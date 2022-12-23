@@ -10,6 +10,7 @@ from django.conf import settings
 register = template.Library()
 from campaign_leads.views import rgb_to_hex_tuple, hex_to_rgb_tuple
 from django.contrib.auth.models import User
+from core.models import Subscription
 import math
 
 def roundup(x, round_target):
@@ -346,6 +347,9 @@ def render_whatsapp_template_to_html_tag(whatsapp_template):
 @register.filter
 def get_subscription_sites_tag(company, numerical):
     return company.get_subscription_sites(numerical)
+@register.filter
+def get_subscription_by_stripe_price_id(price_id):
+    return Subscription.objects.filter(stripe_price_id=price_id).first()
 
 # @register.filter
 # def earliest_site_tag(site_qs):

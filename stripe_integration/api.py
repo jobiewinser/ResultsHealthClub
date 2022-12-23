@@ -47,6 +47,30 @@ def list_subscriptions(customer_id):
     )
     return subscriptions
 
+# Create a function to retrieve all existing subscription links
+def list_payment_methods(customer_id):
+    payment_methods = stripe.PaymentMethod.list(
+        customer=customer_id,
+        type="card"
+    )
+    return payment_methods
+
+# Create a function to retrieve all existing subscription links
+def add_payment_method(customer_id, number, exp_month, exp_year, cvc):
+    # Create a PaymentMethod object
+    payment_method = stripe.PaymentMethod.create(
+        type='card',
+        card={
+            'number': number,
+            'exp_month': exp_month,
+            'exp_year': exp_year,
+            'cvc': cvc
+        },
+        customer=customer_id
+    )
+    return payment_method
+
+
 # Create a function to cancel an existing subscription link
 def cancel_subscription_link(session_id):
     # Cancel the subscription link
@@ -64,6 +88,13 @@ def create_webhooks(endpoint_secret):
         endpoint_secret=endpoint_secret
     )
     return webhook
+
+# # Create webhooks
+# def update_subscription(subscription_id):
+#     webhook = stripe.Subscription.update(
+#         subscription=
+#     )
+#     return webhook
 
 def create_checkout_session(checkout_session_id, price_id, customer_id):
     try:
@@ -83,3 +114,20 @@ def create_checkout_session(checkout_session_id, price_id, customer_id):
         return str(e)
 
     return session
+
+    
+def add_or_update_subscription(customer_id, payment_method, price):
+    # Check if a subscription exists for the customer
+    customer = stripe.Customer.retrieve(customer_id)
+    subscription = customer.subscriptions.data[0]
+    # If a subscription exists, update it
+    if subscription:
+        subscription.payment_method = payment_method
+        subscription.price = price
+        subscription.save()
+    # Otherwise create a new subscription
+    else:
+        customer.subscriptions.create(
+        payment_method=payment_method,
+        price=price
+        )

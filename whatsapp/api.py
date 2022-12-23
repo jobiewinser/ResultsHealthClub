@@ -1,17 +1,9 @@
 import logging
 import os
-from datetime import datetime
-
 import requests
 from django.conf import settings
 import json
-from django.utils.decorators import method_decorator
-from django.http import HttpResponse, Http404
-from django.views import View 
-from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import get_object_or_404
-from django.http.response import HttpResponseRedirect
-from django.template import loader
+from django.core.mail import send_mail
 
 
 from whatsapp.models import WhatsappMessageImage, WhatsappTemplate
@@ -255,15 +247,11 @@ class Whatsapp():
             "language": "en_GB",
             "components": pending_components,
         }
-        
-                
-        from django.core.mail import send_mail
-        from django.shortcuts import render
         response = requests.post(url=url, json=body, headers=headers)
         response_body = response.json()
         description = f"<p>body: {str(body)}</p><br><p>response_body: {str(response_body)}</p>"
         send_mail(
-            subject='Winser Systems Prod - create template ',
+            subject=f'Winser Systems {os.getenv("SITE_URL")} - create template ',
             message=description,
             from_email='jobiewinser@gmail.com',
             recipient_list=['jobiewinser@gmail.com'])
@@ -287,7 +275,7 @@ class Whatsapp():
                 type = error_types.get(code, None)
             if not type:                
                 send_mail(
-                    subject='Winser Systems Prod - create template error unknown type ',
+                    subject=f'Winser Systems {os.getenv("SITE_URL")} - create template error unknown type ',
                     message=f"unknown error for template {str(template_object.pk)}: {str(error)}",
                     from_email='jobiewinser@gmail.com',
                     recipient_list=['jobiewinser@gmail.com'])
