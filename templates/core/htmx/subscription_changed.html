@@ -1,0 +1,23 @@
+{%load core_tags%}
+
+<div class="generic_modal_contents">
+    <div class="card card-white m-1 p-3" style="">
+      <div class="row">
+        <div class="col">
+            Successfully changed subscription! 
+            <br>
+            <button class="btn btn-success" onclick="window.location.reload();">
+                Refresh the page
+            </button>
+        </div>
+    </div>
+    <script>
+        $('#generic_modal').on('hidden.bs.modal', function (e) {
+            $('#page_load_indicator').addClass('htmx-request')
+            window.location.reload();
+        })
+    </script>
+</div>
+<span hx-swap-oob="true" id="generic_modal_title">
+    Success
+</span>

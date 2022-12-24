@@ -4,7 +4,11 @@
     <div class="card card-white m-1 p-3" style="">
       <div class="row">
         <div class="col">
-            Payment
+            {%with site_subscription_change.site as site%}
+            <span id="payment_methods_wrapper">
+                {%include 'core/htmx/payment_methods.html'%}
+            </span>
+            {%endwith%}
         </div>
     </div>
 </div>

@@ -5,49 +5,7 @@
       <div class="row">
         <div class="col">
             
-        <script>
-            var cardNumber = new Cleave('#cardNumber', {
-                creditCard: true
-            });
-        </script>
-
-        <div class="card-form">
-            <div class="card-body">
-                <form  hx-post="{%url 'add-stripe-payment-method' %}"
-                    hx-target="#payment_methods_wrapper"
-                    hx-indicator="#payment_methods_htmx_indicator"
-                    hx-vals='{"site_pk":"{{site.pk}}"}'>
-                    <div class="row">
-                        <div class="form-group col-md">
-                            <label for="cardNumber">Card Number</label>
-                            <input type="text" class="form-control" name="cardNumber" id="cardNumber" placeholder="0000 0000 0000 0000" />
-                        </div>
-                    </div>
-                    <div class="row">                
-                        <div class="form-group col-md">
-                            <label for="expiryMonth">Expiry Month</label>
-                            <input type="tel" maxlength="2" class="form-control" name="expiryMonth" id="expiryMonth" placeholder="MM" />
-                        </div>
-                
-                        <div class="form-group col-md">
-                            <label for="expiryYear">Expiry Year</label>
-                            <input type="tel" maxlength="2" class="form-control" name="expiryYear" id="expiryYear" placeholder="YY" />
-                        </div>
-                        <div class="form-group col-md-">
-                            <label for="cvc">CVC</label>
-                            <input type="tel" maxlength="3" class="form-control" name="cvc" id="cvc" placeholder="000" />
-                        </div>
-                    </div>
-                
-                    <div class="row mt-2">
-                        <div class="form-group col-md-4">
-                            <button type="submit" class="btn btn-primary btn-block"
-                            >Submit</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
+        
         </div>
     </div>
 </div>

@@ -3,7 +3,7 @@
 <div class="generic_modal_contents">
     <div class="card card-white m-1 p-3"> 
       <div class="row">
-        <div class="col">
+        <div class="col right">
             <button class="btn btn-light"
                 hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
                 hx-vals='{"template_name": "switch_subscription","switch_subscription":"{{site_subscription_change.subscription_to.numerical}}","site_pk":"{{site.pk}}"}'
@@ -13,7 +13,7 @@
                 Back
             </button>
           </div>            
-          <div class="col">
+          <div class="col ">
               <button type="button" class="btn btn-primary" onclick="outputSubscriptionProfileChoice('{{site_subscription_change.pk}}')">Proceed</button>
           </div>
         </div>
@@ -21,13 +21,13 @@
         {% comment %} <p>
             You currently have a <b>{{site_subscription_change.subscription_from.get_name_display}}</b> subscription £{{site_subscription_change.subscription_from.cost|floatformat:2}} p/m (per facility/site)
         </p> {% endcomment %}
-        <p class="text-{{site_subscription_change.subscription_to.bootstrap_colour}}">
+        <p class="text-{{site_subscription_change.subscription_to.bootstrap_colour}} center">
             You are going to switch to a <b>{{site_subscription_change.subscription_to.get_name_display}}</b> subscription £{{site_subscription_change.subscription_to.cost|floatformat:2}} p/m (per facility/site)
         </p>
 
         <div class="row mt-3">
-            <div class="col-auto">
-                  <table id="profile_choice_table" class="table display" style="width:100%">
+            <div class="col" style="min-width:700px">
+                  <table id="profile_choice_table" class="table display m-3" style="width:100%;">
                     <thead>
                       <tr>
                         <th>Select</th>

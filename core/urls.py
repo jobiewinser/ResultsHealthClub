@@ -54,6 +54,7 @@ urlpatterns = [
     path('stripe-subscription-canceled/', coreviews.StripeSubscriptionCanceledView.as_view(), name='stripe-subscription-cancelled'),  
     path('add-stripe-payment-method/', coreviews.add_stripe_payment_method, name='add-stripe-payment-method'),  
     path('detach-stripe-payment-method/', coreviews.detach_stripe_payment_method, name='detach-stripe-payment-method'),  
+    path('complete-stripe-subscription/', coreviews.complete_stripe_subscription, name='complete-stripe-subscription'),  
 
     
 ]

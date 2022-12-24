@@ -11,6 +11,19 @@ import sys
         
 def run_startup():
     # try:
+        webhooks = list_webhooks()
+        webhook_found = False
+        for webhook in webhooks:
+            if webhook['url'] == f'{os.getenv("SITE_URL")}/stripe-webhooks/':
+                if 'customer.subscription.created' in webhook['enabled_events'] \
+                    and 'customer.subscription.deleted' in webhook['enabled_events']  \
+                    and 'customer.subscription.updated' in webhook['enabled_events'] :
+                    webhook_found = True
+                    break
+                else:
+                    delete_webhook(webhook['id'])
+        if not webhook_found:
+            create_webhook()
         subscription, created = Subscription.objects.get_or_create(name="free")
         subscription.max_profiles = 5
         subscription.analytics_seconds = 604800
@@ -74,7 +87,7 @@ def run_demo_startup():
                 name="Abingdon Site",
                 company=company,
             )
-            site1.subscription_new = Subscription.objects.filter(numerical=2).first()
+            # site1.subscription_new = Subscription.objects.filter(numerical=2).first()
             site1.calendly_token = os.getenv("DEFAULT_CALENDLY_TOKEN")
             site1.calendly_organization = os.getenv("DEFAULT_CALENDLY_ORGANIZATION")
             site1.save()
@@ -205,32 +218,34 @@ def run_debug_startup():
             site.calendly_token = os.getenv("DEFAULT_CALENDLY_TOKEN")
             site.calendly_organization = os.getenv("DEFAULT_CALENDLY_ORGANIZATION")
             site.guid = "6325bcde-feb9-4c"
-            site.subscription_new = Subscription.objects.filter(numerical=2).first()
+            # site.subscription_new = Subscription.objects.filter(numerical=2).first()
             site.save()
 
             whatsapp_business_account, created = WhatsappBusinessAccount.objects.get_or_create(
                 site = site,
                 whatsapp_business_account_id="100707722886543",
             )
-            whatsapp_template_1, created = WhatsappTemplate.objects.get_or_create(
-                whatsapp_business_account = whatsapp_business_account,    
-                company = company,
-                name = "hello_world"
-            )
-            whatsapp_template_1.name = "hello_world"
-            whatsapp_template_1.edited = datetime.now()
-            whatsapp_template_1.status = "APPROVED"
-            whatsapp_template_1.message_template_id = "505825570915381"
-            whatsapp_template_1.category = "ACCOUNT_UPDATE"
-            whatsapp_template_1.language = "en_US"
-            whatsapp_template_1.last_approval = datetime.now()
-            whatsapp_template_1.components = [
-                    {"text": "Hello World", "type": "HEADER", "format": "TEXT"},
-                    {"text": "Welcome and congratulations!! This message demonstrates your ability to send a message notification from WhatsApp Business Platform’s Cloud API. Thank you for taking the time to test with us.", "type": "BODY"},
-                    {"text": "WhatsApp Business API Team", "type": "FOOTER"}
-                ]
-            whatsapp_template_1.save()
-            
+            try:
+                whatsapp_template_1, created = WhatsappTemplate.objects.get_or_create(
+                    whatsapp_business_account = whatsapp_business_account,    
+                    company = company,
+                    name = "hello_world"
+                )
+                whatsapp_template_1.name = "hello_world"
+                whatsapp_template_1.edited = datetime.now()
+                whatsapp_template_1.status = "APPROVED"
+                whatsapp_template_1.message_template_id = "505825570915381"
+                whatsapp_template_1.category = "ACCOUNT_UPDATE"
+                whatsapp_template_1.language = "en_US"
+                whatsapp_template_1.last_approval = datetime.now()
+                whatsapp_template_1.components = [
+                        {"text": "Hello World", "type": "HEADER", "format": "TEXT"},
+                        {"text": "Welcome and congratulations!! This message demonstrates your ability to send a message notification from WhatsApp Business Platform’s Cloud API. Thank you for taking the time to test with us.", "type": "BODY"},
+                        {"text": "WhatsApp Business API Team", "type": "FOOTER"}
+                    ]
+                whatsapp_template_1.save()
+            except:
+                pass
             whatsapp_number1, created = WhatsappNumber.objects.get_or_create(
                 company=company,
                 whatsapp_business_account = whatsapp_business_account,

@@ -93,20 +93,33 @@ def attach_payment_method(customer_id, payment_method_id):
 
 
 # Create a function to cancel an existing subscription link
-def cancel_subscription_link(session_id):
+def cancel_subscription_link():
     # Cancel the subscription link
-    subscription_link = stripe.billing_portal.Session.cancel(session_id)
+    subscription_link = stripe.billing_portal.Session.cancel(os.getenv("STRIPE_SECRET_KEY"))
 
     # Return the link
     return subscription_link
 
+# List webhooks
+def list_webhooks():
+    return stripe.WebhookEndpoint.list(
+    )
+
 # Create webhooks
-def create_webhooks(endpoint_secret):
+def create_webhook():
     webhook = stripe.WebhookEndpoint.create(
-        url=f"{os.getenv('SITE_URL')}/webhook",
-        enabled_events=['customer.subscription.deleted', 'customer.subscription.deleted', 'customer.subscription.deleted', 'customer.subscription.deleted'],
+        url=f"{os.getenv('SITE_URL')}/stripe-webhooks/",
+        enabled_events=['customer.subscription.deleted', 'customer.subscription.updated', 'customer.subscription.created'],
         api_version='2019-03-14',
-        endpoint_secret=endpoint_secret
+        # endpoint_secret=os.getenv("STRIPE_SECRET_KEY")
+    )
+    return webhook
+
+# Create webhooks
+def delete_webhook(webhook_id):
+    webhook = stripe.WebhookEndpoint.delete(
+        sid=webhook_id,
+        # endpoint_secret=os.getenv("STRIPE_SECRET_KEY")
     )
     return webhook
 
@@ -135,20 +148,46 @@ def create_checkout_session(checkout_session_id, price_id, customer_id):
         return str(e)
 
     return session
+    
+def delete_subscriptions(customer_id):
+    subscriptions = list_subscriptions(customer_id)
+    for subscription in subscriptions:
+        subscription = stripe.Subscription.delete(
+            sid=subscription['id']
+        )
+    return
 
     
-def add_or_update_subscription(customer_id, payment_method, price):
+def add_or_update_subscription(customer_id, payment_method, price_id):
     # Check if a subscription exists for the customer
-    customer = stripe.Customer.retrieve(customer_id)
-    subscription = customer.subscriptions.data[0]
+    # customer = stripe.Customer.retrieve(customer_id)
+    subscriptions = list_subscriptions(customer_id)
     # If a subscription exists, update it
-    if subscription:
-        subscription.payment_method = payment_method
-        subscription.price = price
-        subscription.save()
+    if subscriptions:
+        existing_subscription = subscriptions['data'][-1]
+        subscription_id = existing_subscription['id']
+        if existing_subscription['plan'].stripe_id == price_id:
+            return existing_subscription
+        subscription = stripe.Subscription.modify(
+            sid = subscription_id,
+            cancel_at_period_end=False,
+            proration_behavior='create_prorations',
+            default_payment_method = payment_method,
+            items=[{
+                # 'payment_method': payment_method,
+                'price': price_id,
+            }],
+        )
+        return subscription
     # Otherwise create a new subscription
     else:
-        customer.subscriptions.create(
-        payment_method=payment_method,
-        price=price
+        subscription = stripe.Subscription.create(
+            customer=customer_id,
+            default_payment_method = payment_method,
+            items=[{
+                # 'payment_method': payment_method,
+                'price': price_id,
+            }]
         )
+        return subscription
+    

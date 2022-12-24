@@ -80,6 +80,20 @@ class SiteSubscriptionChange(models.Model):
             self.subscription_to_text = str(self.subscription_to.name)
         super(SiteSubscriptionChange, self).save(force_insert, force_update, using, update_fields)
 
+    def complete(self):
+        users_to_keep = self.users_to_keep.all()
+        for user in User.objects.filter(profile__sites_allowed=self.site).order_by('profile__role'):
+            if not user in users_to_keep:
+                profile = user.profile
+                profile.sites_allowed.remove(self.site)
+                if profile.site == self.site:
+                    profile.site = profile.sites_allowed.all().first()
+                profile.save()
+        if not self.subscription_to.stripe_price_id:
+            self.site.subscription_new = self.subscription_to
+            self.site.save()
+        self.completed = datetime.now()
+        self.save()
 class SiteUsersOnline(models.Model):
     users_online = models.CharField(max_length=1500, default=";")
     site = models.ForeignKey("core.Site", on_delete=models.SET_NULL, null=True, blank=True)
@@ -776,7 +790,7 @@ class Profile(models.Model):
             if not self.active_sites_allowed:
                 warnings["no_company_warning"] = "This profile has no sites that they are allowed to access"
             if not self.site:
-                warnings["no_site_warning"] = "This profile has no main site assigned to it"
+                warnings["no_site_warning"] = "This profile has no primary site assigned to it"
             if not self.avatar:
                 warnings["no_avatar_warning"] = "This profile has no profile picture"
             if not self.calendly_event_page_url:

@@ -65,7 +65,7 @@ PROFILE_ERROR_OPTIONS = {
     '1':"No profile set up for your user account.",
     '2':"No company assigned to your profile (please contact: <a href='mailto:jobie@winser.uk'>jobie@winser.uk</a> or <a href='tel:+447872000364'>+44 7872 000364</a>).",
     '3':"You have not been granted permission to access any sites.",
-    '4':"You have not been allocated a main site.",
+    '4':"You have not been allocated a primary site.",
 }
 class ProfileIncorrectlyConfiguredView(TemplateView):
     template_name='profile_incorrectly_configured.html'
@@ -603,13 +603,23 @@ def choose_attached_profiles(request):
     stripe_customer_object.json_data = stripe_customer
     stripe_customer_object.site = site_subscription_change.site
     stripe_customer_object.save()
+    if site_subscription_change.subscription_to.stripe_price_id:
+        return render(request, 'core/htmx/subscription_payment.html', {'site_subscription_change':site_subscription_change})
+    delete_subscriptions(customer_id)
+    site_subscription_change.complete()
+    return render(request, 'core/htmx/subscription_changed.html', {'site_subscription_change':site_subscription_change})
     
+@login_required
+@check_core_profile_requirements_fulfilled
+def complete_stripe_subscription(request):
+    site_subscription_change_pk = request.POST.get('site_subscription_change_pk')
+    site_subscription_change = SiteSubscriptionChange.objects.get(pk=site_subscription_change_pk)
     
-    
-    session = create_checkout_session(site_subscription_change.stripe_session_id, site_subscription_change.subscription_to.stripe_price_id, site_subscription_change.site.stripecustomer.customer_id)
-    return HttpResponse(status=200,headers={'HX-Redirect':session.url})
-    # temp = create_subscription(stripe_customer_object.customer_id, [site_subscription_change.subscription_to.stripe_price_id])
-    # return render(request, 'core/htmx/setup_payment.html', {'site_subscription_change':site_subscription_change})
+    stripe_payment_method_id = request.POST.get('stripe_payment_method_id')
+    subscription = add_or_update_subscription(site_subscription_change.site.stripecustomer.customer_id, stripe_payment_method_id, site_subscription_change.subscription_to.stripe_price_id)
+    site_subscription_change.site.get_stripe_subscriptions_and_update_models
+    site_subscription_change.complete()
+    return render(request, 'core/htmx/subscription_changed.html', {'site_subscription_change':site_subscription_change})
 
 @method_decorator(login_required, name='dispatch')
 @method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
@@ -654,6 +664,7 @@ class StripeSubscriptionCanceledView(TemplateView):
 @login_required
 @check_core_profile_requirements_fulfilled
 def add_stripe_payment_method(request): 
+    context = {}
     site_pk = request.POST.get('site_pk')
     site = Site.objects.get(pk=site_pk)
     if get_profile_allowed_to_change_subscription(request.user.profile, site):
@@ -668,11 +679,16 @@ def add_stripe_payment_method(request):
             site.stripecustomer.customer_id, 
             payment_method['id']
         )
-        return render(request, 'core/htmx/payment_methods.html', {'site':site})
+        context['site'] = site
+        site_subscription_change_pk = request.POST.get('site_subscription_change_pk')        
+        if site_subscription_change_pk:
+            context['site_subscription_change'] = SiteSubscriptionChange.objects.filter(pk=site_subscription_change_pk)
+        return render(request, 'core/htmx/payment_methods.html', context)
     return HttpResponse(status=403)
 @login_required
 @check_core_profile_requirements_fulfilled
 def detach_stripe_payment_method(request): 
+    context = {}
     site_pk = request.POST.get('site_pk')
     site = Site.objects.get(pk=site_pk)
     if get_profile_allowed_to_change_subscription(request.user.profile, site):
@@ -681,6 +697,10 @@ def detach_stripe_payment_method(request):
         )
         if error:
             return HttpResponse(str(error), status=400)
-        return render(request, 'core/htmx/payment_methods.html', {'site':site})
+        context['site'] = site
+        site_subscription_change_pk = request.POST.get('site_subscription_change_pk')        
+        if site_subscription_change_pk:
+            context['site_subscription_change'] = SiteSubscriptionChange.objects.filter(pk=site_subscription_change_pk)
+        return render(request, 'core/htmx/payment_methods.html', context)
     return HttpResponse(status=403)
 

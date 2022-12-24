@@ -103,16 +103,6 @@
                         {%endfor%}
                     </select>
                 </div>  
-                <div class="col-md-auto p-0 ps-1 mt-1">
-                    <button class="btn btn-primary btn-sm" type="button"
-                        data-bs-toggle="popover" 
-                        data-bs-trigger="hover focus" 
-                        data-bs-placement="top"
-                        data-bs-title="What does this do?"
-                        data-bs-content="Add a new campaign category"
-                        onclick="htmx.ajax('GET', '{% url 'campaign-lead-get-modal-content' %}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'add_campaign_category', 'campaign_pk':'{{campaign.pk}}'}})"
-                        >Add</button> 
-                </div>  
             </div>  
         </div>
     </div>
@@ -146,6 +136,6 @@
         hx-vals='{"user_pk": "{{profile.user.pk}}"}'
         hx-post="{% url 'deactivate-profile' %}" hx-push-url="false"
         hx-confirm="Are you sure you want to deactivate this account? They won't be able to login and use the system, but can be reactivated later. If you want this account fully deleted from our system, please email us at jobie@winser.uk and we will promptly do so."
-        hx-swap="none" hx-trigger="click"><i class="fa-light fa-trash"></i> Deactivate</button>
+        hx-swap="none" hx-trigger="click"><i class="fa-light fa-trash"></i> Deactivate profile</button>
     {%endif%}
 </td>
