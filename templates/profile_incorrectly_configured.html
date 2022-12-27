@@ -36,4 +36,9 @@
             
         </div>
     </body>
+    {%if not errors%}
+    <script>
+        window.location.replace("/")
+    </script>
+    {%endif%}
 </html>

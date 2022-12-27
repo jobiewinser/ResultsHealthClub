@@ -55,6 +55,8 @@ urlpatterns = [
     path('add-stripe-payment-method/', coreviews.add_stripe_payment_method, name='add-stripe-payment-method'),  
     path('detach-stripe-payment-method/', coreviews.detach_stripe_payment_method, name='detach-stripe-payment-method'),  
     path('complete-stripe-subscription/', coreviews.complete_stripe_subscription, name='complete-stripe-subscription'),  
+    path('renew-stripe-subscription/', coreviews.renew_stripe_subscription, name='renew-stripe-subscription'),  
+    path('change-default-payment-method/', coreviews.change_default_payment_method, name='change-default-payment-method'),  
 
-    
+
 ]

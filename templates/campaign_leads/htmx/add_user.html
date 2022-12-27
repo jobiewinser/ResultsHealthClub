@@ -102,7 +102,9 @@
                                     Which user should be added?<br>
                                     <select style="width:100%" class="form-control generic_modal_body_select" name="profile_pk">
                                         {%for user in request.user.profile.company.users%}
+                                        {%if not user in site.users%}
                                         <option value="{{user.profile.pk}}">{{user.profile}}</option>
+                                        {%endif%}
                                         {%endfor%}
                                     </select>  
                                 </div>

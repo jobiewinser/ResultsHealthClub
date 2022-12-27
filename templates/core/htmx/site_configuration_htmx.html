@@ -67,7 +67,7 @@
                     {%if request.user.profile|get_profile_allowed_to_change_subscription_tag:site%}
                     <button class="btn btn-{{site.subscription_new.bootstrap_colour}}" 
                         type="button" data-bs-toggle="collapse" data-bs-target="#collapseSubscription" aria-expanded="false" aria-controls="collapseSubscription">
-                        You currently have a <b>{{site.subscription_new.get_name_display}}</b> subscription £{{site.subscription_new.cost|floatformat:2}} p/m (per facility/site) (click to change)
+                        <b>{{site.subscription_new.get_name_display}}</b> subscription £{{site.subscription_new.cost|floatformat:2}} p/m (per facility/site) (click to change)
                     </button>
                     {% comment %} <span class="ms-3">You have {{company.active_sites.count}} active site(s) within this company</span> {% endcomment %}
                     <div class="collapse mt-2" id="collapseSubscription">

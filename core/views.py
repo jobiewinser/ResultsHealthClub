@@ -549,23 +549,31 @@ class SwitchSubscriptionBeginView(TemplateView):
         context = super(SwitchSubscriptionBeginView, self).get_context_data()
         site_pk = self.request.GET.get('site_pk')
         site = Site.objects.get(pk=site_pk)
-        switch_subscription = Subscription.objects.get(numerical=self.request.GET.get('numerical'))
-        
-        SiteSubscriptionChange.objects.filter(subscription_to=switch_subscription, subscription_from = site.subscription_new, site=site, canceled=None, completed=None).exclude(version_started=str(settings.VERSION)).update(canceled=datetime.now())
-        existing_site_subscription_changes = SiteSubscriptionChange.objects.filter(version_started=str(settings.VERSION), subscription_to=switch_subscription, subscription_from = site.subscription_new, site=site, canceled=None, completed=None).order_by('created')
-        if existing_site_subscription_changes:
-            latest_existing_site_subscription_change = existing_site_subscription_changes.last()
-            existing_site_subscription_changes.exclude(pk=latest_existing_site_subscription_change.pk).update(canceled=datetime.now())
-        site_subscription_change, created = SiteSubscriptionChange.objects.get_or_create(
-            version_started=str(settings.VERSION),
-            subscription_to=switch_subscription, 
-            subscription_from = site.subscription_new, 
-            site=site, 
-            canceled=None, 
-            completed=None
-        )
+        site_subscription_change_pk = self.request.GET.get('site_subscription_change_pk')
+        if not site_subscription_change_pk:
+            switch_subscription = Subscription.objects.get(numerical=self.request.GET.get('numerical'))        
+            SiteSubscriptionChange.objects.filter(subscription_to=switch_subscription, subscription_from = site.subscription_new, site=site, canceled=None, completed=None).exclude(version_started=str(settings.VERSION)).update(canceled=datetime.now())
+            existing_site_subscription_changes = SiteSubscriptionChange.objects.filter(version_started=str(settings.VERSION), subscription_to=switch_subscription, subscription_from = site.subscription_new, site=site, canceled=None, completed=None).order_by('created')
+            if existing_site_subscription_changes:
+                latest_existing_site_subscription_change = existing_site_subscription_changes.last()
+                existing_site_subscription_changes.exclude(pk=latest_existing_site_subscription_change.pk).update(canceled=datetime.now())
+            site_subscription_change, created = SiteSubscriptionChange.objects.get_or_create(
+                version_started=str(settings.VERSION),
+                subscription_to=switch_subscription, 
+                subscription_from = site.subscription_new, 
+                site=site, 
+                canceled=None, 
+                completed=None
+            )
+        else:
+            site_subscription_change = SiteSubscriptionChange.objects.get(
+                pk=site_subscription_change_pk
+            )
+        if (site_subscription_change.subscription_to.max_profiles > site_subscription_change.subscription_from.max_profiles and not site_subscription_change.subscription_from.max_profiles == 0) or site_subscription_change.subscription_to.max_profiles == 0:
+            #if not reducing number of allowed profiles
+            self.template_name = 'core/htmx/subscription_payment.html'
         context['site'] = site
-        context['switch_subscription'] = switch_subscription
+        # context['switch_subscription'] = switch_subscription
         context['site_subscription_change'] = site_subscription_change
         
         return context
@@ -585,6 +593,7 @@ def choose_attached_profiles(request):
 
     site_subscription_change.users_to_keep.set(User.objects.filter(pk__in=user_pks, profile__company=site_subscription_change.site.company))
     site_subscription_change.stripe_session_id = f"{site_subscription_change.site.guid}_{str(datetime.timestamp(datetime.now()))}"
+    site_subscription_change.completed_by = request.user
     site_subscription_change.save()
     # if site_subscription_change.subscription_to.whatsapp_enabled:
     #     return render(request, 'templates/core/htmx/setup_payment.html', {'site_subscription_change':site_subscription_change})
@@ -593,9 +602,9 @@ def choose_attached_profiles(request):
     
     
     try:
-        stripe_customer = get_or_create_customer(site_subscription_change.site.stripecustomer.customer_id)
+        stripe_customer = get_or_create_customer(customer_id=site_subscription_change.site.stripecustomer.customer_id)
     except Site.stripecustomer.RelatedObjectDoesNotExist:
-        stripe_customer = get_or_create_customer("")
+        stripe_customer = get_or_create_customer(billing_email=site_subscription_change.site.billing_email)
     customer_id = stripe_customer['id']
     stripe_customer_object, created = StripeCustomer.objects.get_or_create(
         customer_id=customer_id
@@ -605,31 +614,75 @@ def choose_attached_profiles(request):
     stripe_customer_object.save()
     if site_subscription_change.subscription_to.stripe_price_id:
         return render(request, 'core/htmx/subscription_payment.html', {'site_subscription_change':site_subscription_change})
-    delete_subscriptions(customer_id)
+    cancel_subscription(site_subscription_change.site.stripecustomer.subscription_id)
     site_subscription_change.complete()
-    return render(request, 'core/htmx/subscription_changed.html', {'site_subscription_change':site_subscription_change})
+    site_subscription_change.process()
+    return render(request, 'core/htmx/subscription_changed.html', {})
     
+@login_required
+@check_core_profile_requirements_fulfilled
+def change_default_payment_method(request):
+    site_pk = request.POST.get('site_pk')
+    invoice_id = request.POST.get('invoice_id')
+    site = Site.objects.get(pk=site_pk)
+    payment_method_id = request.POST.get('payment_method_id')
+    update_payment_method(site.stripecustomer.subscription_id, payment_method_id)   
+    if invoice_id and not invoice_id == 'None': 
+        invoice = retry_invoice(invoice_id)
+    return render(request, 'core/htmx/subscription_changed.html', {})
+
 @login_required
 @check_core_profile_requirements_fulfilled
 def complete_stripe_subscription(request):
     site_subscription_change_pk = request.POST.get('site_subscription_change_pk')
     site_subscription_change = SiteSubscriptionChange.objects.get(pk=site_subscription_change_pk)
     
-    stripe_payment_method_id = request.POST.get('stripe_payment_method_id')
-    subscription = add_or_update_subscription(site_subscription_change.site.stripecustomer.customer_id, stripe_payment_method_id, site_subscription_change.subscription_to.stripe_price_id)
+    payment_method_id = request.POST.get('payment_method_id')
+    if site_subscription_change.subscription_from.numerical < site_subscription_change.subscription_to.numerical:
+        #if upgrading, upgrade immediately and prorate
+        stripe_subscription = add_or_update_subscription(
+            site_subscription_change.site.stripecustomer.customer_id, 
+            payment_method_id, 
+            site_subscription_change.subscription_to.stripe_price_id,
+            subscription_id=site_subscription_change.site.stripecustomer.subscription_id,
+            proration_behavior='create_prorations',
+        )
+    else:
+        #if downgrading, keep current membership until end of period
+        stripe_subscription = add_or_update_subscription(
+            site_subscription_change.site.stripecustomer.customer_id, 
+            payment_method_id, 
+            site_subscription_change.subscription_to.stripe_price_id,
+            subscription_id=site_subscription_change.site.stripecustomer.subscription_id,
+            proration_behavior='none',
+        )
+    site_subscription_change.site.stripecustomer.subscription_id = stripe_subscription.stripe_id
+    site_subscription_change.site.stripecustomer.save()
     site_subscription_change.site.get_stripe_subscriptions_and_update_models
+    site_subscription_change.completed_by = request.user
     site_subscription_change.complete()
-    return render(request, 'core/htmx/subscription_changed.html', {'site_subscription_change':site_subscription_change})
+    return render(request, 'core/htmx/subscription_changed.html', {})
+
+
+@login_required
+@check_core_profile_requirements_fulfilled
+def renew_stripe_subscription(request):
+    site_pk = request.POST['site_pk']   
+    site = Site.objects.get(pk=site_pk)     
+    payment_method_id = request.POST.get('payment_method_id')
+    if site.stripecustomer.subscription_id and payment_method_id:
+        renew_subscription(site.stripecustomer.subscription_id, payment_method_id)
+        return render(request, 'core/htmx/subscription_changed.html', {})
 
 @method_decorator(login_required, name='dispatch')
 @method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
 class PaymentsAndBillingView(TemplateView):
-    template_name='core/stripe_subscriptions_summary.html'
+    template_name='core/payments_and_billing.html'
 
     def get(self, request, *args, **kwargs):   
         # site = Site.objects.get(pk=site_pk) 
         if request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
-            self.template_name = 'core/htmx/stripe_subscriptions_summary_htmx.html'
+            self.template_name = 'core/htmx/payments_and_billing_htmx.html'
         return super(PaymentsAndBillingView, self).get(request, args, kwargs)
 
     def get_context_data(self, **kwargs):
@@ -682,7 +735,7 @@ def add_stripe_payment_method(request):
         context['site'] = site
         site_subscription_change_pk = request.POST.get('site_subscription_change_pk')        
         if site_subscription_change_pk:
-            context['site_subscription_change'] = SiteSubscriptionChange.objects.filter(pk=site_subscription_change_pk)
+            context['site_subscription_change'] = SiteSubscriptionChange.objects.filter(pk=site_subscription_change_pk).last()
         return render(request, 'core/htmx/payment_methods.html', context)
     return HttpResponse(status=403)
 @login_required
@@ -700,7 +753,7 @@ def detach_stripe_payment_method(request):
         context['site'] = site
         site_subscription_change_pk = request.POST.get('site_subscription_change_pk')        
         if site_subscription_change_pk:
-            context['site_subscription_change'] = SiteSubscriptionChange.objects.filter(pk=site_subscription_change_pk)
+            context['site_subscription_change'] = SiteSubscriptionChange.objects.filter(pk=site_subscription_change_pk).last
         return render(request, 'core/htmx/payment_methods.html', context)
     return HttpResponse(status=403)
 

@@ -15,6 +15,9 @@ Including another URLconf
 """
 from django.urls import path
 import stripe_integration.webhooks as stripewebhooks
+import stripe_integration.views as stripeviews
 urlpatterns = [
     path('stripe-webhooks/', stripewebhooks.webhooks, name='stripe-webhooks' ),    
+    path('create-customer-portal-session/', stripeviews.create_customer_portal_session, name='create-customer-portal-session' ),    
+    
 ]    

@@ -65,6 +65,9 @@ def get_modal_content(request, **kwargs):
                     context['contact'] = Contact.objects.filter(pk=contact_pk).first()
                 if customer_number:
                     context['customer_number'] = customer_number
+            # elif template_name == 'change_default_payment_method':
+            #     context["site"] = Site.objects.get(pk=site_pk)     
+            #     context['switch_subscription'] = Subscription.objects.filter(numerical=request.GET.get('switch_subscription')).first()
                     
             
             return render(request, f"campaign_leads/htmx/{template_name}.html", context)   

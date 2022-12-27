@@ -1,0 +1,245 @@
+{%load static tz core_tags user_permission_tags%}
+<span>    
+    <script>
+        $(document).ready(function() {
+            document.title = "Site Configuration";
+        });
+    </script>
+    {%if site%}
+    <div class="row mt-0">
+        {%block extra_top_left_buttons %}
+        {%with True as hide_show_all%}
+        {%include 'core/htmx/site_selection_single.html'%}
+        {%endwith%}
+        <button hidden hx-get="{%url 'payments-and-billing'%}" hx-push-url="false" hx-swap="innerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
+        {%endblock extra_top_left_buttons %}
+        <div class="col">
+        </div>
+        {%block extra_top_right_buttons %}
+        <input id="current_page" hidden value="payments_and_billing"></input>
+        <div class="col-md-auto p-0 m-1">
+            <span class="badge bg-dark text-white"><h6 class="m-1">Payments and Billing</h6></span>           
+        </div>
+        {%endblock extra_top_right_buttons %}
+    </div>
+    <div class="row mt-2">
+        {%if not request.user.profile|get_profile_allowed_to_edit_site_configuration_tag:site%}
+        You are not allowed to use this page
+        {%else%}
+        <div class="col p-2"> 
+            <img id="payment_methods_htmx_indicator" class="htmx-indicator" src="/static/img/bars.svg"/>
+            <span id="payment_methods_wrapper">
+                {%include 'core/htmx/payment_methods.html'%}
+            </span>
+            <div class="card card-white mt-3">
+                <div class="card-header">
+                    Your Subscriptions for {{site.name}}
+                </div>
+                <div class="card-body">
+                    {% with site.get_stripe_subscriptions_and_update_models as get_stripe_subscriptions_and_update_models%}
+                    {% if get_stripe_subscriptions_and_update_models%}
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Subscription
+                                </th>
+                                <th>
+                                    Default Payment Method
+                                </th>
+                                <th>
+                                    Status
+                                </th>
+                                <th>
+                                    Subscribed Until
+                                </th>
+                                <th>
+                                    Price
+                                </th>
+                                <th>
+                                    
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                            {%for stripe_subscription in get_stripe_subscriptions_and_update_models%}
+                            {%with stripe_subscription.plan.id|get_subscription_by_stripe_price_id as subscription_object%}
+                            <tr>
+                                <td>
+                                    {{subscription_object.get_name_display}}
+                                </td>
+                                <td>
+                                    **** {{stripe_subscription.default_payment_method_data.card.last4}}
+                                    <span class="text-primary pointer"
+                                        hx-indicator="#page_load_indicator" hx-target="#generic_modal_body" 
+                                        hx-vals='{"template_name": "change_default_payment_method","site_pk":"{{site.pk}}"}'
+                                        hx-get="{% url 'campaign-lead-get-modal-content'%}" 
+                                        hx-push-url="false" href='#'
+                                        hx-swap="innerHTML" hx-trigger="click"
+                                    >
+                                    {%if not stripe_subscription.cancel_at_period_end == True%}
+                                    {%if stripe_subscription.default_payment_method_data.card.last4%}
+                                        Change
+                                    {%else%}
+                                    Add
+                                    {%endif%} 
+                                    {%endif%}
+                                    </span>
+                                </td>
+                                <td>
+                                    {{stripe_subscription.status}}
+                                </td>
+                                <td>
+                                    {{stripe_subscription.current_period_end|from_timestamp|nice_date_tag}} 
+                                    {%if not stripe_subscription.cancel_at_period_end == True%}
+                                    (renewing monthly)
+                                    {%else%}
+                                    (ending soon)
+                                    <span class="text-primary pointer"
+                                        hx-indicator="#page_load_indicator" hx-target="#generic_modal_body" 
+                                        hx-vals='{"template_name": "renew_stripe_subscription","site_pk":"{{site.pk}}"}'
+                                        hx-get="{% url 'campaign-lead-get-modal-content'%}" 
+                                        hx-push-url="false" href='#'
+                                        hx-swap="innerHTML" hx-trigger="click"
+                                    >
+                                        Renew
+                                    </span>
+                                    {%endif%}
+                                </td>
+                                <td>
+                                    {{stripe_subscription.plan.amount|division:100|floatformat:2}} {{stripe_subscription.currency}}
+                                </td>
+                                <td>
+                                    <span class="text-primary pointer top-nav-link" hx-indicator="#page_load_indicator" data-active-selector="#configuration-top-nav-dropdown-toggle"
+                                        hx-get="{%url 'site-configuration'%}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML">
+                                        <i class="fa-regular fa-pencil"></i> Modify
+                                    </span>
+                                </td>
+                            </tr>
+                            {%endwith%}
+                            {%endfor%}
+                        </tbody>
+                    </table>
+                    {%else%}
+                    No paid subscriptions
+                    {%endif%}
+                    {%endwith%}
+                </div>                
+            </div>
+        </div>
+        <div class="col p-2"> 
+            <img id="subscriptions_htmx_indicator" class="htmx-indicator" src="/img/bars.svg"/>
+            <div class="card card-white">
+                <div class="card-header">
+                    <div class="row m-0">
+                        <div class="col-md-auto p-0">
+                            Past billing for {{site.name}}
+                        </div>
+                        <div class="col p-0">
+                        </div>
+                        <div class="col-md-auto p-0">
+                            <button class="btn btn-sm btn-primary top-nav-link" hx-indicator="#page_load_indicator" data-active-selector="#configuration-top-nav-dropdown-toggle"
+                                hx-get="{%url 'site-configuration'%}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML">
+                                <i class="fa-regular fa-pencil"></i> Modify Subscription
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {%with site.get_stripe_invoices_by_customer_and_update_models as stripe_invoices%}
+                    {%if stripe_invoices%}
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Status
+                                </th>
+                                <th>
+                                    Invoice date
+                                </th>
+                                <th>
+                                    Amount
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {%for stripe_invoice in stripe_invoices%}
+                            {%with stripe_invoice.plan.id|get_subscription_by_stripe_price_id as subscription_object%}
+                            <tr>
+                                <td>
+                                    
+                                    {%if stripe_invoice.paid%}
+                                    <span class="badge bg-success">
+                                        Paid
+                                    </span>
+                                    {%else%}
+                                    <span class="badge bg-danger pointer">
+                                        Unpaid
+                                    </span>
+                                    <span class="text-primary pointer"
+                                    hx-indicator="#page_load_indicator" hx-target="#generic_modal_body" 
+                                    hx-vals='{"template_name": "change_default_payment_method","site_pk":"{{site.pk}}", "invoice_id":"{{stripe_invoice.id}}"}'
+                                    hx-get="{% url 'campaign-lead-get-modal-content'%}" 
+                                    hx-push-url="false" href='#'
+                                    hx-swap="innerHTML" hx-trigger="click"
+                                    >
+                                        Retry
+                                    </span>
+                                    {%endif%}
+                                </td>
+                                <td class="nowrap">
+                                {% comment %} {{stripe_invoice}} {% endcomment %}
+                                {{stripe_invoice.created|from_timestamp}}
+                                </td>
+                                <td class="help nowrap text-primary"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover focus" 
+                                    data-bs-html="true" 
+                                    data-bs-placement="top"
+                                    data-bs-title="Invoice Details"
+                                    data-bs-content="
+                                    <ul>
+                                    {%for line in stripe_invoice.lines%}
+                                    <li>{{line.amount|division:100|floatformat:2}} {{line.currency}} - {{line.description}}</li>
+                                    {%endfor%}
+                                    </ul>">
+                                    <i class="fa-solid fa-circle-info"></i> {{stripe_invoice.amount_due|division:100|floatformat:2}} {{stripe_invoice.currency}}
+                                </td>
+                            </tr>
+                            {%endwith%}
+
+                            {%endfor%}
+                        </tbody>
+                    </table>
+                    {%else%}
+                    <a class="pointer top-nav-link" hx-indicator="#page_load_indicator" data-active-selector="#configuration-top-nav-dropdown-toggle"
+                        hx-get="{%url 'site-configuration'%}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML">No Subscriptions!</a>
+                    {%endif%}
+                    {%endwith%}
+                </div>                
+            </div>
+            <div class="card card-white mt-3">
+                <div class="card-header">
+                    <div class="row m-0">
+                        <div class="col-md-auto p-0">
+                            Your Stripe Portal for {{site.name}}
+                        </div>
+                        <div class="col p-0">
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="/create-customer-portal-session/?site_pk={{site.pk}}" target="_blank">
+                        {% csrf_token %}
+                        <button class="btn btn-primary" type="submit">Manage billing</button>
+                    </form>
+                </div>                
+            </div>
+        </div>        
+        {%endif%}
+    </div>
+    {%else%}
+    Something went wrong, please let us know if this problem persists: <a href="mailto:jobie@winser.uk">jobie@winser.uk</a>
+    {%endif%}
+</span>

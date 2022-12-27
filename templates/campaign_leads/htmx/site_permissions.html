@@ -45,6 +45,9 @@
         </div>
         {%endif%}
     </div>
+    {%if site_permissions.profile.role == 'a'%}
+    As an owner, this user is allowed to perform all actions
+    {%else%}
     <div class="row">        
         <div class="col">
             <div class="form-check form-switch">
@@ -166,6 +169,7 @@
             </small>
         </div>
     </div>
+    {%endif%}
     <div class="row" style="min-height:100px">  
     {%if error%}          
         <div class="col">

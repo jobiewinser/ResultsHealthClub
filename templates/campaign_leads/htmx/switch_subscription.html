@@ -6,9 +6,23 @@
         {% comment %} <p>
             You currently have a <b>{{site.subscription_new.get_name_display}}</b> subscription £{{site.subscription_new.cost|floatformat:2}} p/m (per facility/site)
         </p> {% endcomment %}
-        <p class="text-{{switch_subscription.bootstrap_colour}}">
-            You are going to switch to a <b>{{switch_subscription.get_name_display}}</b> subscription £{{switch_subscription.cost|floatformat:2}} p/m (per facility/site)
-        </p>
+        <div class="row">
+            <div class="col">
+                <p class="text-{{switch_subscription.bootstrap_colour}}">
+                    Switching to <b>{{switch_subscription.get_name_display}}</b> subscription £{{switch_subscription.cost|floatformat:2}} p/m (per facility/site)
+                </p>
+            </div>
+            <div class="col-md-auto">
+                <button class="btn btn-primary"
+                    hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
+                    hx-vals='{"numerical":"{{switch_subscription.numerical}}","site_pk":"{{site.pk}}"}'
+                    hx-get="{% url 'switch-subscription-begin'%}" 
+                    hx-push-url="false"
+                    hx-swap="innerHTML" hx-trigger="click">
+                    Proceed
+                </button>
+            </div>
+        </div>
         <hr>
             {% if subscription_sites >= switch_subscription.max_of_this_type %}
             <p class="text-danger">
@@ -61,22 +75,16 @@
                 <br>
                 <div class="alert alert-info center">
                     <small>
-                        We are rolling out the <b>Pro</b> tier soon. It requires some extra configuration with your Meta (Whatsapp/Facebook) account to use the Whatsapp automation.
-                        <br>
-                        If you are interested in upgrading, please contact: <a href='mailto:jobie@winser.uk'>jobie@winser.uk</a> or <a href='tel:+447872000364'>+44 7872 000364</a>.
-                        <br>
-                        <b>We promise that it's worth it!</b>
+                        <p>
+                            We are now rolling out the <b>Pro</b> tier. It requires some extra configuration with your Meta (Whatsapp/Facebook) account to use the Whatsapp automation.
+                            If you are interested in upgrading, please contact: <a href='mailto:jobie@winser.uk'>jobie@winser.uk</a> or <a href='tel:+447872000364'>+44 7872 000364</a>.
+                            For the other features this subscription includes, feel free to upgrade anyways and we will get in contact with you about the Whatsapp automation.
+                        
+                            <b>We promise that it's worth it!</b>
+                        </p>
                     </small>
                 </div>
                 {%else%}
-                <button class="btn btn-{{switch_subscription.bootstrap_colour}}"
-                    hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
-                    hx-vals='{"numerical":"{{switch_subscription.numerical}}","site_pk":"{{site.pk}}"}'
-                    hx-get="{% url 'switch-subscription-begin'%}" 
-                    hx-push-url="false"
-                    hx-swap="innerHTML" hx-trigger="click">
-                    Switch Subscription
-                </button>
                 {%endif%}
             </div>
             <div class="col">

@@ -278,7 +278,7 @@ def run_debug_startup():
             numerical_subscription_stripe_links = {
                 # "0":"",
                 "1":["price_1MGCO1AxPlf4eeSj21jDTekS","prod_N0CnsUOe6BGyXm"],
-                # "2":["",""],
+                "2":["price_1MGCOdAxPlf4eeSjxKa23HjD",""],
             }
             for k,v in numerical_subscription_stripe_links.items():
                 Subscription.objects.filter(numerical=k).update(stripe_price_id=v[0], stripe_product_id=v[1])

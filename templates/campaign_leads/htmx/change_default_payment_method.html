@@ -1,0 +1,24 @@
+{%load core_tags%}
+
+<div class="generic_modal_contents">
+    <div class="card card-white m-1 p-3" style="">
+      <div class="row">
+        <div class="col">
+            {% comment %} <div class="row">
+                <div class="col">
+                  <p class="text-{{site_subscription_change.subscription_to.bootstrap_colour}}">
+                      temp text
+                  </p>
+                </div>
+                <div class="col-md-auto">
+                </div>
+            </div> {% endcomment %}
+            <span id="payment_methods_wrapper">
+                {%include 'core/htmx/payment_methods.html'%}
+            </span>
+        </div>
+    </div>
+</div>
+<span hx-swap-oob="true" id="generic_modal_title">
+    Choose Default Payment Method
+</span>

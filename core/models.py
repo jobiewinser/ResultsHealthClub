@@ -63,6 +63,7 @@ class Subscription(models.Model):
 class SiteSubscriptionChange(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     completed = models.DateTimeField(null=True, blank=True, default=None)
+    processed = models.DateTimeField(null=True, blank=True, default=None)
     canceled = models.DateTimeField(null=True, blank=True, default=None)
     users_to_keep = models.ManyToManyField(User, related_name="site_subscription_change_users_to_keep", null=True, blank=True)
     subscription_from = models.ForeignKey("core.Subscription", related_name="site_subscription_change_subscription_from", on_delete=SET_NULL, null=True, blank=True)
@@ -72,6 +73,7 @@ class SiteSubscriptionChange(models.Model):
     version_started = models.CharField(max_length=20, null=True, blank=True)
     site = models.ForeignKey("core.Site", on_delete=SET_NULL, null=True, blank=True)
     stripe_session_id = models.TextField(blank=True, null=True)  
+    completed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         if self.subscription_from:
@@ -80,7 +82,7 @@ class SiteSubscriptionChange(models.Model):
             self.subscription_to_text = str(self.subscription_to.name)
         super(SiteSubscriptionChange, self).save(force_insert, force_update, using, update_fields)
 
-    def complete(self):
+    def process(self):
         users_to_keep = self.users_to_keep.all()
         for user in User.objects.filter(profile__sites_allowed=self.site).order_by('profile__role'):
             if not user in users_to_keep:
@@ -89,11 +91,18 @@ class SiteSubscriptionChange(models.Model):
                 if profile.site == self.site:
                     profile.site = profile.sites_allowed.all().first()
                 profile.save()
-        if not self.subscription_to.stripe_price_id:
-            self.site.subscription_new = self.subscription_to
-            self.site.save()
+        self.processed = datetime.now()
+        self.save()
+        profile = self.completed_by.profile
+        profile.sites_allowed.add(self.site)
+        profile.save()
+        SiteSubscriptionChange.objects.filter(site=self.site, processed=None).update(canceled=datetime.now())        
+        # cancel_all_subscriptions(self.site.stripecustomer.customer_id)
+        
+    def complete(self):
         self.completed = datetime.now()
         self.save()
+        
 class SiteUsersOnline(models.Model):
     users_online = models.CharField(max_length=1500, default=";")
     site = models.ForeignKey("core.Site", on_delete=models.SET_NULL, null=True, blank=True)
@@ -519,7 +528,8 @@ class StripeCustomer(models.Model): #can give a site extra basic/pro subscriptio
     site = models.OneToOneField("core.Site", on_delete=models.SET_NULL, null=True, blank=True)
     customer_id = models.TextField(blank=True, null=True)
     json_data = models.JSONField(null=True, blank=True)
-
+    subscription_id = models.TextField(blank=True, null=True)
+    
 class Site(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     active = models.BooleanField(default=True)
@@ -542,6 +552,7 @@ class Site(models.Model):
     #             )
     subscription_new = models.ForeignKey("core.Subscription", on_delete=models.SET_NULL, null=True, blank=True) #temp called new
     subscription_old = models.CharField(max_length=5, default="free") #temp
+    billing_email = models.TextField(blank=True, null=True)
     
     stripe_subscription_id = ArrayField(
         models.TextField(null=True, blank=True),
@@ -553,16 +564,25 @@ class Site(models.Model):
     guid = models.TextField(null=True, blank=True) 
     
     @property
+    def get_stripe_invoices_by_customer_and_update_models(self):
+        stripe_invoices = list_upcoming_invoices_by_customer(self.stripecustomer.customer_id)
+        return stripe_invoices['data']
+    
+    @property
     def get_stripe_subscriptions_and_update_models(self):
         stripe_subscriptions = list_subscriptions(self.stripecustomer.customer_id)
         sub_ids = []
-        subscription = None
+        subscription_object = None
         for subscription in  stripe_subscriptions:
             sub_ids.append(subscription['id'])
             subscription_objects = Subscription.objects.filter(stripe_price_id=subscription['plan'].stripe_id)
             if subscription_objects.exists():
-                subscription = subscription_objects.first()
-                
+                subscription_object = subscription_objects.first()
+            default_payment_method = subscription['default_payment_method']
+            if default_payment_method:
+                subscription['default_payment_method_data'] = retrieve_payment_method(subscription['default_payment_method'])
+            else:
+                subscription['default_payment_method_data'] = {}
                 
         subscription_override = SubscriptionOverride.objects.filter(
             created__lte = datetime.now(),
@@ -572,7 +592,7 @@ class Site(models.Model):
         if subscription_override:
             self.subscription_new = subscription_override.subscription
         else:
-            self.subscription_new = subscription
+            self.subscription_new = subscription_object
             
             
         if len(stripe_subscriptions) > 1 and not settings.DEMO and not settings.DEBUG:
@@ -702,6 +722,7 @@ class Company(models.Model):
     whatsapp_app_business_id = models.TextField(blank=True, null=True)
     active_campaign_url = models.TextField(null=True, blank=True)
     active_campaign_api_key = models.TextField(null=True, blank=True)
+    contact_email = models.TextField(blank=True, null=True)
     
     def get_subscription_sites(self, numerical):
         return self.site_set.filter(subscription_new__numerical=numerical)
@@ -812,6 +833,8 @@ class Profile(models.Model):
             if not self.campaign_category.site == self.site:
                 self.campaign_category = None
                 self
+        if not self.site:
+            self.site = self.sites_allowed.all().first()
         super(Profile, self).save(force_insert, force_update, using, update_fields)
         if not self.site in self.active_sites_allowed and self.site:
             self.sites_allowed.add(self.site)   
