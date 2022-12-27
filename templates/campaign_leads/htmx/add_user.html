@@ -61,6 +61,12 @@
                                 <input name="password" class="form-control modify_user_input" type="password" id="password"/>
                                 <label for="password">Password<span class="required">*</span></label>
                             </div>
+                
+                            <div class="form-floating m-1">
+                                <input name="calendly_event_page_url" {%if demo and not request.user.is_superuser%}disabled{%endif%}
+                                value="{{request.user.profile.calendly_event_page_url}}" class="form-control modify_user_input" id="calendly_event_page_url"/>
+                                <label for="calendly_event_page_url">Calendly Event Page Url</label>
+                            </div>
                                     
                             <br>
                             <div class="form-group">

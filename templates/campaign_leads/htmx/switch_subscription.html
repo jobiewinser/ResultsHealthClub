@@ -41,15 +41,9 @@
                 You will:
             </p>
             <ul>
-                {% if not switch_subscription.max_profiles %}
                 <li>
-                    Be allowed unlimited profiles on this site.
+                    Be allowed {{switch_subscription.max_profiles_string}} profiles on this site.
                 </li>
-                {% elif switch_subscription.max_profiles  %}
-                <li>
-                    Be prompted to choose which profiles to keep attached to this site (up to {{switch_subscription.max_profiles}}).
-                </li>
-                {%endif%}
                 
                 <li>
                     Have access to {{switch_subscription.analytics_string}}.

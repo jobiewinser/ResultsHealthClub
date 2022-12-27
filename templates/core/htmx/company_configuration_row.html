@@ -130,7 +130,7 @@
         hx-swap="innerHTML" hx-trigger="click"><i class="fa-light fa-gear"></i> Config</button>
 </td>
 <td class="center">   
-    {%if request.user.profile|get_profile_allowed_to_edit_other_profile_tag:profile%}
+    {%if request.user.profile|get_profile_allowed_to_edit_other_profile_tag:profile and not profile.role == 'a'%}
     <button class="nowrap btn btn-dark pointer" type="button"
         hx-indicator=".top-htmx-indicator"
         hx-vals='{"user_pk": "{{profile.user.pk}}"}'

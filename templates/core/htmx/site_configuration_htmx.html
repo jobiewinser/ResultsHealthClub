@@ -60,23 +60,47 @@
                         </div>
                     </div>
                 </div>
-                <div class="card-body">
-                    <p>
-                        To see the different subscription levels: <a target="_blank" href="https://www.winser.uk/index.php/leads-management-pricing/">https://www.winser.uk</a>.
-                    </p>
-                    {%if request.user.profile|get_profile_allowed_to_change_subscription_tag:site%}
-                    <button class="btn btn-{{site.subscription_new.bootstrap_colour}}" 
-                        type="button" data-bs-toggle="collapse" data-bs-target="#collapseSubscription" aria-expanded="false" aria-controls="collapseSubscription">
-                        <b>{{site.subscription_new.get_name_display}}</b> subscription £{{site.subscription_new.cost|floatformat:2}} p/m (per facility/site) (click to change)
-                    </button>
-                    {% comment %} <span class="ms-3">You have {{company.active_sites.count}} active site(s) within this company</span> {% endcomment %}
+                <div class="card-body">           
+                    {%if request.user.profile|get_profile_allowed_to_change_subscription_tag:site%}   
+                    <div class="row">
+                        <div class="ps-0 col-md-auto mb-2">
+                            {%if get_stripe_subscriptions_and_update_models.data.0.status and not get_stripe_subscriptions_and_update_models.data.0.status == 'active'%}
+                                <form method="POST" action="/create-customer-portal-session/?site_pk={{site.pk}}">
+                                    {% csrf_token %}
+                                    <a class="text-danger pointer"
+                                    href="#" onclick="this.parentNode.submit(); return false;">You have actions needed on the Stripe Customer Portal</a>
+                                    <br>
+                                </form>                            
+                            {%endif%}
+                        </div>
+                    </div> 
+                    <div class="row">
+                        <div class="ps-0 col-md-auto">
+                            <form method="POST" action="/create-customer-portal-session/?site_pk={{site.pk}}">
+                                {% csrf_token %}
+                                <button class="btn btn-sm btn-primary"
+                                id="payments_and_billing_link" type="submit"><i class="fa-light fa-sterling-sign"></i> Stripe: Subscriptions and Billing</button>
+                            </form>
+                        </div>
+                        {%if site.subscription_new.numerical|to_int == 0%}
+                        {%if not get_stripe_subscriptions_and_update_models.data.0.status %}
+                        <div class="col-md-auto">
+                            <button class="btn btn-sm btn-{{site.subscription_new.bootstrap_colour}}" 
+                                type="button" data-bs-toggle="collapse" data-bs-target="#collapseSubscription" aria-expanded="false" aria-controls="collapseSubscription">
+                                Choose a paid subscription
+                            </button>
+                        </div>                         
+                        {%endif%}
+                        {%endif%}
+                    </div>
+                    {%if site.subscription_new.numerical|to_int == 0%}
                     <div class="collapse mt-2" id="collapseSubscription">
                         <div class="card card-body">  
                             <div class="row">  
                                 {%for subscription_option in subscription_options%}
                                 {%if not subscription_option == site.subscription_new%}
                                     <div class="col-auto">
-                                        <button class="btn btn-{{subscription_option.bootstrap_colour}}"
+                                        <button class="btn btn-sm btn-{{subscription_option.bootstrap_colour}}"
                                             hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
                                             hx-vals='{"template_name": "switch_subscription","switch_subscription":"{{subscription_option.numerical}}","site_pk":"{{site.pk}}"}'
                                             hx-get="{% url 'campaign-lead-get-modal-content'%}" 
@@ -90,6 +114,17 @@
                             </div>
                         </div>
                     </div>
+                    {%endif%}
+                    <br>
+                    <span class="text-{{site.subscription_new.bootstrap_colour}}">
+                        You have a <b>{{site.subscription_new.get_name_display}}</b> subscription £{{site.subscription_new.cost|floatformat:2}} p/m (per facility/site)
+                    </span>
+                    <br>
+                    <p>
+                        To see the different subscription levels: <a target="_blank" href="https://www.winser.uk/index.php/leads-management-pricing/">https://www.winser.uk</a>.
+                    </p>
+                    {% comment %} <span class="ms-3">You have {{company.active_sites.count}} active site(s) within this company</span> {% endcomment %}
+                    {% comment %}  {% endcomment %}
                     {%else%}
                     <p>
                         To change your site's subscription level you must have the Change Subscription permission.

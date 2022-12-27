@@ -208,6 +208,7 @@ class SiteConfigurationView(TemplateView):
     def get_context_data(self):    
         context = super(SiteConfigurationView, self).get_context_data()
         context.update(get_site_configuration_context(self.request))
+        context['get_stripe_subscriptions_and_update_models'] = context['site'].get_stripe_subscriptions_and_update_models
         return context
     def post(self, request):
         if settings.DEMO and not request.user.is_superuser:
@@ -351,7 +352,7 @@ def deactivate_profile(request):
     if settings.DEMO and not request.user.is_superuser:
         return HttpResponse(status=403)
     user = User.objects.get(pk=request.POST.get('user_pk'))
-    if get_profile_allowed_to_edit_other_profile(request.user.profile, user.profile):
+    if get_profile_allowed_to_edit_other_profile(request.user.profile, user.profile) and not user.profile.role == 'a':
         user.is_active = False
         user.save()
         return HttpResponse(status=200)

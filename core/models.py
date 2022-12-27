@@ -570,40 +570,47 @@ class Site(models.Model):
     
     @property
     def get_stripe_subscriptions_and_update_models(self):
-        stripe_subscriptions = list_subscriptions(self.stripecustomer.customer_id)
-        sub_ids = []
-        subscription_object = None
-        for subscription in  stripe_subscriptions:
-            sub_ids.append(subscription['id'])
-            subscription_objects = Subscription.objects.filter(stripe_price_id=subscription['plan'].stripe_id)
-            if subscription_objects.exists():
-                subscription_object = subscription_objects.first()
-            default_payment_method = subscription['default_payment_method']
-            if default_payment_method:
-                subscription['default_payment_method_data'] = retrieve_payment_method(subscription['default_payment_method'])
-            else:
-                subscription['default_payment_method_data'] = {}
+        if self.stripecustomer:
+            stripe_subscriptions = list_subscriptions(self.stripecustomer.customer_id)
+            sub_ids = []
+            subscription_object = None
+            subscription = None
+            for subscription in stripe_subscriptions:
+                sub_ids.append(subscription['id'])
+                subscription_objects = Subscription.objects.filter(stripe_price_id=subscription['plan'].stripe_id)
+                default_payment_method = subscription['default_payment_method']
+                if default_payment_method:
+                    subscription['default_payment_method_data'] = retrieve_payment_method(subscription['default_payment_method'])
+                else:
+                    subscription['default_payment_method_data'] = {}
+                if subscription_objects.exists():
+                    subscription_object = subscription_objects.first()
+                    break
+                    
+            subscription_override = SubscriptionOverride.objects.filter(
+                created__lte = datetime.now(),
+                end__gte = datetime.now(),
+                site = self,
+            ).first()
+            if subscription_override:
+                self.subscription_new = subscription_override.subscription
+            elif subscription:
+                if subscription.get('status') == 'active':
+                    self.subscription_new = subscription_object
+            elif not stripe_subscriptions:
+                self.subscription_new = None
+            
                 
-        subscription_override = SubscriptionOverride.objects.filter(
-            created__lte = datetime.now(),
-            end__gte = datetime.now(),
-            site = self,
-        ).first()
-        if subscription_override:
-            self.subscription_new = subscription_override.subscription
-        else:
-            self.subscription_new = subscription_object
-            
-            
-        if len(stripe_subscriptions) > 1 and not settings.DEMO and not settings.DEBUG:
-            send_mail(
-                subject=f'Winser Systems {os.getenv("SITE_URL")} - 500 error ',
-                message=f"detected 2 subscriptions for a customer, this probably isn't right: #{str(self.pk)}, stripe sub ids: {str(sub_ids)}",
-                from_email='jobiewinser@gmail.com',
-                recipient_list=['jobiewinser@gmail.com'])
-        self.stripe_subscription_id = sub_ids
-        self.save()
-        return stripe_subscriptions
+            if len(stripe_subscriptions) > 1 and not settings.DEMO and not settings.DEBUG:
+                send_mail(
+                    subject=f'Winser Systems {os.getenv("SITE_URL")} - 500 error ',
+                    message=f"detected 2 subscriptions for a customer, this probably isn't right: #{str(self.pk)}, stripe sub ids: {str(sub_ids)}",
+                    from_email='jobiewinser@gmail.com',
+                    recipient_list=['jobiewinser@gmail.com'])
+            self.stripe_subscription_id = sub_ids
+            self.save()
+            return stripe_subscriptions
+        return None
     
     @property
     def stripe_payment_methods(self):
@@ -922,3 +929,6 @@ class Feedback(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     class Meta:
         ordering = ['-created']
+class StripeConfig(models.Model):
+    webhook_id = models.TextField(null=True, blank=True)
+    webhook_secret = models.TextField(null=True, blank=True)

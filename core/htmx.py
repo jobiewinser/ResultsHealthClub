@@ -94,6 +94,7 @@ class ModifyUser(View):
                 last_name = request.POST.get('last_name', '')
                 password = request.POST.get('password', '')
                 role = request.POST.get('role', '')
+                calendly_event_page_url = request.POST.get('calendly_event_page_url', '')
                 if not first_name:
                     return HttpResponse("Please enter a First Name", status=400)
                 if not password:
@@ -124,7 +125,8 @@ class ModifyUser(View):
                 Profile.objects.create(user = user, 
                                         avatar = profile_picture, 
                                         company = request.user.profile.company, 
-                                        role = role, 
+                                        role = role,
+                                        calendly_event_page_url = calendly_event_page_url, 
                                         site = site)
             elif action == 'edit':       
                 user = User.objects.get(pk=request.POST['user_pk'])   

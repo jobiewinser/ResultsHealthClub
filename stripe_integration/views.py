@@ -13,6 +13,6 @@ def create_customer_portal_session(request):
         # Authenticate your user.
         session = stripe.billing_portal.Session.create(
             customer=f'{site.stripecustomer.customer_id}',
-            return_url=f'{os.getenv("SITE_URL")}/configuration/payments-and-billing/',
+            return_url=f'{os.getenv("SITE_URL")}/configuration/site-configuration/',
         )
         return redirect(session.url)

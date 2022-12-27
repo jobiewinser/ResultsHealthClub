@@ -3,7 +3,6 @@ import os
 # Set your secret key: remember to change this to your live secret key in production
 # See your keys here: https://dashboard.stripe.com/account/apikeys
 stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
-
 # Create a Subscription
 def create_subscription(customer_id, price_ids):
     prices = []
@@ -126,10 +125,23 @@ def list_webhooks():
 def create_webhook():
     webhook = stripe.WebhookEndpoint.create(
         url=f"{os.getenv('SITE_URL')}/stripe-webhooks/",
-        enabled_events=['customer.subscription.deleted', 'customer.subscription.updated', 'customer.subscription.created'],
+        enabled_events=[
+            'invoice.payment_succeeded', 
+            'invoice.payment_failed', 
+            'customer.subscription.deleted', 
+            'customer.subscription.updated', 
+            'customer.subscription.created'
+        ],
         api_version='2019-03-14',
         # endpoint_secret=os.getenv("STRIPE_SECRET_KEY")
     )
+    from core.models import StripeConfig
+    stripe_config = StripeConfig.objects.all().last()
+    if not stripe_config:
+        stripe_config = StripeConfig.objects.create()
+    stripe_config.webhook_id = webhook['id']
+    stripe_config.webhook_secret = webhook['secret']
+    stripe_config.save()
     return webhook
 
 # Create webhooks
