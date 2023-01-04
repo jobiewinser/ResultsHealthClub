@@ -113,7 +113,7 @@ def edit_lead(request, **kwargs):
 
     last_name = request.POST.get('last_name')
 
-    email = request.POST.get('email')
+    email = request.POST.get('email')[:50]
     
     phone = request.POST.get('phone')
     if not phone:

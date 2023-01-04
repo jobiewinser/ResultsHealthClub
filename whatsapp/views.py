@@ -609,7 +609,7 @@ def send_new_template_message(request):
     lead = Campaignlead.objects.filter(pk=request.POST.get('lead_pk', 0)).first()
     if not lead:
         lead = Campaignlead.objects.filter(campaign__site=whatsappnumber.whatsapp_business_account.site, whatsapp_number=combined_number).first()
-    first_name = request.POST.get('first_name')
+    first_name = request.POST.get('first_name')[:25]
     if get_user_allowed_to_send_from_whatsappnumber(request.user, whatsappnumber) and template:
         if contact:
             response = contact.send_template_whatsapp_message(whatsappnumber=whatsappnumber, template=template)

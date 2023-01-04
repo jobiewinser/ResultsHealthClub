@@ -36,7 +36,7 @@
     {%if whatsappnumber%}
     {%include 'messaging/message_list.html'%}
     {%endif%}
-    <div class="card p-0 messaging_site_accordion" id="" style="margin-top: auto;" hx-ws="connect:/ws/message_count/{{request.user.profile.company.pk}}/">
+    <div class="card p-0 messaging_site_accordion" id="messaging_site_accordion" style="margin-top: auto;" hx-ws="connect:/ws/message_count/{{request.user.profile.company.pk}}/">
 
         <div class="card-header chat_bottom_header ps-2 {%if not whatsappnumber%}collapsed{%endif%}" data-bs-toggle="collapse" data-bs-target="#siteCollapse" aria-expanded="false" aria-controls="siteCollapse">
             <span class="primary_td_layer text-white">
@@ -53,7 +53,7 @@
                     <div class="accordion-item">
                     <h2 class="accordion-header" id="flush-headingOne">
                         <button {%if not site.subscription_new.whatsapp_enabled%}disabled{%else%}data-bs-toggle="collapse" data-bs-target="#site_collapse_{{site.pk}}" aria-expanded="false" aria-controls="site_collapse_{{site.pk}}"{%endif%} class="accordion-button no-chevron-button ps-2 {%if whatsappnumber.site == site%} active{%else%} collapsed{%endif%}" type="button" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
-                            <span class="badge bg-dark badge-sm me-1"><i class="fa fa-whatsapp me-1"></i><span class="site_message_count_{{site.pk}}">{{site|site_outstanding_whatsapp_messages_tag:request.user}}</span></span>  <b>{{site.name}}</b> <small>({{site.subscription.get_name_display}})</small> 
+                            <span class="badge bg-dark badge-sm me-1"><i class="fa fa-whatsapp me-1"></i><span class="site_message_count_{{site.pk}}">{{site|site_outstanding_whatsapp_messages_tag:request.user}}</span></span>  <b class="me-1">{{site.name}}</b> <small>({{site.subscription.get_name_display}})</small> 
                         </button>
                     </h2>
                     <div id="site_collapse_{{site.pk}}" class="accordion-collapse collapse {%if whatsappnumber.site == site%} show{%endif%}" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
@@ -80,7 +80,7 @@
         </div>
     </div>
     {%else%}
-    <div class="card p-0 messaging_site_accordion" id="" style="margin-top: auto;" hx-ws="connect:/ws/message_count/{{request.user.profile.company.pk}}/">
+    <div class="card p-0 messaging_site_accordion" id="messaging_site_accordion" style="margin-top: auto;" hx-ws="connect:/ws/message_count/{{request.user.profile.company.pk}}/">
         <div class="card-header chat_bottom_header ps-2 collapsed" data-bs-toggle="collapse" data-bs-target="#siteCollapse" aria-expanded="false" aria-controls="siteCollapse">
             <span class="primary_td_layer text-white">
                 <i class="fa fa-whatsapp" aria-hidden="true"></i> Whatsapp <i class="fa-solid fa-rectangle-pro"></i>

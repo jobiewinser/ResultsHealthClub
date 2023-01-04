@@ -156,8 +156,8 @@ class AttachedError(models.Model):
     additional_info = models.TextField(blank=True, null=True)  
     
 class Contact(models.Model):
-    first_name = models.TextField(null=True, blank=True)
-    last_name = models.TextField(null=True, blank=True)
+    first_name = models.TextField(null=True, blank=True, max_length=25)
+    last_name = models.TextField(null=True, blank=True, max_length=25)
     site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
     customer_number = models.CharField(max_length=50, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -552,7 +552,7 @@ class Site(models.Model):
     #             )
     subscription_new = models.ForeignKey("core.Subscription", on_delete=models.SET_NULL, null=True, blank=True) #temp called new
     subscription_old = models.CharField(max_length=5, default="free") #temp
-    billing_email = models.TextField(blank=True, null=True)
+    billing_email = models.TextField(blank=True, null=True, unique=True, max_length=50)
     
     stripe_subscription_id = ArrayField(
         models.TextField(null=True, blank=True),
@@ -570,47 +570,56 @@ class Site(models.Model):
     
     @property
     def get_stripe_subscriptions_and_update_models(self):
-        if self.stripecustomer:
-            stripe_subscriptions = list_subscriptions(self.stripecustomer.customer_id)
-            sub_ids = []
-            subscription_object = None
-            subscription = None
-            for subscription in stripe_subscriptions:
-                sub_ids.append(subscription['id'])
-                subscription_objects = Subscription.objects.filter(stripe_price_id=subscription['plan'].stripe_id)
-                default_payment_method = subscription['default_payment_method']
-                if default_payment_method:
-                    subscription['default_payment_method_data'] = retrieve_payment_method(subscription['default_payment_method'])
-                else:
-                    subscription['default_payment_method_data'] = {}
-                if subscription_objects.exists():
-                    subscription_object = subscription_objects.first()
-                    break
-                    
-            subscription_override = SubscriptionOverride.objects.filter(
-                created__lte = datetime.now(),
-                end__gte = datetime.now(),
-                site = self,
-            ).first()
-            if subscription_override:
-                self.subscription_new = subscription_override.subscription
-            elif subscription:
-                if subscription.get('status') == 'active':
-                    self.subscription_new = subscription_object
-            elif not stripe_subscriptions:
-                self.subscription_new = None
-            
+        try:
+            temp = self.stripecustomer.pk
+        except Site.stripecustomer.RelatedObjectDoesNotExist as e:
+            stripe_customer = get_or_create_customer(billing_email=self.billing_email)
+            customer_id = stripe_customer['id']
+            stripe_customer_object, created = StripeCustomer.objects.get_or_create(
+                customer_id=customer_id
+            )
+            stripe_customer_object.site = self
+            stripe_customer_object.save()
+        
+        stripe_subscriptions = list_subscriptions(self.stripecustomer.customer_id)
+        sub_ids = []
+        subscription_object = None
+        subscription = None
+        for subscription in stripe_subscriptions:
+            sub_ids.append(subscription['id'])
+            subscription_objects = Subscription.objects.filter(stripe_price_id=subscription['plan'].stripe_id)
+            default_payment_method = subscription['default_payment_method']
+            if default_payment_method:
+                subscription['default_payment_method_data'] = retrieve_payment_method(subscription['default_payment_method'])
+            else:
+                subscription['default_payment_method_data'] = {}
+            if subscription_objects.exists():
+                subscription_object = subscription_objects.first()
+                break
                 
-            if len(stripe_subscriptions) > 1 and not settings.DEMO and not settings.DEBUG:
-                send_mail(
-                    subject=f'Winser Systems {os.getenv("SITE_URL")} - 500 error ',
-                    message=f"detected 2 subscriptions for a customer, this probably isn't right: #{str(self.pk)}, stripe sub ids: {str(sub_ids)}",
-                    from_email='jobiewinser@gmail.com',
-                    recipient_list=['jobiewinser@gmail.com'])
-            self.stripe_subscription_id = sub_ids
-            self.save()
-            return stripe_subscriptions
-        return None
+        subscription_override = SubscriptionOverride.objects.filter(
+            created__lte = datetime.now(),
+            end__gte = datetime.now(),
+            site = self,
+        ).first()
+        if subscription_override:
+            self.subscription_new = subscription_override.subscription
+        elif subscription:
+            if subscription.get('status') == 'active':
+                self.subscription_new = subscription_object
+        elif not stripe_subscriptions:
+            self.subscription_new = None
+        
+            
+        if len(stripe_subscriptions) > 1 and not settings.DEMO and not settings.DEBUG:
+            send_mail(
+                subject=f'Winser Systems {os.getenv("SITE_URL")} - 500 error ',
+                message=f"detected 2 subscriptions for a customer, this probably isn't right: #{str(self.pk)}, stripe sub ids: {str(sub_ids)}",
+                from_email='jobiewinser@gmail.com',
+                recipient_list=['jobiewinser@gmail.com'])
+        self.stripe_subscription_id = sub_ids
+        self.save()
+        return stripe_subscriptions
     
     @property
     def stripe_payment_methods(self):
@@ -729,7 +738,7 @@ class Company(models.Model):
     whatsapp_app_business_id = models.TextField(blank=True, null=True)
     active_campaign_url = models.TextField(null=True, blank=True)
     active_campaign_api_key = models.TextField(null=True, blank=True)
-    contact_email = models.TextField(blank=True, null=True)
+    contact_email = models.TextField(blank=True, null=True, max_length=50)
     
     def get_subscription_sites(self, numerical):
         return self.site_set.filter(subscription_new__numerical=numerical)

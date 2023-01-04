@@ -95,9 +95,9 @@ class ManualCampaign(Campaign):
 
 
 class Campaignlead(models.Model):
-    first_name = models.TextField(null=True, blank=True)
-    last_name = models.TextField(null=True, blank=True)
-    email = models.TextField(null=True, blank=True)
+    first_name = models.TextField(null=True, blank=True, max_length=25)
+    last_name = models.TextField(null=True, blank=True, max_length=25)
+    email = models.TextField(null=True, blank=True, max_length=50)
     
     whatsapp_number = models.TextField(null=True, blank=True)
     # country_code = models.TextField(null=True, blank=True)

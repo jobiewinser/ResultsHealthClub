@@ -604,7 +604,7 @@ def choose_attached_profiles(request):
     
     try:
         stripe_customer = get_or_create_customer(customer_id=site_subscription_change.site.stripecustomer.customer_id)
-    except Site.stripecustomer.RelatedObjectDoesNotExist:
+    except Site.stripecustomer.RelatedObjectDoesNotExist as e:
         stripe_customer = get_or_create_customer(billing_email=site_subscription_change.site.billing_email)
     customer_id = stripe_customer['id']
     stripe_customer_object, created = StripeCustomer.objects.get_or_create(
@@ -638,28 +638,41 @@ def complete_stripe_subscription(request):
     site_subscription_change_pk = request.POST.get('site_subscription_change_pk')
     site_subscription_change = SiteSubscriptionChange.objects.get(pk=site_subscription_change_pk)
     
+    site = site_subscription_change.site
+    try:
+        temp = site.stripecustomer.pk
+    except Site.stripecustomer.RelatedObjectDoesNotExist as e:
+        stripe_customer = get_or_create_customer(billing_email=site.billing_email)
+        customer_id = stripe_customer['id']
+        stripe_customer_object, created = StripeCustomer.objects.get_or_create(
+            customer_id=customer_id
+        )
+        stripe_customer_object.site = site
+        stripe_customer_object.save()
+        
+    
     payment_method_id = request.POST.get('payment_method_id')
     if site_subscription_change.subscription_from.numerical < site_subscription_change.subscription_to.numerical:
         #if upgrading, upgrade immediately and prorate
         stripe_subscription = add_or_update_subscription(
-            site_subscription_change.site.stripecustomer.customer_id, 
+            site.stripecustomer.customer_id, 
             payment_method_id, 
             site_subscription_change.subscription_to.stripe_price_id,
-            subscription_id=site_subscription_change.site.stripecustomer.subscription_id,
+            subscription_id=site.stripecustomer.subscription_id,
             proration_behavior='create_prorations',
         )
     else:
         #if downgrading, keep current membership until end of period
         stripe_subscription = add_or_update_subscription(
-            site_subscription_change.site.stripecustomer.customer_id, 
+            site.stripecustomer.customer_id, 
             payment_method_id, 
             site_subscription_change.subscription_to.stripe_price_id,
-            subscription_id=site_subscription_change.site.stripecustomer.subscription_id,
+            subscription_id=site.stripecustomer.subscription_id,
             proration_behavior='none',
         )
-    site_subscription_change.site.stripecustomer.subscription_id = stripe_subscription.stripe_id
-    site_subscription_change.site.stripecustomer.save()
-    site_subscription_change.site.get_stripe_subscriptions_and_update_models
+    site.stripecustomer.subscription_id = stripe_subscription.stripe_id
+    site.stripecustomer.save()
+    site.get_stripe_subscriptions_and_update_models
     site_subscription_change.completed_by = request.user
     site_subscription_change.complete()
     return render(request, 'core/htmx/subscription_changed.html', {})
@@ -722,6 +735,17 @@ def add_stripe_payment_method(request):
     site_pk = request.POST.get('site_pk')
     site = Site.objects.get(pk=site_pk)
     if get_profile_allowed_to_change_subscription(request.user.profile, site):
+        try:
+            temp = site.stripecustomer.pk
+        except Site.stripecustomer.RelatedObjectDoesNotExist as e:
+            stripe_customer = get_or_create_customer(billing_email=site.billing_email)
+            customer_id = stripe_customer['id']
+            stripe_customer_object, created = StripeCustomer.objects.get_or_create(
+                customer_id=customer_id
+            )
+            stripe_customer_object.site = site
+            stripe_customer_object.save()
+        
         payment_method, error = add_payment_method(
             request.POST['cardNumber'], 
             request.POST['expiryMonth'],

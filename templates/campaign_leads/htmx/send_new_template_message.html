@@ -21,7 +21,7 @@
             </select>
             <br>
             {% if not lead and not contact %}
-            <input name="first_name" class="form-control send_new_template_message_input" placeholder="Customer Name"/>
+            <input name="first_name" maxlength="25" class="form-control send_new_template_message_input" placeholder="Customer Name"/>
             <br>
             <div class="row">
                 {%if customer_number%}

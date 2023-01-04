@@ -89,9 +89,9 @@ class ModifyUser(View):
                 if site.subscription_new.max_profiles:
                     if site.users.count() >= site.subscription_new.max_profiles:
                         return HttpResponse("You already have the maximum number of users", status=400)
-                username = request.POST.get('username', '')
-                first_name = request.POST.get('first_name', '')
-                last_name = request.POST.get('last_name', '')
+                username = request.POST.get('username', '')[:25]
+                first_name = request.POST.get('first_name', '')[:25]
+                last_name = request.POST.get('last_name', '')[:25]
                 password = request.POST.get('password', '')
                 role = request.POST.get('role', '')
                 calendly_event_page_url = request.POST.get('calendly_event_page_url', '')
@@ -133,8 +133,8 @@ class ModifyUser(View):
                 profile = Profile.objects.get_or_create(user = user)[0] 
                 user.profile = profile     
                 if get_profile_allowed_to_edit_other_profile(request.user.profile, user.profile):
-                    first_name = request.POST.get('first_name', '')
-                    last_name = request.POST.get('last_name', '')
+                    first_name = request.POST.get('first_name', '')[:25]
+                    last_name = request.POST.get('last_name', '')[:25]
                     site_pk = request.POST.get('site_pk', '')
                     calendly_event_page_url = request.POST.get('calendly_event_page_url', '')
                     # user.username=f"{first_name}{last_name}" 

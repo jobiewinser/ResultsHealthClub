@@ -60,9 +60,46 @@
         
     </head>
     
+<style> 
+    .flash {
+        animation: flash 1s;
+        animation-iteration-count: infinite;
+    }
+    
+    @keyframes flash {
+        0% {opacity: 1;}
+        50% {opacity: 0;}
+        100% {opacity: 1;}
+    }
+    </style>
     <script>  
+        let boolean = false;
         $(document).ready(function() {
             
+
+            let element = document.querySelector("#messaging_site_accordion");
+
+            // Listen for changes to the boolean
+            document.addEventListener("booleanChange", () => {
+                console.log("booleanChange")
+            if (boolean) {
+                // Flash the element
+                element.classList.add("flash");
+            } else {
+                // Remove the flash class
+                element.classList.remove("flash");
+            }
+            });
+            let boolean = true;
+
+
+
+
+
+
+
+
+
             window.addEventListener('mouseup', function(event){
             })
             
