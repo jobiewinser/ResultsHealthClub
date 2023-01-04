@@ -54,7 +54,7 @@ class Campaign(PolymorphicModel):
     whatsapp_business_account = models.ForeignKey('core.WhatsappBusinessAccount', on_delete=models.SET_NULL, null=True, blank=True)
     color = models.CharField(max_length=15, null=False, blank=False, default="96,248,61")
     def get_active_leads_qs(self):
-        return self.campaignlead_set.exclude(archived=True).exclude(sold=True)
+        return self.campaignlead_set.exclude(archived=True).exclude(sale__archived=False)
     def is_manual(self):
         return False
         
@@ -104,9 +104,9 @@ class Campaignlead(models.Model):
     campaign = models.ForeignKey("campaign_leads.Campaign", on_delete=models.SET_NULL, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     arrived = models.BooleanField(default=False)
-    sold = models.BooleanField(default=False)
-    marked_sold = models.DateTimeField(null=True, blank=True)
-    sold_by = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="campaignlead_sold_by", null=True, blank=True)
+    sold_old = models.BooleanField(default=False)
+    marked_sold_old = models.DateTimeField(null=True, blank=True)
+    sold_by_old = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="campaignlead_sold_by", null=True, blank=True)
     archived = models.BooleanField(default=False)
     active_campaign_contact_id = models.TextField(null=True, blank=True)
     active_campaign_form_id = models.TextField(null=True, blank=True)
@@ -121,6 +121,8 @@ class Campaignlead(models.Model):
     @property
     def ordered_bookings(self):  
         return self.booking_set.all().order_by('-datetime')
+    def active_sales_qs(self):
+        return self.sale_set.exclude(archived=True)
     @property
     def get_product_cost(self):  
         if self.product_cost:
@@ -421,6 +423,15 @@ class Campaignlead(models.Model):
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         self.whatsapp_number = normalize_phone_number(self.whatsapp_number)
+        if self.sold_old:
+            Sale.objects.get_or_create(
+                lead=self,
+                user=self.sold_by_old,
+                datetime=self.marked_sold_old,
+            )
+            self.sold_old = None
+            self.sold_by_old = None
+            self.marked_sold_old = None
         super(Campaignlead, self).save(force_insert, force_update, using, update_fields)
         
 
@@ -446,6 +457,16 @@ class Call(models.Model):
     archived = models.BooleanField(default=False)
     class Meta:
         ordering = ['-datetime']
+
+class Sale(models.Model):
+    created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    datetime = models.DateTimeField(null=True, blank=True)
+    lead = models.ForeignKey(Campaignlead, on_delete=models.SET_NULL, null=True, blank=True)
+    # type = models.CharField(choices=BOOKING_CHOICES, max_length=2, null=False, blank=False)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    archived = models.BooleanField(default=False)
+    # class Meta:
+    #     ordering = ['-datetime']
 
 class Booking(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)

@@ -266,10 +266,10 @@ def mark_archived(request, **kwargs):
             lead = Campaignlead.objects.get(pk=lead_pk)
             if lead.archived:
                 lead.archived = False
-                lead.sold = False
+                # lead.sold = False
             else:
                 lead.archived = True
-                lead.sold = False
+                # lead.sold = False
             lead.save()
             lead.trigger_refresh_websocket(refresh_position=False)
             return render(request, "campaign_leads/htmx/campaign_booking_row.html", {'lead':lead}) 
@@ -331,13 +331,15 @@ def mark_sold(request, **kwargs):
         if request.user.is_authenticated:
             user_pk = request.POST.get('user_pk')
             lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'))
-            if lead.sold and not user_pk:
-                lead.archived = False
+            active_sales = lead.active_sales_qs
+            latest_active_sale = active_sales.last()
+            if latest_active_sale and not user_pk:
+                # lead.archived = False
                 lead.sold = False
                 lead.marked_sold = None
                 lead.sold_by = None
             else:
-                lead.archived = False
+                # lead.archived = False
                 lead.sold = True
                 lead.marked_sold = datetime.now()
                 if user_pk:
@@ -345,6 +347,21 @@ def mark_sold(request, **kwargs):
                 else:
                     lead.sold_by = request.user
             lead.save()
+            return render(request, "campaign_leads/htmx/campaign_booking_row.html", {'lead':lead}) 
+    except Exception as e:
+        logger.debug("mark_archived Error "+str(e))
+        #return HttpResponse(e, status=500)
+        raise e
+
+
+@login_required
+def mark_sales_archived(request, **kwargs):
+    logger.debug(str(request.user))
+    try:
+        if request.user.is_authenticated:
+            lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'))
+            active_sales = lead.active_sales_qs
+            active_sales.update(archived=True)
             return render(request, "campaign_leads/htmx/campaign_booking_row.html", {'lead':lead}) 
     except Exception as e:
         logger.debug("mark_archived Error "+str(e))

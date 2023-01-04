@@ -85,7 +85,7 @@
         </span>        
     </td>
     <td class="nowrap">
-        {%if lead.archived and not lead.sold%}
+        {%if lead.archived and not lead.active_sales_qs%}
             <span class="legend-indicator bg-danger"></span>Archived
         {% elif lead.archived %}
         <span class="legend-indicator bg-success"></span>archived
@@ -203,7 +203,7 @@
             </div>
 
             <div class="btn-group btn-space mt-1">     
-                {%if not lead.sold%}
+                {%if not lead.active_sales_qs%}
                     {%if lead.archived%}
                         <button class="btn btn-danger btn-sm nowrap"
                         {%if demo and not request.user.is_superuser%}disabled{%endif%}

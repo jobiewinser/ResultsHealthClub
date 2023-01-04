@@ -8,7 +8,7 @@
 
             <div class="col-md-auto p-0">
                 <div class="form-check form-switch">
-                    <input class="form-check-input" name="graph_type" {%if graph_type == 'line'%}checked{%endif%} type="checkbox" id="graph_type_leads_to_bookings_and_sales" onchange="$('#refresh_leads_to_bookings_and_sales').click()">
+                    <input class="form-check-input" name="graph_type" {%if graph_type == 'line'%}checked{%endif%} type="checkbox" id="graph_type_leads_per_day" onchange="$('#refresh_leads_per_day').click()">
                 </div> 
             </div>
 
@@ -26,8 +26,12 @@
 
 <div class="row mt-3">
     <div class="col p-0">
-        <div class="chart_wrapper" id="leads_to_bookings_and_sales_chart_wrapper">
-            <canvas class="chart_canvas" id="leads_to_bookings_and_sales_chart" ></canvas>
+        <div class="chart_wrapper" id="leads_per_day_chart_wrapper">     
+            {%if data_set%}
+            <canvas class="chart_canvas" id="leads_per_day_chart" ></canvas>  
+            {%else%}
+            No Data
+            {%endif%}
         </div>
     </div>
 </div>
@@ -36,9 +40,10 @@
 
 <script>
     $(document).ready(function() {
+        {%if data_set%}
         setTimeout(function(){
-            leads_to_bookings_and_sales_chart_var = document.getElementById('leads_to_bookings_and_sales_chart');
-            leads_to_bookings_and_sales_chart = new Chart(leads_to_bookings_and_sales_chart_var, {
+            leads_per_day_chart_var = document.getElementById('leads_per_day_chart');
+            leads_per_day_chart = new Chart(leads_per_day_chart_var, {
                 type: '{%if graph_type%}{{graph_type}}{%else%}bar{%endif%}',
                 data: {
                     labels: [{%for label in time_label_set%}'{{label}}'{% if not forloop.last %},{%endif%}{%endfor%}],
@@ -92,6 +97,7 @@
                     responsive: true
                 }
             });
-        }, 250);         
+        }, 250);   
+        {%endif%}              
     });
 </script>

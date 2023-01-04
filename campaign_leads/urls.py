@@ -34,6 +34,8 @@ urlpatterns = [
     path('add-manual-booking/', campaignleadshtmx.add_manual_booking, name='add-manual-booking' ),
     path('mark-arrived/', campaignleadshtmx.mark_arrived, name='mark-arrived' ),
     path('mark-sold/', campaignleadshtmx.mark_sold, name='mark-sold' ),
+    path('mark-sales-archived/', campaignleadshtmx.mark_sales_archived, name='mark-sales-archived' ),
+    
     path('create-lead-note/', campaignleadshtmx.create_lead_note, name='create-lead-note' ),
     path('edit-lead/', campaignleadshtmx.edit_lead, name='edit-lead' ),
     path('add-campaign-category/', campaignleadshtmx.add_campaign_category, name='add-campaign-category' ),

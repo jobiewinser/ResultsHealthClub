@@ -7,13 +7,19 @@
     <script>
         document.title = "Analytics";
         $(document).ready(function() {
-            var leads_to_bookings_and_sales_chart_var = null;
-            var leads_to_bookings_and_sales_chart = null;
+            var leads_per_day_chart_var = null;
+            var leads_per_day_chart = null;
+            var bookings_per_day_chart_var = null;
+            var bookings_per_day_chart = null;
+            var sales_per_day_chart_var = null;
+            var sales_per_day_chart = null;
     
             var calls_today_chart_var = null;
             var calls_today_chart = null;
             try{
-                leads_to_bookings_and_sales_chart.destroy();
+                leads_per_day_chart.destroy();
+                bookings_per_day_chart.destroy();
+                sales_per_day_chart.destroy();
                 calls_today_chart.destroy();
             }catch{}
         });
