@@ -923,10 +923,10 @@ class SiteProfilePermissions(models.Model):
         self.permissions_count = 0
         for field in self._meta.fields:
             if type(field) == models.BooleanField:
-                if getattr(self, field.attname, False):
-                    self.permissions_count +=1
-                elif role == 'a':
+                if role == 'a':
                     setattr(self, field.attname, True)
+                    self.permissions_count +=1
+                elif getattr(self, field.attname, False):
                     self.permissions_count +=1
         return super(SiteProfilePermissions, self).save(force_insert, force_update, using, update_fields)
     

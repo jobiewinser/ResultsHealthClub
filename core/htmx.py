@@ -39,9 +39,11 @@ def get_modal_content(request, **kwargs):
                 if profile_pk:
                     profile = Profile.objects.get(pk=profile_pk)
                     context["profile"] = profile
-                    CompanyProfilePermissions.objects.get_or_create(profile=profile, company=profile.company)
+                    company_profile_permissions, created = CompanyProfilePermissions.objects.get_or_create(profile=profile, company=profile.company)
+                    company_profile_permissions.save()
                     for site in profile.company.active_sites:
-                        SiteProfilePermissions.objects.get_or_create(profile=profile, site=site)
+                        site_profile_permissions, created = SiteProfilePermissions.objects.get_or_create(profile=profile, site=site)
+                        site_profile_permissions.save()
             elif template_name == 'add_phone_number':
                 if site_pk:
                     context["site"] = Site.objects.get(pk=site_pk)
