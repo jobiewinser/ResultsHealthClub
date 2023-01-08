@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 
-from campaign_leads.models import Call, Campaign, Campaignlead, CampaignCategory, Sale
+from campaign_leads.models import Call, Campaign, Campaignlead, CampaignCategory, Sale, Booking
 from core.models import Site
 from dateutil import relativedelta
 from django.contrib.auth.models import User
@@ -12,9 +12,13 @@ from django.db.models import Sum
 from django.db.models import Q, Count
 from analytics.views import get_minimum_site_subscription_level_from_site_qs
 
-def check_if_start_date_allowed_and_replace(start_date, lead_qs=None, site_qs=None):
-    if not site_qs:
+def check_if_start_date_allowed_and_replace(start_date, lead_qs=None, site_qs=None, sale_qs=None, booking_qs=None):
+    if not site_qs and lead_qs:
         site_qs = Site.objects.filter(campaign__campaignlead__in=lead_qs)
+    if not site_qs and sale_qs:
+        site_qs = Site.objects.filter(campaign__campaignlead__sale__in=sale_qs)
+    if not site_qs and booking_qs:
+        site_qs = Site.objects.filter(campaign__campaignlead__booking__in=booking_qs)
     subscription = get_minimum_site_subscription_level_from_site_qs(site_qs)
     earliest_site = site_qs.order_by('created').first()
     if subscription.analytics_seconds: 
@@ -34,8 +38,8 @@ def check_if_start_date_allowed_and_replace(start_date, lead_qs=None, site_qs=No
     else:
         return datetime.strptime(str(minimum_datetime_allowed)[0:10], '%Y-%m-%d')
     
-def get_leads_per_day_between_dates_with_timeframe_differences(start_date, end_date, timeframe, user, campaigns=[], campaign_categorys=[], sites=[]):
-    qs = Campaignlead.objects.all()
+def get_leads_per_day_between_dates_with_timeframe_differences(start_date, end_date, timeframe=relativedelta.relativedelta(days=1), campaigns=[], campaign_categorys=[], sites=[]):
+    qs = Campaignlead.objects.filter(created__gte=start_date, created__lt=end_date + timeframe)
     if qs:
         start_date = check_if_start_date_allowed_and_replace(start_date, lead_qs=qs)
         if campaigns:
@@ -43,74 +47,76 @@ def get_leads_per_day_between_dates_with_timeframe_differences(start_date, end_d
         elif campaign_categorys:
             qs = qs.filter(campaign__campaign_category__in=campaign_categorys)
         elif sites:
-            qs = qs.filter(campaign__site__in=sites)    
-        index_date = start_date
-        time_label_set = []
-        data_set = []
-        while index_date < end_date + timeframe:
-            index_qs = qs.filter(created__gte=index_date, created__lt=index_date + timeframe)
-            leads = index_qs.count()
-            data_set.append({
-                'leads':leads,
-            })
-            time_label_set.append(f"{index_date}")
-            index_date = index_date + timeframe
-        return data_set, time_label_set, start_date  
+            qs = qs.filter(campaign__site__in=sites)   
+        if qs: 
+            index_date = start_date
+            time_label_set = []
+            data_set = []
+            while index_date < end_date + timeframe:
+                index_qs = qs.filter(created__gte=index_date, created__lt=index_date + timeframe)
+                leads = index_qs.count()
+                data_set.append({
+                    'leads':leads,
+                })
+                time_label_set.append(f"{index_date}")
+                index_date = index_date + timeframe
+            return data_set, time_label_set, start_date  
     return [], [], start_date  
 
 
-def get_bookings_per_day_between_dates_with_timeframe_differences(start_date, end_date, timeframe, user, campaigns=[], campaign_categorys=[], sites=[]):
-    qs = Campaignlead.objects.all().exclude(booking=None)
+def get_bookings_per_day_between_dates_with_timeframe_differences(start_date, end_date, timeframe=relativedelta.relativedelta(days=1), campaigns=[], campaign_categorys=[], sites=[]):
+    qs = Booking.objects.filter(datetime__gte=start_date, datetime__lt=end_date + timeframe).exclude(archived=True)
     if qs:
-        start_date = check_if_start_date_allowed_and_replace(start_date, lead_qs=qs)
+        start_date = check_if_start_date_allowed_and_replace(start_date, booking_qs=qs)
         if campaigns:
-            qs = qs.filter(campaign__in=campaigns)
+            qs = qs.filter(lead__campaign__in=campaigns)
         elif campaign_categorys:
-            qs = qs.filter(campaign__campaign_category__in=campaign_categorys)
+            qs = qs.filter(lead__campaign__campaign_category__in=campaign_categorys)
         elif sites:
-            qs = qs.filter(campaign__site__in=sites)
-        
-        index_date = start_date
-        time_label_set = []
-        data_set = []
-        while index_date < end_date + timeframe:
-            index_qs = qs.filter(booking__created__gte=index_date, booking__created__lt=index_date + timeframe).count()
+            qs = qs.filter(lead__campaign__site__in=sites)
+        if qs:
             
-            data_set.append({
-                'bookings':index_qs,
-            })
-            time_label_set.append(f"{index_date}")
-            index_date = index_date + timeframe
-        return data_set, time_label_set, start_date  
+            index_date = start_date
+            time_label_set = []
+            data_set = []
+            while index_date < end_date + timeframe:
+                index_qs = qs.filter(created__gte=index_date, created__lt=index_date + timeframe).count()
+                
+                data_set.append({
+                    'bookings':index_qs,
+                })
+                time_label_set.append(f"{index_date}")
+                index_date = index_date + timeframe
+            return data_set, time_label_set, start_date  
     return [], [], start_date  
 
-def get_sales_per_day_between_dates_with_timeframe_differences(start_date, end_date, timeframe, user, campaigns=[], campaign_categorys=[], sites=[]):
-    qs = Campaignlead.objects.all().exclude(sale=None)
+def get_sales_per_day_between_dates_with_timeframe_differences(start_date, end_date, timeframe=relativedelta.relativedelta(days=1), campaigns=[], campaign_categorys=[], sites=[]):
+    qs = Sale.objects.filter(datetime__gte=start_date, datetime__lt=end_date + timeframe).exclude(archived=True)
     if qs:
-        start_date = check_if_start_date_allowed_and_replace(start_date, lead_qs=qs)
+        start_date = check_if_start_date_allowed_and_replace(start_date, sale_qs=qs)
         if campaigns:
-            qs = qs.filter(campaign__in=campaigns)
+            qs = qs.filter(lead__campaign__in=campaigns)
         elif campaign_categorys:
-            qs = qs.filter(campaign__campaign_category__in=campaign_categorys)
+            qs = qs.filter(lead__campaign__campaign_category__in=campaign_categorys)
         elif sites:
-            qs = qs.filter(campaign__site__in=sites)
-        
-        index_date = start_date
-        time_label_set = []
-        data_set = []
-        while index_date < end_date + timeframe:
-            index_qs = qs.filter(sale__datetime__gte=index_date, sale__datetime__lt=index_date + timeframe).count()
-            
-            data_set.append({
-                'sales':index_qs,
-            })
-            time_label_set.append(f"{index_date}")
-            index_date = index_date + timeframe
-        return data_set, time_label_set, start_date  
+            qs = qs.filter(lead__campaign__site__in=sites)
+        if qs:        
+            index_date = start_date
+            time_label_set = []
+            data_set = []
+            while index_date < end_date + timeframe:
+                index_qs = qs.filter(datetime__gte=index_date, datetime__lt=index_date + timeframe).count()
+                
+                data_set.append({
+                    'sales':index_qs,
+                })
+                time_label_set.append(f"{index_date}")
+                index_date = index_date + timeframe
+            return data_set, time_label_set, start_date  
     return [], [], start_date  
     
-def get_calls_made_per_day_between_dates(start_date, end_date, user, campaigns=[], campaign_categorys=[], sites=[], get_user_totals=False):
-    qs = Call.objects.all()
+def get_calls_made_per_day_between_dates(start_date, end_date, user, timeframe=relativedelta.relativedelta(days=1), campaigns=[], campaign_categorys=[], sites=[], get_user_totals=False):
+    qs = Call.objects.filter(created__gte=start_date, created__lt=end_date + timeframe)
     if qs:
         if campaigns:
             qs = qs.filter(lead__campaign__in=campaigns)
@@ -118,33 +124,34 @@ def get_calls_made_per_day_between_dates(start_date, end_date, user, campaigns=[
             qs = qs.filter(lead__campaign__campaign_category__in=campaign_categorys)
         elif sites:
             qs = qs.filter(lead__campaign__site__in=sites)
-        start_date = check_if_start_date_allowed_and_replace(start_date, lead_qs=Campaignlead.objects.filter(call__in=qs))
-        index_date = start_date
-        time_label_set = []
-        data_set = []
-        
-        while index_date < end_date + relativedelta.relativedelta(days=1):
-            index_qs = qs.filter(datetime__gte=index_date, datetime__lt=index_date + relativedelta.relativedelta(days=1))
-                
-            unique_callers = index_qs.order_by('user').values('user').distinct()
-            if get_user_totals:
-                user_calls_list = []
-                for user in unique_callers:
-                    user_calls_list.append({
-                        'user':user,
-                        'calls':index_qs.filter(user=user).count()
+        if qs:
+            start_date = check_if_start_date_allowed_and_replace(start_date, lead_qs=Campaignlead.objects.filter(call__in=qs))
+            index_date = start_date
+            time_label_set = []
+            data_set = []
+            
+            while index_date < end_date + relativedelta.relativedelta(days=1):
+                index_qs = qs.filter(datetime__gte=index_date, datetime__lt=index_date + relativedelta.relativedelta(days=1))
+                    
+                unique_callers = index_qs.order_by('user').values('user').distinct()
+                if get_user_totals:
+                    user_calls_list = []
+                    for user in unique_callers:
+                        user_calls_list.append({
+                            'user':user,
+                            'calls':index_qs.filter(user=user).count()
+                        })
+                    data_set.append({
+                        'total_calls':index_qs.count(),
+                        'user_calls_list':user_calls_list
                     })
-                data_set.append({
-                    'total_calls':index_qs.count(),
-                    'user_calls_list':user_calls_list
-                })
-            else:
-                data_set.append({
-                    'total_calls':index_qs.count(),
-                })
-            time_label_set.append(f"{index_date}")
-            index_date = index_date + relativedelta.relativedelta(days=1)
-        return data_set, time_label_set, start_date
+                else:
+                    data_set.append({
+                        'total_calls':index_qs.count(),
+                    })
+                time_label_set.append(f"{index_date}")
+                index_date = index_date + relativedelta.relativedelta(days=1)
+            return data_set, time_label_set, start_date
     return [], [], start_date  
 
 def get_calls_today_dataset(campaigns=[], campaign_categorys=[], sites=[]):
@@ -166,7 +173,7 @@ def get_calls_today_dataset(campaigns=[], campaign_categorys=[], sites=[]):
 
 def get_sales_today_dataset(campaigns=[], campaign_categorys=[], sites=[]):
     data_set = []
-    qs = Sale.objects.filter(datetime__gte=datetime.now().replace(hour=0,minute=0,second=0,microsecond=0))
+    qs = Sale.objects.filter(datetime__gte=datetime.now().replace(hour=0,minute=0,second=0,microsecond=0)).exclude(archived=True)
     if campaigns:
         qs = qs.filter(lead__campaign__in=campaigns)
     elif campaign_categorys:
@@ -202,7 +209,7 @@ def get_leads_per_day(request):
     start_date = datetime.strptime(request.GET.get('start_date'), '%Y-%m-%d')
     end_date = datetime.strptime(request.GET.get('end_date'), '%Y-%m-%d') + relativedelta.relativedelta(days=1) 
 
-    data_set, time_label_set, start_date = get_leads_per_day_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(days=1), request.user, campaigns=campaigns, campaign_categorys=campaign_categorys, sites=sites)
+    data_set, time_label_set, start_date = get_leads_per_day_between_dates_with_timeframe_differences(start_date, end_date, campaigns=campaigns, campaign_categorys=campaign_categorys, sites=sites)
         
     context['data_set'] = data_set
     context['time_label_set'] = time_label_set
@@ -236,7 +243,7 @@ def get_bookings_per_day(request):
     start_date = datetime.strptime(request.GET.get('start_date'), '%Y-%m-%d')
     end_date = datetime.strptime(request.GET.get('end_date'), '%Y-%m-%d') + relativedelta.relativedelta(days=1) 
 
-    data_set, time_label_set, start_date = get_bookings_per_day_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(days=1), request.user, campaigns=campaigns, campaign_categorys=campaign_categorys, sites=sites)
+    data_set, time_label_set, start_date = get_bookings_per_day_between_dates_with_timeframe_differences(start_date, end_date, campaigns=campaigns, campaign_categorys=campaign_categorys, sites=sites)
         
     context['data_set'] = data_set
     context['time_label_set'] = time_label_set
@@ -270,7 +277,7 @@ def get_sales_per_day(request):
     start_date = datetime.strptime(request.GET.get('start_date'), '%Y-%m-%d')
     end_date = datetime.strptime(request.GET.get('end_date'), '%Y-%m-%d') + relativedelta.relativedelta(days=1) 
 
-    data_set, time_label_set, start_date = get_sales_per_day_between_dates_with_timeframe_differences(start_date, end_date, relativedelta.relativedelta(days=1), request.user, campaigns=campaigns, campaign_categorys=campaign_categorys, sites=sites)
+    data_set, time_label_set, start_date = get_sales_per_day_between_dates_with_timeframe_differences(start_date, end_date, campaigns=campaigns, campaign_categorys=campaign_categorys, sites=sites)
         
     context['data_set'] = data_set
     context['time_label_set'] = time_label_set

@@ -104,7 +104,7 @@ class Campaignlead(models.Model):
     campaign = models.ForeignKey("campaign_leads.Campaign", on_delete=models.SET_NULL, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     arrived = models.BooleanField(default=False)
-    sold_old = models.BooleanField(default=False)
+    sold_old = models.BooleanField(default=False, null=True, blank=True)
     marked_sold_old = models.DateTimeField(null=True, blank=True)
     sold_by_old = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="campaignlead_sold_by", null=True, blank=True)
     archived = models.BooleanField(default=False)
@@ -121,6 +121,7 @@ class Campaignlead(models.Model):
     @property
     def ordered_bookings(self):  
         return self.booking_set.all().order_by('-datetime')
+    @property
     def active_sales_qs(self):
         return self.sale_set.exclude(archived=True)
     @property

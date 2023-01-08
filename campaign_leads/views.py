@@ -244,7 +244,7 @@ class CampaignConfigurationView(TemplateView):
                 )
                 campaign.json_data = campaign_dict
                 campaign.save()
-        except:
+        except Exception as e:
             pass
         if company:
             campaigns = company.get_and_generate_campaign_objects()
@@ -261,7 +261,7 @@ class CampaignConfigurationView(TemplateView):
         site_pk = get_single_site_pk_from_request(self.request)
         if site_pk and not site_pk == 'all':
             try:
-                campaigns = campaigns.filter(site__pk=site_pk)
+                campaigns = campaigns.filter(Q(site=None)|Q(site__pk=site_pk))
                 self.request.GET['site_pk'] = site_pk    
                 context['site'] = Site.objects.get(pk=site_pk)
             except Exception as e:

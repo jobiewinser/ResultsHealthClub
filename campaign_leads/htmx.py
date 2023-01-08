@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import render
 import logging
 from django.contrib.auth.decorators import login_required
-from campaign_leads.models import Campaign, Campaignlead, Booking, Note, ManualCampaign, CampaignCategory
+from campaign_leads.models import Campaign, Campaignlead, Booking, Note, ManualCampaign, CampaignCategory, Sale
 from core.models import Site, WhatsappNumber,Subscription
 from core.views import get_site_pks_from_request_and_return_sites
 from django.db.models import Count
@@ -333,19 +333,19 @@ def mark_sold(request, **kwargs):
             lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'))
             active_sales = lead.active_sales_qs
             latest_active_sale = active_sales.last()
+            active_sales.update(archived=True)
             if latest_active_sale and not user_pk:
-                # lead.archived = False
-                lead.sold = False
-                lead.marked_sold = None
-                lead.sold_by = None
+                active_sales.update(archived=True)
             else:
-                # lead.archived = False
-                lead.sold = True
-                lead.marked_sold = datetime.now()
                 if user_pk:
-                    lead.sold_by = User.objects.get(pk=user_pk)
+                    user = User.objects.get(pk=user_pk)
                 else:
-                    lead.sold_by = request.user
+                    user = request.user
+                Sale.objects.create(
+                    user = user,
+                    datetime = datetime.now(),
+                    lead = lead,
+                )
             lead.save()
             return render(request, "campaign_leads/htmx/campaign_booking_row.html", {'lead':lead}) 
     except Exception as e:
@@ -354,19 +354,19 @@ def mark_sold(request, **kwargs):
         raise e
 
 
-@login_required
-def mark_sales_archived(request, **kwargs):
-    logger.debug(str(request.user))
-    try:
-        if request.user.is_authenticated:
-            lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'))
-            active_sales = lead.active_sales_qs
-            active_sales.update(archived=True)
-            return render(request, "campaign_leads/htmx/campaign_booking_row.html", {'lead':lead}) 
-    except Exception as e:
-        logger.debug("mark_archived Error "+str(e))
-        #return HttpResponse(e, status=500)
-        raise e
+# @login_required
+# def mark_sales_archived(request, **kwargs):
+#     logger.debug(str(request.user))
+#     try:
+#         if request.user.is_authenticated:
+#             lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'))
+#             active_sales = lead.active_sales_qs
+#             active_sales.update(archived=True)
+#             return render(request, "campaign_leads/htmx/campaign_booking_row.html", {'lead':lead}) 
+#     except Exception as e:
+#         logger.debug("mark_archived Error "+str(e))
+#         #return HttpResponse(e, status=500)
+#         raise e
 
 @login_required
 def create_lead_note(request, **kwargs):

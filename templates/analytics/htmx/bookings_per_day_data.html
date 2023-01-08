@@ -48,24 +48,10 @@
                 data: {
                     labels: [{%for label in time_label_set%}'{{label}}'{% if not forloop.last %},{%endif%}{%endfor%}],
                     datasets: [{
-                        label: 'Leads',
-                        data: [{%for data_entry in data_set%}{{data_entry.leads}}{% if not forloop.last %},{%endif%}{%endfor%}],
-                        backgroundColor: 'rgba(180, 180, 180, 0.4)',
-                        borderColor: 'rgba(180, 180, 180, 0.85)',
-                        fill: true,
-                        borderWidth: 1
-                    }, {
                         label: 'Bookings',
                         data: [{%for data_entry in data_set%}{{data_entry.bookings}}{% if not forloop.last %},{%endif%}{%endfor%}],
                         backgroundColor: [{%for data_entry in data_set%}'rgba(255, 193, 7, 0.35)'{% if not forloop.last %},{%endif%}{%endfor%}],
                         borderColor: [{%for data_entry in data_set%}'rgba(255, 193, 7, 0.7)'{% if not forloop.last %},{%endif%}{%endfor%}],
-                        fill: true,
-                        borderWidth: 1
-                    }, {
-                        label: 'Sales',
-                        data: [{%for data_entry in data_set%}{{data_entry.sales}}{% if not forloop.last %},{%endif%}{%endfor%}],
-                        backgroundColor: [{%for data_entry in data_set%}'rgba(25, 135, 84, 0.35)'{% if not forloop.last %},{%endif%}{%endfor%}],
-                        borderColor: [{%for data_entry in data_set%}'rgba(25, 135, 84, 0.7)'{% if not forloop.last %},{%endif%}{%endfor%}],
                         fill: true,
                         borderWidth: 1
                     }]
