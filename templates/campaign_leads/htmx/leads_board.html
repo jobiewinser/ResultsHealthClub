@@ -19,14 +19,30 @@
             </div>          
         </div> 
         <div class="col-md-auto m-1 p-0">
-            <button class="btn btn-primary btn-sm" 
-                data-bs-toggle="popover" 
-                data-bs-trigger="hover focus" 
-                data-bs-placement="top"
-                data-bs-content="Manually create a campaign lead."
-                onclick="htmx.ajax('GET', '{% url 'campaign-lead-get-modal-content'%}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'edit_lead'}})">
-                    <i class="fa fa-plus" aria-hidden="true"></i> Manual Lead
-            </button>
+            <div class="btn-group btn-space mt-1 dropdown">
+                <button class="btn btn-space btn-primary  btn-sm nowrap pe-2" 
+                    data-bs-toggle="popover" 
+                    data-bs-trigger="hover focus" 
+                    data-bs-placement="top"
+                    data-bs-content="Manually create a campaign lead."
+                    onclick="htmx.ajax('GET', '{% url 'campaign-lead-get-modal-content'%}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'edit_lead'}})">
+                        <i class="fa fa-plus" aria-hidden="true"></i> Add Lead
+                </button>
+
+                <ul class="dropdown-menu">
+                    <li>
+                        <a class="dropdown-item" href="#"
+                            onclick="htmx.ajax('GET', '{% url 'campaign-lead-get-modal-content'%}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'import_active_campaign_leads','lead_pk':'{{lead.pk}}'}})">
+                            Import existing Active Campaign leads
+                        </a>
+                    </li>
+                </ul>
+
+                <button class="btn btn-space btn-primary btn-sm nowrap border-start ps-1" id="sold_{{lead.pk}}_dropdown"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fa-solid fa-chevron-down"></i>
+                </button>
+            </div>
         </div>
     </div>
     <div class="row p-0 m-0 ">

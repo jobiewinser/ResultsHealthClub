@@ -60,5 +60,6 @@ urlpatterns = [
     path('configuration/campaign-assign-campaign-category/', campaignleadsviews.campaign_assign_campaign_category_htmx, name='campaign-assign-campaign-category'), 
     path('configuration/campaign-assign-whatsapp-business-account/', campaignleadsviews.campaign_assign_whatsapp_business_account_htmx, name='campaign-assign-whatsapp-business-account'), 
     path('configuration/campaign-assign-product_cost/', campaignleadsviews.campaign_assign_product_cost_htmx, name='campaign-assign-product_cost'), 
+    path('get-contacts-for-campaign/', campaignleadshtmx.get_contacts_for_campaign, name='get-contacts-for-campaign'), 
     
 ]

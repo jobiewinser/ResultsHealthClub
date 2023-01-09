@@ -5,6 +5,7 @@ from django.shortcuts import render
 import logging
 from django.contrib.auth.decorators import login_required
 from campaign_leads.models import Campaign, Campaignlead, Booking, Note, ManualCampaign, CampaignCategory, Sale
+from active_campaign.models import ActiveCampaign
 from core.models import Site, WhatsappNumber,Subscription
 from core.views import get_site_pks_from_request_and_return_sites
 from django.db.models import Count
@@ -13,7 +14,7 @@ from campaign_leads.views import get_campaign_qs
 from whatsapp.models import WhatsappTemplate
 from django.conf import settings
 logger = logging.getLogger(__name__) 
-
+from active_campaign.api import ActiveCampaignApi
 @login_required
 def get_modal_content(request, **kwargs):
     try:
@@ -53,6 +54,8 @@ def get_modal_content(request, **kwargs):
                 lead = Campaignlead.objects.get(pk=lead_pk)
                 context['lead'] = lead
                 # context['users'] = User.objects.filter(profile__sites_allowed=lead.campaign.site)
+            # elif template_name == 'import_active_campaign_leads':
+                
             elif template_name in ['switch_subscription','add_stripe_payment_method','choose_attached_profiles']:
                 context["site"] = Site.objects.get(pk=site_pk)     
                 context['switch_subscription'] = Subscription.objects.filter(numerical=request.GET.get('switch_subscription')).first()
@@ -392,3 +395,13 @@ def create_lead_note(request, **kwargs):
         #return HttpResponse(e, status=500)
         raise e
         
+        
+@login_required
+def get_contacts_for_campaign(request, **kwargs):
+    logger.debug(str(request.user))
+    campaign = ActiveCampaign.objects.get(pk=request.POST.get('campaign_pk'))
+    active_campaign_api = ActiveCampaignApi(request.user.profile.company.active_campaign_api_key, request.user.profile.company.active_campaign_url)
+    
+    for contact_dict in active_campaign_api.list_contacts(campaign.active_campaign_id).get('contacts',[]):
+        print(contact_dict)
+                

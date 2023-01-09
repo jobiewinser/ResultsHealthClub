@@ -35,19 +35,38 @@
                         {%endif%}
                     </div>
                 </div>
+                {%if seconds_until_send_disabled%}
                 <div style="position: absolute; right:0; bottom: 0; width:100%;" class="row mb-2" id="message_input_div_{{customer_number}}"> 
                     <div class="col"> 
                         <input {%if not seconds_until_send_disabled%}disabled{%endif%} class="form-control form-control-sm message_input_text" id="message_input_{{customer_number}}"  name="message"  type="text"/>
                         
                         <input hidden class="form-control" value="{{customer_number}}"  name="messaging_customer_number"  type="text"/>
                     </div>
-                    {%if seconds_until_send_disabled%}
                     <div class="col-auto"> 
-                        <button onclick="setTimeout(function (){$('#message_input_{{customer_number}}').val('')}, 10);" class="badge bg-primary message_submit" id="message_submit_{{customer_number}}"><i class="fa-solid fa-paper-plane-top"></i></button>
-                        
+                        <button onclick="setTimeout(function (){$('#message_input_{{customer_number}}').val('')}, 10);" class="badge bg-primary message_submit" id="message_submit_{{customer_number}}"><i class="fa-solid fa-paper-plane-top"></i></button>                        
                     </div>
-                    {%endif%}
                 </div>
+                {%else%}
+                <div style="position: absolute; right:0; bottom: 0px; width:100%;" class="row mb-2" id="message_input_div_{{customer_number}}"> 
+                    <div class="col"> 
+                        <div class="alert alert-secondary p-1 m-0"> 
+                            <small>Send a message template instead</small>
+                            <button class="btn btn-primary btn-xs" 
+                                data-bs-toggle="popover" 
+                                data-bs-trigger="hover focus" 
+                                data-bs-placement="top"
+                                data-bs-content="Manually start a conversation using a template."
+                                hx-indicator="#page_load_indicator" hx-target="#generic_modal_body" 
+                                hx-get="{% url 'get-modal-content' %}" 
+                                hx-push-url="false"
+                                hx-vals='{"template_name": "send_new_template_message", "whatsappnumber_pk":"{{whatsappnumber.pk}}", "lead_pk":"{{lead.pk}}", "contact_pk":"{{contact.pk}}", "customer_number":"{{customer_number}}"}'
+                                hx-swap="innerHTML" hx-trigger="click">
+                                    <i class="fa fa-pencil" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {%endif%}
             </form>
         </div>
     </div>

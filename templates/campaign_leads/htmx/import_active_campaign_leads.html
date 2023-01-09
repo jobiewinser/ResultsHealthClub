@@ -1,0 +1,43 @@
+{%load core_tags%}
+<div class="generic_modal_contents">
+    <div class="card card-white m-1 p-3">
+        <form hx-post="{%url 'mark-sold'%}" hx-trigger="submit" hx-indicator="#page_load_indicator" hx-swap="none">
+            <input type="text" style="display:None" id="modal_lead_pk" name="lead_pk" value="{{lead.pk}}"/>
+            {% csrf_token %}
+            <div class="row">
+                <div class="col">
+                    <div class="m-1">
+                        <div id="campaign_list_wrapper">    
+                            <label for="campaign_pks" style="width:300px">
+                                Filter <b>Campaigns</b><br>
+                                <select class="form-control select2-styling generic_modal_body_select" id="import_campaign_pk" name="campaign_pk" style="width:400px"
+                                onchange="htmx.ajax('GET', {%url 'get-contacts-for-campaign'%}, {indicator:'#page_load_indicator', swap:'innerHTML', target: '#import_contact_div'})"
+                                >
+                                        {%for campaign in request.user.profile.active_campaigns_allowed%}
+                                            <option value="{{campaign.pk}}">
+                                                {{campaign.name}}
+                                            </option>
+                                        {%endfor%}
+                                </select>
+                            </label>
+                        </div>
+                    </div>                    
+                </div>
+            </div>
+            <div class="row">
+                <div class="col" id="import_contact_div">               
+                </div>
+            </div>
+            <div class="row m-1">
+                <div class="col center" >
+                    <button class="btn btn-primary" type="submit" {%if demo and not request.user.is_superuser%}disabled{%endif%}>
+                        Submit
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<span hx-swap-oob="true" id="generic_modal_title">
+    Import existing Active Campaign leads
+</span>

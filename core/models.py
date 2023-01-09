@@ -814,6 +814,13 @@ class Profile(models.Model):
         return self.sites_allowed.filter(active=True).order_by('created')
     
     @property
+    def active_campaigns_allowed(self):
+        from active_campaign.models import ActiveCampaign
+        sites = self.sites_allowed.filter(active=True)
+        temp = ActiveCampaign.objects.all()
+        return ActiveCampaign.objects.filter(site__in=sites)
+    
+    @property
     def name(self):
         if self.user.last_name:
             return f"{self.user.first_name} {self.user.last_name}"

@@ -81,5 +81,19 @@ class ActiveCampaignApi:
             i+=1
             response_json = requests.get(url=f"{url}&offset={i}", headers=headers).json()
         return messages
+    # Get
+    def list_contacts(self, campaign_id):        
+        url = f"{self.active_campaign_url}api/3/contacts?listid={campaign_id}&limit=100"
+        headers = self._get_headers()
+        i = 0
+        count = 0
+        contacts = []
+        response_json = requests.get(url=url, headers=headers).json()
+        while count < int(response_json.get('meta', {}).get('total', 0)):
+            count += len(response_json.get('contacts',[]))
+            contacts += response_json.get('contacts',[])
+            i+=1
+            response_json = requests.get(url=f"{url}&offset={i}", headers=headers).json()
+        return contacts
 
     

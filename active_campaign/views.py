@@ -32,32 +32,22 @@ class Webhooks(View):
                             if campaign.site.active_campaign_leads_enabled:
                                 phone_number_whole = str(data.get('contact[phone]', "")).replace(' ','').replace('+','')
 
-                                possible_duplicate  = False
-                                today = datetime.now().date()
-                                tomorrow = today + timedelta(1)
-                                today_start = datetime.combine(today, time())
-                                today_end = datetime.combine(tomorrow, time())
-                                if Campaignlead.objects.filter(
-                                        campaign=campaign,
-                                        active_campaign_contact_id=data.get('contact[id]')
-                                    ) or  Campaignlead.objects.filter(
-                                        campaign=campaign,
-                                        whatsapp_number=phone_number_whole,
-                                        created__lte=today_end, 
-                                        created__gte=today_start, 
-                                    ): 
-                                    possible_duplicate  = True
-                                if not possible_duplicate:
-                                    lead = Campaignlead.objects.create(
+                                # possible_duplicate  = False
+                                # today = datetime.now().date()
+                                # tomorrow = today + timedelta(1)
+                                # today_start = datetime.combine(today, time())
+                                # today_end = datetime.combine(tomorrow, time())
+                                campaign_lead, created = Campaignlead.objects.get_or_create(
                                         active_campaign_contact_id=data.get('contact[id]'),
-                                        first_name=data.get('contact[first_name]', "None"),
-                                        whatsapp_number=phone_number_whole,
                                         campaign=campaign,
-                                        active_campaign_form_id=data.get('form[id]', None),
-                                        possible_duplicate = possible_duplicate,
-                                        email = data.get('contact[email]', "")
                                     )
-                                    lead.trigger_refresh_websocket(refresh_position=True)
+                                campaign_lead.first_name=data.get('contact[first_name]', "None")
+                                campaign_lead.whatsapp_number=phone_number_whole
+                                campaign_lead.active_campaign_form_id=data.get('form[id]', None)
+                                campaign_lead.email = data.get('contact[email]', "")
+                                
+                                campaign_lead.save()
+                                campaign_lead.trigger_refresh_websocket(refresh_position=True)
             return HttpResponse( "text", 200)
      
 logger = logging.getLogger(__name__)
