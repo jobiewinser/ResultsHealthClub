@@ -6,5 +6,6 @@ urlpatterns = [
     path('set-whatsapp-template-sending-status/', activecampaignviews.set_whatsapp_template_sending_status, name='set-whatsapp-template-sending-status'),
     
     path('set-active-campaign-lead-status/', activecampaignviews.set_active_campaign_leads_status, name='set-active-campaign-lead-status'),
+    path('import-active-campaign-leads/', activecampaignviews.import_active_campaign_leads, name='import-active-campaign-leads'),
     
 ]

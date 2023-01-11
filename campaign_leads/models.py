@@ -424,6 +424,11 @@ class Campaignlead(models.Model):
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         self.whatsapp_number = normalize_phone_number(self.whatsapp_number)
+        try:
+            if not self.product_cost:
+                self.product_cost = self.campaign.product_cost
+        except:
+            pass
         if self.sold_old:
             Sale.objects.get_or_create(
                 lead=self,

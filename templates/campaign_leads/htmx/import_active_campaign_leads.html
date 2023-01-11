@@ -1,7 +1,7 @@
 {%load core_tags%}
 <div class="generic_modal_contents">
     <div class="card card-white m-1 p-3">
-        <form hx-post="{%url 'mark-sold'%}" hx-trigger="submit" hx-indicator="#page_load_indicator" hx-swap="none">
+        <form hx-post="{%url 'import-active-campaign-leads'%}" hx-trigger="submit" hx-indicator="#page_load_indicator" hx-swap="none">
             <input type="text" style="display:None" id="modal_lead_pk" name="lead_pk" value="{{lead.pk}}"/>
             {% csrf_token %}
             <div class="row">
@@ -9,15 +9,15 @@
                     <div class="m-1">
                         <div id="campaign_list_wrapper">    
                             <label for="campaign_pks" style="width:300px">
-                                Filter <b>Campaigns</b><br>
-                                <select class="form-control select2-styling generic_modal_body_select" id="import_campaign_pk" name="campaign_pk" style="width:400px"
-                                onchange="htmx.ajax('GET', {%url 'get-contacts-for-campaign'%}, {indicator:'#page_load_indicator', swap:'innerHTML', target: '#import_contact_div'})"
-                                >
-                                        {%for campaign in request.user.profile.active_campaigns_allowed%}
-                                            <option value="{{campaign.pk}}">
-                                                {{campaign.name}}
-                                            </option>
-                                        {%endfor%}
+                                Import for Campaign <br>
+                                <button hidden hx-get="{%url 'get-contacts-for-campaign'%}" hx-swap="innerHTML" hx-target="#import_contact_div" hx-indicator="#page_load_indicator" hx-include="#import_campaign_pk" id="import_campaign_button"></button>
+                                <select class="form-control select2-styling generic_modal_body_select" id="import_campaign_pk" name="campaign_pk" style="width:400px" onchange="$('#import_campaign_button').click()">
+                                    <option selected></option>
+                                    {%for campaign in request.user.profile.active_campaigns_allowed%}
+                                    <option value="{{campaign.pk}}">
+                                        {{campaign.name}}
+                                    </option>
+                                    {%endfor%}
                                 </select>
                             </label>
                         </div>
@@ -26,13 +26,6 @@
             </div>
             <div class="row">
                 <div class="col" id="import_contact_div">               
-                </div>
-            </div>
-            <div class="row m-1">
-                <div class="col center" >
-                    <button class="btn btn-primary" type="submit" {%if demo and not request.user.is_superuser%}disabled{%endif%}>
-                        Submit
-                    </button>
                 </div>
             </div>
         </form>

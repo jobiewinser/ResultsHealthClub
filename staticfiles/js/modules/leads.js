@@ -6,6 +6,14 @@ function leadshandlehtmxbeforeRequest(evt){
     }
 }
 
+function leadshandlehtmxafterRequest(evt){
+    if (evt.detail.xhr.status == 200){
+        if (evt.detail.pathInfo.requestPath.includes("import-active-campaign-leads")){
+            $('#generic_modal').modal('hide');
+        }             
+    }
+}
+
 function leadshandlehtmxafterSwap(evt){
     if (evt.detail.xhr.status == 200){
         if (![undefined, ''].includes(evt.detail.pathInfo.requestPath)){

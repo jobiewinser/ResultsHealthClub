@@ -399,9 +399,13 @@ def create_lead_note(request, **kwargs):
 @login_required
 def get_contacts_for_campaign(request, **kwargs):
     logger.debug(str(request.user))
-    campaign = ActiveCampaign.objects.get(pk=request.POST.get('campaign_pk'))
+    context = {}
+    campaign = ActiveCampaign.objects.get(pk=request.GET.get('campaign_pk'))
     active_campaign_api = ActiveCampaignApi(request.user.profile.company.active_campaign_api_key, request.user.profile.company.active_campaign_url)
-    
-    for contact_dict in active_campaign_api.list_contacts(campaign.active_campaign_id).get('contacts',[]):
-        print(contact_dict)
-                
+    contacts = active_campaign_api.list_contacts_by_campaign(campaign.active_campaign_id)
+    contact_id_list = []
+    for contact in contacts:
+        contact_id_list.append(contact.get('id'))
+    context['campaign_lead_ids'] = Campaignlead.objects.filter(active_campaign_contact_id__in=contact_id_list).values_list('active_campaign_contact_id', flat=True)
+    context['contacts'] = contacts
+    return render(request, "campaign_leads/htmx/import_contact_div_contents.html", context)

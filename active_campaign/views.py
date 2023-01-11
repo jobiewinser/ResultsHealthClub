@@ -12,6 +12,7 @@ from django.shortcuts import render
 from django.conf import settings
 from datetime import datetime, timedelta, time
 from core.user_permission_functions import *
+from active_campaign.api import ActiveCampaignApi
 @method_decorator(csrf_exempt, name="dispatch")
 class Webhooks(View):
     def get(self, request, *args, **kwargs):
@@ -97,3 +98,25 @@ def set_active_campaign_leads_status(request, **kwargs):
         logger.error(f"set_active_campaign_leads_status {str(e)}")
         return HttpResponse("Couldn't set_active_campaign_leads_status", status=500)
 
+@login_required
+def import_active_campaign_leads(request, **kwargs):
+    try:
+        active_campaign_contact_id_list = request.POST.getlist('active_campaign_contact_id[]')
+        active_campaign_api = ActiveCampaignApi(request.user.profile.company.active_campaign_api_key, request.user.profile.company.active_campaign_url)
+        contacts = active_campaign_api.list_contacts_by_id_list(active_campaign_contact_id_list)
+        campaign = ActiveCampaign.objects.get(pk=request.POST.get('campaign_pk'))
+        for contact in contacts:
+            if not Campaignlead.objects.filter(active_campaign_contact_id__in=contact['id'], campaign=campaign):
+                lead = Campaignlead()
+                refresh_position = True
+                lead.campaign = campaign
+                lead.first_name = contact.get('firstName')
+                lead.last_name = contact.get('lastName')
+                lead.email = contact.get('email')
+                lead.whatsapp_number = contact.get('phone')
+                lead.save()
+                lead.trigger_refresh_websocket(refresh_position=refresh_position)
+        return HttpResponse("Successfully import contacts", status=200)
+    except Exception as e:        
+        logger.error(f"import_active_campaign_leads {str(e)}")
+        return HttpResponse("Couldn't import_active_campaign_leads", status=500)
