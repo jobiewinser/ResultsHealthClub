@@ -210,7 +210,10 @@ def get_booking_table_context(request):
     context['archived'] = archived_filter
     
     sold_filter = (request.GET.get('sold', '').lower() =='true')
-    leads = leads.exclude(sale__archived=sold_filter)   
+    if sold_filter:        
+        leads = leads.filter(sale__archived=False)   
+    else:
+        leads = leads.exclude(sale__archived=False)   
     context['sold'] = sold_filter
 
     context['booking_needed_count'] = leads.filter(booking=None).count()

@@ -477,12 +477,14 @@ def get_pipeline(request):
         opportunities = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, created__gte=start_date, created__lt=end_date, campaign__site__in=request.user.profile.active_sites_allowed).annotate(calls=Count('call'))
 
     live_opportunities = opportunities.exclude(archived=True).exclude(sale__archived=False)
-    closed_opportunities = opportunities.filter(sale__archived=False)
+    sold_opportunities = opportunities.filter(sale__archived=False, booking__archived=False)
+    booked_opportunities = opportunities.filter(booking__archived=False)
     lost_opportunities = opportunities.filter(archived=True).exclude(sale__archived=False)
 
     context['opportunities'] = opportunities.count()
     context['live_opportunities'] = live_opportunities.count()
-    context['closed_opportunities'] = closed_opportunities.count()
+    context['sold_opportunities'] = sold_opportunities.count()
+    context['booked_opportunities'] = booked_opportunities.count()
     context['lost_opportunities'] = lost_opportunities.count()
     
     if live_opportunities:
@@ -490,10 +492,15 @@ def get_pipeline(request):
     else:
         context['live_value'] = 0
 
-    if closed_opportunities:
-        context['closed_value'] = float(closed_opportunities.aggregate(Sum('campaign__product_cost')).get('campaign__product_cost__sum', 0))
+    if sold_opportunities:
+        context['sold_value'] = float(sold_opportunities.aggregate(Sum('campaign__product_cost')).get('campaign__product_cost__sum', 0))
     else:
-        context['closed_value'] = 0
+        context['sold_value'] = 0
+
+    if booked_opportunities:
+        context['booked_value'] = float(booked_opportunities.aggregate(Sum('campaign__product_cost')).get('campaign__product_cost__sum', 0))
+    else:
+        context['booked_value'] = 0
 
     if lost_opportunities:
         context['lost_value'] = float(lost_opportunities.aggregate(Sum('campaign__product_cost')).get('campaign__product_cost__sum', 0))
@@ -506,11 +513,18 @@ def get_pipeline(request):
         context['opportunities_value'] = 0
 
     if context['live_opportunities'] or context['lost_opportunities']:
-        context['conversion_rate'] = (context['closed_opportunities'] / (context['live_opportunities'] + context['lost_opportunities'])) * 100
+        context['booked_rate'] = (context['booked_opportunities'] / (context['live_opportunities'] + context['lost_opportunities'])) * 100
     elif context['live_opportunities']:
-        context['conversion_rate'] = 100
+        context['booked_rate'] = 100
     else:
-        context['conversion_rate'] = 0
+        context['booked_rate'] = 0
+
+    if context['live_opportunities'] or context['lost_opportunities']:
+        context['sold_rate'] = (context['sold_opportunities'] / (context['booked_opportunities'])) * 100
+    elif context['live_opportunities']:
+        context['sold_rate'] = 100
+    else:
+        context['sold_rate'] = 0
     context['start_date'] = start_date
     context['end_date'] = end_date
     context['minimum_site_subscription_level_in_query'] = get_minimum_site_subscription_level_from_site_qs(sites)

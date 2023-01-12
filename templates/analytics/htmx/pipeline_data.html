@@ -16,10 +16,18 @@
         </div>
         <div class="row" style="color:green">
             <div class="col center">
-                Closed
+                Sold
             </div>
             <div class="col center">
-                {{closed_opportunities}}
+                {{sold_opportunities}}
+            </div>
+        </div>
+        <div class="row" style="color:blue">
+            <div class="col center">
+                Booked
+            </div>
+            <div class="col center">
+                {{booked_opportunities}}
             </div>
         </div>
         <div class="row" style="color:grey">
@@ -47,10 +55,18 @@
         </div>
         <div class="row" style="color:green">
             <div class="col center">
-                Closed
+                Sold
             </div>
             <div class="col center">
-                £{{closed_value|floatformat:2}}
+                £{{sold_value|floatformat:2}}
+            </div>
+        </div>
+        <div class="row" style="color:blue">
+            <div class="col center">
+                Booked
+            </div>
+            <div class="col center">
+                £{{booked_value|floatformat:2}}
             </div>
         </div>
         <div class="row" style="color:grey">
@@ -71,8 +87,10 @@
         </div>
     </div>
     <div class="col center">
-        <h5>Conversion Rate</h5>
-        <h6>{{conversion_rate|floatformat:2}}%</h6>
+        <h5 class="mt-2">Sold Rate</h5>
+        <h6 style="color:green">{{sold_rate|floatformat:2}}% <br>of booked leads were sold</h6>
+        <h5>Booked Rate</h5>
+        <h6 style="color:blue">{{booked_rate|floatformat:2}}% <br>of leads were booked</h6>
     </div>
 </div>
 {%else%}

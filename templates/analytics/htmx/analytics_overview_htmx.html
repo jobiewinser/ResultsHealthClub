@@ -37,9 +37,9 @@
         {%include 'campaign_leads/htmx/campaign_select.html'%}
         {% comment %} {%endif%} {% endcomment %}
 
-        <button hidden hx-get="{% url 'analytics-overview' %}" hx-push-url="false" hx-swap="innerHTML" hx-include=".non_site_dependant_analytics_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_site" hx-vals='{"test":"test"}' class="btn btn-primary btn-sm"></button>
+        <button hidden hx-get="{% url 'analytics-overview' %}" hx-push-url="false" hx-swap="innerHTML" hx-include=".non_site_dependant_analytics_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
         <button hidden hx-get="{%url 'analytics-overview'%}" onclick="$('#campaign_pk').val('').trigger('change')"
-        hx-push-url="false" hx-swap="innerHTML" hx-include=".overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_campaign_category" class="btn btn-primary btn-sm"></button>
+        hx-push-url="false" hx-swap="innerHTML" hx-include=".overview_table_filters, .non_site_dependant_analytics_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_campaign_category" class="btn btn-primary btn-sm"></button>
         <button hidden
             hx-get="{%url 'refresh-analytics'%}"
             hx-swap="outerHTML" hx-push-url="false" hx-include=".non_site_dependant_analytics_filters" hx-indicator="#page_load_indicator" hx-target="#analytics_span_wrapper" id="filter_campaign"></button>
