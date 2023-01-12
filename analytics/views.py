@@ -57,10 +57,11 @@ def refresh_analytics(request):
     return render(request, 'analytics/htmx/analytics_content.html', get_analytics_context(request))
 
 def get_minimum_site_subscription_level_from_site_qs(site_qs):
-    lowest_subscription_site = site_qs.order_by('subscription_new__numerical').first()
-    if lowest_subscription_site:
-        print(lowest_subscription_site)
-        return lowest_subscription_site.subscription_new
+    if site_qs:
+        lowest_subscription_site = site_qs.order_by('subscription_new__numerical').first()
+        if lowest_subscription_site:
+            print(lowest_subscription_site)
+            return lowest_subscription_site.subscription_new
     return Subscription.objects.get(numerical=2)
 # def get_minimum_site_subscription_level_from_campaign_qs(campaign_qs):
 #     for numerical in [0,1,2]:
