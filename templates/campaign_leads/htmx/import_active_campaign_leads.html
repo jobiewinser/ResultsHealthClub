@@ -10,6 +10,10 @@
                         <div id="campaign_list_wrapper">    
                             <label for="campaign_pks" style="width:300px">
                                 Import for Campaign <br>
+                                
+                                {%if demo and not request.user.is_superuser%}
+                                Here you can import existing leads from your active campaign account into our system. This is disabled for the demo
+                                {%else%} 
                                 <button hidden hx-get="{%url 'get-contacts-for-campaign'%}" hx-swap="innerHTML" hx-target="#import_contact_div" hx-indicator="#page_load_indicator" hx-include="#import_campaign_pk" id="import_campaign_button"></button>
                                 <select class="form-control select2-styling generic_modal_body_select" id="import_campaign_pk" name="campaign_pk" style="width:400px" onchange="$('#import_campaign_button').click()">
                                     <option selected></option>
@@ -19,6 +23,7 @@
                                     </option>
                                     {%endfor%}
                                 </select>
+                                {%endif%} 
                             </label>
                         </div>
                     </div>                    

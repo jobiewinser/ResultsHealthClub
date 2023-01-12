@@ -519,9 +519,9 @@ def get_pipeline(request):
     else:
         context['booked_rate'] = 0
 
-    if context['live_opportunities'] or context['lost_opportunities']:
+    if context['booked_opportunities']:
         context['sold_rate'] = (context['sold_opportunities'] / (context['booked_opportunities'])) * 100
-    elif context['live_opportunities']:
+    elif context['sold_opportunities']:
         context['sold_rate'] = 100
     else:
         context['sold_rate'] = 0
