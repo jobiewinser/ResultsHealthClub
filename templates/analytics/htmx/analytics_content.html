@@ -18,7 +18,7 @@
                     <div class="col p-0">
                     </div>
                     <div class="col m-1 right p-0">
-                        <input id="start_date" value="{%if start_date%}{{start_date}}{%else%}{{''|today_date_tag|add_days:-7|date_to_date_input_prefill}}{%endif%}" 
+                        <input id="start_date" value="{%if start_date%}{{start_date}}{%elif not end_date and not start_date and minimum_site_subscription_level_in_query.numerical|to_int == 0%}{{''|today_date_tag|add_days:-7|date_to_date_input_prefill}}{%elif not end_date and not start_date and not minimum_site_subscription_level_in_query.numerical|to_int == 0%}{{''|today_date_tag|add_months:-1|date_to_date_input_prefill}}{%endif%}" 
                             min="{%if minimum_site_subscription_level_in_query.analytics_seconds and not request.user.profile.active_sites_allowed.first.created > ''|today_date_tag|subtract_seconds_to_days_rounded_up:minimum_site_subscription_level_in_query.analytics_seconds%}{{''|today_date_tag|subtract_seconds_to_days_rounded_up:minimum_site_subscription_level_in_query.analytics_seconds|date_to_date_input_prefill}}{%else%}{{request.user.profile.active_sites_allowed.first.created|date_to_date_input_prefill}}{%endif%}" 
                             max="{{''|today_date_input_tag}}" class="form-control form-control-xs non_site_dependant_analytics_filters" type="date" name="start_date"
                             onchange="$('#refresh_analytics').click();"/>
