@@ -80,7 +80,7 @@
                             >
                             <button 
                                 {% comment %} {%if request.user.profile.active_sites_allowed.first.created > ''|today_date_tag|add_days:-7 %}disabled{%endif%} {% endcomment %}
-                                class="btn btn-secondary btn-xs quick_filter_date_button {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_tag|add_days:-7|date_to_date_input_prefill%}active{%elif not end_date and not start_date%}active{%endif%}" 
+                                class="btn btn-secondary btn-xs quick_filter_date_button {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_tag|add_days:-7|date_to_date_input_prefill%}active{%elif not end_date and not start_date and minimum_site_subscription_level_in_query.numerical|to_int == 0%}active{%endif%}" 
                                 onclick="$('#start_date').val('{{''|today_date_tag|add_days:-7|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change'); $('.quick_filter_date_button').removeClass('active'); $(this).addClass('active');">
                                 <small>{{''|today_date_tag|add_days:-7|nice_date_tag}} (week)</small>
                             </button>
@@ -110,7 +110,7 @@
                             <button 
                                 {%if minimum_site_subscription_level_in_query.numerical|to_int == 0 and not demo%}disabled{%endif%}
                                 {% comment %} {%if request.user.profile.active_sites_allowed.first.created > ''|today_date_tag|add_months:-1 %}disabled{%endif%} {% endcomment %}
-                                class="btn btn-secondary btn-xs quick_filter_date_button {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_tag|add_months:-1|date_to_date_input_prefill%}active{%endif%}" 
+                                class="btn btn-secondary btn-xs quick_filter_date_button {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_tag|add_months:-1|date_to_date_input_prefill%}active{%elif not end_date and not start_date and not minimum_site_subscription_level_in_query.numerical|to_int == 0%}active{%endif%}" 
                                 onclick="$('#start_date').val('{{''|today_date_tag|add_months:-1|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change'); $('.quick_filter_date_button').removeClass('active'); $(this).addClass('active');">
                                 <small>{{''|today_date_tag|add_months:-1|nice_date_tag}} (month) {%if minimum_site_subscription_level_in_query.numerical|to_int == 0%}<b>Basic</b>{%endif%}</small>
                             </button>

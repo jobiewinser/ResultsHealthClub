@@ -87,6 +87,7 @@ function select2stuff(){
     
     $('.generic_modal_body_select').select2({
         dropdownCssClass: "generic_modal_body_dropdown",
+        dropdownParent: $("#generic_modal"),
         // searchInputPlaceholder: '🔎 Search here...',        
         // theme: 'bootstrap-5',
       });
@@ -188,7 +189,10 @@ function basehandlehtmxafterRequest(evt){
             }else if (evt.detail.pathInfo.requestPath.includes("submit-feedback-form")){
                 $('#generic_modal').modal('hide');
                 snackbarShow('Successfully submitted feedback', 'success')
-            }
+            } else if (evt.detail.pathInfo.requestPath.includes("import-active-campaign-leads")){
+                $('#generic_modal').modal('hide');
+                snackbarShow(evt.detail.xhr.responseText, 'success')
+            } 
             
             
             

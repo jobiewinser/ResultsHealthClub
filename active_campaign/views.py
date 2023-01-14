@@ -32,23 +32,21 @@ class Webhooks(View):
                         if campaign.site:
                             if campaign.site.active_campaign_leads_enabled:
                                 phone_number_whole = str(data.get('contact[phone]', "")).replace(' ','').replace('+','')
-
-                                # possible_duplicate  = False
-                                # today = datetime.now().date()
-                                # tomorrow = today + timedelta(1)
-                                # today_start = datetime.combine(today, time())
-                                # today_end = datetime.combine(tomorrow, time())
-                                campaign_lead, created = Campaignlead.objects.get_or_create(
+                                if not Campaignlead.objects.filter(
                                         active_campaign_contact_id=data.get('contact[id]'),
                                         campaign=campaign,
-                                    )
-                                campaign_lead.first_name=data.get('contact[first_name]', "None")
-                                campaign_lead.whatsapp_number=phone_number_whole
-                                campaign_lead.active_campaign_form_id=data.get('form[id]', None)
-                                campaign_lead.email = data.get('contact[email]', "")
-                                
-                                campaign_lead.save()
-                                campaign_lead.trigger_refresh_websocket(refresh_position=True)
+                                    ).exclude(archived=True).exclude(sale__archived=False):                                    
+                                    campaign_lead, created = Campaignlead.objects.get_or_create(
+                                            active_campaign_contact_id=data.get('contact[id]'),
+                                            campaign=campaign,
+                                        )
+                                    campaign_lead.first_name=data.get('contact[first_name]', "None")
+                                    campaign_lead.whatsapp_number=phone_number_whole
+                                    campaign_lead.active_campaign_form_id=data.get('form[id]', None)
+                                    campaign_lead.email = data.get('contact[email]', "")
+                                    
+                                    campaign_lead.save()
+                                    campaign_lead.trigger_refresh_websocket(refresh_position=True)
             return HttpResponse( "text", 200)
      
 logger = logging.getLogger(__name__)
@@ -101,22 +99,28 @@ def set_active_campaign_leads_status(request, **kwargs):
 @login_required
 def import_active_campaign_leads(request, **kwargs):
     try:
+        successful_import = False
         active_campaign_contact_id_list = request.POST.getlist('active_campaign_contact_id[]')
         active_campaign_api = ActiveCampaignApi(request.user.profile.company.active_campaign_api_key, request.user.profile.company.active_campaign_url)
-        contacts = active_campaign_api.list_contacts_by_id_list(active_campaign_contact_id_list)
-        campaign = ActiveCampaign.objects.get(pk=request.POST.get('campaign_pk'))
-        for contact in contacts:
-            if not Campaignlead.objects.filter(active_campaign_contact_id__in=contact['id'], campaign=campaign):
-                lead = Campaignlead()
-                refresh_position = True
-                lead.campaign = campaign
-                lead.first_name = contact.get('firstName')
-                lead.last_name = contact.get('lastName')
-                lead.email = contact.get('email')
-                lead.whatsapp_number = contact.get('phone')
-                lead.save()
-                lead.trigger_refresh_websocket(refresh_position=refresh_position)
-        return HttpResponse("Successfully import contacts", status=200)
+        if active_campaign_contact_id_list:
+            contacts = active_campaign_api.list_contacts_by_id_list(active_campaign_contact_id_list)
+            campaign = ActiveCampaign.objects.get(pk=request.POST.get('campaign_pk'))
+            for contact in contacts:
+                if not Campaignlead.objects.filter(active_campaign_contact_id=contact['id'], campaign=campaign).exclude(archived=True).exclude(sale__archived=False):
+                    lead = Campaignlead()
+                    lead.active_campaign_contact_id = contact['id']
+                    refresh_position = True
+                    lead.campaign = campaign
+                    lead.first_name = contact.get('firstName')
+                    lead.last_name = contact.get('lastName')
+                    lead.email = contact.get('email')
+                    lead.whatsapp_number = contact.get('phone')
+                    lead.save()
+                    lead.trigger_refresh_websocket(refresh_position=refresh_position)
+                    successful_import = True
+        if successful_import:
+            return HttpResponse("Successfully import contacts", status=200)
+        return HttpResponse("No valid contacts selected", status=400)
     except Exception as e:        
         logger.error(f"import_active_campaign_leads {str(e)}")
         return HttpResponse("Couldn't import_active_campaign_leads", status=500)

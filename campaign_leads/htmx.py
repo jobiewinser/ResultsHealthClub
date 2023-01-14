@@ -406,6 +406,6 @@ def get_contacts_for_campaign(request, **kwargs):
     contact_id_list = []
     for contact in contacts:
         contact_id_list.append(contact.get('id'))
-    context['campaign_lead_ids'] = Campaignlead.objects.filter(active_campaign_contact_id__in=contact_id_list).values_list('active_campaign_contact_id', flat=True)
+    context['campaign_lead_ids'] = list(Campaignlead.objects.filter(active_campaign_contact_id__in=contact_id_list, campaign=campaign).exclude(archived=True).exclude(sale__archived=False).values_list('active_campaign_contact_id', flat=True))
     context['contacts'] = contacts
     return render(request, "campaign_leads/htmx/import_contact_div_contents.html", context)

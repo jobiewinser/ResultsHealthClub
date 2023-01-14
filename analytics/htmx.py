@@ -23,8 +23,12 @@ def check_if_start_date_allowed_and_replace(start_date, lead_qs=None, site_qs=No
     earliest_site = site_qs.order_by('created').first()
     if subscription.analytics_seconds: 
         minimum_datetime_allowed = datetime.now() - relativedelta.relativedelta(days = round(subscription.analytics_seconds/86400))
-    else:
+    elif earliest_site:
         minimum_datetime_allowed = earliest_site.created
+    else:
+        return datetime.now()
+        
+        
     if start_date > minimum_datetime_allowed and start_date > earliest_site.created: #if queried date is all good
         return start_date
     if start_date > earliest_site.created: #if queried date is correctly after earliest site in query
