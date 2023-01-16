@@ -127,7 +127,7 @@ def get_modal_content(request, **kwargs):
     try:
         request.GET._mutable = True
         context = {}
-        conetxt['sites'] = get_site_pks_from_request_and_return_sites(request)
+        context['sites'] = get_site_pks_from_request_and_return_sites(request)
 
 
         whatsapp_message_image_pk = request.GET.get('whatsapp_message_image_pk')
