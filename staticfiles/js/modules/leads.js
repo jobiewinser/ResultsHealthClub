@@ -24,7 +24,15 @@ function leadshandlehtmxafterSwap(evt){
                 document.getElementById('notification2').play();
                 set_total_costs();
                 set_lead_counts();                
-            }
+            } else if (evt.detail.pathInfo.requestPath.includes("get-contacts-for-campaign")){
+                try{$('#import_contact_table').dataTable().fnDestroy()}catch{};
+                $('#import_contact_table').DataTable(            
+                {  
+                    order: [[ 2, 'desc' ]],
+                    iDisplayLength: 10
+                }
+                );        
+            }            
         }             
     }
 }

@@ -135,6 +135,11 @@ def prefill_time_input_with_now(nothing):
         return ""
 
 @register.filter
+def convert_string_to_datetime(string):
+    dt_object = datetime.strptime(string, "%Y-%m-%d %H:%M:%S")
+    return dt_object
+
+@register.filter
 def nice_date_tag(date):
     try:
         date = date + datetime.timedelta(hours=1)
