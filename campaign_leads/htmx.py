@@ -124,6 +124,7 @@ def edit_lead(request, **kwargs):
     
     country_code = request.POST.get('country_code', "")
     
+    disabled_automated_messaging = request.POST.get('enable_automated_messaging', 'on') == 'off'
     product_cost = request.POST.get('product_cost', 0)
     
     lead_pk = request.POST.get('lead_pk')
@@ -140,6 +141,7 @@ def edit_lead(request, **kwargs):
     lead.whatsapp_number = f"{country_code}{phone}"
     if product_cost:
         lead.product_cost = product_cost
+    lead.disabled_automated_messaging = disabled_automated_messaging
     
     lead.save()
     lead.trigger_refresh_websocket(refresh_position=refresh_position)

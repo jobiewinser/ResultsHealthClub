@@ -90,29 +90,29 @@
 </td>
 <td>
     {%if not template.name == 'hello_world' and not template.status == 'PENDING' and not template.status == 'AWAITING_APPROVAL'%}
-    {%if template.pending_components%}
-    <button 
-        class="btn btn-danger btn-sm m-1" hx-confirm="Are you sure you want to clear your changes made to this template since the last whatsapp approval?"
-        hx-post="{% url 'whatsapp-clear-changes' %}" hx-vals='{"template_pk":"{{template.pk}}"}' 
-        hx-indicator="#page_load_indicator" hx-target="#template_row_{{template.pk}}"
-        hx-swap="innerHTML"
-        ><i class="fa fa-arrow-rotate-left"></i> Clear Changes</button>
-    {%if ''|today_date_tag|timestamp < template.last_approval|add_days:1|timestamp and not template.status == 'REJECTED'%}
-    <span
-        data-bs-toggle="popover" 
-        data-bs-trigger="hover focus" 
-        data-bs-html="true" 
-        data-bs-placement="top"
-        data-bs-title="What does this do?"
-        data-bs-content="
-        <p>
-            This template has been submitted to Whatsapp for approval in the last 24 hours, please wait until {{template.last_approval|add_days:1|nice_datetime_tag}}.
-        </p>
-        "
-    ><button disabled
-    {%else%}
-    <span><button 
-    {%endif%}
+        {%if template.pending_components%}
+        <button 
+            class="btn btn-danger btn-sm m-1" hx-confirm="Are you sure you want to clear your changes made to this template since the last whatsapp approval?"
+            hx-post="{% url 'whatsapp-clear-changes' %}" hx-vals='{"template_pk":"{{template.pk}}"}' 
+            hx-indicator="#page_load_indicator" hx-target="#template_row_{{template.pk}}"
+            hx-swap="innerHTML"
+            ><i class="fa fa-arrow-rotate-left"></i> Clear Changes</button>
+        {%if ''|today_date_tag|timestamp < template.last_approval|add_days:1|timestamp and not template.status == 'REJECTED'%}
+        <span
+            data-bs-toggle="popover" 
+            data-bs-trigger="hover focus" 
+            data-bs-html="true" 
+            data-bs-placement="top"
+            data-bs-title="What does this do?"
+            data-bs-content="
+            <p>
+                This template has been submitted to Whatsapp for approval in the last 24 hours, please wait until {{template.last_approval|add_days:1|nice_datetime_tag}}.
+            </p>
+            "
+        ><button disabled
+        {%else%}
+        <span><button 
+        {%endif%}
         <button class="btn btn-success btn-sm m-1" hx-confirm="Are you sure you want to request approval for this template?"
         hx-post="{% url 'whatsapp-approval' %}" hx-vals='{"template_pk":"{{template.pk}}"}' 
         hx-indicator="#page_load_indicator" hx-target="#template_row_{{template.pk}}"
@@ -121,6 +121,23 @@
     </span>
     {%endif%}
     
+
+        {%if '{{' in template.components|to_str%}
+        <a class="btn btn-warning btn-sm m-1 pointer" 
+                hx-indicator="#page_load_indicator"
+                hx-get="{%url 'whatsapp-template-import' template_pk=template.pk %}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML"
+                data-bs-toggle="popover" 
+                data-bs-trigger="hover focus" 
+                data-bs-html="true" 
+                data-bs-placement="top"
+                data-bs-title="What does this do?"
+                data-bs-content="
+                <p>
+                    Clicking this will allow you configure an existing template within Whatsapp Manager for use within the Leads Management system.
+                </p>
+                "><i class="fa fa-pencil" aria-hidden="true"></i> Configure
+        </a>
+        {%else%}
         <span>
             <a class="btn btn-warning btn-sm m-1 pointer" 
                     hx-indicator="#page_load_indicator"
@@ -154,7 +171,10 @@
                 "><i class="fa fa-pencil" aria-hidden="true"></i> View
             </button>
         </span>
+        {%endif%}
     
+
+
     <button class="btn btn-dark btn-sm m-1" 
         {%if demo or debug%}disabled{%endif%}
         hx-post="{%url 'whatsapp-template-delete'%}"

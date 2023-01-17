@@ -197,7 +197,7 @@ class Campaignlead(models.Model):
                 return mark_safe(f"{rendered_html} {delete_htmx}")
 
     def send_template_whatsapp_message(self, whatsappnumber=None, send_order=None, template=None, communication_method = 'a'):
-        if self.disabled_automated_messaging:
+        if self.disabled_automated_messaging and send_order:
             pass #not sure if anything needs to happen here yet. will probably indicate on the leads card that messaging is disabled
         else:
             print("Campaignlead send_template_whatsapp_message", whatsappnumber, send_order, template, communication_method)

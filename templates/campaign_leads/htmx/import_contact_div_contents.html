@@ -1,7 +1,7 @@
 {%load core_tags%}
 <div class="alert alert-info">
     <p>
-        Select contacts to import onto your leads board and then click submit below.
+        Select contacts to import onto your leads board and then click Import below.
     </p>
     <p>
         <small>
@@ -59,10 +59,10 @@
 <div class="row m-1">
     <div class="col center">
         <button class="btn btn-primary" type="submit" {%if demo and not request.user.is_superuser%}disabled{%endif%}>
-            Submit
+            Import
         </button>
         <button class="btn btn-light" name="disabled_automated_messaging" value="true" type="submit" {%if demo and not request.user.is_superuser%}disabled{%endif%}>
-            Submit (no automatic Whatsapp Messages)
+            Import (no automatic Whatsapp Messages)
         </button>
     </div>
 </div>

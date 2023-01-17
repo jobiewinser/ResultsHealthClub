@@ -376,6 +376,22 @@ class WhatsappTemplatesEditView(TemplateView):
 
 @method_decorator(login_required, name='dispatch')
 @method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
+class WhatsappTemplatesImportView(TemplateView):
+    template_name='whatsapp/whatsapp_template_configure.html'
+
+    def get_context_data(self, **kwargs):
+        self.request.GET._mutable = True     
+        if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+            self.template_name = 'whatsapp/htmx/whatsapp_template_configure_htmx.html'   
+        context = super(WhatsappTemplatesImportView, self).get_context_data(**kwargs)
+        template = WhatsappTemplate.objects.get(pk=kwargs.get('template_pk'))
+        if self.request.user.profile.company == template.company:
+            context['template'] = template
+            context['variables'] = template_variables
+            return context
+
+@method_decorator(login_required, name='dispatch')
+@method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
 class WhatsappTemplatesReadOnlyView(WhatsappTemplatesEditView):
     def get_context_data(self, **kwargs):  
         context = super(WhatsappTemplatesReadOnlyView, self).get_context_data(**kwargs)
