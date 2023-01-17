@@ -56,12 +56,15 @@
         <span class="secondary_td_layer">
             {%if not lead.message_set.all%}
                 <button class="btn btn-sm btn-secondary position-relative" 
-                    hx-get="{%url 'send-first-template-whatsapp-booking-row' lead_pk=lead.pk%}"
+                    {%if lead.disabled_automated_messaging%}
+                    onclick="alert(`This lead is marked as don't automatically message. Please manually send a template from the message window at the bottom of your screen.`)"
+                    {%else%}
+                    hx-post="{%url 'send-first-template-whatsapp-booking-row' lead_pk=lead.pk%}"
                     hx-indicator="#page_load_indicator" 
-                    {% comment %} hx-include="#max_call_count" {% endcomment %}
                     hx-target="#row_{{lead.pk}}"
                     hx-push-url="false"
                     hx-swap="innerHTML" hx-trigger="click"  
+                    {%endif%}
                     data-customer-number="{{lead.whatsapp_number}}">
                         Send <i class="fa fa-whatsapp"></i>
                 </button>

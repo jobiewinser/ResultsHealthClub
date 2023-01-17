@@ -16,7 +16,7 @@ from django.conf import settings
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 logger = logging.getLogger(__name__)
-
+from whatsapp.models import WhatsAppMessage
 
 @login_required
 def get_modal_content(request, **kwargs):
@@ -55,8 +55,28 @@ def get_modal_content(request, **kwargs):
                 if site_pk:
                     context["site"] = Site.objects.get(pk=site_pk)            
             elif template_name == 'send_new_template_message':
+                
                 whatsappnumber_pk = request.GET.get('whatsappnumber_pk', None)
-                context['whatsappnumber'] = WhatsappNumber.objects.get(pk=whatsappnumber_pk)
+                
+                if whatsappnumber_pk:
+                    whatsappnumber = WhatsappNumber.objects.get(pk=whatsappnumber_pk)
+                else:
+                    lead_pk = request.GET.get('lead_pk') 
+                    # latest_message = WhatsAppMessage.objects.filter(customer_number=customer_number, whatsappnumber__whatsapp_business_account__site=site).order_by('datetime').last()
+                    # if latest_message:
+                    #     whatsappnumber = latest_message.whatsappnumber
+                    # else:
+                    if lead_pk:
+                        lead = Campaignlead.objects.get(pk=lead_pk)
+                    else:
+                        customer_number = request.GET.get('customer_number') 
+                        site = Site.objects.filter(pk=request.GET.get('site_pk')).first()
+                        lead = Campaignlead.objects.filter(campaign__site=site, whatsapp_number=customer_number).last()
+                        context['customer_numbers'] = [customer_number]    
+                    context['lead'] = lead
+                    whatsappnumber = lead.campaign.whatsapp_business_account.whatsappnumber
+                context['whatsappnumber'] = whatsappnumber
+                 
                 # context['site'] = context['whatsappnumber'].whatsapp_business_account.site
                 lead_pk = request.GET.get('lead_pk', None)
                 contact_pk = request.GET.get('contact_pk', None)

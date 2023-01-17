@@ -8,7 +8,7 @@ class Command(BaseCommand):
     help = 'help text'
 
     def handle(self, *args, **options):
-        for campaign_lead in Campaignlead.objects.filter(booking=None).exclude(sale__archived=True).exclude(archived=True):
+        for campaign_lead in Campaignlead.objects.filter(booking=None).exclude(sale__archived=True).exclude(archived=True).exclude(disabled_automated_messaging=True):
             whatsapp_messages = WhatsAppMessage.objects.filter(lead=campaign_lead)
             day_ago =  datetime.now() - timedelta(days = 1)
             if not whatsapp_messages.filter(datetime__gte=day_ago):

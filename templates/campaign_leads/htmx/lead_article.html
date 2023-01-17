@@ -36,32 +36,54 @@
                 </span>
             </div>
             <div class="col-md-auto p-0">
-                
-                {%if not lead.message_set.all%}
-                <button class="btn btn-sm btn-secondary position-relative" 
-                    hx-get="{%url 'send-first-template-whatsapp-lead-article' lead_pk=lead.pk%}"
-                    hx-indicator="#page_load_indicator" 
-                    hx-include="#max_call_count"
-                    hx-swap="none"
-                    onclick="$('#page_load_indicator').addClass('htmx-request')"
-                    hx-push-url="false"
-                    hx-trigger="click delay:0.5s"  
-                    data-customer-number="{{lead.whatsapp_number}}">
-                        Send <i class="fa fa-whatsapp"></i>
-                </button>
-                {%else%}
-                    <button class="btn btn-sm btn-success text-white position-relative"                     
-                        hx-get="{%url 'message-list'%}"
-                        hx-target="#chat_bottom"
-                        hx-swap="outerHTML"
-                        hx-indicator="#page_load_indicator"                 
-                        hx-vals='{"site_pk": "{{lead.campaign.site.pk}}", "customer_number": "{{lead.whatsapp_number}}"}'
-                        hx-trigger="click"                        
-                        onclick="$('#chat_card_{{lead.whatsapp_number}}').remove(); $('#chat_list_bottom_window').remove();"
+                <div class="btn-group btn-space mt-0 dropdown position-relative" style="height: 20px">
+                    {%if not lead.message_set.exists%}
+                    <button class="btn btn-space btn-xs btn-secondary nowrap ps-1 pe-1"                     
+                        {%if lead.disabled_automated_messaging%}
+                        onclick="alert(`This lead is marked as don't automatically message. Please manually send a template instead.`);"
+                        {%else%}
+                        hx-include="#max_call_count"
+                        hx-post="{%url 'send-first-template-whatsapp-lead-article' lead_pk=lead.pk%}"
+                        hx-indicator="#page_load_indicator" 
+                        hx-push-url="false"
+                        hx-swap="none" hx-trigger="click"  
+                        {%endif%}
                         data-customer-number="{{lead.whatsapp_number}}">
-                            Chat <i class="fa fa-whatsapp"></i>
+                            Send <i class="fa fa-whatsapp"></i>
                     </button>
-                {%endif%}
+                    {%else%}
+                        <button class="btn btn-space btn-xs btn-success nowrap ps-1 pe-1"                     
+                            hx-get="{%url 'message-list'%}"
+                            hx-target="#chat_bottom"
+                            hx-swap="outerHTML"
+                            hx-indicator="#page_load_indicator"                 
+                            hx-vals='{"site_pk": "{{lead.campaign.site.pk}}", "customer_number": "{{lead.whatsapp_number}}"}'
+                            hx-trigger="click"                        
+                            onclick="$('#chat_card_{{lead.whatsapp_number}}').remove(); $('#chat_list_bottom_window').remove();"
+                            data-customer-number="{{lead.whatsapp_number}}">
+                                Chat <i class="fa fa-whatsapp"></i>
+                        </button>
+                    {%endif%}    
+
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="#" id="send_new_template_message_{{lead.pk}}"
+                                hx-indicator="#htmx_indicator_messageCollapse_{{whatsappnumber.pk}}" hx-target="#generic_modal_body" 
+                                hx-get="{% url 'get-modal-content' %}" 
+                                hx-push-url="false"
+                                hx-vals='{"template_name": "send_new_template_message", "lead_pk": "{{lead.pk}}"}'
+                                hx-swap="innerHTML" hx-trigger="click">
+                                <small>Manually start a conversation using a template</small>
+                            </a>
+                        </li>
+                    </ul>    
+                    <button class="btn btn-space btn-{%if not lead.message_set.exists%}secondary{%else%}success{%endif%} btn-sm nowrap border-start ps-1 pe-1 pt-0" id="sold_{{lead.pk}}_dropdown"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fa-solid fa-chevron-down  fa-2xs"></i>
+                    </button>
+                </div>
+
+                
             </div>
         </div>
         <div class="row">
