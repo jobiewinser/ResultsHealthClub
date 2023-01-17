@@ -442,8 +442,10 @@ class Campaignlead(models.Model):
         
 
 def normalize_phone_number(number):
-    if number[:2] == '44':
-        number = '0' + number[2:]
+    if number:
+        if len(number) > 2:
+            if number[:2] == '44':
+                number = '0' + number[2:]
     return number
     
 @receiver(models.signals.post_save, sender=Campaignlead)
