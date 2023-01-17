@@ -9,7 +9,7 @@
     data-bs-title="Additional Information"
     data-bs-content="
     Last edited by: <b>{%if template.edited_by.profile.name%}{{template.edited_by.profile.name}}{%else%}Unknown{%endif%}</b>     
-    at <b>{%if template.edited.profile.name%}{{template.edited|nice_date_tag}}{%else%}Unknown{%endif%}</b>">
+    at <b>{%if template.edited%}{{template.edited|nice_date_tag}}{%else%}Unknown{%endif%}</b>">
     <i class="fa-solid fa-circle-info"></i>
     {%if template.name%}
         <small>({%if template.language%}{{template.language}}{%endif%})</small>
@@ -77,15 +77,14 @@
     {%if template.status%}
     <br>
     {%endif%}
-    {%if template.pending_components%}
-    <span class="secondary_td_layer nowrap">
-            {%if not template.status == 'AWAITING_APPROVAL' and not template.status == 'PENDING'%}Draft awaiting submission <i class="fa-solid fa-arrow-right"></i>{%else%}Waiting for Whatsapp approval{%endif%}          
-    </span>   
-    {%endif%}
     {%if '{{' in template.components|to_str%}
     <span class="secondary_td_layer nowrap">
             Needs configuring (coming soon)         
-    </span>   
+    </span>
+    {%elif template.pending_components%}
+    <span class="secondary_td_layer nowrap">
+            {%if not template.status == 'AWAITING_APPROVAL' and not template.status == 'PENDING'%}Draft awaiting submission <i class="fa-solid fa-arrow-right"></i>{%else%}Waiting for Whatsapp approval{%endif%}          
+    </span>  
     {%endif%}
 </td>
 <td>
@@ -121,23 +120,6 @@
     </span>
     {%endif%}
     
-
-        {%if '{{' in template.components|to_str%}
-        <a class="btn btn-warning btn-sm m-1 pointer" 
-                hx-indicator="#page_load_indicator"
-                hx-get="{%url 'whatsapp-template-import' template_pk=template.pk %}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML"
-                data-bs-toggle="popover" 
-                data-bs-trigger="hover focus" 
-                data-bs-html="true" 
-                data-bs-placement="top"
-                data-bs-title="What does this do?"
-                data-bs-content="
-                <p>
-                    Clicking this will allow you configure an existing template within Whatsapp Manager for use within the Leads Management system.
-                </p>
-                "><i class="fa fa-pencil" aria-hidden="true"></i> Configure
-        </a>
-        {%else%}
         <span>
             <a class="btn btn-warning btn-sm m-1 pointer" 
                     hx-indicator="#page_load_indicator"
@@ -151,7 +133,7 @@
                     <p>
                         Clicking edit will allow you to make changes to this template. These changes are not submitted to whatsapp until you choose to do so.
                     </p>
-                    "><i class="fa fa-pencil" aria-hidden="true"></i> Edit
+                    "><i class="fa fa-pencil" aria-hidden="true"></i> {%if '{{' in template.components|to_str%}Configure{%else%}Edit{%endif%}
                 </a>
         </span>
         <span>
@@ -171,7 +153,6 @@
                 "><i class="fa fa-pencil" aria-hidden="true"></i> View
             </button>
         </span>
-        {%endif%}
     
 
 

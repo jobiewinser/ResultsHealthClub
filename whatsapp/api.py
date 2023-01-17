@@ -242,8 +242,8 @@ class Whatsapp():
 
             
         body = { 
-            "name": template_object.pending_name,
-            "category": template_object.pending_category,
+            "name": template_object.pending_name or template_object.name,
+            "category": template_object.pending_category or template_object.category,
             "language": "en_GB",
             "components": pending_components,
         }
@@ -288,7 +288,7 @@ class Whatsapp():
             )
         elif message_template_id:
             AttachedError.objects.filter(
-                type__in = ['1300', '1301', '1302', '1303'],
+                type__in = ['1300', '1301', '1302', '1303', '0101','0104'],
                 whatsapp_template = template_object,
                 attached_field = "whatsapp_template",
                 archived = False,
@@ -319,18 +319,32 @@ class Whatsapp():
             if potential_error:
                 code = potential_error.get('code')
                 if str(code) == '100':
+                    if potential_error.get('error_subcode') == 33:
+                        error_type = '0104'
+                        # name = template_object.pending_name or template_object.name
+                        # version_int = check_last_two_and_return_version_int(name)
+                        # if version_int:
+                        #     name = name[:-1] + str(version_int + 1)
+                        # else:
+                        #     name = name + "_1"
+                        # template_object.pending_name = (template_object.pending_name or template_object.name) + "_1"
+                        # create_attempt = self.create_template(template_object)
+                        # if create_attempt:
+                        #     return create_attempt
+                    else:
+                        error_type = '0101'
                     AttachedError.objects.create(
-                        type = '0101',
+                        type = error_type,
                         attached_field = "whatsapp_template",
                         whatsapp_template = template_object,
                     )
             else:
                 AttachedError.objects.filter(
-                    type = '0101',
+                    type__in = ['0101','0104'],
                     whatsapp_template = template_object,
                     archived = False,
                 ).update(archived = True)
-
+            
             print("edit_template", str(response_body))
             return response_body
     #GET
@@ -430,3 +444,13 @@ def get_filename_from_cd(cd):
     if len(fname) == 0:
         return None
     return fname[0]
+
+
+# def check_last_two_and_return_version_int(string):
+#   if string[-2:] == '_':
+#     try:
+#       return int(string[-1])
+#     except ValueError:
+#       return False
+#   else:
+#     return False

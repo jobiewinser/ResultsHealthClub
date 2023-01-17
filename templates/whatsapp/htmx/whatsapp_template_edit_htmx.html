@@ -1,4 +1,4 @@
-{%load static%}
+{%load static core_tags%}
 <span>
     <script>
         var variables = {{variables|safe}}  
@@ -37,12 +37,21 @@
         <div class="col-md-auto p-0 m-1">
             <span class="badge bg-dark text-white"><h6 class="m-1">Edit Template</h6></span>          
         </div>
+        
         {%endblock extra_top_right_buttons %}    
     </div>   
     <div class="row mt-2 whatsapp_write_div">
         <div class="col">
             <div class="alert alert-info">
+                {%if '{{' in template.components|to_str%}
+                With this interface, you can import an existing Whatsapp template from Whatsapp Manager into the Leads Management System. This may not be compatible with any other whatsapp automation tools you use as they will likely use a different system to us.
+                <br>
+                To complete this process, please swap any {% verbatim %}{{1}}{% endverbatim %} or similar variables with valid ones using the "Insert variable" select box to the side. 
+                <br>
+                You can edit the template after this process is complete with the <i class="fa fa-pencil" aria-hidden="true"></i> Edit button on the whatsapp template list
+                {%else%}
                 The information below does not reflect the real template on Whatsapp, this is an edited draft that can be sent to Whatsapp for approval later through the Template Table.
+                {%endif%}
             </div>
         </div>
     </div>
