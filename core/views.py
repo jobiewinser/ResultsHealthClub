@@ -10,7 +10,7 @@ from django.contrib.sessions.models import Session
 from django.contrib.auth.models import User
 from calendly.api import Calendly
 from core.core_decorators import check_core_profile_requirements_fulfilled
-from core.models import ROLE_CHOICES, StripeCustomer, FreeTasterLink, FreeTasterLinkClick, Profile, Site, CompanyProfilePermissions, SiteProfilePermissions, Feedback, Subscription,SiteSubscriptionChange
+from core.models import ROLE_CHOICES, StripeCustomer, FreeTasterLink, FreeTasterLinkClick, Profile, Site, CompanyProfilePermissions, SiteProfilePermissions, Feedback, Subscription,SiteSubscriptionChange, Company
 from django.contrib.auth import authenticate
 from django.contrib.auth import login
 from django.core.exceptions import PermissionDenied
@@ -782,3 +782,22 @@ def detach_stripe_payment_method(request):
         return render(request, 'core/htmx/payment_methods.html', context)
     return HttpResponse(status=403)
 
+
+
+class RegisterNewCompanyView(TemplateView):
+    template_name='registration/register_new_company.html'
+    def get(self, request, *args, **kwargs):
+        # if request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+        #     self.template_name = 'core/change_log_htmx.html'
+        return super().get(request, *args, **kwargs)
+    # def post(self, request):
+    #     owner_email = request.POST.get('owner_email').lower()
+    #     company_name = request.POST.get('company_name')
+    #     password = request.POST.get('password')
+        
+    #     existing_users = User.objects.filter(email=owner_email)
+    #     existing_companies = Company.objects.filter(name__iexact=company_name)
+        
+    #     if existing_users:
+    #         return HttpResponse('<span swap-oob=""')
+        
