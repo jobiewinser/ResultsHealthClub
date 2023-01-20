@@ -782,22 +782,115 @@ def detach_stripe_payment_method(request):
         return render(request, 'core/htmx/payment_methods.html', context)
     return HttpResponse(status=403)
 
-
-
+from django.contrib.auth import get_user_model
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.mail import EmailMessage
+from django.template import loader
+import uuid
 class RegisterNewCompanyView(TemplateView):
     template_name='registration/register_new_company.html'
     def get(self, request, *args, **kwargs):
         # if request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
         #     self.template_name = 'core/change_log_htmx.html'
         return super().get(request, *args, **kwargs)
-    # def post(self, request):
-    #     owner_email = request.POST.get('owner_email').lower()
-    #     company_name = request.POST.get('company_name')
-    #     password = request.POST.get('password')
+    def post(self, request):
+        error_found = False
+        context= {'errors':{
+            'owner_email':[],
+            'company_name':[],
+            'password':[],
+        }}
+        Company.objects.filter(name__iexact = 'bleap').delete()
+        Profile.objects.filter(user__email__iexact = 'jobiewinser@live.co.uk').delete()
+        User.objects.filter(email__iexact = 'jobiewinser@live.co.uk').delete()
+            
+        owner_email = request.POST.get('owner_email').lower()
+        company_name = request.POST.get('company_name')
+        password = request.POST.get('password')
         
-    #     existing_users = User.objects.filter(email=owner_email)
-    #     existing_companies = Company.objects.filter(name__iexact=company_name)
+        context['owner_email'] = owner_email
+        context['company_name'] = company_name
+        context['password'] = password
         
-    #     if existing_users:
-    #         return HttpResponse('<span swap-oob=""')
         
+        for error in is_password_safe(password):
+            context['errors']['password'].append(error)
+            error_found = True
+        
+        existing_users = User.objects.filter(email=owner_email)
+        existing_companies = Company.objects.filter(name__iexact=company_name)
+        
+        if existing_users:
+            if existing_users.filter(is_active=True):
+                context['errors']['owner_email'].append("This email is already used within our system.")
+            else:
+                context['errors']['owner_email'].append("This email is already in the process of registering. <br>If they have not completed this in 24 hours, it will become available again.")
+            error_found = True
+        
+        if existing_companies:
+            if existing_companies.filter(is_active=True):
+                context['errors']['company_name'].append("This company already exists within our system.")
+            else:
+                context['errors']['company_name'].append("This company name is already in the process of registering. <br>If they have not completed this in 24 hours, it will become available again.")
+            
+            error_found = True
+            
+        if error_found:
+            return HttpResponse(render(request, "registration/register_new_company_snippet.html", context), status=200)
+        
+        user = User.objects.create(
+            email = owner_email,
+            username = owner_email,
+            password = password,
+            is_active = False,
+        )
+        
+        company = Company.objects.create(
+            name = company_name
+        )
+        
+        profile = Profile.objects.create(
+            user=user,
+            company = company,
+            register_uuid = str(uuid.uuid4())[:16]
+        )
+        
+        mail_subject = 'Activate your account.'
+        message = loader.render_to_string('registration/registration_email.html', {
+            'user': user,
+            'domain': os.getenv("SITE_URL"),
+            'profile': profile,
+        })
+        to_email = user.email
+        email = EmailMessage(
+            mail_subject, message, to=[to_email]
+        )
+        email.send()
+        return HttpResponse(render(request, "registration/register_new_company_success.html", context), status=200)
+                
+
+def activate(request, register_uuid, email):
+    try:
+        profile = Profile.objects.get(register_uuid=register_uuid, user__email__iexact=email)
+    except(Profile.DoesNotExist):
+        profile = None
+    if profile:
+        user = profile.user
+        user.is_active = True
+        user.save()
+        login(request, user, backend='core.backends.CustomBackend')
+        return redirect("/")
+    else:
+        return HttpResponse('Activation link is invalid!')
+    
+def is_password_safe(password):
+    if len(password) < 10:
+        yield "Password must be at least 10 characters Long"
+    if len(password) > 32:
+        yield "Password must be at most 32 characters Long"
+    if not any(char.isdigit() for char in password):
+        yield "Password must have a digit"
+    if not any(char.isupper() for char in password):
+        yield "Password must contain an upper case character"
+    if not any(char.islower() for char in password):
+        yield "Password must contain a lower case character"

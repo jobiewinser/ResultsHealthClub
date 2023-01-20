@@ -1,0 +1,65 @@
+<div class="text-center">
+    <h5 class="mb-0">Register your company!</h5>
+</div>
+{%if not demo or request.user.is_superuser%}
+<form class="mt-4 pt-2" hx-post="{%url 'register'%}" hx-indicator="#page_load_indicator" hx-swap="innerHTML" hx-target="#auth_content" id="login-form">
+  {% csrf_token %}
+  <div class="form-floating form-floating-custom mb-4">
+    <input type="text"
+      class="form-control"
+      id="company_name"
+      name="company_name"
+      value="{{company_name}}">
+    <label for="input-username">Company Name</label>
+    <div class="form-floating-icon">
+      <i class="fa-light fa-buildings"></i>
+    </div>
+  </div>
+  {%if errors.company_name%}
+  <ul>
+    {%for error in errors.company_name%}
+    <li class="text-danger">{{error|safe}}</li>
+    {%endfor%}
+  </ul>
+  {%endif%}
+  <div class="form-floating form-floating-custom mb-4">
+    <input type="email"
+      class="form-control"
+      id="owner_email"
+      name="owner_email"
+      value="{{owner_email}}">
+    <label for="input-username">Company Owner Email</label>
+    <div class="form-floating-icon">
+      <i class="fa-light fa-envelope"></i>
+    </div>
+  </div>
+  {%if errors.owner_email%}
+  <ul>
+    {%for error in errors.owner_email%}
+    <li class="text-danger">{{error|safe}}</li>
+    {%endfor%}
+  </ul>
+  {%endif%}
+  <div class="form-floating form-floating-custom mb-4">
+    <input type="password"
+      class="form-control"
+      id="password"
+      name="password"
+      value="{{password}}">
+    <label for="input-username">Password</label>
+    <div class="form-floating-icon">
+      <i class="fa-light fa-lock"></i>
+    </div>
+  </div>
+  {%if errors.password%}
+  <ul>
+    {%for error in errors.password%}
+    <li class="text-danger">{{error|safe}}</li>
+    {%endfor%}
+  </ul>
+  {%endif%}
+  <button class="btn btn-primary w-100 waves-effect waves-light" type="submit">Register</button>
+</form>
+{%else%}
+(Demo, Disabled) 
+{%endif%}

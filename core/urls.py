@@ -57,7 +57,8 @@ urlpatterns = [
     path('complete-stripe-subscription/', coreviews.complete_stripe_subscription, name='complete-stripe-subscription'),  
     path('renew-stripe-subscription/', coreviews.renew_stripe_subscription, name='renew-stripe-subscription'),  
     path('change-default-payment-method/', coreviews.change_default_payment_method, name='change-default-payment-method'),  
-    path('accounts/register/', coreviews.RegisterNewCompanyView.as_view(), name='register'),  
+    path('accounts/register/', coreviews.RegisterNewCompanyView.as_view(), name='register'), 
 
+    path('activate/<str:register_uuid>/<str:email>/', coreviews.activate, name='activate'),
 
 ]

@@ -740,7 +740,7 @@ class Company(models.Model):
     active_campaign_url = models.TextField(null=True, blank=True)
     active_campaign_api_key = models.TextField(null=True, blank=True)
     contact_email = models.TextField(blank=True, null=True, max_length=50)
-    
+    is_active = models.BooleanField(default=True)
     def get_subscription_sites(self, numerical):
         return self.site_set.filter(subscription_new__numerical=numerical)
     def outstanding_whatsapp_messages(self, user):
@@ -809,7 +809,7 @@ class Profile(models.Model):
     company = models.ForeignKey("core.Company", on_delete=models.SET_NULL, null=True, blank=True)
     sites_allowed = models.ManyToManyField("core.Site", related_name="profile_sites_allowed", null=True, blank=True)
     calendly_event_page_url = models.TextField(blank=True, null=True)
-    
+    register_uuid = models.TextField(null=True, blank=True)
     @property
     def active_sites_allowed(self):
         return self.sites_allowed.filter(active=True).order_by('created')
@@ -857,7 +857,7 @@ class Profile(models.Model):
             if not self.campaign_category.site == self.site:
                 self.campaign_category = None
                 self
-        if not self.site:
+        if not self.site and self.pk:
             self.site = self.sites_allowed.all().first()
         super(Profile, self).save(force_insert, force_update, using, update_fields)
         if not self.site in self.active_sites_allowed and self.site:

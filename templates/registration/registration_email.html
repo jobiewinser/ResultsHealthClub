@@ -1,0 +1,4 @@
+{% autoescape off %}
+    Welcome to Winser Systems!
+    Here is your activation link: <a href="{{domain}}{% url 'activate' register_uuid=profile.register_uuid  email=profile.user.email %}">Activate Your Account</a>
+{% endautoescape %}
