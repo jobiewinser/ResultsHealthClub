@@ -9,7 +9,11 @@
       class="form-control"
       id="company_name"
       name="company_name"
-      value="{{company_name}}">
+      {%if debug and not owner_email%}
+      value="bleap"
+      {%else%}
+      value="{{company_name}}"
+      {%endif%}>
     <label for="input-username">Company Name</label>
     <div class="form-floating-icon">
       <i class="fa-light fa-buildings"></i>
@@ -27,7 +31,11 @@
       class="form-control"
       id="owner_email"
       name="owner_email"
-      value="{{owner_email}}">
+      {%if debug and not owner_email%}
+      value="jobiewinser@live.co.uk"
+      {%else%}
+      value="{{owner_email}}"
+      {%endif%}>
     <label for="input-username">Company Owner Email</label>
     <div class="form-floating-icon">
       <i class="fa-light fa-envelope"></i>
@@ -45,7 +53,11 @@
       class="form-control"
       id="password"
       name="password"
-      value="{{password}}">
+      {%if debug and not password%}
+      value="2FDnfdsaDFjnfsda"
+      {%else%}
+      value="{{password}}"
+      {%endif%}>
     <label for="input-username">Password</label>
     <div class="form-floating-icon">
       <i class="fa-light fa-lock"></i>

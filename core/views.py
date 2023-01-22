@@ -855,19 +855,36 @@ class RegisterNewCompanyView(TemplateView):
             register_uuid = str(uuid.uuid4())[:16]
         )
         
-        mail_subject = 'Activate your account.'
         message = loader.render_to_string('registration/registration_email.html', {
             'user': user,
             'domain': os.getenv("SITE_URL"),
             'profile': profile,
+            'title': "Activate your account",
         })
-        to_email = user.email
-        email = EmailMessage(
-            mail_subject, message, to=[to_email]
-        )
-        email.send()
+        
+        send_email(user.email, 'Activate your account.', {"message": message})
         return HttpResponse(render(request, "registration/register_new_company_success.html", context), status=200)
-                
+
+def send_email(recipients, subject, messages):
+    
+    if settings.DEBUG:
+        messages['message'] = 'Debug - sent to jobiewinser@gmail.com instead of: ' +str(recipients)+ '<br>' + messages['message']
+        subject = "[DEBUG] "+subject
+        recipients = "jobiewinser@gmail.com"
+
+    if type(recipients) == str:
+        recipients = [recipients]
+
+    response = send_mail(
+        subject,
+        messages.get('plain_message',None) or '',
+        "jobiewinser@gmail.com",
+        recipients,
+        html_message=messages['message'],
+        fail_silently=False,
+    )
+    return response
+
 
 def activate(request, register_uuid, email):
     try:
