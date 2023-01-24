@@ -15,13 +15,13 @@
             <b>Name:</b> {{lead.name}}<br>
             <b>Number:</b> {{lead.whatsapp_number}}<br>
             <b>Email:</b> {{lead.email}}<br>
-            <b>Campaign:</b> {{lead.campaign.name}}<br>
+            <b>Campaign:</b> {{lead.campaign}}<br>
             <b>Site:</b> {{lead.campaign.site.name}}<br>
             <b>Created:</b> {{lead.created}}<br>
             <b>Last Dragged:</b> {{lead.last_dragged}}<br>
 
             <br>
-            <b>Campaign Cost (at lead creation):</b> {{lead.get_product_cost|floatformat:2}}<br>
+            <b>Cost:</b> {{lead.get_product_cost|floatformat:2}}<br>
             ">
                 <i class="fa-solid fa-circle-info" style="color:light-blue"></i>
             </span>
@@ -106,7 +106,7 @@
     </td> {% endcomment %}
     <td class="double_layer_td">
         {% comment %} Live Well Female {% endcomment %}        
-        <span class="primary_td_layer">{{lead.campaign.name}}</span>
+        <span class="primary_td_layer">{{lead.campaign}}</span>
         <br>
         <span class="secondary_td_layer">{{lead.campaign.site.name}}</span>
     </td>

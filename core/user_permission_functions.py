@@ -9,7 +9,7 @@ from core.models import FreeTasterLink, FreeTasterLinkClick, Profile, Site, What
 def get_available_sites_for_user(user):
     profile = user.profile
     if profile.role == 'a':
-        return Site.objects.filter(company=profile.company)
+        return Site.objects.filter(company=profile.company).exclude(active=False)
     if profile.active_sites_allowed:
         return profile.active_sites_allowed
     return Site.objects.none()

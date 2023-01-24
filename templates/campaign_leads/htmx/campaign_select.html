@@ -9,7 +9,7 @@
                     {%for campaign_category in campaign_categorys%}
                         {%for campaign in campaign_category.campaign_set.all%}
                         {% comment %} {%if campaign.get_active_leads_qs.count%} {% endcomment %}
-                            <option {%if campaign.pk|to_str in request|get_key_in_get_or_post:'campaign_pks' or campaign.pk|to_int in request|get_key_in_get_or_post:'campaign_pks' %}selected{%endif%} value="{{campaign.pk}}">{{campaign.name}}
+                            <option {%if campaign.pk|to_str in request|get_key_in_get_or_post:'campaign_pks' or campaign.pk|to_int in request|get_key_in_get_or_post:'campaign_pks' %}selected{%endif%} value="{{campaign.pk}}">{{campaign}}
                                 {% comment %} ({{campaign.get_active_leads_qs.count}} active) {% endcomment %}
                             </option>
                         {% comment %} {%endif%} {% endcomment %}
@@ -19,7 +19,7 @@
                   {%for site in sites%}
                       {%for campaign in site.campaign_set.all%}
                       {% comment %} {%if campaign.get_active_leads_qs.count%} {% endcomment %}
-                          <option {%if campaign.pk|to_str in request|get_key_in_get_or_post:'campaign_pks' or campaign.pk|to_int in request|get_key_in_get_or_post:'campaign_pks' %}selected{%endif%} value="{{campaign.pk}}">{{campaign.name}}
+                          <option {%if campaign.pk|to_str in request|get_key_in_get_or_post:'campaign_pks' or campaign.pk|to_int in request|get_key_in_get_or_post:'campaign_pks' %}selected{%endif%} value="{{campaign.pk}}">{{campaign}}
                               {% comment %} ({{campaign.get_active_leads_qs.count}} active) {% endcomment %}
                           </option>
                       {% comment %} {%endif%} {% endcomment %}

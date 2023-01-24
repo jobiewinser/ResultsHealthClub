@@ -82,10 +82,10 @@
                                 id="payments_and_billing_link" type="submit"><i class="fa-light fa-sterling-sign"></i> Stripe: Subscriptions and Billing</button>
                             </form>
                         </div>
-                        {%if site.subscription_new.numerical|to_int == 0%}
+                        {%if site.subscription.numerical|to_int == 0%}
                         {%if not get_stripe_subscriptions_and_update_models.data.0.status %}
                         <div class="col-md-auto">
-                            <button class="btn btn-sm btn-{{site.subscription_new.bootstrap_colour}}" 
+                            <button class="btn btn-sm btn-{{site.subscription.bootstrap_colour}}" 
                                 type="button" data-bs-toggle="collapse" data-bs-target="#collapseSubscription" aria-expanded="false" aria-controls="collapseSubscription">
                                 Choose a paid subscription
                             </button>
@@ -93,12 +93,12 @@
                         {%endif%}
                         {%endif%}
                     </div>
-                    {%if site.subscription_new.numerical|to_int == 0%}
+                    {%if site.subscription.numerical|to_int == 0%}
                     <div class="collapse mt-2" id="collapseSubscription">
                         <div class="card card-body">  
                             <div class="row">  
                                 {%for subscription_option in subscription_options%}
-                                {%if not subscription_option == site.subscription_new%}
+                                {%if not subscription_option == site.subscription%}
                                     <div class="col-auto">
                                         <button class="btn btn-sm btn-{{subscription_option.bootstrap_colour}}"
                                             hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
@@ -116,8 +116,8 @@
                     </div>
                     {%endif%}
                     <br>
-                    <span class="text-{{site.subscription_new.bootstrap_colour}}">
-                        You have a <b>{{site.subscription_new.get_name_display}}</b> subscription £{{site.subscription_new.cost|floatformat:2}} p/m (per facility/site)
+                    <span class="text-{{site.subscription.bootstrap_colour}}">
+                        You have a <b>{{site.subscription.get_name_display}}</b> subscription £{{site.subscription.cost|floatformat:2}} p/m (per facility/site)
                     </span>
                     <br>
                     <p>
@@ -141,18 +141,18 @@
                             <i class="fa-regular fa-calendar-days"></i> <span class="name_display_{{site.pk}}">{{site.name}}</span> <b>Profiles</b>
                         </div>
                         <div class="col-auto border-start">                            
-                            <b>{{site.users.count}}</b> of <b>{{site.subscription_new.max_profiles_string}}</b> allowed profiles
+                            <b>{{site.users.count}}</b> of <b>{{site.subscription.max_profiles_string}}</b> allowed profiles
                         </div>
                         <div class="col-auto border-start">   
                             <span 
-                                {%if site.users.count >= site.subscription_new.max_profiles and site.subscription_new.max_profiles%}
+                                {%if site.users.count >= site.subscription.max_profiles and site.subscription.max_profiles%}
                                     data-bs-toggle="popover" 
                                     data-bs-trigger="hover focus" 
                                     data-bs-placement="top"
                                     data-bs-content="You already have the maximum number of profiles for this site's subscription, please deactivate one before clicking this."
                                 {%endif%}>                         
                                 <button class="nowrap btn btn-success btn-sm pointer" type="button" {%if request.user.profile.role == 'c'%}disabled{%endif%}
-                                    {%if site.users.count >=  site.subscription_new.max_profiles and site.subscription_new.max_profiles%}
+                                    {%if site.users.count >=  site.subscription.max_profiles and site.subscription.max_profiles%}
                                         disabled
                                     {%endif%}
                                     hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
@@ -163,14 +163,14 @@
                         </div>
                         <div class="col-auto border-start">   
                             <span 
-                                {%if site.users.count >=  site.subscription_new.max_profiles and site.subscription_new.max_profiles%}
+                                {%if site.users.count >=  site.subscription.max_profiles and site.subscription.max_profiles%}
                                     data-bs-toggle="popover" 
                                     data-bs-trigger="hover focus" 
                                     data-bs-placement="top"
                                     data-bs-content="You already have the maximum number of profiles for this site's subscription, please deactivate one before clicking this."
                                 {%endif%}>                         
                                 <button class="nowrap btn btn-warning btn-sm pointer" type="button" {%if request.user.profile.role == 'c'%}disabled{%endif%}
-                                    {%if site.users.count >=  site.subscription_new.max_profiles and site.subscription_new.max_profiles%}
+                                    {%if site.users.count >=  site.subscription.max_profiles and site.subscription.max_profiles%}
                                         disabled
                                     {%endif%}
                                     hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
@@ -237,7 +237,7 @@
                             <i class="fa fa-whatsapp" aria-hidden="true"></i> <span class="name_display_{{site.pk}}">{{site.name}}</span> <b>Whatsapp Settings</b> <i class="fa-solid fa-rectangle-pro"></i>
                         </div>
                         <div class="card-body">
-                            {%if site.subscription_new.whatsapp_enabled%}
+                            {%if site.subscription.whatsapp_enabled%}
                                 <span id="whatsapp_site_config_wrapper">
                                     {%include 'core/htmx/whatsapp_site_config_row.html'%}
                                 </span>

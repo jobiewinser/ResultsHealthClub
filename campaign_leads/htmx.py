@@ -46,9 +46,9 @@ def get_modal_content(request, **kwargs):
                 if lead_pk:
                     context['lead'] = Campaignlead.objects.get(pk=lead_pk)
                     context['site'] = context['lead'].campaign.site
-                manual_campaign =  ManualCampaign.objects.filter(site__in=context['sites']).first()
-                if not manual_campaign:
-                    ManualCampaign.objects.create(site=context['site'], name = "Manually Created")
+                if not ManualCampaign.objects.filter(site__in=context['sites']).exists():
+                    for site in request.user.profile.company.active_sites:
+                        ManualCampaign.objects.get_or_create(site=site, name = "Manually Created")
                 context['campaigns'] = get_campaign_qs(request)         
             elif template_name == 'mark_sold':
                 lead = Campaignlead.objects.get(pk=lead_pk)
@@ -56,9 +56,9 @@ def get_modal_content(request, **kwargs):
                 # context['users'] = User.objects.filter(profile__sites_allowed=lead.campaign.site)
             # elif template_name == 'import_active_campaign_leads':
                 
-            elif template_name in ['switch_subscription','add_stripe_payment_method','choose_attached_profiles']:
-                context["site"] = Site.objects.get(pk=site_pk)     
-                context['switch_subscription'] = Subscription.objects.filter(numerical=request.GET.get('switch_subscription')).first()
+            elif template_name in ['switch_subscription','choose_attached_profiles']:
+                context["site"] = Site.objects.get(pk=site_pk)
+                context['switch_subscription'] = Subscription.objects.filter(numerical=request.GET.get('switch_subscription')).exclude(active=False).first()
             elif template_name in ['change_default_payment_method', 'renew_stripe_subscription']:
                 context["site"] = Site.objects.get(pk=site_pk)
                 context[template_name] = True

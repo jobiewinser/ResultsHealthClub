@@ -1,0 +1,91 @@
+{%load core_tags%}
+<div class="generic_modal_contents">
+    <div class="card card-white m-1 p-3">
+        <form hx-post="{%url 'add-site'%}" hx-trigger="submit" hx-indicator="#page_load_indicator" hx-target="#generic_modal_body">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col p-1" >
+                    <div class="card p-0 borderless">
+                        <div class="card-header center bg-secondary-trans-50" >
+                            <h5>Free - £0 p/m</h5>
+                        </div>
+                        <div class="card-body bg-secondary-trans-20" >
+                            <ul>
+                                <li>Active Campaign integration</li>
+                                <li>Calendly integration</li>
+                                <li>Up to 5 profiles (per Free site)</li>
+                                <li>Restricted analytics</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col p-1" >
+                    <div class="card p-0 borderless">
+                        <div class="card-header center bg-primary-trans-50" >
+                            <h5>Basic - £9.99 p/m</h5>
+                        </div>
+                        <div class="card-body bg-primary-trans-20" >
+                            <ul>
+                                <li>Up to 10 Profiles</li>
+                                <li>Extra analytics, showing up to a month</li>
+                                <li>All Free tier features</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col p-1" >
+                    <div class="card p-0 borderless">
+                        <div class="card-header center bg-success-trans-50" >
+                            <h5>Pro - £34.99 p/m</h5>
+                        </div>
+                        <div class="card-body bg-success-trans-20" >
+                            <ul>
+                                <li>Automated Whatsapp template sending</li>
+                                <li>Built in Whatsapp messenger using your existing whatsapp phone number</li>
+                                <li>Up to 100 Profiles</li>
+                                <li>Unrestricted analytics</li>
+                                <li>All Basic tier features</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                
+            <div class="row m-1">
+                <div class="col center">
+                    <div class="form-floating m-1">
+                        <select name="subscription" class="form-select" id="add_site_subscription">  
+                            {%for subscription_option in subscription_options%}
+                            <option {% if site and site.sign_up_subscription.pk == subscription_option.pk%}selected{% endif%} value="{{subscription_option.pk}}">{{subscription_option.get_name_display}}</option>
+                            {%endfor%}
+                        </select>
+                        <label for="add_site_subscription">Subscription<span class="required">*</span></label>
+                    </div>
+
+                    <div class="form-floating m-1">
+                        <input name="name" maxlength="25" {% if site%}value="{{site.name}}"{% elif debug%}value="test site"{%endif%} class="form-control" id="add_site_name"/>
+                        <label for="add_site_name">Site Name<span class="required">*</span></label>
+                    </div>
+
+                    <div class="m-1">
+                        <p>Additional settings such as Whatsapp, Calendly and Active Campaign configuration is available after site creation.</p>
+                    </div>
+
+                    {% if site%}
+                        <input name="site_pk" hidden {% if site%}value="{{site.pk}}"{%endif%}/>
+                    {% endif%}
+                </div>
+            </div>
+            <div class="row m-1">
+                <div class="col center" >
+                    <button class="btn btn-primary" type="submit" {%if demo and not request.user.is_superuser%}disabled{%endif%}>
+                        Add Site
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<span hx-swap-oob="true" id="generic_modal_title">
+    Add Site
+</span>

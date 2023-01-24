@@ -59,7 +59,7 @@ class Webhooks(View):
                 value = change.get('value')
                 metadata = value.get('metadata', {})
                 if not field == 'message_template_status_update':
-                    site = Site.objects.filter(whatsappbusinessaccount__whatsappnumber__number=metadata.get('display_phone_number')).first()
+                    site = Site.objects.filter(whatsappbusinessaccount__whatsappnumber__number=metadata.get('display_phone_number')).exclude(active=False).first()
                     if site:
                         signature = ""
                         if not settings.DEBUG:
@@ -297,7 +297,7 @@ class WhatsappTemplatesView(TemplateView):
                 self.request.GET['site_pk'] = self.request.user.profile.site.pk
                 site = self.request.user.profile.site
             else:
-                site = Site.objects.filter(company=self.request.user.profile.company.first()).first()
+                site = Site.objects.filter(company=self.request.user.profile.company.first()).exclude(active=False).first()
 
                 
         whatsapp_business_account_pk = self.request.GET.get('whatsapp_business_account_pk')

@@ -21,7 +21,7 @@ def message_list(request, **kwargs):
     context = {}
     whatsappnumber = None
     customer_number = request.GET.get('customer_number') 
-    site = Site.objects.filter(pk=request.GET.get('site_pk')).first()
+    site = Site.objects.filter(pk=request.GET.get('site_pk')).exclude(active=False).first()
     context['chat_site'] = [site]    
     whatsappnumber_pk = request.GET.get('whatsappnumber_pk')
     if whatsappnumber_pk:

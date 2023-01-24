@@ -4,7 +4,7 @@
 <div class="generic_modal_contents">
     <div class="card card-white m-1 p-3">
         {% comment %} <p>
-            You currently have a <b>{{site.subscription_new.get_name_display}}</b> subscription £{{site.subscription_new.cost|floatformat:2}} p/m (per facility/site)
+            You currently have a <b>{{site.subscription.get_name_display}}</b> subscription £{{site.subscription.cost|floatformat:2}} p/m (per facility/site)
         </p> {% endcomment %}
         <div class="row">
             <div class="col">
@@ -27,7 +27,7 @@
             {% if subscription_sites >= switch_subscription.max_of_this_type %}
             <p class="text-danger">
                 You already have a Free site for your company, you will have to deactivate that site or this one. as you are only allowed 1.
-                {%if site.subscription_new.numerical|to_int == 2%}
+                {%if site.subscription.numerical|to_int == 2%}
                     Alternatively <a hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
                                     hx-vals='{"template_name": "switch_subscription","switch_subscription":1,"site_pk":"{{site.pk}}"}'
                                     hx-get="{% url 'campaign-lead-get-modal-content'%}" 
@@ -48,11 +48,11 @@
                 <li>
                     Have access to {{switch_subscription.analytics_string}}.
                 </li>
-                {% if not switch_subscription.whatsapp_enabled and site.subscription_new.whatsapp_enabled  %}
+                {% if not switch_subscription.whatsapp_enabled and site.subscription.whatsapp_enabled  %}
                 <li>
                     Need to deactivate your Whatsapp integration for this site. If you need help with this, please contact: <a href='mailto:jobie@winser.uk'>jobie@winser.uk</a>. Your phone number won't be available to use within your Whatsapp phone/desktop app until it is removed from your "Whatsapp Business Account" <a target="_blank" href="https://business.facebook.com/settings/whatsapp-business-accounts/">Here</a>.
                 </li>
-                {% elif switch_subscription.whatsapp_enabled and not site.subscription_new.whatsapp_enabled  %}
+                {% elif switch_subscription.whatsapp_enabled and not site.subscription.whatsapp_enabled  %}
                 <li>
                     Gain access to Whatsapp automation.
                 </li>
@@ -65,7 +65,7 @@
             </div>
             <div class="col-auto">
 
-                {% if switch_subscription.whatsapp_enabled and not site.subscription_new.whatsapp_enabled  %}
+                {% if switch_subscription.whatsapp_enabled and not site.subscription.whatsapp_enabled  %}
                 <br>
                 <div class="alert alert-info center">
                     <small>

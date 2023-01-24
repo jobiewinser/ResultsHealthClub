@@ -52,7 +52,7 @@ class HomeView(TemplateView):
 
 
 @method_decorator(login_required, name='dispatch')
-@method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
+# @method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
 class ChangeLogView(TemplateView):
     template_name='core/change_log.html'
     def get(self, request, *args, **kwargs):
@@ -67,11 +67,16 @@ PROFILE_ERROR_OPTIONS = {
     '3':"You have not been granted permission to access any sites.",
     '4':"You have not been allocated a primary site.",
 }
-class ProfileIncorrectlyConfiguredView(TemplateView):
-    template_name='profile_incorrectly_configured.html'
+class ProfileConfigurationNeededView(TemplateView):
+    template_name='core/profile_configuration_needed.html'
+    def get(self, request, *args, **kwargs):
+        if request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+            self.template_name = 'core/profile_configuration_needed_htmx.html'
+        return super().get(request, *args, **kwargs)
+        
 
     def get_context_data(self, **kwargs):
-        context = super(ProfileIncorrectlyConfiguredView, self).get_context_data(**kwargs)       
+        context = super(ProfileConfigurationNeededView, self).get_context_data(**kwargs)       
         errors = []
         if not self.request.user.profile:
             errors.append(PROFILE_ERROR_OPTIONS['1'])
@@ -208,7 +213,7 @@ class SiteConfigurationView(TemplateView):
     def get_context_data(self):    
         context = super(SiteConfigurationView, self).get_context_data()
         context.update(get_site_configuration_context(self.request))
-        context['get_stripe_subscriptions_and_update_models'] = context['site'].get_stripe_subscriptions_and_update_models
+        context['get_stripe_subscriptions_and_update_models'] = context['site'].get_stripe_subscriptions_and_update_models()
         return context
     def post(self, request):
         if settings.DEMO and not request.user.is_superuser:
@@ -256,7 +261,7 @@ class SiteConfigurationView(TemplateView):
             
 
 @method_decorator(login_required, name='dispatch')
-@method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
+# @method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
 class CompanyConfigurationView(TemplateView):
     template_name='core/company_configuration.html'
 
@@ -324,7 +329,7 @@ def change_site_allowed(request):
         else:
             if site_pk in sites_allowed_pk_list:
                 sites_allowed_pk_list.remove(site_pk)
-        profile.sites_allowed.set(Site.objects.filter(pk__in=sites_allowed_pk_list))
+        profile.sites_allowed.set(Site.objects.filter(pk__in=sites_allowed_pk_list).exclude(active=False))
         profile.save()
     else:
         context['error'] = "You do not have permission to do this"
@@ -352,10 +357,11 @@ def deactivate_profile(request):
     if settings.DEMO and not request.user.is_superuser:
         return HttpResponse(status=403)
     user = User.objects.get(pk=request.POST.get('user_pk'))
-    if get_profile_allowed_to_edit_other_profile(request.user.profile, user.profile) and not user.profile.role == 'a':
-        user.is_active = False
-        user.save()
-        return HttpResponse(status=200)
+    if not user.profile.role == 'c':
+        if get_profile_allowed_to_edit_other_profile(request.user.profile, user.profile) and not user.profile.role == 'a':
+            user.is_active = False
+            user.save()
+            return HttpResponse(status=200)
     return HttpResponse(status=403)
 
 
@@ -366,8 +372,8 @@ def reactivate_profile(request):
     site = Site.objects.get(pk=request.POST.get('site_pk'))
     user = User.objects.get(pk=request.POST.get('user_pk'))
     if get_profile_allowed_to_edit_other_profile(request.user.profile, user.profile):
-        if site.subscription_new.max_profiles:
-            if site.users.count() >= site.subscription_new.max_profiles:
+        if site.subscription.max_profiles:
+            if site.users.count() >= site.subscription.max_profiles:
                 return HttpResponse("You already have the maximum number of users", status=400)
         user.is_active = True
         user.save()
@@ -456,7 +462,7 @@ def get_site_pks_from_request_and_return_sites(request):
             if profile.site:
                 site_pks == [request.user.profile.site.pk]
     request.GET['site_pks'] = list(site_pks)
-    return Site.objects.filter(pk__in=site_pks)
+    return Site.objects.filter(pk__in=site_pks).exclude(active=False)
 
 @login_required
 def get_single_site_pk_from_request(request):  
@@ -541,7 +547,7 @@ class SwitchSubscriptionBeginView(TemplateView):
     def get(self, request, *args, **kwargs):
         request.GET._mutable = True   
         site_pk = request.GET.get('site_pk')
-        site = Site.objects.filter(pk=site_pk).first()
+        site = Site.objects.filter(pk=site_pk).exclude(active=False).first()
         if site:  
             if get_profile_allowed_to_change_subscription(request.user.profile, site):
                 return super(SwitchSubscriptionBeginView, self).get(request, args, kwargs)
@@ -553,15 +559,15 @@ class SwitchSubscriptionBeginView(TemplateView):
         site_subscription_change_pk = self.request.GET.get('site_subscription_change_pk')
         if not site_subscription_change_pk:
             switch_subscription = Subscription.objects.get(numerical=self.request.GET.get('numerical'))        
-            SiteSubscriptionChange.objects.filter(subscription_to=switch_subscription, subscription_from = site.subscription_new, site=site, canceled=None, completed=None).exclude(version_started=str(settings.VERSION)).update(canceled=datetime.now())
-            existing_site_subscription_changes = SiteSubscriptionChange.objects.filter(version_started=str(settings.VERSION), subscription_to=switch_subscription, subscription_from = site.subscription_new, site=site, canceled=None, completed=None).order_by('created')
+            SiteSubscriptionChange.objects.filter(subscription_to=switch_subscription, subscription_from = site.subscription, site=site, canceled=None, completed=None).exclude(version_started=str(settings.VERSION)).update(canceled=datetime.now())
+            existing_site_subscription_changes = SiteSubscriptionChange.objects.filter(version_started=str(settings.VERSION), subscription_to=switch_subscription, subscription_from = site.subscription, site=site, canceled=None, completed=None).order_by('created')
             if existing_site_subscription_changes:
                 latest_existing_site_subscription_change = existing_site_subscription_changes.last()
                 existing_site_subscription_changes.exclude(pk=latest_existing_site_subscription_change.pk).update(canceled=datetime.now())
             site_subscription_change, created = SiteSubscriptionChange.objects.get_or_create(
                 version_started=str(settings.VERSION),
                 subscription_to=switch_subscription, 
-                subscription_from = site.subscription_new, 
+                subscription_from = site.subscription, 
                 site=site, 
                 canceled=None, 
                 completed=None
@@ -672,7 +678,7 @@ def complete_stripe_subscription(request):
         )
     site.stripecustomer.subscription_id = stripe_subscription.stripe_id
     site.stripecustomer.save()
-    site.get_stripe_subscriptions_and_update_models
+    site.get_stripe_subscriptions_and_update_models()
     site_subscription_change.completed_by = request.user
     site_subscription_change.complete()
     return render(request, 'core/htmx/subscription_changed.html', {})
@@ -852,7 +858,8 @@ class RegisterNewCompanyView(TemplateView):
         profile = Profile.objects.create(
             user=user,
             company = company,
-            register_uuid = str(uuid.uuid4())[:16]
+            register_uuid = str(uuid.uuid4())[:16],
+            role="a"
         )
         
         message = loader.render_to_string('registration/registration_email.html', {
@@ -888,7 +895,7 @@ def send_email(recipients, subject, messages):
 
 def activate(request, register_uuid, email):
     try:
-        profile = Profile.objects.get(register_uuid=register_uuid, user__email__iexact=email)
+        profile = Profile.objects.get(register_uuid=register_uuid, user__email__iexact=email, user__is_active=False, role="a")
     except(Profile.DoesNotExist):
         profile = None
     if profile:

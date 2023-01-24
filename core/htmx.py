@@ -1,7 +1,7 @@
 import os
 import uuid
 from calendly.api import Calendly
-from core.models import ROLE_CHOICES, FreeTasterLink, Profile, Site, WhatsappNumber, Contact, SiteProfilePermissions, CompanyProfilePermissions
+from core.models import ROLE_CHOICES, FreeTasterLink, Profile, Site, WhatsappNumber, Contact, SiteProfilePermissions, CompanyProfilePermissions, Subscription
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import render
@@ -34,6 +34,9 @@ def get_modal_content(request, **kwargs):
                 user_pk = request.GET.get('user_pk', None)
                 if user_pk:
                     context["edit_user"] = User.objects.get(pk=user_pk)
+            elif template_name == 'add_site':
+                if site_pk:
+                    context["site"] = Site.objects.get(pk=site_pk)                  
             elif template_name == 'edit_permissions':
                 profile_pk = request.GET.get('profile_pk', None)
                 if profile_pk:
@@ -70,9 +73,11 @@ def get_modal_content(request, **kwargs):
                         lead = Campaignlead.objects.get(pk=lead_pk)
                     else:
                         customer_number = request.GET.get('customer_number') 
-                        site = Site.objects.filter(pk=request.GET.get('site_pk')).first()
+                        site = Site.objects.filter(pk=request.GET.get('site_pk')).exclude(active=False).first()
                         lead = Campaignlead.objects.filter(campaign__site=site, whatsapp_number=customer_number).last()
-                        context['customer_numbers'] = [customer_number]    
+                        context['customer_numbers'] = [customer_number]   
+                    if not lead.campaign.whatsapp_business_account:
+                        return HttpResponse("You don't have a whatsapp number linked to this campaign!", status="400")
                     context['lead'] = lead
                     whatsappnumber = lead.campaign.whatsapp_business_account.whatsappnumber
                 context['whatsappnumber'] = whatsappnumber
@@ -108,8 +113,8 @@ class ModifyUser(View):
             action = request.POST.get('action', '')
             if action == 'add':
                 site = Site.objects.get(pk=request.POST.get('site_pk', ''))
-                if site.subscription_new.max_profiles:
-                    if site.users.count() >= site.subscription_new.max_profiles:
+                if site.subscription.max_profiles:
+                    if site.users.count() >= site.subscription.max_profiles:
                         return HttpResponse("You already have the maximum number of users", status=400)
                 username = request.POST.get('username', '')[:25]
                 first_name = request.POST.get('first_name', '')[:25]
@@ -188,24 +193,26 @@ def create_calendly_webhook_subscription(request, **kwargs):
         return HttpResponse(status=500)
     site = Site.objects.get(pk=request.POST.get('site_pk')) 
     if get_profile_allowed_to_edit_site_configuration(request.user.profile, site): 
-        calendly = Calendly(site.calendly_token)
-        print("calendly", calendly)
-        calendly_webhooks = calendly.list_webhook_subscriptions(organization = site.calendly_organization).get('collection')
-        print("calendly_webhooks", site)
-        if calendly_webhooks == None:
-            if site.subscription_new.max_profiles:
-                if site.users.count() >= site.subscription_new.max_profiles:
-                    return HttpResponse("Invalid Calendly details", status=400)
-        for webhook in calendly_webhooks:
-            if webhook.get('state') == 'active' \
-            and webhook.get('callback_url') == f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/" \
-            and webhook.get('organization') == f"{os.getenv('CALENDLY_URL')}/organizations/{site.calendly_organization}":
-                active_webhook_uuid = webhook.get('uri').replace(f"{os.getenv('CALENDLY_URL')}/webhook_subscriptions/", "")
-                calendly.delete_webhook_subscriptions(webhook_guuid = active_webhook_uuid)
-        print("site.guid", site.guid)
-        print("site.calendly_organization", site.calendly_organization)
-        response = calendly.create_webhook_subscription(site.guid, organization = site.calendly_organization)
-        print("create_calendly_webhook_subscription response", response)
+        if site.calendly_organization and site.calendly_token:
+            calendly = Calendly(site.calendly_token)
+            print("calendly", calendly)
+            calendly_webhooks = calendly.list_webhook_subscriptions(organization = site.calendly_organization).get('collection')
+            print("calendly_webhooks", site)
+            if calendly_webhooks == None:
+                if site.subscription.max_profiles:
+                    if site.users.count() >= site.subscription.max_profiles:
+                        return HttpResponse("Invalid Calendly details", status=400)
+            for webhook in calendly_webhooks:
+                if webhook.get('state') == 'active' \
+                and webhook.get('callback_url') == f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/" \
+                and webhook.get('organization') == f"{os.getenv('CALENDLY_URL')}/organizations/{site.calendly_organization}":
+                    active_webhook_uuid = webhook.get('uri').replace(f"{os.getenv('CALENDLY_URL')}/webhook_subscriptions/", "")
+                    calendly.delete_webhook_subscriptions(webhook_guuid = active_webhook_uuid)
+            print("site.guid", site.guid)
+            print("site.calendly_organization", site.calendly_organization)
+            response = calendly.create_webhook_subscription(site.guid, organization = site.calendly_organization)
+            print("create_calendly_webhook_subscription response", response)
+        return HttpResponse("Your Calendly settings are not submitted yet", status=400)
     return render(request, "core/htmx/calendly_webhook_status_wrapper.html", {'site':site, 'site_webhook_active':(response.get('resource',{}).get('state')=='active')})
     
 @login_required
@@ -225,21 +232,47 @@ def delete_calendly_webhook_subscription(request, **kwargs):
                 break
     return render(request, "core/htmx/calendly_webhook_status_wrapper.html", {'site':site, 'site_webhook_active':False})
 
-# @login_required
-# def add_site(request, **kwargs):
-#     if settings.DEMO and not request.user.is_superuser:
-#         return HttpResponse(status=500)
-#     company = Company.objects.get(pk=request.POST.get('company_pk'))
-#     if not company.subscription == 'pro':
-#         site = Site.objects.create(
-#             name = "New Site",
-#             company = company,
-#         )
-
-#         response = HttpResponse( status=200)
-#         response["HX-Redirect"] = f"/site-configuration/?site_pk={site.pk}"
-#         return response
-#     return HttpResponse("This feature requires a Pro subscription", status=403)
+@login_required
+def add_site(request, **kwargs):
+    if settings.DEMO and not request.user.is_superuser:
+        return HttpResponse(status=500)
+    site_pk = request.POST.get('site_pk')
+    name = request.POST.get('name')
+    sign_up_subscription = Subscription.objects.get(pk=request.POST.get('subscription'))
+    profile = request.user.profile
+    if not sign_up_subscription.stripe_price_id and profile.company.free_sites.exists():
+        return HttpResponse("You already have a free site within your company (max 1). Please purchase a subscription for that site or this new one to continue.", status=400)
+    if request.user.profile.role == 'a' and name and sign_up_subscription:
+        if site_pk:
+            site = Site.objects.get(pk=site_pk)
+        else:
+            if request.user.profile.company.part_created_site:
+                return HttpResponse("Another site is being added (potentially by another user within your company)", status=400)
+            site = Site(
+                company = request.user.profile.company,
+                active = False,
+            )
+        site.name = name
+        site.sign_up_subscription = sign_up_subscription
+        
+        if site.sign_up_subscription.stripe_price_id: #do we need to move to the next stage of setting up payment?
+            site.save()
+            profile.sites_allowed.add(site)
+            profile.save()
+            response = HttpResponse( status=200)
+            return response
+        else: #or can we just create the new site!
+            site.active = True
+            site.subscription = sign_up_subscription
+            site.sign_up_subscription = None
+            site.save()
+            profile.sites_allowed.add(site)
+            profile.save()
+            response = HttpResponse( status=200)
+            response["HX-Redirect"] = f"/configuration/site-configuration/?site_pk={site.pk}"
+            return response
+            
+    return HttpResponse("This feature requires a Pro subscription", status=403)
 
 @login_required
 def generate_free_taster_link(request, **kwargs):

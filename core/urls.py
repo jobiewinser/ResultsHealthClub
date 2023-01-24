@@ -32,12 +32,12 @@ urlpatterns = [
     path('create-calendly-webhook-subscription/', corehtmx.create_calendly_webhook_subscription, name='create-calendly-webhook-subscription' ),
     path('delete-calendly-webhook-subscription/', corehtmx.delete_calendly_webhook_subscription, name='delete-calendly-webhook-subscription' ),
 
-    # path('add-site/', corehtmx.add_site, name='add-site' ),
+    path('add-site/', corehtmx.add_site, name='add-site' ),
     
     path('delete-free-taster-link/', corehtmx.delete_free_taster_link, name='delete-free-taster-link' ),  
     # path('configuration/', coreviews.ConfigurationView.as_view(), name='configuration'),  
 
-    path('profile-incorrectly-configured/', coreviews.ProfileIncorrectlyConfiguredView.as_view(), name='profile-incorrectly-configured'),  
+    path('profile-configuration-needed/', coreviews.ProfileConfigurationNeededView.as_view(), name='profile-configuration-needed'),  
     path('configuration/company-permissions/', coreviews.CompanyPermissionsView.as_view(), name='company-permissions'),  
     path('configuration/site-permissions/', coreviews.SitePermissionsView.as_view(), name='site-permissions'),  
     path('configuration/change-sites-allowed/', coreviews.change_site_allowed, name='change-sites-allowed'),  

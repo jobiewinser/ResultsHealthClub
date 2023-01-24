@@ -71,7 +71,7 @@ body * {
 
 .whole_page_disconnected_indicator {
     background: rgba(211, 211, 211, 0.4);
-    top: 0;
+    top: 60PX;
     left: 0;
     bottom: 0;
     right: 0;
@@ -471,6 +471,17 @@ body * {
 .bg-warning-trans-20 {
     background-color: rgba(255, 193, 7, 0.2) !important;
 }
+
+.bg-secondary-trans-50 {
+    background-color: rgba(108, 117, 125, 0.5) !important;
+}
+.bg-success-trans-50 {
+    background-color: rgba(25, 135, 84, 0.5) !important;
+}
+.bg-primary-trans-50 {
+    background-color: rgba(13, 110, 253, 0.5) !important;
+}
+
 .complete-tr>* {
     background-color: rgba(25, 135, 84, 0.1) !important;
 }

@@ -53,6 +53,10 @@ class Campaign(PolymorphicModel):
     # fifth_send_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="fifth_send_template_campaign", on_delete=models.SET_NULL, null=True, blank=True)
     whatsapp_business_account = models.ForeignKey('core.WhatsappBusinessAccount', on_delete=models.SET_NULL, null=True, blank=True)
     color = models.CharField(max_length=15, null=False, blank=False, default="96,248,61")
+    
+    def __str__(self):
+        return self.name
+    
     def get_active_leads_qs(self):
         return self.campaignlead_set.exclude(archived=True).exclude(sale__archived=False)
     def is_manual(self):
@@ -92,6 +96,9 @@ class ManualCampaign(Campaign):
     @property
     def is_manual(self):
         return True
+    
+    def __str__(self):
+        return f"Manually Created ({self.site.name})"
 
 
 class Campaignlead(models.Model):
@@ -297,7 +304,7 @@ class Campaignlead(models.Model):
                                             params.append(              
                                                 {
                                                     "type": "text",
-                                                    "text":  self.campaign.name
+                                                    "text":  str(self.campaign)
                                                 }
                                             )
                                             text = text.replace('[[2]]',self.first_name)

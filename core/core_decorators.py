@@ -10,7 +10,7 @@ from django.contrib.auth.decorators import user_passes_test
 logger = logging.getLogger(__name__)
 
 
-def check_core_profile_requirements_fulfilled(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login_url="/profile-incorrectly-configured"):
+def check_core_profile_requirements_fulfilled(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login_url="/profile-configuration-needed"):
     """
     Decorator for views that checks that the user has a profile, a company and at least 1 site allowed
     """

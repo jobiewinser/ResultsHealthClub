@@ -1,0 +1,26 @@
+<span
+    title="Add a Site"
+    data-bs-toggle="popover" 
+    data-bs-trigger="hover focus" 
+    data-bs-placement="right"
+    data-bs-html="true"
+    data-bs-content="
+    {%if request.user.profile.role == 'c'%}Only the company's owner can set up a new site.{%else%}You can have up to 1 free site and unlimited paid sites.{%endif%}        
+    ">
+    {% if request.user.profile.company.part_created_site%}
+    
+        <button class="btn btn-sm btn-success"
+            hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
+            hx-vals='{"template_name": "add_site", "site_pk": "{{request.user.profile.company.part_created_site.pk}}"}'
+            hx-get="{% url 'get-modal-content'%}" 
+            hx-push-url="false"
+            hx-swap="innerHTML" hx-trigger="click"><i class="fa-solid fa-plus help"></i> Continue Adding Site</button> 
+    {%else%}        
+        <button class="btn btn-sm btn-success"
+        hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
+        hx-vals='{"template_name": "add_site"}'
+        hx-get="{% url 'get-modal-content'%}" 
+        hx-push-url="false"
+        hx-swap="innerHTML" hx-trigger="click"><i class="fa-solid fa-plus help"></i> Add Site</button> 
+    {%endif%}
+</span>
