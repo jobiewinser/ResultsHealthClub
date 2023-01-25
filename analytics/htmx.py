@@ -416,26 +416,26 @@ def get_current_call_count_distribution(request):
     non_time_filtered_live_opportunities = Campaignlead.objects.filter(booking = None, archived = False).exclude(sale__archived=False).annotate(calls=Count('call'))
     
     if campaigns:
-        non_time_filtered_opportunities = non_time_filtered_live_opportunities.filter(campaign__site__company=request.user.profile.company, campaign__in=campaigns, campaign__site__in=request.user.profile.active_sites_allowed)
+        non_time_filtered_live_opportunities = non_time_filtered_live_opportunities.filter(campaign__site__company=request.user.profile.company, campaign__in=campaigns, campaign__site__in=request.user.profile.active_sites_allowed)
     if campaign_categorys:
-        non_time_filtered_opportunities = non_time_filtered_live_opportunities.filter(campaign__campaign_category__site__company=request.user.profile.company, campaign__campaign_category__in=campaign_categorys, campaign__campaign_category__site__in=request.user.profile.active_sites_allowed)
+        non_time_filtered_live_opportunities = non_time_filtered_live_opportunities.filter(campaign__campaign_category__site__company=request.user.profile.company, campaign__campaign_category__in=campaign_categorys, campaign__campaign_category__site__in=request.user.profile.active_sites_allowed)
     elif sites:
-        non_time_filtered_opportunities = non_time_filtered_live_opportunities.filter(campaign__site__company=request.user.profile.company, campaign__site__in=sites).filter(campaign__site__in=request.user.profile.active_sites_allowed)
+        non_time_filtered_live_opportunities = non_time_filtered_live_opportunities.filter(campaign__site__company=request.user.profile.company, campaign__site__in=sites).filter(campaign__site__in=request.user.profile.active_sites_allowed)
     else:
-        non_time_filtered_opportunities = non_time_filtered_live_opportunities.filter(campaign__site__company=request.user.profile.company, campaign__site__in=request.user.profile.active_sites_allowed)
+        non_time_filtered_live_opportunities = non_time_filtered_live_opportunities.filter(campaign__site__company=request.user.profile.company, campaign__site__in=request.user.profile.active_sites_allowed)
 
 
     call_counts_tuples = []
     index = 0
-    if non_time_filtered_opportunities.filter(calls__gte=index):
-        while non_time_filtered_opportunities.filter(calls__gte=index):
-            if non_time_filtered_opportunities.exclude(calls=index).count():
-                queryset_percentage_portion = (non_time_filtered_opportunities.filter(calls=index).count() / non_time_filtered_opportunities.count())*100
-            elif non_time_filtered_opportunities.filter(calls=index).count():
+    if non_time_filtered_live_opportunities.filter(calls__gte=index):
+        while non_time_filtered_live_opportunities.filter(calls__gte=index):
+            if non_time_filtered_live_opportunities.exclude(calls=index).count():
+                queryset_percentage_portion = (non_time_filtered_live_opportunities.filter(calls=index).count() / non_time_filtered_live_opportunities.count())*100
+            elif non_time_filtered_live_opportunities.filter(calls=index).count():
                 queryset_percentage_portion = 100
             else:
                 queryset_percentage_portion = 0
-            call_counts_tuples.append((index, non_time_filtered_opportunities.filter(calls=index).count(), non_time_filtered_live_opportunities.filter(calls=index).aggregate(Sum('product_cost')), queryset_percentage_portion))
+            call_counts_tuples.append((index, non_time_filtered_live_opportunities.filter(calls=index).count(), non_time_filtered_live_opportunities.filter(calls=index).aggregate(Sum('product_cost')), queryset_percentage_portion))
             index = index + 1
     else:
         pass
