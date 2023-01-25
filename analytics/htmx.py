@@ -404,25 +404,25 @@ def get_current_call_count_distribution(request):
     campaign_categorys = None
     sites = []
     if campaign_pks:
-        campaigns = Campaign.objects.filter(pk__in=campaign_pks)
+        campaigns = Campaign.objects.filter(pk__in=campaign_pks, site__in=request.user.profile.active_sites_allowed)
         sites = Site.objects.filter(campaign__in=campaigns)
     elif campaign_category_pks:
-        campaign_categorys = CampaignCategory.objects.filter(pk__in=campaign_category_pks)
+        campaign_categorys = CampaignCategory.objects.filter(pk__in=campaign_category_pks, site__in=request.user.profile.active_sites_allowed)
         sites = Site.objects.filter(campaigncategory__in=campaign_categorys)
     else:
         site_pks = request.GET.getlist('site_pks', request.user.profile.active_sites_allowed)
         sites = Site.objects.filter(pk__in=site_pks)
     
-    non_time_filtered_live_opportunities = Campaignlead.objects.filter(booking = None, archived = False).exclude(sale__archived=False).annotate(calls=Count('call'))
+    non_time_filtered_live_opportunities = Campaignlead.objects.filter(archived = False).exclude(booking__archived=False).exclude(sale__archived=False).annotate(calls=Count('call'))
     
     if campaigns:
-        non_time_filtered_live_opportunities = non_time_filtered_live_opportunities.filter(campaign__site__company=request.user.profile.company, campaign__in=campaigns, campaign__site__in=request.user.profile.active_sites_allowed)
+        non_time_filtered_live_opportunities = non_time_filtered_live_opportunities.filter(campaign__in=campaigns)
     if campaign_categorys:
-        non_time_filtered_live_opportunities = non_time_filtered_live_opportunities.filter(campaign__campaign_category__site__company=request.user.profile.company, campaign__campaign_category__in=campaign_categorys)
+        non_time_filtered_live_opportunities = non_time_filtered_live_opportunities.filter(campaign__campaign_category__in=campaign_categorys)
     elif sites:
-        non_time_filtered_live_opportunities = non_time_filtered_live_opportunities.filter(campaign__site__company=request.user.profile.company, campaign__site__in=sites).filter(campaign__site__in=request.user.profile.active_sites_allowed)
+        non_time_filtered_live_opportunities = non_time_filtered_live_opportunities.filter(campaign__site__in=sites)
     else:
-        non_time_filtered_live_opportunities = non_time_filtered_live_opportunities.filter(campaign__site__company=request.user.profile.company, campaign__site__in=request.user.profile.active_sites_allowed)
+        non_time_filtered_live_opportunities = non_time_filtered_live_opportunities.filter(campaign__site__company=request.user.profile.company)
 
 
     call_counts_tuples = []
