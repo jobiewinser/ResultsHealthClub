@@ -418,7 +418,7 @@ def get_current_call_count_distribution(request):
     if campaigns:
         non_time_filtered_live_opportunities = non_time_filtered_live_opportunities.filter(campaign__site__company=request.user.profile.company, campaign__in=campaigns, campaign__site__in=request.user.profile.active_sites_allowed)
     if campaign_categorys:
-        non_time_filtered_live_opportunities = non_time_filtered_live_opportunities.filter(campaign__campaign_category__site__company=request.user.profile.company, campaign__campaign_category__in=campaign_categorys, campaign__campaign_category__site__in=request.user.profile.active_sites_allowed)
+        non_time_filtered_live_opportunities = non_time_filtered_live_opportunities.filter(campaign__campaign_category__site__company=request.user.profile.company, campaign__campaign_category__in=campaign_categorys)
     elif sites:
         non_time_filtered_live_opportunities = non_time_filtered_live_opportunities.filter(campaign__site__company=request.user.profile.company, campaign__site__in=sites).filter(campaign__site__in=request.user.profile.active_sites_allowed)
     else:
