@@ -435,7 +435,7 @@ def get_current_call_count_distribution(request):
                 queryset_percentage_portion = 100
             else:
                 queryset_percentage_portion = 0
-            call_counts_tuples.append((index, non_time_filtered_opportunities.filter(calls=index).count(), non_time_filtered_live_opportunities.filter(calls=index).aggregate(Sum('campaign__product_cost')), queryset_percentage_portion))
+            call_counts_tuples.append((index, non_time_filtered_opportunities.filter(calls=index).count(), non_time_filtered_live_opportunities.filter(calls=index).aggregate(Sum('product_cost')), queryset_percentage_portion))
             index = index + 1
     else:
         pass
@@ -492,27 +492,27 @@ def get_pipeline(request):
     context['lost_opportunities'] = lost_opportunities.count()
     
     if live_opportunities:
-        context['live_value'] = float(live_opportunities.aggregate(Sum('campaign__product_cost')).get('campaign__product_cost__sum', 0))
+        context['live_value'] = float(live_opportunities.aggregate(Sum('product_cost')).get('product_cost__sum', 0))
     else:
         context['live_value'] = 0
 
     if sold_opportunities:
-        context['sold_value'] = float(sold_opportunities.aggregate(Sum('campaign__product_cost')).get('campaign__product_cost__sum', 0))
+        context['sold_value'] = float(sold_opportunities.aggregate(Sum('product_cost')).get('product_cost__sum', 0))
     else:
         context['sold_value'] = 0
 
     if booked_opportunities:
-        context['booked_value'] = float(booked_opportunities.aggregate(Sum('campaign__product_cost')).get('campaign__product_cost__sum', 0))
+        context['booked_value'] = float(booked_opportunities.aggregate(Sum('product_cost')).get('product_cost__sum', 0))
     else:
         context['booked_value'] = 0
 
     if lost_opportunities:
-        context['lost_value'] = float(lost_opportunities.aggregate(Sum('campaign__product_cost')).get('campaign__product_cost__sum', 0))
+        context['lost_value'] = float(lost_opportunities.aggregate(Sum('product_cost')).get('product_cost__sum', 0))
     else:
         context['lost_value'] = 0
 
     if opportunities:
-        context['opportunities_value'] = float(opportunities.aggregate(Sum('campaign__product_cost')).get('campaign__product_cost__sum', 0))
+        context['opportunities_value'] = float(opportunities.aggregate(Sum('product_cost')).get('product_cost__sum', 0))
     else:
         context['opportunities_value'] = 0
 
