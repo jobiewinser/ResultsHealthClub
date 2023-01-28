@@ -33,6 +33,9 @@ urlpatterns = [
     path('delete-calendly-webhook-subscription/', corehtmx.delete_calendly_webhook_subscription, name='delete-calendly-webhook-subscription' ),
 
     path('add-site/', corehtmx.add_site, name='add-site' ),
+    path('add-stripe-payment-method-new-site-handler/', coreviews.add_stripe_payment_method_new_site_handler, name='add-stripe-payment-method-new-site-handler'),  
+    path('detach-stripe-payment-method-new-site-handler/', coreviews.detach_stripe_payment_method_new_site_handler, name='detach-stripe-payment-method-new-site-handler'),  
+    path('complete-stripe-subscription-new-site-handler/', coreviews.complete_stripe_subscription_new_site_handler, name='complete-stripe-subscription-new-site-handler'),  
     
     path('delete-free-taster-link/', corehtmx.delete_free_taster_link, name='delete-free-taster-link' ),  
     # path('configuration/', coreviews.ConfigurationView.as_view(), name='configuration'),  
@@ -52,9 +55,9 @@ urlpatterns = [
     # path('stripe-subscription-success/', coreviews.StripeSubscriptionSuccessView.as_view(), name='stripe-subscription-success'),  
     # path('configuration/payments-and-billing/', coreviews.PaymentsAndBillingView.as_view(), name='payments-and-billing'),  
     path('stripe-subscription-canceled/', coreviews.StripeSubscriptionCanceledView.as_view(), name='stripe-subscription-cancelled'),  
-    path('add-stripe-payment-method/', coreviews.add_stripe_payment_method, name='add-stripe-payment-method'),  
-    path('detach-stripe-payment-method/', coreviews.detach_stripe_payment_method, name='detach-stripe-payment-method'),  
-    path('complete-stripe-subscription/', coreviews.complete_stripe_subscription, name='complete-stripe-subscription'),  
+    path('add-stripe-payment-method-handler/', coreviews.add_stripe_payment_method_handler, name='add-stripe-payment-method-handler'),  
+    path('detach-stripe-payment-method-handler/', coreviews.detach_stripe_payment_method_handler, name='detach-stripe-payment-method-handler'),  
+    path('complete-stripe-subscription-handler/', coreviews.complete_stripe_subscription_handler, name='complete-stripe-subscription-handler'),  
     path('renew-stripe-subscription/', coreviews.renew_stripe_subscription, name='renew-stripe-subscription'),  
     path('change-default-payment-method/', coreviews.change_default_payment_method, name='change-default-payment-method'),  
     path('accounts/register/', coreviews.RegisterNewCompanyView.as_view(), name='register'), 

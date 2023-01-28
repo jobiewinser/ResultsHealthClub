@@ -30,8 +30,8 @@ def get_profile_allowed_to_toggle_whatsapp_sending(profile, site):
         return permissions.toggle_whatsapp_sending
     return False
 def get_profile_allowed_to_change_subscription(profile, site):
-    permissions = SiteProfilePermissions.objects.filter(profile=profile, site=site).first()
-    if permissions:
+    if site in profile.sites_allowed.all():
+        permissions, created = SiteProfilePermissions.objects.get_or_create(profile=profile, site=site)
         return permissions.change_subscription
     return False
     

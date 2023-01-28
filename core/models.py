@@ -709,6 +709,26 @@ class Site(models.Model):
         super(Site, self).save(force_insert, force_update, using, update_fields)
         
         
+    def complete_stripe_subscription_new_site(self, payment_method_id):
+        try:
+            temp = self.stripecustomer.pk
+        except Site.stripecustomer.RelatedObjectDoesNotExist as e:
+            stripe_customer = get_or_create_customer(billing_email=self.billing_email)
+            customer_id = stripe_customer['id']
+            stripe_customer_object, created = StripeCustomer.objects.get_or_create(
+                customer_id=customer_id
+            )
+            stripe_customer_object.self = self
+            stripe_customer_object.save()
+            
+        stripe_subscription = add_or_update_subscription(
+            self.stripecustomer.customer_id, 
+            payment_method_id, 
+            self.sign_up_subscription.stripe_price_id,
+            subscription_id=self.stripecustomer.subscription_id,
+            proration_behavior='create_prorations',
+        )
+        self.get_stripe_subscriptions_and_update_models()
 
         
 

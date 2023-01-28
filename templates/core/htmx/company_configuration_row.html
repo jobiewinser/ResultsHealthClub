@@ -132,7 +132,7 @@
 <td class="center">   
     {%if request.user.profile|get_profile_allowed_to_edit_other_profile_tag:profile and not profile.role == 'a'%}
     <button class="nowrap btn btn-dark pointer" type="button"
-    {% if profile.role == 'c'%}disabled{%endif%}
+    {% if profile.role == 'a'%}disabled{%endif%}
         hx-indicator=".top-htmx-indicator"
         hx-vals='{"user_pk": "{{profile.user.pk}}"}'
         hx-post="{% url 'deactivate-profile' %}" hx-push-url="false"

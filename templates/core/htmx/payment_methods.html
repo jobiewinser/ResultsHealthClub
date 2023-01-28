@@ -48,7 +48,7 @@
                                             creditCard: true
                                         });
                                     </script> {% endcomment %}
-                                    <form  hx-post="{%url 'add-stripe-payment-method' %}"
+                                    <form  hx-post="{%url 'add-stripe-payment-method-handler' %}"
                                         hx-target="#payment_methods_wrapper"
                                         hx-indicator="#page_load_indicator"
                                         hx-vals='{"site_pk":"{{site.pk}}" {%if site_subscription_change %},"site_subscription_change_pk": "{{site_subscription_change.pk}}"{%endif%}}'>
@@ -117,7 +117,7 @@
                             {%endif%}
                             hx-indicator="#page_load_indicator" hx-target="#generic_modal_body" 
                             hx-vals='{"payment_method_id": "{{stripe_payment_method.id}}", "site_pk": "{{site.pk}}" {%if site_subscription_change %},"site_subscription_change_pk": "{{site_subscription_change.pk}}"{%endif%}}'
-                            hx-post="{% url 'complete-stripe-subscription' %}" hx-push-url="false"
+                            hx-post="{% url 'complete-stripe-subscription-handler' %}" hx-push-url="false"
                             hx-swap="innerHTML" hx-trigger="click" hx-confirm="Are you sure you want to use this payment method?">
                             <i class="fa-regular fa-check"></i> Use
                         </button>
@@ -140,7 +140,7 @@
                             {%endif%}
                             hx-indicator="#page_load_indicator" hx-target="#payment_methods_wrapper"
                             hx-vals='{"payment_method_id": "{{stripe_payment_method.id}}", "site_pk": "{{site.pk}}" {%if site_subscription_change %},"site_subscription_change_pk": "{{site_subscription_change.pk}}"{%endif%}}'
-                            hx-post="{% url 'detach-stripe-payment-method' %}" hx-push-url="false"
+                            hx-post="{% url 'detach-stripe-payment-method-handler' %}" hx-push-url="false"
                             hx-swap="innerHTML" hx-trigger="click" hx-confirm="Are you sure you want to detach this payment method? You may lose access to some your subscription tier if you haven't got another method active.">
                             <i class="fa-regular fa-trash"></i> Detach
                         </button>

@@ -357,7 +357,7 @@ def deactivate_profile(request):
     if settings.DEMO and not request.user.is_superuser:
         return HttpResponse(status=403)
     user = User.objects.get(pk=request.POST.get('user_pk'))
-    if not user.profile.role == 'c':
+    if not user.profile.role == 'a':
         if get_profile_allowed_to_edit_other_profile(request.user.profile, user.profile) and not user.profile.role == 'a':
             user.is_active = False
             user.save()
@@ -640,8 +640,12 @@ def change_default_payment_method(request):
 
 @login_required
 @check_core_profile_requirements_fulfilled
-def complete_stripe_subscription(request):
-    site_subscription_change_pk = request.POST.get('site_subscription_change_pk')
+def complete_stripe_subscription_handler(request):
+    complete_stripe_subscription(request.POST.get('site_subscription_change_pk'), request.POST.get('payment_method_id'), request.user)
+    return render(request, 'core/htmx/subscription_changed.html', {})
+
+def complete_stripe_subscription(site_subscription_change_pk, payment_method_id, user):
+    site_subscription_change_pk = site_subscription_change_pk
     site_subscription_change = SiteSubscriptionChange.objects.get(pk=site_subscription_change_pk)
     
     site = site_subscription_change.site
@@ -655,9 +659,7 @@ def complete_stripe_subscription(request):
         )
         stripe_customer_object.site = site
         stripe_customer_object.save()
-        
     
-    payment_method_id = request.POST.get('payment_method_id')
     if site_subscription_change.subscription_from.numerical < site_subscription_change.subscription_to.numerical:
         #if upgrading, upgrade immediately and prorate
         stripe_subscription = add_or_update_subscription(
@@ -679,10 +681,26 @@ def complete_stripe_subscription(request):
     site.stripecustomer.subscription_id = stripe_subscription.stripe_id
     site.stripecustomer.save()
     site.get_stripe_subscriptions_and_update_models()
-    site_subscription_change.completed_by = request.user
+    site_subscription_change.completed_by = user
     site_subscription_change.complete()
-    return render(request, 'core/htmx/subscription_changed.html', {})
 
+
+@login_required
+def complete_stripe_subscription_new_site_handler(request):
+    payment_method_id = request.POST.get('payment_method_id')
+    if payment_method_id:
+        profile = request.user.profile
+        site = Site.objects.get(pk=request.POST['site_pk'])
+        site.complete_stripe_subscription_new_site(payment_method_id)
+        
+        site.active = True
+        site.sign_up_subscription = None
+        site.save()
+        profile.sites_allowed.add(site)
+        profile.save()
+        response = HttpResponse( status=200)
+        response["HX-Redirect"] = f"/configuration/site-configuration/?site_pk={site.pk}"
+        return response
 
 @login_required
 @check_core_profile_requirements_fulfilled
@@ -733,52 +751,72 @@ class StripeSubscriptionCanceledView(TemplateView):
 
 
     
-
 @login_required
 @check_core_profile_requirements_fulfilled
-def add_stripe_payment_method(request): 
+def add_stripe_payment_method_handler(request): 
     context = {}
     site_pk = request.POST.get('site_pk')
     site = Site.objects.get(pk=site_pk)
     if get_profile_allowed_to_change_subscription(request.user.profile, site):
-        try:
-            temp = site.stripecustomer.pk
-        except Site.stripecustomer.RelatedObjectDoesNotExist as e:
-            stripe_customer = get_or_create_customer(billing_email=site.billing_email)
-            customer_id = stripe_customer['id']
-            stripe_customer_object, created = StripeCustomer.objects.get_or_create(
-                customer_id=customer_id
-            )
-            stripe_customer_object.site = site
-            stripe_customer_object.save()
-        
-        payment_method, error = add_payment_method(
+        add_stripe_payment_method(site, 
             request.POST['cardNumber'], 
             request.POST['expiryMonth'],
             request.POST['expiryYear'],
             request.POST['cvc'])
-        if error:
-            return HttpResponse(str(error), status=400)
-        payment_method = attach_payment_method(
-            site.stripecustomer.customer_id, 
-            payment_method['id']
-        )
         context['site'] = site
         site_subscription_change_pk = request.POST.get('site_subscription_change_pk')        
         if site_subscription_change_pk:
             context['site_subscription_change'] = SiteSubscriptionChange.objects.filter(pk=site_subscription_change_pk).last()
         return render(request, 'core/htmx/payment_methods.html', context)
     return HttpResponse(status=403)
+
 @login_required
-@check_core_profile_requirements_fulfilled
-def detach_stripe_payment_method(request): 
+# @check_core_profile_requirements_fulfilled
+def add_stripe_payment_method_new_site_handler(request): 
     context = {}
     site_pk = request.POST.get('site_pk')
     site = Site.objects.get(pk=site_pk)
     if get_profile_allowed_to_change_subscription(request.user.profile, site):
-        payment_method, error = detach_payment_method(
-            request.POST['payment_method_id']
+        add_stripe_payment_method(site, 
+            request.POST['cardNumber'], 
+            request.POST['expiryMonth'],
+            request.POST['expiryYear'],
+            request.POST['cvc']) 
+        context['site'] = site
+        site_subscription_change_pk = request.POST.get('site_subscription_change_pk')        
+        if site_subscription_change_pk:
+            context['site_subscription_change'] = SiteSubscriptionChange.objects.filter(pk=site_subscription_change_pk).last()
+        return render(request, 'campaign_leads/htmx/new_site_payment_methods.html', context)
+    return HttpResponse(status=403)
+
+def add_stripe_payment_method(site, card_number, expiry_month, expiry_year, cvc):    
+    try:
+        # Check if exists
+        site.stripecustomer.pk
+    except Site.stripecustomer.RelatedObjectDoesNotExist as e:
+        stripe_customer = get_or_create_customer(billing_email=site.billing_email)
+        customer_id = stripe_customer['id']
+        stripe_customer_object, created = StripeCustomer.objects.get_or_create(
+            customer_id=customer_id
         )
+        stripe_customer_object.site = site
+        stripe_customer_object.save()
+    
+    payment_method, error = add_payment_method(card_number, expiry_month, expiry_year, cvc)
+    if error:
+        return HttpResponse(str(error), status=400)
+    payment_method = attach_payment_method(
+        site.stripecustomer.customer_id, 
+        payment_method['id']
+    )
+@login_required
+@check_core_profile_requirements_fulfilled
+def detach_stripe_payment_method_handler(request): 
+    context = {}
+    site_pk = request.POST.get('site_pk')
+    site = Site.objects.get(pk=site_pk)
+    if get_profile_allowed_to_change_subscription(request.user.profile, site):
+        payment_method, error = detach_stripe_payment_method(request.POST['payment_method_id'])
         if error:
             return HttpResponse(str(error), status=400)
         context['site'] = site
@@ -788,6 +826,27 @@ def detach_stripe_payment_method(request):
         return render(request, 'core/htmx/payment_methods.html', context)
     return HttpResponse(status=403)
 
+@login_required
+def detach_stripe_payment_method_new_site_handler(request): 
+    context = {}
+    site_pk = request.POST.get('site_pk')
+    site = Site.objects.get(pk=site_pk)
+    if get_profile_allowed_to_change_subscription(request.user.profile, site):
+        payment_method, error = detach_stripe_payment_method(request.POST['payment_method_id'])
+        if error:
+            return HttpResponse(str(error), status=400)
+        context['site'] = site
+        site_subscription_change_pk = request.POST.get('site_subscription_change_pk')        
+        if site_subscription_change_pk:
+            context['site_subscription_change'] = SiteSubscriptionChange.objects.filter(pk=site_subscription_change_pk).last
+        return render(request, 'core/htmx/payment_methods.html', context)
+    return HttpResponse(status=403)
+def detach_stripe_payment_method(payment_method_id):
+    payment_method, error = detach_payment_method(
+        payment_method_id
+    )
+    return payment_method, error
+    
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.mail import EmailMessage

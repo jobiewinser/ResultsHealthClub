@@ -259,8 +259,7 @@ def add_site(request, **kwargs):
             site.save()
             profile.sites_allowed.add(site)
             profile.save()
-            response = HttpResponse( status=200)
-            return response
+            return render(request, "campaign_leads/htmx/new_site_payment_methods.html", {'site':site})
         else: #or can we just create the new site!
             site.active = True
             site.subscription = sign_up_subscription
