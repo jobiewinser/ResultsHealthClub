@@ -6,19 +6,15 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
-from calendly.api import Calendly
 from campaign_leads.models import Call, Campaign, Campaignlead, CampaignTemplateLink, CampaignCategory
 from active_campaign.api import ActiveCampaignApi
 from active_campaign.models import ActiveCampaign
 from core.models import Profile, Site, WhatsappBusinessAccount
-from core.user_permission_functions import get_available_sites_for_user, get_user_allowed_to_add_call
+from core.user_permission_functions import get_user_allowed_to_add_call
 from core.views import get_site_pks_from_request_and_return_sites, get_campaign_category_pks_from_request, get_single_site_pk_from_request
 from django.db.models import Q, Count
 from django.db.models import OuterRef, Subquery, Count
-from django.db.models import F
-from whatsapp.api import Whatsapp
 from whatsapp.models import WhatsappTemplate
-from django.template import loader
 from core.core_decorators import check_core_profile_requirements_fulfilled
 logger = logging.getLogger(__name__)
 

@@ -36,7 +36,10 @@ def get_modal_content(request, **kwargs):
                     context["edit_user"] = User.objects.get(pk=user_pk)
             elif template_name == 'add_site':
                 if site_pk:
-                    context["site"] = Site.objects.get(pk=site_pk)                  
+                    context["site"] = Site.objects.get(pk=site_pk)     
+                elif request.user.profile.company.part_created_site:
+                    context["site"] = request.user.profile.company.part_created_site    
+                    
             elif template_name == 'edit_permissions':
                 profile_pk = request.GET.get('profile_pk', None)
                 if profile_pk:

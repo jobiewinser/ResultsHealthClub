@@ -7,8 +7,7 @@
     data-bs-content="
     {%if request.user.profile.role == 'c'%}Only the company's owner can set up a new site.{%else%}You can have up to 1 free site and unlimited paid sites.{%endif%}        
     ">
-    {% if request.user.profile.company.part_created_site%}
-    
+    {% if request.user.profile.company.part_created_site%}    
         <button class="btn btn-sm btn-success"
             hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
             hx-vals='{"template_name": "add_site", "site_pk": "{{request.user.profile.company.part_created_site.pk}}"}'
