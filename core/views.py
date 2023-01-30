@@ -462,9 +462,9 @@ def get_site_pks_from_request_and_return_sites(request):
             if profile.site:
                 site_pks == [request.user.profile.site.pk]
     request.GET['site_pks'] = list(site_pks)
-    return Site.objects.filter(pk__in=site_pks).exclude(active=False)
+    return request.user.profile.active_sites_allowed.filter(pk__in=site_pks).exclude(active=False) #this only allows active sites in the user's active sites list
 
-@login_required
+#this doesn't needs a method decorator because it is not directly used by urls.py
 def get_single_site_pk_from_request(request):  
     if request.method == 'GET':
         request_dict = request.GET
@@ -478,7 +478,7 @@ def get_single_site_pk_from_request(request):
         if profile.site:
             return request.user.profile.site.pk
 
-@login_required
+#this doesn't needs a method decorator because it is not directly used by urls.py
 def get_campaign_category_pks_from_request(request):  
     if request.method == 'GET':
         request_dict = request.GET
@@ -865,9 +865,10 @@ class RegisterNewCompanyView(TemplateView):
             'company_name':[],
             'password':[],
         }}
-        Company.objects.filter(name__iexact = 'bleap').delete()
-        Profile.objects.filter(user__email__iexact = 'jobiewinser@live.co.uk').delete()
-        User.objects.filter(email__iexact = 'jobiewinser@live.co.uk').delete()
+        if settings.DEBUG:
+            Company.objects.filter(name__iexact = 'bleap').delete()
+            Profile.objects.filter(user__email__iexact = 'jobiewinser@live.co.uk').delete()
+            User.objects.filter(email__iexact = 'jobiewinser@live.co.uk').delete()
             
         owner_email = request.POST.get('owner_email').lower()
         company_name = request.POST.get('company_name')
@@ -911,7 +912,8 @@ class RegisterNewCompanyView(TemplateView):
         )
         
         company = Company.objects.create(
-            name = company_name
+            name = company_name,
+            billing_email = owner_email
         )
         
         profile = Profile.objects.create(

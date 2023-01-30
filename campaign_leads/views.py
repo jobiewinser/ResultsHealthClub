@@ -19,10 +19,12 @@ from core.core_decorators import check_core_profile_requirements_fulfilled
 logger = logging.getLogger(__name__)
 
 def hex_to_rgb_tuple(hex):
+    # this function takes a hex string and returns a string of rgb values
 	hex = hex.replace('#','')
 	return f"{int(hex[0:2], 16)},{int(hex[2:4], 16)},{int(hex[4:6], 16)}"
 
 def rgb_to_hex_tuple(rgb_string):
+    # this function takes a string of rgb values and returns a hex string
     try:
         r,g,b = rgb_string.split(',')
         r = ('{:X}').format(int(r)).zfill(2)
@@ -32,8 +34,10 @@ def rgb_to_hex_tuple(rgb_string):
     except Exception as e:
         return "FFFFFF"
 
-
+#this doesn't needs a method decorator because it is not directly used by urls.py
 def get_campaign_qs(request):
+    # this function is used to get the campaigns for the campaign leads overview
+    # it returns a queryset of campaigns that are filtered by the request
     first_model_query = (Campaignlead.objects
         .filter(campaign=OuterRef('pk'), archived=False)
         .values('campaign')
@@ -49,16 +53,16 @@ def get_campaign_qs(request):
     campaign_category_pks = request.GET.getlist('campaign_category_pks', [])
     if campaign_category_pks:
         campaign_qs = campaign_qs.filter(campaign_category__pk__in=campaign_category_pks)
-    return campaign_qs.filter(site__company=request.user.profile.company).order_by('first_model_count')
+    return campaign_qs.filter(site__company=request.user.profile.company, site__in=request.user.profile.active_sites_allowed).order_by('first_model_count')
+#this doesn't needs a method decorator because it is not directly used by urls.py
 def get_campaign_category_qs(request):
     sites = get_site_pks_from_request_and_return_sites(request)
     return CampaignCategory.objects.filter(site__in=sites)
 
-
-
 @method_decorator(login_required, name='dispatch')
 @method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
 class CampaignleadsOverviewView(TemplateView):
+    # this class is used to render the campaign leads overview
     template_name='campaign_leads/campaign_leads_overview.html'
     def get(self, request, *args, **kwargs):
         try:
@@ -73,18 +77,11 @@ class CampaignleadsOverviewView(TemplateView):
         context = super(CampaignleadsOverviewView, self).get_context_data(**kwargs)  
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'campaign_leads/htmx/campaign_leads_overview_htmx.html'   
-        # else:
-        #     context['use_defaults'] = True
-        
-        # if self.request.GET.get('use_defaults', None):
-        #     context['use_defaults'] = True
-
         context.update(get_leads_board_context(self.request))
-            
-        # whatsapp = Whatsapp()
         return context
-        
+#this doesn't needs a method decorator because it is not directly used by urls.py
 def get_leads_board_context(request):
+    # this function is used to get the context for the campaign leads overview and refresh_leads_board
     request.GET._mutable = True 
     context = {}   
     context['sites'] = get_site_pks_from_request_and_return_sites(request)
@@ -159,6 +156,7 @@ def refresh_leads_board(request):
 @method_decorator(login_required, name='dispatch')
 @method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
 class CampaignBookingsOverviewView(TemplateView):
+    # this class is used to display the campaign bookings overview
     template_name='campaign_leads/campaign_bookings_overview.html'
     def get_context_data(self, **kwargs):
         context = super(CampaignBookingsOverviewView, self).get_context_data(**kwargs)    
@@ -169,6 +167,7 @@ class CampaignBookingsOverviewView(TemplateView):
         context.update(get_booking_table_context(self.request))
         return context
 def get_booking_table_context(request):
+    #this function is used to get the context for the booking table and refresh_booking_table_htmx
     request.GET._mutable = True     
     context = {}
     leads = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, campaign__site__in=request.user.profile.active_sites_allowed).exclude(booking__archived=True)
@@ -226,6 +225,7 @@ def refresh_booking_table_htmx(request):
 @method_decorator(login_required, name='dispatch')
 @method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
 class CampaignConfigurationView(TemplateView):
+    #this view is used to configure the campaigns
     template_name='campaign_leads/campaign_configuration.html'
 
     def get_context_data(self, **kwargs):
@@ -273,6 +273,7 @@ class CampaignConfigurationView(TemplateView):
         
 @login_required
 def get_campaigns(request, **kwargs):
+    #this function is used to get the campaigns from active campaign
     # try:
     if request.user.profile.company:
         request.user.profile.company.get_and_generate_campaign_objects()
@@ -284,6 +285,7 @@ def get_campaigns(request, **kwargs):
 
 @login_required
 def new_call(request, **kwargs):
+    #this function is used to add a new call to a lead and refresh the lead article
     logger.debug(str(request.user))
     try:
         if request.user.is_authenticated:
@@ -310,16 +312,15 @@ def new_call(request, **kwargs):
                 lead.trigger_refresh_websocket(refresh_position=True)                
                 return HttpResponse( status=200)
             return HttpResponse( status=500)
-            # return render(request, 'campaign_leads/htmx/lead_article.html', {'lead':lead,'max_call_count':kwargs.get('max_call_count', 1), 'call_count':call_count})
     except Exception as e:
         logger.debug("new_call Error "+str(e))
-        #return HttpResponse(e, status=500)
         raise e
 
 
 
 @login_required
 def campaign_assign_auto_send_template_htmx(request):
+    #this function is used to assign a template to a campaign to be auto sent
     if settings.DEMO and not request.user.is_superuser:
         return HttpResponse(status=500)
     campaign = Campaign.objects.get(pk=request.POST.get('campaign_pk'))
@@ -343,6 +344,7 @@ def campaign_assign_auto_send_template_htmx(request):
 
 @login_required
 def campaign_assign_whatsapp_business_account_htmx(request):    
+    #this function is used to assign a whatsapp business account to a campaign and refresh the campaign config row
     if settings.DEMO and not request.user.is_superuser:
         return HttpResponse(status=500)
     campaign = Campaign.objects.get(pk=request.POST.get('campaign_pk'))
@@ -354,6 +356,7 @@ def campaign_assign_whatsapp_business_account_htmx(request):
     return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign})
 @login_required
 def campaign_assign_campaign_category_htmx(request):
+    #this function is used to assign a campaign category to a campaign and refresh the campaign config row
     if settings.DEMO and not request.user.is_superuser:
         return HttpResponse(status=500)
     campaign = Campaign.objects.get(pk=request.POST.get('campaign_pk'))
@@ -363,6 +366,7 @@ def campaign_assign_campaign_category_htmx(request):
     return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign})
 @login_required
 def profile_assign_campaign_category_htmx(request):
+    #this function is used to assign a campaign category to a profile and refresh the profile config row
     if settings.DEMO and not request.user.is_superuser:
         return HttpResponse(status=500)
     context= {}
@@ -375,12 +379,14 @@ def profile_assign_campaign_category_htmx(request):
 
 @login_required
 def refresh_campaign_configuration_row(request):
+    #this function is used to refresh the campaign config row
     campaign = Campaign.objects.get(pk=request.POST.get('campaign_pk'))
     campaign.save()
     return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign})
     
 @login_required
 def campaign_assign_color_htmx(request):
+    #this function is used to assign a color to a campaign and refresh the campaign config row
     campaign = Campaign.objects.get(pk=request.POST.get('campaign_pk'))
     campaign.color = hex_to_rgb_tuple(request.POST.get('color', "60F83D"))
     campaign.save()
@@ -389,6 +395,7 @@ def campaign_assign_color_htmx(request):
 
 @login_required
 def campaign_assign_product_cost_htmx(request):
+    #this function is used to assign a product cost to a campaign and refresh the campaign config row
     if settings.DEMO and not request.user.is_superuser:
         return HttpResponse(status=500)
     campaign = Campaign.objects.get(pk=request.POST.get('campaign_pk'))
@@ -397,10 +404,10 @@ def campaign_assign_product_cost_htmx(request):
         campaign.product_cost = product_cost
         campaign.save()
     return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign,})
-                                                                            # 'site_list': get_available_sites_for_user(request.user)})
 
 @login_required
 def toggle_claim_lead(request, **kwargs):
+    #this function is used to toggle the claim of a lead to the request user or toggle it off if there is already a claim
     logger.debug(str(request.user))
     try:
         lead = Campaignlead.objects.get(pk=kwargs.get('lead_pk'))
