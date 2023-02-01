@@ -75,11 +75,11 @@ function handleDraggedItem(dragged_elem, drag_target){
         error: function(XMLHttpRequest, textStatus, errorThrown) {
         }
     })
-    let call_count = parseInt($(drag_target).data("call-count"));
-    let max_call_count = parseInt($('#max_call_count').val());
-    if (call_count > max_call_count) {
-        $('#add_column').click();
-    }
+    // let call_count = parseInt($(drag_target).data("call-count"));
+    // let max_call_count = parseInt($('#max_call_count').val());
+    // if (call_count > max_call_count) {
+    //     $('#add_column').click();
+    // }
 }
 
 function set_total_costs(){  

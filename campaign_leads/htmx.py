@@ -1,3 +1,4 @@
+#0.9 safe
 from datetime import datetime
 from django.http import HttpResponse
 from django.contrib.auth.models import User
@@ -85,7 +86,7 @@ def add_campaign_category(request, **kwargs):
     campaign_pk = request.POST.get('campaign_pk')
     site_pk = request.POST.get('site_pk')
     if campaign_pk:
-        campaign = Campaign.objects.get(pk=campaign_pk)
+        campaign = request.user.profile.campaigns_allowed.get(pk=campaign_pk)
         campaign_category, created = CampaignCategory.objects.get_or_create(site=campaign.site, name=name)
         campaign.campaign_category = campaign_category
         campaign.save()
@@ -108,7 +109,7 @@ def edit_lead(request, **kwargs):
     campaign_pk = request.POST.get('campaign_pk')
     if not campaign_pk:
         return HttpResponse("Please choose a campaign", status=500)
-    campaign = Campaign.objects.get(pk=campaign_pk)    
+    campaign = request.user.profile.campaigns_allowed.get(pk=campaign_pk)    
     
     first_name = request.POST.get('first_name')
     if not first_name:
@@ -130,6 +131,9 @@ def edit_lead(request, **kwargs):
     lead_pk = request.POST.get('lead_pk')
     if lead_pk:
         lead = Campaignlead.objects.get(pk=lead_pk)
+        if not lead.campaign in request.user.profile.campaigns_allowed:
+            return HttpResponse("You are not permissted to use this campaign", status=403)
+            
         refresh_position = False
     else:
         lead = Campaignlead()
@@ -151,44 +155,44 @@ def edit_lead(request, **kwargs):
     #     logger.debug("create_campaign_lead Error "+str(e))
     #     # raise Exception
     #     return HttpResponse("Error with creating a campaign lead", status=500)
-@login_required
-def get_leads_column_meta_data(request, **kwargs):
-    logger.debug(str(request.user))
-    try:
-        leads = Campaignlead.objects
-        campaign_pk = request.GET.get('campaign_pk', None)
-            # request.GET['campaign_pk'] = campaign_pk
-        sites = get_site_pks_from_request_and_return_sites(request).filter(archived=False, booking=None, campaign__site__in=request.user.profile.active_sites_allowed)
-        if request.GET['site_pks']:
-            leads = leads.filter(campaign__site__pk__in=request.GET['site_pks'])
+# @login_required
+# def get_leads_column_meta_data(request, **kwargs):
+#     logger.debug(str(request.user))
+#     try:
+#         leads = Campaignlead.objects.filter(campaign__site__in=request.user.profile.active_sites_allowed)
+#         campaign_pk = request.GET.get('campaign_pk', None)
+#             # request.GET['campaign_pk'] = campaign_pk
+#         sites = get_site_pks_from_request_and_return_sites(request).filter(archived=False, booking=None)
+#         if request.GET['site_pks']:
+#             leads = leads.filter(campaign__site__pk__in=request.GET['site_pks'])
             
-        if campaign_pk:
-            leads = leads.filter(campaign=Campaign.objects.get(pk=campaign_pk))
-        leads = leads.annotate(calls=Count('call'))
-        querysets = [
-            ('Fresh', leads.filter(calls=0), 0)
-        ]
-        index = 0
-        # if leads.filter(calls__gt=index):
-        while leads.filter(calls__gt=index) or index < 21:
-            index = index + 1
-            querysets.append(
-                (f"Call {index}", leads.filter(calls=index), index)
-            )
-        # else:
-        #     querysets.append(
-        #         (f"Call 1", leads.none(), 1)
-        #     )
-        return render(request, 'campaign_leads/htmx/column_metadata_htmx.html', {'querysets':querysets})
-    except Exception as e:
-        logger.debug("get_leads_column_meta_data Error "+str(e))
-        #return HttpResponse(e, status=500)
-        raise e
+#         if campaign_pk:
+#             leads = leads.filter(campaign=request.user.profile.campaigns_allowed.get(pk=campaign_pk))
+#         leads = leads.annotate(calls=Count('call'))
+#         querysets = [
+#             ('Fresh', leads.filter(calls=0), 0)
+#         ]
+#         index = 0
+#         # if leads.filter(calls__gt=index):
+#         while leads.filter(calls__gt=index) or index < 21:
+#             index = index + 1
+#             querysets.append(
+#                 (f"Call {index}", leads.filter(calls=index), index)
+#             )
+#         # else:
+#         #     querysets.append(
+#         #         (f"Call 1", leads.none(), 1)
+#         #     )
+#         return render(request, 'campaign_leads/htmx/column_metadata_htmx.html', {'querysets':querysets})
+#     except Exception as e:
+#         logger.debug("get_leads_column_meta_data Error "+str(e))
+#         #return HttpResponse(e, status=500)
+#         raise e
 @login_required
 def refresh_lead_article(request, **kwargs):
     logger.debug(str(request.user))
     try:
-        lead = Campaignlead.objects.get(pk=kwargs.get('lead_pk'))       
+        lead = Campaignlead.objects.get(pk=kwargs.get('lead_pk'), campaign__site__in=request.user.profile.active_sites_allowed)       
         return render(request, 'campaign_leads/htmx/lead_article.html', {'lead':lead, 'max_call_count':0})
     except Exception as e:
         logger.debug("get_leads_column_meta_data Error "+str(e))
@@ -198,7 +202,7 @@ def refresh_lead_article(request, **kwargs):
 def refresh_booking_row(request, **kwargs):
     logger.debug(str(request.user))
     try:
-        lead = Campaignlead.objects.get(pk=kwargs.get('lead_pk'))       
+        lead = Campaignlead.objects.get(pk=kwargs.get('lead_pk'), campaign__site__in=request.user.profile.active_sites_allowed)       
         return render(request, 'campaign_leads/htmx/campaign_booking_row_htmx.html', {'lead':lead})
     except Exception as e:
         logger.debug("get_leads_column_meta_data Error "+str(e))
@@ -210,7 +214,7 @@ def refresh_booking_row(request, **kwargs):
 def add_manual_booking(request, **kwargs):
     logger.debug(str(request.user))
     try:        
-        lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'))
+        lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'), campaign__site__in=request.user.profile.active_sites_allowed)
         booking_date = request.POST.get('booking_date')
         booking_time = request.POST.get('booking_time')
         # if (request.POST.get('booking_type', 'off') == 'on'):
@@ -266,18 +270,20 @@ def add_manual_booking(request, **kwargs):
 def mark_archived(request, **kwargs):
     logger.debug(str(request.user))
     try:
-        if request.user.is_authenticated:
-            lead_pk = request.POST.get('lead_pk') or kwargs.get('lead_pk')
-            lead = Campaignlead.objects.get(pk=lead_pk)
-            if lead.archived:
-                lead.archived = False
-                # lead.sold = False
-            else:
-                lead.archived = True
-                # lead.sold = False
-            lead.save()
-            lead.trigger_refresh_websocket(refresh_position=False)
-            return render(request, "campaign_leads/htmx/campaign_booking_row.html", {'lead':lead}) 
+        lead_pk = request.POST.get('lead_pk') or kwargs.get('lead_pk')
+        lead = Campaignlead.objects.get(pk=lead_pk, campaign__site__in=request.user.profile.active_sites_allowed)
+        if lead.active_sales_qs.exists():
+            return HttpResponse("Cannot archive a lead with active sales", status=400)
+            
+        if lead.archived:
+            lead.archived = False
+            # lead.sold = False
+        else:
+            lead.archived = True
+            # lead.sold = False
+        lead.save()
+        lead.trigger_refresh_websocket(refresh_position=False)
+        return render(request, "campaign_leads/htmx/campaign_booking_row.html", {'lead':lead}) 
     except Exception as e:
         logger.debug("mark_archived Error "+str(e))
         #return HttpResponse(e, status=500)
@@ -304,11 +310,10 @@ def new_leads_column(request, **kwargs):
 def delete_lead(request, **kwargs):
     logger.debug(str(request.user))
     try:
-        if request.user.is_authenticated:
-            lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'))
-            lead.delete()
+        lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'), campaign__site__in=request.user.profile.active_sites_allowed)
+        lead.delete()
 
-            return HttpResponse( "text", 200)
+        return HttpResponse( "text", 200)
     except Exception as e:
         logger.debug("mark_archived Error "+str(e))
         #return HttpResponse(e, status=500)
@@ -318,11 +323,10 @@ def delete_lead(request, **kwargs):
 def mark_arrived(request, **kwargs):
     logger.debug(str(request.user))
     try:
-        if request.user.is_authenticated:
-            lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'))
-            lead.arrived = not lead.arrived
-            lead.save()
-            return render(request, "campaign_leads/htmx/campaign_booking_row.html", {'lead':lead}) 
+        lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'), campaign__site__in=request.user.profile.active_sites_allowed)
+        lead.arrived = not lead.arrived
+        lead.save()
+        return render(request, "campaign_leads/htmx/campaign_booking_row.html", {'lead':lead}) 
     except Exception as e:
         logger.debug("mark_archived Error "+str(e))
         #return HttpResponse(e, status=500)
@@ -333,26 +337,26 @@ def mark_arrived(request, **kwargs):
 def mark_sold(request, **kwargs):
     logger.debug(str(request.user))
     try:
-        if request.user.is_authenticated:
-            user_pk = request.POST.get('user_pk')
-            lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'))
-            active_sales = lead.active_sales_qs
-            latest_active_sale = active_sales.last()
+        user_pk = request.POST.get('user_pk')
+        lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'), campaign__site__in=request.user.profile.active_sites_allowed)
+        active_sales = lead.active_sales_qs
+        latest_active_sale = active_sales.last()
+        active_sales.update(archived=True)
+        if latest_active_sale and not user_pk:
             active_sales.update(archived=True)
-            if latest_active_sale and not user_pk:
-                active_sales.update(archived=True)
+        else:
+            if user_pk:
+                user = User.objects.get(pk=user_pk)
             else:
-                if user_pk:
-                    user = User.objects.get(pk=user_pk)
-                else:
-                    user = request.user
-                Sale.objects.create(
-                    user = user,
-                    datetime = datetime.now(),
-                    lead = lead,
-                )
-            lead.save()
-            return render(request, "campaign_leads/htmx/campaign_booking_row.html", {'lead':lead}) 
+                user = request.user
+            Sale.objects.create(
+                user = user,
+                datetime = datetime.now(),
+                lead = lead,
+            )
+        lead.archived = False
+        lead.save()
+        return render(request, "campaign_leads/htmx/campaign_booking_row.html", {'lead':lead}) 
     except Exception as e:
         logger.debug("mark_archived Error "+str(e))
         #return HttpResponse(e, status=500)
@@ -378,7 +382,7 @@ def create_lead_note(request, **kwargs):
     logger.debug(str(request.user))
     try:
         if request.user.is_authenticated:
-            lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'))
+            lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'), campaign__site__in=request.user.profile.active_sites_allowed)
             note = request.POST.get('note','')
             if note:
                 if settings.DEMO and not request.user.is_superuser:
@@ -402,7 +406,7 @@ def create_lead_note(request, **kwargs):
 def get_contacts_for_campaign(request, **kwargs):
     logger.debug(str(request.user))
     context = {}
-    campaign = ActiveCampaign.objects.get(pk=request.GET.get('campaign_pk'))
+    campaign = request.user.profile.active_campaigns_allowed.get(pk=request.GET.get('campaign_pk'))
     active_campaign_api = ActiveCampaignApi(request.user.profile.company.active_campaign_api_key, request.user.profile.company.active_campaign_url)
     contacts = active_campaign_api.list_contacts_by_campaign(campaign.active_campaign_id)
     contact_id_list = []
