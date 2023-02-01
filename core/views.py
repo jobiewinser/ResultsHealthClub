@@ -444,26 +444,34 @@ def free_taster_redirect(request, **kwargs):
 
 @login_required
 def get_site_pks_from_request_and_return_sites(request):
+    #make request.GET mutable and get request_dict
     request.GET._mutable = True 
+    profile = request.user.profile
     if request.method == 'GET':
         request_dict = request.GET
     elif request.method == 'POST':
         request_dict = request.POST
-    temp_site_pks = request.GET.get('site_pks', None)
+    
+    #get site_pks from request
+    temp_site_pks = request.GET.get('site_pks', [])
+    #if site_pks is a string, convert to list
     if type(temp_site_pks) == list:
         site_pks = temp_site_pks
     else:
-        site_pks = request.GET.getlist('site_pks',request.user.profile.active_sites_allowed.values_list('pk', flat=True))
+        site_pks = request.GET.getlist('site_pks', [])
+        
+    #remove empty strings from list
     while "" in site_pks:
         site_pks.pop(site_pks.index(""))
+        
     if not site_pks:
-        profile = Profile.objects.filter(user=request.user).first()
         if profile and not request_dict.get('campaign_category_pk', None) and not request_dict.get('campaign_pk', None):
             if profile.site:
-                site_pks == [request.user.profile.site.pk]
-    request.GET['site_pks'] = list(site_pks)
-    return request.user.profile.active_sites_allowed.filter(pk__in=site_pks).exclude(active=False) #this only allows active sites in the user's active sites list
-
+                site_pks = [profile.site.pk]
+    request.GET['site_pks'] = site_pks
+    if site_pks:
+        return profile.active_sites_allowed.filter(pk__in=site_pks).exclude(active=False) #this only allows active sites in the user's active sites list
+    return Site.objects.none()
 #this doesn't needs a method decorator because it is not directly used by urls.py
 def get_single_site_pk_from_request(request):  
     if request.method == 'GET':

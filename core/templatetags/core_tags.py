@@ -142,7 +142,7 @@ def convert_string_to_datetime(string):
 @register.filter
 def nice_date_tag(date):
     try:
-        date = date + datetime.timedelta(hours=1)
+        date = date + timedelta(hours=1)
         date = (date.date() - date(1970, 1, 1)).total_seconds()
         # just for preview/phrase editing
         date = datetime.strptime(str(date), '%d-%m-%Y')
@@ -156,7 +156,7 @@ def nice_date_tag(date):
 @register.filter
 def short_date_tag(date):
     try:
-        date = date + datetime.timedelta(hours=1)
+        date = date + timedelta(hours=1)
         date = (date.date() - date(1970, 1, 1)).total_seconds()
         # just for preview/phrase editing
         date = datetime.strptime(str(date), '%d/%m/%Y')
@@ -168,22 +168,32 @@ def short_date_tag(date):
         return str(date)
 
 @register.filter
-def nice_datetime_tag(date):
+def nice_datetime_tag(dt):
     try:
-        if date.date() == datetime.today().date():
-            return f"{date.strftime('%H:%M')} - today"
-        return str(date.strftime("%H:%M - %-d %B %Y"))
+        if dt.date() == datetime.today().date():
+            return f"{dt.strftime('%H:%M')} - today"
+        return str(dt.strftime("%H:%M - %-d %B %Y"))
     except Exception as e:
-        return str(date)
+        return str(dt)
 
 @register.filter
-def nice_message_datetime_tag(date):
+def nice_message_datetime_tag(dt):
     try:
-        if date.date() == datetime.today().date():
-            return f"{date.strftime('%H:%M')}"
-        return str(date.strftime("%-d %B %Y"))
+        if dt.date() == datetime.today().date():
+            return f"{dt.strftime('%H:%M')}"
+        return str(dt.strftime("%-d %B %Y"))
     except Exception as e:
-        return str(date)
+        return str(dt)
+
+@register.filter
+def time_ago_tag(dt):   
+
+    now = datetime.now()
+    day_ago = now - timedelta(days = 1)
+
+    if dt < day_ago:
+        return  f"{str(round((now - dt).total_seconds() / 86400))} day(s) ago"
+    return  f"{str(round((now - dt).total_seconds() / 3600))} hour(s) ago"
 
     
 @register.filter
