@@ -81,16 +81,17 @@
                         data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fa-solid fa-chevron-down  fa-2xs"></i>
                     </button>
-                </div>
-
-                
+                </div>                
             </div>
         </div>
         <div class="row">
             <span class="secondary_td_layer elipses-overflow campaign_name p-0 ps-1" style="max-width:140px">{{lead.campaign}}</span>
         </div>
         <div class="row">
-            <span class="secondary_td_layer elipses-overflow site_name p-0 ps-1" style="max-width:140px"><b><i>{{lead.campaign.site.name}}</i></b></span>
+            <span class="secondary_td_layer elipses-overflow site_name p-0 ps-1" style="max-width:140px">{{lead.campaign.site.name}}</span>
+        </div>
+        <div class="row">
+            <span class="secondary_td_layer elipses-overflow site_name p-0 ps-1" style="max-width:140px">Called <b>{%if lead.last_dragged%}{{lead.last_dragged|time_ago_tag}}{%else%}Never{%endif%}</b></span>
         </div>
         <div class="row mt-3">
             <span class="secondary_td_layer p-0" >
