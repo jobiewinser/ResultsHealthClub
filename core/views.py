@@ -1,3 +1,4 @@
+#0.9 safe
 import os
 import sys
 import traceback
@@ -39,15 +40,11 @@ class LoginDemoView(View):
 
 @method_decorator(login_required, name='dispatch')
 @method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
-class HomeView(TemplateView):
-    template_name='core/customer_home.html'
+class HomeView(View):
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             if request.user.profile:
                 return redirect("/leads-and-calls/")
-        if request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
-            self.template_name = 'core/htmx/customer_home_htmx.html'
-        return super(HomeView, self).get(request, args, kwargs)
     
 
 
@@ -101,15 +98,10 @@ class CompanyPermissionsView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(CompanyPermissionsView, self).get_context_data(**kwargs)       
-        # permission_company = self.request.user.profile.company
-        
-        # profile = Profile.objects.get(pk=self.request.GET.get('profile_pk'))
-        # context['company_permissions'], created = CompanyProfilePermissions.objects.get_or_create(profile=profile, company=permission_company)
         company_permissions = CompanyProfilePermissions.objects.get(pk=self.request.GET.get('company_permissions_pk'))
         company_permissions.save()
         context['company_permissions'] = company_permissions
         context['profile'] = company_permissions.profile
-        # context['permission_company'] = permission_company
         return context
     def post(self, request):
         if settings.DEMO and not request.user.is_superuser:
@@ -135,15 +127,11 @@ class SitePermissionsView(TemplateView):
     template_name='campaign_leads/htmx/edit_permissions.html'
 
     def get_context_data(self, **kwargs):
-        context = super(SitePermissionsView, self).get_context_data(**kwargs)       
-        # permission_site = Site.objects.get(pk=self.request.GET.get('site_pk'))
-        # context['site'] = Site.objects.get(pk=self.request.GET.get('site_pk'))
-        # profile = Profile.objects.get(pk=self.request.GET.get('profile_pk'))
+        context = super(SitePermissionsView, self).get_context_data(**kwargs)    
         site_permissions = SiteProfilePermissions.objects.get(pk=self.request.GET.get('site_permissions_pk'))
         site_permissions.save()
         context['site_permissions'] = site_permissions
         context['profile'] = site_permissions.profile
-        # context['permission_site'] = permission_site
         return context
     def post(self, request):
         if settings.DEMO and not request.user.is_superuser:
@@ -170,7 +158,7 @@ class SitePermissionsView(TemplateView):
 def get_site_configuration_context(request):
     request.GET._mutable = True   
     context = {}
-    site_pk = get_single_site_pk_from_request(request)   
+    site_pk = get_single_site_pk_from_request_or_default_profile_site(request)   
     request.GET['site_pk'] = site_pk   
     site = Site.objects.get(pk=site_pk)     
 
@@ -220,31 +208,19 @@ class SiteConfigurationView(TemplateView):
             return HttpResponse(status=500)
         self.request.POST._mutable = True 
         site = Site.objects.get(pk=request.POST.get('site_pk'))   
-
-        # permissions
-        # if not get_profile_allowed_to_edit_site_configuration(request.user.profile, site):
-        #     if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
-        #         return HttpResponse("You don't have permission to edit this")
-        #     raise PermissionDenied()
-        # endpermissions
-
-
+        if not get_profile_allowed_to_view_site_configuration(request.user.profile, site):
+            if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+                return HttpResponse("You don't have the edit Calendly configuration permission", status=403)
+            raise PermissionDenied()
+        
         response_text = ""     
         if 'name' in request.POST:
-            if not get_profile_allowed_to_edit_site_configuration(request.user.profile, site):
-                if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
-                    return HttpResponse("You don't have the edit site configuration permission", status=403)
-                raise PermissionDenied()
             site.name = request.POST['name']
             response_text = f"{response_text} <span hx-swap-oob='innerHTML:.name_display_{site.pk}'>{site.name}</span>"            
             site.save()
             return HttpResponse(response_text, status=200)
             
         if 'calendly_organization' in request.POST or 'calendly_token' in request.POST:
-            if not get_profile_allowed_to_edit_site_calendly_configuration(request.user.profile, site):
-                if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
-                    return HttpResponse("You don't have the edit Calendly configuration permission", status=403)
-                raise PermissionDenied()
             if 'calendly_organization' in request.POST:
                 if request.POST['calendly_organization'] == '' or request.POST['calendly_organization'].replace('*', ''): #stops the **** input submitting!
                     site.calendly_organization = request.POST['calendly_organization']        
@@ -265,17 +241,25 @@ class SiteConfigurationView(TemplateView):
 class CompanyConfigurationView(TemplateView):
     template_name='core/company_configuration.html'
 
+    def get(self, request, *args, **kwargs):
+        if not request.user.profile.role == 'a':
+            if request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+                return HttpResponse("Only an owner can edit the company configuration", status=403)
+            raise PermissionDenied()
+        return super().get(request, *args, **kwargs)
+        
     def get_context_data(self, **kwargs):
+            
         self.request.GET._mutable = True       
         context = super(CompanyConfigurationView, self).get_context_data(**kwargs)
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'core/htmx/company_configuration_htmx.html'
         # context['site_list'] = get_available_sites_for_user(self.request.user)
-        
-        context['role_choices'] = ROLE_CHOICES
         context['company'] = self.request.user.profile.company
         for profile in context['company'].profile_set.all():
-            CompanyProfilePermissions.objects.get_or_create(profile=profile, company=profile.company)
+            CompanyProfilePermissions.objects.get_or_create(profile=profile, company=profile.company)  
+        
+        context['role_choices'] = ROLE_CHOICES
         # context['site_list'] = get_available_sites_for_user(self.request.user)
         return context
 @login_required
@@ -470,10 +454,10 @@ def get_site_pks_from_request_and_return_sites(request):
                 site_pks = [profile.site.pk]
     request.GET['site_pks'] = site_pks
     if site_pks:
-        return profile.active_sites_allowed.filter(pk__in=site_pks).exclude(active=False) #this only allows active sites in the user's active sites list
+        return request.user.profile.active_sites_allowed.filter(pk__in=site_pks) #this only allows active sites in the user's active sites list
     return Site.objects.none()
 #this doesn't needs a method decorator because it is not directly used by urls.py
-def get_single_site_pk_from_request(request):  
+def get_single_site_pk_from_request_or_default_profile_site(request):  
     if request.method == 'GET':
         request_dict = request.GET
     elif request.method == 'POST':
@@ -555,7 +539,7 @@ class SwitchSubscriptionBeginView(TemplateView):
     def get(self, request, *args, **kwargs):
         request.GET._mutable = True   
         site_pk = request.GET.get('site_pk')
-        site = Site.objects.filter(pk=site_pk).exclude(active=False).first()
+        site = request.user.profile.active_sites_allowed.filter(pk=site_pk).first()
         if site:  
             if get_profile_allowed_to_change_subscription(request.user.profile, site):
                 return super(SwitchSubscriptionBeginView, self).get(request, args, kwargs)
@@ -563,7 +547,7 @@ class SwitchSubscriptionBeginView(TemplateView):
     def get_context_data(self):    
         context = super(SwitchSubscriptionBeginView, self).get_context_data()
         site_pk = self.request.GET.get('site_pk')
-        site = Site.objects.get(pk=site_pk)
+        site = self.request.user.profile.active_sites_allowed.get(pk=site_pk)
         site_subscription_change_pk = self.request.GET.get('site_subscription_change_pk')
         if not site_subscription_change_pk:
             switch_subscription = Subscription.objects.get(numerical=self.request.GET.get('numerical'))        
@@ -599,52 +583,56 @@ def choose_attached_profiles(request):
     site_subscription_change_pk = request.POST.get('site_subscription_change_pk')
     # del request.POST['site_subscription_change_pk']
     site_subscription_change = SiteSubscriptionChange.objects.get(pk=site_subscription_change_pk)
-    user_pks = []
-    for k,v in request.POST.items():
-        if 'choose_profile_' in k and v == 'on':
-            user_pks.append(k.replace('choose_profile_', ''))
-    if len(user_pks) > site_subscription_change.subscription_to.max_profiles:
-        return HttpResponse("Too many profiles chosen", status=400)
+    if site_subscription_change.site in request.user.profile.active_sites_allowed.all():
+        user_pks = []
+        for k,v in request.POST.items():
+            if 'choose_profile_' in k and v == 'on':
+                user_pks.append(k.replace('choose_profile_', ''))
+        if len(user_pks) > site_subscription_change.subscription_to.max_profiles:
+            return HttpResponse("Too many profiles chosen", status=400)
 
-    site_subscription_change.users_to_keep.set(User.objects.filter(pk__in=user_pks, profile__company=site_subscription_change.site.company))
-    site_subscription_change.stripe_session_id = f"{site_subscription_change.site.guid}_{str(datetime.timestamp(datetime.now()))}"
-    site_subscription_change.completed_by = request.user
-    site_subscription_change.save()
-    # if site_subscription_change.subscription_to.whatsapp_enabled:
-    #     return render(request, 'templates/core/htmx/setup_payment.html', {'site_subscription_change':site_subscription_change})
-    # else:
-    
-    
-    
-    try:
-        stripe_customer = get_or_create_customer(customer_id=site_subscription_change.site.stripecustomer.customer_id)
-    except Site.stripecustomer.RelatedObjectDoesNotExist as e:
-        stripe_customer = get_or_create_customer(billing_email=site_subscription_change.site.billing_email)
-    customer_id = stripe_customer['id']
-    stripe_customer_object, created = StripeCustomer.objects.get_or_create(
-        customer_id=customer_id
-    )
-    stripe_customer_object.json_data = stripe_customer
-    stripe_customer_object.site = site_subscription_change.site
-    stripe_customer_object.save()
-    if site_subscription_change.subscription_to.stripe_price_id:
-        return render(request, 'core/htmx/subscription_payment.html', {'site_subscription_change':site_subscription_change})
-    cancel_subscription(site_subscription_change.site.stripecustomer.subscription_id)
-    site_subscription_change.complete()
-    site_subscription_change.process()
-    return render(request, 'core/htmx/subscription_changed.html', {})
+        site_subscription_change.users_to_keep.set(User.objects.filter(pk__in=user_pks, profile__company=site_subscription_change.site.company))
+        site_subscription_change.stripe_session_id = f"{site_subscription_change.site.guid}_{str(datetime.timestamp(datetime.now()))}"
+        site_subscription_change.completed_by = request.user
+        site_subscription_change.save()
+        # if site_subscription_change.subscription_to.whatsapp_enabled:
+        #     return render(request, 'templates/core/htmx/setup_payment.html', {'site_subscription_change':site_subscription_change})
+        # else:
+        
+        
+        
+        try:
+            stripe_customer = get_or_create_customer(customer_id=site_subscription_change.site.stripecustomer.customer_id)
+        except Site.stripecustomer.RelatedObjectDoesNotExist as e:
+            stripe_customer = get_or_create_customer(billing_email=site_subscription_change.site.billing_email)
+        customer_id = stripe_customer['id']
+        stripe_customer_object, created = StripeCustomer.objects.get_or_create(
+            customer_id=customer_id
+        )
+        stripe_customer_object.json_data = stripe_customer
+        stripe_customer_object.site = site_subscription_change.site
+        stripe_customer_object.save()
+        if site_subscription_change.subscription_to.stripe_price_id:
+            return render(request, 'core/htmx/subscription_payment.html', {'site_subscription_change':site_subscription_change})
+        cancel_subscription(site_subscription_change.site.stripecustomer.subscription_id)
+        site_subscription_change.complete()
+        site_subscription_change.process()
+        return render(request, 'core/htmx/subscription_changed.html', {})
+    return HttpResponse("Not allowed to change that site", status=403)
     
 @login_required
 @check_core_profile_requirements_fulfilled
 def change_default_payment_method(request):
     site_pk = request.POST.get('site_pk')
     invoice_id = request.POST.get('invoice_id')
-    site = Site.objects.get(pk=site_pk)
+    site = request.user.profile.active_sites_allowed.get(pk=site_pk)
     payment_method_id = request.POST.get('payment_method_id')
-    update_payment_method(site.stripecustomer.subscription_id, payment_method_id)   
-    if invoice_id and not invoice_id == 'None': 
-        invoice = retry_invoice(invoice_id)
-    return render(request, 'core/htmx/subscription_changed.html', {})
+    if get_profile_allowed_to_change_subscription(request.user.profile, site):
+        update_payment_method(site.stripecustomer.subscription_id, payment_method_id)   
+        if invoice_id and not invoice_id == 'None': 
+            invoice = retry_invoice(invoice_id)
+        return render(request, 'core/htmx/subscription_changed.html', {})
+    return HttpResponse("Not allowed to change that site subscription", status=403)
 
 @login_required
 @check_core_profile_requirements_fulfilled
@@ -654,43 +642,46 @@ def complete_stripe_subscription_handler(request):
 
 def complete_stripe_subscription(site_subscription_change_pk, payment_method_id, user):
     site_subscription_change_pk = site_subscription_change_pk
-    site_subscription_change = SiteSubscriptionChange.objects.get(pk=site_subscription_change_pk)
-    
+    site_subscription_change = SiteSubscriptionChange.objects.get(pk=site_subscription_change_pk) 
     site = site_subscription_change.site
-    try:
-        temp = site.stripecustomer.pk
-    except Site.stripecustomer.RelatedObjectDoesNotExist as e:
-        stripe_customer = get_or_create_customer(billing_email=site.billing_email)
-        customer_id = stripe_customer['id']
-        stripe_customer_object, created = StripeCustomer.objects.get_or_create(
-            customer_id=customer_id
-        )
-        stripe_customer_object.site = site
-        stripe_customer_object.save()
     
-    if site_subscription_change.subscription_from.numerical < site_subscription_change.subscription_to.numerical:
-        #if upgrading, upgrade immediately and prorate
-        stripe_subscription = add_or_update_subscription(
-            site.stripecustomer.customer_id, 
-            payment_method_id, 
-            site_subscription_change.subscription_to.stripe_price_id,
-            subscription_id=site.stripecustomer.subscription_id,
-            proration_behavior='create_prorations',
-        )
-    else:
-        #if downgrading, keep current membership until end of period
-        stripe_subscription = add_or_update_subscription(
-            site.stripecustomer.customer_id, 
-            payment_method_id, 
-            site_subscription_change.subscription_to.stripe_price_id,
-            subscription_id=site.stripecustomer.subscription_id,
-            proration_behavior='none',
-        )
-    site.stripecustomer.subscription_id = stripe_subscription.stripe_id
-    site.stripecustomer.save()
-    site.get_stripe_subscriptions_and_update_models()
-    site_subscription_change.completed_by = user
-    site_subscription_change.complete()
+    if get_profile_allowed_to_change_subscription(user.profile, site):
+        try:
+            #check it exists
+            site.stripecustomer.pk
+        except Site.stripecustomer.RelatedObjectDoesNotExist as e:
+            stripe_customer = get_or_create_customer(billing_email=site.billing_email)
+            customer_id = stripe_customer['id']
+            stripe_customer_object, created = StripeCustomer.objects.get_or_create(
+                customer_id=customer_id
+            )
+            stripe_customer_object.site = site
+            stripe_customer_object.save()
+        
+        if site_subscription_change.subscription_from.numerical < site_subscription_change.subscription_to.numerical:
+            #if upgrading, upgrade immediately and prorate
+            stripe_subscription = add_or_update_subscription(
+                site.stripecustomer.customer_id, 
+                payment_method_id, 
+                site_subscription_change.subscription_to.stripe_price_id,
+                subscription_id=site.stripecustomer.subscription_id,
+                proration_behavior='create_prorations',
+            )
+        else:
+            #if downgrading, keep current membership until end of period
+            stripe_subscription = add_or_update_subscription(
+                site.stripecustomer.customer_id, 
+                payment_method_id, 
+                site_subscription_change.subscription_to.stripe_price_id,
+                subscription_id=site.stripecustomer.subscription_id,
+                proration_behavior='none',
+            )
+        site.stripecustomer.subscription_id = stripe_subscription.stripe_id
+        site.stripecustomer.save()
+        site.get_stripe_subscriptions_and_update_models()
+        site_subscription_change.completed_by = user
+        site_subscription_change.complete()
+    return HttpResponse("Not allowed to change that site subscription", status=403)
 
 
 @login_required
@@ -698,64 +689,68 @@ def complete_stripe_subscription_new_site_handler(request):
     payment_method_id = request.POST.get('payment_method_id')
     if payment_method_id:
         profile = request.user.profile
-        site = Site.objects.get(pk=request.POST['site_pk'])
-        site.complete_stripe_subscription_new_site(payment_method_id)
-        
-        site.active = True
-        site.sign_up_subscription = None
-        site.save()
-        profile.sites_allowed.add(site)
-        profile.save()
-        response = HttpResponse( status=200)
-        response["HX-Redirect"] = f"/configuration/site-configuration/?site_pk={site.pk}"
-        return response
+        site = profile.active_sites_allowed.get(pk=request.POST['site_pk'])
+        if get_profile_allowed_to_change_subscription(profile, site):
+            site.complete_stripe_subscription_new_site(payment_method_id)
+            
+            site.active = True
+            site.sign_up_subscription = None
+            site.save()
+            profile.sites_allowed.add(site)
+            profile.save()
+            response = HttpResponse( status=200)
+            response["HX-Redirect"] = f"/configuration/site-configuration/?site_pk={site.pk}"
+            return response
+        return HttpResponse("Not allowed to change that site subscription", status=403)
 
 @login_required
 @check_core_profile_requirements_fulfilled
 def renew_stripe_subscription(request):
     site_pk = request.POST['site_pk']   
-    site = Site.objects.get(pk=site_pk)     
-    payment_method_id = request.POST.get('payment_method_id')
-    if site.stripecustomer.subscription_id and payment_method_id:
-        renew_subscription(site.stripecustomer.subscription_id, payment_method_id)
-        return render(request, 'core/htmx/subscription_changed.html', {})
+    site = Site.objects.get(pk=site_pk)    
+    if get_profile_allowed_to_change_subscription(request.user.profile, site): 
+        payment_method_id = request.POST.get('payment_method_id')
+        if site.stripecustomer.subscription_id and payment_method_id:
+            renew_subscription(site.stripecustomer.subscription_id, payment_method_id)
+            return render(request, 'core/htmx/subscription_changed.html', {})
+    return HttpResponse("Not allowed to change that site subscription", status=403)
 
-@method_decorator(login_required, name='dispatch')
-@method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
-class PaymentsAndBillingView(TemplateView):
-    template_name='core/payments_and_billing.html'
+# @method_decorator(login_required, name='dispatch')
+# @method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
+# class PaymentsAndBillingView(TemplateView):
+#     template_name='core/payments_and_billing.html'
 
-    def get(self, request, *args, **kwargs):   
-        # site = Site.objects.get(pk=site_pk) 
-        if request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
-            self.template_name = 'core/htmx/payments_and_billing_htmx.html'
-        return super(PaymentsAndBillingView, self).get(request, args, kwargs)
+#     def get(self, request, *args, **kwargs):   
+#         # site = Site.objects.get(pk=site_pk) 
+#         if request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+#             self.template_name = 'core/htmx/payments_and_billing_htmx.html'
+#         return super(PaymentsAndBillingView, self).get(request, args, kwargs)
 
-    def get_context_data(self, **kwargs):
-        self.request.GET._mutable = True   
-        context = {}
-        site_pk = get_single_site_pk_from_request(self.request)   
-        self.request.GET['site_pk'] = site_pk   
-        site = Site.objects.get(pk=site_pk)     
+#     def get_context_data(self, **kwargs):
+#         self.request.GET._mutable = True   
+#         context = {}
+#         site_pk = get_single_site_pk_from_request_or_default_profile_site(self.request)   
+#         self.request.GET['site_pk'] = site_pk   
+#         site = Site.objects.get(pk=site_pk)     
 
-        # permissions
-        context['permitted'] = False
-        if get_profile_allowed_to_view_site_configuration(self.request.user.profile, site):
-            context['permitted'] = True
-        # end permissions
+#         # permissions
+#         context['permitted'] = False
+#         if get_profile_allowed_to_view_site_configuration(self.request.user.profile, site):
+#             context['permitted'] = True
+#         # end permissions
         
-        context['site'] = site
-        # context['stripe_subscriptions'] = list_subscriptions(site.stripecustomer.customer_id)
-        return context
+#         context['site'] = site
+#         # context['stripe_subscriptions'] = list_subscriptions(site.stripecustomer.customer_id)
+#         return context
     
-@method_decorator(login_required, name='dispatch')
-@method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
-class StripeSubscriptionCanceledView(TemplateView):
-    template_name='core/stripe_subscription_canceled.html'
+# @method_decorator(login_required, name='dispatch')
+# @method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
+# class StripeSubscriptionCanceledView(TemplateView):
+#     template_name='core/stripe_subscription_canceled.html'
 
-    def get_context_data(self, **kwargs):
-        context = super(StripeSubscriptionCanceledView, self).get_context_data(**kwargs)       
-        return context
+#     def get_context_data(self, **kwargs):
+#         context = super(StripeSubscriptionCanceledView, self).get_context_data(**kwargs)       
+#         return context
 
 
     
@@ -764,7 +759,7 @@ class StripeSubscriptionCanceledView(TemplateView):
 def add_stripe_payment_method_handler(request): 
     context = {}
     site_pk = request.POST.get('site_pk')
-    site = Site.objects.get(pk=site_pk)
+    site = request.user.profile.active_sites_allowed.get(pk=site_pk)
     if get_profile_allowed_to_change_subscription(request.user.profile, site):
         add_stripe_payment_method(site, 
             request.POST['cardNumber'], 
@@ -783,7 +778,7 @@ def add_stripe_payment_method_handler(request):
 def add_stripe_payment_method_new_site_handler(request): 
     context = {}
     site_pk = request.POST.get('site_pk')
-    site = Site.objects.get(pk=site_pk)
+    site = request.user.profile.active_sites_allowed.get(pk=site_pk)
     if get_profile_allowed_to_change_subscription(request.user.profile, site):
         add_stripe_payment_method(site, 
             request.POST['cardNumber'], 
@@ -822,7 +817,7 @@ def add_stripe_payment_method(site, card_number, expiry_month, expiry_year, cvc)
 def detach_stripe_payment_method_handler(request): 
     context = {}
     site_pk = request.POST.get('site_pk')
-    site = Site.objects.get(pk=site_pk)
+    site = request.user.profile.active_sites_allowed.get(pk=site_pk)
     if get_profile_allowed_to_change_subscription(request.user.profile, site):
         payment_method, error = detach_stripe_payment_method(request.POST['payment_method_id'])
         if error:
@@ -838,7 +833,7 @@ def detach_stripe_payment_method_handler(request):
 def detach_stripe_payment_method_new_site_handler(request): 
     context = {}
     site_pk = request.POST.get('site_pk')
-    site = Site.objects.get(pk=site_pk)
+    site = request.user.profile.active_sites_allowed.get(pk=site_pk)
     if get_profile_allowed_to_change_subscription(request.user.profile, site):
         payment_method, error = detach_stripe_payment_method(request.POST['payment_method_id'])
         if error:
@@ -920,8 +915,7 @@ class RegisterNewCompanyView(TemplateView):
         )
         
         company = Company.objects.create(
-            name = company_name,
-            billing_email = owner_email
+            name = company_name
         )
         
         profile = Profile.objects.create(

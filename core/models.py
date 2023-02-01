@@ -891,6 +891,10 @@ class Profile(models.Model):
                     permissions, created = SiteProfilePermissions.objects.get_or_create(profile=self, site=site)
                 except:
                     pass
+            try:
+                permissions, created = CompanyProfilePermissions.objects.get_or_create(profile=self, company=self.company)
+            except:
+                pass
         
 class FreeTasterLink(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)

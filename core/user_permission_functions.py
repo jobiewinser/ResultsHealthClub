@@ -69,6 +69,8 @@ def get_profile_allowed_to_edit_profile_permissions(user_profile, target_profile
     return False
 
 def check_if_profile_is_higher_authority_than_profile(user_profile, target_profile):
+    user_profile.save()
+    target_profile.save()
     # owners have authority over themselves
     if user_profile == target_profile and user_profile.role == 'a':
         return True

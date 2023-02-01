@@ -11,7 +11,7 @@ from active_campaign.api import ActiveCampaignApi
 from active_campaign.models import ActiveCampaign
 from core.models import Profile, Site, WhatsappBusinessAccount
 from core.user_permission_functions import get_user_allowed_to_add_call
-from core.views import get_site_pks_from_request_and_return_sites, get_campaign_category_pks_from_request, get_single_site_pk_from_request
+from core.views import get_site_pks_from_request_and_return_sites, get_campaign_category_pks_from_request, get_single_site_pk_from_request_or_default_profile_site
 from django.db.models import Q, Count
 from django.db.models import OuterRef, Subquery, Count
 from whatsapp.models import WhatsappTemplate
@@ -257,7 +257,7 @@ class CampaignConfigurationView(TemplateView):
         #         self.request.GET['campaign_category_pk'] = campaign_category_pk
         #     except Exception as e:
         #         pass
-        site_pk = get_single_site_pk_from_request(self.request)
+        site_pk = get_single_site_pk_from_request_or_default_profile_site(self.request)
         if site_pk and not site_pk == 'all':
             try:
                 campaigns = campaigns.filter(Q(site=None)|Q(site__pk=site_pk))

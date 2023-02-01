@@ -254,6 +254,7 @@ def add_site(request, **kwargs):
             site = Site(
                 company = request.user.profile.company,
                 active = False,
+                billing_email = request.user.email,
             )
         site.name = name
         site.sign_up_subscription = sign_up_subscription

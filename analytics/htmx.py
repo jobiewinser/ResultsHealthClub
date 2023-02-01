@@ -208,7 +208,7 @@ def get_leads_per_day(request):
     #     sites = Site.objects.filter(campaigncategory__in=campaign_categorys).exclude(active=False)
     # else:
     site_pks = request.GET.getlist('site_pks', request.user.profile.active_sites_allowed)
-    sites = Site.objects.filter(pk__in=site_pks).exclude(active=False)
+    sites = request.user.profile.active_sites_allowed.filter(pk__in=site_pks)
 
     start_date = datetime.strptime(request.GET.get('start_date'), '%Y-%m-%d')
     end_date = datetime.strptime(request.GET.get('end_date'), '%Y-%m-%d') + relativedelta.relativedelta(days=1) 
@@ -242,7 +242,7 @@ def get_bookings_per_day(request):
     #     sites = Site.objects.filter(campaigncategory__in=campaign_categorys).exclude(active=False)
     # else:
     site_pks = request.GET.getlist('site_pks', request.user.profile.active_sites_allowed)
-    sites = Site.objects.filter(pk__in=site_pks).exclude(active=False)
+    sites = request.user.profile.active_sites_allowed.filter(pk__in=site_pks)
 
     start_date = datetime.strptime(request.GET.get('start_date'), '%Y-%m-%d')
     end_date = datetime.strptime(request.GET.get('end_date'), '%Y-%m-%d') + relativedelta.relativedelta(days=1) 
@@ -276,7 +276,7 @@ def get_sales_per_day(request):
     #     sites = Site.objects.filter(campaigncategory__in=campaign_categorys).exclude(active=False)
     # else:
     site_pks = request.GET.getlist('site_pks', request.user.profile.active_sites_allowed)
-    sites = Site.objects.filter(pk__in=site_pks).exclude(active=False)
+    sites = request.user.profile.active_sites_allowed.filter(pk__in=site_pks)
 
     start_date = datetime.strptime(request.GET.get('start_date'), '%Y-%m-%d')
     end_date = datetime.strptime(request.GET.get('end_date'), '%Y-%m-%d') + relativedelta.relativedelta(days=1) 
@@ -310,7 +310,7 @@ def get_calls_today(request):
     #     sites = Site.objects.filter(campaigncategory__in=campaign_categorys).exclude(active=False)
     # else:
     site_pks = request.GET.getlist('site_pks', request.user.profile.active_sites_allowed)
-    sites = Site.objects.filter(pk__in=site_pks).exclude(active=False)
+    sites = request.user.profile.active_sites_allowed.filter(pk__in=site_pks)
 
     data_set, raw_qs = get_calls_today_dataset(campaigns=campaigns, campaign_categorys=campaign_categorys, sites=sites)
         
@@ -339,7 +339,7 @@ def get_sales_today(request):
     #     sites = Site.objects.filter(campaigncategory__in=campaign_categorys).exclude(active=False)
     # else:
     site_pks = request.GET.getlist('site_pks', request.user.profile.active_sites_allowed)
-    sites = Site.objects.filter(pk__in=site_pks).exclude(active=False)
+    sites = request.user.profile.active_sites_allowed.filter(pk__in=site_pks)
     
     data_set, raw_qs = get_sales_today_dataset(campaigns=campaigns, campaign_categorys=campaign_categorys, sites=sites)
         
@@ -368,7 +368,7 @@ def get_calls_made_per_day(request):
     #     sites = Site.objects.filter(campaigncategory__in=campaign_categorys).exclude(active=False)
     # else:
     site_pks = request.GET.getlist('site_pks', request.user.profile.active_sites_allowed)
-    sites = Site.objects.filter(pk__in=site_pks).exclude(active=False)
+    sites = request.user.profile.active_sites_allowed.filter(pk__in=site_pks)
 
     start_date = datetime.strptime(request.GET.get('start_date'), '%Y-%m-%d')
     end_date = datetime.strptime(request.GET.get('end_date'), '%Y-%m-%d') + relativedelta.relativedelta(days=1) 
@@ -402,7 +402,7 @@ def get_current_call_count_distribution(request):
     #     sites = Site.objects.filter(campaigncategory__in=campaign_categorys).exclude(active=False)
     # else:
     site_pks = request.GET.getlist('site_pks', request.user.profile.active_sites_allowed)
-    sites = Site.objects.filter(pk__in=site_pks).exclude(active=False)
+    sites = request.user.profile.active_sites_allowed.filter(pk__in=site_pks)
     
     non_time_filtered_live_opportunities = Campaignlead.objects.filter(booking = None, archived = False).exclude(sale__archived=False).annotate(calls=Count('call'))
     
@@ -449,7 +449,7 @@ def get_pipeline(request):
     #     sites = Site.objects.filter(campaigncategory__in=campaign_categorys).exclude(active=False)
     # else:
     site_pks = request.GET.getlist('site_pks', request.user.profile.active_sites_allowed)
-    sites = Site.objects.filter(pk__in=site_pks).exclude(active=False)
+    sites = request.user.profile.active_sites_allowed.filter(pk__in=site_pks)
 
     start_date = datetime.strptime(request.GET.get('start_date'), '%Y-%m-%d')
 
