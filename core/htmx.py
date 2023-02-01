@@ -1,3 +1,4 @@
+#0.9 safe
 import os
 import uuid
 from calendly.api import Calendly
@@ -115,7 +116,7 @@ class ModifyUser(View):
         try:
             action = request.POST.get('action', '')
             if action == 'add':
-                site = Site.objects.get(pk=request.POST.get('site_pk', ''))
+                site = request.user.profile.active_sites_allowed.get(pk=request.POST.get('site_pk', ''))
                 if site.subscription.max_profiles:
                     if site.users.count() >= site.subscription.max_profiles:
                         return HttpResponse("You already have the maximum number of users", status=400)
@@ -135,8 +136,8 @@ class ModifyUser(View):
                     #     raise ValidationError("The word password is not allowed as a password")
                 except ValidationError as e:
                     return HttpResponse(e, status=400)
-                if not role:
-                    return HttpResponse("Please enter a Role", status=400)
+                if not role or request.user.profile.role == 'c':
+                    return HttpResponse(f"Please enter a Role with lower permissions than yourself {str(request.user.profile.get_role_display)}", status=400)
                 profile_picture = request.FILES.get('profile_picture')
                 # calendly_event_page_url = request.POST.get('calendly_event_page_url', '')
                 if not username:
@@ -277,41 +278,41 @@ def add_site(request, **kwargs):
             
     return HttpResponse("This feature requires a Pro subscription", status=403)
 
-@login_required
-def generate_free_taster_link(request, **kwargs):
-    if settings.DEMO and not request.user.is_superuser:
-        return HttpResponse(status=500)
-    try:
-        if request.user.is_authenticated:
-            customer_name = request.POST.get('customer_name', '')
-            site_pk = request.POST.get('site_pk','')
-            if customer_name:
-                guid = str(uuid.uuid4())[:8]
-                while FreeTasterLink.objects.filter(guid=guid):
-                    guid = str(uuid.uuid4())[:8]
-                generated_link = FreeTasterLink.objects.create(customer_name=customer_name, user=request.user, guid=guid, site=Site.objects.get(pk=site_pk))
-                return render(request, f"core/htmx/generated_link_display.html", {'generated_link':generated_link})  
-    except Exception as e:
-        logger.debug("generate_free_taster_link Error "+str(e))
-        #return HttpResponse(e, status=500)
-        raise e
+# @login_required
+# def generate_free_taster_link(request, **kwargs):
+#     if settings.DEMO and not request.user.is_superuser:
+#         return HttpResponse(status=500)
+#     try:
+#         if request.user.is_authenticated:
+#             customer_name = request.POST.get('customer_name', '')
+#             site_pk = request.POST.get('site_pk','')
+#             if customer_name:
+#                 guid = str(uuid.uuid4())[:8]
+#                 while FreeTasterLink.objects.filter(guid=guid):
+#                     guid = str(uuid.uuid4())[:8]
+#                 generated_link = FreeTasterLink.objects.create(customer_name=customer_name, user=request.user, guid=guid, site=Site.objects.get(pk=site_pk))
+#                 return render(request, f"core/htmx/generated_link_display.html", {'generated_link':generated_link})  
+#     except Exception as e:
+#         logger.debug("generate_free_taster_link Error "+str(e))
+#         #return HttpResponse(e, status=500)
+#         raise e
 
 
-@login_required
-def delete_free_taster_link(request, **kwargs):
-    if settings.DEMO and not request.user.is_superuser:
-        return HttpResponse(status=500)
-    logger.debug(str(request.user))
-    try:
-        if request.user.is_authenticated:
-            link_pk = request.POST.get('link_pk','')
-            if link_pk:
-                FreeTasterLink.objects.get(pk=link_pk).delete()
-            return HttpResponse( "text", 200)
-    except Exception as e:
-        logger.debug("delete_free_taster_link Error "+str(e))
-        #return HttpResponse(e, status=500)
-        raise e
+# @login_required
+# def delete_free_taster_link(request, **kwargs):
+#     if settings.DEMO and not request.user.is_superuser:
+#         return HttpResponse(status=500)
+#     logger.debug(str(request.user))
+#     try:
+#         if request.user.is_authenticated:
+#             link_pk = request.POST.get('link_pk','')
+#             if link_pk:
+#                 FreeTasterLink.objects.get(pk=link_pk).delete()
+#             return HttpResponse( "text", 200)
+#     except Exception as e:
+#         logger.debug("delete_free_taster_link Error "+str(e))
+#         #return HttpResponse(e, status=500)
+#         raise e
 
 
         

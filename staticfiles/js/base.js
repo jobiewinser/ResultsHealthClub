@@ -127,12 +127,15 @@ function basehandlehtmxafterRequest(evt){
     popoverstuff()
     let status = evt.detail.xhr.status;
     let srcElement = $(evt.srcElement);
-    if(status == 200) {
-        if (![undefined, ''].includes(evt.detail.pathInfo.path)){
-            if (evt.detail.pathInfo.path.includes("login")){
-                window.location.replace("/");
-            }
-        }
+    if (evt.detail.xhr.responseURL.includes("accounts/login")) {
+        window.location.replace("/");
+    }
+    else if(status == 200) {
+        // if (![undefined, ''].includes(evt.detail.pathInfo.path)){
+        //     if (evt.detail.pathInfo.path.includes("login")){
+        //         window.location.replace("/");
+        //     }
+        // }
         if (![undefined, ''].includes(evt.detail.pathInfo.requestPath)){
             if (evt.detail.pathInfo.requestPath.includes("login-htmx")){
                 $('#generic_modal').modal('hide');
@@ -203,6 +206,9 @@ function basehandlehtmxafterRequest(evt){
             srcElement.after("<div id='login_error' style='color:red'>Not Found</div>");
         }
         snackbarShow('Error: '+evt.detail.xhr.response, 'danger', display_ms=5000)           
+    }else if (status == 302) {   
+        console.log(1, evt)
+        alert("TEST")        
     }else if (status == 500){
         snackbarShow('Error: '+evt.detail.xhr.response, 'danger', display_ms=5000)           
     }else if (status == 400){

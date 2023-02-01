@@ -689,7 +689,7 @@ def complete_stripe_subscription_new_site_handler(request):
     payment_method_id = request.POST.get('payment_method_id')
     if payment_method_id:
         profile = request.user.profile
-        site = profile.active_sites_allowed.get(pk=request.POST['site_pk'])
+        site = profile.sites_allowed.get(pk=request.POST['site_pk'])
         if get_profile_allowed_to_change_subscription(profile, site):
             site.complete_stripe_subscription_new_site(payment_method_id)
             
@@ -778,7 +778,7 @@ def add_stripe_payment_method_handler(request):
 def add_stripe_payment_method_new_site_handler(request): 
     context = {}
     site_pk = request.POST.get('site_pk')
-    site = request.user.profile.active_sites_allowed.get(pk=site_pk)
+    site = request.user.profile.sites_allowed.get(pk=site_pk)
     if get_profile_allowed_to_change_subscription(request.user.profile, site):
         add_stripe_payment_method(site, 
             request.POST['cardNumber'], 
@@ -872,6 +872,7 @@ class RegisterNewCompanyView(TemplateView):
             Company.objects.filter(name__iexact = 'bleap').delete()
             Profile.objects.filter(user__email__iexact = 'jobiewinser@live.co.uk').delete()
             User.objects.filter(email__iexact = 'jobiewinser@live.co.uk').delete()
+            Site.objects.filter(billing_email__iexact = 'jobiewinser@live.co.uk').update(billing_email='')
             
         owner_email = request.POST.get('owner_email').lower()
         company_name = request.POST.get('company_name')
@@ -886,9 +887,7 @@ class RegisterNewCompanyView(TemplateView):
             context['errors']['password'].append(error)
             error_found = True
         
-        existing_users = User.objects.filter(email=owner_email)
-        existing_companies = Company.objects.filter(name__iexact=company_name)
-        
+        existing_users = User.objects.filter(email=owner_email)        
         if existing_users:
             if existing_users.filter(is_active=True):
                 context['errors']['owner_email'].append("This email is already used within our system.")
@@ -896,12 +895,17 @@ class RegisterNewCompanyView(TemplateView):
                 context['errors']['owner_email'].append("This email is already in the process of registering. <br>If they have not completed this in 24 hours, it will become available again.")
             error_found = True
         
+        existing_sites_with_email = Site.objects.filter(billing_email=owner_email)        
+        if existing_sites_with_email:
+            context['errors']['owner_email'].append("This email is already used within our system for a billing account.")
+            error_found = True
+        
+        existing_companies = Company.objects.filter(name__iexact=company_name)
         if existing_companies:
             if existing_companies.filter(is_active=True):
                 context['errors']['company_name'].append("This company already exists within our system.")
             else:
-                context['errors']['company_name'].append("This company name is already in the process of registering. <br>If they have not completed this in 24 hours, it will become available again.")
-            
+                context['errors']['company_name'].append("This company name is already in the process of registering. <br>If they have not completed this in 24 hours, it will become available again.")            
             error_found = True
             
         if error_found:

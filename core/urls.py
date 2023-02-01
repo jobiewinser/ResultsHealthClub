@@ -28,7 +28,7 @@ urlpatterns = [
     path('modify-user/', corehtmx.ModifyUser.as_view(), name='modify-user' ),
     # path('free-tasters/overview/', coreviews.FreeTasterOverviewView.as_view(), name='free-taster-overview' ),
     path('free-tasters/redirect/<str:guid>/', coreviews.free_taster_redirect, name='free-taster' ),
-    path('generate-free-taster-link/', corehtmx.generate_free_taster_link, name='generate-free-taster-link' ),
+    # path('generate-free-taster-link/', corehtmx.generate_free_taster_link, name='generate-free-taster-link' ),
     path('create-calendly-webhook-subscription/', corehtmx.create_calendly_webhook_subscription, name='create-calendly-webhook-subscription' ),
     path('delete-calendly-webhook-subscription/', corehtmx.delete_calendly_webhook_subscription, name='delete-calendly-webhook-subscription' ),
 
@@ -37,7 +37,7 @@ urlpatterns = [
     path('detach-stripe-payment-method-new-site-handler/', coreviews.detach_stripe_payment_method_new_site_handler, name='detach-stripe-payment-method-new-site-handler'),  
     path('complete-stripe-subscription-new-site-handler/', coreviews.complete_stripe_subscription_new_site_handler, name='complete-stripe-subscription-new-site-handler'),  
     
-    path('delete-free-taster-link/', corehtmx.delete_free_taster_link, name='delete-free-taster-link' ),  
+    # path('delete-free-taster-link/', corehtmx.delete_free_taster_link, name='delete-free-taster-link' ),  
     # path('configuration/', coreviews.ConfigurationView.as_view(), name='configuration'),  
 
     path('profile-configuration-needed/', coreviews.ProfileConfigurationNeededView.as_view(), name='profile-configuration-needed'),  

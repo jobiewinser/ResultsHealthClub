@@ -555,7 +555,7 @@ class Site(models.Model):
     sign_up_subscription = models.ForeignKey("core.Subscription", related_name="sign_up_subscription_site", on_delete=models.SET_NULL, null=True, blank=True) #temp called new
     
     # subscription_old = models.CharField(max_length=5, default="free") #temp
-    billing_email = models.TextField(blank=True, null=True, unique=True, max_length=50)
+    billing_email = models.TextField(blank=True, null=True, max_length=50)
     
     stripe_subscription_id = ArrayField(
         models.TextField(null=True, blank=True),
