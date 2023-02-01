@@ -9,7 +9,7 @@ from core.models import FreeTasterLink, FreeTasterLinkClick, Profile, Site, What
 def get_available_sites_for_user(user):
     profile = user.profile
     if profile.role == 'a':
-        return Site.objects.filter(company=profile.company)
+        return Site.objects.filter(company=profile.company).exclude(active=False)
     if profile.active_sites_allowed:
         return profile.active_sites_allowed
     return Site.objects.none()
@@ -30,8 +30,8 @@ def get_profile_allowed_to_toggle_whatsapp_sending(profile, site):
         return permissions.toggle_whatsapp_sending
     return False
 def get_profile_allowed_to_change_subscription(profile, site):
-    permissions = SiteProfilePermissions.objects.filter(profile=profile, site=site).first()
-    if permissions:
+    if site in profile.sites_allowed.all():
+        permissions, created = SiteProfilePermissions.objects.get_or_create(profile=profile, site=site)
         return permissions.change_subscription
     return False
     

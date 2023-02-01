@@ -41,7 +41,7 @@ def get_analytics_context(request):
             pass
     if request.META.get("HTTP_HX_REQUEST", 'false') == 'false' or request.GET.get('use_defaults', None):
         context['use_defaults'] = True
-        context['sites'] = Site.objects.filter(pk=request.user.profile.site.pk)
+        context['sites'] = Site.objects.filter(pk=request.user.profile.site.pk).exclude(active=False)
     else:
         context['sites'] = get_site_pks_from_request_and_return_sites(request)  
     context['start_date'] = request.GET.get('start_date', None)
@@ -58,18 +58,18 @@ def refresh_analytics(request):
 
 def get_minimum_site_subscription_level_from_site_qs(site_qs):
     if site_qs:
-        lowest_subscription_site = site_qs.order_by('subscription_new__numerical').first()
+        lowest_subscription_site = site_qs.order_by('subscription__numerical').first()
         if lowest_subscription_site:
             print(lowest_subscription_site)
-            return lowest_subscription_site.subscription_new
+            return lowest_subscription_site.subscription
     return Subscription.objects.get(numerical=2)
 # def get_minimum_site_subscription_level_from_campaign_qs(campaign_qs):
 #     for numerical in [0,1,2]:
-#         if campaign_qs.filter(site__subscription_new__numerical=numerical):
+#         if campaign_qs.filter(site__subscription__numerical=numerical):
 #             return Subscription.objects.get(numerical=numerical)
 #     return Subscription.objects.get(numerical=2)
 # def get_minimum_site_subscription_level_from_campaign_category_qs(campaign_category_qs):
 #     for numerical in [0,1,2]:
-#         if campaign_category_qs.filter(site__subscription_new__numerical=numerical):
+#         if campaign_category_qs.filter(site__subscription__numerical=numerical):
 #             return Subscription.objects.get(numerical=numerical)
 #     return Subscription.objects.get(numerical=2)

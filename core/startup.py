@@ -90,7 +90,7 @@ def run_demo_startup():
                 name="Abingdon Site",
                 company=company,
             )
-            # site1.subscription_new = Subscription.objects.filter(numerical=2).first()
+            # site1.subscription = Subscription.objects.filter(numerical=2).first()
             site1.calendly_token = os.getenv("DEFAULT_CALENDLY_TOKEN")
             site1.calendly_organization = os.getenv("DEFAULT_CALENDLY_ORGANIZATION")
             site1.save()
@@ -221,7 +221,7 @@ def run_debug_startup():
             site.calendly_token = os.getenv("DEFAULT_CALENDLY_TOKEN")
             site.calendly_organization = os.getenv("DEFAULT_CALENDLY_ORGANIZATION")
             site.guid = "6325bcde-feb9-4c"
-            # site.subscription_new = Subscription.objects.filter(numerical=2).first()
+            # site.subscription = Subscription.objects.filter(numerical=2).first()
             site.save()
 
             whatsapp_business_account, created = WhatsappBusinessAccount.objects.get_or_create(

@@ -1,0 +1,52 @@
+{%load core_tags%}
+
+<div class="generic_modal_contents">
+    <div class="card card-white m-1 p-3" style="">
+      <div class="row">
+        <div class="col">
+            <div class="row">
+                <div class="col">
+                  <p class="text-{{site_subscription_change.subscription_to.bootstrap_colour}}">
+                      Switching to <b>{{site_subscription_change.subscription_to.get_name_display}}</b> subscription £{{site_subscription_change.subscription_to.cost|floatformat:2}} p/m (per facility/site)
+                  </p>
+                  {%if site_subscription_change.subscription_from.numerical < 1 %}
+                  <p class="text-secondary">
+                    Changes will be immediate after successful payment.
+                  </p>
+                  {%elif site_subscription_change.subscription_to.numerical < site_subscription_change.subscription_from.numerical %}
+                  <p class="text-secondary">
+                    Changes will take place at the end of the billing period.
+                  </p>
+                  {%else%}
+                  <p class="text-success">
+                    Changes will be immediate after successful payment and for this billing period, you will only pay for the remaining days of the period at the increased rate. For more info: <a href="https://stripe.com/docs/billing/subscriptions/prorations" target="_blank">Stripe Prorations</a>
+                  </p>
+                  {%endif%}
+                </div>
+                <div class="col-md-auto">
+                  <button class="btn btn-light"
+                      hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
+                      {% if not site_subscription_change.subscription_to.max_profiles < site_subscription_change.subscription_from.max_profiles%}
+                      hx-vals='{"template_name": "switch_subscription","switch_subscription":"{{site_subscription_change.subscription_to.numerical}}","site_pk":"{{site_subscription_change.site.pk}}"}'
+                      hx-get="{% url 'campaign-lead-get-modal-content'%}" 
+                      {%else%}
+                      hx-vals='{"site_subscription_change_pk":"{{site_subscription_change.pk}}","site_pk":"{{site_subscription_change.site.pk}}"}'
+                      hx-get="{% url 'switch-subscription-begin'%}" 
+                      {%endif%}
+                      hx-push-url="false"
+                      hx-swap="innerHTML" hx-trigger="click">
+                      Back
+                  </button>
+                </div>
+            </div>
+            {%with site_subscription_change.site as site%}
+            <span id="payment_methods_wrapper">
+                {%include 'core/htmx/payment_methods.html'%}
+            </span>
+            {%endwith%}
+        </div>
+    </div>
+</div>
+<span hx-swap-oob="true" id="generic_modal_title">
+    Set up Payment
+</span>

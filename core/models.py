@@ -532,7 +532,7 @@ class StripeCustomer(models.Model): #can give a site extra basic/pro subscriptio
     subscription_id = models.TextField(blank=True, null=True)
     
 class Site(models.Model):
-    created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    created = models.DateTimeField(null=True, blank=True)
     active = models.BooleanField(default=True)
     name = models.TextField(blank=True, null=True)
     company = models.ForeignKey("core.Company", on_delete=models.SET_NULL, null=True, blank=True)
@@ -551,8 +551,10 @@ class Site(models.Model):
     #                 ('basic', 'Basic'),
     #                 ('pro', 'Pro'),
     #             )
-    subscription_new = models.ForeignKey("core.Subscription", on_delete=models.SET_NULL, null=True, blank=True) #temp called new
-    subscription_old = models.CharField(max_length=5, default="free") #temp
+    subscription = models.ForeignKey("core.Subscription", on_delete=models.SET_NULL, null=True, blank=True) #temp called new
+    sign_up_subscription = models.ForeignKey("core.Subscription", related_name="sign_up_subscription_site", on_delete=models.SET_NULL, null=True, blank=True) #temp called new
+    
+    # subscription_old = models.CharField(max_length=5, default="free") #temp
     billing_email = models.TextField(blank=True, null=True, unique=True, max_length=50)
     
     stripe_subscription_id = ArrayField(
@@ -569,7 +571,7 @@ class Site(models.Model):
         stripe_invoices = list_upcoming_invoices_by_customer(self.stripecustomer.customer_id)
         return stripe_invoices['data']
     
-    @property
+    
     def get_stripe_subscriptions_and_update_models(self):
         try:
             temp = self.stripecustomer.pk
@@ -604,12 +606,12 @@ class Site(models.Model):
             site = self,
         ).first()
         if subscription_override:
-            self.subscription_new = subscription_override.subscription
+            self.subscription = subscription_override.subscription
         elif subscription:
             if subscription.get('status') == 'active':
-                self.subscription_new = subscription_object
+                self.subscription = subscription_object
         elif not stripe_subscriptions:
-            self.subscription_new = None
+            self.subscription = Subscription.objects.filter(numerical__lt=1).last()
         
             
         if len(stripe_subscriptions) > 1 and not settings.DEMO and not settings.DEBUG:
@@ -627,12 +629,12 @@ class Site(models.Model):
         return list_payment_methods(self.stripecustomer.customer_id)       
          
     
-    @property
-    def subscription(self):
-        if not self.subscription_new and self.subscription_old:
-            self.subscription_new = Subscription.objects.filter(name=self.subscription_old).first()
-            self.save()
-        return self.subscription_new
+    # @property
+    # def subscription(self):
+    #     if not self.subscription and self.subscription_old:
+    #         self.subscription = Subscription.objects.filter(name=self.subscription_old).first()
+    #         self.save()
+    #     return self.subscription
     
     @property
     def users(self):
@@ -651,11 +653,11 @@ class Site(models.Model):
 
         
     def check_if_allowed_to_get_analytics(self, start_date):
-        if not self.subscription_new:
+        if not self.subscription:
             self.save()
-        if not self.subscription_new.analytics_seconds:
+        if not self.subscription.analytics_seconds:
             return True
-        if (datetime.now() - timedelta(seconds=self.subscription_new.analytics_seconds)) < start_date:
+        if (datetime.now() - timedelta(seconds=self.subscription.analytics_seconds)) < start_date:
             return True
         return False
     def __str__(self):
@@ -700,11 +702,33 @@ class Site(models.Model):
     def return_phone_numbers(self):
         return WhatsappNumber.objects.filter(whatsapp_business_account__site=self, archived=False).order_by('pk')
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-        if not self.subscription_new and self.subscription_old:
-            self.subscription_new = Subscription.objects.filter(name=self.subscription_old).first()
+        if self.active and not self.created:
+            self.created = datetime.now()
+        # if not self.subscription and self.subscription_old:
+        #     self.subscription = Subscription.objects.filter(name=self.subscription_old).first()
         super(Site, self).save(force_insert, force_update, using, update_fields)
         
         
+    def complete_stripe_subscription_new_site(self, payment_method_id):
+        try:
+            temp = self.stripecustomer.pk
+        except Site.stripecustomer.RelatedObjectDoesNotExist as e:
+            stripe_customer = get_or_create_customer(billing_email=self.billing_email)
+            customer_id = stripe_customer['id']
+            stripe_customer_object, created = StripeCustomer.objects.get_or_create(
+                customer_id=customer_id
+            )
+            stripe_customer_object.self = self
+            stripe_customer_object.save()
+            
+        stripe_subscription = add_or_update_subscription(
+            self.stripecustomer.customer_id, 
+            payment_method_id, 
+            self.sign_up_subscription.stripe_price_id,
+            subscription_id=self.stripecustomer.subscription_id,
+            proration_behavior='create_prorations',
+        )
+        self.get_stripe_subscriptions_and_update_models()
 
         
 
@@ -740,9 +764,9 @@ class Company(models.Model):
     active_campaign_url = models.TextField(null=True, blank=True)
     active_campaign_api_key = models.TextField(null=True, blank=True)
     contact_email = models.TextField(blank=True, null=True, max_length=50)
-    
+    is_active = models.BooleanField(default=True)
     def get_subscription_sites(self, numerical):
-        return self.site_set.filter(subscription_new__numerical=numerical)
+        return self.site_set.filter(subscription__numerical=numerical)
     def outstanding_whatsapp_messages(self, user):
         # Readdress this, I can't find a good way to get latest message for each conversation, then filter based on the last message being inbound...
         count = 0
@@ -758,10 +782,13 @@ class Company(models.Model):
         return User.objects.filter(profile__company=self, is_active=True).order_by('profile__site', 'profile__role')
     @property
     def free_sites(self):
-        return self.site_set.filter(subscription_new__numerical=0)
+        return self.site_set.filter(subscription__numerical=0)
     @property
     def has_pro_subscription_site(self):
-        return self.site_set.filter(subscription_new__numerical=2).exists()
+        return self.site_set.filter(subscription__numerical=2).exists()
+    @property
+    def part_created_site(self):
+        return self.site_set.filter(created=None).first()
     
     @property
     def get_campaign_leads_enabled(self):
@@ -809,7 +836,7 @@ class Profile(models.Model):
     company = models.ForeignKey("core.Company", on_delete=models.SET_NULL, null=True, blank=True)
     sites_allowed = models.ManyToManyField("core.Site", related_name="profile_sites_allowed", null=True, blank=True)
     calendly_event_page_url = models.TextField(blank=True, null=True)
-    
+    register_uuid = models.TextField(null=True, blank=True)
     @property
     def active_sites_allowed(self):
         return self.sites_allowed.filter(active=True).order_by('created')
@@ -823,9 +850,13 @@ class Profile(models.Model):
     
     @property
     def name(self):
-        if self.user.last_name:
-            return f"{self.user.first_name} {self.user.last_name}"
-        return self.user.first_name
+        if self.user:
+            if self.user.first_name or self.user.last_name:
+                return f"{self.user.first_name} {self.user.last_name}"
+            if self.user.email:
+                return f"{self.user.email}"
+            return "No name configured"
+        return "This profile is disabled"
     @property
     def warnings(self):
         warnings = {}
@@ -843,21 +874,13 @@ class Profile(models.Model):
         return warnings
         
     def __str__(self):
-        try:
-            if self.user.first_name or self.user.last_name:
-                return f"{self.user.first_name} {self.user.last_name}"
-        except:
-            pass
-        return str(self.pk)
-    @property
-    def name(self):
-        return f"{self.user.first_name} {self.user.last_name}"
+        return str(self.name)
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         if self.campaign_category:
             if not self.campaign_category.site == self.site:
                 self.campaign_category = None
                 self
-        if not self.site:
+        if not self.site and self.pk:
             self.site = self.sites_allowed.all().first()
         super(Profile, self).save(force_insert, force_update, using, update_fields)
         if not self.site in self.active_sites_allowed and self.site:

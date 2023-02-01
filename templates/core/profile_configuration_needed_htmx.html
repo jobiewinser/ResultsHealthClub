@@ -1,0 +1,27 @@
+{%load static%}
+<span>
+        <div class="center" style="text-align: center;">
+                <div>                 
+                    <img class="center-horizontal" style="width:auto; height:300px;" src="{% static 'img/logo_black.png' %}" alt="Winser Systems Logo">
+                </div>
+                {%if request.user.profile.company.active_sites%}
+                <div style="padding-top: 5px;">   
+                    <h3 class="center-horizontal" style="margin: 35px;">Your profile is incorrectly configured</h3>
+                    <p class="center-horizontal" style="font-size: 16px; margin: 15px;">Please contact your manager and ask them to fix the following problems:</span></p>
+                    <ul>
+                        {%for error in errors%}
+                        <li><small>{{error|safe}}</small></li>
+                        {%endfor%}
+                    </ul>
+                    <p class="center-horizontal" style="margin: 15px;">You are logged in as <b>{{request.user.username}}</b></span></p>
+                    <a class="btn btn-warning btn-sm" href="/accounts/logout/">Sign out</a>
+                </div>
+                {%else%}
+                <div style="padding-top: 5px;">   
+                    <h3 class="center-horizontal" style="margin: 35px;">Please set up your first site</h3>
+                    {%include 'core/htmx/add_site_button.html'%}
+                </div>
+                {%endif%}
+                
+        </div>
+</span>

@@ -20,7 +20,7 @@
                                     <option selected></option>
                                     {%for campaign in request.user.profile.active_campaigns_allowed%}
                                     <option value="{{campaign.pk}}">
-                                        {{campaign.name}}
+                                        {{campaign}}
                                     </option>
                                     {%endfor%}
                                 </select>

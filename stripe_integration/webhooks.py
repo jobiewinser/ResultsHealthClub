@@ -32,7 +32,7 @@ def webhooks(request):
         return HttpResponse(status=400)
 
   # Handle the event
-    site =  Site.objects.filter(stripecustomer__customer_id=event['data']['object']['customer']).first()
+    site =  Site.objects.filter(stripecustomer__customer_id=event['data']['object']['customer']).exclude(active=False).first()
     # if event['type'] == 'customer.subscription.created':
     #     if site:
     #         site.get_stripe_subscriptions_and_update_models
@@ -49,7 +49,7 @@ def webhooks(request):
     #     print()
     # elif event['type'] == 'customer.subscription.updated':
     if site:
-        site.get_stripe_subscriptions_and_update_models
+        site.get_stripe_subscriptions_and_update_models()
         site_subscription_change = SiteSubscriptionChange.objects.filter(site=site, completed=datetime.now()).last()
         if site_subscription_change:
             site_subscription_change.process()

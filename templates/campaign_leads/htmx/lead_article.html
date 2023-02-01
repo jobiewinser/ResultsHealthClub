@@ -18,7 +18,7 @@
                     <b>Name:</b> {{lead.name}}<br>
                     <b>Number:</b> {{lead.whatsapp_number}}<br>
                     <b>Email:</b> {{lead.email}}<br>
-                    <b>Campaign:</b> {{lead.campaign.name}}<br>
+                    <b>Campaign:</b> {{lead.campaign}}<br>
                     <b>Site:</b> {{lead.campaign.site.name}}<br>
                     <b>Created:</b> {{lead.created}}<br>
                     <b>Last Dragged:</b> {{lead.last_dragged}}<br>
@@ -87,7 +87,7 @@
             </div>
         </div>
         <div class="row">
-            <span class="secondary_td_layer elipses-overflow campaign_name p-0 ps-1" style="max-width:140px">{{lead.campaign.name}}</span>
+            <span class="secondary_td_layer elipses-overflow campaign_name p-0 ps-1" style="max-width:140px">{{lead.campaign}}</span>
         </div>
         <div class="row">
             <span class="secondary_td_layer elipses-overflow site_name p-0 ps-1" style="max-width:140px"><b><i>{{lead.campaign.site.name}}</i></b></span>

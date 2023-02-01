@@ -1,0 +1,129 @@
+{%load static tz core_tags user_permission_tags%}
+
+<span id="payment_methods_wrapper">
+    <div class="card card-white">
+        <div class="card-header">
+            Payment Methods on Stripe for {{site.name}}
+        </div>
+        <div class="card-body">
+            <div class="alert alert-warning">
+                <ul>
+                    <li>These payment methods are not stored in any way with Winser Systems, they are kept with Stripe.</li>
+                    <li>Each site has it's own payment methods. So you may have to enter your details for each new site.</li>
+                </ul>                
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            Type
+                        </th>
+                        <th>
+                            Card ending
+                        </th>
+                        <th>
+                            
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="center" colspan="4">
+                            <button class="btn btn-xs btn-primary" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#collapseAddPaymentMethod"
+                                >
+                                <i class="fa-regular fa-plus"></i> Add
+                            </button> 
+                            <div id="collapseAddPaymentMethod" class="collapse {%if advanced_settings_open%}show{%endif%}" data-bs-parent="#accordion"
+                                onclick="
+                                $('.cardNumber').each(function () {
+                                    new Cleave(this, { creditCard: true })
+                                });
+                                ">
+                                <div class="card-body">                                
+                                    <div class="card card-white m-2">
+                                        <form  hx-post="{%url 'add-stripe-payment-method-new-site-handler' %}"
+                                            hx-target="#payment_methods_wrapper"
+                                            hx-swap="#outerHTML"
+                                            hx-indicator="#page_load_indicator"
+                                            hx-vals='{"site_pk":"{{site.pk}}"}'>
+                                            <div class="row">
+                                                <div class="form-group col-md">
+                                                    <label for="cardNumber">Card Number</label>
+                                                    <input type="text" class="form-control cardNumber" name="cardNumber" id="cardNumber" placeholder="0000 0000 0000 0000" />
+                                                </div>
+                                            </div>
+                                            <div class="row">                
+                                                <div class="form-group col-md">
+                                                    <label for="expiryMonth">Expiry Month</label>
+                                                    <input type="tel" maxlength="2" class="form-control" name="expiryMonth" id="expiryMonth" placeholder="MM" />
+                                                </div>
+                                        
+                                                <div class="form-group col-md">
+                                                    <label for="expiryYear">Expiry Year</label>
+                                                    <input type="tel" maxlength="2" class="form-control" name="expiryYear" id="expiryYear" placeholder="YY" />
+                                                </div>
+                                                <div class="form-group col-md-">
+                                                    <label for="cvc">CVC</label>
+                                                    <input type="tel" maxlength="3" class="form-control" name="cvc" id="cvc" placeholder="000" />
+                                                </div>
+                                            </div>
+                                        
+                                            <div class="row m-2">
+                                                <div class="form-group col center">
+                                                    <button type="submit" class="btn btn-primary btn-block"
+                                                    >Submit</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>          
+                        </td>
+                    </tr>
+                    {%for stripe_payment_method in site.stripe_payment_methods%}
+                    <tr>
+                        <td>
+                            {{stripe_payment_method.type}}
+                        </td>
+                        <td>
+                            **** {{stripe_payment_method.card.last4}}
+                        </td>
+                        {% comment %} <td>
+                            {{stripe_payment_method.billing_details.name}}
+                        </td>  {% endcomment %}
+                        <td>                            
+                            <button class="btn btn-xs btn-success" 
+                                {%if not request.user.profile|get_profile_allowed_to_change_subscription_tag:site%}
+                                    disabled
+                                {%endif%}
+                                hx-indicator="#page_load_indicator" hx-target="#generic_modal_body" 
+                                hx-vals='{"payment_method_id": "{{stripe_payment_method.id}}", "site_pk": "{{site.pk}}" {%if site_subscription_change %},"site_subscription_change_pk": "{{site_subscription_change.pk}}"{%endif%}}'
+                                hx-post="{% url 'complete-stripe-subscription-new-site-handler' %}" hx-push-url="false"
+                                hx-swap="innerHTML" hx-trigger="click" hx-confirm="Are you sure you want to use this payment method?">
+                                <i class="fa-regular fa-check"></i> Use
+                            </button>
+                            <button class="btn btn-xs btn-dark" 
+                                {%if not request.user.profile|get_profile_allowed_to_change_subscription_tag:site%}
+                                    disabled
+                                {%endif%}
+                                hx-indicator="#page_load_indicator" hx-target="#payment_methods_wrapper"
+                                hx-swap="#outerHTML"
+                                hx-vals='{"payment_method_id": "{{stripe_payment_method.id}}", "site_pk": "{{site.pk}}" {%if site_subscription_change %},"site_subscription_change_pk": "{{site_subscription_change.pk}}"{%endif%}}'
+                                hx-post="{% url 'detach-stripe-payment-method-new-site-handler' %}" hx-push-url="false" hx-trigger="click" hx-confirm="Are you sure you want to detach this payment method? You may lose access to some your subscription tier if you haven't got another method active.">
+                                <i class="fa-regular fa-trash"></i> Detach
+                            </button>
+                        </td> 
+                    </tr>
+                    {%empty%}
+                    <tr>
+                        <td class="center" colspan="4">
+                            No Payment Methods
+                        </td>
+                    </tr>                
+                    {%endfor%}
+                </tbody>
+            </table>
+        </div>                
+    </div>
+</span>

@@ -25,7 +25,7 @@
                     data-bs-trigger="hover focus" 
                     data-bs-placement="top"
                     data-bs-content="Manually create a campaign lead."
-                    onclick="htmx.ajax('GET', '{% url 'campaign-lead-get-modal-content'%}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'edit_lead'}})">
+                    onclick="htmx.ajax('GET', '{% url 'campaign-lead-get-modal-content'%}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'edit_lead', 'site_pk':'{{site.pk}}'}})">
                         <i class="fa fa-plus" aria-hidden="true"></i> Add Lead
                 </button>
 

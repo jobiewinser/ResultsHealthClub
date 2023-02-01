@@ -12,13 +12,13 @@ from django.db.models import Sum
 from django.db.models import Q, Count
 from analytics.views import get_minimum_site_subscription_level_from_site_qs
 
-def check_if_start_date_allowed_and_replace(start_date, lead_qs=None, site_qs=None, sale_qs=None, booking_qs=None):
-    if not site_qs and lead_qs:
-        site_qs = Site.objects.filter(campaign__campaignlead__in=lead_qs)
-    if not site_qs and sale_qs:
-        site_qs = Site.objects.filter(campaign__campaignlead__sale__in=sale_qs)
-    if not site_qs and booking_qs:
-        site_qs = Site.objects.filter(campaign__campaignlead__booking__in=booking_qs)
+def check_if_start_date_allowed_and_replace(start_date, site_qs, lead_qs=None, sale_qs=None, booking_qs=None):
+    # if not site_qs and lead_qs:
+    #     site_qs = Site.objects.filter(campaign__campaignlead__in=lead_qs).exclude(active=False)
+    # if not site_qs and sale_qs:
+    #     site_qs = Site.objects.filter(campaign__campaignlead__sale__in=sale_qs).exclude(active=False)
+    # if not site_qs and booking_qs:
+    #     site_qs = Site.objects.filter(campaign__campaignlead__booking__in=booking_qs).exclude(active=False)
     subscription = get_minimum_site_subscription_level_from_site_qs(site_qs)
     earliest_site = site_qs.order_by('created').first()
     if subscription.analytics_seconds: 
@@ -45,7 +45,7 @@ def check_if_start_date_allowed_and_replace(start_date, lead_qs=None, site_qs=No
 def get_leads_per_day_between_dates_with_timeframe_differences(start_date, end_date, timeframe=relativedelta.relativedelta(days=1), campaigns=[], campaign_categorys=[], sites=[]):
     qs = Campaignlead.objects.filter(created__gte=start_date, created__lt=end_date + timeframe)
     if qs:
-        start_date = check_if_start_date_allowed_and_replace(start_date, lead_qs=qs)
+        start_date = check_if_start_date_allowed_and_replace(start_date, sites, lead_qs=qs)
         if campaigns:
             qs = qs.filter(campaign__in=campaigns)
         elif campaign_categorys:
@@ -71,7 +71,7 @@ def get_leads_per_day_between_dates_with_timeframe_differences(start_date, end_d
 def get_bookings_per_day_between_dates_with_timeframe_differences(start_date, end_date, timeframe=relativedelta.relativedelta(days=1), campaigns=[], campaign_categorys=[], sites=[]):
     qs = Booking.objects.filter(datetime__gte=start_date, datetime__lt=end_date + timeframe).exclude(archived=True)
     if qs:
-        start_date = check_if_start_date_allowed_and_replace(start_date, booking_qs=qs)
+        start_date = check_if_start_date_allowed_and_replace(start_date, sites, booking_qs=qs)
         if campaigns:
             qs = qs.filter(lead__campaign__in=campaigns)
         elif campaign_categorys:
@@ -97,7 +97,7 @@ def get_bookings_per_day_between_dates_with_timeframe_differences(start_date, en
 def get_sales_per_day_between_dates_with_timeframe_differences(start_date, end_date, timeframe=relativedelta.relativedelta(days=1), campaigns=[], campaign_categorys=[], sites=[]):
     qs = Sale.objects.filter(datetime__gte=start_date, datetime__lt=end_date + timeframe).exclude(archived=True)
     if qs:
-        start_date = check_if_start_date_allowed_and_replace(start_date, sale_qs=qs)
+        start_date = check_if_start_date_allowed_and_replace(start_date, sites, sale_qs=qs)
         if campaigns:
             qs = qs.filter(lead__campaign__in=campaigns)
         elif campaign_categorys:
@@ -129,7 +129,7 @@ def get_calls_made_per_day_between_dates(start_date, end_date, user, timeframe=r
         elif sites:
             qs = qs.filter(lead__campaign__site__in=sites)
         if qs:
-            start_date = check_if_start_date_allowed_and_replace(start_date, lead_qs=Campaignlead.objects.filter(call__in=qs))
+            start_date = check_if_start_date_allowed_and_replace(start_date, sites, lead_qs=Campaignlead.objects.filter(call__in=qs))
             index_date = start_date
             time_label_set = []
             data_set = []
@@ -202,13 +202,13 @@ def get_leads_per_day(request):
     sites = []
     if campaign_pks:
         campaigns = Campaign.objects.filter(pk__in=campaign_pks)
-        sites = Site.objects.filter(campaign__in=campaigns)
+        sites = Site.objects.filter(campaign__in=campaigns).exclude(active=False)
     elif campaign_category_pks:
         campaign_categorys = CampaignCategory.objects.filter(pk__in=campaign_category_pks)
-        sites = Site.objects.filter(campaigncategory__in=campaign_categorys)
+        sites = Site.objects.filter(campaigncategory__in=campaign_categorys).exclude(active=False)
     else:
         site_pks = request.GET.getlist('site_pks', request.user.profile.active_sites_allowed)
-        sites = Site.objects.filter(pk__in=site_pks)
+        sites = Site.objects.filter(pk__in=site_pks).exclude(active=False)
 
     start_date = datetime.strptime(request.GET.get('start_date'), '%Y-%m-%d')
     end_date = datetime.strptime(request.GET.get('end_date'), '%Y-%m-%d') + relativedelta.relativedelta(days=1) 
@@ -236,13 +236,13 @@ def get_bookings_per_day(request):
     sites = []
     if campaign_pks:
         campaigns = Campaign.objects.filter(pk__in=campaign_pks)
-        sites = Site.objects.filter(campaign__in=campaigns)
+        sites = Site.objects.filter(campaign__in=campaigns).exclude(active=False)
     elif campaign_category_pks:
         campaign_categorys = CampaignCategory.objects.filter(pk__in=campaign_category_pks)
-        sites = Site.objects.filter(campaigncategory__in=campaign_categorys)
+        sites = Site.objects.filter(campaigncategory__in=campaign_categorys).exclude(active=False)
     else:
         site_pks = request.GET.getlist('site_pks', request.user.profile.active_sites_allowed)
-        sites = Site.objects.filter(pk__in=site_pks)
+        sites = Site.objects.filter(pk__in=site_pks).exclude(active=False)
 
     start_date = datetime.strptime(request.GET.get('start_date'), '%Y-%m-%d')
     end_date = datetime.strptime(request.GET.get('end_date'), '%Y-%m-%d') + relativedelta.relativedelta(days=1) 
@@ -270,13 +270,13 @@ def get_sales_per_day(request):
     sites = []
     if campaign_pks:
         campaigns = Campaign.objects.filter(pk__in=campaign_pks)
-        sites = Site.objects.filter(campaign__in=campaigns)
+        sites = Site.objects.filter(campaign__in=campaigns).exclude(active=False)
     elif campaign_category_pks:
         campaign_categorys = CampaignCategory.objects.filter(pk__in=campaign_category_pks)
-        sites = Site.objects.filter(campaigncategory__in=campaign_categorys)
+        sites = Site.objects.filter(campaigncategory__in=campaign_categorys).exclude(active=False)
     else:
         site_pks = request.GET.getlist('site_pks', request.user.profile.active_sites_allowed)
-        sites = Site.objects.filter(pk__in=site_pks)
+        sites = Site.objects.filter(pk__in=site_pks).exclude(active=False)
 
     start_date = datetime.strptime(request.GET.get('start_date'), '%Y-%m-%d')
     end_date = datetime.strptime(request.GET.get('end_date'), '%Y-%m-%d') + relativedelta.relativedelta(days=1) 
@@ -304,13 +304,13 @@ def get_calls_today(request):
     sites = []
     if campaign_pks:
         campaigns = Campaign.objects.filter(pk__in=campaign_pks)
-        sites = Site.objects.filter(campaign__in=campaigns)
+        sites = Site.objects.filter(campaign__in=campaigns).exclude(active=False)
     elif campaign_category_pks:
         campaign_categorys = CampaignCategory.objects.filter(pk__in=campaign_category_pks)
-        sites = Site.objects.filter(campaigncategory__in=campaign_categorys)
+        sites = Site.objects.filter(campaigncategory__in=campaign_categorys).exclude(active=False)
     else:
         site_pks = request.GET.getlist('site_pks', request.user.profile.active_sites_allowed)
-        sites = Site.objects.filter(pk__in=site_pks)
+        sites = Site.objects.filter(pk__in=site_pks).exclude(active=False)
 
     start_date = datetime.strptime(request.GET.get('start_date'), '%Y-%m-%d')
     end_date = datetime.strptime(request.GET.get('end_date'), '%Y-%m-%d') + relativedelta.relativedelta(days=1)
@@ -336,13 +336,13 @@ def get_sales_today(request):
     sites = []
     if campaign_pks:
         campaigns = Campaign.objects.filter(pk__in=campaign_pks)
-        sites = Site.objects.filter(campaign__in=campaigns)
+        sites = Site.objects.filter(campaign__in=campaigns).exclude(active=False)
     elif campaign_category_pks:
         campaign_categorys = CampaignCategory.objects.filter(pk__in=campaign_category_pks)
-        sites = Site.objects.filter(campaigncategory__in=campaign_categorys)
+        sites = Site.objects.filter(campaigncategory__in=campaign_categorys).exclude(active=False)
     else:
         site_pks = request.GET.getlist('site_pks', request.user.profile.active_sites_allowed)
-        sites = Site.objects.filter(pk__in=site_pks)
+        sites = Site.objects.filter(pk__in=site_pks).exclude(active=False)
 
     start_date = datetime.strptime(request.GET.get('start_date'), '%Y-%m-%d')
     end_date = datetime.strptime(request.GET.get('end_date'), '%Y-%m-%d') + relativedelta.relativedelta(days=1)
@@ -367,20 +367,16 @@ def get_calls_made_per_day(request):
     sites = []
     if campaign_pks:
         campaigns = Campaign.objects.filter(pk__in=campaign_pks)
-        sites = Site.objects.filter(campaign__in=campaigns)
+        sites = Site.objects.filter(campaign__in=campaigns).exclude(active=False)
     elif campaign_category_pks:
         campaign_categorys = CampaignCategory.objects.filter(pk__in=campaign_category_pks)
-        sites = Site.objects.filter(campaigncategory__in=campaign_categorys)
+        sites = Site.objects.filter(campaigncategory__in=campaign_categorys).exclude(active=False)
     else:
         site_pks = request.GET.getlist('site_pks', request.user.profile.active_sites_allowed)
-        sites = Site.objects.filter(pk__in=site_pks)
+        sites = Site.objects.filter(pk__in=site_pks).exclude(active=False)
 
     start_date = datetime.strptime(request.GET.get('start_date'), '%Y-%m-%d')
-    end_date = datetime.strptime(request.GET.get('end_date'), '%Y-%m-%d') + relativedelta.relativedelta(days=1)
-    start_date = datetime.strptime(request.GET.get('start_date'), '%Y-%m-%d')
-    # if not request.user.profile.company.check_if_allowed_to_get_analytics(start_date):
-    #     start_date = datetime.now() - timedelta(days=7)
-    end_date = datetime.strptime(request.GET.get('end_date'), '%Y-%m-%d') + relativedelta.relativedelta(days=1)   
+    end_date = datetime.strptime(request.GET.get('end_date'), '%Y-%m-%d') + relativedelta.relativedelta(days=1) 
     
     data_set, time_label_set, start_date = get_calls_made_per_day_between_dates(start_date, end_date, request.user, campaigns=campaigns, campaign_categorys=campaign_categorys, sites=sites)
         
@@ -404,38 +400,38 @@ def get_current_call_count_distribution(request):
     campaign_categorys = None
     sites = []
     if campaign_pks:
-        campaigns = Campaign.objects.filter(pk__in=campaign_pks, site__in=request.user.profile.active_sites_allowed)
-        sites = Site.objects.filter(campaign__in=campaigns)
+        campaigns = Campaign.objects.filter(pk__in=campaign_pks)
+        sites = Site.objects.filter(campaign__in=campaigns).exclude(active=False)
     elif campaign_category_pks:
-        campaign_categorys = CampaignCategory.objects.filter(pk__in=campaign_category_pks, site__in=request.user.profile.active_sites_allowed)
-        sites = Site.objects.filter(campaigncategory__in=campaign_categorys)
+        campaign_categorys = CampaignCategory.objects.filter(pk__in=campaign_category_pks)
+        sites = Site.objects.filter(campaigncategory__in=campaign_categorys).exclude(active=False)
     else:
         site_pks = request.GET.getlist('site_pks', request.user.profile.active_sites_allowed)
-        sites = Site.objects.filter(pk__in=site_pks)
+        sites = Site.objects.filter(pk__in=site_pks).exclude(active=False)
     
-    non_time_filtered_live_opportunities = Campaignlead.objects.filter(archived = False).exclude(booking__archived=False).exclude(sale__archived=False).annotate(calls=Count('call'))
+    non_time_filtered_live_opportunities = Campaignlead.objects.filter(booking = None, archived = False).exclude(sale__archived=False).annotate(calls=Count('call'))
     
     if campaigns:
-        non_time_filtered_live_opportunities = non_time_filtered_live_opportunities.filter(campaign__in=campaigns)
+        non_time_filtered_opportunities = non_time_filtered_live_opportunities.filter(campaign__site__company=request.user.profile.company, campaign__in=campaigns, campaign__site__in=request.user.profile.active_sites_allowed)
     if campaign_categorys:
-        non_time_filtered_live_opportunities = non_time_filtered_live_opportunities.filter(campaign__campaign_category__in=campaign_categorys)
+        non_time_filtered_opportunities = non_time_filtered_live_opportunities.filter(campaign__campaign_category__site__company=request.user.profile.company, campaign__campaign_category__in=campaign_categorys, campaign__campaign_category__site__in=request.user.profile.active_sites_allowed)
     elif sites:
-        non_time_filtered_live_opportunities = non_time_filtered_live_opportunities.filter(campaign__site__in=sites)
+        non_time_filtered_opportunities = non_time_filtered_live_opportunities.filter(campaign__site__company=request.user.profile.company, campaign__site__in=sites).filter(campaign__site__in=request.user.profile.active_sites_allowed)
     else:
-        non_time_filtered_live_opportunities = non_time_filtered_live_opportunities.filter(campaign__site__company=request.user.profile.company)
+        non_time_filtered_opportunities = non_time_filtered_live_opportunities.filter(campaign__site__company=request.user.profile.company, campaign__site__in=request.user.profile.active_sites_allowed)
 
 
     call_counts_tuples = []
     index = 0
-    if non_time_filtered_live_opportunities.filter(calls__gte=index):
-        while non_time_filtered_live_opportunities.filter(calls__gte=index):
-            if non_time_filtered_live_opportunities.exclude(calls=index).count():
-                queryset_percentage_portion = (non_time_filtered_live_opportunities.filter(calls=index).count() / non_time_filtered_live_opportunities.count())*100
-            elif non_time_filtered_live_opportunities.filter(calls=index).count():
+    if non_time_filtered_opportunities.filter(calls__gte=index):
+        while non_time_filtered_opportunities.filter(calls__gte=index):
+            if non_time_filtered_opportunities.exclude(calls=index).count():
+                queryset_percentage_portion = (non_time_filtered_opportunities.filter(calls=index).count() / non_time_filtered_opportunities.count())*100
+            elif non_time_filtered_opportunities.filter(calls=index).count():
                 queryset_percentage_portion = 100
             else:
                 queryset_percentage_portion = 0
-            call_counts_tuples.append((index, non_time_filtered_live_opportunities.filter(calls=index).count(), non_time_filtered_live_opportunities.filter(calls=index).aggregate(Sum('product_cost')), queryset_percentage_portion))
+            call_counts_tuples.append((index, non_time_filtered_opportunities.filter(calls=index).count(), non_time_filtered_live_opportunities.filter(calls=index).aggregate(Sum('campaign__product_cost')), queryset_percentage_portion))
             index = index + 1
     else:
         pass
@@ -452,13 +448,13 @@ def get_pipeline(request):
     sites = []
     if campaign_pks:
         campaigns = Campaign.objects.filter(pk__in=campaign_pks)
-        sites = Site.objects.filter(campaign__in=campaigns)
+        sites = Site.objects.filter(campaign__in=campaigns).exclude(active=False)
     elif campaign_category_pks:
         campaign_categorys = CampaignCategory.objects.filter(pk__in=campaign_category_pks)
-        sites = Site.objects.filter(campaigncategory__in=campaign_categorys)
+        sites = Site.objects.filter(campaigncategory__in=campaign_categorys).exclude(active=False)
     else:
         site_pks = request.GET.getlist('site_pks', request.user.profile.active_sites_allowed)
-        sites = Site.objects.filter(pk__in=site_pks)
+        sites = Site.objects.filter(pk__in=site_pks).exclude(active=False)
 
     start_date = datetime.strptime(request.GET.get('start_date'), '%Y-%m-%d')
 
@@ -492,27 +488,27 @@ def get_pipeline(request):
     context['lost_opportunities'] = lost_opportunities.count()
     
     if live_opportunities:
-        context['live_value'] = float(live_opportunities.aggregate(Sum('product_cost')).get('product_cost__sum', 0))
+        context['live_value'] = float(live_opportunities.aggregate(Sum('campaign__product_cost')).get('campaign__product_cost__sum', 0))
     else:
         context['live_value'] = 0
 
     if sold_opportunities:
-        context['sold_value'] = float(sold_opportunities.aggregate(Sum('product_cost')).get('product_cost__sum', 0))
+        context['sold_value'] = float(sold_opportunities.aggregate(Sum('campaign__product_cost')).get('campaign__product_cost__sum', 0))
     else:
         context['sold_value'] = 0
 
     if booked_opportunities:
-        context['booked_value'] = float(booked_opportunities.aggregate(Sum('product_cost')).get('product_cost__sum', 0))
+        context['booked_value'] = float(booked_opportunities.aggregate(Sum('campaign__product_cost')).get('campaign__product_cost__sum', 0))
     else:
         context['booked_value'] = 0
 
     if lost_opportunities:
-        context['lost_value'] = float(lost_opportunities.aggregate(Sum('product_cost')).get('product_cost__sum', 0))
+        context['lost_value'] = float(lost_opportunities.aggregate(Sum('campaign__product_cost')).get('campaign__product_cost__sum', 0))
     else:
         context['lost_value'] = 0
 
     if opportunities:
-        context['opportunities_value'] = float(opportunities.aggregate(Sum('product_cost')).get('product_cost__sum', 0))
+        context['opportunities_value'] = float(opportunities.aggregate(Sum('campaign__product_cost')).get('campaign__product_cost__sum', 0))
     else:
         context['opportunities_value'] = 0
 
