@@ -1,7 +1,7 @@
 {%load core_tags%}
 <div class="generic_modal_contents">
     <div class="card card-white m-1 p-3">
-        <form hx-post="{%url 'mark-sold'%}" hx-trigger="submit" hx-indicator="#page_load_indicator" hx-swap="none">
+        <form hx-post="{%url 'mark-sold'%}" hx-trigger="submit" hx-indicator="#page_load_indicator" hx-swap="outerHTML" hx-target="#row_{{lead.pk}}">
             <input type="text" style="display:None" id="modal_lead_pk" name="lead_pk" value="{{lead.pk}}"/>
             {% csrf_token %}
             <div class="row">

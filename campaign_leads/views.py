@@ -125,7 +125,7 @@ def get_leads_board_context(request):
                 filtered = True    
         except:
             pass
-    leads = leads.annotate(calls=Count('call')).order_by('-last_dragged')
+    leads = leads.annotate(calls=Count('call')).order_by('last_dragged')
     
     context['querysets'] = [
         ('Fresh', leads.filter(calls=0), 0)

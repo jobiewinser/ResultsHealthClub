@@ -199,7 +199,7 @@ class Campaignlead(models.Model):
                     campaign_category_pk = 0
                 site = self.campaign.site
                 company = site.company
-                rendered_html = f"<span hx-swap-oob='afterbegin:.campaign_column_{campaign.pk}_calls_{new_position},.campaign_category_column_{campaign_category_pk}_calls_{new_position},.site_column_{site.pk}_calls_{new_position},.company_column_{company.pk}_calls_{new_position}'><a hx-get='/refresh-lead-article/{self.pk}/' hx-swap='outerHTML' hx-indicator='#top-htmx-indicator' hx-trigger='load' href='#'></a> </span>"
+                rendered_html = f"<span hx-swap-oob='beforeend:.campaign_column_{campaign.pk}_calls_{new_position},.campaign_category_column_{campaign_category_pk}_calls_{new_position},.site_column_{site.pk}_calls_{new_position},.company_column_{company.pk}_calls_{new_position}'><a hx-get='/refresh-lead-article/{self.pk}/' hx-swap='outerHTML' hx-indicator='#top-htmx-indicator' hx-trigger='load' href='#'></a> </span>"
                 from django.utils.safestring import mark_safe
                 return mark_safe(f"{rendered_html} {delete_htmx}")
 
