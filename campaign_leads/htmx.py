@@ -314,7 +314,7 @@ def delete_lead(request, **kwargs):
         lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'), campaign__site__in=request.user.profile.active_sites_allowed)
         lead.delete()
 
-        return HttpResponse( "text", 200)
+        return HttpResponse("", 200)
     except Exception as e:
         logger.debug("mark_archived Error "+str(e))
         #return HttpResponse(e, status=500)
