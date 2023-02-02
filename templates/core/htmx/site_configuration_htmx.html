@@ -56,7 +56,7 @@
                 <div class="card-header">
                     <div class="row">
                         <div class="col-auto ps-0">
-                            <i class="fa-regular fa-calendar-days"></i> <span class="name_display_{{site.pk}}">{{site.name}}</span> <b>Subscription</b>
+                            <i class="fa-regular fa-sterling-sign"></i> <span class="name_display_{{site.pk}}">{{site.name}}</span> <b>Subscription</b>
                         </div>
                     </div>
                 </div>
@@ -106,7 +106,7 @@
                                             hx-get="{% url 'campaign-lead-get-modal-content'%}" 
                                             hx-push-url="false"
                                             hx-swap="innerHTML" hx-trigger="click">
-                                            Switch to <b>{{subscription_option.get_name_display}}</b> subscription £{{subscription_option.cost|floatformat:2}} p/m (per facility/site)
+                                            Switch to <b>{{subscription_option.get_name_display}}</b> subscription £{{subscription_option.cost|floatformat:2}} p/m (for this site)
                                         </button>
                                     </div>
                                 {%endif%}
@@ -117,7 +117,7 @@
                     {%endif%}
                     <br>
                     <span class="text-{{site.subscription.bootstrap_colour}}">
-                        You have a <b>{{site.subscription.get_name_display}}</b> subscription £{{site.subscription.cost|floatformat:2}} p/m (per facility/site)
+                        You have a <b>{{site.subscription.get_name_display}}</b> subscription £{{site.subscription.cost|floatformat:2}} p/m (for this site)
                     </span>
                     <br>
                     <p>
@@ -138,7 +138,7 @@
                 <div class="card-header">
                     <div class="row">
                         <div class="col-auto ps-0">
-                            <i class="fa-regular fa-calendar-days"></i> <span class="name_display_{{site.pk}}">{{site.name}}</span> <b>Profiles</b>
+                            <i class="fa-solid fa-users"></i> <span class="name_display_{{site.pk}}">{{site.name}}</span> <b>Profiles</b>
                         </div>
                         <div class="col-auto border-start">                            
                             <b>{{site.users.count}}</b> of <b>{{site.subscription.max_profiles_string}}</b> allowed profiles

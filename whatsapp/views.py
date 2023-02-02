@@ -18,7 +18,7 @@ from core.models import Site, WhatsappBusinessAccount, WhatsappNumber, Contact
 from core.core_decorators import check_core_profile_requirements_fulfilled
 from django.contrib.auth.decorators import login_required
 from whatsapp.models import WhatsappTemplate
-
+from core.core_decorators import *
 import hmac
 import hashlib
 import pickle
@@ -420,9 +420,8 @@ class WhatsappTemplatesCreateView(TemplateView):
 
     
 @login_required
+@not_demo_or_superuser_check
 def whatsapp_approval_htmx(request):
-    if settings.DEMO and not request.user.is_superuser:
-        return HttpResponse(status=500)
     template = WhatsappTemplate.objects.get(pk=request.POST.get('template_pk'))
     if request.user.profile.company == template.company:
         whatsapp = Whatsapp(template.whatsapp_business_account.site.whatsapp_access_token)
@@ -433,9 +432,8 @@ def whatsapp_approval_htmx(request):
         return render(request, 'whatsapp/whatsapp_templates_row.html', {'template':WhatsappTemplate.objects.get(pk=request.POST.get('template_pk')), 'site':template.whatsapp_business_account.site, 'submitting_to_whatsapp': True})
 
 @login_required
+@not_demo_or_superuser_check
 def delete_whatsapp_template_htmx(request):
-    if settings.DEMO and not request.user.is_superuser:
-        return HttpResponse(status=500)
     body = QueryDict(request.body)
     template = WhatsappTemplate.objects.get(pk=body.get('template_pk'))
     whatsapp_business_account = template.whatsapp_business_account
@@ -449,9 +447,8 @@ def delete_whatsapp_template_htmx(request):
 
          
 @login_required
+@not_demo_or_superuser_check
 def whatsapp_clear_changes_htmx(request):
-    if settings.DEMO and not request.user.is_superuser:
-        return HttpResponse(status=500)
     template = WhatsappTemplate.objects.get(pk=request.POST.get('template_pk'))
     if request.user.profile.company == template.company:
         template.pending_category = None
@@ -463,9 +460,8 @@ def whatsapp_clear_changes_htmx(request):
                                                                             # 'site_list': get_available_sites_for_user(request.user), 
 
 @login_required
+@not_demo_or_superuser_check
 def whatsapp_number_change_alias(request):
-    if settings.DEMO and not request.user.is_superuser:
-        return HttpResponse(status=500)
     whatsappnumber = WhatsappNumber.objects.get(pk=request.POST.get('whatsappnumber_pk'))
     if get_profile_allowed_to_edit_whatsapp_settings(request.user.profile, whatsappnumber.whatsapp_business_account.site):
         alias = request.POST.get('alias', None)
@@ -519,9 +515,8 @@ def whatsapp_number_change_alias(request):
 #     return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
 
 @login_required
+@not_demo_or_superuser_check
 def add_phone_number(request):
-    if settings.DEMO and not request.user.is_superuser:
-        return HttpResponse(status=500)
     whatsapp_business_account_pk = request.POST.get('whatsapp_business_account_pk', None)
     country_code = request.POST.get('country_code', None)
     phone_number = request.POST.get('phone_number', None)
@@ -535,9 +530,8 @@ def add_phone_number(request):
     return HttpResponse("Incorrect values entered, please try again.",status=500)
 
 @login_required
+@not_demo_or_superuser_check
 def add_whatsapp_business_account(request):
-    if settings.DEMO and not request.user.is_superuser:
-        return HttpResponse(status=500)
     try: 
         site_pk = request.POST.get('site_pk', None)
         whatsapp_business_account_id = request.POST.get('whatsapp_business_account_id', None)
@@ -564,9 +558,8 @@ def add_whatsapp_business_account(request):
         return HttpResponse("Server Error, please try again later.",status=500)
 
 @login_required
+@not_demo_or_superuser_check
 def save_whatsapp_template_ajax(request):
-    if settings.DEMO and not request.user.is_superuser:
-        return HttpResponse(status=500)
     changes_made = False
     if request.POST.get('created', False):
         template = WhatsappTemplate(
@@ -661,9 +654,8 @@ def send_new_template_message(request):
 #     customer_number = models.CharField(max_length=50, null=True, blank=True)
 #     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 @login_required
+@not_demo_or_superuser_check
 def set_whatsapp_site_config(request, **kwargs):
-    if settings.DEMO and not request.user.is_superuser:
-        return HttpResponse(status=500)
     try:
         site = Site.objects.get(pk=request.POST.get('site_pk',None))
         if not get_profile_allowed_to_edit_whatsapp_settings(request.user.profile, site):

@@ -18,6 +18,7 @@ from django.db.models import OuterRef, Subquery, Count
 from whatsapp.models import WhatsappTemplate
 from core.core_decorators import check_core_profile_requirements_fulfilled
 from core.user_permission_functions import get_profile_allowed_to_edit_other_profile
+from core.core_decorators import *
 logger = logging.getLogger(__name__)
 def hex_to_rgb_tuple(hex):
     # this function takes a hex string and returns a string of rgb values
@@ -238,9 +239,8 @@ class CampaignConfigurationView(TemplateView):
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'campaign_leads/campaign_configuration_htmx.html'  
         company = self.request.user.profile.company
-        if not ManualCampaign.objects.filter(site__in=context['sites']).exists():
-            for site in company.active_sites:
-                ManualCampaign.objects.get_or_create(site=site, name = "Manually Created")
+        for site in company.active_sites:
+            ManualCampaign.objects.get_or_create(site=site, name = "Manually Created")
         try:
             for campaign_dict in ActiveCampaignApi(company.active_campaign_api_key, company.active_campaign_url).get_lists(company.active_campaign_url).get('lists',[]):
                 campaign, created = ActiveCampaign.objects.get_or_create(
@@ -326,10 +326,9 @@ def new_call(request, **kwargs):
 
 
 @login_required
+@not_demo_or_superuser_check
 def campaign_assign_auto_send_template_htmx(request):
     #this function is used to assign a template to a campaign to be auto sent
-    if settings.DEMO and not request.user.is_superuser:
-        return HttpResponse(status=500)
     campaign = Campaign.objects.get(pk=request.POST.get('campaign_pk'), site__in=request.user.profile.active_sites_allowed)
     send_order = send_order = request.POST['send_order']
     template_pk = request.POST.get('template_pk')
@@ -350,10 +349,9 @@ def campaign_assign_auto_send_template_htmx(request):
     return render(request, 'campaign_leads/htmx/choose_auto_templates.html', {'campaign':campaign})
     
 @login_required
+@not_demo_or_superuser_check
 def campaign_assign_whatsapp_business_account_htmx(request):    
     #this function is used to assign a whatsapp business account to a campaign and refresh the campaign config row
-    if settings.DEMO and not request.user.is_superuser:
-        return HttpResponse(status=500)
     campaign = Campaign.objects.get(pk=request.POST.get('campaign_pk'), site__in=request.user.profile.active_sites_allowed)
     whatsapp_business_account_pk = request.POST.get('whatsapp_business_account_pk') or 0
     
@@ -362,20 +360,18 @@ def campaign_assign_whatsapp_business_account_htmx(request):
     campaign.save()
     return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign})
 @login_required
+@not_demo_or_superuser_check
 def campaign_assign_campaign_category_htmx(request):
     #this function is used to assign a campaign category to a campaign and refresh the campaign config row
-    if settings.DEMO and not request.user.is_superuser:
-        return HttpResponse(status=500)
     campaign = Campaign.objects.get(pk=request.POST.get('campaign_pk'), site__in=request.user.profile.active_sites_allowed)
     campaign_category_pk = request.POST.get('campaign_category_pk') or 0    
     campaign.campaign_category = CampaignCategory.objects.filter(pk=campaign_category_pk).first()
     campaign.save()
     return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign})
 @login_required
+@not_demo_or_superuser_check
 def profile_assign_campaign_category_htmx(request):
     #this function is used to assign a campaign category to a profile and refresh the profile config row
-    if settings.DEMO and not request.user.is_superuser:
-        return HttpResponse(status=500)
     context= {}
     profile = Profile.objects.get(pk=request.POST.get('profile_pk'))
     if get_profile_allowed_to_edit_other_profile(request.user.profile, profile):
@@ -402,10 +398,9 @@ def campaign_assign_color_htmx(request):
     
 
 @login_required
+@not_demo_or_superuser_check
 def campaign_assign_product_cost_htmx(request):
     #this function is used to assign a product cost to a campaign and refresh the campaign config row
-    if settings.DEMO and not request.user.is_superuser:
-        return HttpResponse(status=500)
     campaign = Campaign.objects.get(pk=request.POST.get('campaign_pk'), site__in=request.user.profile.active_sites_allowed)
     product_cost = request.POST.get('product_cost')
     if product_cost:

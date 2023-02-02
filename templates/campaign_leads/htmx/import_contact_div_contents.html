@@ -61,8 +61,10 @@
         <button class="btn btn-primary" type="submit" {%if demo and not request.user.is_superuser%}disabled{%endif%}>
             Import
         </button>
+        {%if campaign.site.subscription.whatsapp_enabled%}
         <button class="btn btn-light" name="disabled_automated_messaging" value="true" type="submit" {%if demo and not request.user.is_superuser%}disabled{%endif%}>
-            Import (no automatic Whatsapp Messages)
+            Import (disable Whatsapp Messages)
         </button>
+        {%endif%}
     </div>
 </div>

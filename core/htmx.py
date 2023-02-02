@@ -16,6 +16,7 @@ from campaign_leads.models import Campaignlead
 from django.conf import settings
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
+from core.core_decorators import *
 logger = logging.getLogger(__name__)
 from whatsapp.models import WhatsAppMessage
 
@@ -109,10 +110,9 @@ def get_modal_content(request, **kwargs):
 
 
 @method_decorator(login_required, name="dispatch")
+@method_decorator(check_core_profile_requirements_fulfilled, name='post')
 class ModifyUser(View):
     def post(self, request, **kwargs):
-        if settings.DEMO and not request.user.is_superuser:
-            return HttpResponse(status=500)
         try:
             action = request.POST.get('action', '')
             if action == 'add':
@@ -192,9 +192,8 @@ class ModifyUser(View):
             #return HttpResponse(e, status=500)
             raise e
 @login_required
+@not_demo_or_superuser_check
 def create_calendly_webhook_subscription(request, **kwargs):
-    if settings.DEMO and not request.user.is_superuser:
-        return HttpResponse(status=500)
     site = Site.objects.get(pk=request.POST.get('site_pk')) 
     if get_profile_allowed_to_edit_site_configuration(request.user.profile, site): 
         if site.calendly_organization and site.calendly_token:
@@ -203,9 +202,9 @@ def create_calendly_webhook_subscription(request, **kwargs):
             calendly_webhooks = calendly.list_webhook_subscriptions(organization = site.calendly_organization).get('collection')
             print("calendly_webhooks", site)
             if calendly_webhooks == None:
-                if site.subscription.max_profiles:
-                    if site.users.count() >= site.subscription.max_profiles:
-                        return HttpResponse("Invalid Calendly details", status=400)
+                # if site.subscription.max_profiles:
+                    # if site.users.count() >= site.subscription.max_profiles:
+                return HttpResponse("Invalid Calendly details", status=400)
             for webhook in calendly_webhooks:
                 if webhook.get('state') == 'active' \
                 and webhook.get('callback_url') == f"{os.getenv('SITE_URL')}/calendly-webhooks/{site.guid}/" \
@@ -220,9 +219,8 @@ def create_calendly_webhook_subscription(request, **kwargs):
     return render(request, "core/htmx/calendly_webhook_status_wrapper.html", {'site':site, 'site_webhook_active':(response.get('resource',{}).get('state')=='active')})
     
 @login_required
+@not_demo_or_superuser_check
 def delete_calendly_webhook_subscription(request, **kwargs):
-    if settings.DEMO and not request.user.is_superuser:
-        return HttpResponse(status=500)
     site = Site.objects.get(pk=request.POST.get('site_pk'))    
     if get_profile_allowed_to_edit_site_configuration(request.user.profile, site): 
         calendly = Calendly(site.calendly_token)
@@ -237,9 +235,8 @@ def delete_calendly_webhook_subscription(request, **kwargs):
     return render(request, "core/htmx/calendly_webhook_status_wrapper.html", {'site':site, 'site_webhook_active':False})
 
 @login_required
+@not_demo_or_superuser_check
 def add_site(request, **kwargs):
-    if settings.DEMO and not request.user.is_superuser:
-        return HttpResponse(status=500)
     site_pk = request.POST.get('site_pk')
     name = request.POST.get('name')
     sign_up_subscription = Subscription.objects.get(pk=request.POST.get('subscription'))

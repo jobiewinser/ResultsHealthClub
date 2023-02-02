@@ -82,8 +82,11 @@ class Campaign(PolymorphicModel):
     @property
     def warnings(self):
         warnings = {}
-        if not self.campaigntemplatelink_set.filter(send_order=1):
-            warnings["first_send_template_missing"] = "This campaign doesn't have a 1st Auto-Send Template, it won't automatically send a message to the customer"
+        if self.site:
+            if self.site.subscription:
+                if self.site.subscription.whatsapp_enabled:
+                    if not self.campaigntemplatelink_set.filter(send_order=1):
+                        warnings["first_send_template_missing"] = "This campaign doesn't have a 1st Auto-Send Template, it won't automatically send a message to the customer"
         return warnings
 @receiver(models.signals.post_save, sender=Campaign)
 def execute_after_save(sender, instance, created, *args, **kwargs):
@@ -199,7 +202,7 @@ class Campaignlead(models.Model):
                     campaign_category_pk = 0
                 site = self.campaign.site
                 company = site.company
-                rendered_html = f"<span hx-swap-oob='beforeend:.campaign_column_{campaign.pk}_calls_{new_position},.campaign_category_column_{campaign_category_pk}_calls_{new_position},.site_column_{site.pk}_calls_{new_position},.company_column_{company.pk}_calls_{new_position}'><a hx-get='/refresh-lead-article/{self.pk}/' hx-swap='outerHTML' hx-indicator='#top-htmx-indicator' hx-trigger='load' href='#'></a> </span>"
+                rendered_html = f"<span hx-swap-oob='beforeend:.campaign_column_{campaign.pk}_calls_{new_position},.campaign_category_column_{campaign_category_pk}_calls_{new_position},.site_column_{site.pk}_calls_{new_position},.company_column_{company.pk}_calls_{new_position}'><a hx-get='/refresh-lead-article/{self.pk}/' hx-swap='outerHTML' hx-vals=' U+007B U+0022 flash U+0022 : true U+007D' hx-indicator='#top-htmx-indicator' hx-trigger='load' href='#'></a> </span>"
                 from django.utils.safestring import mark_safe
                 return mark_safe(f"{rendered_html} {delete_htmx}")
 

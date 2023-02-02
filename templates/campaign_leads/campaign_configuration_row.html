@@ -100,7 +100,7 @@ id="submit_site_pk_{{campaign.pk}}"></button>
     {%endif%}
 </td>
 <td >   
-    {%if campaign.site and campaign.site.subscription.whatsapp_enabled%}      
+    {%if campaign.site and campaign.site.subscription.whatsapp_enabled %}      
     <span hidden>{{campaign.whatsapp_business_account.pk}}</span>                   
     <span  
         data-bs-toggle="popover" 
@@ -126,10 +126,14 @@ id="submit_site_pk_{{campaign.pk}}"></button>
             {%endfor%}
         </select>
     </span> 
+    {%elif campaign.site and not campaign.site.subscription.whatsapp_enabled%}
+    <i class="fa-solid fa-rectangle-pro"></i> subscription feature
     {%endif%}
 </td>
 <td>
-    {%if campaign.whatsapp_business_account%}
+    {%if campaign.site and not campaign.site.subscription.whatsapp_enabled %} 
+    <i class="fa-solid fa-rectangle-pro"></i> subscription feature    
+    {%elif campaign.whatsapp_business_account%}
     <span id="choose_templates_button_wrapper_{{campaign.pk}}">
         {%include 'campaign_leads/htmx/choose_templates_button.html'%}
     </span>    

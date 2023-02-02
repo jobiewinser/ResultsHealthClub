@@ -16,6 +16,7 @@ from whatsapp.models import WhatsappTemplate
 from django.conf import settings
 logger = logging.getLogger(__name__) 
 from active_campaign.api import ActiveCampaignApi
+from core.core_decorators import *
 @login_required
 def get_modal_content(request, **kwargs):
     try:
@@ -75,9 +76,8 @@ def get_modal_content(request, **kwargs):
 
 
 @login_required
+@not_demo_or_superuser_check
 def add_campaign_category(request, **kwargs):
-    if settings.DEMO and not request.user.is_superuser:
-        return HttpResponse(status=500)
     # logger.debug(str(request.user))
     # try:        
     name = request.POST.get('category_name')
@@ -101,9 +101,8 @@ def add_campaign_category(request, **kwargs):
     #     return HttpResponse("Error with creating a campaign lead", status=500)
 
 @login_required
+@not_demo_or_superuser_check
 def edit_lead(request, **kwargs):
-    if settings.DEMO and not request.user.is_superuser:
-        return HttpResponse(status=500)
     # logger.debug(str(request.user))
     # try:        
     campaign_pk = request.POST.get('campaign_pk')
@@ -146,6 +145,8 @@ def edit_lead(request, **kwargs):
     if product_cost:
         lead.product_cost = product_cost
     lead.disabled_automated_messaging = disabled_automated_messaging
+    if not campaign.site.subscription.whatsapp_enabled:
+        lead.disabled_automated_messaging = True
     
     lead.save()
     lead.trigger_refresh_websocket(refresh_position=refresh_position)
@@ -414,4 +415,5 @@ def get_contacts_for_campaign(request, **kwargs):
         contact_id_list.append(contact.get('id'))
     context['campaign_lead_ids'] = list(Campaignlead.objects.filter(active_campaign_contact_id__in=contact_id_list, campaign=campaign).exclude(archived=True).exclude(sale__archived=False).values_list('active_campaign_contact_id', flat=True))
     context['contacts'] = contacts
+    context['campaign'] = campaign
     return render(request, "campaign_leads/htmx/import_contact_div_contents.html", context)

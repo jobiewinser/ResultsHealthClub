@@ -100,7 +100,10 @@ else:
         os.path.join(BASE_DIR, "staticfiles"),
     )
     WSGI_APPLICATION = 'wsgi.application' #haven't testied this on prod yet, might be pointless?
-DEMO=os.getenv("DEMO", False)=='True'
+    
+PUBLIC=os.getenv('PUBLIC','False')=='True'
+    
+DEMO=os.getenv("DEMO",'False')=='True'
 # if DEBUG:
 WHATSAPP_PHONE_OVERRIDE1=None
 WHATSAPP_PHONE_OVERRIDE2='447974214718'

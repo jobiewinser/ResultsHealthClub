@@ -45,6 +45,8 @@ class Webhooks(View):
                                     campaign_lead.active_campaign_form_id=data.get('form[id]', None)
                                     campaign_lead.email = data.get('contact[email]', "")
                                     
+                                    if not campaign.site.subscription.whatsapp_enabled:
+                                        campaign_lead.disabled_automated_messaging = True
                                     campaign_lead.save()
                                     campaign_lead.trigger_refresh_websocket(refresh_position=True)
             return HttpResponse( "text", 200)
@@ -118,6 +120,8 @@ def import_active_campaign_leads(request, **kwargs):
                     lead.email = contact.get('email')
                     lead.whatsapp_number = contact.get('phone')
                     lead.disabled_automated_messaging = disabled_automated_messaging
+                    if not campaign.site.subscription.whatsapp_enabled:
+                        lead.disabled_automated_messaging = True
                     lead.save()
                     lead.trigger_refresh_websocket(refresh_position=refresh_position)
                     successful_import = True

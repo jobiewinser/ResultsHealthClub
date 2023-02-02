@@ -22,3 +22,30 @@ def check_core_profile_requirements_fulfilled(function=None, redirect_field_name
     if function:
         return actual_decorator(function)
     return False
+
+
+def not_demo_or_superuser_check(function):
+    def wrapper(request, *args, **kwargs):
+        if not settings.DEMO or request.user.is_superuser:
+            return function(request, *args, **kwargs)
+        else:
+            raise PermissionDenied
+    return wrapper
+
+
+def not_debug_check(function):
+    def wrapper(*args, **kwargs):
+        if not settings.DEBUG:
+            return function(*args, **kwargs)
+        else:
+            raise Exception("DEBUG not enabled!")
+    return wrapper
+
+
+def public_check(function):
+    def wrapper(*args, **kwargs):
+        if settings.PUBLIC:
+            return function(*args, **kwargs)
+        else:
+            raise Exception("PUBLIC not enabled!")
+    return wrapper

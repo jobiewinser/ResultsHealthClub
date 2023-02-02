@@ -4,12 +4,12 @@
 <div class="generic_modal_contents">
     <div class="card card-white m-1 p-3">
         {% comment %} <p>
-            You currently have a <b>{{site.subscription.get_name_display}}</b> subscription £{{site.subscription.cost|floatformat:2}} p/m (per facility/site)
+            You currently have a <b>{{site.subscription.get_name_display}}</b> subscription £{{site.subscription.cost|floatformat:2}} p/m (for this site)
         </p> {% endcomment %}
         <div class="row">
             <div class="col">
                 <p class="text-{{switch_subscription.bootstrap_colour}}">
-                    Switching to <b>{{switch_subscription.get_name_display}}</b> subscription £{{switch_subscription.cost|floatformat:2}} p/m (per facility/site)
+                    Switching to <b>{{switch_subscription.get_name_display}}</b> subscription £{{switch_subscription.cost|floatformat:2}} p/m (for this site)
                 </p>
             </div>
             <div class="col-md-auto">

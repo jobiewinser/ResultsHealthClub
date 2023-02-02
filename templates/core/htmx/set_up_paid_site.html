@@ -7,7 +7,7 @@
             <div class="row">
                 <div class="col">
                   <p class="text-{{site_subscription_change.subscription_to.bootstrap_colour}}">
-                      Switching to <b>{{site_subscription_change.subscription_to.get_name_display}}</b> subscription £{{site_subscription_change.subscription_to.cost|floatformat:2}} p/m (per facility/site)
+                      Switching to <b>{{site_subscription_change.subscription_to.get_name_display}}</b> subscription £{{site_subscription_change.subscription_to.cost|floatformat:2}} p/m (for this site)
                   </p>
                   {%if site_subscription_change.subscription_from.numerical < 1 %}
                   <p class="text-secondary">

@@ -26,6 +26,7 @@ from django.views.generic.list import ListView
 from stripe_integration.api import *
 from django.core.mail import send_mail
 from django.shortcuts import redirect, render
+from core.core_decorators import *
 logger = logging.getLogger(__name__)
 
 class LoginDemoView(View):
@@ -93,6 +94,7 @@ class ProfileConfigurationNeededView(TemplateView):
 
 @method_decorator(login_required, name='dispatch')
 @method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
+@method_decorator(check_core_profile_requirements_fulfilled, name='post')
 class CompanyPermissionsView(TemplateView):
     template_name='campaign_leads/htmx/edit_permissions.html'
 
@@ -104,8 +106,6 @@ class CompanyPermissionsView(TemplateView):
         context['profile'] = company_permissions.profile
         return context
     def post(self, request):
-        if settings.DEMO and not request.user.is_superuser:
-            return HttpResponse(status=500)
         company_permissions = CompanyProfilePermissions.objects.get(pk = request.POST.get('company_permissions_pk'))
         context = {'company_permissions':company_permissions}
         if get_profile_allowed_to_edit_other_profile_permissions(request.user.profile, company_permissions.company):
@@ -123,6 +123,7 @@ class CompanyPermissionsView(TemplateView):
 
 @method_decorator(login_required, name='dispatch')
 @method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
+@method_decorator(check_core_profile_requirements_fulfilled, name='post')
 class SitePermissionsView(TemplateView):
     template_name='campaign_leads/htmx/edit_permissions.html'
 
@@ -134,8 +135,6 @@ class SitePermissionsView(TemplateView):
         context['profile'] = site_permissions.profile
         return context
     def post(self, request):
-        if settings.DEMO and not request.user.is_superuser:
-            return HttpResponse(status=500)
         site_permissions = SiteProfilePermissions.objects.get(pk = request.POST.get('site_permissions_pk'))
         context = {'site_permissions':site_permissions}
         if get_profile_allowed_to_edit_other_profile_permissions(request.user.profile, site_permissions.site.company):
@@ -189,6 +188,7 @@ def get_site_configuration_context(request):
     return context
 @method_decorator(login_required, name='dispatch')
 @method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
+@method_decorator(not_demo_or_superuser_check, name='post')
 class SiteConfigurationView(TemplateView):
     template_name='core/site_configuration.html'
 
@@ -204,8 +204,8 @@ class SiteConfigurationView(TemplateView):
         context['get_stripe_subscriptions_and_update_models'] = context['site'].get_stripe_subscriptions_and_update_models()
         return context
     def post(self, request):
-        if settings.DEMO and not request.user.is_superuser:
-            return HttpResponse(status=500)
+        # if settings.DEMO and not request.user.is_superuser:
+        #     return HttpResponse(status=500)
         self.request.POST._mutable = True 
         site = Site.objects.get(pk=request.POST.get('site_pk'))   
         if not get_profile_allowed_to_view_site_configuration(request.user.profile, site):
@@ -263,9 +263,8 @@ class CompanyConfigurationView(TemplateView):
         # context['site_list'] = get_available_sites_for_user(self.request.user)
         return context
 @login_required
+@not_demo_or_superuser_check
 def change_profile_role(request):
-    if settings.DEMO and not request.user.is_superuser:
-        return HttpResponse(status=500)
     profile = Profile.objects.get(pk=request.POST.get('profile_pk'))
     if (not request.user == profile.user and get_profile_allowed_to_edit_other_profile(request.user.profile, profile)):
         role = request.POST.get('role', None)
@@ -279,9 +278,8 @@ def change_profile_role(request):
             return render(request, 'core/htmx/company_configuration_row.html', context)
     return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
 @login_required
+@not_demo_or_superuser_check
 def change_profile_site(request):
-    if settings.DEMO and not request.user.is_superuser:
-        return HttpResponse(status=500)
     profile = Profile.objects.get(pk=request.POST.get('profile_pk'))
     if get_profile_allowed_to_edit_other_profile(request.user.profile, profile):
         site_pk = request.POST.get('site_pk', None)
@@ -295,9 +293,8 @@ def change_profile_site(request):
             return render(request, 'core/htmx/company_configuration_row.html', context)
     return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
 @login_required
+@not_demo_or_superuser_check
 def change_site_allowed(request):
-    if settings.DEMO and not request.user.is_superuser:
-        return HttpResponse(status=500)
     profile = Profile.objects.get(pk=request.POST.get('profile_pk'))
     context = {}
     site_pk = int(request.POST.get('site_pk', 0))
@@ -337,9 +334,8 @@ def submit_feedback_form(request):
     return HttpResponse(status=200)
 
 @login_required
+@not_demo_or_superuser_check
 def deactivate_profile(request):
-    if settings.DEMO and not request.user.is_superuser:
-        return HttpResponse(status=403)
     user = User.objects.get(pk=request.POST.get('user_pk'))
     if not user.profile.role == 'a':
         if get_profile_allowed_to_edit_other_profile(request.user.profile, user.profile) and not user.profile.role == 'a':
@@ -350,9 +346,8 @@ def deactivate_profile(request):
 
 
 @login_required
+@not_demo_or_superuser_check
 def reactivate_profile(request):
-    if settings.DEMO and not request.user.is_superuser:
-        return HttpResponse(status=403)
     site = Site.objects.get(pk=request.POST.get('site_pk'))
     user = User.objects.get(pk=request.POST.get('user_pk'))
     if get_profile_allowed_to_edit_other_profile(request.user.profile, user.profile):
