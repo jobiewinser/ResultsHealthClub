@@ -160,7 +160,7 @@
     <div class="col">
         <div class="row my-2">    
             <div class="col analytics_col">
-                <button hidden id="refresh_pipeline" class="refresh_date_specific_analytic" hx-trigger="load, click delay:0.5s"
+                <button hidden id="refresh_pipeline" class="refresh_date_specific_analytic" hx-trigger="load delay:0.3s, click delay:0.3s"
                         hx-get="{%url 'get-pipeline' %}"
                         hx-include="#start_date, #end_date, .non_site_dependant_analytics_filters, .site_dependant_analytics_filters"
                         hx-target="#pipeline_body"
@@ -185,7 +185,7 @@
             </div>
             <div class="col-md-auto analytics_col">
                 {%if minimum_site_subscription_level_in_query.analytics_numerical|to_int == 2%}
-                <button hidden id="refresh_current_call_count_distribution" hx-trigger="load, click delay:0.5s"
+                <button hidden id="refresh_current_call_count_distribution" hx-trigger="load delay:0.3s, click delay:0.3s"
                     class="refresh_non_date_specific_analytic"
                     hx-get="{%url 'get-current-call-count-distribution' %}"
                     hx-include="#start_date, #end_date, .non_site_dependant_analytics_filters, .site_dependant_analytics_filters, #graph_type_current_call_count_distribution"
@@ -216,7 +216,7 @@
         </div> 
         <div class="row my-2">
             <div class="col analytics_col">
-                <button hidden id="refresh_calls_today" hx-trigger="load, click delay:0.5s"
+                <button hidden id="refresh_calls_today" hx-trigger="load delay:0.3s, click delay:0.3s"
                     class="refresh_non_date_specific_analytic"
                     hx-get="{%url 'get-calls-today' %}"
                     hx-include="#start_date, #end_date, .non_site_dependant_analytics_filters, .site_dependant_analytics_filters, #graph_type_calls_today"
@@ -240,7 +240,7 @@
                 </div>
             </div>
             <div class="col analytics_col">
-                <button hidden id="refresh_sales_today" hx-trigger="load, click delay:0.5s"
+                <button hidden id="refresh_sales_today" hx-trigger="load delay:0.3s, click delay:0.3s"
                     class="refresh_non_date_specific_analytic"
                     hx-get="{%url 'get-sales-today' %}"
                     hx-include="#start_date, #end_date, .non_site_dependant_analytics_filters, .site_dependant_analytics_filters, #graph_type_sales_today"
@@ -267,7 +267,7 @@
         
         <div class="row my-2">
             <div class="col analytics_col">
-                <button hidden id="refresh_leads_per_day" class="refresh_date_specific_analytic" hx-trigger="load, click delay:0.5s"
+                <button hidden id="refresh_leads_per_day" class="refresh_date_specific_analytic" hx-trigger="load delay:0.3s, click delay:0.3s"
                     hx-get="{%url 'get-leads-per-day' %}"
                     hx-include="#start_date, #end_date, .non_site_dependant_analytics_filters, .site_dependant_analytics_filters, #graph_type_leads_per_day"
                     hx-target="#leads_per_day_card_body"
@@ -292,7 +292,7 @@
             </div>
 
             <div class="col analytics_col">
-                <button hidden id="refresh_bookings_per_day" class="refresh_date_specific_analytic" hx-trigger="load, click delay:0.5s"
+                <button hidden id="refresh_bookings_per_day" class="refresh_date_specific_analytic" hx-trigger="load delay:0.3s, click delay:0.3s"
                     hx-get="{%url 'get-bookings-per-day' %}"
                     hx-include="#start_date, #end_date, .non_site_dependant_analytics_filters, .site_dependant_analytics_filters, #graph_type_bookings_per_day"
                     hx-target="#bookings_per_day_card_body"
@@ -319,7 +319,7 @@
 
         <div class="row my-2">
             <div class="col analytics_col">
-                <button hidden id="refresh_sales_per_day" class="refresh_date_specific_analytic" hx-trigger="load, click delay:0.5s"
+                <button hidden id="refresh_sales_per_day" class="refresh_date_specific_analytic" hx-trigger="load delay:0.3s, click delay:0.3s"
                     hx-get="{%url 'get-sales-per-day' %}"
                     hx-include="#start_date, #end_date, .non_site_dependant_analytics_filters, .site_dependant_analytics_filters, #graph_type_sales_per_day"
                     hx-target="#sales_per_day_card_body"
@@ -344,7 +344,7 @@
             </div>
             
             <div class="col analytics_col">
-                <button hidden id="refresh_calls_made_per_day" class="refresh_date_specific_analytic" hx-trigger="load, click delay:0.5s"
+                <button hidden id="refresh_calls_made_per_day" class="refresh_date_specific_analytic" hx-trigger="load delay:0.3s, click delay:0.3s"
                     hx-get="{%url 'get-calls-made-per-day' %}"
                     hx-include="#start_date, #end_date, .non_site_dependant_analytics_filters, .site_dependant_analytics_filters, #graph_type_calls_made_per_day"
                     hx-target="#calls_made_per_day_card_body"
