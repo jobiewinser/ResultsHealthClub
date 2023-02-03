@@ -96,6 +96,7 @@ def get_bookings_per_day_between_dates_with_timeframe_differences(start_date, en
 
 def get_sales_per_day_between_dates_with_timeframe_differences(start_date, end_date, timeframe=relativedelta.relativedelta(days=1), campaigns=[], campaign_categorys=[], sites=[]):
     qs = Sale.objects.filter(datetime__gte=start_date, datetime__lt=end_date + timeframe).exclude(archived=True)
+    unique_user_list = User.objects.filter(pk__in=set(qs.values_list('user', flat=True).distinct())) 
     if qs:
         start_date = check_if_start_date_allowed_and_replace(start_date, sites, sale_qs=qs)
         if campaigns:
@@ -105,17 +106,18 @@ def get_sales_per_day_between_dates_with_timeframe_differences(start_date, end_d
         elif sites:
             qs = qs.filter(lead__campaign__site__in=sites)
         if qs:        
-            index_date = start_date
             time_label_set = []
-            data_set = []
-            while index_date < end_date + timeframe:
-                index_qs = qs.filter(datetime__gte=index_date, datetime__lt=index_date + timeframe).count()
-                
-                data_set.append({
-                    'sales':index_qs,
-                })
-                time_label_set.append(f"{index_date}")
-                index_date = index_date + timeframe
+            data_set = {}
+            loop_index = 0
+            for user in unique_user_list:
+                index_date = start_date
+                data_set[user.profile.name] = []
+                while index_date < end_date + timeframe:
+                    if loop_index == 0:
+                        time_label_set.append(f"{index_date}")
+                    index_qs = qs.filter(datetime__gte=index_date, datetime__lt=index_date + timeframe)
+                    index_date = index_date + timeframe
+                    data_set[user.profile.name].append(index_qs.filter(user=user).count())
             return data_set, time_label_set, start_date  
     return [], [], start_date  
     

@@ -266,7 +266,7 @@
         </div>    
         
         <div class="row my-2">
-            <div class="col analytics_col">
+            <div class="col-12 analytics_col">
                 <button hidden id="refresh_leads_per_day" class="refresh_date_specific_analytic" hx-trigger="load delay:0.3s, click delay:0.3s"
                     hx-get="{%url 'get-leads-per-day' %}"
                     hx-include="#start_date, #end_date, .non_site_dependant_analytics_filters, .site_dependant_analytics_filters, #graph_type_leads_per_day"
@@ -291,7 +291,7 @@
                 </div>
             </div>
 
-            <div class="col analytics_col">
+            <div class="col-12 analytics_col graph_col">
                 <button hidden id="refresh_bookings_per_day" class="refresh_date_specific_analytic" hx-trigger="load delay:0.3s, click delay:0.3s"
                     hx-get="{%url 'get-bookings-per-day' %}"
                     hx-include="#start_date, #end_date, .non_site_dependant_analytics_filters, .site_dependant_analytics_filters, #graph_type_bookings_per_day"
@@ -318,7 +318,7 @@
         </div> 
 
         <div class="row my-2">
-            <div class="col analytics_col">
+            <div class="col-12 analytics_col graph_col">
                 <button hidden id="refresh_sales_per_day" class="refresh_date_specific_analytic" hx-trigger="load delay:0.3s, click delay:0.3s"
                     hx-get="{%url 'get-sales-per-day' %}"
                     hx-include="#start_date, #end_date, .non_site_dependant_analytics_filters, .site_dependant_analytics_filters, #graph_type_sales_per_day"
@@ -343,7 +343,7 @@
                 </div>
             </div>
             
-            <div class="col analytics_col">
+            <div class="col-12 analytics_col graph_col">
                 <button hidden id="refresh_calls_made_per_day" class="refresh_date_specific_analytic" hx-trigger="load delay:0.3s, click delay:0.3s"
                     hx-get="{%url 'get-calls-made-per-day' %}"
                     hx-include="#start_date, #end_date, .non_site_dependant_analytics_filters, .site_dependant_analytics_filters, #graph_type_calls_made_per_day"
