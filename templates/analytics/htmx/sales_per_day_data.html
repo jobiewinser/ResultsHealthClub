@@ -43,7 +43,7 @@
         var background_color_random_list = []
         var border_color_random_list = []
         {%for user, data_entries in data_set.items%}
-            var [backgroundColor, borderColor] = dynamicColors(0.8, 1)
+            var [backgroundColor, borderColor] = dynamicColors(0.5, 1)
             background_color_random_list.push(backgroundColor)
             border_color_random_list.push(borderColor)    
         {%endfor%}
