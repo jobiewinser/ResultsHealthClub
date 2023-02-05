@@ -1,21 +1,21 @@
 {%load core_tags%}
 <div class="row">
     <div class="col-md-auto p-0">
-        <div class="row" style="margin-left:0px !important;">
+        {% comment %} <div class="row" style="margin-left:0px !important;">
             <div class="col right">
                 <small>Bar</small>
             </div>
 
             <div class="col-md-auto p-0">
                 <div class="form-check form-switch">
-                    <input class="form-check-input" name="graph_type" {%if graph_type == 'line'%}checked{%endif%} type="checkbox" id="graph_type_calls_made_per_day" onchange="$('#refresh_calls_made_per_day').click()">
-                </div>
+                    <input class="form-check-input" name="graph_type" {%if graph_type == 'line'%}checked{%endif%} type="checkbox" id="graph_type_calls_per_day" onchange="$('#refresh_calls_per_day').click()">
+                </div> 
             </div>
 
             <div class="col-md-auto" style="text-align:left; padding-left:5px">
                 <small>Line</small>
             </div>
-        </div>
+        </div> {% endcomment %}
     </div>
     <div class="col p-0">
     </div>
@@ -26,10 +26,9 @@
 
 <div class="row mt-3">
     <div class="col p-0">
-        <div class="chart_wrapper center" id="calls_made_per_day_chart_wrapper">
-            
+        <div class="chart_wrapper center" id="calls_per_day_chart_wrapper">
             {%if data_set%}
-            <canvas class="chart_canvas" id="calls_made_per_day_chart" ></canvas>
+            <canvas class="chart_canvas" id="calls_per_day_chart" ></canvas>
             {%else%}
             No Data
             {%endif%}
@@ -38,33 +37,48 @@
 </div>
 
 
+
 <script>
     $(document).ready(function() {
+        var background_color_random_list = []
+        var border_color_random_list = []
+        {%for user, data_entries in data_set.items%}
+            var [backgroundColor, borderColor] = dynamicColors(0.8, 1)
+            background_color_random_list.push(backgroundColor)
+            border_color_random_list.push(borderColor)    
+        {%endfor%}
+        console.log(background_color_random_list)
+        {%if data_set%}
         setTimeout(function(){
-            calls_made_per_day_chart_var = document.getElementById('calls_made_per_day_chart');
-            calls_made_per_day_chart = new Chart(calls_made_per_day_chart_var, {
-                type: '{%if graph_type%}{{graph_type}}{%else%}bar{%endif%}',
+            calls_per_day_chart_var = document.getElementById('calls_per_day_chart');
+            calls_per_day_chart = new Chart(calls_per_day_chart_var, {
+                type: 'bar',
                 data: {
-                    labels: [{%for label in time_label_set%}'{{label}}'{% if not forloop.last %},{%endif%}{%endfor%}],
-                    datasets: [{
-                        label: 'Calls',
-                        data: [{%for data_entry in data_set%}{{data_entry.total_calls}}{% if not forloop.last %},{%endif%}{%endfor%}],
-                        backgroundColor: 'rgba(255, 193, 7, 0.4)',
-                        borderColor: 'rgba(255, 193, 7, 0.85)',
-                        fill: true,
-                        borderWidth: 1
-                    }]
+                    labels: [{%for label in time_label_set%}'{{label}}'{% if not forloop.last %},{%endif%}{%endfor%}],                    
+                    datasets: [
+                        {%for user, data_entries in data_set.items%}{
+                            label: '{{user}}',
+                            data: [{%for data_entry in data_entries%}'{{data_entry}}'{% if not forloop.last %},{%endif%}{%endfor%}],
+                            backgroundColor: background_color_random_list[{{ forloop.counter0 }}],
+                            borderColor: border_color_random_list[{{ forloop.counter0 }}],
+                            fill: true,
+                            borderWidth: 1
+                        },
+                        {%endfor%}
+                    ]
                 },
                 options: {
-                    scales: {
+                    scales: {      
                         y: {
+                            stacked: true,
                             beginAtZero: true,
                             ticks: {
                             beginAtZero: true,
                             callback: function(value) {if (value % 1 === 0) {return value;} }
                             }
                         },
-                        xAxis: {
+                        x: {
+                            stacked: true,
                             type: "time",
                             time: {
                                 displayFormats: {
@@ -79,10 +93,15 @@
                             gridLines: { display: false }
                         }
                     },
-                    responsive: true
+                    responsive: true,
+                    plugins: {
+                        legend:{
+                            display:true
+                        },
+                    }
                 }
             });
-        }, 250); 
-        
+        }, 250);  
+        {%endif%}               
     });
 </script>

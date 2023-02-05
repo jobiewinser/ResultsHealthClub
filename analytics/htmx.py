@@ -67,33 +67,6 @@ def get_leads_per_day_between_dates_with_timeframe_differences(start_date, end_d
             return data_set, time_label_set, start_date  
     return [], [], start_date  
 
-
-def get_bookings_per_day_between_dates_with_timeframe_differences(start_date, end_date, timeframe=relativedelta.relativedelta(days=1), campaigns=[], campaign_categorys=[], sites=[]):
-    qs = Booking.objects.filter(datetime__gte=start_date, datetime__lt=end_date + timeframe).exclude(archived=True)
-    if qs:
-        start_date = check_if_start_date_allowed_and_replace(start_date, sites, booking_qs=qs)
-        if campaigns:
-            qs = qs.filter(lead__campaign__in=campaigns)
-        elif campaign_categorys:
-            qs = qs.filter(lead__campaign__campaign_category__in=campaign_categorys)
-        elif sites:
-            qs = qs.filter(lead__campaign__site__in=sites)
-        if qs:
-            
-            index_date = start_date
-            time_label_set = []
-            data_set = []
-            while index_date < end_date + timeframe:
-                index_qs = qs.filter(created__gte=index_date, created__lt=index_date + timeframe).count()
-                
-                data_set.append({
-                    'bookings':index_qs,
-                })
-                time_label_set.append(f"{index_date}")
-                index_date = index_date + timeframe
-            return data_set, time_label_set, start_date  
-    return [], [], start_date  
-
 def get_sales_per_day_between_dates_with_timeframe_differences(start_date, end_date, timeframe=relativedelta.relativedelta(days=1), campaigns=[], campaign_categorys=[], sites=[]):
     qs = Sale.objects.filter(datetime__gte=start_date, datetime__lt=end_date + timeframe).exclude(archived=True)
     unique_user_list = User.objects.filter(pk__in=set(qs.values_list('user', flat=True).distinct())) 
@@ -120,9 +93,49 @@ def get_sales_per_day_between_dates_with_timeframe_differences(start_date, end_d
                     data_set[user.profile.name].append(index_qs.filter(user=user).count())
             return data_set, time_label_set, start_date  
     return [], [], start_date  
+
+def get_bookings_per_day_between_dates_with_timeframe_differences(start_date, end_date, timeframe=relativedelta.relativedelta(days=1), campaigns=[], campaign_categorys=[], sites=[]):
+    qs = Booking.objects.filter(datetime__gte=start_date, datetime__lt=end_date + timeframe).exclude(archived=True)
+    unique_user_list = User.objects.filter(pk__in=set(qs.values_list('user', flat=True).distinct())) 
+    if qs:
+        start_date = check_if_start_date_allowed_and_replace(start_date, sites, booking_qs=qs)
+        if campaigns:
+            qs = qs.filter(lead__campaign__in=campaigns)
+        elif campaign_categorys:
+            qs = qs.filter(lead__campaign__campaign_category__in=campaign_categorys)
+        elif sites:
+            qs = qs.filter(lead__campaign__site__in=sites)
+        if qs:
+            time_label_set = []
+            data_set = {}
+            loop_index = 0
+            for user in unique_user_list:
+                index_date = start_date
+                data_set[user.profile.name] = []
+                while index_date < end_date + timeframe:
+                    if loop_index == 0:
+                        time_label_set.append(f"{index_date}")
+                    index_qs = qs.filter(datetime__gte=index_date, datetime__lt=index_date + timeframe)
+                    index_date = index_date + timeframe
+                    data_set[user.profile.name].append(index_qs.filter(user=user).count())
+            
+            # index_date = start_date
+            # time_label_set = []
+            # data_set = []
+            # while index_date < end_date + timeframe:
+            #     index_qs = qs.filter(created__gte=index_date, created__lt=index_date + timeframe).count()
+                
+            #     data_set.append({
+            #         'bookings':index_qs,
+            #     })
+            #     time_label_set.append(f"{index_date}")
+            #     index_date = index_date + timeframe
+            return data_set, time_label_set, start_date  
+    return [], [], start_date  
     
 def get_calls_made_per_day_between_dates(start_date, end_date, user, timeframe=relativedelta.relativedelta(days=1), campaigns=[], campaign_categorys=[], sites=[], get_user_totals=False):
     qs = Call.objects.filter(created__gte=start_date, created__lt=end_date + timeframe)
+    unique_user_list = User.objects.filter(pk__in=set(qs.values_list('user', flat=True).distinct())) 
     if qs:
         if campaigns:
             qs = qs.filter(lead__campaign__in=campaigns)
@@ -134,29 +147,39 @@ def get_calls_made_per_day_between_dates(start_date, end_date, user, timeframe=r
             start_date = check_if_start_date_allowed_and_replace(start_date, sites, lead_qs=Campaignlead.objects.filter(call__in=qs))
             index_date = start_date
             time_label_set = []
-            data_set = []
+            data_set = {}
             
             while index_date < end_date + relativedelta.relativedelta(days=1):
                 index_qs = qs.filter(datetime__gte=index_date, datetime__lt=index_date + relativedelta.relativedelta(days=1))
+                loop_index = 0
+                for user in unique_user_list:
+                    index_date = start_date
+                    data_set[user.profile.name] = []
+                    while index_date < end_date + timeframe:
+                        if loop_index == 0:
+                            time_label_set.append(f"{index_date}")
+                        index_qs = qs.filter(datetime__gte=index_date, datetime__lt=index_date + timeframe)
+                        index_date = index_date + timeframe
+                        data_set[user.profile.name].append(index_qs.filter(user=user).count())
                     
-                unique_callers = index_qs.order_by('user').values('user').distinct()
-                if get_user_totals:
-                    user_calls_list = []
-                    for user in unique_callers:
-                        user_calls_list.append({
-                            'user':user,
-                            'calls':index_qs.filter(user=user).count()
-                        })
-                    data_set.append({
-                        'total_calls':index_qs.count(),
-                        'user_calls_list':user_calls_list
-                    })
-                else:
-                    data_set.append({
-                        'total_calls':index_qs.count(),
-                    })
-                time_label_set.append(f"{index_date}")
-                index_date = index_date + relativedelta.relativedelta(days=1)
+                # unique_callers = index_qs.order_by('user').values('user').distinct()
+                # if get_user_totals:
+                #     user_calls_list = []
+                #     for user in unique_callers:
+                #         user_calls_list.append({
+                #             'user':user,
+                #             'calls':index_qs.filter(user=user).count()
+                #         })
+                #     data_set.append({
+                #         'total_calls':index_qs.count(),
+                #         'user_calls_list':user_calls_list
+                #     })
+                # else:
+                #     data_set.append({
+                #         'total_calls':index_qs.count(),
+                #     })
+                # time_label_set.append(f"{index_date}")
+                # index_date = index_date + relativedelta.relativedelta(days=1)
             return data_set, time_label_set, start_date
     return [], [], start_date  
 
