@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from campaign_leads.models import Campaignlead, Campaign
+from campaign_leads.models import Campaignlead, Campaign, Booking
 
 # Register your models here.
 
@@ -22,5 +22,6 @@ class CampaignAdmin(admin.ModelAdmin):
     'whatsapp_business_account']
 admin.site.register(Campaign, CampaignAdmin)
 
-
-    
+class BookingAdmin(admin.ModelAdmin):
+    list_display = ['datetime', 'lead', 'user', 'calendly_event_uri', 'archived', 'created']
+admin.site.register(Booking, BookingAdmin)
