@@ -5,13 +5,17 @@
     <div class="col-md-auto" style="width:330px" id="">  
         <div class="card card-white analytics-card card-white" style="position:fixed; top:30%; left:24px">
             <div class="card-header pb-0 pt-3">
-                <h6 class="help m-0" style="min-height:30px"
-                    data-bs-toggle="popover" 
-                    data-bs-trigger="hover focus" 
-                    data-bs-placement="right"
-                    data-bs-html="true"
-                    data-bs-content="These inputs filter the graphs below by time."><i class="fa-solid fa-circle-info"></i> <b>Filters</b> 
-                </h6> 
+                <div class="row m-0">
+                    <div class="col-auto p-0">
+                        <h6 class="help m-0" style="min-height:30px"
+                            data-bs-toggle="popover" 
+                            data-bs-trigger="hover focus" 
+                            data-bs-placement="left"
+                            data-bs-html="true"
+                            data-bs-content="These inputs filter the graphs below by time."><i class="fa-solid fa-circle-info"></i> <b>Filters</b> 
+                        </h6> 
+                    </div>
+                </div>
             </div>
             <div class="card-body center" id="filters_card_body">
                 <div class="row my-2">
@@ -169,14 +173,17 @@
                         onclick="$('#htmx-indicator-pipeline').addClass('htmx-request')">refresh</button>
                 <div class="card card-white analytics-card card-white" style="min-width: 500px;">
                     <div class="card-header">
-                        <h6 class="help m-0"
-                            data-bs-toggle="popover" 
-                            data-bs-trigger="hover focus" 
-                            data-bs-placement="right"
-                            data-bs-html="true"
-                            data-bs-content="This shows the potential monetary value of leads <b>created</b> between the shown dates that were successfully marked as sold, still live or closed without being sold (filtered by site and campaign above)."><i class="fa-solid fa-circle-info"></i> Pipeline & Conversion Rate <i class="fa-solid fa-rectangle-pro"></i>
-                            <img  class="htmx-indicator invert" id="htmx-indicator-pipeline" src="{% static 'img/bars.svg' %}"/>
-                        </h6> 
+                        <div class="row m-0">
+                            <div class="col-auto p-0">
+                                <h6 class="help m-0"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover focus" 
+                                    data-bs-html="true"
+                                    data-bs-content="This shows the potential monetary value of leads <b>created</b> between the shown dates that were successfully marked as sold, still live or closed without being sold (filtered by site and campaign above)."><i class="fa-solid fa-circle-info"></i> Pipeline & Conversion Rate <i class="fa-solid fa-rectangle-pro"></i>
+                                    <img  class="htmx-indicator invert" id="htmx-indicator-pipeline" src="{% static 'img/bars.svg' %}"/>
+                                </h6> 
+                            </div>
+                        </div>
                     </div>
                     <div class="card-body" id="pipeline_body">
                         
@@ -196,15 +203,17 @@
                 {%endif%}
                 <div class="card card-white analytics-card card-white" style="min-width: 500px;">
                     <div class="card-header">
-                        <h6 class="help m-0"
-                            data-bs-toggle="popover" 
-                            data-bs-trigger="hover focus" 
-                            data-bs-placement="right"
-                            data-bs-html="true"
-                            data-bs-content="This shows the <b>current</b> distribution of leads in each call count column on the <b>Leads</b> page (filtered by site and campaign above)."><i class="fa-solid fa-circle-info"></i> Current Call Count Distribution <i class="fa-solid fa-rectangle-pro"></i>
-                            <img class="htmx-indicator invert" id="htmx-indicator-current-call-count-distribution" src="{% static 'img/bars.svg' %}"/>
-                        </h6> 
-                            
+                        <div class="row m-0">
+                            <div class="col-auto p-0">
+                                <h6 class="help m-0"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover focus" 
+                                    data-bs-html="true"
+                                    data-bs-content="This shows the <b>current</b> distribution of leads in each call count column on the <b>Leads</b> page (filtered by site and campaign above)."><i class="fa-solid fa-circle-info"></i> Current Call Count Distribution <i class="fa-solid fa-rectangle-pro"></i>
+                                    <img class="htmx-indicator invert" id="htmx-indicator-current-call-count-distribution" src="{% static 'img/bars.svg' %}"/>
+                                </h6> 
+                            </div>
+                        </div>                            
                     </div>
                     <div class="card-body" id="{%if minimum_site_subscription_level_in_query.analytics_numerical|to_int == 2%}current_call_count_distribution_card_body{%endif%}">       
                         {%if not minimum_site_subscription_level_in_query.analytics_numerical|to_int == 2%}             
@@ -226,14 +235,17 @@
                     onclick="$('#htmx-indicator-calls-today').addClass('htmx-request'); $('#calls_today_chart_wrapper').empty();">refresh</button>
                 <div class="card card-white analytics-card card-white">
                     <div class="card-header">
-                        <h6 class="help m-0"
-                            data-bs-toggle="popover" 
-                            data-bs-trigger="hover focus" 
-                            data-bs-placement="right"
-                            data-bs-html="true"
-                            data-bs-content="This shows the amount of calls made today since midnight (filtered by site and campaign above)."><i class="fa-solid fa-circle-info"></i> Calls Today 
-                            <img  class="htmx-indicator invert" id="htmx-indicator-calls-today" src="{% static 'img/bars.svg' %}"/>
-                        </h6> 
+                        <div class="row m-0">
+                            <div class="col-auto p-0">
+                                <h6 class="help m-0"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover focus" 
+                                    data-bs-html="true"
+                                    data-bs-content="This shows the amount of calls made today since midnight (filtered by site and campaign above)."><i class="fa-solid fa-circle-info"></i> Calls Today 
+                                    <img  class="htmx-indicator invert" id="htmx-indicator-calls-today" src="{% static 'img/bars.svg' %}"/>
+                                </h6> 
+                            </div>
+                        </div>
                     </div>
                     <div class="card-body" id="calls_today_card_body">
                     </div>
@@ -250,14 +262,17 @@
                     onclick="$('#htmx-indicator-sales-today').addClass('htmx-request'); $('#sales_today_chart_wrapper').empty();">refresh</button>
                 <div class="card card-white analytics-card card-white">
                     <div class="card-header">
-                        <h6 class="help m-0"
-                            data-bs-toggle="popover" 
-                            data-bs-trigger="hover focus" 
-                            data-bs-placement="right"
-                            data-bs-html="true"
-                            data-bs-content="This shows the amount of sales made today since midnight (filtered by site and campaign above)."><i class="fa-solid fa-circle-info"></i> Sales Today 
-                            <img  class="htmx-indicator invert" id="htmx-indicator-sales-today" src="{% static 'img/bars.svg' %}"/>
-                        </h6> 
+                        <div class="row m-0">
+                            <div class="col-auto p-0">
+                                <h6 class="help m-0"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover focus" 
+                                    data-bs-html="true"
+                                    data-bs-content="This shows the amount of sales made today since midnight (filtered by site and campaign above)."><i class="fa-solid fa-circle-info"></i> Sales Today 
+                                    <img  class="htmx-indicator invert" id="htmx-indicator-sales-today" src="{% static 'img/bars.svg' %}"/>
+                                </h6> 
+                            </div>
+                        </div>
                     </div>
                     <div class="card-body" id="sales_today_card_body">
                     </div>
@@ -276,14 +291,17 @@
                     onclick="$('#htmx-indicator-leads-and-bookings').addClass('htmx-request'); $('#leads_per_day_chart_wrapper').empty();">refresh</button>
                 <div class="card card-white analytics-card card-white">
                     <div class="card-header">
-                        <h6 class="help m-0"
-                            data-bs-toggle="popover" 
-                            data-bs-trigger="hover focus" 
-                            data-bs-placement="right"
-                            data-bs-html="true"
-                            data-bs-content='This shows the analytics for Leads for the chosen site/campaign per day, received between the chosen dates.'><i class="fa-solid fa-circle-info"></i> Leads Per Day
-                            <img  class="htmx-indicator invert" id="htmx-indicator-leads-and-bookings" src="{% static 'img/bars.svg' %}"/>
-                        </h6> 
+                        <div class="row m-0">
+                            <div class="col-auto p-0">
+                                <h6 class="help m-0"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover focus" 
+                                    data-bs-html="true"
+                                    data-bs-content='This shows the analytics for Leads for the chosen site/campaign per day, received between the chosen dates.'><i class="fa-solid fa-circle-info"></i> Leads Per Day
+                                    <img  class="htmx-indicator invert" id="htmx-indicator-leads-and-bookings" src="{% static 'img/bars.svg' %}"/>
+                                </h6> 
+                            </div>
+                        </div>
                     </div>
                     <div class="card-body" id="leads_per_day_card_body">
                         
@@ -301,14 +319,17 @@
                     onclick="$('#htmx-indicator-leads-and-bookings').addClass('htmx-request'); $('#bookings_per_day_chart_wrapper').empty();">refresh</button>
                 <div class="card card-white analytics-card card-white">
                     <div class="card-header">
-                        <h6 class="help m-0"
-                            data-bs-toggle="popover" 
-                            data-bs-trigger="hover focus" 
-                            data-bs-placement="right"
-                            data-bs-html="true"
-                            data-bs-content='This shows the analytics for Bookings for the chosen site/campaign per day, made between the chosen dates.'><i class="fa-solid fa-circle-info"></i> Bookings Per Day
-                            <img  class="htmx-indicator invert" id="htmx-indicator-leads-and-bookings" src="{% static 'img/bars.svg' %}"/>
-                        </h6> 
+                        <div class="row m-0">
+                            <div class="col-auto p-0">
+                                <h6 class="help m-0"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover focus" 
+                                    data-bs-html="true"
+                                    data-bs-content='This shows the analytics for Bookings for the chosen site/campaign per day, made between the chosen dates.'><i class="fa-solid fa-circle-info"></i> Bookings Per Day
+                                    <img  class="htmx-indicator invert" id="htmx-indicator-leads-and-bookings" src="{% static 'img/bars.svg' %}"/>
+                                </h6> 
+                            </div>
+                        </div>
                     </div>
                     <div class="card-body" id="bookings_per_day_card_body">
                         
@@ -328,14 +349,17 @@
                     onclick="$('#htmx-indicator-leads-and-bookings').addClass('htmx-request'); $('#sales_per_day_chart_wrapper').empty();">refresh</button>
                 <div class="card card-white analytics-card card-white">
                     <div class="card-header">
-                        <h6 class="help m-0"
-                            data-bs-toggle="popover" 
-                            data-bs-trigger="hover focus" 
-                            data-bs-placement="right"
-                            data-bs-html="true"
-                            data-bs-content='This shows the analytics for Sales for the chosen site/campaign per day, made between the chosen dates.'><i class="fa-solid fa-circle-info"></i> Sales Per Day
-                            <img  class="htmx-indicator invert" id="htmx-indicator-leads-and-bookings" src="{% static 'img/bars.svg' %}"/>
-                        </h6> 
+                        <div class="row m-0">
+                            <div class="col-auto p-0">
+                                <h6 class="help m-0"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover focus" 
+                                    data-bs-html="true"
+                                    data-bs-content='This shows the analytics for Sales for the chosen site/campaign per day, made between the chosen dates.'><i class="fa-solid fa-circle-info"></i> Sales Per Day
+                                    <img  class="htmx-indicator invert" id="htmx-indicator-leads-and-bookings" src="{% static 'img/bars.svg' %}"/>
+                                </h6> 
+                            </div>
+                        </div>
                     </div>
                     <div class="card-body" id="sales_per_day_card_body">
                         
@@ -353,14 +377,17 @@
                     onclick="$('#htmx-indicator-calls-made-per-day').addClass('htmx-request'); $('#calls_made_per_day_chart_wrapper').empty();">refresh</button>
                 <div class="card card-white analytics-card card-white">
                     <div class="card-header">
-                        <h6 class="help m-0"
-                            data-bs-toggle="popover" 
-                            data-bs-trigger="hover focus" 
-                            data-bs-placement="right"
-                            data-bs-html="true"
-                            data-bs-content="This shows the number of calls made per day for the chosen site and/or campaign (top left), between the times chosen (right)."><i class="fa-solid fa-circle-info"></i> Calls Made Per Day 
-                            <img  class="htmx-indicator invert" id="htmx-indicator-calls-made-per-day" src="{% static 'img/bars.svg' %}"/>
-                        </h6> 
+                        <div class="row m-0">
+                            <div class="col-auto p-0">
+                                <h6 class="help m-0"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover focus" 
+                                    data-bs-html="true"
+                                    data-bs-content="This shows the number of calls made per day for the chosen site and/or campaign (top left), between the times chosen (right)."><i class="fa-solid fa-circle-info"></i> Calls Made Per Day 
+                                    <img  class="htmx-indicator invert" id="htmx-indicator-calls-made-per-day" src="{% static 'img/bars.svg' %}"/>
+                                </h6> 
+                            </div>
+                        </div>
                     </div>
                     <div class="card-body" id="calls_made_per_day_card_body">
                     </div>
