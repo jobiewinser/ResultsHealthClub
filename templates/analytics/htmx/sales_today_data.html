@@ -47,29 +47,20 @@
     </div>
 </div>
 
-
-
 <script>
-    {%if data_set%}
-    var background_color_random_list = []
-    var border_color_random_list = []
-    {%for data_set_tuple in data_set%}
-        var [backgroundColor, borderColor] = dynamicColors({%if graph_type == 'polarArea'%}0.5{%else%}0.8{%endif%}, 1)
-        background_color_random_list.push(backgroundColor)
-        border_color_random_list.push(borderColor)    
-    {%endfor%}
+    console.log([{%for profile_pk, data_dict in data_set.items%}'{{data_dict.data}}',{%endfor%}])
     $(document).ready(function() {
         setTimeout(function(){
             sales_today_chart_var = document.getElementById('sales_today_chart');
             sales_today_chart = new Chart(sales_today_chart_var, {
                 type: '{%if graph_type%}{{graph_type}}{%else%}polarArea{%endif%}',
                 data: {
-                    labels: [{%for data_set_tuple in data_set%}'{{data_set_tuple.0}}'{% if not forloop.last %},{%endif%}{%endfor%}],
+                    labels: [{%for profile_pk, data_dict in data_set.items%}'{{data_dict.name}}',{%endfor%}],
                     datasets: [{
                         label: 'Sales',
-                        data: [{%for data_set_tuple in data_set%}'{{data_set_tuple.1}}'{% if not forloop.last %},{%endif%}{%endfor%}],
-                        backgroundColor: background_color_random_list,
-                        borderColor: border_color_random_list,
+                        data: [{%for profile_pk, data_dict in data_set.items%}'{{data_dict.data}}',{%endfor%}],
+                        backgroundColor: [{%for profile_pk, data_dict in data_set.items%}'rgba({{data_dict.color}},{%if graph_type == 'polarArea'%}0.5{%else%}0.8{%endif%})',{%endfor%}],
+                        borderColor: [{%for profile_pk, data_dict in data_set.items%}'rgba({{data_dict.color}},1)',{%endfor%}],
                         fill: true,
                         borderWidth: 1
                     }]
@@ -80,5 +71,4 @@
             });
         }, 250); 
     });
-    {%endif%}
 </script>

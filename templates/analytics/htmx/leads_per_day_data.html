@@ -46,10 +46,10 @@
             leads_per_day_chart = new Chart(leads_per_day_chart_var, {
                 type: '{%if graph_type%}{{graph_type}}{%else%}bar{%endif%}',
                 data: {
-                    labels: [{%for label in time_label_set%}'{{label}}'{% if not forloop.last %},{%endif%}{%endfor%}],
+                    labels: [{%for label in time_label_set%}'{{label}}',{%endfor%}],
                     datasets: [{
                         label: 'Leads',
-                        data: [{%for data_entry in data_set%}{{data_entry.leads}}{% if not forloop.last %},{%endif%}{%endfor%}],
+                        data: [{%for data_entry in data_set%}{{data_entry.leads}},{%endfor%}],
                         backgroundColor: 'rgba(180, 180, 180, 0.4)',
                         borderColor: 'rgba(180, 180, 180, 0.85)',
                         fill: true,

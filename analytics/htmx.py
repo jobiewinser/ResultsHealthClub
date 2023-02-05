@@ -213,7 +213,7 @@ def get_calls_made_per_day_between_dates(start_date, end_date, user, timeframe=r
     return [], [], start_date  
 
 def get_calls_today_dataset(campaigns=[], campaign_categorys=[], sites=[]):
-    data_set = []
+    data_set = {}
     qs = Call.objects.filter(datetime__gte= datetime.now().replace(hour=0,minute=0,second=0,microsecond=0))
     if campaigns:
         qs = qs.filter(lead__campaign__in=campaigns)
@@ -226,11 +226,29 @@ def get_calls_today_dataset(campaigns=[], campaign_categorys=[], sites=[]):
         for user_pk in unique_users:
             if user_pk:
                 user = User.objects.get(pk=user_pk)
-                data_set.append((user.profile.name, qs.filter(user=user).count()))
+                data_set[user.profile.pk] = {
+                    'name':user.profile.name,
+                    'color':user.profile.color,
+                    'data':qs.filter(user=user).count(),
+                }
+    deactivated_user_count = qs.filter(user__is_active=False).count()
+    if deactivated_user_count:
+        data_set['0'] = {
+            'name':"Deactivated Users",
+            'color':"135,135,135",
+            'data':deactivated_user_count,
+        }
+    deleted_user_count = qs.filter(user=None).count()
+    if deleted_user_count:
+        data_set['0'] = {
+            'name':"Deleted Users",
+            'color':"0,0,0",
+            'data':deleted_user_count,
+        }
     return data_set, qs
 
 def get_sales_today_dataset(campaigns=[], campaign_categorys=[], sites=[]):
-    data_set = []
+    data_set = {}
     qs = Sale.objects.filter(datetime__gte=datetime.now().replace(hour=0,minute=0,second=0,microsecond=0)).exclude(archived=True)
     if campaigns:
         qs = qs.filter(lead__campaign__in=campaigns)
@@ -243,7 +261,25 @@ def get_sales_today_dataset(campaigns=[], campaign_categorys=[], sites=[]):
         for user_pk in unique_users:
             if user_pk:
                 user = User.objects.get(pk=user_pk)
-                data_set.append((user.profile.name, qs.filter(user=user).count()))
+                data_set[user.profile.pk] = {
+                    'name':user.profile.name,
+                    'color':user.profile.color,
+                    'data':qs.filter(user=user).count(),
+                }
+    deactivated_user_count = qs.filter(user__is_active=False).count()
+    if deactivated_user_count:
+        data_set['0'] = {
+            'name':"Deactivated Users",
+            'color':"135,135,135",
+            'data':deactivated_user_count,
+        }
+    deleted_user_count = qs.filter(user=None).count()
+    if deleted_user_count:
+        data_set['0'] = {
+            'name':"Deleted Users",
+            'color':"0,0,0",
+            'data':deleted_user_count,
+        }
     return data_set, qs
     
 @login_required
