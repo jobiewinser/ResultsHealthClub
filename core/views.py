@@ -982,6 +982,7 @@ def is_password_safe(password):
         yield "Password must contain a lower case character"
         
 @login_required
+@not_demo_or_superuser_check
 def profile_assign_color_htmx(request):
     from campaign_leads.views import hex_to_rgb_tuple
     #this function is used to assign a color to a profile and refresh the profile config row

@@ -188,9 +188,11 @@
                                 <th class="center">
                                     User
                                 </th>
+                                {%if not demo or request.user.is_superuser%}
                                 <th class="center">
                                     Colour
                                 </th>
+                                {%endif%}
                                 <th class="center">
                                     Primary Site
                                 </th>

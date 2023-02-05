@@ -101,9 +101,11 @@
                                     <th class="center">
                                         Colour
                                     </th>
+                                    {%if not demo or request.user.is_superuser%}
                                     <th class="center">
                                         Primary Site
                                     </th>
+                                    {%endif%}
                                     <th class="center">
                                         Role
                                     </th>
