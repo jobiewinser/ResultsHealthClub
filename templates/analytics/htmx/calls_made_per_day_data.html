@@ -40,14 +40,6 @@
 
 <script>
     $(document).ready(function() {
-        var background_color_random_list = []
-        var border_color_random_list = []
-        {%for user, data_entries in data_set.items%}
-            var [backgroundColor, borderColor] = dynamicColors(0.8, 1)
-            background_color_random_list.push(backgroundColor)
-            border_color_random_list.push(borderColor)    
-        {%endfor%}
-        console.log(background_color_random_list)
         {%if data_set%}
         setTimeout(function(){
             calls_per_day_chart_var = document.getElementById('calls_per_day_chart');
@@ -56,11 +48,11 @@
                 data: {
                     labels: [{%for label in time_label_set%}'{{label}}'{% if not forloop.last %},{%endif%}{%endfor%}],                    
                     datasets: [
-                        {%for user, data_entries in data_set.items%}{
+                        {%for user, data_and_color_dict in data_set.items%}{
                             label: '{{user}}',
-                            data: [{%for data_entry in data_entries%}'{{data_entry}}'{% if not forloop.last %},{%endif%}{%endfor%}],
-                            backgroundColor: background_color_random_list[{{ forloop.counter0 }}],
-                            borderColor: border_color_random_list[{{ forloop.counter0 }}],
+                            data: [{%for data_entry in data_and_color_dict.data%}'{{data_entry}}'{% if not forloop.last %},{%endif%}{%endfor%}],
+                            backgroundColor: 'rgba({{data_and_color_dict.color}}, 0.8)',
+                            borderColor: 'rgba({{data_and_color_dict.color}}, 1)',
                             fill: true,
                             borderWidth: 1
                         },

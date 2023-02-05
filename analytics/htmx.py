@@ -84,13 +84,13 @@ def get_sales_per_day_between_dates_with_timeframe_differences(start_date, end_d
             loop_index = 0
             for user in unique_user_list:
                 index_date = start_date
-                data_set[user.profile.name] = []
+                data_set[user.profile.name] = {'color':user.profile.color, 'data':[]}
                 while index_date < end_date + timeframe:
                     if loop_index == 0:
                         time_label_set.append(f"{index_date}")
                     index_qs = qs.filter(datetime__gte=index_date, datetime__lt=index_date + timeframe)
                     index_date = index_date + timeframe
-                    data_set[user.profile.name].append(index_qs.filter(user=user).count())
+                    data_set[user.profile.name]['data'].append(index_qs.filter(user=user).count())
             return data_set, time_label_set, start_date  
     return [], [], start_date  
 
@@ -111,13 +111,13 @@ def get_bookings_per_day_between_dates_with_timeframe_differences(start_date, en
             loop_index = 0
             for user in unique_user_list:
                 index_date = start_date
-                data_set[user.profile.name] = []
+                data_set[user.profile.name] = {'color':user.profile.color, 'data':[]}
                 while index_date < end_date + timeframe:
                     if loop_index == 0:
                         time_label_set.append(f"{index_date}")
                     index_qs = qs.filter(datetime__gte=index_date, datetime__lt=index_date + timeframe)
                     index_date = index_date + timeframe
-                    data_set[user.profile.name].append(index_qs.filter(user=user).count())
+                    data_set[user.profile.name]['data'].append(index_qs.filter(user=user).count())
             
             # index_date = start_date
             # time_label_set = []
@@ -154,13 +154,13 @@ def get_calls_made_per_day_between_dates(start_date, end_date, user, timeframe=r
                 loop_index = 0
                 for user in unique_user_list:
                     index_date = start_date
-                    data_set[user.profile.name] = []
+                    data_set[user.profile.name] = {'color':user.profile.color, 'data':[]}
                     while index_date < end_date + timeframe:
                         if loop_index == 0:
                             time_label_set.append(f"{index_date}")
                         index_qs = qs.filter(datetime__gte=index_date, datetime__lt=index_date + timeframe)
                         index_date = index_date + timeframe
-                        data_set[user.profile.name].append(index_qs.filter(user=user).count())
+                        data_set[user.profile.name]['data'].append(index_qs.filter(user=user).count())
                     
                 # unique_callers = index_qs.order_by('user').values('user').distinct()
                 # if get_user_totals:

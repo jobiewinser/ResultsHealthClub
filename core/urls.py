@@ -40,6 +40,7 @@ urlpatterns = [
     # path('delete-free-taster-link/', corehtmx.delete_free_taster_link, name='delete-free-taster-link' ),  
     # path('configuration/', coreviews.ConfigurationView.as_view(), name='configuration'),  
 
+    path('configuration/profile-assign-color/', coreviews.profile_assign_color_htmx, name='profile-assign-color'), 
     path('profile-configuration-needed/', coreviews.ProfileConfigurationNeededView.as_view(), name='profile-configuration-needed'),  
     path('configuration/company-permissions/', coreviews.CompanyPermissionsView.as_view(), name='company-permissions'),  
     path('configuration/site-permissions/', coreviews.SitePermissionsView.as_view(), name='site-permissions'),  

@@ -980,3 +980,13 @@ def is_password_safe(password):
         yield "Password must contain an upper case character"
     if not any(char.islower() for char in password):
         yield "Password must contain a lower case character"
+        
+@login_required
+def profile_assign_color_htmx(request):
+    from campaign_leads.views import hex_to_rgb_tuple
+    #this function is used to assign a color to a profile and refresh the profile config row
+    profile = Profile.objects.get(pk=request.POST.get('profile_pk'), site__in=request.user.profile.active_sites_allowed)
+    profile.color = hex_to_rgb_tuple(request.POST.get('color', "60F83D"))
+    profile.save()
+    return render(request, 'core/htmx/company_configuration_row.html', {'profile':profile})
+    

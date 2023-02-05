@@ -46,6 +46,16 @@
     </div>
 </td>
 <td class="center">
+    <span hidden>{{profile.color}}</span>   
+    <input type="color" id="color_{{profile.pk}}"  name="color" class="form-control" style="height: 38.5px; width: 52.5px;"
+        hx-post="{% url 'profile-assign-color' %}" hx-swap="innerHTML" 
+        hx-trigger="change"
+        hx-indicator=".top-htmx-indicator" 
+        hx-vals='{"profile_pk": "{{profile.pk}}"}'
+        hx-target="#user_configuration_row_{{profile.pk}}"
+        value="#{{profile.color|rgb_to_hex_tuple_tag}}">
+</td>
+<td class="center">
     <div class="row">
         <div class="col p-0">
             <select class="form-select reset_on_error" name="site_pk" id="profile_site_{{profile.pk}}" hx-post="{% url 'change-profile-site' %}" hx-swap="innerHTML" 

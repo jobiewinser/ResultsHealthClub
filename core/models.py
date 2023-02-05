@@ -837,6 +837,7 @@ class Profile(models.Model):
     sites_allowed = models.ManyToManyField("core.Site", related_name="profile_sites_allowed", null=True, blank=True)
     calendly_event_page_url = models.TextField(blank=True, null=True)
     register_uuid = models.TextField(null=True, blank=True)
+    color = models.CharField(max_length=15, null=False, blank=False, default="96,248,61")
     @property
     def active_sites_allowed(self):
         return self.sites_allowed.filter(active=True).order_by('created')
