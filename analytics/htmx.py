@@ -115,7 +115,7 @@ def get_bookings_per_day_between_dates_with_timeframe_differences(start_date, en
                 while index_date < end_date + timeframe:
                     if loop_index == 0:
                         time_label_set.append(f"{index_date}")
-                    index_qs = qs.filter(created__gte=index_date, datetime__lt=index_date + timeframe)
+                    index_qs = qs.filter(created__gte=index_date, created__lt=index_date + timeframe)
                     index_date = index_date + timeframe
                     data_set[user.profile.name]['data'].append(index_qs.filter(user=user).count())
             
