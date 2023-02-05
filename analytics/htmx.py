@@ -44,7 +44,7 @@ def check_if_start_date_allowed_and_replace(start_date, site_qs, lead_qs=None, s
     
 def get_leads_per_day_between_dates_with_timeframe_differences(start_date, end_date, timeframe=relativedelta.relativedelta(days=1), campaigns=[], campaign_categorys=[], sites=[]):
     qs = Campaignlead.objects.filter(created__gte=start_date, created__lt=end_date + timeframe)
-    if qs:
+    if qs.exists():
         start_date = check_if_start_date_allowed_and_replace(start_date, sites, lead_qs=qs)
         if campaigns:
             qs = qs.filter(campaign__in=campaigns)
@@ -52,7 +52,7 @@ def get_leads_per_day_between_dates_with_timeframe_differences(start_date, end_d
             qs = qs.filter(campaign__campaign_category__in=campaign_categorys)
         elif sites:
             qs = qs.filter(campaign__site__in=sites)   
-        if qs: 
+        if qs.exists(): 
             index_date = start_date
             time_label_set = []
             data_set = []
@@ -69,8 +69,8 @@ def get_leads_per_day_between_dates_with_timeframe_differences(start_date, end_d
 
 def get_sales_per_day_between_dates_with_timeframe_differences(start_date, end_date, timeframe=relativedelta.relativedelta(days=1), campaigns=[], campaign_categorys=[], sites=[]):
     qs = Sale.objects.filter(datetime__gte=start_date, datetime__lt=end_date + timeframe).exclude(archived=True)
-    unique_user_list = User.objects.filter(pk__in=set(qs.values_list('user', flat=True).distinct())) 
-    if qs:
+    unique_user_list = User.objects.filter(is_active=True, pk__in=set(qs.values_list('user', flat=True).distinct())) 
+    if qs.exists():
         start_date = check_if_start_date_allowed_and_replace(start_date, sites, sale_qs=qs)
         if campaigns:
             qs = qs.filter(lead__campaign__in=campaigns)
@@ -78,26 +78,44 @@ def get_sales_per_day_between_dates_with_timeframe_differences(start_date, end_d
             qs = qs.filter(lead__campaign__campaign_category__in=campaign_categorys)
         elif sites:
             qs = qs.filter(lead__campaign__site__in=sites)
-        if qs:        
+        if qs.exists():        
             time_label_set = []
-            data_set = {}
-            loop_index = 0
+            data_set = {
+                "Deactivated Users":{'color':"135,135,135", 'data':[]},
+                "Deleted Users":{'color':"0,0,0", 'data':[]},
+            }
+            index_date = start_date
+            deactivated_user_entry_found = False
+            deleted_user_entry_found = False
             for user in unique_user_list:
-                index_date = start_date
                 data_set[user.profile.name] = {'color':user.profile.color, 'data':[]}
-                while index_date < end_date + timeframe:
-                    if loop_index == 0:
-                        time_label_set.append(f"{index_date}")
-                    index_qs = qs.filter(datetime__gte=index_date, datetime__lt=index_date + timeframe)
-                    index_date = index_date + timeframe
+            
+            while index_date < end_date + timeframe:
+                time_label_set.append(f"{index_date}")
+                index_qs = qs.filter(datetime__gte=index_date, datetime__lt=index_date + timeframe)
+                for user in unique_user_list:
                     data_set[user.profile.name]['data'].append(index_qs.filter(user=user).count())
+                deactivated_user_count = index_qs.filter(user__is_active=False).count()
+                if deactivated_user_count:
+                    deactivated_user_entry_found = True
+                deleted_user_count = index_qs.filter(user=None).count()
+                if deleted_user_count:
+                    deleted_user_entry_found = True
+                data_set["Deactivated Users"]['data'].append(deactivated_user_count)
+                data_set["Deleted Users"]['data'].append(deleted_user_count)
+                
+                index_date = index_date + timeframe
+            if not deactivated_user_entry_found:
+                data_set.pop('Deactivated Users')
+            if not deleted_user_entry_found:
+                data_set.pop('Deleted Users')
             return data_set, time_label_set, start_date  
     return [], [], start_date  
 
 def get_bookings_per_day_between_dates_with_timeframe_differences(start_date, end_date, timeframe=relativedelta.relativedelta(days=1), campaigns=[], campaign_categorys=[], sites=[]):
-    qs = Booking.objects.filter(datetime__gte=start_date, datetime__lt=end_date + timeframe).exclude(archived=True)
-    unique_user_list = User.objects.filter(pk__in=set(qs.values_list('user', flat=True).distinct())) 
-    if qs:
+    qs = Booking.objects.filter(created__gte=start_date, created__lt=end_date + timeframe).exclude(archived=True)
+    unique_user_list = User.objects.filter(is_active=True, pk__in=set(qs.values_list('user', flat=True).distinct())) 
+    if qs.exists():
         start_date = check_if_start_date_allowed_and_replace(start_date, sites, booking_qs=qs)
         if campaigns:
             qs = qs.filter(lead__campaign__in=campaigns)
@@ -105,20 +123,37 @@ def get_bookings_per_day_between_dates_with_timeframe_differences(start_date, en
             qs = qs.filter(lead__campaign__campaign_category__in=campaign_categorys)
         elif sites:
             qs = qs.filter(lead__campaign__site__in=sites)
-        if qs:
+        if qs.exists():
             time_label_set = []
-            data_set = {}
-            loop_index = 0
+            data_set = {
+                "Deactivated Users":{'color':"135,135,135", 'data':[]},
+                "Deleted Users":{'color':"0,0,0", 'data':[]},
+            }
+            index_date = start_date
+            deactivated_user_entry_found = False
+            deleted_user_entry_found = False
             for user in unique_user_list:
-                index_date = start_date
                 data_set[user.profile.name] = {'color':user.profile.color, 'data':[]}
-                while index_date < end_date + timeframe:
-                    if loop_index == 0:
-                        time_label_set.append(f"{index_date}")
-                    index_qs = qs.filter(created__gte=index_date, created__lt=index_date + timeframe)
-                    index_date = index_date + timeframe
-                    data_set[user.profile.name]['data'].append(index_qs.filter(user=user).count())
             
+            while index_date < end_date + timeframe:
+                time_label_set.append(f"{index_date}")
+                index_qs = qs.filter(created__gte=index_date, created__lt=index_date + timeframe)
+                for user in unique_user_list:
+                    data_set[user.profile.name]['data'].append(index_qs.filter(user=user).count())
+                deactivated_user_count = index_qs.filter(user__is_active=False).count()
+                if deactivated_user_count:
+                    deactivated_user_entry_found = True
+                deleted_user_count = index_qs.filter(user=None).count()
+                if deleted_user_count:
+                    deleted_user_entry_found = True
+                data_set["Deactivated Users"]['data'].append(deactivated_user_count)
+                data_set["Deleted Users"]['data'].append(deleted_user_count)
+                
+                index_date = index_date + timeframe
+            if not deactivated_user_entry_found:
+                data_set.pop('Deactivated Users')
+            if not deleted_user_entry_found:
+                data_set.pop('Deleted Users')
             # index_date = start_date
             # time_label_set = []
             # data_set = []
@@ -134,52 +169,46 @@ def get_bookings_per_day_between_dates_with_timeframe_differences(start_date, en
     return [], [], start_date  
     
 def get_calls_made_per_day_between_dates(start_date, end_date, user, timeframe=relativedelta.relativedelta(days=1), campaigns=[], campaign_categorys=[], sites=[], get_user_totals=False):
-    qs = Call.objects.filter(created__gte=start_date, created__lt=end_date + timeframe)
-    unique_user_list = User.objects.filter(pk__in=set(qs.values_list('user', flat=True).distinct())) 
-    if qs:
+    qs = Call.objects.filter(datetime__gte=start_date, datetime__lt=end_date + timeframe)
+    unique_user_list = User.objects.filter(is_active=True, pk__in=set(qs.values_list('user', flat=True).distinct())) 
+    if qs.exists():
         if campaigns:
             qs = qs.filter(lead__campaign__in=campaigns)
         elif campaign_categorys:
             qs = qs.filter(lead__campaign__campaign_category__in=campaign_categorys)
         elif sites:
             qs = qs.filter(lead__campaign__site__in=sites)
-        if qs:
-            start_date = check_if_start_date_allowed_and_replace(start_date, sites, lead_qs=Campaignlead.objects.filter(call__in=qs))
-            index_date = start_date
+        if qs.exists():
             time_label_set = []
-            data_set = {}
+            data_set = {
+                "Deactivated Users":{'color':"135,135,135", 'data':[]},
+                "Deleted Users":{'color':"0,0,0", 'data':[]},
+            }
+            index_date = start_date
+            deactivated_user_entry_found = False
+            deleted_user_entry_found = False
+            for user in unique_user_list:
+                data_set[user.profile.name] = {'color':user.profile.color, 'data':[]}
             
-            while index_date < end_date + relativedelta.relativedelta(days=1):
-                index_qs = qs.filter(datetime__gte=index_date, datetime__lt=index_date + relativedelta.relativedelta(days=1))
-                loop_index = 0
+            while index_date < end_date + timeframe:
+                time_label_set.append(f"{index_date}")
+                index_qs = qs.filter(datetime__gte=index_date, datetime__lt=index_date + timeframe)
                 for user in unique_user_list:
-                    index_date = start_date
-                    data_set[user.profile.name] = {'color':user.profile.color, 'data':[]}
-                    while index_date < end_date + timeframe:
-                        if loop_index == 0:
-                            time_label_set.append(f"{index_date}")
-                        index_qs = qs.filter(datetime__gte=index_date, datetime__lt=index_date + timeframe)
-                        index_date = index_date + timeframe
-                        data_set[user.profile.name]['data'].append(index_qs.filter(user=user).count())
-                    
-                # unique_callers = index_qs.order_by('user').values('user').distinct()
-                # if get_user_totals:
-                #     user_calls_list = []
-                #     for user in unique_callers:
-                #         user_calls_list.append({
-                #             'user':user,
-                #             'calls':index_qs.filter(user=user).count()
-                #         })
-                #     data_set.append({
-                #         'total_calls':index_qs.count(),
-                #         'user_calls_list':user_calls_list
-                #     })
-                # else:
-                #     data_set.append({
-                #         'total_calls':index_qs.count(),
-                #     })
-                # time_label_set.append(f"{index_date}")
-                # index_date = index_date + relativedelta.relativedelta(days=1)
+                    data_set[user.profile.name]['data'].append(index_qs.filter(user=user).count())
+                deactivated_user_count = index_qs.filter(user__is_active=False).count()
+                if deactivated_user_count:
+                    deactivated_user_entry_found = True
+                deleted_user_count = index_qs.filter(user=None).count()
+                if deleted_user_count:
+                    deleted_user_entry_found = True
+                data_set["Deactivated Users"]['data'].append(deactivated_user_count)
+                data_set["Deleted Users"]['data'].append(deleted_user_count)
+                
+                index_date = index_date + timeframe
+            if not deactivated_user_entry_found:
+                data_set.pop('Deactivated Users')
+            if not deleted_user_entry_found:
+                data_set.pop('Deleted Users')
             return data_set, time_label_set, start_date
     return [], [], start_date  
 
@@ -533,7 +562,7 @@ def get_pipeline(request):
         context['opportunities_value'] = 0
 
     if context['live_opportunities'] or context['lost_opportunities']:
-        context['booked_rate'] = (context['booked_opportunities'] / (context['live_opportunities'] + context['lost_opportunities'])) * 100
+        context['booked_rate'] = (context['booked_opportunities'] / context['opportunities']) * 100
     elif context['live_opportunities']:
         context['booked_rate'] = 100
     else:
