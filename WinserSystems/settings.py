@@ -167,9 +167,9 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.demo',
+                'core.context_processors.public',
                 'core.context_processors.version',      
-                'core.context_processors.subscription_options',     
-                         
+                'core.context_processors.subscription_options',                              
             ],
         },
     },
