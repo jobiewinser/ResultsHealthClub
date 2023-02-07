@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from campaign_leads.models import Campaignlead, Campaign, Booking
+from campaign_leads.models import Campaignlead, Campaign, Booking, Call
 
 # Register your models here.
 
@@ -25,3 +25,8 @@ admin.site.register(Campaign, CampaignAdmin)
 class BookingAdmin(admin.ModelAdmin):
     list_display = ['datetime', 'lead', 'user', 'calendly_event_uri', 'archived', 'created']
 admin.site.register(Booking, BookingAdmin)
+
+class CallAdmin(admin.ModelAdmin):
+    list_display = ['created', 'datetime', 'lead', 'user', 'error_json', 'archived']
+    search_fields = ['created', 'datetime', 'archived']    
+admin.site.register(Call, CallAdmin)
