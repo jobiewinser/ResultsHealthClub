@@ -27,6 +27,6 @@ class BookingAdmin(admin.ModelAdmin):
 admin.site.register(Booking, BookingAdmin)
 
 class CallAdmin(admin.ModelAdmin):
-    list_display = ['created', 'datetime', 'lead', 'user', 'error_json', 'archived']
+    list_display = ['created', 'datetime', 'lead', 'user', 'archived']
     search_fields = ['created', 'datetime', 'archived']    
 admin.site.register(Call, CallAdmin)

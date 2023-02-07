@@ -473,9 +473,9 @@ def execute_after_save(sender, instance, created, *args, **kwargs):
 class Call(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     datetime = models.DateTimeField(null=False, blank=False)
-    lead = models.ForeignKey(Campaignlead, on_delete=models.SET_NULL, null=True, blank=True)
+    lead = models.ForeignKey(Campaignlead, on_delete=models.CASCADE, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
-    error_json = models.JSONField(default=dict)
+    # error_json = models.JSONField(default=dict)
     archived = models.BooleanField(default=False)
     class Meta:
         ordering = ['-datetime']
