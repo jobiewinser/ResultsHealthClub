@@ -88,13 +88,16 @@ def get_sales_per_day_between_dates_with_timeframe_differences(start_date, end_d
             deactivated_user_entry_found = False
             deleted_user_entry_found = False
             for user in unique_user_list:
-                data_set[user.profile.name] = {'color':user.profile.color, 'data':[]}
+                data_set[user.profile.name] = {'color':user.profile.color, 'data':[], 'found':False}
             
             while index_date < end_date + timeframe:
                 time_label_set.append(f"{index_date}")
                 index_qs = qs.filter(datetime__gte=index_date, datetime__lt=index_date + timeframe)
                 for user in unique_user_list:
-                    data_set[user.profile.name]['data'].append(index_qs.filter(user=user).count())
+                    user_count = index_qs.filter(user=user).count()
+                    if user_count:
+                        data_set[user.profile.name]['found'] = True                        
+                    data_set[user.profile.name]['data'].append(user_count)
                 deactivated_user_count = index_qs.filter(user__is_active=False).count()
                 if deactivated_user_count:
                     deactivated_user_entry_found = True
@@ -109,6 +112,9 @@ def get_sales_per_day_between_dates_with_timeframe_differences(start_date, end_d
                 data_set.pop('Deactivated Users')
             if not deleted_user_entry_found:
                 data_set.pop('Deleted Users')
+            for user in unique_user_list:
+                if not data_set[user.profile.name]['found']:
+                    data_set.pop(user.profile.name)
             return data_set, time_label_set, start_date  
     return [], [], start_date  
 
@@ -133,13 +139,16 @@ def get_bookings_per_day_between_dates_with_timeframe_differences(start_date, en
             deactivated_user_entry_found = False
             deleted_user_entry_found = False
             for user in unique_user_list:
-                data_set[user.profile.name] = {'color':user.profile.color, 'data':[]}
+                data_set[user.profile.name] = {'color':user.profile.color, 'data':[], 'found':False}
             
             while index_date < end_date + timeframe:
                 time_label_set.append(f"{index_date}")
                 index_qs = qs.filter(created__gte=index_date, created__lt=index_date + timeframe)
                 for user in unique_user_list:
-                    data_set[user.profile.name]['data'].append(index_qs.filter(user=user).count())
+                    user_count = index_qs.filter(user=user).count()
+                    if user_count:
+                        data_set[user.profile.name]['found'] = True                        
+                    data_set[user.profile.name]['data'].append(user_count)
                 deactivated_user_count = index_qs.filter(user__is_active=False).count()
                 if deactivated_user_count:
                     deactivated_user_entry_found = True
@@ -154,6 +163,9 @@ def get_bookings_per_day_between_dates_with_timeframe_differences(start_date, en
                 data_set.pop('Deactivated Users')
             if not deleted_user_entry_found:
                 data_set.pop('Deleted Users')
+            for user in unique_user_list:
+                if not data_set[user.profile.name]['found']:
+                    data_set.pop(user.profile.name)
             # index_date = start_date
             # time_label_set = []
             # data_set = []
@@ -188,13 +200,16 @@ def get_calls_made_per_day_between_dates(start_date, end_date, user, timeframe=r
             deactivated_user_entry_found = False
             deleted_user_entry_found = False
             for user in unique_user_list:
-                data_set[user.profile.name] = {'color':user.profile.color, 'data':[]}
+                data_set[user.profile.name] = {'color':user.profile.color, 'data':[], 'found':False}
             
             while index_date < end_date + timeframe:
                 time_label_set.append(f"{index_date}")
                 index_qs = qs.filter(datetime__gte=index_date, datetime__lt=index_date + timeframe)
                 for user in unique_user_list:
-                    data_set[user.profile.name]['data'].append(index_qs.filter(user=user).count())
+                    user_count = index_qs.filter(user=user).count()
+                    if user_count:
+                        data_set[user.profile.name]['found'] = True                        
+                    data_set[user.profile.name]['data'].append(user_count)
                 deactivated_user_count = index_qs.filter(user__is_active=False).count()
                 if deactivated_user_count:
                     deactivated_user_entry_found = True
@@ -209,6 +224,9 @@ def get_calls_made_per_day_between_dates(start_date, end_date, user, timeframe=r
                 data_set.pop('Deactivated Users')
             if not deleted_user_entry_found:
                 data_set.pop('Deleted Users')
+            for user in unique_user_list:
+                if not data_set[user.profile.name]['found']:
+                    data_set.pop(user.profile.name)
             return data_set, time_label_set, start_date
     return [], [], start_date  
 
