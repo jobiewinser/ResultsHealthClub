@@ -119,7 +119,7 @@ class AttachedError(models.Model):
                         ('1104', "Message failed to send because more than 24 hours have passed since the customer last replied to this number. You can still send a template message at 24 hour intervals instead"),
                         ('1105', "Message failed to send because the Whatsapp account is not yet registered (contact Winser Systems)"),
                         ('1106', "The requested phone number has been deleted"),
-                        ('1107', "Parameter Invalid - They probably aren't on Whatsapp"),
+                        ('1107', "Phone number probably not on Whatsapp"),
                         ('1108', "The message sent was too long (including any variables). Please edit the whatsapp template to make the offending section shorter or edit the lead/contact's name to be shorter for example."),
                         ('1201', "Whatsapp Template not found Whatsapp's system"),
                         ('1202', "There is no Whatsapp Business linked to this Lead's assosciated Site"),
@@ -467,9 +467,14 @@ class WhatsappNumber(PhoneNumber):
         for dict in qs.order_by('customer_number','-datetime').distinct('customer_number').values('pk'):
             message_pk_list.append(dict.get('pk'))
         qs = WhatsAppMessage.objects.filter(pk__in=message_pk_list).order_by('-datetime')
+        
         received = query.get('received')
         if received:
-            qs = qs.filter(inbound=True).filter(read=False)
+            qs = qs.filter(inbound=True, read=False)
+            
+        hide_auto = query.get('hide_auto')
+        if hide_auto:
+            qs = qs.filter(template=None)
         return qs[:10]
 
     def send_whatsapp_message(self, customer_number=None, lead=None, message="", user=None):  

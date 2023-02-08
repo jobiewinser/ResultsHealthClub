@@ -33,7 +33,7 @@ def message_list(request, **kwargs):
             whatsappnumber = latest_message.whatsappnumber
     if whatsappnumber:
         context['whatsappnumber'] = whatsappnumber
-        context['messages'] = whatsappnumber.get_latest_messages()
+        context['messages'] = whatsappnumber.get_latest_messages(query={"hide_auto":True})
     # if get_user_allowed_to_use_site_messaging(request.user, site):
     return render(request, "messaging/messaging_list.html", context)
 
@@ -170,7 +170,7 @@ def get_message_list_body(request, **kwargs):
         context = {}
         whatsappnumber = WhatsappNumber.objects.get(pk=request.GET.get('whatsappnumber_pk')) 
         context['whatsappnumber'] = whatsappnumber
-        context['messages'] = whatsappnumber.get_latest_messages(query={"search_string":request.GET.get('search_string'), "received":request.GET.get('received')})
+        context['messages'] = whatsappnumber.get_latest_messages(query={"search_string":request.GET.get('search_string'), "received":request.GET.get('received'), "hide_auto":request.GET.get('hide_auto', 'off') == 'on'})
         return render(request, "messaging/htmx/message_list_body.html", context)   
     except Exception as e:
         logger.debug("get_more_messages Error "+str(e))
@@ -184,7 +184,7 @@ def get_more_message_list_rows(request, **kwargs):
         whatsappnumber = WhatsappNumber.objects.get(pk=request.GET.get('whatsappnumber_pk'))
         earliest_datetime_timestamp = request.GET.get('earliest_datetime_timestamp')        
         context['whatsappnumber'] = whatsappnumber
-        context['messages'] = whatsappnumber.get_latest_messages(after_datetime_timestamp=earliest_datetime_timestamp,query={"search_string":request.GET.get('search_string'), "received":request.GET.get('received')})
+        context['messages'] = whatsappnumber.get_latest_messages(after_datetime_timestamp=earliest_datetime_timestamp,query={"search_string":request.GET.get('search_string'), "received":request.GET.get('received'), "hide_auto":request.GET.get('hide_auto', 'off') == 'on'})
         return render(request, "messaging/htmx/message_list_rows.html", context)   
     except Exception as e:
         logger.debug("get_more_messages Error "+str(e))

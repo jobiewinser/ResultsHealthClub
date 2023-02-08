@@ -27,7 +27,7 @@
                         class="form-control form-control-xs input_messageCollapse_{{whatsappnumber.pk}}"
                         id="search_messageCollapse_{{whatsappnumber.pk}}"
                         name="search_string"
-                        oninput="$('#received_messageCollapse_{{whatsappnumber.pk}}').prop('checked', false).trigger('change'); $('#htmx_indicator_messageCollapse_{{whatsappnumber.pk}}').addClass('htmx-request');"
+                        oninput="$('#received_messageCollapse_{{whatsappnumber.pk}}').prop('checked', false).trigger('change'); $('#hide_auto_messageCollapse_{{whatsappnumber.pk}}').prop('checked', false).trigger('change'); $('#htmx_indicator_messageCollapse_{{whatsappnumber.pk}}').addClass('htmx-request');"
                         hx-target="#messageCollapse_{{whatsappnumber.pk}}"
                         hx-swap="innerHTML"
                         hx-vals='{"whatsappnumber_pk":"{{whatsappnumber.pk}}"}'
@@ -46,7 +46,26 @@
                             id="received_messageCollapse_{{whatsappnumber.pk}}"
                             name="received"
                             type="checkbox"
-                            oninput="$('#search_messageCollapse_{{whatsappnumber.pk}}').val(''); $('#htmx_indicator_messageCollapse_{{whatsappnumber.pk}}').addClass('htmx-request');"
+                            {% comment %} oninput="$('#search_messageCollapse_{{whatsappnumber.pk}}').val(''); $('#htmx_indicator_messageCollapse_{{whatsappnumber.pk}}').addClass('htmx-request');" {% endcomment %}
+                            oninput="$('#htmx_indicator_messageCollapse_{{whatsappnumber.pk}}').addClass('htmx-request');"
+                            hx-target="#messageCollapse_{{whatsappnumber.pk}}"
+                            hx-swap="innerHTML"
+                            hx-trigger="input delay:0.5s"
+                            hx-vals='{"whatsappnumber_pk":"{{whatsappnumber.pk}}"}'
+                            hx-include=".input_messageCollapse_{{whatsappnumber.pk}}"
+                            hx-get="{%url 'get-message-list-body'%}"
+                            hx-indicator="#htmx_indicator_messageCollapse_{{whatsappnumber.pk}}"/>
+                    </div> 
+                    <div class="form-check form-switch">
+                        <small>Hide Template Messages</small> 
+                        <input 
+                            class="form-check-input input_messageCollapse_{{whatsappnumber.pk}}" 
+                            id="hide_auto_messageCollapse_{{whatsappnumber.pk}}"
+                            name="hide_auto"
+                            checked
+                            type="checkbox"
+                            {% comment %} oninput="$('#search_messageCollapse_{{whatsappnumber.pk}}').val(''); $('#htmx_indicator_messageCollapse_{{whatsappnumber.pk}}').addClass('htmx-request');" {% endcomment %}
+                            oninput="$('#htmx_indicator_messageCollapse_{{whatsappnumber.pk}}').addClass('htmx-request');"
                             hx-target="#messageCollapse_{{whatsappnumber.pk}}"
                             hx-swap="innerHTML"
                             hx-trigger="input delay:0.5s"
