@@ -35,7 +35,7 @@
         
         <link href="{% static 'css/phone.css' %}?{{version}}" rel="stylesheet" />
         <link href="{% static 'css/drag_drop.css' %}?{{version}}" rel="stylesheet" />
-        <link rel="stylesheet" type="text/css"  href="{% static 'css/base.css' %}?{{version}}">
+        <link rel="stylesheet" type="text/css"  href="{% static 'css/base.css' %}?{%if debug%}{{''|random_guid}}{%else%}{{version}}{%endif%}">
         <script src="{% static 'js/drag_drop.js' %}?{{version}}"></script> 
         <script src="{% static 'js/base.js' %}?{{version}}"></script>
         <script src="{% static 'js/chat.js' %}?{{version}}"></script>        
@@ -280,11 +280,15 @@
             set_lead_counts();           
         });
 
+        const setTheme = function (theme) {
+            document.getElementById('body').setAttribute('data-bs-theme', theme)
+        }
+
         
             
         {% comment %} flash() {% endcomment %}
     </script>
-    <body>        
+    <body id="body" data-bs-theme="light">        
         {%block nav%}
         {%include 'core/nav.html'%}
         {%endblock%}

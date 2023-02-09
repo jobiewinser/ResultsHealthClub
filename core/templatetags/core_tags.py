@@ -88,7 +88,8 @@ def seconds_until_hours_passed_tag(dt, hours):
 @register.filter
 def percentage_to_opacity(percentage, average_out_opacity=0.9):
     try:
-        return ((percentage / 100) + average_out_opacity) / 2
+        return ((percentage / 100) + average_out_opacity)
+        # return ((percentage / 100) + average_out_opacity) / 2
     except:
         return 0.6
 @register.filter
@@ -383,3 +384,6 @@ def get_subscription_by_stripe_price_id(price_id):
 # @register.filter
 # def earliest_site_tag(site_qs):
 #     return site_qs.order_by('created').first()
+@register.filter
+def random_guid(anything):
+    return str(uuid.uuid4()) 

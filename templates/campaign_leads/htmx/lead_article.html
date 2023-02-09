@@ -1,7 +1,7 @@
 {%load core_tags static%}
 {%if not lead.archived%}
 <article style="margin-right:50px; border-top: 3px solid rgba({{lead.campaign.color}}, 1); border-bottom: 3px solid rgba({{lead.campaign.color}}, 1);"
-    id="lead-{{lead.pk}}" data-id="{{lead.pk}}"  class="card draggable-card lead_card column-drag lead-{{lead.pk}}">
+    id="lead-{{lead.pk}}" data-id="{{lead.pk}}"  class="card draggable-card lead_card column-drag lead-{{lead.pk}} bg-light">
     <script>setDoubleTap("#lead-{{lead.pk}}")</script>
         <input type="text" style="display:None" id="lead_pk_{{lead.pk}}" name="lead_pk" value="{{lead.pk}}"/>
         <div class="row" style="height:30px">
@@ -26,7 +26,7 @@
                     <br>
                     <b>Campaign Cost (at lead creation):</b> {{lead.get_product_cost|floatformat:2}}<br>
                     ">
-                        <i class="fa-solid fa-circle-info" style="color:light-blue"></i>
+                        <i class="fa-solid fa-circle-info text-info"></i>
                     </span> 
                     
                     <span class="lead_name">{{lead.name}}</span>
@@ -120,7 +120,7 @@
                 {%endfor%}
             </ul>
             ">
-                <i class="fa-solid fa-triangle-exclamation help flashme" style="color:red"></i>
+                <i class="fa-solid fa-triangle-exclamation help flashme text-danger"></i>
         </span>
         {%endif%} 
         {%if lead.assigned_user%}

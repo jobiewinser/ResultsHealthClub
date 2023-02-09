@@ -1,7 +1,7 @@
 {%load user_permission_tags%}
 <span id="calendly_webhook_status_wrapper">
     {%if site_webhook_active%}
-        <b style="color:green">Active</b>
+        <b class="text-success">Active</b>
         <br>
         <span 
             {%if not request.user.profile|get_profile_allowed_to_edit_site_configuration_tag:site%}
@@ -24,7 +24,7 @@
             </button>
         </span>
     {%else%}
-        <b style="color:red">Inactive</b> 
+        <b class="text-danger">Inactive</b> 
         <br>
         <span 
             {%if not request.user.profile|get_profile_allowed_to_edit_site_configuration_tag:site%}disabled

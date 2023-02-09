@@ -87,7 +87,7 @@
         </div>
         <div class="row chat_lead_name_row">
             <div class="col p-0 elipses-overflow" id="message_list_row_{{message.customer_number}}_{{whatsappnumber.pk}}" style="height:18px">
-                {%if message.failed%}<i class="fa-solid fa-triangle-exclamation" style="color:red"></i>{%endif%}  {%if message.inbound%}Them{%else%}You{%endif%}:
+                {%if message.failed%}<i class="fa-solid fa-triangle-exclamation text-danger"></i>{%endif%}  {%if message.inbound%}Them{%else%}You{%endif%}:
                 {%if message.message%}
                     {{message.message|safe}}
                 {%elif message.image.all%}

@@ -11,7 +11,7 @@ body{
 
 body, #generic_modal_body {
     /* font-family: Arial, Helvetica, sans-serif; */
-    background-color: #f4f5f8;
+    /* background-color: #f4f5f8; */
 }
 body {
     overflow:hidden
@@ -426,6 +426,7 @@ body * {
 .borderless {
     border: unset !important;
 }
+
 .bg-success-trans {
     background-color: rgba(25, 135, 84, 0.6) !important;
 }
@@ -595,8 +596,19 @@ tr.odd td {
 /* .row {
     background-color: unset;
 } */
-.card {
-    background-color: #FFF;
+[data-bs-theme=light] .card {
+    background-color: #FFF !important;
+}
+
+[data-bs-theme="dark"] .select2, .select2 *{
+    background-color: var(--bs-body-bg) !important;
+}
+
+[data-bs-theme="dark"] .select2-dropdown, .select2-dropdown *{
+    background-color: var(--bs-body-bg) !important;
+}
+[data-bs-theme="dark"] table, table *{
+    background-color: var(--bs-body-bg) !important;
 }
 
 /* FL TABLE */
