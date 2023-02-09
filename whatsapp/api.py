@@ -236,10 +236,17 @@ class Whatsapp():
                     counter = counter + 1
                 component['text'] = text
 
-        for i in range(len(pending_components)):
+        # for i in range(len(pending_components)):
+        #     if not pending_components[i].get('text', ''):
+        #         del pending_components[i]
+        i = 0
+        length = len(pending_components)
+        while i < length:
             if not pending_components[i].get('text', ''):
                 del pending_components[i]
-
+                i -= 1
+                length -= 1
+            i += 1
             
         body = { 
             "name": template_object.pending_name or template_object.name,
