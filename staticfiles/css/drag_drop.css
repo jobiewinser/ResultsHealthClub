@@ -78,11 +78,11 @@
     min-height: 100vh;
     
 }
-.column{
+.column {
     padding:2px;
     /* background:rgba(33, 37, 41, 0.1); */
     border-radius: 10px;
-    background:rgba(33, 37, 41, 0.1);
+    background:rgba(228,228,228, 0.5);
     min-height:200px
 }
 

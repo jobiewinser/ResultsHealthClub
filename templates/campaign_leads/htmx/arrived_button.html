@@ -1,4 +1,4 @@
-<button class="btn btn-space btn-{%if lead.arrived%}warning{%else%}light{%endif%} btn-sm nowrap" id="arrived_{{lead.pk}}"
+<button class="btn btn-space {%if lead.arrived%}btn-warning{%else%}btn-secondary{%endif%} btn-sm nowrap" id="arrived_{{lead.pk}}"
 {%if demo and not request.user.is_superuser%}disabled{%endif%}
 data-bs-toggle="popover" 
 data-bs-trigger="hover focus" 

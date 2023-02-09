@@ -1,7 +1,7 @@
 {%load static core_tags%}
 <!DOCTYPE html>
 {% comment %} <meta name="viewport" content="width=device-width, initial-scale=1"> {% endcomment %}
-<html>    
+<html id="html" data-bs-theme="{%if request.user.profile.theme%}{{request.user.profile.theme}}{%else%}light{%endif%}">    
     <head>
         <script>
             var csrftoken = '{{ csrf_token }}';
@@ -281,14 +281,14 @@
         });
 
         const setTheme = function (theme) {
-            document.getElementById('body').setAttribute('data-bs-theme', theme)
+            document.getElementById('html').setAttribute('data-bs-theme', theme)
         }
 
         
             
         {% comment %} flash() {% endcomment %}
     </script>
-    <body id="body" data-bs-theme="light">        
+    <body id="body">        
         {%block nav%}
         {%include 'core/nav.html'%}
         {%endblock%}

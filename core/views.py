@@ -990,4 +990,12 @@ def profile_assign_color_htmx(request):
     profile.color = hex_to_rgb_tuple(request.POST.get('color', "60F83D"))
     profile.save()
     return render(request, 'core/htmx/company_configuration_row.html', {'profile':profile})
+
+@login_required
+@not_demo_or_superuser_check
+def change_theme(request):
+    profile = request.user.profile
+    profile.theme = request.POST.get('theme', 'light')
+    profile.save()
+    return HttpResponse("Successfully changed theme", status=200)
     

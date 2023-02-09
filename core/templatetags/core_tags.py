@@ -386,4 +386,13 @@ def get_subscription_by_stripe_price_id(price_id):
 #     return site_qs.order_by('created').first()
 @register.filter
 def random_guid(anything):
-    return str(uuid.uuid4()) 
+    return str(uuid.uuid4())
+
+@register.filter(name='display_phone')
+def display_phone(number_string, country=None):
+    """Convert a 11 character string into xxxxx xxxxxx."""
+    if not len(number_string) == 11:
+        return number_string
+    first = number_string[0:5]
+    second = number_string[5:11]
+    return f"{first} {second}"
