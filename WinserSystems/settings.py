@@ -75,6 +75,7 @@ LOGGING = {
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("SECRET_KEY")
 if os.getenv('ENVIRONMENT') == 'development':
+    RUNSERVERPLUS_POLLER_RELOADER_INTERVAL = 999
     ALLOWED_HOSTS = ['*']
     DEBUG = True
     CSRF_COOKIE_SECURE = False
@@ -99,14 +100,17 @@ else:
         os.path.join(BASE_DIR, "staticfiles"),
     )
     WSGI_APPLICATION = 'wsgi.application' #haven't testied this on prod yet, might be pointless?
-DEMO=os.getenv("DEMO", False)=='True'
+    
+PUBLIC=os.getenv('PUBLIC','False')=='True'
+    
+DEMO=os.getenv("DEMO",'False')=='True'
 # if DEBUG:
 WHATSAPP_PHONE_OVERRIDE1=None
 WHATSAPP_PHONE_OVERRIDE2='447974214718'
 WHATSAPP_PHONE_OVERRIDE3='447506372794'
 
 if DEBUG:
-    WHATSAPP_PHONE_OVERRIDE1='447827777940'
+    WHATSAPP_PHONE_OVERRIDE1='447872000364'
 
 # Application definition
 
@@ -121,6 +125,7 @@ INSTALLED_APPS = [
     'campaign_leads',
     'active_campaign',
     'whatsapp',
+    'stripe_integration',
     'messaging',
     # 'twilio',
     'calendly',
@@ -162,6 +167,9 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.demo',
+                'core.context_processors.public',
+                'core.context_processors.version',      
+                'core.context_processors.subscription_options',                              
             ],
         },
     },
@@ -290,3 +298,4 @@ BLEACH_VALID_ATTRS = {
     'img': ['src', 'alt', 'style'],
 }
 BLEACH_VALID_STYLES = ['color', 'cursor', 'float', 'margin']
+VERSION=0.95

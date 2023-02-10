@@ -1,4 +1,5 @@
-  <div class="card chat_bottom_window p-0" id="chat_list_bottom_window">
+{%load static%}
+<div class="card chat_bottom_window p-0" id="chat_list_bottom_window">
     <div class="card-header chat_bottom_header" data-bs-toggle="collapse" data-bs-target="#messageCollapse_{{whatsappnumber.pk}}_wrapper" aria-expanded="false" aria-controls="messageCollapse_{{whatsappnumber.pk}}_wrapper">
         <div class="row">
             <div class="col p-0">
@@ -7,15 +8,15 @@
                     <span class="secondary_td_layer phone_display_{{whatsappnumber.pk}}">{{whatsappnumber}}</span> 
                 </div> 
             </div>
-            <div class="col-auto p-0 pointer">
-                <img class="htmx-indicator invert" style="height:100%" id="htmx_indicator_messageCollapse_{{whatsappnumber.pk}}" src="https://htmx.org/img/bars.svg"/>
+            <div class="col-auto p-0 pe-3">
+                <img class="htmx-indicator invert" style="height:100%" id="htmx_indicator_messageCollapse_{{whatsappnumber.pk}}" src="{% static 'img/bars.svg' %}"/>
             </div>
         </div>
     </div>
     <div class="collapse show" id="messageCollapse_{{whatsappnumber.pk}}_wrapper">
         <div class="card-body p-0 bg-secondary text-white" id="messageFilters_{{whatsappnumber.pk}}">
             <div class="htmx-indicator disconnected_indicator message_count_disconnected_indicator">
-                <b>Connecting</b> <img class="invert" src="https://htmx.org/img/bars.svg">
+                <b>Connecting</b> <img class="invert" src="{% static 'img/bars.svg' %}">
             </div>
             <div class="row ps-2">
                 <div class="col-md-auto p-1 right">
@@ -26,7 +27,7 @@
                         class="form-control form-control-xs input_messageCollapse_{{whatsappnumber.pk}}"
                         id="search_messageCollapse_{{whatsappnumber.pk}}"
                         name="search_string"
-                        oninput="$('#received_messageCollapse_{{whatsappnumber.pk}}').prop('checked', false).trigger('change'); $('#htmx_indicator_messageCollapse_{{whatsappnumber.pk}}').addClass('htmx-request');"
+                        oninput="$('#received_messageCollapse_{{whatsappnumber.pk}}').prop('checked', false).trigger('change'); $('#hide_auto_messageCollapse_{{whatsappnumber.pk}}').prop('checked', false).trigger('change'); $('#htmx_indicator_messageCollapse_{{whatsappnumber.pk}}').addClass('htmx-request');"
                         hx-target="#messageCollapse_{{whatsappnumber.pk}}"
                         hx-swap="innerHTML"
                         hx-vals='{"whatsappnumber_pk":"{{whatsappnumber.pk}}"}'
@@ -39,13 +40,32 @@
             <div class="row ps-2">
                 <div class="col-md-auto p-1 ">
                     <div class="form-check form-switch">
-                        <small>Only Show Received</small> 
+                        <small>Show Unread</small> 
                         <input 
                             class="form-check-input input_messageCollapse_{{whatsappnumber.pk}}" 
                             id="received_messageCollapse_{{whatsappnumber.pk}}"
                             name="received"
                             type="checkbox"
-                            oninput="$('#search_messageCollapse_{{whatsappnumber.pk}}').val(''); $('#htmx_indicator_messageCollapse_{{whatsappnumber.pk}}').addClass('htmx-request');"
+                            {% comment %} oninput="$('#search_messageCollapse_{{whatsappnumber.pk}}').val(''); $('#htmx_indicator_messageCollapse_{{whatsappnumber.pk}}').addClass('htmx-request');" {% endcomment %}
+                            oninput="$('#htmx_indicator_messageCollapse_{{whatsappnumber.pk}}').addClass('htmx-request');"
+                            hx-target="#messageCollapse_{{whatsappnumber.pk}}"
+                            hx-swap="innerHTML"
+                            hx-trigger="input delay:0.5s"
+                            hx-vals='{"whatsappnumber_pk":"{{whatsappnumber.pk}}"}'
+                            hx-include=".input_messageCollapse_{{whatsappnumber.pk}}"
+                            hx-get="{%url 'get-message-list-body'%}"
+                            hx-indicator="#htmx_indicator_messageCollapse_{{whatsappnumber.pk}}"/>
+                    </div> 
+                    <div class="form-check form-switch">
+                        <small>Hide Template Messages</small> 
+                        <input 
+                            class="form-check-input input_messageCollapse_{{whatsappnumber.pk}}" 
+                            id="hide_auto_messageCollapse_{{whatsappnumber.pk}}"
+                            name="hide_auto"
+                            checked
+                            type="checkbox"
+                            {% comment %} oninput="$('#search_messageCollapse_{{whatsappnumber.pk}}').val(''); $('#htmx_indicator_messageCollapse_{{whatsappnumber.pk}}').addClass('htmx-request');" {% endcomment %}
+                            oninput="$('#htmx_indicator_messageCollapse_{{whatsappnumber.pk}}').addClass('htmx-request');"
                             hx-target="#messageCollapse_{{whatsappnumber.pk}}"
                             hx-swap="innerHTML"
                             hx-trigger="input delay:0.5s"
@@ -68,7 +88,7 @@
                         hx-push-url="false"
                         hx-vals='{"template_name": "send_new_template_message", "whatsappnumber_pk":"{{whatsappnumber.pk}}"}'
                         hx-swap="innerHTML" hx-trigger="click">
-                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                            <i class="fa fa-paper-plane-top" aria-hidden="true"></i>
                     </button>
                 </div>
             </div>

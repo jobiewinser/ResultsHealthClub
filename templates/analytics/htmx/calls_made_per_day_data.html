@@ -1,21 +1,21 @@
 {%load core_tags%}
 <div class="row">
     <div class="col-md-auto p-0">
-        <div class="row" style="margin-left:0px !important;">
+        {% comment %} <div class="row" style="margin-left:0px !important;">
             <div class="col right">
                 <small>Bar</small>
             </div>
 
             <div class="col-md-auto p-0">
                 <div class="form-check form-switch">
-                    <input class="form-check-input" name="graph_type" {%if graph_type == 'line'%}checked{%endif%} type="checkbox" id="graph_type_calls_made_per_day" onchange="$('#refresh_calls_made_per_day').click()">
-                </div>
+                    <input class="form-check-input" name="graph_type" {%if graph_type == 'line'%}checked{%endif%} type="checkbox" id="graph_type_calls_per_day" onchange="$('#refresh_calls_per_day').click()">
+                </div> 
             </div>
 
             <div class="col-md-auto" style="text-align:left; padding-left:5px">
                 <small>Line</small>
             </div>
-        </div>
+        </div> {% endcomment %}
     </div>
     <div class="col p-0">
     </div>
@@ -26,40 +26,51 @@
 
 <div class="row mt-3">
     <div class="col p-0">
-        <div class="chart_wrapper" id="calls_made_per_day_chart_wrapper">
-            <canvas class="chart_canvas" id="calls_made_per_day_chart" ></canvas>
+        <div class="chart_wrapper center" id="calls_per_day_chart_wrapper">
+            {%if data_set%}
+            <canvas class="chart_canvas" id="calls_per_day_chart" ></canvas>
+            {%else%}
+            No Data
+            {%endif%}
         </div>
     </div>
 </div>
 
 
+
 <script>
     $(document).ready(function() {
+        {%if data_set%}
         setTimeout(function(){
-            calls_made_per_day_chart_var = document.getElementById('calls_made_per_day_chart');
-            calls_made_per_day_chart = new Chart(calls_made_per_day_chart_var, {
-                type: '{%if graph_type%}{{graph_type}}{%else%}bar{%endif%}',
+            calls_per_day_chart_var = document.getElementById('calls_per_day_chart');
+            calls_per_day_chart = new Chart(calls_per_day_chart_var, {
+                type: 'bar',
                 data: {
-                    labels: [{%for label in time_label_set%}'{{label}}'{% if not forloop.last %},{%endif%}{%endfor%}],
-                    datasets: [{
-                        label: 'Calls',
-                        data: [{%for data_entry in data_set%}{{data_entry.total_calls}}{% if not forloop.last %},{%endif%}{%endfor%}],
-                        backgroundColor: 'rgba(25, 135, 84, 0.4)',
-                        borderColor: 'rgba(25, 135, 84, 0.85)',
-                        fill: true,
-                        borderWidth: 1
-                    }]
+                    labels: [{%for label in time_label_set%}'{{label}}',{%endfor%}],                    
+                    datasets: [
+                        {%for user, data_and_color_dict in data_set.items%}{
+                            label: '{{user}}',
+                            data: [{%for data_entry in data_and_color_dict.data%}'{{data_entry}}',{%endfor%}],
+                            backgroundColor: 'rgba({{data_and_color_dict.color}}, 1.0)',
+                            borderColor: 'rgba({{data_and_color_dict.color}}, 1)',
+                            fill: true,
+                            borderWidth: 1
+                        },
+                        {%endfor%}
+                    ]
                 },
                 options: {
-                    scales: {
+                    scales: {      
                         y: {
+                            stacked: true,
                             beginAtZero: true,
                             ticks: {
                             beginAtZero: true,
                             callback: function(value) {if (value % 1 === 0) {return value;} }
                             }
                         },
-                        xAxis: {
+                        x: {
+                            stacked: true,
                             type: "time",
                             time: {
                                 displayFormats: {
@@ -74,10 +85,15 @@
                             gridLines: { display: false }
                         }
                     },
-                    responsive: true
+                    responsive: true,
+                    plugins: {
+                        legend:{
+                            display:true
+                        },
+                    }
                 }
             });
-        }, 250); 
-        
+        }, 250);  
+        {%endif%}               
     });
 </script>

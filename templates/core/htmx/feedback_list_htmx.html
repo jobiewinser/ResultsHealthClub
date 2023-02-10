@@ -1,0 +1,35 @@
+
+<div class="row mt-0" style="padding:10px">
+    <div class="col center" style="">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        Created
+                    </th>
+                    <th>
+                        User
+                    </th>
+                    <th>
+                        Comment
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {%for feedback in object_list%}
+                <tr>
+                    <td>
+                        {{feedback.created}}
+                    </td>
+                    <td>
+                        {{feedback.user}}
+                    </td>
+                    <td>
+                        {{feedback.comment}}
+                    </td>
+                </tr>
+                {%endfor%}
+            </tbody>
+        </table>
+    </div>
+</div>

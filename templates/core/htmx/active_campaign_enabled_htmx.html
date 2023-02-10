@@ -4,21 +4,21 @@
         data-bs-trigger="hover focus" 
         data-bs-placement="top"
         data-bs-html="true"
-        data-bs-title="Receive Active Campaign Leads"
-        {%if not request.user.profile|get_user_allowed_to_toggle_active_campaign_tag:site%}
-        data-bs-content="You do not have permission to edit this field: Toggle Receive Active Campaign Leads"
+        data-bs-title="Automatically Receive Active Campaign Leads"
+        {%if not request.user.profile|get_profile_allowed_to_toggle_active_campaign_tag:site%}
+        data-bs-content="You do not have permission to edit this field: Toggle Automatically Receive Active Campaign Leads"
         {%else%} 
         data-bs-content="Disabling this toggle will stop active campaign from creating leads on Winser Systems for this site.
         <br>
         <b>Example Usage:</b>
         <br>
-        You're not ready to use this system with another gym you own, so flick this option off for that gym, or Jobie is doing a demonstration and wants to show you the live messaging system without messaging real customers. 
+        You're not ready to use this system with another gym you own, so flick this option off for that gym. 
         "
         {%endif%} >
         <div class="form-check form-switch">
-            <label> Receive Active Campaign Leads <i class="fa-solid fa-circle-info help"></i></label> 
+            <label> Automatically Receive Active Campaign Leads <i class="fa-solid fa-circle-info help"></i></label> 
             <input hx-post="{%url 'set-active-campaign-lead-status'%}" hx-target="#active_campaign_leads_wrapper" hx-swap="innerHTML" hx-trigger="input delay:0.1s" hx-indicator="#htmx_indicator_site_form" hx-vals='{"site_pk": "{{site.pk}}"}'
-            {%if not request.user.profile|get_user_allowed_to_toggle_active_campaign_tag:site%}disabled{%endif%} 
+            {%if not request.user.profile|get_profile_allowed_to_toggle_active_campaign_tag:site%}disabled{%endif%} 
             class="form-check-input" name="active_campaign_leads_enabled" {%if site.active_campaign_leads_enabled%}checked{%endif%} type="checkbox">
         </div>
     </div>

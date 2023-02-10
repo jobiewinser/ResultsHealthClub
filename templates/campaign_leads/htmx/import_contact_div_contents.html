@@ -1,0 +1,75 @@
+{%load core_tags%}
+<div class="alert alert-info">
+    <p>
+        Select contacts to import onto your leads board and then click Import below.
+    </p>
+    <p>
+        <small>
+            Warning: if you import contacts that do not meet your current filter on the leads board, they won't appear for you immediately (they will appear for you when filtering with the "Filter <b>Campaigns</b>" selection at the top of the leads board)
+        </small>
+    </p>
+</div>
+<div class="card card-highlight">
+    <table class="table" id="import_contact_table">
+        <thead>
+            <tr>
+                <th scope="col">Import</th>
+                <th scope="col">Name</th>
+                <th scope="col">Date Updated</th>
+                <th scope="col">Number</th>
+                <th scope="col">Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for contact in contacts %}
+            <tr>
+                <td scope="row">
+                    <div class="form-check form-switch" {%if contact.id|to_str in campaign_lead_ids%}                    
+                        data-bs-toggle="popover" 
+                        data-bs-trigger="hover focus" 
+                        data-bs-placement="top"
+                        data-bs-title="Why is this disabled?"
+                        data-bs-content="This lead is already in our system for this campaign (and not archived, or sold)" 
+                    {%endif%}>
+                        <input class="form-check-input" name="active_campaign_contact_id[]" type="checkbox" value="{{contact.id}}" {%if contact.id|to_str in campaign_lead_ids%}checked disabled{%endif%}/>
+                    </div>
+                </td>
+                <td scope="row">{{contact.firstName}} {{contact.lastName}}</td>
+                <td scope="row" class="">
+                    {%with contact.updated_timestamp|convert_string_to_datetime as updated_datetime%}      
+                    <span hidden>{%if updated_datetime%}{{updated_datetime|timestamp}}{%else%}9999999999{%endif%}</span>              
+                    <span class="primary_td_layer">
+                        {{updated_datetime.date}}
+                    </span>
+                    <br>
+                    <span class="secondary_td_layer">
+                        {{updated_datetime.time}}
+                    </span>  
+                    {%endwith%}
+                </td>
+
+                
+                <td scope="row" class="">{{contact.phone}}</td>
+                <td scope="row">{{contact.email}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="row m-1">
+    <div class="col center">
+        <button class="btn btn-primary" type="submit" {%if demo and not request.user.is_superuser%}disabled{%endif%}>
+            Import
+        </button>
+        {%if campaign.site.subscription.whatsapp_enabled%}
+        <button class="btn btn-secondary" name="disabled_automated_messaging" value="true" type="submit" {%if demo and not request.user.is_superuser%}disabled{%endif%} 
+        data-bs-html="true" 
+        data-bs-toggle="popover" data-bs-placement="top" 
+        data-bs-trigger="hover"
+        title="Import (disable Whatsapp Messages)"
+        data-bs-content="This will import these leads, but will prevent each one from receiving automatic messages in the future (unless reenabled)!">
+            Import (disable auto messages)
+        </button>
+        {%endif%}
+    </div>
+</div>

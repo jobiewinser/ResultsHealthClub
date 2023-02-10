@@ -28,7 +28,7 @@ class Message(PolymorphicModel):
             return self.contact
         self.contact = Contact.objects.filter(customer_number=self.customer_number).last()
         self.save()
-        return self.contact
+        return self.contact    
 
 class MessageImage(PolymorphicModel):  
     image = models.ImageField(upload_to="secure/message_images", null=True, blank=True)    

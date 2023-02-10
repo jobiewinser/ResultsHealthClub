@@ -1,6 +1,6 @@
 {%load core_tags%}
 <span hx-swap-oob='innerHTML:.company_message_count'>{{request.user|company_outstanding_whatsapp_messages_tag}}</span>
-{%for site in request.user.profile.sites_allowed.all%}
+{%for site in request.user.profile.active_sites_allowed%}
 <span hx-swap-oob='innerHTML:.site_message_count_{{site.pk}}'>{{site|site_outstanding_whatsapp_messages_tag:request.user}}</span>
 {%for whatsapp_business_account in site.whatsappbusinessaccount_set.all%}
 <span hx-swap-oob='innerHTML:.whatsappnumber_message_count_{{whatsapp_business_account.whatsappnumber.pk}}'>{{whatsapp_business_account.whatsappnumber|whatsappnumber_outstanding_whatsapp_messages_tag:request.user}}</span>

@@ -1,13 +1,14 @@
 {%load static core_tags%}
 <!DOCTYPE html>
 {% comment %} <meta name="viewport" content="width=device-width, initial-scale=1"> {% endcomment %}
-<html>    
+<html id="html" data-bs-theme="{%if request.user.profile.theme%}{{request.user.profile.theme}}{%else%}light{%endif%}">    
     <head>
         <script>
             var csrftoken = '{{ csrf_token }}';
         </script>
         <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>
         {%block cdn%}
+            <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
             <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" />
             <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>                    
             <script src="{% static 'js/jquery-3.6.0.js' %}"></script>                    
@@ -24,29 +25,30 @@
 
             <link rel="stylesheet" href="{% static 'css/select2.4.1.0.min.css' %}" />
             <script src="{% static 'js/select2.4.1.0.min.js' %}"></script>
-            <link rel="stylesheet" href="{% static 'css/bootstrap-icons.1.4.0.css' %}" />
-            
             <link rel="stylesheet" href="{% static 'css/select2-bootstrap-5-theme.1.3.0.min.css' %}"/>
             <link rel="stylesheet" href="{% static 'css/select2-bootstrap-5-theme.1.3.0.rtl.min.css' %}"/>
+            <link rel="stylesheet" href="{% static 'css/bootstrap-icons.1.4.0.css' %}" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/cleave.js/1.5.3/cleave.min.js"></script>
+            
             {%endblock cdn%}
         
         
-        <link href="{% static 'css/phone.css' %}?0.61" rel="stylesheet" />
-        <link href="{% static 'css/drag_drop.css' %}?0.61" rel="stylesheet" />
-        <link rel="stylesheet" type="text/css"  href="{% static 'css/base.css' %}?0.61">
-        <script src="{% static 'js/drag_drop.js' %}?0.61"></script> 
-        <script src="{% static 'js/base.js' %}?0.61"></script>
-        <script src="{% static 'js/chat.js' %}?0.61"></script>        
-        <script src="{% static 'js/modules/leads.js' %}?0.61"></script>
-        <script src="{% static 'js/modules/booking.js' %}?0.61"></script>
-        <script src="{% static 'js/modules/graphs.js' %}?0.61"></script>
-        <script src="{% static 'js/modules/free_tasters.js' %}?0.61"></script>
-        <script src="{% static 'js/modules/campaign_configuration.js' %}?0.61"></script>
-        <script src="{% static 'js/modules/company_configuration.js' %}?0.61"></script>
-        <script src="{% static 'js/modules/whatsapp_templates.js' %}?0.61"></script>
-        <script src="{% static 'js/modules/whatsapp_template_edit.js' %}?0.61"></script>
-        <audio id="notification1" src="{% static 'audio/notification1.wav' %}?0.61" preload="auto"></audio>
-        <audio id="notification2" src="{% static 'audio/notification2.mp3' %}?0.61" preload="auto"></audio>
+        <link href="{% static 'css/phone.css' %}?{{version}}" rel="stylesheet" />
+        <link href="{% static 'css/drag_drop.css' %}?{{version}}" rel="stylesheet" />
+        <link rel="stylesheet" type="text/css"  href="{% static 'css/base.css' %}?{%if debug%}{{''|random_guid}}{%else%}{{version}}{%endif%}">
+        <script src="{% static 'js/drag_drop.js' %}?{{version}}"></script> 
+        <script src="{% static 'js/base.js' %}?{{version}}"></script>
+        <script src="{% static 'js/chat.js' %}?{{version}}"></script>        
+        <script src="{% static 'js/modules/leads.js' %}?{{version}}"></script>
+        <script src="{% static 'js/modules/booking.js' %}?{{version}}"></script>
+        <script src="{% static 'js/modules/graphs.js' %}?{{version}}"></script>
+        <script src="{% static 'js/modules/free_tasters.js' %}?{{version}}"></script>
+        <script src="{% static 'js/modules/campaign_configuration.js' %}?{{version}}"></script>
+        <script src="{% static 'js/modules/company_configuration.js' %}?{{version}}"></script>
+        <script src="{% static 'js/modules/whatsapp_templates.js' %}?{{version}}"></script>
+        <script src="{% static 'js/modules/whatsapp_template_edit.js' %}?{{version}}"></script>
+        <audio id="notification1" src="{% static 'audio/notification1.wav' %}?{{version}}" preload="auto"></audio>
+        <audio id="notification2" src="{% static 'audio/notification2.mp3' %}?{{version}}" preload="auto"></audio>
         
         {%block styles%}
         <style>
@@ -58,9 +60,46 @@
         
     </head>
     
+<style> 
+    .flash {
+        animation: flash 1s;
+        animation-iteration-count: infinite;
+    }
+    
+    @keyframes flash {
+        0% {opacity: 1;}
+        50% {opacity: 0;}
+        100% {opacity: 1;}
+    }
+    </style>
     <script>  
+        let boolean = false;
         $(document).ready(function() {
             
+
+            let element = document.querySelector("#messaging_site_accordion");
+
+            // Listen for changes to the boolean
+            document.addEventListener("booleanChange", () => {
+                console.log("booleanChange")
+            if (boolean) {
+                // Flash the element
+                element.classList.add("flash");
+            } else {
+                // Remove the flash class
+                element.classList.remove("flash");
+            }
+            });
+            let boolean = true;
+
+
+
+
+
+
+
+
+
             window.addEventListener('mouseup', function(event){
             })
             
@@ -146,7 +185,9 @@
                 } else if (current_module == 'whatsapp_templates'){
                     whatsapptemplateshandlehtmxafterRequest(evt);                    
                 }  else if (current_module == 'campaign_booking_overview'){
-                    bookinghandlehtmxafterRequest(evt);                    
+                    setTimeout(function(){
+                        bookinghandlehtmxafterRequest(evt);   
+                    }, 500);                  
                 } 
                 basehandlehtmxafterRequest(evt);
             }
@@ -154,7 +195,6 @@
             
             function handlehtmxhistoryCacheError(evt){
                 var current_module = $('#current_page').val()
-                console.log(evt);
             }
             document.body.addEventListener('htmx:historyCacheError', handlehtmxhistoryCacheError);
 
@@ -239,8 +279,16 @@
             set_total_costs();
             set_lead_counts();           
         });
+
+        const setTheme = function (theme) {
+            document.getElementById('html').setAttribute('data-bs-theme', theme)
+        }
+
+        
+            
+        {% comment %} flash() {% endcomment %}
     </script>
-    <body>        
+    <body id="body">        
         {%block nav%}
         {%include 'core/nav.html'%}
         {%endblock%}
@@ -248,10 +296,10 @@
             {%block content%} 
             {%endblock content%}
         </div>
-        <img class="htmx-indicator" id="page_load_indicator" src="https://htmx.org/img/bars.svg"/>
+        <img class="htmx-indicator" id="page_load_indicator" src="{% static 'img/bars.svg' %}"/>
 
         <div class="modal fade" id="generic_modal" role="dialog" style="overflow:hidden;display: none;">
-            <div class="modal-dialog modal-lg">
+            <div class="modal-dialog modal-xl">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="generic_modal_title"></h5>
@@ -264,12 +312,14 @@
                 </div>
             </div>
         </div>
+
+        
         {%block snackbar%}
         <div id="snackbar"></div>
         {%if request.user.is_authenticated%}
         <span id="chat_bottom_wrapper">
             
-            <img  class="htmx-indicator invert" id="chat_bottom_htmx_indicator" src="https://htmx.org/img/bars.svg"/>
+            <img  class="htmx-indicator invert" id="chat_bottom_htmx_indicator" src="{% static 'img/bars.svg' %}"/>
             <span
             hx-get="{%url 'message-list'%}"
             hx-target="#chat_bottom_wrapper"
@@ -280,6 +330,10 @@
         {%endif%}
 
         {%endblock snackbar%}
+        <button class="btn btn-primary" style="border-radius:10px; opacity: 0.8; position: fixed; bottom: 25px; left: 20px;" hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
+            hx-vals='{"template_name": "tutorial"}'
+            hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
+            hx-swap="innerHTML" hx-trigger="click" style="z-index:99"><i class="fa-regular fa-square-question"></i></button>
     </body>
 </html>
 

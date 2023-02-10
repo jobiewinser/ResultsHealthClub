@@ -1,11 +1,11 @@
 {%load core_tags static%}
 {%if not lead.archived%}
 <article style="margin-right:50px; border-top: 3px solid rgba({{lead.campaign.color}}, 1); border-bottom: 3px solid rgba({{lead.campaign.color}}, 1);"
-    id="lead-{{lead.pk}}" data-id="{{lead.pk}}"  class="card draggable-card lead_card column-drag lead-{{lead.pk}}">
+    id="lead-{{lead.pk}}" data-id="{{lead.pk}}"  class="card draggable-card lead_card column-drag lead-{{lead.pk}} bg-light">
     <script>setDoubleTap("#lead-{{lead.pk}}")</script>
         <input type="text" style="display:None" id="lead_pk_{{lead.pk}}" name="lead_pk" value="{{lead.pk}}"/>
         <div class="row" style="height:30px">
-            <div class="col p-0 elipses-overflow">
+            <div class="col p-0 pe-1 elipses-overflow">
                 <span class="primary_td_layer">
                     <span 
                     class="help"
@@ -18,7 +18,7 @@
                     <b>Name:</b> {{lead.name}}<br>
                     <b>Number:</b> {{lead.whatsapp_number}}<br>
                     <b>Email:</b> {{lead.email}}<br>
-                    <b>Campaign:</b> {{lead.campaign.name}}<br>
+                    <b>Campaign:</b> {{lead.campaign}}<br>
                     <b>Site:</b> {{lead.campaign.site.name}}<br>
                     <b>Created:</b> {{lead.created}}<br>
                     <b>Last Dragged:</b> {{lead.last_dragged}}<br>
@@ -26,71 +26,77 @@
                     <br>
                     <b>Campaign Cost (at lead creation):</b> {{lead.get_product_cost|floatformat:2}}<br>
                     ">
-                        <i class="fa-solid fa-circle-info" style="color:light-blue"></i>
+                        <i class="fa-solid fa-circle-info text-info"></i>
                     </span> 
-                    {%if lead.active_errors%}
-                    <span 
-                    data-bs-toggle="popover" 
-                    data-bs-trigger="hover focus" 
-                    data-bs-html="true" 
-                    data-bs-placement="top"
-                    data-bs-title="Errors"
-                    data-bs-content="
-                    <b>Errors:</b>
-                    <ul>
-                        {%for error in lead.active_errors%}
-                        <li>{{error.created}} - {{error.get_type_display}}</li>
-                        {%endfor%}
-                    </ul>
-                    ">
-                        <i class="fa-solid fa-triangle-exclamation help" style="color:red"></i>
-                    </span>
-                    {%endif%} 
-                    <span class="lead_name">{{lead.name}}</span>
+                    
+                    <span class="lead_name text-dark">{{lead.name}}</span>
                     
                     
                     
                 </span>
             </div>
             <div class="col-md-auto p-0">
-                
-                {%if not lead.message_set.all%}
-                <button class="btn btn-sm btn-secondary position-relative" 
-                    hx-get="{%url 'send-first-template-whatsapp-lead-article' lead_pk=lead.pk%}"
-                    hx-indicator="#page_load_indicator" 
-                    hx-include="#max_call_count"
-                    hx-swap="none"
-                    onclick="$('#page_load_indicator').addClass('htmx-request')"
-                    hx-push-url="false"
-                    hx-trigger="click delay:0.5s"  
-                    data-customer-number="{{lead.whatsapp_number}}">
-                        Start <i class="fa fa-whatsapp"></i>
-                </button>
-                {%else%}
-                    <button class="btn btn-sm btn-success text-white position-relative"                     
-                        hx-get="{%url 'message-list'%}"
-                        hx-target="#chat_bottom"
-                        hx-swap="outerHTML"
-                        hx-indicator="#page_load_indicator"                 
-                        hx-vals='{"site_pk": "{{lead.campaign.site.pk}}", "customer_number": "{{lead.whatsapp_number}}"}'
-                        hx-trigger="click"                        
-                        onclick="$('#chat_card_{{lead.whatsapp_number}}').remove(); $('#chat_list_bottom_window').remove();"
+                <div class="btn-group btn-space mt-0 dropdown position-relative" style="height: 20px">
+                    {%if not lead.message_set.exists%}
+                    <button class="btn btn-space btn-xs btn-secondary nowrap ps-1 pe-1"                     
+                        {%if lead.disabled_automated_messaging%}
+                        onclick="alert(`This lead is marked as don't automatically message. Please manually send a template instead.`);"
+                        {%else%}
+                        hx-include="#max_call_count"
+                        hx-post="{%url 'send-first-template-whatsapp-lead-article' lead_pk=lead.pk%}"
+                        hx-indicator="#page_load_indicator" 
+                        hx-push-url="false"
+                        hx-swap="none" hx-trigger="click"  
+                        {%endif%}
                         data-customer-number="{{lead.whatsapp_number}}">
-                            Chat <i class="fa fa-whatsapp"></i>
+                            Send <i class="fa fa-whatsapp"></i>
                     </button>
-                {%endif%}
+                    {%else%}
+                        <button class="btn btn-space btn-xs btn-success nowrap ps-1 pe-1"                     
+                            hx-get="{%url 'message-list'%}"
+                            hx-target="#chat_bottom"
+                            hx-swap="outerHTML"
+                            hx-indicator="#page_load_indicator"                 
+                            hx-vals='{"site_pk": "{{lead.campaign.site.pk}}", "customer_number": "{{lead.whatsapp_number}}"}'
+                            hx-trigger="click"                        
+                            onclick="$('#chat_card_{{lead.whatsapp_number}}').remove(); $('#chat_list_bottom_window').remove();"
+                            data-customer-number="{{lead.whatsapp_number}}">
+                                Chat <i class="fa fa-whatsapp"></i>
+                        </button>
+                    {%endif%}    
+
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="#" id="send_new_template_message_{{lead.pk}}"
+                                hx-indicator="#htmx_indicator_messageCollapse_{{whatsappnumber.pk}}" hx-target="#generic_modal_body" 
+                                hx-get="{% url 'get-modal-content' %}" 
+                                hx-push-url="false"
+                                hx-vals='{"template_name": "send_new_template_message", "lead_pk": "{{lead.pk}}"}'
+                                hx-swap="innerHTML" hx-trigger="click">
+                                <small>Manually start a conversation using a template</small>
+                            </a>
+                        </li>
+                    </ul>    
+                    <button class="btn btn-space btn-{%if not lead.message_set.exists%}secondary{%else%}success{%endif%} btn-sm nowrap border-start ps-1 pe-1 pt-0" id="sold_{{lead.pk}}_dropdown"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fa-solid fa-chevron-down  fa-2xs"></i>
+                    </button>
+                </div>                
             </div>
         </div>
         <div class="row">
-            <span class="secondary_td_layer elipses-overflow campaign_name p-0 ps-1" style="max-width:150px">{{lead.campaign.name}}</span>
+            <span class="secondary_td_layer elipses-overflow campaign_name p-0 ps-1" style="max-width:140px">{{lead.campaign}}</span>
         </div>
         <div class="row">
-            <span class="secondary_td_layer elipses-overflow site_name p-0 ps-1" style="max-width:150px">{{lead.campaign.site.name}}</span>
+            <span class="secondary_td_layer elipses-overflow site_name p-0 ps-1" style="max-width:140px">{{lead.campaign.site.name}}</span>
+        </div>
+        <div class="row">
+            <span class="secondary_td_layer elipses-overflow site_name p-0 ps-1" style="max-width:140px">Called <b>{%if lead.last_dragged%}{{lead.last_dragged|time_ago_tag}}{%else%}Never{%endif%}</b></span>
         </div>
         <div class="row mt-3">
             <span class="secondary_td_layer p-0" >
                 <div class="row">
-                    <div class="col p-0 elipses-overflow">
+                    <div class="col p-0 pe-1 elipses-overflow">
                         <b><i class="fa fa-whatsapp" aria-hidden="true"></i> <span class="phone_number">{{lead.whatsapp_number}}</span></b>
                     </div>
                     <div class="col-md-auto p-0 right"> 
@@ -99,6 +105,24 @@
                 </div>
             </span>
         </div>
+        {%if lead.active_errors%}
+        <span class="lead_card_warning_wrapper"
+            data-bs-toggle="popover" 
+            data-bs-trigger="hover focus" 
+            data-bs-html="true" 
+            data-bs-placement="top"
+            data-bs-title="Errors"
+            data-bs-content="
+            <b>Errors:</b>
+            <ul>
+                {%for error in lead.active_errors%}
+                <li>{{error.created}} - {{error.get_type_display}}</li>
+                {%endfor%}
+            </ul>
+            ">
+                <i class="fa-solid fa-triangle-exclamation help flashme text-danger"></i>
+        </span>
+        {%endif%} 
         {%if lead.assigned_user%}
         <span class="lead_claimed_img_wrapper" 
             data-bs-toggle="popover" 
@@ -132,7 +156,7 @@
             data-bs-trigger="hover focus" 
             data-bs-html="true" 
             data-bs-placement="top"
-            data-bs-title="Edit Lead."
+            data-bs-title="Edit Lead"
             data-bs-content="
             Click here to make changes to this lead within the Leads Management System. 
             <br>

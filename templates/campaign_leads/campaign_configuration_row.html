@@ -2,7 +2,7 @@
 <td>
     <div class="row">
         <div class="col p-0">
-            {{campaign.name}}
+            {{campaign}}
         </div>
         <div class="col-md-auto p-0">
             {%if campaign.warnings %}
@@ -19,7 +19,7 @@
                     {%endfor%}
                 </ul>
                 ">
-                    <i class="fa-solid fa-triangle-exclamation" style="color:orange"></i>
+                    <i class="fa-solid fa-triangle-exclamation text-warning"></i>
                 </span>
             {%endif%}
         </div>
@@ -69,6 +69,7 @@ id="submit_site_pk_{{campaign.pk}}"></button>
             value="#{{campaign.color|rgb_to_hex_tuple_tag}}">
 </td>
 <td>       
+    {%if campaign.site%}
     <div class="row">
         <div class="col p-0">
             <span hidden>{{campaign.campaign_category.name}}</span>           
@@ -96,8 +97,10 @@ id="submit_site_pk_{{campaign.pk}}"></button>
                 >Add</button> 
         </div>  
     </div>  
+    {%endif%}
 </td>
-<td >         
+<td >   
+    {%if campaign.site and campaign.site.subscription.whatsapp_enabled %}      
     <span hidden>{{campaign.whatsapp_business_account.pk}}</span>                   
     <span  
         data-bs-toggle="popover" 
@@ -123,9 +126,14 @@ id="submit_site_pk_{{campaign.pk}}"></button>
             {%endfor%}
         </select>
     </span> 
+    {%elif campaign.site and not campaign.site.subscription.whatsapp_enabled%}
+    <i class="fa-solid fa-rectangle-pro"></i> subscription feature
+    {%endif%}
 </td>
 <td>
-    {%if campaign.whatsapp_business_account%}
+    {%if campaign.site and not campaign.site.subscription.whatsapp_enabled %} 
+    <i class="fa-solid fa-rectangle-pro"></i> subscription feature    
+    {%elif campaign.whatsapp_business_account%}
     <span id="choose_templates_button_wrapper_{{campaign.pk}}">
         {%include 'campaign_leads/htmx/choose_templates_button.html'%}
     </span>    

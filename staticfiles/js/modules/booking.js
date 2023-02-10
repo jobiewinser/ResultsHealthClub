@@ -14,7 +14,6 @@ function bookinghandlehtmxafterSwap(evt){
     if (evt.detail.target.id == 'overview_table_span_wrapper'){
         initBookingDataTable(); 
     }
-    console.log(evt)
     if (evt.detail.xhr.status == 200){
         if (![undefined, ''].includes(evt.detail.pathInfo.requestPath)){
             if (evt.detail.pathInfo.requestPath.includes("mark-archived")){
@@ -33,7 +32,7 @@ function bookinghandlehtmxafterSwap(evt){
                 $('#generic_modal').modal('hide');
                 snackbarShow('Successfully sold to customer', 'success')
             } else if (evt.detail.pathInfo.requestPath.includes("campaign-booking-overview")){
-                $('#refresh_campaign_list_wrapper').click(); 
+                // $('#refresh_campaign_list_wrapper').click(); 
                 snackbarShow('Successfully refreshed table', 'success')
             }    
         }   
@@ -69,10 +68,15 @@ function bookinghandlehtmxbeforeRequest(evt){
 }
 
 function  bookinghandlehtmxafterRequest(evt){
+    console.log(evt)
     if (evt.detail.xhr.status == 200){
         if (evt.detail.pathInfo.requestPath.includes("create-lead-note")){
             snackbarShow('Successfully added note', 'success')
             htmx.ajax('GET', "/refresh-booking-row/"+evt.detail.xhr.response+"/", {swap:'innerHTML', target: '#row_'+evt.detail.xhr.response})
+        } else if (evt.detail.pathInfo.requestPath.includes("booking-overview")){            
+            // setTimeout(function(){
+            //     select2stuff()
+            // }, 500); 
         } 
     }
 }

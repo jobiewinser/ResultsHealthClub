@@ -1,14 +1,12 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 import logging
 from django.conf import settings
 from django.http import HttpResponse, QueryDict
 import json
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from campaign_leads.models import Campaign, Campaignlead, Call
-from core.user_permission_functions import get_available_sites_for_user, get_user_allowed_to_edit_site_configuration, get_user_allowed_to_edit_template, get_user_allowed_to_edit_whatsappnumber, get_user_allowed_to_send_from_whatsappnumber
-from core.views import get_site_pk_from_request
-from messaging.models import Message
+from campaign_leads.models import Campaignlead
+from core.user_permission_functions import *
 from whatsapp.api import Whatsapp
 from django.views.generic import TemplateView
 from whatsapp.models import WHATSAPP_ORDER_CHOICES, WhatsAppMessage, WhatsAppMessageStatus, WhatsAppWebhookRequest, WhatsappMessageImage, WhatsappTemplate, template_variables
@@ -16,20 +14,11 @@ from django.template import loader
 logger = logging.getLogger(__name__)
 from django.views import View 
 from django.utils.decorators import method_decorator
-from core.models import ErrorModel, Site, WhatsappBusinessAccount, WhatsappNumber, Contact
-from random import randrange
+from core.models import Site, WhatsappBusinessAccount, WhatsappNumber, Contact
 from core.core_decorators import check_core_profile_requirements_fulfilled
 from django.contrib.auth.decorators import login_required
 from whatsapp.models import WhatsappTemplate
-# def random_date(start,l):
-#     current = start
-#     while l >= 0:
-#         current = current + timedelta(minutes=randrange(10))
-#         l-=1
-#     return current
-
-# startDate = datetime(2013, 9, 20,13,00)
-# temp1 = random_date(startDate,10)
+from core.core_decorators import *
 import hmac
 import hashlib
 import pickle
@@ -70,9 +59,11 @@ class Webhooks(View):
                 value = change.get('value')
                 metadata = value.get('metadata', {})
                 if not field == 'message_template_status_update':
-                    site = Site.objects.filter(whatsappbusinessaccount__whatsappnumber__number=metadata.get('display_phone_number')).first()
+                    site = Site.objects.filter(whatsappbusinessaccount__whatsappnumber__number=metadata.get('display_phone_number')).exclude(active=False).first()
                     if site:
-                        signature = 'sha256=' + hmac.new(site.company.whatsapp_app_secret_key.encode('utf-8'), bytes(request.body), digestmod=hashlib.sha256).hexdigest()
+                        signature = ""
+                        if not settings.DEBUG:
+                            signature = 'sha256=' + hmac.new(site.company.whatsapp_app_secret_key.encode('utf-8'), bytes(request.body), digestmod=hashlib.sha256).hexdigest()
                         if signature == request.META.get('HTTP_X_HUB_SIGNATURE_256') or settings.DEBUG:
                             if site:
                                 if field == 'messages':
@@ -137,14 +128,14 @@ class Webhooks(View):
                             if signature == request.META.get('HTTP_X_HUB_SIGNATURE_256'):
                                 if template:
                                     event = value.get('event')
+                                    reason = str(value.get('reason', ''))
                                     if event == 'PENDING_DELETION':
                                         template.delete()
                                     else:
                                         template.status=event
-                                        reason = value.get('reason', None)
                                         
-                                        if reason and not reason.lower() == 'none':
-                                            template.latest_reason=value.get('reason')
+                                        if reason:
+                                            template.latest_reason=reason
                                         else:
                                             template.latest_reason=None
                                         template.name=value.get('message_template_name')
@@ -207,11 +198,15 @@ def handle_received_whatsapp_image_message(message_json, metadata, webhook_objec
     whatsapp_message.image.set([image_object])
     new_message_to_websocket(whatsapp_message, whatsappnumber)
 
+def normalize_phone_number(number):
+    if number[:2] == '44':
+        number = '0' + number[2:]
+    return number
 
 def handle_received_whatsapp_text_message(message_json, metadata, webhook_object):
     wamid = message_json.get('id')
-    to_number = metadata.get('display_phone_number')
-    from_number = message_json.get('from')
+    to_number =  metadata.get('display_phone_number')
+    from_number = normalize_phone_number(message_json.get('from'))
     lead = Campaignlead.objects.filter(whatsapp_number=from_number).last()
     whatsappnumber = WhatsappNumber.objects.get(number=to_number)
     site = whatsappnumber.whatsapp_business_account.site
@@ -302,7 +297,7 @@ class WhatsappTemplatesView(TemplateView):
                 self.request.GET['site_pk'] = self.request.user.profile.site.pk
                 site = self.request.user.profile.site
             else:
-                site = Site.objects.filter(company=self.request.user.profile.company.first()).first()
+                site = Site.objects.filter(company=self.request.user.profile.company.first()).exclude(active=False).first()
 
                 
         whatsapp_business_account_pk = self.request.GET.get('whatsapp_business_account_pk')
@@ -342,16 +337,16 @@ def refresh_template_data(whatsapp_business_account):
                 template.name = api_template.get('name')
                 template.language = api_template.get('language')
                 template.category = api_template.get('category')
-                # if created:
-                # # if not template.components and not template.pending_components:
-                #     components = []
-                #     for dict in api_template.get('components', []):
-                #         json_dict = {}
-                #         for k,v in dict.items():
-                #             json_dict[k] = str(v)
-                #         components.append(json_dict)
+                if created:
+                # if not template.components and not template.pending_components:
+                    components = []
+                    for dict in api_template.get('components', []):
+                        json_dict = {}
+                        for k,v in dict.items():
+                            json_dict[k] = str(v)
+                        components.append(json_dict)
                     
-                #     template.components = components
+                    template.components = components
                 try:
                     template.save()
                 except Exception as e:
@@ -377,6 +372,22 @@ class WhatsappTemplatesEditView(TemplateView):
                 "TRANSACTIONAL":"Transactional",
                 "MARKETING":"Marketing",
             }
+            return context
+
+@method_decorator(login_required, name='dispatch')
+@method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
+class WhatsappTemplatesImportView(TemplateView):
+    template_name='whatsapp/whatsapp_template_configure.html'
+
+    def get_context_data(self, **kwargs):
+        self.request.GET._mutable = True     
+        if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+            self.template_name = 'whatsapp/htmx/whatsapp_template_configure_htmx.html'   
+        context = super(WhatsappTemplatesImportView, self).get_context_data(**kwargs)
+        template = WhatsappTemplate.objects.get(pk=kwargs.get('template_pk'))
+        if self.request.user.profile.company == template.company:
+            context['template'] = template
+            context['variables'] = template_variables
             return context
 
 @method_decorator(login_required, name='dispatch')
@@ -409,9 +420,8 @@ class WhatsappTemplatesCreateView(TemplateView):
 
     
 @login_required
+@not_demo_or_superuser_check
 def whatsapp_approval_htmx(request):
-    if settings.DEMO and not request.user.is_superuser:
-        return HttpResponse(status=500)
     template = WhatsappTemplate.objects.get(pk=request.POST.get('template_pk'))
     if request.user.profile.company == template.company:
         whatsapp = Whatsapp(template.whatsapp_business_account.site.whatsapp_access_token)
@@ -422,9 +432,8 @@ def whatsapp_approval_htmx(request):
         return render(request, 'whatsapp/whatsapp_templates_row.html', {'template':WhatsappTemplate.objects.get(pk=request.POST.get('template_pk')), 'site':template.whatsapp_business_account.site, 'submitting_to_whatsapp': True})
 
 @login_required
+@not_demo_or_superuser_check
 def delete_whatsapp_template_htmx(request):
-    if settings.DEMO and not request.user.is_superuser:
-        return HttpResponse(status=500)
     body = QueryDict(request.body)
     template = WhatsappTemplate.objects.get(pk=body.get('template_pk'))
     whatsapp_business_account = template.whatsapp_business_account
@@ -434,13 +443,12 @@ def delete_whatsapp_template_htmx(request):
     template.status="PENDING_DELETION"
     template.archived = True
     template.save()
-    return HttpResponse("", status=200)
+    return HttpResponse( status=200)
 
          
 @login_required
+@not_demo_or_superuser_check
 def whatsapp_clear_changes_htmx(request):
-    if settings.DEMO and not request.user.is_superuser:
-        return HttpResponse(status=500)
     template = WhatsappTemplate.objects.get(pk=request.POST.get('template_pk'))
     if request.user.profile.company == template.company:
         template.pending_category = None
@@ -452,11 +460,10 @@ def whatsapp_clear_changes_htmx(request):
                                                                             # 'site_list': get_available_sites_for_user(request.user), 
 
 @login_required
+@not_demo_or_superuser_check
 def whatsapp_number_change_alias(request):
-    if settings.DEMO and not request.user.is_superuser:
-        return HttpResponse(status=500)
     whatsappnumber = WhatsappNumber.objects.get(pk=request.POST.get('whatsappnumber_pk'))
-    if get_user_allowed_to_edit_whatsappnumber(request.user, whatsappnumber):
+    if get_profile_allowed_to_edit_whatsapp_settings(request.user.profile, whatsappnumber.whatsapp_business_account.site):
         alias = request.POST.get('alias', None)
         if alias or alias == '':
             whatsappnumber.alias = alias
@@ -489,7 +496,7 @@ def whatsapp_number_change_alias(request):
 #                 Campaign.objects.filter(first_send_template=template).update(first_send_template=None)
 #                 Campaign.objects.filter(second_send_template=template).update(second_send_template=None)
 #                 Campaign.objects.filter(third_send_template=template).update(third_send_template=None)
-#                 return HttpResponse("",status=200)
+#                 return HttpResponse(status=200)
 #     return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
 
 # @login_required
@@ -504,36 +511,34 @@ def whatsapp_number_change_alias(request):
 #                 whatsappnumber.save()
 #                 Site.objects.filter(default_number=whatsappnumber).update(default_number=None)
 #                 WhatsAppMessage.objects.filter(whatsappnumber=whatsappnumber).update(site=site)
-#                 return HttpResponse("",status=200)
+#                 return HttpResponse(status=200)
 #     return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
 
 @login_required
+@not_demo_or_superuser_check
 def add_phone_number(request):
-    if settings.DEMO and not request.user.is_superuser:
-        return HttpResponse(status=500)
     whatsapp_business_account_pk = request.POST.get('whatsapp_business_account_pk', None)
     country_code = request.POST.get('country_code', None)
     phone_number = request.POST.get('phone_number', None)
     if whatsapp_business_account_pk and country_code and phone_number:
         whatsapp_business_account = WhatsappBusinessAccount.objects.get(pk=whatsapp_business_account_pk)
-        if get_user_allowed_to_edit_site_configuration(request.user.profile, whatsapp_business_account.site):            
+        if get_profile_allowed_to_edit_site_configuration(request.user.profile, whatsapp_business_account.site):            
             whatsapp = Whatsapp(whatsapp_business_account.site.whatsapp_access_token)
             whatsapp.create_phone_number(whatsapp_business_account.whatsapp_business_account_id, country_code, phone_number)
-            return HttpResponse("",status=200,headers={'HX-Refresh':True})
+            return HttpResponse(status=200,headers={'HX-Refresh':True})
         return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
     return HttpResponse("Incorrect values entered, please try again.",status=500)
 
 @login_required
+@not_demo_or_superuser_check
 def add_whatsapp_business_account(request):
-    if settings.DEMO and not request.user.is_superuser:
-        return HttpResponse(status=500)
     try: 
         site_pk = request.POST.get('site_pk', None)
         whatsapp_business_account_id = request.POST.get('whatsapp_business_account_id', None)
         if site_pk and whatsapp_business_account_id:
             site = Site.objects.get(pk=site_pk)
             whatsapp = Whatsapp(site.whatsapp_access_token) 
-            if get_user_allowed_to_edit_site_configuration(request.user.profile, site):      
+            if get_profile_allowed_to_edit_site_configuration(request.user.profile, site):      
                 if whatsapp.get_phone_numbers(whatsapp_business_account_id).get('data',[]):   
                     whatsapp_business_account = WhatsappBusinessAccount.objects.filter(whatsapp_business_account_id=whatsapp_business_account_id).first()
                     if whatsapp_business_account:
@@ -544,7 +549,7 @@ def add_whatsapp_business_account(request):
                         else:
                             whatsapp_business_account.delete()
                     WhatsappBusinessAccount.objects.create(site=site, whatsapp_business_account_id=whatsapp_business_account_id)
-                    return HttpResponse("",status=200,headers={'HX-Refresh':True})
+                    return HttpResponse(status=200,headers={'HX-Refresh':True})
                 else:
                     return HttpResponse("There are no phone numbers assosciated with that Whatsapp Business Account ID.",status=500)
             return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
@@ -553,9 +558,8 @@ def add_whatsapp_business_account(request):
         return HttpResponse("Server Error, please try again later.",status=500)
 
 @login_required
+@not_demo_or_superuser_check
 def save_whatsapp_template_ajax(request):
-    if settings.DEMO and not request.user.is_superuser:
-        return HttpResponse(status=500)
     changes_made = False
     if request.POST.get('created', False):
         template = WhatsappTemplate(
@@ -593,7 +597,7 @@ def save_whatsapp_template_ajax(request):
             template.edited_by = request.user
             template.edited = datetime.now()
             template.save()
-    return HttpResponse("", status=200)
+    return HttpResponse(status=200)
 
 @login_required
 def send_new_template_message(request):
@@ -614,7 +618,7 @@ def send_new_template_message(request):
     lead = Campaignlead.objects.filter(pk=request.POST.get('lead_pk', 0)).first()
     if not lead:
         lead = Campaignlead.objects.filter(campaign__site=whatsappnumber.whatsapp_business_account.site, whatsapp_number=combined_number).first()
-    first_name = request.POST.get('first_name')
+    first_name = request.POST.get('first_name', '')[:25]
     if get_user_allowed_to_send_from_whatsappnumber(request.user, whatsappnumber) and template:
         if contact:
             response = contact.send_template_whatsapp_message(whatsappnumber=whatsappnumber, template=template)
@@ -638,9 +642,9 @@ def send_new_template_message(request):
             response = contact.send_template_whatsapp_message(whatsappnumber=whatsappnumber, template=template)
             if response:
                 return response
-        return HttpResponse("", status=500)
+        return HttpResponse( status=500)
 
-    return HttpResponse("", status=403)
+    return HttpResponse( status=403)
 
     
 # class Contact(Message):
@@ -650,11 +654,12 @@ def send_new_template_message(request):
 #     customer_number = models.CharField(max_length=50, null=True, blank=True)
 #     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 @login_required
+@not_demo_or_superuser_check
 def set_whatsapp_site_config(request, **kwargs):
-    if settings.DEMO and not request.user.is_superuser:
-        return HttpResponse(status=500)
     try:
         site = Site.objects.get(pk=request.POST.get('site_pk',None))
+        if not get_profile_allowed_to_edit_whatsapp_settings(request.user.profile, site):
+            return HttpResponse("You need the edit Whatsapp Settings permission", status=403)
         site.whatsapp_access_token = request.POST.get('whatsapp_access_token')
         site.save()
         whatsapp = Whatsapp(site.whatsapp_access_token)
@@ -662,5 +667,5 @@ def set_whatsapp_site_config(request, **kwargs):
         return render(request, 'core/htmx/whatsapp_site_config_row.html', {'site':site, 'whatsapp_business_details':whatsapp_business_details})
     except Exception as e:        
         logger.error(f"set_whatsapp_template_sending_status {str(e)}")
-        return HttpResponse("Couldn't set_whatsapp_template_sending_status", status=500)
+        return HttpResponse("Couldn't set Whatsapp configuration", status=500)
 

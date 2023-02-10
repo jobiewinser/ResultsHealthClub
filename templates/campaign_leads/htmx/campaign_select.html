@@ -1,13 +1,25 @@
 {%load core_tags%}
-<div id="campaign_list_wrapper">    
-    <select class="form-select select2 select2-styling overview_table_filters site_dependant_analytics_filters" oninput="$('#filter_campaign').click()" id="campaign_pk" name="campaign_pk">
-        <option value="">Show All Campaigns</option>
-        {%for campaign in campaigns%}
-        {% comment %} {%if campaign.get_active_leads_qs.count%} {% endcomment %}
-            <option {%if request.GET.campaign_pk|str_to_int == campaign.pk%}selected{%endif%} value="{{campaign.pk}}">{{campaign.name}} ({{campaign.get_active_leads_qs.count}} Fresh/Booked Leads)
-                 {% comment %} ({{campaign.get_active_leads_qs.count}} active) {% endcomment %}
-                </option>
-        {% comment %} {%endif%} {% endcomment %}
-        {%endfor%}
-    </select>
+<div class="col-md-auto m-1 ps-2 pe-0 border-start">
+    <div id="campaign_list_wrapper">    
+        <label for="campaign_pks" style="width:300px">
+            Filter <b>Campaigns</b><br>
+          <select multiple="multiple" class="form-control select2tag select2-styling overview_table_filters site_dependant_analytics_filters" oninput="$('#filter_campaign').click()" id="campaign_pks" name="campaign_pks">
+                {%if request|get_key_in_get_or_post:'campaign_category_pks'%}
+                    {%for campaign_category in campaign_categorys%}
+                        {%for campaign in campaign_category.campaign_set.all%}
+                            <option {%if campaign.pk|to_str in request|get_key_in_get_or_post:'campaign_pks' or campaign.pk|to_int in request|get_key_in_get_or_post:'campaign_pks' %}selected{%endif%} value="{{campaign.pk}}">{{campaign}}
+                            </option>
+                        {%endfor%}
+                    {%endfor%}
+                {%elif sites%}
+                  {%for site in sites%}
+                      {%for campaign in site.campaign_set.all%}
+                          <option {%if campaign.pk|to_str in request|get_key_in_get_or_post:'campaign_pks' or campaign.pk|to_int in request|get_key_in_get_or_post:'campaign_pks' %}selected{%endif%} value="{{campaign.pk}}">{{campaign}}
+                          </option>
+                      {%endfor%}
+                  {%endfor%}
+                {%endif%}
+          </select>
+        </label>
+    </div>
 </div>

@@ -53,8 +53,12 @@ class Campaign(PolymorphicModel):
     # fifth_send_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="fifth_send_template_campaign", on_delete=models.SET_NULL, null=True, blank=True)
     whatsapp_business_account = models.ForeignKey('core.WhatsappBusinessAccount', on_delete=models.SET_NULL, null=True, blank=True)
     color = models.CharField(max_length=15, null=False, blank=False, default="96,248,61")
+    
+    def __str__(self):
+        return self.name
+    
     def get_active_leads_qs(self):
-        return self.campaignlead_set.exclude(archived=True).exclude(sold=True)
+        return self.campaignlead_set.exclude(archived=True).exclude(sale__archived=False)
     def is_manual(self):
         return False
         
@@ -78,8 +82,11 @@ class Campaign(PolymorphicModel):
     @property
     def warnings(self):
         warnings = {}
-        if not self.campaigntemplatelink_set.filter(send_order=1):
-            warnings["first_send_template_missing"] = "This campaign doesn't have a 1st Auto-Send Template, it won't automatically send a message to the customer"
+        if self.site:
+            if self.site.subscription:
+                if self.site.subscription.whatsapp_enabled:
+                    if not self.campaigntemplatelink_set.filter(send_order=1):
+                        warnings["first_send_template_missing"] = "This campaign doesn't have a 1st Auto-Send Template, it won't automatically send a message to the customer"
         return warnings
 @receiver(models.signals.post_save, sender=Campaign)
 def execute_after_save(sender, instance, created, *args, **kwargs):
@@ -92,21 +99,25 @@ class ManualCampaign(Campaign):
     @property
     def is_manual(self):
         return True
+    
+    def __str__(self):
+        return f"Manually Created ({self.site.name})"
 
 
 class Campaignlead(models.Model):
-    first_name = models.TextField(null=True, blank=True)
-    last_name = models.TextField(null=True, blank=True)
-    email = models.TextField(null=True, blank=True)
+    first_name = models.TextField(null=True, blank=True, max_length=25)
+    last_name = models.TextField(null=True, blank=True, max_length=25)
+    email = models.TextField(null=True, blank=True, max_length=50)
     
     whatsapp_number = models.TextField(null=True, blank=True)
     # country_code = models.TextField(null=True, blank=True)
     campaign = models.ForeignKey("campaign_leads.Campaign", on_delete=models.SET_NULL, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     arrived = models.BooleanField(default=False)
-    sold = models.BooleanField(default=False)
-    marked_sold = models.DateTimeField(null=True, blank=True)
-    sold_by = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="campaignlead_sold_by", null=True, blank=True)
+    sold_old = models.BooleanField(default=False, null=True, blank=True)
+    marked_sold_old = models.DateTimeField(null=True, blank=True)
+    sold_by_old = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="campaignlead_sold_by", null=True, blank=True)
+    disabled_automated_messaging = models.BooleanField(default=False)
     archived = models.BooleanField(default=False)
     active_campaign_contact_id = models.TextField(null=True, blank=True)
     active_campaign_form_id = models.TextField(null=True, blank=True)
@@ -121,6 +132,9 @@ class Campaignlead(models.Model):
     @property
     def ordered_bookings(self):  
         return self.booking_set.all().order_by('-datetime')
+    @property
+    def active_sales_qs(self):
+        return self.sale_set.exclude(archived=True)
     @property
     def get_product_cost(self):  
         if self.product_cost:
@@ -181,232 +195,273 @@ class Campaignlead(models.Model):
                 return rendered_html
             else:
                 delete_htmx = f"<span hx-swap-oob='delete' id='lead-{self.pk}'></span>"
-                rendered_html = f"<span hx-swap-oob='afterbegin:.campaign_column_{self.campaign.pk}_calls_{new_position},.site_column_{self.campaign.site.pk}_calls_{new_position},.company_column_{self.campaign.site.company.pk}_calls_{new_position}'><a hx-get='/refresh-lead-article/{self.pk}/' hx-swap='outerHTML' hx-indicator='#top-htmx-indicator' hx-trigger='load' href='#'></a> </span>"
+                campaign = self.campaign
+                if self.campaign.campaign_category:
+                    campaign_category_pk = self.campaign.campaign_category.pk
+                else:
+                    campaign_category_pk = 0
+                site = self.campaign.site
+                company = site.company
+                rendered_html = f"<span hx-swap-oob='beforeend:.campaign_column_{campaign.pk}_calls_{new_position},.campaign_category_column_{campaign_category_pk}_calls_{new_position},.site_column_{site.pk}_calls_{new_position},.company_column_{company.pk}_calls_{new_position}'><a hx-get='/refresh-lead-article/{self.pk}/' hx-swap='outerHTML' hx-vals=' U+007B U+0022 flash U+0022 : true U+007D' hx-indicator='#top-htmx-indicator' hx-trigger='load' href='#'></a> </span>"
                 from django.utils.safestring import mark_safe
                 return mark_safe(f"{rendered_html} {delete_htmx}")
 
     def send_template_whatsapp_message(self, whatsappnumber=None, send_order=None, template=None, communication_method = 'a'):
-        print("Campaignlead send_template_whatsapp_message", whatsappnumber, send_order, template, communication_method)
-        if not whatsappnumber:
-            whatsappnumber = self.campaign.whatsapp_business_account.whatsappnumber
-        from core.models import AttachedError, send_message_to_websocket
-        customer_number = self.whatsapp_number
-        if settings.DEMO:
-            whatsapp_message, created = WhatsAppMessage.objects.get_or_create(
-                wamid="",
-                datetime=datetime.now(),
-                lead=self,
-                message=f"""
-                <b>Hi {self.first_name}</b>
-                <br>
-                <br>
-                <p>This is a demonstration of the whatsapp system! With the Pro subscription, you can add your own whatsapp accounts and automate sending templates here!</p>
-                <small>Thanks from Winser Systems!</small>
-                """,
-                site=self.campaign.site,
-                whatsappnumber=whatsappnumber,
-                customer_number=customer_number,
-                template=template,
-                inbound=False,
-            )
-            send_message_to_websocket(whatsappnumber, customer_number, whatsapp_message, self.campaign.site)
-            self.trigger_refresh_websocket(refresh_position=False)
-            return HttpResponse(status=200)
-        if communication_method == 'a':
-            print("CampaignleadDEBUG1")
-            if send_order:
-                campaigntemplatelink = self.campaign.campaigntemplatelink_set.filter(send_order=send_order).first()
-                if campaigntemplatelink:
-                    template = campaigntemplatelink.template
-                type = str(1202)
-            else:
-                type = None
-            
-            if template:      
-                print("CampaignleadDEBUG2")
-                if type:          
-                    AttachedError.objects.filter(
-                        type = type,
-                        campaign_lead = self,
-                        archived = False,
-                    ).update(archived = True)
-                if template.whatsapp_business_account.whatsapp_business_account_id:  
-                    print("CampaignleadDEBUG3")                  
-                    AttachedError.objects.filter(
-                        type = '1202',
-                        campaign_lead = self,
-                        archived = False,
-                    ).update(archived = True)
-                    if template.whatsapp_business_account.site.whatsapp_template_sending_enabled:
-                        print("CampaignleadDEBUG4")
+        if self.disabled_automated_messaging and send_order:
+            pass #not sure if anything needs to happen here yet. will probably indicate on the leads card that messaging is disabled
+        else:
+            print("Campaignlead send_template_whatsapp_message", whatsappnumber, send_order, template, communication_method)
+            if not whatsappnumber:
+                whatsappnumber = self.campaign.whatsapp_business_account.whatsappnumber
+            from core.models import AttachedError, send_message_to_websocket
+            customer_number = self.whatsapp_number
+            if settings.DEMO:
+                whatsapp_message, created = WhatsAppMessage.objects.get_or_create(
+                    wamid="",
+                    datetime=datetime.now(),
+                    lead=self,
+                    message=f"""
+                    <b>Hi {self.first_name}</b>
+                    <br>
+                    <br>
+                    <p>This is a demonstration of the whatsapp system! With the Pro subscription, you can add your own whatsapp accounts and automate sending templates here!</p>
+                    <small>Thanks from Winser Systems!</small>
+                    """,
+                    site=self.campaign.site,
+                    whatsappnumber=whatsappnumber,
+                    customer_number=customer_number,
+                    template=template,
+                    inbound=False,
+                )
+                send_message_to_websocket(whatsappnumber, customer_number, whatsapp_message, self.campaign.site)
+                self.trigger_refresh_websocket(refresh_position=False)
+                return HttpResponse(status=200)
+            if communication_method == 'a':
+                print("CampaignleadDEBUG1")
+                if send_order:
+                    campaigntemplatelink = self.campaign.campaigntemplatelink_set.filter(send_order=send_order).first()
+                    if campaigntemplatelink:
+                        template = campaigntemplatelink.template
+                    type = str(1202)
+                else:
+                    type = None
+                
+                if template:      
+                    print("CampaignleadDEBUG2")
+                    if type:          
                         AttachedError.objects.filter(
-                            type = '1220',
+                            type = type,
                             campaign_lead = self,
                             archived = False,
                         ).update(archived = True)
-                        if template.message_template_id:
-                            print("CampaignleadDEBUG5")
+                    if template.whatsapp_business_account.whatsapp_business_account_id:  
+                        print("CampaignleadDEBUG3")                  
+                        AttachedError.objects.filter(
+                            type = '1202',
+                            campaign_lead = self,
+                            archived = False,
+                        ).update(archived = True)
+                        if template.whatsapp_business_account.site.whatsapp_template_sending_enabled:
+                            print("CampaignleadDEBUG4")
                             AttachedError.objects.filter(
-                                type = '1201',
+                                type = '1220',
                                 campaign_lead = self,
                                 archived = False,
                             ).update(archived = True)
-                            whatsapp = Whatsapp(self.campaign.site.whatsapp_access_token)
-                            template_live = whatsapp.get_template(template.whatsapp_business_account.whatsapp_business_account_id, template.message_template_id)
-                            print(template_live)
-                            template.name = template_live['name']
+                            if template.message_template_id:
+                                print("CampaignleadDEBUG5")
+                                AttachedError.objects.filter(
+                                    type = '1201',
+                                    campaign_lead = self,
+                                    archived = False,
+                                ).update(archived = True)
+                                whatsapp = Whatsapp(self.campaign.site.whatsapp_access_token)
+                                template_live = whatsapp.get_template(template.whatsapp_business_account.whatsapp_business_account_id, template.message_template_id)
+                                print(template_live)
+                                template.name = template_live['name']
 
-                            template.category = template_live['category']
-                            template.language = template_live['language']
-                            template.save()
+                                template.category = template_live['category']
+                                template.language = template_live['language']
+                                template.save()
 
-                            components =   [] 
+                                components =   [] 
 
-                            whole_text = ""
-                            counter = 1
-                            for component in template.components:
-                                params = []
-                                component_type = component.get('type', "").lower()
-                                # if component_type == 'header':
-                                text = component.get('text', '')
-                                if component_type in ['header', 'body']:
-                                    if '[[1]]' in text:
-                                        params.append(              
+                                whole_text = template.render_whatsapp_template_to_html(lead=self)
+                                counter = 1
+                                for component in template.components:
+                                    params = []
+                                    component_type = component.get('type', "").lower()
+                                    # if component_type == 'header':
+                                    text = component.get('text', '')
+                                    if component_type in ['header', 'body']:
+                                        if '[[1]]' in text:
+                                            params.append(              
+                                                {
+                                                    "type": "text",
+                                                    "text":  self.first_name
+                                                }
+                                            )
+                                            text = text.replace('[[1]]',self.first_name)
+                                            counter = counter + 1
+                                        # if '[[2]]' in text:
+                                        #     params.append(              
+                                        #         {
+                                        #             "type": "text",
+                                        #             "text":  str(self.campaign)
+                                        #         }
+                                        #     )
+                                        #     text = text.replace('[[2]]',self.campaign)
+                                        #     counter = counter + 1
+                                    if params:
+                                        components.append(
                                             {
-                                                "type": "text",
-                                                "text":  self.first_name
+                                                "type": component_type,
+                                                "parameters": params
                                             }
                                         )
-                                        text = text.replace('[[1]]',self.first_name)
-                                        counter = counter + 1
-                                whole_text = f"""
-                                    {whole_text} 
-                                    {text}
-                                """
-                                if params:
-                                    components.append(
-                                        {
-                                            "type": component_type,
-                                            "parameters": params
-                                        }
-                                    )
+                            else:
+                                print("CampaignleadDEBUG6")
+                                print("errorhere selected template not found on Whatsapp's system")
+                                attached_error, created = AttachedError.objects.get_or_create(
+                                    type = '1201',
+                                    attached_field = "campaign_lead",
+                                    campaign_lead = self,
+                                    archived = False,
+                                )
+                                if not created:
+                                    attached_error.created = datetime.now()
+                                    attached_error.save()
+                                return HttpResponse("Messaging Error: Couldn't find the specified template", status=400)
                         else:
-                            print("CampaignleadDEBUG6")
-                            print("errorhere selected template not found on Whatsapp's system")
+                            print("CampaignleadDEBUG7")
+                            print("errorhere template messaging disabled")
                             attached_error, created = AttachedError.objects.get_or_create(
-                                type = '1201',
+                                type = '1220',
                                 attached_field = "campaign_lead",
                                 campaign_lead = self,
+                                archived = False,
                             )
                             if not created:
                                 attached_error.created = datetime.now()
                                 attached_error.save()
-                            return HttpResponse("Messaging Error: Couldn't find the specified template", status=400)
+                            return HttpResponse("Messaging Error: Template Messaging disabled for this site", status=400)
                     else:
-                        print("CampaignleadDEBUG7")
-                        print("errorhere template messaging disabled")
+                        print("CampaignleadDEBUG8")
+                        print("errorhere no Whatsapp Business Account Linked")
                         attached_error, created = AttachedError.objects.get_or_create(
-                            type = '1220',
+                            type = '1202',
                             attached_field = "campaign_lead",
                             campaign_lead = self,
+                            archived = False,
                         )
                         if not created:
                             attached_error.created = datetime.now()
                             attached_error.save()
-                        return HttpResponse("Messaging Error: Template Messaging disabled for this site", status=400)
-                else:
-                    print("CampaignleadDEBUG8")
-                    print("errorhere no Whatsapp Business Account Linked")
-                    attached_error, created = AttachedError.objects.get_or_create(
-                        type = '1202',
-                        attached_field = "campaign_lead",
-                        campaign_lead = self,
-                    )
-                    if not created:
-                        attached_error.created = datetime.now()
-                        attached_error.save()
-                    return HttpResponse("Messaging Error: No Whatsapp Business Account linked", status=400)
-                language = {
-                    "policy":"deterministic",
-                    "code":template.language
-                }
-                site = self.campaign.site
-                if not whatsappnumber and send_order:
-                    whatsappnumber = self.campaign.whatsapp_business_account.whatsappnumber
-                if not settings.DEMO:
-                    response = whatsapp.send_template_message(self.whatsapp_number, whatsappnumber, template, language, components)
-                else:
-                    response = {} #TODO
-                print(str(response))
-                logger.debug(str(response))
-                
-                reponse_messages = response.get('messages',[])
-                error = response.get('error',[])
-                if reponse_messages:
-                    AttachedError.objects.filter(
-                        type__in = ['1107','1106'], 
-                        attached_field = "campaign_lead",
-                        campaign_lead = self,
-                        archived = False,
-                    ).update(archived = True)    
-                    for response_message in reponse_messages:
-                        whatsapp_message, created = WhatsAppMessage.objects.get_or_create(
-                            wamid=response_message.get('id'),
-                            datetime=datetime.now(),
-                            lead=self,
-                            message=whole_text,
-                            site=site,
-                            whatsappnumber=whatsappnumber,
-                            customer_number=customer_number,
-                            template=template,
-                            inbound=False,
-                            send_order=send_order
-                        )
-                        if created:                 
-                            send_message_to_websocket(whatsappnumber, customer_number, whatsapp_message, whatsappnumber.whatsapp_business_account )                           
-                    logger.debug("site.send_template_whatsapp_message success") 
-                    self.trigger_refresh_websocket(refresh_position=False)
-                    return HttpResponse("Message Sent", status=200)
+                        return HttpResponse("Messaging Error: No Whatsapp Business Account linked", status=400)
+                    language = {
+                        "policy":"deterministic",
+                        "code":template.language
+                    }
+                    site = self.campaign.site
+                    if not whatsappnumber and send_order:
+                        whatsappnumber = self.campaign.whatsapp_business_account.whatsappnumber
+                    if not settings.DEMO:
+                        response = whatsapp.send_template_message(self.whatsapp_number, whatsappnumber, template, language, components)
+                    else:
+                        response = {} #TODO
+                    print(str(response))
+                    logger.debug(str(response))
                     
-                elif error.get('code', None) == 33:
-                    AttachedError.objects.create(
-                        type = '1106',
-                        attached_field = "customer_number",
-                        whatsapp_number = whatsappnumber,
-                        customer_number = customer_number,
-                        admin_action_required = True,
-                    )
-                elif error.get('code', None) == 100:   
-                    attached_error, created = AttachedError.objects.get_or_create(
-                        type = '1107',
-                        attached_field = "campaign_lead",
-                        campaign_lead = self,
-                    )
-                    self.trigger_refresh_websocket(refresh_position=False)
-                    return HttpResponse("Message Not Sent", status=400)
-                else:     
-                    self.trigger_refresh_websocket(refresh_position=False)
-                    return HttpResponse("Message Sent", status=500)
-            else:
-                print("CampaignleadDEBUG10")
-                if send_order == 1:
-                    type = '1203'
-                    attached_error, created = AttachedError.objects.get_or_create(
-                        type = type,
-                        attached_field = "campaign_lead",
-                        campaign_lead = self,
-                    )
-                    if not created:
-                        print("CampaignleadDEBUG11")
-                        attached_error.created = datetime.now()
-                        attached_error.save()
-        return HttpResponse("Message Error", status=400)
-            
-            
+                    reponse_messages = response.get('messages',[])
+                    error = response.get('error',[])
+                    if reponse_messages:
+                        AttachedError.objects.filter(
+                            type__in = ['1107','1106'], 
+                            attached_field = "campaign_lead",
+                            campaign_lead = self,
+                            archived = False,
+                        ).update(archived = True)    
+                        for response_message in reponse_messages:
+                            whatsapp_message, created = WhatsAppMessage.objects.get_or_create(
+                                wamid=response_message.get('id'),
+                                datetime=datetime.now(),
+                                lead=self,
+                                message=whole_text,
+                                site=site,
+                                whatsappnumber=whatsappnumber,
+                                customer_number=customer_number,
+                                template=template,
+                                inbound=False,
+                                send_order=send_order
+                            )
+                            if created:                 
+                                send_message_to_websocket(whatsappnumber, customer_number, whatsapp_message, whatsappnumber.whatsapp_business_account )                           
+                        logger.debug("site.send_template_whatsapp_message success") 
+                        self.trigger_refresh_websocket(refresh_position=False)
+                        return HttpResponse("Message Sent", status=200)
+                        
+                    elif error.get('code', None) == 33:
+                        AttachedError.objects.create(
+                            type = '1106',
+                            attached_field = "customer_number",
+                            whatsapp_number = whatsappnumber,
+                            customer_number = customer_number,
+                            admin_action_required = True,
+                        )
+                    elif error.get('code', None) == 100:   
+                        attached_error, created = AttachedError.objects.get_or_create(
+                            type = '1107',
+                            attached_field = "campaign_lead",
+                            campaign_lead = self,
+                            archived = False,
+                        )
+                        self.trigger_refresh_websocket(refresh_position=False)
+                        return HttpResponse("Message Not Sent", status=400)
+                    else:     
+                        self.trigger_refresh_websocket(refresh_position=False)
+                        return HttpResponse("Message Failed", status=500)
+                else:
+                    print("CampaignleadDEBUG10")
+                    if send_order == 1:
+                        type = '1203'
+                        attached_error, created = AttachedError.objects.get_or_create(
+                            type = type,
+                            attached_field = "campaign_lead",
+                            campaign_lead = self,
+                            archived = False,
+                        )
+                        if not created:
+                            print("CampaignleadDEBUG11")
+                            attached_error.created = datetime.now()
+                            attached_error.save()
+            return HttpResponse("Message Error", status=400)
 
-            
-        # return HttpResponse("No Communication method specified", status=500)
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        self.whatsapp_number = normalize_phone_number(self.whatsapp_number)
+        try:
+            if not self.product_cost:
+                self.product_cost = self.campaign.product_cost
+        except:
+            pass
+        if self.sold_old:
+            Sale.objects.get_or_create(
+                lead=self,
+                user=self.sold_by_old,
+                datetime=self.marked_sold_old,
+            )
+            self.sold_old = None
+            self.sold_by_old = None
+            self.marked_sold_old = None
+        super(Campaignlead, self).save(force_insert, force_update, using, update_fields)
+        
 
+def normalize_phone_number(number):
+    if number:
+        if len(number) > 2:
+            if number[:2] == '44':
+                number = '0' + number[2:]
+    return number
+    
 @receiver(models.signals.post_save, sender=Campaignlead)
 def execute_after_save(sender, instance, created, *args, **kwargs):
     if created and not instance.archived:
@@ -418,12 +473,22 @@ def execute_after_save(sender, instance, created, *args, **kwargs):
 class Call(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     datetime = models.DateTimeField(null=False, blank=False)
-    lead = models.ForeignKey(Campaignlead, on_delete=models.SET_NULL, null=True, blank=True)
+    lead = models.ForeignKey(Campaignlead, on_delete=models.CASCADE, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
-    error_json = models.JSONField(default=dict)
+    # error_json = models.JSONField(default=dict)
     archived = models.BooleanField(default=False)
     class Meta:
         ordering = ['-datetime']
+
+class Sale(models.Model):
+    created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    datetime = models.DateTimeField(null=True, blank=True)
+    lead = models.ForeignKey(Campaignlead, on_delete=models.SET_NULL, null=True, blank=True)
+    # type = models.CharField(choices=BOOKING_CHOICES, max_length=2, null=False, blank=False)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    archived = models.BooleanField(default=False)
+    # class Meta:
+    #     ordering = ['-datetime']
 
 class Booking(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)

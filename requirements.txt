@@ -32,5 +32,5 @@ django-hijack==3.1.2
 django-hijack-admin==2.1.10
 Werkzeug==2.0.0
 django-extensions==3.2.1
-
+stripe==5.0.0
 names==0.3.0

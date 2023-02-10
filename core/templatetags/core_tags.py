@@ -10,10 +10,21 @@ from django.conf import settings
 register = template.Library()
 from campaign_leads.views import rgb_to_hex_tuple, hex_to_rgb_tuple
 from django.contrib.auth.models import User
+from core.models import Subscription
 import math
 
 def roundup(x, round_target):
     return int(int(math.ceil(x / round_target)) * round_target)
+
+def roundup(x, round_target):
+    return int(int(math.ceil(x / round_target)) * round_target)
+    
+@register.filter
+def prettify_variable(value):
+    separated_string = value.replace('_', ' ')
+    pretty_string = separated_string.capitalize()
+    return pretty_string 
+
 
 @register.filter
 def generate_uuid_tag(anything):
@@ -77,7 +88,8 @@ def seconds_until_hours_passed_tag(dt, hours):
 @register.filter
 def percentage_to_opacity(percentage, average_out_opacity=0.9):
     try:
-        return ((percentage / 100) + average_out_opacity) / 2
+        return ((percentage / 100) + average_out_opacity)
+        # return ((percentage / 100) + average_out_opacity) / 2
     except:
         return 0.6
 @register.filter
@@ -124,9 +136,14 @@ def prefill_time_input_with_now(nothing):
         return ""
 
 @register.filter
+def convert_string_to_datetime(string):
+    dt_object = datetime.strptime(string, "%Y-%m-%d %H:%M:%S")
+    return dt_object
+
+@register.filter
 def nice_date_tag(date):
     try:
-        date = date + datetime.timedelta(hours=1)
+        date = date + timedelta(hours=1)
         date = (date.date() - date(1970, 1, 1)).total_seconds()
         # just for preview/phrase editing
         date = datetime.strptime(str(date), '%d-%m-%Y')
@@ -138,22 +155,46 @@ def nice_date_tag(date):
         return str(date)
 
 @register.filter
-def nice_datetime_tag(date):
+def short_date_tag(date):
     try:
-        if date.date() == datetime.today().date():
-            return f"{date.strftime('%H:%M')} - today"
-        return str(date.strftime("%H:%M - %-d %B %Y"))
+        date = date + timedelta(hours=1)
+        date = (date.date() - date(1970, 1, 1)).total_seconds()
+        # just for preview/phrase editing
+        date = datetime.strptime(str(date), '%d/%m/%Y')
+    except Exception as e:
+        pass
+    try:
+        return str(date.strftime("%d/%m/%Y"))
     except Exception as e:
         return str(date)
 
 @register.filter
-def nice_message_datetime_tag(date):
+def nice_datetime_tag(dt):
     try:
-        if date.date() == datetime.today().date():
-            return f"{date.strftime('%H:%M')}"
-        return str(date.strftime("%-d %B %Y"))
+        if dt.date() == datetime.today().date():
+            return f"{dt.strftime('%H:%M')} - today"
+        return str(dt.strftime("%H:%M - %-d %B %Y"))
     except Exception as e:
-        return str(date)
+        return str(dt)
+
+@register.filter
+def nice_message_datetime_tag(dt):
+    try:
+        if dt.date() == datetime.today().date():
+            return f"{dt.strftime('%H:%M')}"
+        return str(dt.strftime("%-d %B %Y"))
+    except Exception as e:
+        return str(dt)
+
+@register.filter
+def time_ago_tag(dt):   
+
+    now = datetime.now()
+    day_ago = now - timedelta(days = 1)
+
+    if dt < day_ago:
+        return  f"{str(round((now - dt).total_seconds() / 86400))} day(s) ago"
+    return  f"{str(round((now - dt).total_seconds() / 3600))} hour(s) ago"
 
     
 @register.filter
@@ -162,15 +203,29 @@ def timestamp(date):
         return time.mktime(date.timetuple())        
     except Exception as e:
         return 0000000000.0
+    
+@register.filter
+def from_timestamp(timestamp):
+    try:
+        return datetime.fromtimestamp(timestamp)  
+    except Exception as e:
+        return timestamp
 
 @register.filter
 def get_type(value):
     return type(value)
 
 @register.filter
-def str_to_int(value):
+def to_int(value):
     try:
         return int(value)
+    except:
+        return value
+
+@register.filter
+def to_str(value):
+    try:
+        return str(value)
     except:
         return value
 
@@ -211,6 +266,12 @@ def multiplication(num1, num2):
     except Exception as e:
         return 0
 @register.filter
+def addition(num1, num2):  
+    try:
+        return int(num1) + int(num2)
+    except Exception as e:
+        return 0
+@register.filter
 def censor(str):  
     try:
         return "*" * len(str)
@@ -233,6 +294,12 @@ def add_months(date, x):
 def add_days(date, x):  
     try:
         return date + relativedelta.relativedelta(days=x)
+    except Exception as e:
+        return "Error"
+@register.filter
+def subtract_seconds_to_days_rounded_up(date, seconds):  
+    try:
+        return date - relativedelta.relativedelta(days = round(seconds/86400))
     except Exception as e:
         return "Error"
 
@@ -263,13 +330,13 @@ def company_outstanding_whatsapp_messages_tag(user):
     return user.profile.company.outstanding_whatsapp_messages(user)
 @register.filter
 def site_outstanding_whatsapp_messages_tag(site, user):
-    if site in user.profile.sites_allowed.all():
+    if site in user.profile.active_sites_allowed:
         return site.outstanding_whatsapp_messages(user)
     return 0
 @register.filter
 def whatsappnumber_outstanding_whatsapp_messages_tag(whatsappnumber, user):
     if whatsappnumber:
-        if whatsappnumber.whatsapp_business_account.site in user.profile.sites_allowed.all():
+        if whatsappnumber.whatsapp_business_account.site in user.profile.active_sites_allowed:
             return whatsappnumber.outstanding_whatsapp_messages(user)
         return 0
 
@@ -305,3 +372,27 @@ def render_whatsapp_template_with_contact_to_html_tag(whatsapp_template, contact
 def render_whatsapp_template_to_html_tag(whatsapp_template):
     return whatsapp_template.render_whatsapp_template_to_html()
 
+
+
+@register.filter
+def get_subscription_sites_tag(company, numerical):
+    return company.get_subscription_sites(numerical)
+@register.filter
+def get_subscription_by_stripe_price_id(price_id):
+    return Subscription.objects.filter(stripe_price_id=price_id).first()
+
+# @register.filter
+# def earliest_site_tag(site_qs):
+#     return site_qs.order_by('created').first()
+@register.filter
+def random_guid(anything):
+    return str(uuid.uuid4())
+
+@register.filter(name='display_phone')
+def display_phone(number_string, country=None):
+    """Convert a 11 character string into xxxxx xxxxxx."""
+    if not len(number_string) == 11:
+        return number_string
+    first = number_string[0:5]
+    second = number_string[5:11]
+    return f"{first} {second}"

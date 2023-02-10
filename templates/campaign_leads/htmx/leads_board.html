@@ -19,19 +19,35 @@
             </div>          
         </div> 
         <div class="col-md-auto m-1 p-0">
-            <button class="btn btn-primary btn-sm" 
-                data-bs-toggle="popover" 
-                data-bs-trigger="hover focus" 
-                data-bs-placement="top"
-                data-bs-content="Manually create a campaign lead."
-                onclick="htmx.ajax('GET', '{% url 'campaign-lead-get-modal-content'%}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'edit_lead'}})">
-                    <i class="fa fa-plus" aria-hidden="true"></i> Manual Lead
-            </button>
+            <div class="btn-group btn-space mt-0 dropdown">
+                <button class="btn btn-space btn-primary  btn-sm nowrap pe-2" 
+                    data-bs-toggle="popover" 
+                    data-bs-trigger="hover focus" 
+                    data-bs-placement="top"
+                    data-bs-content="Manually create a campaign lead."
+                    onclick="htmx.ajax('GET', '{% url 'campaign-lead-get-modal-content'%}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'edit_lead', 'site_pk':'{{site.pk}}'}})">
+                        <i class="fa fa-plus" aria-hidden="true"></i> Add Lead
+                </button>
+
+                <ul class="dropdown-menu">
+                    <li>
+                        <a class="dropdown-item" href="#"
+                            onclick="htmx.ajax('GET', '{% url 'campaign-lead-get-modal-content'%}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'import_active_campaign_leads','lead_pk':'{{lead.pk}}'}})">
+                            Import existing Active Campaign leads
+                        </a>
+                    </li>
+                </ul>
+
+                <button class="btn btn-space btn-primary btn-sm nowrap border-start ps-1" id="sold_{{lead.pk}}_dropdown"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fa-solid fa-chevron-down"></i>
+                </button>
+            </div>
         </div>
     </div>
     <div class="row p-0 m-0 ">
-        <div class="col p-0 m-0 board Content" id="leads_board" class="" hx-ws="connect:/ws/lead/{{company.pk}}/">
-                <!-- <button hidden hx-get="{% url 'get-leads-column-meta-data'%}" hx-include=".overview_table_filters" id="refresh_column_metadata" hx-indicator=".column-htmx-indicator" hx-target="#column_metadata_0" hx-trigger="click" hx-swap="outerHTML"></button> -->
+        <div class="col p-0 m-0 board" id="leads_board" class="" hx-ws="connect:/ws/lead/{{company.pk}}/">
+                {% comment %} <button hidden hx-get="{% url 'get-leads-column-meta-data'%}" hx-include=".overview_table_filters" id="refresh_column_metadata" hx-indicator=".column-htmx-indicator" hx-target="#column_metadata_0" hx-trigger="click" hx-swap="outerHTML"></button> {% endcomment %}
                 <button hidden hx-get="{% url 'new-leads-column' %}" hx-include="#max_call_count" id="add_column" hx-indicator=".column-htmx-indicator" hx-target="#leads_board_span_wrapper" hx-trigger="click" hx-swap="beforeend"></button>
                 {%include 'campaign_leads/htmx/lead_columns.html' %}
         </div>

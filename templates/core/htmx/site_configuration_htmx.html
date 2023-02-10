@@ -1,46 +1,40 @@
-{%load core_tags%}
-{%load static tz core_tags%}
-{%load user_permission_tags%}
+{%load static tz core_tags user_permission_tags%}
 <span>    
     <script>
         $(document).ready(function() {
             document.title = "Site Configuration";
         });
     </script>
+    {%if site%}
     <div class="row mt-0">
         {%block extra_top_left_buttons %}
-        {% comment %} <div class="col-md-auto">
-            <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
-        </div> {% endcomment %}
         {%with True as hide_show_all%}
-        {%include 'core/htmx/site_selection.html'%}
+        {%include 'core/htmx/site_selection_single.html'%}
         {%endwith%}
-        <button hidden hx-get="" hx-push-url="false" hx-swap="innerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
+        <button hidden hx-get="{%url 'site-configuration'%}" hx-push-url="false" hx-swap="innerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
         {%endblock extra_top_left_buttons %}
         <div class="col">
         </div>
         {%block extra_top_right_buttons %}
         <input id="current_page" hidden value="site_configuration"></input>
-        <div class="col-md-auto p-0 m-1">
+        {% comment %} <div class="col-md-auto p-0 m-1">
             <span class="badge bg-dark text-white"><h6 class="m-1">Site Configuration</h6></span>           
-        </div>
+        </div> {% endcomment %}
         {%endblock extra_top_right_buttons %}
     </div>
     <div class="row mt-2">
-        <div class="col">
-        </div>
-        <div class="col-md-auto p-2"> 
+        <div class="col p-2"> 
             <div class="row m-2">
                 <div class="col-md p-0">   
                     <div class="row ">
                         <div class="col-md-auto p-0">      
-                            <div class="form-floating m-1" {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}
+                            <div class="form-floating m-1" {%if not request.user.profile|get_profile_allowed_to_edit_site_configuration_tag:site%}
                                                                 data-bs-html="true" 
                                                                 data-bs-toggle="popover" data-bs-placement="left" 
-                                                                data-bs-trigger="hover"
+                                                                data-bs-trigger="hover focus"
                                                                 title="Name of this site"
                                                                 data-bs-content="You do not have permission to edit this field: Edit Site Configuration"{%endif%}>  
-                                <input value="{{site.name}}" type="text" name="name" class="form-control site_configuration_input" id="site_name"  {%if not request.user.profile.role == 'a'%}disabled{%endif%} {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}disabled{%endif%}
+                                <input value="{{site.name}}" type="text" name="name" class="form-control site_configuration_input" id="site_name"  {%if not request.user.profile.role == 'a'%}disabled{%endif%} {%if not request.user.profile|get_profile_allowed_to_edit_site_configuration_tag:site%}disabled{%endif%}
                                     hx-post="" hx-swap="none" hx-indicator="#htmx_indicator_site_form" hx-vals='{"site_pk": "{{site.pk}}"}' hx-trigger='input delay:0.5s' oninput="$('#htmx_indicator_site_form').addClass('htmx-request');">
                                 <label for="site_name">Name of this site</label>
                             </div>
@@ -52,123 +46,309 @@
                             </div>
                         </div>
                         <div class="col-md-auto pe-0">
-                            <img  class="htmx-indicator invert" id="htmx_indicator_site_form" src="https://htmx.org/img/bars.svg"/>
+                            <img  class="htmx-indicator invert" id="htmx_indicator_site_form" src="{% static 'img/bars.svg' %}"/>
                         </div>
                     </div>
                 </div>
             </div>
-            {% comment %} <div class="m-3 form-check">
-                <input type="checkbox" onClick="this.checked=!this.checked" class="form-check-input" id="calendly_configured" {%if site.calendly_token and site.calendly_organization %}checked{%endif%}>
-                <label class="form-check-label" for="exampleCheck1">Calendly Enabled? <small><i>(configured by Winser Systems)</i></small></label>
-            </div> {% endcomment %}
-            <div class="card card-white m-2">
+
+            <div class="card card-highlight p-2">
                 <div class="card-header">
-                    <i class="fa fa-whatsapp" aria-hidden="true"></i> <b class="name_display_{{site.pk}}">{{site.name}}</b> Whatsapp Settings {%if not site.company.subscription == 'pro'%}<i class="fa-solid fa-rectangle-pro"></i>{%endif%}
-                </div>
-                <div class="card-body">
-                    {%if site.company.subscription == 'pro'%}
-                        <span id="whatsapp_site_config_wrapper">
-                            {%include 'core/htmx/whatsapp_site_config_row.html'%}
-                        </span>
-                        <hr>
-                        <span id="whatsapp_template_sending_wrapper">
-                            {%include 'core/htmx/whatsapp_template_sending_enabled_htmx.html'%}
-                        </span>
-                        <hr>
-                        <div class="m-3">
-                            {%include 'core/htmx/site_configuration_table_htmx.html'%}
-                        </div>
-                    {%else%}
-                        <p>With a <i class="fa-solid fa-rectangle-pro"></i> subscription, you can automate further by automatically sending <i class="fa fa-whatsapp text-success" aria-hidden="true"></i> Whatsapp templates to your customers immediately after they fill in your Active Campaign Forms.</p>
-                        <p>You can also manage multiple whatsapp phone numbers from one screen, here on Winser Systems.</p>
-                    {%endif%}
-                </div>
-            </div>
-            <div class="card card-white m-2">
-                <div class="card-header">
-                    <i class="fa-regular fa-calendar-days"></i> <b class="name_display_{{site.pk}}">{{site.name}}</b> Calendly Settings
-                </div>
-                <div class="card-body">
                     <div class="row">
-                        <div class="col-md-auto p-0 card card-light">      
-                            <form class="" hx-post="" hx-swap="innerHTML" hx-indicator="#page_load_indicator " 
-                            hx-vals='{"site_pk": "{{site.pk}}"}' 
-                            hx-trigger='submit delay:0.3s' autocomplete="off" autofill="off" hx-target="#content">
-                                <div class="row mt-1">
-                                    <div class="col-md-auto">   
-                                        <div class="form-floating m-1"
-                                        {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}
-                                            data-bs-toggle="popover" 
-                                            data-bs-trigger="hover focus" 
-                                            data-bs-html="true" 
-                                            data-bs-placement="top"
-                                            data-bs-title="Site Calendly Organisation"
-                                            data-bs-content="
-                                                You do not have permission to edit this field: Edit Site Configuration
-                                            "
-                                        {%endif%}>
-                                            <input style="min-width:400px" id="calendly_organization" type="text" class="form-control" name="calendly_organization" {%if not request.user.profile.role == 'a'%}disabled{%endif%}
-                                                oninput="$('#calendly_config_submit').attr('disabled', false)"
-                                                value="{%if site.calendly_organization%}{{site.calendly_organization}}{%endif%}" {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}disabled{%endif%}/>
-                                            <label for="calendly_organization">Site Calendly Organisation</label>
-                                        </div>
-                                    </div>
-                                    <div class="col">   
-                                        <div class="form-floating m-1"
-                                        {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}
-                                            data-bs-toggle="popover" 
-                                            data-bs-trigger="hover focus" 
-                                            data-bs-html="true" 
-                                            data-bs-placement="top"
-                                            data-bs-title="Site Calendly Token"
-                                            data-bs-content="
-                                                You do not have permission to edit this field: Edit Site Configuration
-                                            "
-                                        {%endif%}>
-                                            <input name="calendly_token" type="password" class="form-control"
-                                                oninput="$('#calendly_config_submit').attr('disabled', false)"
-                                                value="{{site.calendly_token|censor}}" {%if not request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}disabled{%endif%}/>
-                                            <label class="elipses-overflow">Site Calendly Token</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col center">  
-                                        {%if request.user.profile|get_user_allowed_to_edit_site_configuration_tag:site%}<button type='submit' class="btn btn-primary btn-sm m-3" id="calendly_config_submit" disabled>Submit</button>{%endif%}  
-                                    </div>
-                                </div>
+                        <div class="col-auto ps-0">
+                            <i class="fa-regular fa-sterling-sign"></i> <span class="name_display_{{site.pk}}">{{site.name}}</span> <b>Subscription</b>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">           
+                    {%if request.user.profile|get_profile_allowed_to_change_subscription_tag:site%}   
+                    <div class="row">
+                        <div class="ps-0 col-md-auto mb-2">
+                            {%if get_stripe_subscriptions_and_update_models.data.0.status and not get_stripe_subscriptions_and_update_models.data.0.status == 'active'%}
+                                <form method="POST" action="/create-customer-portal-session/?site_pk={{site.pk}}">
+                                    {% csrf_token %}
+                                    <a class="text-danger pointer"
+                                    href="#" onclick="this.parentNode.submit(); return false;">You have actions needed on the Stripe Customer Portal</a>
+                                    <br>
+                                </form>                            
+                            {%endif%}
+                        </div>
+                    </div> 
+                    <div class="row">
+                        <div class="ps-0 col-md-auto">
+                            <form method="POST" action="/create-customer-portal-session/?site_pk={{site.pk}}">
+                                {% csrf_token %}
+                                <button class="btn btn-sm btn-primary"
+                                id="payments_and_billing_link" type="submit"><i class="fa-light fa-sterling-sign"></i> Stripe: Subscriptions and Billing</button>
                             </form>
                         </div>
-                        
-                        <div class="col-md p-0">   
-                        </div>
-                        <div class="col-md-auto m-1 p-2 alert alert-light center" style="min-width:350px;min-height:100px;">                          
-                            <div>   
-                                Calendly Webhook for <span class="name_display_{{site.pk}}">{{site.name}}</span>: 
-                                {%include 'core/htmx/calendly_webhook_status_wrapper.html'%}  
+                        {%if site.subscription.numerical|to_int == 0%}
+                        {%if not get_stripe_subscriptions_and_update_models.data.0.status %}
+                        <div class="col-md-auto">
+                            <button class="btn btn-sm btn-{{site.subscription.bootstrap_colour}}" 
+                                type="button" data-bs-toggle="collapse" data-bs-target="#collapseSubscription" aria-expanded="false" aria-controls="collapseSubscription">
+                                Choose a paid subscription
+                            </button>
+                        </div>                         
+                        {%endif%}
+                        {%endif%}
+                    </div>
+                    {%if site.subscription.numerical|to_int == 0%}
+                    <div class="collapse mt-2" id="collapseSubscription">
+                        <div class="card card-body">  
+                            <div class="row">  
+                                {%for subscription_option in subscription_options%}
+                                {%if not subscription_option == site.subscription%}
+                                    <div class="col-auto">
+                                        <button class="btn btn-sm btn-{{subscription_option.bootstrap_colour}}"
+                                            hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
+                                            hx-vals='{"template_name": "switch_subscription","switch_subscription":"{{subscription_option.numerical}}","site_pk":"{{site.pk}}"}'
+                                            hx-get="{% url 'campaign-lead-get-modal-content'%}" 
+                                            hx-push-url="false"
+                                            hx-swap="innerHTML" hx-trigger="click">
+                                            Switch to <b>{{subscription_option.get_name_display}}</b> subscription £{{subscription_option.cost|floatformat:2}} p/m (for this site)
+                                        </button>
+                                    </div>
+                                {%endif%}
+                                {%endfor%}
                             </div>
                         </div>
                     </div>
+                    {%endif%}
+                    <br>
+                    <span class="text-{{site.subscription.bootstrap_colour}}">
+                        You have a <b>{{site.subscription.get_name_display}}</b> subscription £{{site.subscription.cost|floatformat:2}} p/m (for this site)
+                    </span>
+                    <br>
+                    <p>
+                        To see the different subscription levels: <a target="_blank" href="https://www.winser.uk/index.php/leads-management-pricing/">https://www.winser.uk</a>.
+                    </p>
+                    {% comment %} <span class="ms-3">You have {{company.active_sites.count}} active site(s) within this company</span> {% endcomment %}
+                    {% comment %}  {% endcomment %}
+                    {%else%}
+                    <p>
+                        To change your site's subscription level you must have the Change Subscription permission.
+                    </p>
+                    {%endif%}
                 </div>
             </div>
-            <div class="card card-white m-2">
+
+
+            <div class="card card-highlight p-2 mt-3">
                 <div class="card-header">
-                    <i class="fa-light fa-dumbbell"></i> <b class="name_display_{{site.pk}}">{{site.name}}</b> Active Campaign Settings
-                </div>
-                <div class="card-body">
-                    <div class="row mt-2">
-                        <div class="col-md-auto" id="active_campaign_leads_wrapper">
-                            {%include 'core/htmx/active_campaign_enabled_htmx.html'%}
+                    <div class="row">
+                        <div class="col-auto ps-0">
+                            <i class="fa-solid fa-users"></i> <span class="name_display_{{site.pk}}">{{site.name}}</span> <b>Profiles</b>
                         </div>
-                        <div class="col">
+                        <div class="col-auto border-start">                            
+                            <b>{{site.users.count}}</b> of <b>{{site.subscription.max_profiles_string}}</b> allowed profiles
                         </div>
-                        <div class="col-md-auto">
+                        <div class="col-auto border-start">   
+                            <span 
+                                {%if site.users.count >= site.subscription.max_profiles and site.subscription.max_profiles%}
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover focus" 
+                                    data-bs-placement="top"
+                                    data-bs-content="You already have the maximum number of profiles for this site's subscription, please deactivate one before clicking this."
+                                {%endif%}>                         
+                                <button class="nowrap btn btn-success btn-sm pointer" type="button" {%if request.user.profile.role == 'c'%}disabled{%endif%}
+                                    {%if site.users.count >=  site.subscription.max_profiles and site.subscription.max_profiles%}
+                                        disabled
+                                    {%endif%}
+                                    hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
+                                    hx-vals='{"template_name": "add_user", "site_pk": "{{site.pk}}"}'
+                                    hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
+                                    hx-swap="innerHTML" hx-trigger="click"><i class="fa-light fa-plus"></i> Add new/existing profile to {{site.name}}</button>
+                            </span>
+                        </div>
+                        <div class="col-auto border-start">   
+                            <span 
+                                {%if site.users.count >=  site.subscription.max_profiles and site.subscription.max_profiles%}
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover focus" 
+                                    data-bs-placement="top"
+                                    data-bs-content="You already have the maximum number of profiles for this site's subscription, please deactivate one before clicking this."
+                                {%endif%}>                         
+                                <button class="nowrap btn btn-warning btn-sm pointer" type="button" {%if request.user.profile.role == 'c'%}disabled{%endif%}
+                                    {%if site.users.count >=  site.subscription.max_profiles and site.subscription.max_profiles%}
+                                        disabled
+                                    {%endif%}
+                                    hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
+                                    hx-vals='{"template_name": "reactivate_user", "site_pk": "{{site.pk}}"}'
+                                    hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
+                                    hx-swap="innerHTML" hx-trigger="click"><i class="fa-light fa-plus"></i> Reactivate a user for {{site.name}}</button>
+                            </span>
                         </div>
                     </div>
                 </div>
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th class="center">
+                                    User
+                                </th>
+                                {%if not demo or request.user.is_superuser%}
+                                <th class="center">
+                                    Colour
+                                </th>
+                                {%endif%}
+                                <th class="center">
+                                    Primary Site
+                                </th>
+                                <th class="center">
+                                    Role
+                                </th>
+                                <th class="center">
+                                    Campaign Category
+                                </th>
+                                <th class="center">
+                                    Permissions
+                                </th>
+                                <th class="center">
+                                    Configuration
+                                </th>
+                                <th class="center">
+                                    
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {%for temp_user in site.users%}
+                            {%with temp_user.profile as profile%}
+                            <tr id="user_configuration_row_{{profile.pk}}">
+                                {%include 'core/htmx/company_configuration_row.html'%}
+                            </tr>
+                            {%endwith%}
+                            {%endfor%}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
-        <div class="col">
+            
+
+            <div class="card  w-100 mt-3">
+                <div class="card-header pointer" data-bs-toggle="collapse" data-bs-target="#collapseAdvancedSettings">
+                    <div class="row">
+                        <div class="col-md-auto p-0">   
+                            <h4>Advanced Settings</h4>
+                        </div>
+                    </div>
+                </div>
+                <div id="collapseAdvancedSettings" class="collapse {%if advanced_settings_open%}show{%endif%}" data-bs-parent="#accordion">
+                  <div class="card-body">
+                    <div class="card card-highlight m-2">
+                        <div class="card-header">
+                            <i class="fa fa-whatsapp" aria-hidden="true"></i> <span class="name_display_{{site.pk}}">{{site.name}}</span> <b>Whatsapp Settings</b> <i class="fa-solid fa-rectangle-pro"></i>
+                        </div>
+                        <div class="card-body">
+                            {%if site.subscription.whatsapp_enabled%}
+                                <span id="whatsapp_site_config_wrapper">
+                                    {%include 'core/htmx/whatsapp_site_config_row.html'%}
+                                </span>
+                                <hr>
+                                <span id="whatsapp_template_sending_wrapper">
+                                    {%include 'core/htmx/whatsapp_template_sending_enabled_htmx.html'%}
+                                </span>
+                                <hr>
+                                <div class="m-3">
+                                    {%include 'core/htmx/site_configuration_table_htmx.html'%}
+                                </div>
+                            {%else%}
+                                <p>With a <i class="fa-solid fa-rectangle-pro"></i> subscription, you can automate further by automatically sending <i class="fa fa-whatsapp text-success" aria-hidden="true"></i> Whatsapp templates to your customers immediately after they fill in your Active Campaign Forms.</p>
+                                <p>You can also manage multiple whatsapp phone numbers from one screen, here on Winser Systems.</p>
+                            {%endif%}
+                        </div>
+                    </div>
+                    <div class="card card-highlight m-2">
+                        <div class="card-header">
+                            <i class="fa-regular fa-calendar-days"></i> <span class="name_display_{{site.pk}}">{{site.name}}</span> <b>Calendly Settings</b>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-auto p-0 card card-light">      
+                                    <form class="" hx-post="{%url 'site-configuration'%}" hx-swap="innerHTML" hx-indicator="#page_load_indicator " 
+                                    hx-vals='{"site_pk": "{{site.pk}}"}' 
+                                    hx-trigger='submit delay:0.3s' autocomplete="off" autofill="off" hx-target="#content">
+                                        <div class="row mt-1">
+                                            <div class="col-md-auto">   
+                                                <div class="form-floating m-1"
+                                                {%if not request.user.profile|get_profile_allowed_to_edit_site_calendly_configuration_tag:site%}
+                                                    data-bs-toggle="popover" 
+                                                    data-bs-trigger="hover focus" 
+                                                    data-bs-html="true" 
+                                                    data-bs-placement="top"
+                                                    data-bs-title="Site Calendly Organisation"
+                                                    data-bs-content="
+                                                        You do not have permission to edit this field: Edit Calendly Configuration
+                                                    "
+                                                {%endif%}>
+                                                    <input style="min-width:400px" id="calendly_organization" type="password" type="text" class="form-control" name="calendly_organization"
+                                                        oninput="$('#calendly_config_submit').attr('disabled', false)" onfocus="this.value=''; this.removeAttribute('onfocus');"
+                                                        value="{%if site.calendly_organization%}{{site.calendly_organization|censor}}{%endif%}" {%if not request.user.profile|get_profile_allowed_to_edit_site_calendly_configuration_tag:site%}disabled{%endif%}/>
+                                                    <label for="calendly_organization">Site Calendly Organisation</label>
+                                                </div>
+                                            </div>
+                                            <div class="col">   
+                                                <div class="form-floating m-1"
+                                                {%if not request.user.profile|get_profile_allowed_to_edit_site_calendly_configuration_tag:site%}
+                                                    data-bs-toggle="popover" 
+                                                    data-bs-trigger="hover focus" 
+                                                    data-bs-html="true" 
+                                                    data-bs-placement="top"
+                                                    data-bs-title="Site Calendly Token"
+                                                    data-bs-content="
+                                                        You do not have permission to edit this field: Edit Calendly Configuration
+                                                    "
+                                                {%endif%}>
+                                                    <input name="calendly_token" type="password" class="form-control"
+                                                        oninput="$('#calendly_config_submit').attr('disabled', false)" onfocus="this.value=''; this.removeAttribute('onfocus');"
+                                                        value="{{site.calendly_token|censor}}" {%if not request.user.profile|get_profile_allowed_to_edit_site_calendly_configuration_tag:site%}disabled{%endif%}/>
+                                                    <label class="elipses-overflow">Site Calendly Token</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col center">  
+                                                {%if request.user.profile|get_profile_allowed_to_edit_site_configuration_tag:site%}<button type='submit' class="btn btn-primary btn-sm m-3" id="calendly_config_submit" disabled>Submit</button>{%endif%}  
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                
+                                <div class="col-md p-0">   
+                                </div>
+                                <div class="col-md-auto m-1 p-2 alert alert-light center" style="min-width:350px;min-height:100px;">                          
+                                    <div>   
+                                        Calendly Webhook for <span class="name_display_{{site.pk}}">{{site.name}}</span>: 
+                                        {%include 'core/htmx/calendly_webhook_status_wrapper.html'%}  
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card card-highlight m-2">
+                        <div class="card-header">
+                            <i class="fa-light fa-dumbbell"></i> <span class="name_display_{{site.pk}}">{{site.name}}</span> <b>Active Campaign Settings</b>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mt-2">
+                                <div class="col-md-auto" id="active_campaign_leads_wrapper">
+                                    {%include 'core/htmx/active_campaign_enabled_htmx.html'%}
+                                </div>
+                                <div class="col">
+                                </div>
+                                <div class="col-md-auto">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+            </div>            
         </div>
     </div>
+    {%else%}
+    Something went wrong, please let us know if this problem persists: <a href="mailto:jobie@winser.uk">jobie@winser.uk</a>
+    {%endif%}
 </span>

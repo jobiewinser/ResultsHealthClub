@@ -1,8 +1,9 @@
-{%load core_tags%}
+{%load core_tags static%}
+<div class="right" style="writing-mode: vertical-lr; transform: rotate(180deg); margin-left:10px; margin-top:80px"><i class="fa-solid fa-arrow-up"></i> New Calls <span class="pl-3; pr-3;">---</span> Old Calls <i class="fa-solid fa-arrow-down"></i></div>
 {%for queryset_title, queryset, call_count in querysets%} 
 <script>
   $(document).ready(function() {
-    new Sortable(document.getElementById('{%if campaign.pk%}campaign_column_{{campaign.pk}}_calls_{{call_count}}{%elif site.pk%}site_column_{{site.pk}}_calls_{{call_count}}{%else%}company_column_{{request.user.profile.company.pk}}_calls_{{call_count}}{%endif%}'), {
+    new Sortable(document.getElementById('{%if request.GET.campaign_pks%}{%for campaign_pk in request.GET.campaign_pks%}campaign_column_{{campaign_pk}}_calls_{{call_count}}{%endfor%}{%elif request.GET.campaign_category_pks%}{%for campaign_category_pk in request.GET.campaign_category_pks%}campaign_category_column_{{campaign_category_pk}}_calls_{{call_count}}{%endfor%}{%elif request.GET.site_pks%}{%for site_pk in request.GET.site_pks%}site_column_{{site_pk}}_calls_{{call_count}}{%endfor%}{%else%}company_column_{{request.user.profile.company.pk}}_calls_{{call_count}}{%endif%}'), {
             
         group: {
             name: 'leads-columns',
@@ -14,7 +15,8 @@
             multiDrag: true,
             fallbackOnBody: true,
             onAdd: function (/**Event*/evt) {
-                handleDraggedItem($(evt.item), $(evt.to)) 
+                handleDraggedItem($(evt.item), $(evt.to), evt.newDraggableIndex) 
+                
                 evt.preventDefault();
             },
             onStart: function (/**Event*/evt) {
@@ -43,12 +45,12 @@
 {%with call_count as counter%}
 <div class="column-done">
     <div class="m-2 manually_add_lead_div">
-    <h2 class="m-0">{{queryset_title}} <img  class="htmx-indicator invert column-htmx-indicator" src="https://htmx.org/img/bars.svg"/></h2> 
+    <h2 class="m-0">{{queryset_title}} <img  class="htmx-indicator invert column-htmx-indicator" src="{% static 'img/bars.svg' %}"/></h2> 
     {%include 'campaign_leads/htmx/column_metadata.html'%}
     </div>
     <div 
-    id="{%if campaign.pk%}campaign_column_{{campaign.pk}}_calls_{{call_count}}{%elif site.pk%}site_column_{{site.pk}}_calls_{{call_count}}{%else%}company_column_{{request.user.profile.company.pk}}_calls_{{call_count}}{%endif%}" 
-    class="sortable_drag column_{{call_count}} column {%if campaign.pk%}campaign_column_{{campaign.pk}}_calls_{{call_count}}{%elif site.pk%}site_column_{{site.pk}}_calls_{{call_count}}{%else%}company_column_{{request.user.profile.company.pk}}_calls_{{call_count}}{%endif%}"
+    id="{%if request.GET.campaign_pks%}{%for campaign_pk in request.GET.campaign_pks%}campaign_column_{{campaign_pk}}_calls_{{call_count}}{%endfor%}{%elif request.GET.campaign_category_pks%}{%for campaign_category_pk in request.GET.campaign_category_pks%}campaign_category_column_{{campaign_category_pk}}_calls_{{call_count}}{%endfor%}{%elif request.GET.site_pks%}{%for site_pk in request.GET.site_pks%}site_column_{{site_pk}}_calls_{{call_count}}{%endfor%}{%else%}company_column_{{request.user.profile.company.pk}}_calls_{{call_count}}{%endif%}" 
+    class="sortable_drag column_{{call_count}} column {%if request.GET.campaign_pks%}{%for campaign_pk in request.GET.campaign_pks%}campaign_column_{{campaign_pk}}_calls_{{call_count}}{% if not forloop.last %} {%endif%}{%endfor%}{%elif request.GET.campaign_category_pks%}{%for campaign_category_pk in request.GET.campaign_category_pks%}campaign_category_column_{{campaign_category_pk}}_calls_{{call_count}}{% if not forloop.last %} {%endif%}{%endfor%}{%elif request.GET.site_pks%}{%for site_pk in request.GET.site_pks%}site_column_{{site_pk}}_calls_{{call_count}}{% if not forloop.last %} {%endif%}{%endfor%}{%else%}company_column_{{request.user.profile.company.pk}}_calls_{{call_count}}{%endif%}"
     data-call-count="{{ call_count }}">
         <article class="" >  </article>
         {%for lead in queryset%}

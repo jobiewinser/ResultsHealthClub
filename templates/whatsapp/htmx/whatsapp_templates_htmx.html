@@ -3,7 +3,8 @@
     <script>
         $(document).ready(function() {
             document.title = "Whatsapp Templates";
-            $("[data-bs-toggle=popover]").popover();
+            {% comment %} flash()    {% endcomment %}
+            popoverstuff()
         });
         var SearchTerm = ""
     </script>
@@ -14,30 +15,30 @@
             <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
         </div> {% endcomment %}
         {%with True as hide_show_all%}
-        {%include 'core/htmx/site_selection.html'%}
+        {%include 'core/htmx/site_selection_single.html'%}
         <div class="col-md-auto m-1 ps-0">
             <div id="phone_list_wrapper">  
                 <select class="form-select select2 select2-styling overview_table_filters"name="whatsapp_business_account_pk" id="whatsapp_business_account_pk" onchange="$('#change_site').click();">
                     {%for whatsapp_business_account in whatsapp_business_accounts%}
-                    <option {%if whatsapp_business_account.pk == request|get_key_in_get_or_post:'whatsapp_business_account_pk'|str_to_int %}selected{%endif%} value="{{whatsapp_business_account.pk}}">Whatsapp Phone: {{whatsapp_business_account.whatsappnumber}}</option>
+                    <option {%if whatsapp_business_account.pk|to_str == request|get_key_in_get_or_post:'whatsapp_business_account_pk' %}selected{%endif%} value="{{whatsapp_business_account.pk}}">Whatsapp Phone: {{whatsapp_business_account.whatsappnumber}}</option>
                     {%endfor%}
                 </select>
             </div>
         </div>
 
 
-        <div class="col-md-auto m-1 ps-0">
-        </div>
 
-        <button hidden hx-get="" hx-push-url="false" hx-swap="innerHTML" hx-include=".overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
+        <button hidden hx-get="{%url 'whatsapp-templates'%}" hx-push-url="false" hx-swap="innerHTML" hx-include=".overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
         {%endwith%}    
         {%endblock extra_top_left_buttons %}
         
         {%block extra_top_right_buttons %}
+        <div class="col m-1 ps-0">
+        </div>
         <input id="current_page" hidden value="whatsapp_templates"></input>
-        <div class="col-md-auto p-0 m-1">
+        {% comment %} <div class="col-md-auto p-0 m-1">
             <span class="badge bg-dark text-white"><h6 class="m-1">Whatsapp Templates</h6></span>          
-        </div> 
+        </div>  {% endcomment %}
         {%endblock extra_top_right_buttons %}    
     </div>   
     <div class="row mt-2">
@@ -60,7 +61,7 @@
             </a>            
         </div>
     </div>
-    <div class="row mt-2 card card-white p-2">
+    <div class="row mt-2 card card-highlight p-2">
         <div class="col">
             <table id="overview_table" class="table"> 
                 <thead> 

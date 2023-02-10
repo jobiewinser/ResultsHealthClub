@@ -1,9 +1,9 @@
 {%load static%}
-<ul class="navbar-nav mb-lg-0" >
+<ul class="navbar-nav mb-lg-0 ms-1"  style="height:54px">
     {%if request.user.is_authenticated%} 
-    <li class="nav-item dropstart p-2">
+    <li class="nav-item dropstart p-1">
         <a class="nav-link text-white p-0 pointer" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <div class="row m-0">
+            <div class="row m-0" style="overflow:hidden">
                 {%if user.profile.demo_account_theme_colour%}
                 <div class="col-auto p-0 rounded-circle m-1" style="width:32px; height:32px;background-color:rgba({{user.profile.demo_account_theme_colour}}, 0.7)">
                     <img src="/media/{{user.profile.avatar}}" 
@@ -17,10 +17,12 @@
                         style="width:32px; height:32px;" class="rounded-circle">
                 </div>
                 {%endif%}
-                <div class="col p-0 m-1 nowrap">
-                    <strong style="font-size:1.5vh">{{user.profile}}</strong>
-                    <input hidden id="user_id" value="{{user.pk}}"/>
+                <div class="col-sm p-0 ms-1 nowrap elipses-overflow" style="">
+                    <strong style="font-size:14px;">{{user.profile}}</strong>
+                    <hr style="margin:0px; margin-bottom:-3px">
+                    <span style="font-size:12px; line-height: 0.75em; ">{%if user.profile.site.name%}{{user.profile.site.name}} ({{user.profile.site.subscription.get_name_display}}){%endif%}</span>
                 </div>
+                <input hidden id="user_id" value="{{user.pk}}"/>
             </div>
         </a>
         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
@@ -35,7 +37,7 @@
     </li>
     {%else%}
     <li class="nav-item ">
-        <a class="pointer btn btn-light ms-3"
+        <a class="pointer btn btn-secondary ms-3"
             hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" hx-vals='{"template_name": "login"}'
             hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
             hx-swap="innerHTML" hx-trigger="click">

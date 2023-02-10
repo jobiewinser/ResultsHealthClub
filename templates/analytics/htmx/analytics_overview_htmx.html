@@ -7,13 +7,19 @@
     <script>
         document.title = "Analytics";
         $(document).ready(function() {
-            var leads_to_bookings_and_sales_chart_var = null;
-            var leads_to_bookings_and_sales_chart = null;
+            var leads_per_day_chart_var = null;
+            var leads_per_day_chart = null;
+            var bookings_per_day_chart_var = null;
+            var bookings_per_day_chart = null;
+            var sales_per_day_chart_var = null;
+            var sales_per_day_chart = null;
     
             var calls_today_chart_var = null;
             var calls_today_chart = null;
             try{
-                leads_to_bookings_and_sales_chart.destroy();
+                leads_per_day_chart.destroy();
+                bookings_per_day_chart.destroy();
+                sales_per_day_chart.destroy();
                 calls_today_chart.destroy();
             }catch{}
         });
@@ -26,42 +32,40 @@
             <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
         </div> {% endcomment %}
         {%include 'core/htmx/site_selection.html'%}
-        {%if site%}
+        {% comment %} {%if sites.count == 1%} {% endcomment %}
         {%include 'campaign_leads/htmx/campaign_category_selection.html'%}
-        {%endif%}
+        {%include 'campaign_leads/htmx/campaign_select.html'%}
+        {% comment %} {%endif%} {% endcomment %}
 
         <button hidden hx-get="{% url 'analytics-overview' %}" hx-push-url="false" hx-swap="innerHTML" hx-include=".non_site_dependant_analytics_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
         <button hidden hx-get="{%url 'analytics-overview'%}" onclick="$('#campaign_pk').val('').trigger('change')"
-        hx-push-url="false" hx-swap="innerHTML" hx-include=".overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_campaign_category" class="btn btn-primary btn-sm"></button>
+        hx-push-url="false" hx-swap="innerHTML" hx-include=".overview_table_filters, .non_site_dependant_analytics_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_campaign_category" class="btn btn-primary btn-sm"></button>
         <button hidden
             hx-get="{%url 'refresh-analytics'%}"
             hx-swap="outerHTML" hx-push-url="false" hx-include=".non_site_dependant_analytics_filters" hx-indicator="#page_load_indicator" hx-target="#analytics_span_wrapper" id="filter_campaign"></button>
 
-        {%if site%}
-        <div class="col-md-auto m-1" hx-get="{% url 'get-campaign'%}" hx-include=".non_site_dependant_analytics_filters" hx-trigger="load" hx-indicator="#page_load_indicator" hx-target="#campaign_list_wrapper" hx-swap="outerHTML">
+        {% comment %} {%if sites.count == 1%} {% endcomment %}
+        {% comment %} <div class="col-md-auto m-1 ps-0" hx-get="{% url 'get-campaign'%}" hx-include=".non_site_dependant_analytics_filters" hx-trigger="load" hx-indicator="#page_load_indicator" hx-target="#campaign_list_wrapper" hx-swap="outerHTML">
             <div id="campaign_list_wrapper">   
                 <select class="form-select select2-styling">
                     <option>Loading</option>
                 </select>    
             </div>
-        </div>
-        {%endif%}
+        </div> {% endcomment %}
+        {% comment %} {%endif%} {% endcomment %}
 
         
         
         {%endblock extra_top_left_buttons %}
 
         <div class="col">
-            {% comment %} <div class="alert alert-warning">
-                <small>Note: Sometimes a graph doesn't load. Click refresh if this happens. Jobie will fix this once he gets the chance.</small>      
-            </div> {% endcomment %}
         </div>
 
         {%block extra_top_right_buttons %}
         <input id="current_page" hidden value="analytics_overview"></input>
-        <div class="col-md-auto p-0 m-1">
+        {% comment %} <div class="col-md-auto p-0 m-1">
             <span class="badge bg-dark text-white"><h6 class="m-1">Analytics</h6></span>      
-        </div>
+        </div> {% endcomment %}
         {%endblock extra_top_right_buttons %}
     </div>
 

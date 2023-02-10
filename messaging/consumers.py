@@ -30,7 +30,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'type': 'chatbox_message',
                 'message': f"""<span hx-swap-oob="outerHTML:.messaging_disconnected_indicator">
                                             <div class="htmx-indicator disconnected_indicator messaging_disconnected_indicator">
-                                                <b>Connecting</b> <img class="invert" src="https://htmx.org/img/bars.svg">
+                                                <b>Connecting</b> <img class="invert" src="/static/img/bars.svg">
                                             </div>
                                         </span>""",
             }
@@ -48,8 +48,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         
         if(user.is_authenticated):
             message = await send_whatsapp_message_to_number(input_message, messaging_customer_number, user, self.scope["url_route"]["kwargs"]["whatsappnumber_pk"])
-
             whatsappnumber = await get_whatsappnumber(self.scope["url_route"]["kwargs"]["whatsappnumber_pk"])
+            
             if message:
                 message_context = {
                     "message": message,
@@ -85,6 +85,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         "message": rendered_html,                       
                     }
                 )
+            await mark_past_messages_as_read(whatsappnumber, user, messaging_customer_number)
     # Receive message from room group.    
     async def chatbox_message(self, event):
         await self.send(
@@ -94,9 +95,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
         
 
 
+def normalize_phone_number(number):
+    if number[:2] == '44':
+        number = '0' + number[2:]
+    return number
+
 
 @sync_to_async
 def send_whatsapp_message_to_number(message, customer_number, user, whatsappnumber_pk):  
+    customer_number = normalize_phone_number(customer_number)
     whatsappnumber = WhatsappNumber.objects.get(pk=whatsappnumber_pk)
     logger.debug("send_whatsapp_message_to_number start") 
     lead = Campaignlead.objects.filter(whatsapp_number=customer_number).first()  
@@ -119,6 +126,14 @@ def message_details_user(user):
 @sync_to_async
 def get_whatsappnumber(whatsappnumber_pk):   
     return WhatsappNumber.objects.get(pk=whatsappnumber_pk)
+@sync_to_async
+def mark_past_messages_as_read(whatsappnumber, user, messaging_customer_number):   
+    WhatsAppMessage.objects.filter(
+        site=whatsappnumber.whatsapp_business_account.site,
+        user=user,
+        customer_number=messaging_customer_number,
+        whatsappnumber=whatsappnumber,
+    ).update(read=True)
 @sync_to_async
 def get_user_company_pk(user):   
     print(user.profile.company.pk)
@@ -197,7 +212,7 @@ def add_user_to_users_online(consumer):
 @sync_to_async
 def remove_user_from_users_online(consumer):              
     chat_object = SiteUsersOnline.objects.get(feature="leads", site=consumer.user.profile.site)
-    chat_object.users_online = chat_object.users_online.replace(f";{consumer.user.pk};", ';')
+    chat_object.users_online = chat_object.users_online.replace(f"{consumer.user.pk};", '')
     chat_object.save()
     return f"""<div hx-swap-oob="true" id="users_online_leads">{loader.render_to_string('campaign_leads/htmx/connected_users.html', {'chat_object':chat_object})}</div> """
 class LeadsConsumer(AsyncWebsocketConsumer):
@@ -235,7 +250,7 @@ class LeadsConsumer(AsyncWebsocketConsumer):
                                             <div hx-swap-oob="outerHTML:.leads_disconnected_indicator">
                                                 <div class="htmx-indicator whole_page_disconnected_indicator leads_disconnected_indicator">
                                                     <div class="whole_page_disconnected_indicator_content">
-                                                        <b>Connecting</b> <img class="invert" src="https://htmx.org/img/bars.svg">
+                                                        <b>Connecting</b> <img class="invert" src="/static/img/bars.svg">
                                                         
                                                         <script>
                                                             var elem = $('#leads_disconnected_indicator');
@@ -317,7 +332,7 @@ class CompanyMessageCountConsumer(AsyncWebsocketConsumer):
                     'data':{
                         'rendered_html':f"""<span hx-swap-oob="outerHTML:.message_count_disconnected_indicator">
                                                 <div class="htmx-indicator disconnected_indicator message_count_disconnected_indicator">
-                                                    <b>Connecting</b> <img class="invert" src="https://htmx.org/img/bars.svg">
+                                                    <b>Connecting</b> <img class="invert" src="/static/img/bars.svg">
                                                 </div>
                                             </span>""",
                     }

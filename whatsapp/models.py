@@ -80,7 +80,8 @@ class WhatsAppMessage(Message):
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         unique = None
-        self.message = bleach.clean(self.message, settings.BLEACH_VALID_TAGS, settings.BLEACH_VALID_ATTRS, settings.BLEACH_VALID_STYLES)
+        if self.message:
+            self.message = bleach.clean(self.message, settings.BLEACH_VALID_TAGS, settings.BLEACH_VALID_ATTRS, settings.BLEACH_VALID_STYLES)
         while not unique:
             qs = WhatsAppMessage.objects.filter(datetime=self.datetime)
             if self.pk:
@@ -89,8 +90,15 @@ class WhatsAppMessage(Message):
                 self.datetime = self.datetime + datetime.timedelta(seconds=1)
             else:
                 unique = True
+        if self.customer_number:
+            self.customer_number = normalize_phone_number(self.customer_number)
         super(WhatsAppMessage, self).save(force_insert, force_update, using, update_fields)
+        
 
+def normalize_phone_number(number):
+    if number[:2] == '44':
+        number = '0' + number[2:]
+    return number
 # class WhatsAppMessage(models.Model):
 #     pass 
     
@@ -118,8 +126,8 @@ WHATSAPP_ORDER_CHOICES = (
     (3, 'Send 48 Hrs after Lead Creation')
 )
 template_variables = {
-    '[[1]]': ["First Name", "Eleanor"],    
-    # '[[2]]': ["Campaign Alias", "Jobie"],    
+    '[[1]]': ["First Name", "Lead Name"],    
+    # '[[2]]': ["Campaign Alias", "Fitness Campaign"],    
 }
 class WhatsappTemplate(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -170,7 +178,8 @@ class WhatsappTemplate(models.Model):
     
     @property
     def active_errors(self):
-        return self.errors.filter(archived=False)
+        from core.models import AttachedError
+        return AttachedError.objects.filter(whatsapp_template=self).filter(archived=False)
     # @property
     # def company_sites_with_same_whatsapp_business_details(self):
     #     try:

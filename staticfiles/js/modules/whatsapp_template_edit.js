@@ -67,9 +67,10 @@ function saveTemplate(whatsapp_business_account_pk, template_pk, create=false){
             url:'/configuration/whatsapp-templates-save/',
             data: post_data,
             success: function (data) {
-                $(window).unbind('beforeunload');                
+                $(window).unbind('beforeunload');         
+                window.history.pushState("Whatsapp Templates", "Title", "/configuration/whatsapp-templates/");
+                htmx.ajax('GET', "/configuration/whatsapp-templates/", {indicator:'#page_load_indicator', swap:'innerHTML', target: '#content'})
                 $('#page_load_indicator').removeClass('htmx-request')
-                htmx.ajax('GET', '/configuration/whatsapp-templates/', {target:'#content'})
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                 $('#page_load_indicator').removeClass('htmx-request')

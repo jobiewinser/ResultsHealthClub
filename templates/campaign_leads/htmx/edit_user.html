@@ -1,6 +1,6 @@
 {%load static%}
 <div class="generic_modal_contents">
-    <div class="card card-white m-1 p-3">
+    <div class="card card-highlight m-1 p-3">
         <div class="row">
             <div class="col center">
                 
@@ -13,20 +13,20 @@
                 {%endif%}
                 
                 <div class="form-floating m-1">
-                    <input name="first_name" {%if demo and not request.user.is_superuser%}disabled{%endif%}
+                    <input name="first_name" maxlength="25" {%if demo and not request.user.is_superuser%}disabled{%endif%}
                     value="{{edit_user.first_name}}" class="form-control modify_user_input" id="first_name"/>
                     <label for="first_name">First Name</label>
                 </div>
                 
                 <div class="form-floating m-1">
-                    <input name="last_name" {%if demo and not request.user.is_superuser%}disabled{%endif%}
+                    <input name="last_name" maxlength="25" {%if demo and not request.user.is_superuser%}disabled{%endif%}
                     value="{{edit_user.last_name}}" class="form-control modify_user_input" id="last_name"/>
                     <label for="last_name">Last Name</label>
                 </div>
                 
                 <div class="form-floating m-1">
                     <input name="calendly_event_page_url" {%if demo and not request.user.is_superuser%}disabled{%endif%}
-                    value="{{edit_user.profile.calendly_event_page_url}}" class="form-control modify_user_input" id="calendly_event_page_url"/>
+                    value="{%if edit_user.profile.calendly_event_page_url%}{{edit_user.profile.calendly_event_page_url}}{%endif%}" class="form-control modify_user_input" id="calendly_event_page_url"/>
                     <label for="calendly_event_page_url">Calendly Event Page Url</label>
                 </div>
                         

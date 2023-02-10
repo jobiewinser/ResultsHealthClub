@@ -9,7 +9,6 @@ function chatCountdown(time, customer_number, whatsappnumber_pk, display_identif
             clearInterval(timer);
         }
         $(display_identifier).html(formatSecondsToDateTime(time))
-        console.log($(identifier))
     }, 1000);
 }
   

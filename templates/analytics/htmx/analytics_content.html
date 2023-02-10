@@ -1,256 +1,399 @@
 {%load static core_tags%}
 <span id="analytics_span_wrapper">
 
-    <div class="row my-3">
-        <div class="col-md-auto analytics_col">
-            <div class="card card-white analytics-card card-white">
-                <div class="card-header">
-                    <h6 class="help m-0" style="min-height:30px"
-                        data-bs-toggle="popover" 
-                        data-bs-trigger="hover focus" 
-                        data-bs-placement="right"
-                        data-bs-html="true"
-                        data-bs-content="These inputs filter the graphs below by time."><i class="fa-solid fa-circle-info"></i> <b>Filters</b> 
-                    </h6> 
+<div class="row my-2">        
+    <div class="col-md-auto" style="width:330px" id="">  
+        <div class="card analytics-card" style="position:fixed; top:30%; left:24px">
+            <div class="card-header pb-0 pt-3">
+                <div class="row m-0">
+                    <div class="col-auto p-0">
+                        <h6 class="help m-0" style="min-height:30px"
+                            data-bs-toggle="popover" 
+                            data-bs-trigger="hover focus" 
+                            data-bs-placement="left"
+                            data-bs-html="true"
+                            data-bs-content="These inputs filter the graphs below by time."><i class="fa-solid fa-circle-info"></i> Filters
+                        </h6> 
+                    </div>
                 </div>
-                <div class="card-body" id="filters_card_body">
-                    <div class="row">
-                        <div class="col p-0">
-                        </div>
-                        <div class="col m-1 right p-0">
-                            <input id="start_date" value="{%if start_date%}{{start_date}}{%else%}{{''|today_date_tag|add_days:-7|date_to_date_input_prefill}}{%endif%}" 
-                                min="{%if not request.user.profile.company.subscription == 'pro'%}{{''|today_date_tag|add_days:-7|date_to_date_input_prefill}}{%else%}{{''|today_date_tag|add_years:-3|date_to_date_input_prefill}}{%endif%}" 
-                                max="{{''|today_date_input_tag}}" class="form-control form-control-sm non_site_dependant_analytics_filters" type="date" name="start_date"
-                                onchange="$('#refresh_analytics').click();"/>
-                        </div>
-                        <div class="col-md-auto m-1 p-0">
-                            <small>To</small>
-                        </div>
-                        <div class="col m-1 left p-0">
-                            <input id="end_date" value="{%if end_date%}{{end_date}}{%else%}{{''|today_date_input_tag}}{%endif%}" 
-                                min="{{''|today_date_tag|add_years:-3|date_to_date_input_prefill}}" 
-                                max="{{''|today_date_input_tag}}" class="form-control form-control-sm non_site_dependant_analytics_filters" type="date" name="end_date"
-                                onchange="$('#refresh_analytics').click();"/>
-                        </div>
-                        <div class="col p-0">
-                        </div>
+            </div>
+            <div class="card-body center" id="filters_card_body">
+                <div class="row my-2">
+                    <div class="col p-0">
                     </div>
-                    <div class="row">
-                        <div class="col p-0">
-                        </div>
-                        <div class="col-md-auto p-0 m-1 ">
-                            <button
-                                hx-include=".non_site_dependant_analytics_filters, .site_dependant_analytics_filters" hx-indicator="#page_load_indicator" id="refresh_analytics"
-                                onclick="$('.refresh_date_specific_analytic').click(); $('.refresh_non_date_specific_analytic').click();"
-                                {% comment %} hx-get="{%url 'refresh-analytics'%}" hx-target="#analytics_span_wrapper" hx-push-url="false" hx-swap="innerHTML"  {% endcomment %}
-                                class="btn btn-success btn-sm"><i class="fa-solid fa-arrows-rotate"></i> Refresh</button>
-                        </div>
-                        <div class="col-md-auto p-0 m-1 right">
-                            <button             
-                                hx-include="" hx-indicator="#page_load_indicator"
-                                hx-get="{%url 'refresh-analytics'%}" hx-target="#analytics_span_wrapper" hx-push-url="false" hx-swap="innerHTML" class="btn btn-warning btn-sm"><i class="fa-solid fa-ban"></i> Reset</button>
-                        </div>
-                        <div class="col p-0">
-                        </div>
+                    <div class="col m-1 right p-0">
+                        <input id="start_date" value="{%if start_date%}{{start_date}}{%elif not end_date and not start_date and minimum_site_subscription_level_in_query.numerical|to_int == 0%}{{''|today_date_tag|add_days:-7|date_to_date_input_prefill}}{%elif not end_date and not start_date and not minimum_site_subscription_level_in_query.numerical|to_int == 0%}{{''|today_date_tag|add_months:-1|date_to_date_input_prefill}}{%endif%}" 
+                            min="{%if minimum_site_subscription_level_in_query.analytics_seconds and not request.user.profile.active_sites_allowed.first.created > ''|today_date_tag|subtract_seconds_to_days_rounded_up:minimum_site_subscription_level_in_query.analytics_seconds%}{{''|today_date_tag|subtract_seconds_to_days_rounded_up:minimum_site_subscription_level_in_query.analytics_seconds|date_to_date_input_prefill}}{%else%}{{request.user.profile.active_sites_allowed.first.created|date_to_date_input_prefill}}{%endif%}" 
+                            max="{{''|today_date_input_tag}}" class="form-control form-control-xs non_site_dependant_analytics_filters" type="date" name="start_date"
+                            onchange="$('#refresh_analytics').click();"/>
                     </div>
-                    <hr>
-                    Quick Filters
-                    <div class="row">
-                        <div class="col-md-auto m-1 p-0">
+                    <div class="col-md-auto m-1 mt-0 p-0">
+                        <small>To</small>
+                    </div>
+                    <div class="col m-1 left p-0">
+                        <input id="end_date" value="{%if end_date%}{{end_date}}{%else%}{{''|today_date_input_tag}}{%endif%}" 
+                            min="{{''|today_date_tag|add_years:-3|date_to_date_input_prefill}}" 
+                            max="{{''|today_date_input_tag}}" class="form-control form-control-xs non_site_dependant_analytics_filters" type="date" name="end_date"
+                            onchange="$('#refresh_analytics').click();"/>
+                    </div>
+                    <div class="col p-0">
+                    </div>
+                </div>
+                <div class="row my-2">
+                    <div class="col p-0">
+                    </div>
+                    <div class="col-md-auto p-0 m-1 ">
+                        <button
+                            hx-include=".non_site_dependant_analytics_filters, .site_dependant_analytics_filters" hx-indicator="#page_load_indicator" id="refresh_analytics"
+                            onclick="$('.refresh_date_specific_analytic').click(); $('.refresh_non_date_specific_analytic').click();"
+                            {% comment %} hx-get="{%url 'refresh-analytics'%}" hx-target="#analytics_span_wrapper" hx-push-url="false" hx-swap="innerHTML"  {% endcomment %}
+                            class="btn btn-success btn-xs"><i class="fa-solid fa-arrows-rotate"></i> Refresh</button>
+                    </div>
+                    <div class="col-md-auto p-0 m-1 right">
+                        <button             
+                            hx-include="" hx-indicator="#page_load_indicator"
+                            hx-get="{%url 'refresh-analytics'%}" hx-target="#analytics_span_wrapper" hx-push-url="false" hx-swap="innerHTML" 
+                            class="btn btn-warning  btn-xs"><i class="fa-solid fa-ban"></i> Reset</button>
+                    </div>
+                    <div class="col p-0">
+                    </div>
+                </div>
+                <hr>
+                Quick Filters 
+                <br>
+                <small>Earliest Data: {{sites.first.created|short_date_tag}}</small>
+                <div class="row my-2">
+                    <div class="col p-0">
+                    </div>
+                    <div class="col-md-auto m-1 p-0">
+                        <button 
+                            class="btn btn-secondary btn-xs quick_filter_date_button {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_input_tag%}active{%endif%}" 
+                            onclick="$('#start_date').val('{{''|today_date_tag|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change'); $('.quick_filter_date_button').removeClass('active'); $(this).addClass('active');">
+                            <small>{{''|today_date_tag|nice_date_tag}} (day)</small>
+                        </button>
+                    </div>
+                    <div class="col-md-auto m-1 p-0">
+                        <div
+                            {% comment %} {%if request.user.profile.active_sites_allowed.first.created > ''|today_date_tag|add_days:-7 %}                                
+                            data-bs-toggle="popover" 
+                            data-bs-trigger="hover focus" 
+                            data-bs-placement="top"
+                            data-bs-title="Why is this disabled?"
+                            data-bs-content="None of the sites in this query were created before a week ago"                                                           
+                            {%endif%} {% endcomment %}
+                            >
                             <button 
-                                class="btn btn-secondary btn-sm quick_filter_date_button {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_input_tag%}active{%endif%}" 
-                                onclick="$('#start_date').val('{{''|today_date_tag|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change'); $('.quick_filter_date_button').removeClass('active'); $(this).addClass('active');">
-                                <small>{{''|today_date_tag|nice_date_tag}} (day)</small>
-                            </button>
-                        </div>
-                        <div class="col-md-auto m-1 p-0">
-                            <button 
-                                class="btn btn-secondary btn-sm quick_filter_date_button {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_tag|add_days:-7|date_to_date_input_prefill%}active{%elif not end_date and not start_date%}active{%endif%}" 
+                                {% comment %} {%if request.user.profile.active_sites_allowed.first.created > ''|today_date_tag|add_days:-7 %}disabled{%endif%} {% endcomment %}
+                                class="btn btn-secondary btn-xs quick_filter_date_button {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_tag|add_days:-7|date_to_date_input_prefill%}active{%elif not end_date and not start_date and minimum_site_subscription_level_in_query.numerical|to_int == 0%}active{%endif%}" 
                                 onclick="$('#start_date').val('{{''|today_date_tag|add_days:-7|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change'); $('.quick_filter_date_button').removeClass('active'); $(this).addClass('active');">
                                 <small>{{''|today_date_tag|add_days:-7|nice_date_tag}} (week)</small>
                             </button>
                         </div>
-                        <div class="col-md-auto m-1 p-0">
-                            <button {%if not request.user.profile.company.subscription == 'pro' and not demo%}disabled{%endif%}
-                                class="btn btn-secondary btn-sm quick_filter_date_button {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_tag|add_months:-1|date_to_date_input_prefill%}active{%endif%}" 
+                    </div>
+                    <div class="col p-0">
+                    </div>
+                </div>
+                <div class="row my-2">
+                    <div class="col p-0">
+                    </div>
+                    <div class="col-md-auto m-1 p-0">
+                        <div 
+                            {%if minimum_site_subscription_level_in_query.numerical|to_int == 0 and not demo %}
+                            data-bs-toggle="popover" 
+                            data-bs-trigger="hover focus" 
+                            data-bs-placement="top"
+                            data-bs-title="Why is this disabled?"
+                            data-bs-content="One of the sites in your query is not permitted to look this far back"   
+                            {% comment %} {%elif request.user.profile.active_sites_allowed.first.created > ''|today_date_tag|add_months:-1 %}
+                            data-bs-toggle="popover" 
+                            data-bs-trigger="hover focus" 
+                            data-bs-placement="top"
+                            data-bs-title="Why is this disabled?"
+                            data-bs-content="None of the sites in this query were created before a month ago"    {% endcomment %}
+                            {%endif%}>
+                            <button 
+                                {%if minimum_site_subscription_level_in_query.numerical|to_int == 0 and not demo%}disabled{%endif%}
+                                {% comment %} {%if request.user.profile.active_sites_allowed.first.created > ''|today_date_tag|add_months:-1 %}disabled{%endif%} {% endcomment %}
+                                class="btn btn-secondary btn-xs quick_filter_date_button {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_tag|add_months:-1|date_to_date_input_prefill%}active{%elif not end_date and not start_date and not minimum_site_subscription_level_in_query.numerical|to_int == 0%}active{%endif%}" 
                                 onclick="$('#start_date').val('{{''|today_date_tag|add_months:-1|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change'); $('.quick_filter_date_button').removeClass('active'); $(this).addClass('active');">
-                                <small>{{''|today_date_tag|add_months:-1|nice_date_tag}} (month) {%if not request.user.profile.company.subscription == 'pro'%}<i class="fa-solid fa-rectangle-pro"></i>{%endif%}</small>
+                                <small>{{''|today_date_tag|add_months:-1|nice_date_tag}} (month) {%if minimum_site_subscription_level_in_query.numerical|to_int == 0%}<b>Basic</b>{%endif%}</small>
                             </button>
                         </div>
-                        <div class="col-md-auto m-1 p-0">
-                            <button {%if not request.user.profile.company.subscription == 'pro' and not demo%}disabled{%endif%}
-                                class="btn btn-secondary btn-sm quick_filter_date_button {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_tag|add_years:-1|date_to_date_input_prefill%}active{%endif%}" 
+                    </div>
+                    <div class="col-md-auto m-1 p-0">
+                        <div
+                            {%if not minimum_site_subscription_level_in_query.numerical|to_int == 2 and not demo %}
+                            data-bs-toggle="popover" 
+                            data-bs-trigger="hover focus" 
+                            data-bs-placement="top"
+                            data-bs-title="Why is this disabled?"
+                            data-bs-content="One of the sites in your query is not permitted to look this far back" 
+                            {% comment %} {%elif request.user.profile.active_sites_allowed.first.created > ''|today_date_tag|add_years:-1 %}
+                            data-bs-toggle="popover" 
+                            data-bs-trigger="hover focus" 
+                            data-bs-placement="top"
+                            data-bs-title="Why is this disabled?"
+                            data-bs-content="None of the sites in this query were created before a year ago"  {% endcomment %}
+                            {%endif%}>
+                            <button 
+                                {%if not minimum_site_subscription_level_in_query.numerical|to_int == 2 and not demo%}disabled{%endif%}
+                                {% comment %} {%if request.user.profile.active_sites_allowed.first.created > ''|today_date_tag|add_years:-1 %}disabled{%endif%} {% endcomment %}
+                                class="btn btn-secondary btn-xs quick_filter_date_button {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_tag|add_years:-1|date_to_date_input_prefill%}active{%endif%}" 
                                 onclick="$('#start_date').val('{{''|today_date_tag|add_years:-1|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change'); $('.quick_filter_date_button').removeClass('active'); $(this).addClass('active');">
-                                <small>{{''|today_date_tag|add_years:-1|nice_date_tag}} (year) {%if not request.user.profile.company.subscription == 'pro'%}<i class="fa-solid fa-rectangle-pro"></i>{%endif%}</small>
+                                <small>{{''|today_date_tag|add_years:-1|nice_date_tag}} (year) {%if not minimum_site_subscription_level_in_query.numerical|to_int == 2%}<i class="fa-solid fa-rectangle-pro"></i>{%endif%}</small>
                             </button>
                         </div>
                     </div>
-                </div>
-                {%if not request.user.profile.company.subscription == 'pro'%}
-                <hr>
-                <div class="row">
-                    <div class="col p-0 m-0 center">
-                        <p>
-                            <small>With a <i class="fa-solid fa-rectangle-pro"></i> subscription you can see further back in time!</small>
-                        </p>
+                    <div class="col p-0">
                     </div>
                 </div>
-                {%endif%}
             </div>
-        </div>
-        <div class="col analytics_col">
-            <button hidden id="refresh_calls_today" hx-trigger="load, click delay:0.5s"
-                class="refresh_non_date_specific_analytic"
-                hx-get="{%url 'get-calls-today' %}"
-                hx-include="#start_date, #end_date, .non_site_dependant_analytics_filters, .site_dependant_analytics_filters, #graph_type_calls_today"
-                hx-target="#calls_today_card_body"
-                hx-indicator="#htmx-indicator-calls-today"
-                hx-swap="innerHTML"
-                onclick="$('#htmx-indicator-calls-today').addClass('htmx-request'); $('#calls_today_chart_wrapper').empty();">refresh</button>
-            <div class="card card-white analytics-card card-white">
-                <div class="card-header">
-                    <h6 class="help m-0"
-                        data-bs-toggle="popover" 
-                        data-bs-trigger="hover focus" 
-                        data-bs-placement="right"
-                        data-bs-html="true"
-                        data-bs-content="This shows the amount of calls made today since midnight (filtered by site and campaign above)."><i class="fa-solid fa-circle-info"></i> Calls Today 
-                        <img  class="htmx-indicator invert" id="htmx-indicator-calls-today" src="https://htmx.org/img/bars.svg"/>
-                    </h6> 
-                </div>
-                <div class="card-body" id="calls_today_card_body">
+            {% comment %} {%if not minimum_site_subscription_level_in_query.analytics_numerical|to_int == 2%}
+            <hr>
+            <div class="row my-2">
+                <div class="col center">
+                    <p>
+                        <small>Your query will be limited to the lowest analytics features within your query. <br>With a Pro subscription, you can see further back in time and see more metrics!</small>
+                    </p>
                 </div>
             </div>
-        </div>
-        <div class="col analytics_col">
-            <button hidden id="refresh_sales_today" hx-trigger="load, click delay:0.5s"
-                class="refresh_non_date_specific_analytic"
-                hx-get="{%url 'get-sales-today' %}"
-                hx-include="#start_date, #end_date, .non_site_dependant_analytics_filters, .site_dependant_analytics_filters, #graph_type_sales_today"
-                hx-target="#sales_today_card_body"
-                hx-indicator="#htmx-indicator-sales-today"
-                hx-swap="innerHTML"
-                onclick="$('#htmx-indicator-sales-today').addClass('htmx-request'); $('#sales_today_chart_wrapper').empty();">refresh</button>
-            <div class="card card-white analytics-card card-white">
-                <div class="card-header">
-                    <h6 class="help m-0"
-                        data-bs-toggle="popover" 
-                        data-bs-trigger="hover focus" 
-                        data-bs-placement="right"
-                        data-bs-html="true"
-                        data-bs-content="This shows the amount of sales made today since midnight (filtered by site and campaign above)."><i class="fa-solid fa-circle-info"></i> Sales Today 
-                        <img  class="htmx-indicator invert" id="htmx-indicator-sales-today" src="https://htmx.org/img/bars.svg"/>
-                    </h6> 
-                </div>
-                <div class="card-body" id="sales_today_card_body">
-                </div>
-            </div>
-        </div>
-    </div>    
-    
-    <div class="row my-3">
-        <div class="col-8 analytics_col">
-            <button hidden id="refresh_leads_to_bookings_and_sales" class="refresh_date_specific_analytic" hx-trigger="load, click delay:0.5s"
-                hx-get="{%url 'get-leads-to-bookings-and-sales' %}"
-                hx-include="#start_date, #end_date, .non_site_dependant_analytics_filters, .site_dependant_analytics_filters, #graph_type_leads_to_bookings_and_sales"
-                hx-target="#leads_to_bookings_and_sales_card_body"
-                hx-indicator="#htmx-indicator-leads-and-bookings"
-                hx-swap="innerHTML"
-                onclick="$('#htmx-indicator-leads-and-bookings').addClass('htmx-request'); $('#leads_to_bookings_and_sales_chart_wrapper').empty();">refresh</button>
-            <div class="card card-white analytics-card card-white">
-                <div class="card-header">
-                    <h6 class="help m-0"
-                        data-bs-toggle="popover" 
-                        data-bs-trigger="hover focus" 
-                        data-bs-placement="right"
-                        data-bs-html="true"
-                        data-bs-content='This shows the analytics for Leads and Bookings for the chosen site/campaign per day, between the chosen dates. The "Leads" bar/line indicates the number of unique leads received, the "Bookings" bar/line indicates the number of those leads that were successfully marked as sold.'><i class="fa-solid fa-circle-info"></i> Leads to Bookings and Sales 
-                        <img  class="htmx-indicator invert" id="htmx-indicator-leads-and-bookings" src="https://htmx.org/img/bars.svg"/>
-                    </h6> 
-                </div>
-                <div class="card-body" id="leads_to_bookings_and_sales_card_body">
-                    
-                </div>
-            </div>
-        </div>
+            {%endif%} {% endcomment %}
+        </div>      
         
-        <div class="col-4 analytics_col">
-            <button hidden id="refresh_calls_made_per_day" class="refresh_date_specific_analytic" hx-trigger="load, click delay:0.5s"
-                hx-get="{%url 'get-calls-made-per-day' %}"
-                hx-include="#start_date, #end_date, .non_site_dependant_analytics_filters, .site_dependant_analytics_filters, #graph_type_calls_made_per_day"
-                hx-target="#calls_made_per_day_card_body"
-                hx-indicator="#htmx-indicator-calls-made-per-day"
-                hx-swap="innerHTML"
-                onclick="$('#htmx-indicator-calls-made-per-day').addClass('htmx-request'); $('#calls_made_per_day_chart_wrapper').empty();">refresh</button>
-            <div class="card card-white analytics-card card-white">
-                <div class="card-header">
-                    <h6 class="help m-0"
-                        data-bs-toggle="popover" 
-                        data-bs-trigger="hover focus" 
-                        data-bs-placement="right"
-                        data-bs-html="true"
-                        data-bs-content="This shows the number of calls made per day for the chosen site and/or campaign (top left), between the times chosen (right)."><i class="fa-solid fa-circle-info"></i> Calls Made Per Day 
-                        <img  class="htmx-indicator invert" id="htmx-indicator-calls-made-per-day" src="https://htmx.org/img/bars.svg"/>
-                    </h6> 
-                </div>
-                <div class="card-body" id="calls_made_per_day_card_body">
-                </div>
-            </div>
-        </div>
-    </div> 
-    <div class="row my-3">    
-        <div class="col analytics_col">
-            <button hidden id="refresh_pipeline" class="refresh_date_specific_analytic" hx-trigger="load, click delay:0.5s"
-                    hx-get="{%url 'get-pipeline' %}"
-                    hx-include="#start_date, #end_date, .non_site_dependant_analytics_filters, .site_dependant_analytics_filters"
-                    hx-target="#pipeline_body"
-                    hx-indicator="#htmx-indicator-pipeline"
-                    hx-swap="innerHTML"
-                    onclick="$('#htmx-indicator-pipeline').addClass('htmx-request')">refresh</button>
-            <div class="card card-white analytics-card card-white" style="min-width: 500px;">
-                <div class="card-header">
-                    <h6 class="help m-0"
-                        data-bs-toggle="popover" 
-                        data-bs-trigger="hover focus" 
-                        data-bs-placement="right"
-                        data-bs-html="true"
-                        data-bs-content="This shows the potential monetary value of leads <b>created</b> between the shown dates that were successfully marked as sold, still live or closed without being sold (filtered by site and campaign above)."><i class="fa-solid fa-circle-info"></i> Pipeline & Conversion Rate  {%if not request.user.profile.company.subscription == 'pro'%}<i class="fa-solid fa-rectangle-pro"></i>{%endif%}
-                        <img  class="htmx-indicator invert" id="htmx-indicator-pipeline" src="https://htmx.org/img/bars.svg"/>
-                    </h6> 
-                </div>
-                <div class="card-body" id="pipeline_body">
-                    
-                </div>
-            </div> 
-        </div>
-        <div class="col analytics_col">
-            {%if request.user.profile.company.subscription == 'pro'%}
-            <button hidden id="refresh_current_call_count_distribution" hx-trigger="load, click delay:0.5s"
-                class="refresh_non_date_specific_analytic"
-                hx-get="{%url 'get-current-call-count-distribution' %}"
-                hx-include="#start_date, #end_date, .non_site_dependant_analytics_filters, .site_dependant_analytics_filters, #graph_type_current_call_count_distribution"
-                hx-target="#current_call_count_distribution_card_body"
-                hx-indicator="#htmx-indicator-current-call-count-distribution"
-                hx-swap="innerHTML"
-                onclick="$('#htmx-indicator-current-call-count-distribution').addClass('htmx-request'); ">refresh</button>
-            {%endif%}
-            <div class="card card-white analytics-card card-white" style="min-width: 500px;">
-                <div class="card-header">
-                    <h6 class="help m-0"
-                        data-bs-toggle="popover" 
-                        data-bs-trigger="hover focus" 
-                        data-bs-placement="right"
-                        data-bs-html="true"
-                        data-bs-content="This shows the <b>current</b> distribution of leads in each call count column on the <b>Leads</b> page (filtered by site and campaign above)."><i class="fa-solid fa-circle-info"></i> Current Call Count Distribution  {%if not request.user.profile.company.subscription == 'pro'%}<i class="fa-solid fa-rectangle-pro"></i>{%endif%}
-                        <img class="htmx-indicator invert" id="htmx-indicator-current-call-count-distribution" src="https://htmx.org/img/bars.svg"/>
-                    </h6> 
+    </div>
+    <div class="col">
+        <div class="row my-2">    
+            <div class="col analytics_col">
+                <button hidden id="refresh_pipeline" class="refresh_date_specific_analytic" hx-trigger="load delay:0.3s, click delay:0.3s"
+                        hx-get="{%url 'get-pipeline' %}"
+                        hx-include="#start_date, #end_date, .non_site_dependant_analytics_filters, .site_dependant_analytics_filters"
+                        hx-target="#pipeline_body"
+                        hx-indicator="#htmx-indicator-pipeline"
+                        hx-swap="innerHTML"
+                        onclick="$('#htmx-indicator-pipeline').addClass('htmx-request')">refresh</button>
+                <div class="card analytics-card" style="min-width: 500px;">
+                    <div class="card-header">
+                        <div class="row m-0">
+                            <div class="col-auto p-0">
+                                <h6 class="help m-0"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover focus" 
+                                    data-bs-html="true"
+                                    data-bs-content="This shows the potential monetary value of leads <b>created</b> between the shown dates that were successfully marked as sold, still live or closed without being sold (filtered by site and campaign above)."><i class="fa-solid fa-circle-info"></i> Pipeline & Conversion Rate <i class="fa-solid fa-rectangle-pro"></i>
+                                    <img  class="htmx-indicator invert" id="htmx-indicator-pipeline" src="{% static 'img/bars.svg' %}"/>
+                                </h6> 
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body" id="pipeline_body">
                         
-                </div>
-                <div class="card-body" id="{%if request.user.profile.company.subscription == 'pro'%}current_call_count_distribution_card_body{%endif%}">                    
-                    {%if not request.user.profile.company.subscription == 'pro'%}<small>Extra analytics can be unlocked through a <i class="fa-solid fa-rectangle-pro"></i> subscription!</small>{%endif%}
+                    </div>
+                </div> 
+            </div>
+            <div class="col-md-auto analytics_col">
+                {%if minimum_site_subscription_level_in_query.analytics_numerical|to_int == 2%}
+                <button hidden id="refresh_current_call_count_distribution" hx-trigger="load delay:0.3s, click delay:0.3s"
+                    class="refresh_non_date_specific_analytic"
+                    hx-get="{%url 'get-current-call-count-distribution' %}"
+                    hx-include="#start_date, #end_date, .non_site_dependant_analytics_filters, .site_dependant_analytics_filters, #graph_type_current_call_count_distribution"
+                    hx-target="#current_call_count_distribution_card_body"
+                    hx-indicator="#htmx-indicator-current-call-count-distribution"
+                    hx-swap="innerHTML"
+                    onclick="$('#htmx-indicator-current-call-count-distribution').addClass('htmx-request'); ">refresh</button>
+                {%endif%}
+                <div class="card analytics-card" style="min-width: 500px;">
+                    <div class="card-header">
+                        <div class="row m-0">
+                            <div class="col-auto p-0">
+                                <h6 class="help m-0"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover focus" 
+                                    data-bs-html="true"
+                                    data-bs-content="This shows the <b>current</b> distribution of leads in each call count column on the <b>Leads</b> page (filtered by site and campaign above)."><i class="fa-solid fa-circle-info"></i> Current Call Count Distribution <i class="fa-solid fa-rectangle-pro"></i>
+                                    <img class="htmx-indicator invert" id="htmx-indicator-current-call-count-distribution" src="{% static 'img/bars.svg' %}"/>
+                                </h6> 
+                            </div>
+                        </div>                            
+                    </div>
+                    <div class="card-body" id="{%if minimum_site_subscription_level_in_query.analytics_numerical|to_int == 2%}current_call_count_distribution_card_body{%endif%}">       
+                        {%if not minimum_site_subscription_level_in_query.analytics_numerical|to_int == 2%}             
+                        One of the sites in your query has a <b>{{minimum_site_subscription_level_in_query.get_name_display}}</b> subscription. This analytics metric requires a <b><i class="fa-solid fa-rectangle-pro"></i></b> subscription for all sites in the query.
+                        {%endif%}
+                    </div>
                 </div>
             </div>
-        </div>
+        </div> 
+        <div class="row my-2">
+            <div class="col analytics_col">
+                <button hidden id="refresh_calls_today" hx-trigger="load delay:0.3s, click delay:0.3s"
+                    class="refresh_non_date_specific_analytic"
+                    hx-get="{%url 'get-calls-today' %}"
+                    hx-include="#start_date, #end_date, .non_site_dependant_analytics_filters, .site_dependant_analytics_filters, #graph_type_calls_today"
+                    hx-target="#calls_today_card_body"
+                    hx-indicator="#htmx-indicator-calls-today"
+                    hx-swap="innerHTML"
+                    onclick="$('#htmx-indicator-calls-today').addClass('htmx-request'); $('#calls_today_chart_wrapper').empty();">refresh</button>
+                <div class="card analytics-card">
+                    <div class="card-header">
+                        <div class="row m-0">
+                            <div class="col-auto p-0">
+                                <h6 class="help m-0"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover focus" 
+                                    data-bs-html="true"
+                                    data-bs-content="This shows the amount of calls made today since midnight (filtered by site and campaign above)."><i class="fa-solid fa-circle-info"></i> Calls Today 
+                                    <img  class="htmx-indicator invert" id="htmx-indicator-calls-today" src="{% static 'img/bars.svg' %}"/>
+                                </h6> 
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body" id="calls_today_card_body">
+                    </div>
+                </div>
+            </div>
+            <div class="col analytics_col">
+                <button hidden id="refresh_sales_today" hx-trigger="load delay:0.3s, click delay:0.3s"
+                    class="refresh_non_date_specific_analytic"
+                    hx-get="{%url 'get-sales-today' %}"
+                    hx-include="#start_date, #end_date, .non_site_dependant_analytics_filters, .site_dependant_analytics_filters, #graph_type_sales_today"
+                    hx-target="#sales_today_card_body"
+                    hx-indicator="#htmx-indicator-sales-today"
+                    hx-swap="innerHTML"
+                    onclick="$('#htmx-indicator-sales-today').addClass('htmx-request'); $('#sales_today_chart_wrapper').empty();">refresh</button>
+                <div class="card analytics-card">
+                    <div class="card-header">
+                        <div class="row m-0">
+                            <div class="col-auto p-0">
+                                <h6 class="help m-0"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover focus" 
+                                    data-bs-html="true"
+                                    data-bs-content="This shows the amount of sales made today since midnight (filtered by site and campaign above)."><i class="fa-solid fa-circle-info"></i> Sales Today 
+                                    <img  class="htmx-indicator invert" id="htmx-indicator-sales-today" src="{% static 'img/bars.svg' %}"/>
+                                </h6> 
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body" id="sales_today_card_body">
+                    </div>
+                </div>
+            </div>
+        </div>    
+        
+        <div class="row my-2">
+            <div class="col-12 analytics_col">
+                <button hidden id="refresh_leads_per_day" class="refresh_date_specific_analytic" hx-trigger="load delay:0.3s, click delay:0.3s"
+                    hx-get="{%url 'get-leads-per-day' %}"
+                    hx-include="#start_date, #end_date, .non_site_dependant_analytics_filters, .site_dependant_analytics_filters, #graph_type_leads_per_day"
+                    hx-target="#leads_per_day_card_body"
+                    hx-indicator="#htmx-indicator-leads-and-bookings"
+                    hx-swap="innerHTML"
+                    onclick="$('#htmx-indicator-leads-and-bookings').addClass('htmx-request'); $('#leads_per_day_chart_wrapper').empty();">refresh</button>
+                <div class="card analytics-card">
+                    <div class="card-header">
+                        <div class="row m-0">
+                            <div class="col-auto p-0">
+                                <h6 class="help m-0"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover focus" 
+                                    data-bs-html="true"
+                                    data-bs-content='This shows the analytics for Leads for the chosen site/campaign per day, received between the chosen dates.'><i class="fa-solid fa-circle-info"></i> Leads Per Day
+                                    <img  class="htmx-indicator invert" id="htmx-indicator-leads-and-bookings" src="{% static 'img/bars.svg' %}"/>
+                                </h6> 
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body" id="leads_per_day_card_body">
+                        
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 analytics_col graph_col">
+                <button hidden id="refresh_bookings_per_day" class="refresh_date_specific_analytic" hx-trigger="load delay:0.3s, click delay:0.3s"
+                    hx-get="{%url 'get-bookings-per-day' %}"
+                    hx-include="#start_date, #end_date, .non_site_dependant_analytics_filters, .site_dependant_analytics_filters, #graph_type_bookings_per_day"
+                    hx-target="#bookings_per_day_card_body"
+                    hx-indicator="#htmx-indicator-leads-and-bookings"
+                    hx-swap="innerHTML"
+                    onclick="$('#htmx-indicator-leads-and-bookings').addClass('htmx-request'); $('#bookings_per_day_chart_wrapper').empty();">refresh</button>
+                <div class="card analytics-card">
+                    <div class="card-header">
+                        <div class="row m-0">
+                            <div class="col-auto p-0">
+                                <h6 class="help m-0"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover focus" 
+                                    data-bs-html="true"
+                                    data-bs-content='This shows the analytics for Bookings for the chosen site/campaign per day, made between the chosen dates.'><i class="fa-solid fa-circle-info"></i> Bookings Per Day
+                                    <img  class="htmx-indicator invert" id="htmx-indicator-leads-and-bookings" src="{% static 'img/bars.svg' %}"/>
+                                </h6> 
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body" id="bookings_per_day_card_body">
+                        
+                    </div>
+                </div>
+            </div>
+        </div> 
+
+        <div class="row my-2">
+            <div class="col-12 analytics_col graph_col">
+                <button hidden id="refresh_sales_per_day" class="refresh_date_specific_analytic" hx-trigger="load delay:0.3s, click delay:0.3s"
+                    hx-get="{%url 'get-sales-per-day' %}"
+                    hx-include="#start_date, #end_date, .non_site_dependant_analytics_filters, .site_dependant_analytics_filters, #graph_type_sales_per_day"
+                    hx-target="#sales_per_day_card_body"
+                    hx-indicator="#htmx-indicator-leads-and-bookings"
+                    hx-swap="innerHTML"
+                    onclick="$('#htmx-indicator-leads-and-bookings').addClass('htmx-request'); $('#sales_per_day_chart_wrapper').empty();">refresh</button>
+                <div class="card analytics-card">
+                    <div class="card-header">
+                        <div class="row m-0">
+                            <div class="col-auto p-0">
+                                <h6 class="help m-0"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover focus" 
+                                    data-bs-html="true"
+                                    data-bs-content='This shows the analytics for Sales for the chosen site/campaign per day, made between the chosen dates.'><i class="fa-solid fa-circle-info"></i> Sales Per Day
+                                    <img  class="htmx-indicator invert" id="htmx-indicator-leads-and-bookings" src="{% static 'img/bars.svg' %}"/>
+                                </h6> 
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body" id="sales_per_day_card_body">
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-12 analytics_col graph_col">
+                <button hidden id="refresh_calls_made_per_day" class="refresh_date_specific_analytic" hx-trigger="load delay:0.3s, click delay:0.3s"
+                    hx-get="{%url 'get-calls-made-per-day' %}"
+                    hx-include="#start_date, #end_date, .non_site_dependant_analytics_filters, .site_dependant_analytics_filters, #graph_type_calls_made_per_day"
+                    hx-target="#calls_made_per_day_card_body"
+                    hx-indicator="#htmx-indicator-calls-made-per-day"
+                    hx-swap="innerHTML"
+                    onclick="$('#htmx-indicator-calls-made-per-day').addClass('htmx-request'); $('#calls_made_per_day_chart_wrapper').empty();">refresh</button>
+                <div class="card analytics-card">
+                    <div class="card-header">
+                        <div class="row m-0">
+                            <div class="col-auto p-0">
+                                <h6 class="help m-0"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover focus" 
+                                    data-bs-html="true"
+                                    data-bs-content="This shows the number of calls made per day for the chosen site and/or campaign (top left), between the times chosen (right)."><i class="fa-solid fa-circle-info"></i> Calls Made Per Day 
+                                    <img  class="htmx-indicator invert" id="htmx-indicator-calls-made-per-day" src="{% static 'img/bars.svg' %}"/>
+                                </h6> 
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body" id="calls_made_per_day_card_body">
+                    </div>
+                </div>
+            </div>
+        </div>         
     </div> 
-    
+</div> 
 </span>

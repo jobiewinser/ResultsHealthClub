@@ -1,5 +1,5 @@
 {%load core_tags%}
-{%if request.user.profile.company.subscription == 'pro'%}
+{%if minimum_site_subscription_level_in_query.analytics_numerical|to_int == 2%}
 <div class="row">
     <div class="col p-0">
     </div>
@@ -14,15 +14,23 @@
                 <h5>{{opportunities}} Leads</h5>
             </div>
         </div>
-        <div class="row" style="color:green">
+        <div class="row text-success">
             <div class="col center">
-                Closed
+                Sold
             </div>
             <div class="col center">
-                {{closed_opportunities}}
+                {{sold_opportunities}}
             </div>
         </div>
-        <div class="row" style="color:grey">
+        <div class="row text-primary">
+            <div class="col center">
+                Booked
+            </div>
+            <div class="col center">
+                {{booked_opportunities}}
+            </div>
+        </div>
+        <div class="row text-secondary">
             <div class="col center">
                 Live
             </div>
@@ -30,7 +38,7 @@
                 {{live_opportunities }}
             </div>
         </div>
-        <div class="row" style="color:red">
+        <div class="row text-danger">
             <div class="col center">
                 Lost
             </div>
@@ -45,15 +53,23 @@
                 <h5>£{{opportunities_value|floatformat:2}}</h5>
             </div>
         </div>
-        <div class="row" style="color:green">
+        <div class="row text-success">
             <div class="col center">
-                Closed
+                Sold
             </div>
             <div class="col center">
-                £{{closed_value|floatformat:2}}
+                £{{sold_value|floatformat:2}}
             </div>
         </div>
-        <div class="row" style="color:grey">
+        <div class="row text-primary">
+            <div class="col center">
+                Booked
+            </div>
+            <div class="col center">
+                £{{booked_value|floatformat:2}}
+            </div>
+        </div>
+        <div class="row text-secondary">
             <div class="col center">
                 Live
             </div>
@@ -61,7 +77,7 @@
                 £{{live_value|floatformat:2}}
             </div>
         </div>
-        <div class="row" style="color:red">
+        <div class="row text-danger">
             <div class="col center">
                 Lost
             </div>
@@ -71,10 +87,12 @@
         </div>
     </div>
     <div class="col center">
-        <h5>Conversion Rate</h5>
-        <h6>{{conversion_rate|floatformat:2}}%</h6>
+        <h5 class="mt-2">Sold Rate</h5>
+        <h6 class="text-success">{{sold_rate|floatformat:2}}% <br>of booked leads were sold</h6>
+        <h5>Booked Rate</h5>
+        <h6 class="text-primary">{{booked_rate|floatformat:2}}% <br>of leads were booked</h6>
     </div>
 </div>
 {%else%}
-<small>Extra analytics can be unlocked through a <i class="fa-solid fa-rectangle-pro"></i> subscription!</small>
+One of the sites in your query has a <b>{{minimum_site_subscription_level_in_query.get_name_display}}</b> subscription. This analytics metric requires a <b><i class="fa-solid fa-rectangle-pro"></i></b> subscription for all sites in the query.
 {%endif%}

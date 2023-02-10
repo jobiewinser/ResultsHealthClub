@@ -22,6 +22,7 @@ urlpatterns = [
     path('configuration/whatsapp-templates/', whatsappviews.WhatsappTemplatesView.as_view(), name='whatsapp-templates'),
     path('configuration/whatsapp-template/<str:template_pk>/', whatsappviews.WhatsappTemplatesEditView.as_view(), name='whatsapp-template'),
     path('configuration/whatsapp-template-readonly/<str:template_pk>/', whatsappviews.WhatsappTemplatesReadOnlyView.as_view(), name='whatsapp-template-readonly'),
+    path('configuration/whatsapp-template-import/<str:template_pk>/', whatsappviews.WhatsappTemplatesImportView.as_view(), name='whatsapp-template-import'),
 
 
     path('configuration/whatsapp-template-create/<str:whatsapp_business_account_pk>/', whatsappviews.WhatsappTemplatesCreateView.as_view(), name='whatsapp-template-create'),

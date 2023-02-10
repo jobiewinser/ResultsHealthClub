@@ -1,9 +1,10 @@
-<button class="btn btn-space btn-{%if lead.sold%}success{%else%}light{%endif%} btn-sm nowrap" id="sold_{{lead.pk}}"
+
+<button class="btn btn-space {%if lead.active_sales_qs.exists%}btn-success{%else%}btn-secondary{%endif%} btn-sm nowrap pe-2" id="sold_{{lead.pk}}"
 {%if demo and not request.user.is_superuser%}disabled{%endif%}
 data-bs-toggle="popover" 
 data-bs-trigger="hover focus" 
 data-bs-placement="top"
-data-bs-content="{%if lead.sold%}Mark this lead as not sold{%else%}Mark this lead as sold{%endif%}"
+data-bs-content="{%if lead.active_sales_qs.exists%}Mark this lead as not sold{%else%}Mark this lead as sold{%endif%}"
     {% comment %} hx-indicator=".top-htmx-indicator" hx-target="#row_{{lead.pk}}"
     hx-include="#lead_pk_{{lead.pk}}"
     hx-post="{% url 'mark-sold' %}" 
@@ -11,3 +12,17 @@ data-bs-content="{%if lead.sold%}Mark this lead as not sold{%else%}Mark this lea
     hx-swap="outerHTML" hx-trigger="click"      {% endcomment %}
 onclick="htmx.ajax('POST', '{% url 'mark-sold' %}', {target:'#row_{{lead.pk}}', swap:'outerHTML', values:htmx.values(htmx.find('#lead_pk_{{lead.pk}}'))})"
 ><i class="fa-regular fa-sterling-sign"></i> Sold {%if demo and not request.user.is_superuser%}(Demo, Disabled){%endif%}</button>
+
+<ul class="dropdown-menu">
+    <li>
+        <a class="dropdown-item" href="#"
+            onclick="htmx.ajax('GET', '{% url 'campaign-lead-get-modal-content'%}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'mark_sold','lead_pk':'{{lead.pk}}'}})">
+            Mark as sold by another user
+        </a>
+    </li>
+</ul>
+
+<button class="btn btn-space {%if lead.active_sales_qs.exists%}btn-success{%else%}btn-secondary{%endif%} btn-sm nowrap ps-1" id="sold_{{lead.pk}}_dropdown"
+    data-bs-toggle="dropdown" aria-expanded="false">
+    <i class="fa-solid fa-chevron-down"></i>
+</button>

@@ -7,7 +7,7 @@
             {%for campaign_category in site.campaigncategory_set.all%}
                 <li>{{campaign_category.name}}</li>
             {%empty%}
-                <li>No Templates to show</li>
+                <li>No Categories</li>
             {%endfor%}
         </ul>
     </div>

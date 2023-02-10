@@ -30,36 +30,36 @@
     {%endif%}
     {%endfor%}
     
-    {%if request.user.profile.company.subscription == 'pro'%}
+    {%if request.user.profile.company.has_pro_subscription_site%}
     <span id="next_chat_window"></span>
 
     {%if whatsappnumber%}
     {%include 'messaging/message_list.html'%}
     {%endif%}
-    <div class="card p-0 messaging_site_accordion" id="" style="margin-top: auto;" hx-ws="connect:/ws/message_count/{{request.user.profile.company.pk}}/">
+    <div class="card p-0 messaging_site_accordion" id="messaging_site_accordion" style="margin-top: auto;" hx-ws="connect:/ws/message_count/{{request.user.profile.company.pk}}/">
 
-        <div class="card-header chat_bottom_header ps-2 collapsed" data-bs-toggle="collapse" data-bs-target="#siteCollapse" aria-expanded="false" aria-controls="siteCollapse">
+        <div class="card-header chat_bottom_header ps-2 {%if not whatsappnumber%}collapsed{%endif%}" data-bs-toggle="collapse" data-bs-target="#siteCollapse" aria-expanded="false" aria-controls="siteCollapse">
             <span class="primary_td_layer text-white">
                 <span class="badge bg-light badge-sm me-1"><i class="fa fa-whatsapp me-1"></i><span class="company_message_count">{{request.user|company_outstanding_whatsapp_messages_tag}}</span></span>Whatsapp 
             </span>
         </div>
-        <div class="card-body collapse p-0" id="siteCollapse">
+        <div class="card-body collapse p-0 {%if whatsappnumber%}show{%endif%}" id="siteCollapse">
             <div class="htmx-indicator disconnected_indicator message_count_disconnected_indicator">
-                <b>Connecting</b> <img class="invert" src="https://htmx.org/img/bars.svg">
+                <b>Connecting</b> <img class="invert" src="{% static 'img/bars.svg' %}">
             </div>
             <div class="accordion accordion-flush" id="accordionFlushExample" style="margin-top: auto;">
                 {%with request.user|get_allowed_site_chats_for_user_tag as chat_sites%}
                 {%for site in chat_sites%}   
                     <div class="accordion-item">
                     <h2 class="accordion-header" id="flush-headingOne">
-                        <button class="accordion-button no-chevron-button ps-2 {%if whatsappnumber.site == site%} active{%else%} collapsed{%endif%}" type="button" data-bs-toggle="collapse" data-bs-target="#site_collapse_{{site.pk}}" aria-expanded="false" aria-controls="site_collapse_{{site.pk}}" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
-                            <span class="badge bg-dark badge-sm me-1"><i class="fa fa-whatsapp me-1"></i><span class="site_message_count_{{site.pk}}">{{site|site_outstanding_whatsapp_messages_tag:request.user}}</span></span>  <b>{{site.name}}</b>
+                        <button {%if not site.subscription.whatsapp_enabled%}disabled{%else%}data-bs-toggle="collapse" data-bs-target="#site_collapse_{{site.pk}}" aria-expanded="false" aria-controls="site_collapse_{{site.pk}}"{%endif%} class="accordion-button no-chevron-button ps-2 {%if whatsappnumber.site == site%} active{%else%} collapsed{%endif%}" type="button" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
+                            <span class="badge bg-dark badge-sm me-1"><i class="fa fa-whatsapp me-1"></i><span class="site_message_count_{{site.pk}}">{{site|site_outstanding_whatsapp_messages_tag:request.user}}</span></span>  <b class="me-1">{{site.name}}</b> <small>({{site.subscription.get_name_display}})</small> 
                         </button>
                     </h2>
                     <div id="site_collapse_{{site.pk}}" class="accordion-collapse collapse {%if whatsappnumber.site == site%} show{%endif%}" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
                         <div class="accordion-body" style="white-space: nowrap; overflow: hidden;">
                             {%for chat_whatsappnumber in site.return_phone_numbers%}
-                                <button class="btn btn-sm btn-secondary elipses-overflow {%if chat_whatsappnumber == whatsappnumber%}active{%endif%} btn-xs" style="max-width:125px"
+                                <button class="btn {%if chat_whatsappnumber == whatsappnumber%}btn-primary active{%else%}btn-secondary{%endif%} elipses-overflow  btn-sm" style="max-width:125px"
                                 hx-get="{%url 'message-list'%}"
                                 hx-target="#chat_bottom"
                                 hx-swap="outerHTML"
@@ -67,7 +67,7 @@
                                 hx-vals='{"site_pk": "{{site.pk}}", "whatsappnumber_pk": "{{chat_whatsappnumber.pk}}"}'
                                 hx-trigger="click"
                                 
-                                ><span class="badge bg-dark badge-sm me-1"><i class="fa fa-whatsapp me-1"></i><span class="whatsappnumber_message_count_{{chat_whatsappnumber.pk}}">{{chat_whatsappnumber|whatsappnumber_outstanding_whatsapp_messages_tag:request.user}}</span></span>
+                                ><span class="badge bg-dark badge-sm m-1"><i class="fa fa-whatsapp me-1"></i><span class="whatsappnumber_message_count_{{chat_whatsappnumber.pk}}">{{chat_whatsappnumber|whatsappnumber_outstanding_whatsapp_messages_tag:request.user}}</span></span>
                                     <b class="phone_display_{{chat_whatsappnumber.pk}}">{{chat_whatsappnumber}}</b></button>
                                 <br>
                             {%endfor%}
@@ -80,7 +80,7 @@
         </div>
     </div>
     {%else%}
-    <div class="card p-0 messaging_site_accordion" id="" style="margin-top: auto;" hx-ws="connect:/ws/message_count/{{request.user.profile.company.pk}}/">
+    <div class="card p-0 messaging_site_accordion" id="messaging_site_accordion" style="margin-top: auto;" hx-ws="connect:/ws/message_count/{{request.user.profile.company.pk}}/">
         <div class="card-header chat_bottom_header ps-2 collapsed" data-bs-toggle="collapse" data-bs-target="#siteCollapse" aria-expanded="false" aria-controls="siteCollapse">
             <span class="primary_td_layer text-white">
                 <i class="fa fa-whatsapp" aria-hidden="true"></i> Whatsapp <i class="fa-solid fa-rectangle-pro"></i>

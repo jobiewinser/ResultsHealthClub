@@ -6,7 +6,7 @@ from django.shortcuts import render
 from campaign_leads.models import Campaignlead
 from core.models import Site, WhatsappNumber, Contact, AttachedError
 from core.user_permission_functions import get_allowed_site_chats_for_user, get_user_allowed_to_use_site_messaging
-from core.views import get_site_pk_from_request
+from core.views import get_site_pks_from_request_and_return_sites
 from whatsapp.models import WhatsAppMessage, WhatsappMessageImage
 from django.contrib.auth.decorators import login_required
 from core.templatetags.core_tags import seconds_until_hours_passed
@@ -21,7 +21,7 @@ def message_list(request, **kwargs):
     context = {}
     whatsappnumber = None
     customer_number = request.GET.get('customer_number') 
-    site = Site.objects.filter(pk=request.GET.get('site_pk')).first()
+    site = Site.objects.filter(pk=request.GET.get('site_pk')).exclude(active=False).first()
     context['chat_site'] = [site]    
     whatsappnumber_pk = request.GET.get('whatsappnumber_pk')
     if whatsappnumber_pk:
@@ -33,7 +33,7 @@ def message_list(request, **kwargs):
             whatsappnumber = latest_message.whatsappnumber
     if whatsappnumber:
         context['whatsappnumber'] = whatsappnumber
-        context['messages'] = whatsappnumber.get_latest_messages()
+        context['messages'] = whatsappnumber.get_latest_messages(query={"hide_auto":True})
     # if get_user_allowed_to_use_site_messaging(request.user, site):
     return render(request, "messaging/messaging_list.html", context)
 
@@ -57,7 +57,7 @@ def message_window(request, **kwargs):
         context["customer_number"] = kwargs.get('customer_number')
         context['whatsappnumber'] = whatsappnumber
         return render(request, "messaging/message_window_htmx.html", context)
-    return HttpResponse("", status=500)
+    return HttpResponse( status=500)
 
 @login_required
 def get_messaging_list_row(request, **kwargs):
@@ -127,9 +127,7 @@ def get_modal_content(request, **kwargs):
     try:
         request.GET._mutable = True
         context = {}
-        site_pk = get_site_pk_from_request(request)
-        if site_pk:
-            request.GET['site_pk'] = site_pk
+        context['sites'] = get_site_pks_from_request_and_return_sites(request)
 
 
         whatsapp_message_image_pk = request.GET.get('whatsapp_message_image_pk')
@@ -140,12 +138,12 @@ def get_modal_content(request, **kwargs):
         if lead_pk:
             lead = Campaignlead.objects.get(pk=lead_pk)
             context['lead'] = lead
-            if request.GET.get('template_name', None) == "message_window_modal":
+            # if request.GET.get('template_name', None) == "message_window_modal":
                 # whatsappnumber = lead.campaign.site.default_number
-                customer_number = lead.whatsapp_number
-                context['customer_number'] = customer_number
-                context['whatsappnumber'] = whatsappnumber
-                context['messages'] = WhatsAppMessage.objects.filter(customer_number=customer_number, whatsappnumber=whatsappnumber).order_by('datetime')
+                # customer_number = lead.whatsapp_number
+                # context['customer_number'] = customer_number
+                # context['whatsappnumber'] = whatsappnumber
+                # context['messages'] = WhatsAppMessage.objects.filter(customer_number=customer_number, whatsappnumber=whatsappnumber).order_by('datetime')
                 # context['messages'] = WhatsAppMessage.objects.filter(customer_number=customer_number, whatsappnumber=whatsappnumber).order_by('-datetime')[:20:-1]
         
         if request.user.is_authenticated:
@@ -172,7 +170,7 @@ def get_message_list_body(request, **kwargs):
         context = {}
         whatsappnumber = WhatsappNumber.objects.get(pk=request.GET.get('whatsappnumber_pk')) 
         context['whatsappnumber'] = whatsappnumber
-        context['messages'] = whatsappnumber.get_latest_messages(query={"search_string":request.GET.get('search_string'), "received":request.GET.get('received')})
+        context['messages'] = whatsappnumber.get_latest_messages(query={"search_string":request.GET.get('search_string'), "received":request.GET.get('received'), "hide_auto":request.GET.get('hide_auto', 'off') == 'on'})
         return render(request, "messaging/htmx/message_list_body.html", context)   
     except Exception as e:
         logger.debug("get_more_messages Error "+str(e))
@@ -186,7 +184,7 @@ def get_more_message_list_rows(request, **kwargs):
         whatsappnumber = WhatsappNumber.objects.get(pk=request.GET.get('whatsappnumber_pk'))
         earliest_datetime_timestamp = request.GET.get('earliest_datetime_timestamp')        
         context['whatsappnumber'] = whatsappnumber
-        context['messages'] = whatsappnumber.get_latest_messages(after_datetime_timestamp=earliest_datetime_timestamp,query={"search_string":request.GET.get('search_string'), "received":request.GET.get('received')})
+        context['messages'] = whatsappnumber.get_latest_messages(after_datetime_timestamp=earliest_datetime_timestamp,query={"search_string":request.GET.get('search_string'), "received":request.GET.get('received'), "hide_auto":request.GET.get('hide_auto', 'off') == 'on'})
         return render(request, "messaging/htmx/message_list_rows.html", context)   
     except Exception as e:
         logger.debug("get_more_messages Error "+str(e))
@@ -209,6 +207,15 @@ def get_more_message_chat_rows(request):
         logger.debug("get_more_messages Error "+str(e))
         #return HttpResponse(e, status=500)
         raise e
+@login_required
+def mark_read(request):
+    try:
+        WhatsAppMessage.objects.filter(pk=request.POST.get('message_pk')).update(read=True)
+        return HttpResponse("", status=200) 
+    except Exception as e:
+        logger.debug("mark_read Error "+str(e))
+        #return HttpResponse(e, status=500)
+        raise e
         
 
 # @login_required
@@ -217,7 +224,7 @@ def get_more_message_chat_rows(request):
 #         request.session['open_chat_conversation_customer_number'] = request.session.get('open_chat_conversation_customer_number', []).remove(request.POST.get('customer_number'))
 #     except Exception as e:
 #         print("clear_chat_from_session error", str(e))
-#     return HttpResponse("", "text", 200)
+#     return HttpResponse( "text", 200)
     
 
 

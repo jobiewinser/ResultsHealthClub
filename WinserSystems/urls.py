@@ -28,6 +28,7 @@ urlpatterns = [
     path('', include('active_campaign.urls')),
     path('', include('analytics.urls')),
     path('', include('calendly.urls')),
+    path('', include('stripe_integration.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     # path('twilio/', include('twilio.urls')),
     url(r'^hijack/', include('hijack.urls', namespace='hijack')),

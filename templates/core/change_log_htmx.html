@@ -4,6 +4,129 @@
     </div>
     <div class="col-8">
         <div class="m-3 card p-2">
+            <h5>V0.8 - 6 January 2022</h5>
+            <ul>
+                <li>
+                    Added payment system using stripe. Companies can now officially start signing up once I put the site live.
+                </li>              
+                <li>
+                    Added lots of backend work around subscriptions.
+                </li>                
+                <li>
+                    Analytics now bases what you are allowed to do on which sites you've queried (permissions and when the sites were created).
+                </li>           
+                <li>
+                    Further work on the site/company config pages. Getting ready for potential subscriptions coming in eventually (hopefully).
+                </li>                   
+                <li>
+                    Added backend code for grandfathering in prices. If i decide to honor the original prices for an extended period of time, the system can handle that.
+                </li>                  
+                <li>
+                    When opening the leads board, bookings or analytics, it correctly fills the query with your default site, campaign category (if you have one) and campaign (if you have one).
+                </li>                
+                <li>
+                    Much less wording is hardcoded around subscriptions and how many profiles you are allowed etc due to the backend work on subscriptions.
+                </li>                    
+                <li>                            
+                    <small>
+                        Bugs:                    
+                        <ul>
+                            <li>
+                               More whatsapp template error messages sent from Meta are now handled correctly (still more work needed to handle all possible errors).
+                            </li>
+                            <li>
+                               UNRESOLVED. Found a bug where dragging and selecting text over the leads board then dragging at the same time as a lead moving from another user's actions causes the board to break. This will likely be fixed when I get around to remaking the websockets for the board. 
+                            </li>
+                        </ul>
+                    </small>
+                </li>
+            </ul>
+            <hr>
+            <h5>V0.7 - 19 December 2022</h5>
+            <ul>
+                <li>
+                    Replying to a message marks all messages sent by that customer to your site as read.
+                </li>
+                <li>
+                    "Show all received" toggle on message window is now "Show all unread".
+                </li>
+                <li>
+                    Unread messages can now be marked as read.
+                </li>
+                <li>
+                    Added feedback forms access from the top nav bar.
+                </li>
+                <li>
+                    Sales can now be assigned to other users i.e employee 1 can mark a lead as sold by employee 2.
+                </li>
+                <li>
+                    Sent templates are now show formatted with a header, body and footer in the chat window.
+                </li>
+                <li>
+                    When sending a template manually <i class="fa fa-pencil" aria-hidden="true"></i> buttons, a preview is now show before sending.
+                </li>
+                <li>
+                    Started on payment system so public can actually use the system.
+                </li>
+                <li>
+                    Made site, campaign category and campaign select boxes allow multiple queries where applicable.
+                </li>
+                {% comment %} <li>
+                    Made warning - such as message failed to send - flash the warning triangle, to make it more clear.
+                </li> {% endcomment %}
+                <li>
+                    Added warning to booking row, similar to lead cards.
+                </li>
+                <li>
+                    HUGE overhaul on the leads board that was needed for switching the select boxes to allow choosing multiple sites etc (instead of just show all sites).
+                </li>
+                <li>
+                    A sites users can now be deactivated and reactivated (not deleted, unless specifically requested by the company).
+                </li>
+                <li>
+                    Added a top nav section similar to profile for the company you're a part of. Also added the site under your profile name.
+                </li>
+                <li>
+                    Changed the subscription concept. Each site now has a subscription, allowing companies to mix and match (this also makes the payment subscriptions easier to set up).                
+                    <ul>
+                        <li>
+                            This means that the Pro only analytics are disabled unless only a pro subscription sites are chosen in the query (it gives a warning if incorrectly used).
+                        </li>
+                        <li>
+                            Inline with this change, profiles are now site focussed, not company focussed. Meaning that users can be managed through the site configuration (this is due to the different site subscriptions being allowed different numbers of profiles).
+                        </li>
+                        <li>
+                            Subscriptions are now managed through the site configuration page. The subscription level change wizard details the changes that will occur when you swap tier. It will also prompt you to deactivate accounts to meet the new limit if lower.
+                        </li>
+                        <li>
+                            Each company is only allowed 1 Free site. Technically a company could abuse this to created lots of companies with free sites instead of paying for a basic subscription. They will however lose the ability to compare sites with analytics easily a dn management tools will be harder to use.
+                        </li>
+                        <li>
+                            Previously available site configuration tools are now moved to an advanced settings card on the same page.
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <small>
+                        Bugs:                    
+                        <ul>
+                            <li>
+                                Manual bookings are now validated client and server side.
+                            </li>
+                            <li>
+                                Templates manually sent with <i class="fa fa-pencil" aria-hidden="true"></i> buttons now show correctly in the chat window.
+                            </li>
+                            <li>
+                                Hover information windows shouldn't stick in the top right or when swapping page through a button click.
+                            </li>
+                            <li>
+                                I now normalise the customer numbers to use 078 etc, not 4478.
+                            </li>
+                        </ul>
+                    </small>
+                </li>
+            </ul>
+            <hr>
             <h5>V0.6 - 16 December 2022</h5>
             <ul>
                 <li>
@@ -170,7 +293,7 @@
                     Added ability for <i class="fa-solid fa-rectangle-pro"></i> to add additional sites themselves.
                 </li>
                 <li>
-                    Moved some graphs around and combined some graphs together such as "Pipeline & Conversion Rate" and "Leads to Bookings and Sales".
+                    Moved some graphs around and combined some graphs together such as "Pipeline & Conversion Rate", "Leads Per Day", "Bookings Per Day", "Sales Per Day".
                 </li>
                 <li>
                     Moved some graphs around and combined some graphs together.

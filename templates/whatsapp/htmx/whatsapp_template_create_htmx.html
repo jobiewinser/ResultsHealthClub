@@ -5,18 +5,14 @@
 {%block template_name%}
 <h5>Template Name</h5>
 <div class="row"
-data-bs-toggle="popover" 
-data-bs-trigger="hover focus" 
-data-bs-html="true" 
-data-bs-placement="top"
-data-bs-title="What does this do?"
-data-bs-content="
-<p>
-    The template name does not appear for recipients, it's for your/Whatsapp's reference.
-</p>
-">
+    data-bs-toggle="popover" 
+    data-bs-trigger="hover focus" 
+    data-bs-html="true" 
+    data-bs-placement="top"
+    data-bs-title="What does this do?"
+    data-bs-content="This it the name of the template sent to whatsapp. It must only use lowercase letters and underscores! <br><br><small>e.g <b>my_first_message_template</b></small>">
     <div class="col">
-        <input class="form-control" id="template_name" value="{{template.name}}" name="template_name">
+        <input class="form-control" id="template_name" oninput="validateWhatsappText(this);" value="{{template.name}}" name="template_name">
     </div>
 </div>
 {%endblock template_name%}

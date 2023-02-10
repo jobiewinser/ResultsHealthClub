@@ -26,7 +26,7 @@ urlpatterns = [
     path('refresh-lead-article/<str:lead_pk>/', campaignleadshtmx.refresh_lead_article, name='refresh-lead-article' ),
     path('refresh-booking-row/<str:lead_pk>/', campaignleadshtmx.refresh_booking_row, name='refresh-booking-row' ),
     path('toggle-claim-lead/<str:lead_pk>/', campaignleadsviews.toggle_claim_lead, name='toggle-claim-lead' ),
-    path('get-leads-column-meta-data/', campaignleadshtmx.get_leads_column_meta_data, name='get-leads-column-meta-data' ),
+    # path('get-leads-column-meta-data/', campaignleadshtmx.get_leads_column_meta_data, name='get-leads-column-meta-data' ),
     # path('create-campaign-lead/', campaignleadshtmx.create_campaign_lead, name='create-campaign-lead' ),
     
     path('get-campaign/', campaignleadsviews.get_campaigns, name='get-campaign'),
@@ -34,6 +34,8 @@ urlpatterns = [
     path('add-manual-booking/', campaignleadshtmx.add_manual_booking, name='add-manual-booking' ),
     path('mark-arrived/', campaignleadshtmx.mark_arrived, name='mark-arrived' ),
     path('mark-sold/', campaignleadshtmx.mark_sold, name='mark-sold' ),
+    # path('mark-sales-archived/', campaignleadshtmx.mark_sales_archived, name='mark-sales-archived' ),
+    
     path('create-lead-note/', campaignleadshtmx.create_lead_note, name='create-lead-note' ),
     path('edit-lead/', campaignleadshtmx.edit_lead, name='edit-lead' ),
     path('add-campaign-category/', campaignleadshtmx.add_campaign_category, name='add-campaign-category' ),
@@ -58,5 +60,6 @@ urlpatterns = [
     path('configuration/campaign-assign-campaign-category/', campaignleadsviews.campaign_assign_campaign_category_htmx, name='campaign-assign-campaign-category'), 
     path('configuration/campaign-assign-whatsapp-business-account/', campaignleadsviews.campaign_assign_whatsapp_business_account_htmx, name='campaign-assign-whatsapp-business-account'), 
     path('configuration/campaign-assign-product_cost/', campaignleadsviews.campaign_assign_product_cost_htmx, name='campaign-assign-product_cost'), 
+    path('get-contacts-for-campaign/', campaignleadshtmx.get_contacts_for_campaign, name='get-contacts-for-campaign'), 
     
 ]

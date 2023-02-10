@@ -5,15 +5,15 @@
             
             <div class="form-floating m-1">     
                 <select class="form-select campaign_bookings_inputs" name="site_pk" id="campaign_site">
-                    {%for site in request.user.profile.sites_allowed.all%}
-                    <option {%if site.pk == request|get_key_in_get_or_post:'site_pk'|str_to_int %}selected{%endif%} value="{{site.pk}}">{{site.name}}</option>
+                    {%for site in request.user.profile.active_sites_allowed%}
+                    <option {%if site.pk|to_str == request|get_key_in_get_or_post:'site_pk' %}selected{%endif%} value="{{site.pk}}">{{site.name}}</option>
                     {%endfor%}
                 </select>
                 <label for="campaign_site">For Site<span class="required">*</span></label>
             </div>
             
             <div class="form-floating m-1">
-                <input name="first_name" id="campaign_first_name" class="form-control campaign_bookings_inputs"/>
+                <input name="first_name" maxlength="25" id="campaign_first_name" class="form-control campaign_bookings_inputs"/>
                 <label for="campaign_first_name">Customer Name<span class="required">*</span></label>
             </div>
             

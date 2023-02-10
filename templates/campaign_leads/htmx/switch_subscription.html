@@ -1,0 +1,92 @@
+{%load core_tags%}
+
+{% with site.company|get_subscription_sites_tag:switch_subscription.numerical|to_int as subscription_sites %}
+<div class="generic_modal_contents">
+    <div class="card card-highlight m-1 p-3">
+        {% comment %} <p>
+            You currently have a <b>{{site.subscription.get_name_display}}</b> subscription £{{site.subscription.cost|floatformat:2}} p/m (for this site)
+        </p> {% endcomment %}
+        <div class="row">
+            <div class="col">
+                <p class="text-{{switch_subscription.bootstrap_colour}}">
+                    Switching to <b>{{switch_subscription.get_name_display}}</b> subscription £{{switch_subscription.cost|floatformat:2}} p/m (for this site)
+                </p>
+            </div>
+            <div class="col-md-auto">
+                <button class="btn btn-primary"
+                    hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
+                    hx-vals='{"numerical":"{{switch_subscription.numerical}}","site_pk":"{{site.pk}}"}'
+                    hx-get="{% url 'switch-subscription-begin'%}" 
+                    hx-push-url="false"
+                    hx-swap="innerHTML" hx-trigger="click">
+                    Proceed
+                </button>
+            </div>
+        </div>
+        <hr>
+            {% if subscription_sites >= switch_subscription.max_of_this_type %}
+            <p class="text-danger">
+                You already have a Free site for your company, you will have to deactivate that site or this one. as you are only allowed 1.
+                {%if site.subscription.numerical|to_int == 2%}
+                    Alternatively <a hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
+                                    hx-vals='{"template_name": "switch_subscription","switch_subscription":1,"site_pk":"{{site.pk}}"}'
+                                    hx-get="{% url 'campaign-lead-get-modal-content'%}" 
+                                    hx-push-url="false" href='#'
+                                    hx-swap="innerHTML" hx-trigger="click">switch to a basic subscription instead</a>.
+                {%endif%}
+            </p>
+            {%else%}
+            
+            <p>
+                You will:
+            </p>
+            <ul>
+                <li>
+                    Be allowed {{switch_subscription.max_profiles_string}} profiles on this site.
+                </li>
+                
+                <li>
+                    Have access to {{switch_subscription.analytics_string}}.
+                </li>
+                {% if not switch_subscription.whatsapp_enabled and site.subscription.whatsapp_enabled  %}
+                <li>
+                    Need to deactivate your Whatsapp integration for this site. If you need help with this, please contact: <a href='mailto:jobie@winser.uk'>jobie@winser.uk</a>. Your phone number won't be available to use within your Whatsapp phone/desktop app until it is removed from your "Whatsapp Business Account" <a target="_blank" href="https://business.facebook.com/settings/whatsapp-business-accounts/">Here</a>.
+                </li>
+                {% elif switch_subscription.whatsapp_enabled and not site.subscription.whatsapp_enabled  %}
+                <li>
+                    Gain access to Whatsapp automation.
+                </li>
+                {%endif%}
+            </ul>
+        {%endif%}
+
+        <div class="row mt-3">
+            <div class="col">
+            </div>
+            <div class="col-auto">
+
+                {% if switch_subscription.whatsapp_enabled and not site.subscription.whatsapp_enabled  %}
+                <br>
+                <div class="alert alert-info center">
+                    <small>
+                        <p>
+                            We are now rolling out the <b>Pro</b> tier. It requires some extra configuration with your Meta (Whatsapp/Facebook) account to use the Whatsapp automation.
+                            If you are interested in upgrading, please contact: <a href='mailto:jobie@winser.uk'>jobie@winser.uk</a> or <a href='tel:+447872000364'>+44 7872 000364</a>.
+                            For the other features this subscription includes, feel free to upgrade anyways and we will get in contact with you about the Whatsapp automation.
+                        
+                            <b>We promise that it's worth it!</b>
+                        </p>
+                    </small>
+                </div>
+                {%else%}
+                {%endif%}
+            </div>
+            <div class="col">
+            </div>
+        </div>
+    </div>
+</div>
+{%endwith%}
+<span hx-swap-oob="true" id="generic_modal_title">
+    Switch subscription for {{site.name}}
+</span>

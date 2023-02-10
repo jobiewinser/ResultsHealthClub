@@ -6,6 +6,14 @@ function leadshandlehtmxbeforeRequest(evt){
     }
 }
 
+function leadshandlehtmxafterRequest(evt){
+    if (evt.detail.xhr.status == 200){
+        if (evt.detail.pathInfo.requestPath.includes("import-active-campaign-leads")){
+            $('#generic_modal').modal('hide');
+        }             
+    }
+}
+
 function leadshandlehtmxafterSwap(evt){
     if (evt.detail.xhr.status == 200){
         if (![undefined, ''].includes(evt.detail.pathInfo.requestPath)){
@@ -16,7 +24,15 @@ function leadshandlehtmxafterSwap(evt){
                 document.getElementById('notification2').play();
                 set_total_costs();
                 set_lead_counts();                
-            }
+            } else if (evt.detail.pathInfo.requestPath.includes("get-contacts-for-campaign")){
+                try{$('#import_contact_table').dataTable().fnDestroy()}catch{};
+                $('#import_contact_table').DataTable(            
+                {  
+                    order: [[ 2, 'desc' ]],
+                    iDisplayLength: 10
+                }
+                );        
+            }            
         }             
     }
 }
@@ -45,25 +61,26 @@ function filterLeads(searchInput){
 }
 }
 
-function handleDraggedItem(dragged_elem, drag_target){
-    // dragged_elem = $('#'+dragged_elem_id)
-    console.log(dragged_elem)
+function handleDraggedItem(dragged_elem, drag_target, newDraggableIndex){
+    dragged_elem.hide();
     var respStatus = $.ajax({
         type:'POST',
         url:'/new-call/'+dragged_elem.data('id')+'/'+$(drag_target).data("call-count")+'/'+$('#max_call_count').val()+'/',
         data:{'csrfmiddlewaretoken':csrftoken},
         success: function (data) {                
-            // $('#refresh_column_metadata').click()
-            snackbarShow('Successfully added call', 'success')
+            let articles_in_to_col = $(drag_target).find('article').length - 1 // -1 because there's a hidden article to stop the jittering when dragging cards;
+            if ((newDraggableIndex) + 1 < articles_in_to_col){
+                snackbarShow('Added call (moved to the bottom of the list)', 'success')
+            } else {                
+                snackbarShow('Added call', 'success')
+            }
         },
         error: function(XMLHttpRequest, textStatus, errorThrown) {
+            dragged_elem.show();
+            snackbarShow('Failed to add call', 'success')
         }
     })
-    let call_count = parseInt($(drag_target).data("call-count"));
-    let max_call_count = parseInt($('#max_call_count').val());
-    if (call_count > max_call_count) {
-        $('#add_column').click();
-    }
+    
 }
 
 function set_total_costs(){  

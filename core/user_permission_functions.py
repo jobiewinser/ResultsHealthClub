@@ -9,32 +9,46 @@ from core.models import FreeTasterLink, FreeTasterLinkClick, Profile, Site, What
 def get_available_sites_for_user(user):
     profile = user.profile
     if profile.role == 'a':
-        return Site.objects.filter(company=profile.company)
-    if profile.sites_allowed.all():
-        return profile.sites_allowed.all()
+        return Site.objects.filter(company=profile.company).exclude(active=False)
+    if profile.active_sites_allowed:
+        return profile.active_sites_allowed
     return Site.objects.none()
 
-def get_user_allowed_to_toggle_active_campaign(profile, site):
+def get_profile_allowed_to_toggle_active_campaign(profile, site):
     permissions = SiteProfilePermissions.objects.filter(profile=profile, site=site).first()
     if permissions:
         return permissions.toggle_active_campaign
     return False
-def get_user_allowed_to_edit_whatsapp_settings(profile, site):
+def get_profile_allowed_to_edit_whatsapp_settings(profile, site):
     permissions = SiteProfilePermissions.objects.filter(profile=profile, site=site).first()
     if permissions:
         return permissions.edit_whatsapp_settings
     return False
-def get_user_allowed_to_toggle_whatsapp_sending(profile, site):
+def get_profile_allowed_to_toggle_whatsapp_sending(profile, site):
     permissions = SiteProfilePermissions.objects.filter(profile=profile, site=site).first()
     if permissions:
         return permissions.toggle_whatsapp_sending
     return False
-def get_user_allowed_to_edit_site_configuration(profile, site):
+def get_profile_allowed_to_change_subscription(profile, site):
+    if site in profile.sites_allowed.all():
+        permissions, created = SiteProfilePermissions.objects.get_or_create(profile=profile, site=site)
+        return permissions.change_subscription
+    return False
+    
+def get_profile_allowed_to_edit_site_configuration(profile, site):
     permissions = SiteProfilePermissions.objects.filter(profile=profile, site=site).first()
     if permissions:
         return permissions.edit_site_configuration
     return False
-def get_user_allowed_to_view_site_configuration(profile, site):
+    
+def get_profile_allowed_to_edit_site_calendly_configuration(profile, site):
+    permissions = SiteProfilePermissions.objects.filter(profile=profile, site=site).first()
+    if permissions:
+        return permissions.edit_site_calendly_configuration
+    return False
+
+    
+def get_profile_allowed_to_view_site_configuration(profile, site):
     permissions = SiteProfilePermissions.objects.filter(profile=profile, site=site).first()
     if permissions:
         return permissions.view_site_configuration
@@ -55,6 +69,8 @@ def get_profile_allowed_to_edit_profile_permissions(user_profile, target_profile
     return False
 
 def check_if_profile_is_higher_authority_than_profile(user_profile, target_profile):
+    user_profile.save()
+    target_profile.save()
     # owners have authority over themselves
     if user_profile == target_profile and user_profile.role == 'a':
         return True
@@ -74,27 +90,27 @@ def check_if_profile_is_higher_authority_than_profile(user_profile, target_profi
 
 
 
-def get_user_allowed_to_edit_whatsappnumber(user, whatsappnumber):
-    #TODO
-    return True
+# def get_user_allowed_to_edit_whatsappnumber(user, whatsappnumber):
+#     #TODO
+#     return True
 
-def get_user_allowed_to_edit_template(user, template):
-    #TODO
-    return True
+# def get_user_allowed_to_edit_template(user, template):
+#     #TODO
+#     return True
 
 def get_user_allowed_to_use_site_messaging(user, site):
     #TODO
     return True
 
-def get_user_allowed_to_use_site_analytics(user, site):
-    #TODO
-    return True
+# def get_user_allowed_to_use_site_analytics(user, site):
+#     #TODO
+#     return True
 
 def get_allowed_site_chats_for_user(user):
     #TODO
     # return Site.objects.filter(pk__in=[user.profile.site.pk])
     # return Site.objects.filter(company=user.profile.site.company)
-    return user.profile.sites_allowed.all()
+    return user.profile.active_sites_allowed
 
 def get_user_allowed_to_send_from_whatsappnumber(user, whatsappnumber):
     #TODO
