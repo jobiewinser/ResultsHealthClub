@@ -264,16 +264,7 @@ class CampaignConfigurationView(TemplateView):
         #         self.request.GET['campaign_category_pk'] = campaign_category_pk
         #     except Exception as e:
         #         pass
-        campaign_category_pk = self.request.GET.get('campaign_category_pk', None)
-        if campaign_category_pk and not campaign_category_pk == 'all':
-            try:
-                context['campaign_category'] = CampaignCategory.objects.get(pk=campaign_category_pk)
-                campaigns = campaigns.filter(campaign_category=context['campaign_category'])
-                self.request.GET['site_pk'] = context['campaign_category'].site.pk
-                self.request.GET['campaign_category_pk'] = campaign_category_pk
-            except Exception as e:
-                pass
-        site_pk = get_site_pk_from_request(self.request)
+        site_pk = get_single_site_pk_from_request_or_default_profile_site(self.request)
         if site_pk and not site_pk == 'all':
             try:
                 campaigns = campaigns.filter(Q(site=None)|Q(site__pk=site_pk))
