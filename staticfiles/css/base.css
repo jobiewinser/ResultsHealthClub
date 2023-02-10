@@ -214,7 +214,7 @@ body * {
 .card-highlight{
     box-shadow: 0 0.25rem 0.75rem rgb(18 38 63 / 8%);
     background-color: #FFF !important;
-    border: none!important;
+    /* border: none!important; */
     border-radius: 7px;
 }
 
