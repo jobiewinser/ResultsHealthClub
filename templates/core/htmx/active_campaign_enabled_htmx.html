@@ -22,3 +22,7 @@
             class="form-check-input" name="active_campaign_leads_enabled" {%if site.active_campaign_leads_enabled%}checked{%endif%} type="checkbox">
         </div>
     </div>
+
+    {%if site_warning_section_swap%}
+    {%include 'templates/core/htmx/site_warning_section.html'%}
+    {%endif%}

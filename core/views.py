@@ -204,6 +204,7 @@ class SiteConfigurationView(TemplateView):
         context['get_stripe_subscriptions_and_update_models'] = context['site'].get_stripe_subscriptions_and_update_models()
         return context
     def post(self, request):
+        self.request.POST._mutable = True     
         # if settings.DEMO and not request.user.is_superuser:
         #     return HttpResponse(status=500)
         self.request.POST._mutable = True 
@@ -231,7 +232,7 @@ class SiteConfigurationView(TemplateView):
                     site.calendly_token = request.POST['calendly_token']        
                     site.save()
             context = get_site_configuration_context(request)
-            context.update({'advanced_settings_open':True})
+            request.GET['POST']['advanced_settings'] = True
             return render(request, 'core/htmx/site_configuration_htmx.html',context)
         return HttpResponse( status=200)
             

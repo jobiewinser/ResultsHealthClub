@@ -228,14 +228,14 @@
             
 
             <div class="card  w-100 mt-3">
-                <div class="card-header pointer" data-bs-toggle="collapse" data-bs-target="#collapseAdvancedSettings">
+                <div class="card-header pointer {%if not request.GET.advanced_settings and not request.POST.advanced_settings%}collapsed{%endif%}" data-bs-toggle="collapse" data-bs-target="#collapseAdvancedSettings">
                     <div class="row">
                         <div class="col-md-auto p-0">   
                             <h4>Advanced Settings</h4>
                         </div>
                     </div>
                 </div>
-                <div id="collapseAdvancedSettings" class="collapse {%if advanced_settings_open%}show{%endif%}" data-bs-parent="#accordion">
+                <div id="collapseAdvancedSettings" class="collapse {%if request.GET.advanced_settings or request.POST.advanced_settings%}show{%endif%}" data-bs-parent="#accordion">
                   <div class="card-body">
                     <div class="card card-highlight m-2">
                         <div class="card-header">
