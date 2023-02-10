@@ -14,7 +14,7 @@
                 <h5>{{opportunities}} Leads</h5>
             </div>
         </div>
-        <div class="row" style="color:green">
+        <div class="row text-success">
             <div class="col center">
                 Sold
             </div>
@@ -22,7 +22,7 @@
                 {{sold_opportunities}}
             </div>
         </div>
-        <div class="row" style="color:blue">
+        <div class="row text-primary">
             <div class="col center">
                 Booked
             </div>
@@ -30,7 +30,7 @@
                 {{booked_opportunities}}
             </div>
         </div>
-        <div class="row" style="color:grey">
+        <div class="row text-secondary">
             <div class="col center">
                 Live
             </div>
@@ -38,7 +38,7 @@
                 {{live_opportunities }}
             </div>
         </div>
-        <div class="row" style="color:red">
+        <div class="row text-danger">
             <div class="col center">
                 Lost
             </div>
@@ -53,7 +53,7 @@
                 <h5>£{{opportunities_value|floatformat:2}}</h5>
             </div>
         </div>
-        <div class="row" style="color:green">
+        <div class="row text-success">
             <div class="col center">
                 Sold
             </div>
@@ -61,7 +61,7 @@
                 £{{sold_value|floatformat:2}}
             </div>
         </div>
-        <div class="row" style="color:blue">
+        <div class="row text-primary">
             <div class="col center">
                 Booked
             </div>
@@ -69,7 +69,7 @@
                 £{{booked_value|floatformat:2}}
             </div>
         </div>
-        <div class="row" style="color:grey">
+        <div class="row text-secondary">
             <div class="col center">
                 Live
             </div>
@@ -77,7 +77,7 @@
                 £{{live_value|floatformat:2}}
             </div>
         </div>
-        <div class="row" style="color:red">
+        <div class="row text-danger">
             <div class="col center">
                 Lost
             </div>
@@ -88,9 +88,9 @@
     </div>
     <div class="col center">
         <h5 class="mt-2">Sold Rate</h5>
-        <h6 style="color:green">{{sold_rate|floatformat:2}}% <br>of booked leads were sold</h6>
+        <h6 class="text-success">{{sold_rate|floatformat:2}}% <br>of booked leads were sold</h6>
         <h5>Booked Rate</h5>
-        <h6 style="color:blue">{{booked_rate|floatformat:2}}% <br>of leads were booked</h6>
+        <h6 class="text-primary">{{booked_rate|floatformat:2}}% <br>of leads were booked</h6>
     </div>
 </div>
 {%else%}

@@ -108,7 +108,6 @@ def import_active_campaign_leads(request, **kwargs):
             contacts = active_campaign_api.list_contacts_by_id_list(active_campaign_contact_id_list)
             campaign = ActiveCampaign.objects.get(pk=request.POST.get('campaign_pk'))
             disabled_automated_messaging = request.POST.get('disabled_automated_messaging', 'false') == 'true'
-            print()
             for contact in contacts:
                 if not Campaignlead.objects.filter(active_campaign_contact_id=contact['id'], campaign=campaign).exclude(archived=True).exclude(sale__archived=False):
                     lead = Campaignlead()

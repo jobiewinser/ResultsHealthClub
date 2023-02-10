@@ -139,3 +139,5 @@ nano.save
 settings.py1
 .requirements.txt.swp
 # __init__.py
+
+staticfiles/admin

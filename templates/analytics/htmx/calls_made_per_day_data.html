@@ -51,7 +51,7 @@
                         {%for user, data_and_color_dict in data_set.items%}{
                             label: '{{user}}',
                             data: [{%for data_entry in data_and_color_dict.data%}'{{data_entry}}',{%endfor%}],
-                            backgroundColor: 'rgba({{data_and_color_dict.color}}, 0.8)',
+                            backgroundColor: 'rgba({{data_and_color_dict.color}}, 1.0)',
                             borderColor: 'rgba({{data_and_color_dict.color}}, 1)',
                             fill: true,
                             borderWidth: 1

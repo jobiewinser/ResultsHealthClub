@@ -64,5 +64,6 @@ urlpatterns = [
     path('accounts/register/', coreviews.RegisterNewCompanyView.as_view(), name='register'), 
 
     path('activate/<str:register_uuid>/<str:email>/', coreviews.activate, name='activate'),
+    path('change-theme/', coreviews.change_theme, name='change-theme'),
 
 ]

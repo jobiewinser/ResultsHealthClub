@@ -195,6 +195,8 @@ function basehandlehtmxafterRequest(evt){
             } else if (evt.detail.pathInfo.requestPath.includes("import-active-campaign-leads")){
                 $('#generic_modal').modal('hide');
                 snackbarShow(evt.detail.xhr.responseText, 'success')
+            }  else if (evt.detail.pathInfo.requestPath.includes("change-theme")){
+                snackbarShow(evt.detail.xhr.responseText, 'success')
             } 
             
             

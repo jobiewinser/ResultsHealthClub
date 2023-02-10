@@ -1,6 +1,6 @@
 {%load core_tags%}
 <div class="generic_modal_contents">
-    <div class="card card-white m-1 p-3">
+    <div class="card card-highlight m-1 p-3">
         <form hx-post="{%url 'add-site'%}" hx-trigger="submit" hx-indicator="#page_load_indicator" hx-target="#generic_modal_body">
             {% csrf_token %}
             <div class="row">

@@ -2,7 +2,7 @@
 
 {% with site.company|get_subscription_sites_tag:switch_subscription.numerical|to_int as subscription_sites %}
 <div class="generic_modal_contents">
-    <div class="card card-white m-1 p-3">
+    <div class="card card-highlight m-1 p-3">
         {% comment %} <p>
             You currently have a <b>{{site.subscription.get_name_display}}</b> subscription £{{site.subscription.cost|floatformat:2}} p/m (for this site)
         </p> {% endcomment %}

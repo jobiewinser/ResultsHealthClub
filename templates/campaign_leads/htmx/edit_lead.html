@@ -1,6 +1,6 @@
 {%load core_tags%}
 <div class="generic_modal_contents">
-    <div class="card card-white m-1 p-3">
+    <div class="card card-highlight m-1 p-3">
         <form hx-post="{%url 'edit-lead'%}" hx-trigger="submit" hx-indicator="#page_load_indicator" hx-swap="none">
             <input type="text" style="display:None" id="modal_lead_pk" name="lead_pk" value="{{lead.pk}}"/>
             {% csrf_token %}

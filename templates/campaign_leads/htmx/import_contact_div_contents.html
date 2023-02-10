@@ -9,7 +9,7 @@
         </small>
     </p>
 </div>
-<div class="card card-white">
+<div class="card card-highlight">
     <table class="table" id="import_contact_table">
         <thead>
             <tr>
@@ -62,8 +62,13 @@
             Import
         </button>
         {%if campaign.site.subscription.whatsapp_enabled%}
-        <button class="btn btn-light" name="disabled_automated_messaging" value="true" type="submit" {%if demo and not request.user.is_superuser%}disabled{%endif%}>
-            Import (disable Whatsapp Messages)
+        <button class="btn btn-secondary" name="disabled_automated_messaging" value="true" type="submit" {%if demo and not request.user.is_superuser%}disabled{%endif%} 
+        data-bs-html="true" 
+        data-bs-toggle="popover" data-bs-placement="top" 
+        data-bs-trigger="hover"
+        title="Import (disable Whatsapp Messages)"
+        data-bs-content="This will import these leads, but will prevent each one from receiving automatic messages in the future (unless reenabled)!">
+            Import (disable auto messages)
         </button>
         {%endif%}
     </div>

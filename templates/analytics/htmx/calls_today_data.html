@@ -57,7 +57,7 @@
                     datasets: [{
                         label: 'Sales',
                         data: [{%for profile_pk, data_dict in data_set.items%}'{{data_dict.data}}',{%endfor%}],
-                        backgroundColor: [{%for profile_pk, data_dict in data_set.items%}'rgba({{data_dict.color}},{%if graph_type == 'polarArea'%}0.5{%else%}0.8{%endif%})',{%endfor%}],
+                        backgroundColor: [{%for profile_pk, data_dict in data_set.items%}'rgba({{data_dict.color}},{%if graph_type == 'polarArea'%}0.5{%else%}1.0{%endif%})',{%endfor%}],
                         borderColor: [{%for profile_pk, data_dict in data_set.items%}'rgba({{data_dict.color}},1)',{%endfor%}],
                         fill: true,
                         borderWidth: 1

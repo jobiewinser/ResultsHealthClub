@@ -1,7 +1,7 @@
 {%load static tz core_tags user_permission_tags%}
 
 <span id="payment_methods_wrapper">
-    <div class="card card-white">
+    <div class="card card-highlight">
         <div class="card-header">
             Payment Methods on Stripe for {{site.name}}
         </div>
@@ -41,7 +41,7 @@
                                 });
                                 ">
                                 <div class="card-body">                                
-                                    <div class="card card-white m-2">
+                                    <div class="card card-highlight m-2">
                                         <form  hx-post="{%url 'add-stripe-payment-method-new-site-handler' %}"
                                             hx-target="#payment_methods_wrapper"
                                             hx-swap="#outerHTML"

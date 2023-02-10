@@ -1,7 +1,7 @@
 {%load core_tags%}
 
 <div class="generic_modal_contents">
-    <div class="card card-white m-1 p-3" style="">
+    <div class="card card-highlight m-1 p-3" style="">
       <div class="row">
         <div class="col">
             <div class="row">
@@ -24,7 +24,7 @@
                   {%endif%}
                 </div>
                 <div class="col-md-auto">
-                  <button class="btn btn-light"
+                  <button class="btn btn-secondary"
                       hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
                       {% if not site_subscription_change.subscription_to.max_profiles < site_subscription_change.subscription_from.max_profiles%}
                       hx-vals='{"template_name": "switch_subscription","switch_subscription":"{{site_subscription_change.subscription_to.numerical}}","site_pk":"{{site_subscription_change.site.pk}}"}'

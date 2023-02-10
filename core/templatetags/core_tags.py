@@ -88,7 +88,8 @@ def seconds_until_hours_passed_tag(dt, hours):
 @register.filter
 def percentage_to_opacity(percentage, average_out_opacity=0.9):
     try:
-        return ((percentage / 100) + average_out_opacity) / 2
+        return ((percentage / 100) + average_out_opacity)
+        # return ((percentage / 100) + average_out_opacity) / 2
     except:
         return 0.6
 @register.filter
@@ -383,3 +384,15 @@ def get_subscription_by_stripe_price_id(price_id):
 # @register.filter
 # def earliest_site_tag(site_qs):
 #     return site_qs.order_by('created').first()
+@register.filter
+def random_guid(anything):
+    return str(uuid.uuid4())
+
+@register.filter(name='display_phone')
+def display_phone(number_string, country=None):
+    """Convert a 11 character string into xxxxx xxxxxx."""
+    if not len(number_string) == 11:
+        return number_string
+    first = number_string[0:5]
+    second = number_string[5:11]
+    return f"{first} {second}"

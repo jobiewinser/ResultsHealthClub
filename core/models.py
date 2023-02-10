@@ -832,6 +832,7 @@ ROLE_CHOICES = (
 class Profile(models.Model):
     ROLE_CHOICES_PROFILE = ROLE_CHOICES
     role = models.CharField(choices=ROLE_CHOICES_PROFILE, default='c', max_length=1)
+    theme = models.CharField(max_length=10, default="light")
     demo_account_theme_colour = models.CharField(null=True, blank=True, default="", max_length=16)
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True)

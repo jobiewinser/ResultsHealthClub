@@ -39,7 +39,7 @@
                     {%endfor%}
                 </ul>
                 ">
-                    <i class="fa-solid fa-triangle-exclamation" style="color:orange; margin-top:12px; margin-left:6px;"></i>
+                    <i class="fa-solid fa-triangle-exclamation text-warning" style="margin-top:12px; margin-left:6px;"></i>
                 </span>
             {%endif%}
         </div>
@@ -120,7 +120,7 @@
     </div>
 </td>
 <td class="center">   
-    <button class="nowrap btn btn-light pointer" type="button"
+    <button class="nowrap btn btn-secondary pointer" type="button"
     {%if demo and not request.user.is_superuser%}disabled{%endif%}
         {%if not request.user.profile|get_profile_allowed_to_edit_profile_permissions_tag:profile%}
         disabled
@@ -132,7 +132,7 @@
         hx-swap="innerHTML" hx-trigger="click"><i class="fa-light fa-ballot-check"></i> Edit Permissions {%if demo and not request.user.is_superuser%}(Demo, Disabled){%endif%}</button>
 </td>
 <td class="center">   
-    <button class="nowrap btn btn-light pointer" type="button" 
+    <button class="nowrap btn btn-secondary pointer" type="button" 
         {%if not request.user.profile|get_profile_allowed_to_edit_other_profile_tag:profile and not demo%}
         disabled
         {%endif%}

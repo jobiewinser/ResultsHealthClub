@@ -17,9 +17,9 @@
         </div>
         {%block extra_top_right_buttons %}
         <input id="current_page" hidden value="payments_and_billing"></input>
-        <div class="col-md-auto p-0 m-1">
+        {% comment %} <div class="col-md-auto p-0 m-1">
             <span class="badge bg-dark text-white"><h6 class="m-1">Payments and Billing</h6></span>           
-        </div>
+        </div> {% endcomment %}
         {%endblock extra_top_right_buttons %}
     </div>
     <div class="row mt-2">
@@ -31,7 +31,7 @@
             <span id="payment_methods_wrapper">
                 {%include 'core/htmx/payment_methods.html'%}
             </span>
-            <div class="card card-white mt-3">
+            <div class="card card-highlight mt-3">
                 <div class="card-header">
                     Your Subscriptions for {{site.name}}
                 </div>
@@ -130,7 +130,7 @@
         </div>
         <div class="col p-2"> 
             <img id="subscriptions_htmx_indicator" class="htmx-indicator" src="/img/bars.svg"/>
-            <div class="card card-white">
+            <div class="card card-highlight">
                 <div class="card-header">
                     <div class="row m-0">
                         <div class="col-md-auto p-0">
@@ -219,7 +219,7 @@
                     {%endwith%}
                 </div>                
             </div>
-            <div class="card card-white mt-3">
+            <div class="card card-highlight mt-3">
                 <div class="card-header">
                     <div class="row m-0">
                         <div class="col-md-auto p-0">

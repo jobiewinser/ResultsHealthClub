@@ -36,9 +36,9 @@
         <div class="col m-1 ps-0">
         </div>
         <input id="current_page" hidden value="whatsapp_templates"></input>
-        <div class="col-md-auto p-0 m-1">
+        {% comment %} <div class="col-md-auto p-0 m-1">
             <span class="badge bg-dark text-white"><h6 class="m-1">Whatsapp Templates</h6></span>          
-        </div> 
+        </div>  {% endcomment %}
         {%endblock extra_top_right_buttons %}    
     </div>   
     <div class="row mt-2">
@@ -61,7 +61,7 @@
             </a>            
         </div>
     </div>
-    <div class="row mt-2 card card-white p-2">
+    <div class="row mt-2 card card-highlight p-2">
         <div class="col">
             <table id="overview_table" class="table"> 
                 <thead> 
