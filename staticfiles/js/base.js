@@ -256,9 +256,9 @@ function copyTextToClipboard(text) {
     return;
   }
   navigator.clipboard.writeText(text).then(function() {
-      snackbarShow('Successfully copied free taster link', 'success')
+      snackbarShow('Successfully copied to clipboard', 'success')
   }, function(err) {
-      snackbarShow('Failed to copy free taster link', 'danger')
+      snackbarShow('Failed to copy to clipboard', 'danger')
   });
 }
 
@@ -279,9 +279,9 @@ function fallbackCopyTextToClipboard(text) {
       var successful = document.execCommand('copy');
       var msg = successful ? 'successful' : 'unsuccessful';
       if (msg == 'successful') {
-        snackbarShow('Successfully copied free taster link', 'success')
+        snackbarShow('Successfully copied to clipboard', 'success')
       } else {
-        snackbarShow('Failed to copy free taster link', 'danger')
+        snackbarShow('Failed to copy to clipboard', 'danger')
       }
     } catch (err) {
     }

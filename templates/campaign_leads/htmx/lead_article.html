@@ -6,9 +6,9 @@
         <input type="text" style="display:None" id="lead_pk_{{lead.pk}}" name="lead_pk" value="{{lead.pk}}"/>
         <div class="row" style="height:30px">
             <div class="col p-0 pe-1 elipses-overflow">
-                <span class="primary_td_layer">
+                <span class="primary_td_layer pointer" onclick="htmx.ajax('GET', '{% url 'campaign-lead-get-modal-content'%}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'view_lead','lead_pk':'{{lead.pk}}'}})">
                     <span 
-                    class="help"
+                    class=""
                     data-bs-toggle="popover" 
                     data-bs-trigger="hover focus" 
                     data-bs-html="true" 
@@ -29,7 +29,7 @@
                         <i class="fa-solid fa-circle-info text-info"></i>
                     </span> 
                     
-                    <span class="lead_name text-dark">{{lead.name}}</span>
+                    <span class="lead_name">{{lead.name}}</span>
                     
                     
                     

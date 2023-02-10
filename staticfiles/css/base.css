@@ -331,6 +331,10 @@ body * {
 .pointer {
     cursor: pointer;
 }
+.pointer:hover {
+    font-weight:600;
+    color:#3366cc !important;
+}
 .help {
     cursor: help;
 }

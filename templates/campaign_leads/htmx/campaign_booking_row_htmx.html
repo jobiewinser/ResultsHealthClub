@@ -180,7 +180,7 @@
                     {%endfor%}
                 </ul>
                 ">
-                <button class="btn {%if lead.note_set.all%}btn-dark text-dark{%else%}btn-secondary text-secondary{%endif%} btn-sm" type="button"
+                <button class="btn {%if lead.note_set.all%}btn-dark text-white{%else%}btn-secondary text-secondary{%endif%} btn-sm" type="button"
                     onclick="htmx.ajax('GET', '{% url 'campaign-lead-get-modal-content' param1=lead.pk %}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'note_history'}})">
                     <i class="fa-solid fa-notes"></i> <span class="text-secondary">{{lead.note_set.all.count}}</span></button>
             </div>
