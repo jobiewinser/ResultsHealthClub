@@ -220,6 +220,11 @@
         Save Changes {%if demo and not request.user.is_superuser%}(Demo, Disabled){%endif%}
     </button>
     {%endblock submit_button%}
+    <small>
+    <ul>
+    <li id="variable2_warning" class="text-danger" hidden>This template contains The <b>[[2]]</b> campaign name as a variable, so it's only available to use for leads (and not direct sending to contacts)</li>
+    </ul>
+    </small>
     <div class="marvel-device nexus5">
         <div class="screen">
             <div class="screen-container">

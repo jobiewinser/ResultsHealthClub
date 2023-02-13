@@ -234,7 +234,13 @@ class Whatsapp():
                 if '[[1]]' in text:
                     text = text.replace('[[1]]','{{'+str(counter)+'}}')
                     counter = counter + 1
+                if '[[2]]' in text:
+                    template_object.lead_only #this can only be sent to leads as it requires a campaign to work
+                    text = text.replace('[[2]]','{{'+str(counter)+'}}')
+                    counter = counter + 1
                 component['text'] = text
+            
+        template_object.save()
 
         # for i in range(len(pending_components)):
         #     if not pending_components[i].get('text', ''):
@@ -293,6 +299,7 @@ class Whatsapp():
                 attached_field = "whatsapp_template",
                 archived = False,
             )
+            return
         elif message_template_id:
             AttachedError.objects.filter(
                 type__in = ['1300', '1301', '1302', '1303', '0101','0104'],
@@ -315,7 +322,13 @@ class Whatsapp():
                 if '[[1]]' in text:
                     text = text.replace('[[1]]','{{'+str(counter)+'}}')
                     counter = counter + 1
+                if '[[2]]' in text:
+                    template_object.lead_only #this can only be sent to leads as it requires a campaign to work
+                    text = text.replace('[[2]]','{{'+str(counter)+'}}')
+                    counter = counter + 1
                 component['text'] = text
+            
+            template_object.save()
             body = { 
                 "components": pending_components
             }
