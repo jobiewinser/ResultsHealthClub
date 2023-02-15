@@ -58,7 +58,7 @@
                         <input maxlength="25" class="form-control form-control-sm" value="{%if number.alias%}{{number.alias}}{%endif%}" name="alias" id="alias_change_{{number.pk}}" hx-post="{% url 'whatsapp-change-number-alias' %}" hx-swap="none" {%if not request.user.profile.role == 'a'%}disabled{%endif%} 
                             hx-include="#alias_change_{{number.pk}}" hx-indicator="#htmx_indicator_alias_{{number.pk}}"  hx-trigger="input delay:0.5s"
                             hx-vals='{"whatsappnumber_pk": "{{number.pk}}"}' oninput="$('#htmx_indicator_alias_{{number.pk}}').addClass('htmx-request');"      
-                            {%if not request.user.profile|get_profile_allowed_to_edit_whatsapp_settings_tag:site%}disabled{%endif%}
+                            {%if not request.user.profile|get_profile_allowed_to_edit_whatsapp_settings_tag:site.company%}disabled{%endif%}
                             />
                     </div>
                     <div class="col-md-auto pe-0">

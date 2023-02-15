@@ -19,11 +19,6 @@ def get_profile_allowed_to_toggle_active_campaign(profile, site):
     if permissions:
         return permissions.toggle_active_campaign
     return False
-def get_profile_allowed_to_edit_whatsapp_settings(profile, site):
-    permissions = SiteProfilePermissions.objects.filter(profile=profile, site=site).first()
-    if permissions:
-        return permissions.edit_whatsapp_settings
-    return False
 def get_profile_allowed_to_toggle_whatsapp_sending(profile, site):
     permissions = SiteProfilePermissions.objects.filter(profile=profile, site=site).first()
     if permissions:
@@ -57,6 +52,11 @@ def get_profile_allowed_to_edit_other_profile_permissions(profile, company):
     permissions = CompanyProfilePermissions.objects.filter(profile=profile, company=company).first()
     if permissions:
         return permissions.edit_user_permissions
+    return False
+def get_profile_allowed_to_edit_whatsapp_settings(profile, company):
+    permissions = CompanyProfilePermissions.objects.filter(profile=profile, company=company).first()
+    if permissions:
+        return permissions.edit_whatsapp_settings
     return False
 def get_profile_allowed_to_edit_profile_permissions(user_profile, target_profile):
     if check_if_profile_is_higher_authority_than_profile(user_profile, target_profile):

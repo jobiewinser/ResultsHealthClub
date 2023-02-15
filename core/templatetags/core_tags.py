@@ -273,10 +273,12 @@ def addition(num1, num2):
         return 0
 @register.filter
 def censor(str):  
-    try:
-        return "*" * len(str)
-    except Exception as e:
-        return "Error"
+    if str:
+        try:
+            return "*" * len(str)
+        except Exception as e:
+            pass
+    return ""
 
 @register.filter
 def add_years(date, x):  

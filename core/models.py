@@ -221,7 +221,7 @@ class Contact(models.Model):
                                 contact = self,
                                 archived = False,
                             ).update(archived = True)
-                            whatsapp = Whatsapp(self.site.whatsapp_access_token)
+                            whatsapp = Whatsapp(self.site.company.whatsapp_access_token)
                             template_live = whatsapp.get_template(template.whatsapp_business_account.whatsapp_business_account_id, template.message_template_id)
                             template.name = template_live['name']
                             template.category = template_live['category']
@@ -491,8 +491,8 @@ class WhatsappNumber(PhoneNumber):
             logger.debug("site.send_whatsapp_message start") 
             if lead:
                 customer_number = normalize_phone_number(lead.whatsapp_number)
-            if self.whatsapp_business_phone_number_id and self.site.whatsapp_access_token and message:
-                whatsapp = Whatsapp(self.site.whatsapp_access_token)
+            if self.whatsapp_business_phone_number_id and self.company.whatsapp_access_token and message:
+                whatsapp = Whatsapp(self.company.whatsapp_access_token)
                 if '+' in self.number:
                     customer_number = normalize_phone_number(f"{self.number.split('+')[-1]}")
                 response_body, attached_errors = whatsapp.send_free_text_message(customer_number, message, self)
@@ -519,7 +519,7 @@ class WhatsappNumber(PhoneNumber):
                 return None
             logger.debug(f"""site.send_whatsapp_message error:           
                 (self.whatsapp_business_phone_number_id,{str(self.whatsapp_business_phone_number_id)})             
-                (self.site.whatsapp_access_token,{str(self.site.whatsapp_access_token)}) 
+                (self.company.whatsapp_access_token,{str(self.company.whatsapp_access_token)}) 
                 (message,{str(message)}) 
             """) 
         except Exception as e:
@@ -552,7 +552,7 @@ class Site(models.Model):
     company = models.ForeignKey("core.Company", on_delete=models.SET_NULL, null=True, blank=True)
     # whatsapp_number = models.CharField(max_length=50, null=True, blank=True)
     # default_number = models.ForeignKey("core.WhatsappNumber", on_delete=models.SET_NULL, null=True, blank=True, related_name="site_default_number")
-    whatsapp_access_token = models.TextField(blank=True, null=True)
+    whatsapp_access_token_old = models.TextField(blank=True, null=True)
     whatsapp_template_sending_enabled = models.BooleanField(default=False)
     active_campaign_leads_enabled = models.BooleanField(default=False)
     
@@ -687,7 +687,7 @@ class Site(models.Model):
                         count = count + 1
         return count
     def get_live_whatsapp_phone_numbers(self):
-        whatsapp = Whatsapp(self.whatsapp_access_token)  
+        whatsapp = Whatsapp(self.company.whatsapp_access_token)  
         for whatsapp_business_account in self.whatsappbusinessaccount_set.all():
             try:
                 phone_numbers = whatsapp.get_phone_numbers(whatsapp_business_account.whatsapp_business_account_id).get('data',[])  
@@ -773,6 +773,7 @@ class Company(models.Model):
     # whatsapp_enabled = models.BooleanField(default=False)
     # active_campaign_enabled = models.BooleanField(default=False)
     demo = models.BooleanField(default=False)
+    whatsapp_access_token = models.TextField(blank=True, null=True)
     whatsapp_app_secret_key = models.TextField(blank=True, null=True)
     whatsapp_app_business_id = models.TextField(blank=True, null=True)
     active_campaign_url = models.TextField(null=True, blank=True)
@@ -944,6 +945,7 @@ class CompanyProfilePermissions(models.Model):
     profile = models.ForeignKey("core.Profile", on_delete=models.CASCADE, null=True, blank=True)
     company = models.ForeignKey("core.Company", on_delete=models.CASCADE, null=True, blank=True)
     edit_user_permissions = models.BooleanField(default=False)
+    edit_whatsapp_settings = models.BooleanField(default=False)
     permissions_count = models.IntegerField(default = 0)
     class Meta:
         ordering = ['-pk']   
@@ -967,7 +969,6 @@ class SiteProfilePermissions(models.Model):
     edit_site_configuration = models.BooleanField(default=False)
     edit_site_calendly_configuration = models.BooleanField(default=False)
     
-    edit_whatsapp_settings = models.BooleanField(default=False)
     toggle_active_campaign = models.BooleanField(default=False)
     toggle_whatsapp_sending = models.BooleanField(default=False)
     change_subscription = models.BooleanField(default=False)

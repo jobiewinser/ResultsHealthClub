@@ -67,7 +67,7 @@
                 <span>
                     {%if message.message%}
                     {%if message.failed%}<i class="fa-solid fa-triangle-exclamation text-danger"></i>{%endif%} 
-                    {{message.message|safe}}
+                    {{message.message|safe}} 
                     {%endif%}
                     {%if message.image.all%}
                         {% for image in message.image.all%}
