@@ -659,9 +659,16 @@ def set_whatsapp_company_config(request, **kwargs):
         company = Company.objects.get(pk=request.POST.get('company_pk',None))
         if not get_profile_allowed_to_edit_whatsapp_settings(request.user.profile, company):
             return HttpResponse("You need the edit Whatsapp Settings permission", status=403)
-        company.whatsapp_access_token = request.POST.get('whatsapp_access_token')
-        company.whatsapp_app_business_id = request.POST.get('whatsapp_app_business_id')
-        company.whatsapp_app_secret_key = request.POST.get('whatsapp_app_secret_key')
+        whatsapp_access_token = request.POST.get('whatsapp_access_token', '*')
+        whatsapp_app_business_id = request.POST.get('whatsapp_app_business_id', '*')
+        whatsapp_app_secret_key = request.POST.get('whatsapp_app_secret_key', '*')
+        if whatsapp_access_token.replace('*', ''):
+            company.whatsapp_access_token = whatsapp_access_token
+        if whatsapp_app_business_id.replace('*', ''):
+            company.whatsapp_app_business_id = whatsapp_app_business_id
+        if whatsapp_app_secret_key.replace('*', ''):
+            company.whatsapp_app_secret_key = whatsapp_app_secret_key
+        
         company.save()
         whatsapp = Whatsapp(company.whatsapp_access_token)
         whatsapp_business_details = whatsapp.get_business(company.whatsapp_app_business_id)
