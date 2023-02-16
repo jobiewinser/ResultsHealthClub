@@ -338,7 +338,7 @@ def site_outstanding_whatsapp_messages_tag(site, user):
 @register.filter
 def whatsappnumber_outstanding_whatsapp_messages_tag(whatsappnumber, user):
     if whatsappnumber:
-        if whatsappnumber.first().whatsapp_business_account.site in user.profile.active_sites_allowed:
+        if whatsappnumber.whatsapp_business_account.site in user.profile.active_sites_allowed:
             return whatsappnumber.outstanding_whatsapp_messages(user)
         return 0
 

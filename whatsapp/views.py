@@ -170,7 +170,7 @@ def handle_received_whatsapp_image_message(message_json, metadata, webhook_objec
     from_number = message_json.get('from')
     lead = Campaignlead.objects.filter(whatsapp_number=from_number).last()
     whatsappnumber = WhatsappNumber.objects.filter(number=to_number)
-    site = whatsappnumber.first().whatsapp_business_account.site
+    site = whatsappnumber.whatsapp_business_account.site
     # site = Site.objects.get(phonenumber=whatsappnumber)
     datetime_from_request = datetime.fromtimestamp(int(message_json.get('timestamp')))
     if settings.DEBUG:
@@ -209,7 +209,7 @@ def handle_received_whatsapp_text_message(message_json, metadata, webhook_object
     from_number = normalize_phone_number(message_json.get('from'))
     lead = Campaignlead.objects.filter(whatsapp_number=from_number).last()
     whatsappnumber = WhatsappNumber.objects.filter(number=to_number)
-    site = whatsappnumber.first().whatsapp_business_account.site
+    site = whatsappnumber.whatsapp_business_account.site
     # site = Site.objects.get(phonenumber=whatsappnumber)
     datetime_from_request = datetime.fromtimestamp(int(message_json.get('timestamp')))
     if settings.DEBUG:
@@ -464,7 +464,7 @@ def whatsapp_clear_changes_htmx(request):
 @not_demo_or_superuser_check
 def whatsapp_number_change_alias(request):
     whatsappnumber = WhatsappNumber.objects.get(pk=request.POST.get('whatsappnumber_pk'), whatsapp_business_account__active=True)
-    if get_profile_allowed_to_edit_whatsapp_settings(request.user.profile, whatsappnumber.first().whatsapp_business_account.site.company):
+    if get_profile_allowed_to_edit_whatsapp_settings(request.user.profile, whatsappnumber.whatsapp_business_account.site.company):
         alias = request.POST.get('alias', None)
         if alias or alias == '':
             whatsappnumber.alias = alias
@@ -591,7 +591,7 @@ def send_new_template_message(request):
     contact = Contact.objects.filter(pk=request.POST.get('contact_pk', 0)).first()
     lead = Campaignlead.objects.filter(pk=request.POST.get('lead_pk', 0)).first()
     if not lead:
-        lead = Campaignlead.objects.filter(campaign__site=whatsappnumber.first().whatsapp_business_account.site, whatsapp_number=combined_number).first()
+        lead = Campaignlead.objects.filter(campaign__site=whatsappnumber.whatsapp_business_account.site, whatsapp_number=combined_number).first()
     first_name = request.POST.get('first_name', '')[:25]
     if get_user_allowed_to_send_from_whatsappnumber(request.user, whatsappnumber) and template:
         if contact:
@@ -609,7 +609,7 @@ def send_new_template_message(request):
             #     return HttpResponse("Please choose a country code", status=400)
             if not phone:
                 return HttpResponse("Please enter a phone number", status=400)
-            site = whatsappnumber.first().whatsapp_business_account.site
+            site = whatsappnumber.whatsapp_business_account.site
             contact, created = Contact.objects.get_or_create(site=site, customer_number=combined_number)
             contact.first_name = first_name
             contact.save()
