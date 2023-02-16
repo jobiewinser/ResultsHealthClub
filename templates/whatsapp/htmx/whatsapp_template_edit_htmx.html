@@ -133,7 +133,7 @@
                     id="template_header" 
                     name="template_header" 
                     class="template_editor_input form-control" 
-                    oninput="renderTemplate();" value="{%if template.pending_components%}{%for component in template.pending_components%}{%if component.type == 'HEADER'%}{{component.text}}{%endif%}{%endfor%}{%else%}{%for component in template.components%}{%if component.type == 'HEADER'%}{{component.text}}{%endif%}{%endfor%}{%endif%}">
+                    oninput="renderTemplate();" value="{%if template.pending_components%}{%for component in template.pending_components%}{%if component.type == 'HEADER'%}{%if component.text%}{{component.text}}{%endif%}{%endif%}{%endfor%}{%else%}{%for component in template.components%}{%if component.type == 'HEADER'%}{%if component.text%}{{component.text}}{%endif%}{%endif%}{%endfor%}{%endif%}">
                 </div>
                 <div class="col">
                 </div>

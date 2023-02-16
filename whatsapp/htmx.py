@@ -73,7 +73,7 @@ def add_whatsapp_business_account(request):
                     whatsapp_business_account.save()
                     return render(request, 'core/htmx/site_configuration_table_htmx.html', {'whatsapp_numbers':site.get_live_whatsapp_phone_numbers(), 'site': site, })
                 else:
-                    return HttpResponse("There are no phone numbers assosciated with that Whatsapp Business Account ID.",status=500)
+                    return HttpResponse("There are no phone numbers assosciated with that Whatsapp Business Account ID (for your whatsapp credentials).",status=500)
             return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
         return HttpResponse("Please enter a whatsapp_business_account_id.",status=500)
     except Exception as e:

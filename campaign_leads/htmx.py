@@ -359,6 +359,7 @@ def mark_sold(request, **kwargs):
                 datetime = datetime.now(),
                 lead = lead,
             )
+            lead.arrived = True
         lead.archived = False
         lead.save()
         return render(request, "campaign_leads/htmx/campaign_booking_row.html", {'lead':lead}) 

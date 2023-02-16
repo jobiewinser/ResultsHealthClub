@@ -120,43 +120,44 @@ class Webhooks(View):
                                             )[0]                
 
                 elif field == 'message_template_status_update':                    
-                    template = WhatsappTemplate.objects.filter(message_template_id=value.get('message_template_id')).last()
-                    if template:
-                        site = template.whatsapp_business_account.site
-                        if site:
-                            signature = 'sha256=' + hmac.new(site.company.whatsapp_app_secret_key.encode('utf-8'), bytes(request.body), digestmod=hashlib.sha256).hexdigest()
-                            if signature == request.META.get('HTTP_X_HUB_SIGNATURE_256'):
-                                if template:
-                                    event = value.get('event')
-                                    reason = str(value.get('reason', ''))
-                                    if event == 'PENDING_DELETION':
-                                        template.delete()
-                                    else:
-                                        template.status=event
-                                        
-                                        if reason:
-                                            template.latest_reason=reason
+                    templates = WhatsappTemplate.objects.filter(message_template_id=value.get('message_template_id')).last()
+                    if templates.exists:
+                        for template in templates:
+                            site = template.whatsapp_business_account.site
+                            if site:
+                                signature = 'sha256=' + hmac.new(site.company.whatsapp_app_secret_key.encode('utf-8'), bytes(request.body), digestmod=hashlib.sha256).hexdigest()
+                                if signature == request.META.get('HTTP_X_HUB_SIGNATURE_256'):
+                                    if template:
+                                        event = value.get('event')
+                                        reason = str(value.get('reason', ''))
+                                        if event == 'PENDING_DELETION':
+                                            template.delete()
                                         else:
-                                            template.latest_reason=None
-                                        template.name=value.get('message_template_name')
-                                        template.language=value.get('message_template_language')
-                                        whatsapp = Whatsapp(template.whatsapp_business_account.company.whatsapp_access_token)
-                                        template_live = whatsapp.get_template(template.whatsapp_business_account.whatsapp_business_account_id, template.message_template_id)
+                                            template.status=event
+                                            
+                                            if reason:
+                                                template.latest_reason=reason
+                                            else:
+                                                template.latest_reason=None
+                                            template.name=value.get('message_template_name')
+                                            template.language=value.get('message_template_language')
+                                            whatsapp = Whatsapp(template.whatsapp_business_account.site.company.whatsapp_access_token)
+                                            template_live = whatsapp.get_template(template.whatsapp_business_account.whatsapp_business_account_id, template.message_template_id)
 
-                                        template.name = template_live.get('name')
-                                        template.pending_name = ""
+                                            template.name = template_live.get('name')
+                                            template.pending_name = ""
 
-                                        template.category = template_live.get('category')
-                                        template.pending_category = ""
+                                            template.category = template_live.get('category')
+                                            template.pending_category = ""
 
-                                        template.language = template_live.get('language')
-                                        template.pending_language = ""
-                                        
-                                        template.components = template.pending_components
-                                        template.pending_components = []
+                                            template.language = template_live.get('language')
+                                            template.pending_language = ""
+                                            
+                                            template.components = template.pending_components
+                                            template.pending_components = []
 
-                                        template.last_approval = datetime.now()
-                                        template.save()
+                                            template.last_approval = datetime.now()
+                                            template.save()
         response = HttpResponse("")
         response.status_code = 200     
         
@@ -321,17 +322,18 @@ class WhatsappTemplatesView(TemplateView):
 def refresh_template_data(whatsapp_business_account):
     if settings.DEMO:
         return
-    whatsapp = Whatsapp(whatsapp_business_account.company.whatsapp_access_token)
+    whatsapp = Whatsapp(whatsapp_business_account.site.company.whatsapp_access_token)
     templates = whatsapp.get_templates(whatsapp_business_account.whatsapp_business_account_id)
     if templates:
         for api_template in templates.get('data', []):
             if not api_template.get('status') == "PENDING_DELETION" and not 'sample' in api_template.get('name'):
                 template, created = WhatsappTemplate.objects.get_or_create(
-                    message_template_id = api_template.get('id')
+                    message_template_id = api_template.get('id'),
+                    company = whatsapp_business_account.site.company,
                 )                
-                if created:
-                    template.whatsapp_business_account = whatsapp_business_account
-                template.company = whatsapp_business_account.site.company
+                # if created:
+                template.whatsapp_business_account = whatsapp_business_account
+                # template.company = whatsapp_business_account.site.company
                 template.status = api_template.get('status')
                 template.name = api_template.get('name')
                 template.language = api_template.get('language')
@@ -423,7 +425,7 @@ class WhatsappTemplatesCreateView(TemplateView):
 def whatsapp_approval_htmx(request):
     template = WhatsappTemplate.objects.get(pk=request.POST.get('template_pk'))
     if request.user.profile.company == template.company:
-        whatsapp = Whatsapp(template.whatsapp_business_account.company.whatsapp_access_token)
+        whatsapp = Whatsapp(template.whatsapp_business_account.site.company.whatsapp_access_token)
         if template.message_template_id:
             whatsapp.edit_template(template)
         else:
@@ -436,7 +438,7 @@ def delete_whatsapp_template_htmx(request):
     body = QueryDict(request.body)
     template = WhatsappTemplate.objects.get(pk=body.get('template_pk'))
     whatsapp_business_account = template.whatsapp_business_account
-    whatsapp = Whatsapp(whatsapp_business_account.company.whatsapp_access_token)
+    whatsapp = Whatsapp(whatsapp_business_account.site.company.whatsapp_access_token)
     if template.message_template_id and not template.status == 'PENDING_DELETEION':
         whatsapp.delete_template(whatsapp_business_account.whatsapp_business_account_id, template.name)
     template.status="PENDING_DELETION"
@@ -462,7 +464,7 @@ def whatsapp_clear_changes_htmx(request):
 @not_demo_or_superuser_check
 def whatsapp_number_change_alias(request):
     whatsappnumber = WhatsappNumber.objects.get(pk=request.POST.get('whatsappnumber_pk'), whatsapp_business_account__active=True)
-    if get_profile_allowed_to_edit_whatsapp_settings(request.user.profile, whatsappnumber.whatsapp_business_account.site):
+    if get_profile_allowed_to_edit_whatsapp_settings(request.user.profile, whatsappnumber.whatsapp_business_account.site.company):
         alias = request.POST.get('alias', None)
         if alias or alias == '':
             whatsappnumber.alias = alias
@@ -522,7 +524,7 @@ def whatsapp_number_change_alias(request):
 #     if whatsapp_business_account_pk and country_code and phone_number:
 #         whatsapp_business_account = WhatsappBusinessAccount.objects.get(pk=whatsapp_business_account_pk)
 #         if get_profile_allowed_to_edit_site_configuration(request.user.profile, whatsapp_business_account.site):            
-#             whatsapp = Whatsapp(whatsapp_business_account.company.whatsapp_access_token)
+#             whatsapp = Whatsapp(whatsapp_business_account.site.company.whatsapp_access_token)
 #             whatsapp.create_phone_number(whatsapp_business_account.whatsapp_business_account_id, country_code, phone_number)
 #             return HttpResponse(status=200,headers={'HX-Refresh':True})
 #         return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
