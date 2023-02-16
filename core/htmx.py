@@ -52,9 +52,9 @@ def get_modal_content(request, **kwargs):
                     for site in profile.company.active_sites:
                         site_profile_permissions, created = SiteProfilePermissions.objects.get_or_create(profile=profile, site=site)
                         site_profile_permissions.save()
-            elif template_name == 'add_phone_number':
-                if site_pk:
-                    context["site"] = Site.objects.get(pk=site_pk)
+            # elif template_name == 'add_phone_number':
+            #     if site_pk:
+            #         context["site"] = Site.objects.get(pk=site_pk)
             elif template_name == 'add_user':
                 context['role_choices'] = ROLE_CHOICES    
                 if site_pk:
@@ -67,7 +67,7 @@ def get_modal_content(request, **kwargs):
                 whatsappnumber_pk = request.GET.get('whatsappnumber_pk', None)
                 
                 if whatsappnumber_pk:
-                    whatsappnumber = WhatsappNumber.objects.get(pk=whatsappnumber_pk)
+                    whatsappnumber = WhatsappNumber.objects.get(pk=whatsappnumber_pk, whatsapp_business_account__active=True)
                 else:
                     lead_pk = request.GET.get('lead_pk') 
                     # latest_message = WhatsAppMessage.objects.filter(customer_number=customer_number, whatsappnumber__whatsapp_business_account__site=site).order_by('datetime').last()

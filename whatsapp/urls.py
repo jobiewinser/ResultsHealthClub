@@ -37,8 +37,8 @@ urlpatterns = [
       
     # path('configuration/whatsapp-change-template-site/', whatsappviews.whatsapp_template_change_site, name='whatsapp-change-template-site'),    
     # path('configuration/whatsapp-change-number-site/', whatsappviews.whatsapp_number_change_site, name='whatsapp-change-number-site'),      
-    path('configuration/add-phone-number/', whatsappviews.add_phone_number, name='add-phone-number'),      
-    path('configuration/add-whatsapp-business-account/', whatsappviews.add_whatsapp_business_account, name='add-whatsapp-business-account'),    
+    # path('configuration/add-phone-number/', whatsappviews.add_phone_number, name='add-phone-number'),      
+    path('configuration/add-whatsapp-business-account/', whatsapphtmx.add_whatsapp_business_account, name='add-whatsapp-business-account'),    
 
     path('whatsapp-get-modal-content/', whatsapphtmx.get_modal_content, name='whatsapp-get-modal-content' ),
     path('whatsapp-get-modal-content/<str:param1>/', whatsapphtmx.get_modal_content, name='whatsapp-get-modal-content' ),
@@ -47,5 +47,6 @@ urlpatterns = [
     path('send-new-template-message/', whatsappviews.send_new_template_message, name='send-new-template-message' ),
 
     path('set-whatsapp-company-config/', whatsappviews.set_whatsapp_company_config, name='set-whatsapp-company-config'),
+    path('deactivate-whatsapp-business-account/', whatsapphtmx.deactivate_whatsapp_business_account, name='deactivate-whatsapp-business-account'),
     
 ]    

@@ -392,12 +392,21 @@ def send_message_to_websocket(whatsappnumber, customer_number, whatsapp_message,
 class WhatsappBusinessAccount(models.Model):
     whatsapp_business_account_id = models.TextField(null=True, blank=True)
     site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
+    active = models.BooleanField(default=True)
     @property
     def active_templates(self):
         return self.whatsapptemplate_set.exclude(archived=True).exclude(name__icontains="sample")
     @property
     def active_live_templates(self):
         return self.whatsapptemplate_set.filter(status="APPROVED").exclude(archived=True).exclude(name__icontains="sample")
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        if self.site and self.active:
+            # for whatsapp_number in self.whatsappnumber.all():
+            #     whatsapp_number.company = self.site.company
+            #     whatsapp_number.save()
+            self.whatsappnumber.company = self.site.company
+            self.whatsappnumber.save()
+        super(WhatsappBusinessAccount, self).save(force_insert, force_update, using, update_fields)
 
 class PhoneNumber(PolymorphicModel):
     number = models.CharField(max_length=30, null=True, blank=True)
@@ -405,7 +414,6 @@ class PhoneNumber(PolymorphicModel):
     # site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
     company = models.ForeignKey("core.Company", on_delete=models.SET_NULL, null=True, blank=True)
     archived = models.BooleanField(default=False)
-    
     def __str__(self):
         if self.alias:
             return str(self.alias)
@@ -714,7 +722,7 @@ class Site(models.Model):
                 print("get_live_whatsapp_phone_numbers ERROR: ", str(e))
         return self.return_phone_numbers()
     def return_phone_numbers(self):
-        return WhatsappNumber.objects.filter(whatsapp_business_account__site=self, archived=False).order_by('pk')
+        return WhatsappNumber.objects.filter(whatsapp_business_account__site=self, whatsapp_business_account__active=True).order_by('pk')
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         if self.active and not self.created:
             self.created = datetime.now()

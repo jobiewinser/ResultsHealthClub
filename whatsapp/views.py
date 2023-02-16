@@ -168,7 +168,7 @@ def handle_received_whatsapp_image_message(message_json, metadata, webhook_objec
     to_number = metadata.get('display_phone_number')
     from_number = message_json.get('from')
     lead = Campaignlead.objects.filter(whatsapp_number=from_number).last()
-    whatsappnumber = WhatsappNumber.objects.get(number=to_number)
+    whatsappnumber = WhatsappNumber.objects.filter(number=to_number)
     site = whatsappnumber.whatsapp_business_account.site
     # site = Site.objects.get(phonenumber=whatsappnumber)
     datetime_from_request = datetime.fromtimestamp(int(message_json.get('timestamp')))
@@ -207,7 +207,7 @@ def handle_received_whatsapp_text_message(message_json, metadata, webhook_object
     to_number =  metadata.get('display_phone_number')
     from_number = normalize_phone_number(message_json.get('from'))
     lead = Campaignlead.objects.filter(whatsapp_number=from_number).last()
-    whatsappnumber = WhatsappNumber.objects.get(number=to_number)
+    whatsappnumber = WhatsappNumber.objects.filter(number=to_number)
     site = whatsappnumber.whatsapp_business_account.site
     # site = Site.objects.get(phonenumber=whatsappnumber)
     datetime_from_request = datetime.fromtimestamp(int(message_json.get('timestamp')))
@@ -461,7 +461,7 @@ def whatsapp_clear_changes_htmx(request):
 @login_required
 @not_demo_or_superuser_check
 def whatsapp_number_change_alias(request):
-    whatsappnumber = WhatsappNumber.objects.get(pk=request.POST.get('whatsappnumber_pk'))
+    whatsappnumber = WhatsappNumber.objects.get(pk=request.POST.get('whatsappnumber_pk'), whatsapp_business_account__active=True)
     if get_profile_allowed_to_edit_whatsapp_settings(request.user.profile, whatsappnumber.whatsapp_business_account.site):
         alias = request.POST.get('alias', None)
         if alias or alias == '':
@@ -513,48 +513,21 @@ def whatsapp_number_change_alias(request):
 #                 return HttpResponse(status=200)
 #     return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
 
-@login_required
-@not_demo_or_superuser_check
-def add_phone_number(request):
-    whatsapp_business_account_pk = request.POST.get('whatsapp_business_account_pk', None)
-    country_code = request.POST.get('country_code', None)
-    phone_number = request.POST.get('phone_number', None)
-    if whatsapp_business_account_pk and country_code and phone_number:
-        whatsapp_business_account = WhatsappBusinessAccount.objects.get(pk=whatsapp_business_account_pk)
-        if get_profile_allowed_to_edit_site_configuration(request.user.profile, whatsapp_business_account.site):            
-            whatsapp = Whatsapp(whatsapp_business_account.company.whatsapp_access_token)
-            whatsapp.create_phone_number(whatsapp_business_account.whatsapp_business_account_id, country_code, phone_number)
-            return HttpResponse(status=200,headers={'HX-Refresh':True})
-        return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
-    return HttpResponse("Incorrect values entered, please try again.",status=500)
+# @login_required
+# @not_demo_or_superuser_check
+# def add_phone_number(request):
+#     whatsapp_business_account_pk = request.POST.get('whatsapp_business_account_pk', None)
+#     country_code = request.POST.get('country_code', None)
+#     phone_number = request.POST.get('phone_number', None)
+#     if whatsapp_business_account_pk and country_code and phone_number:
+#         whatsapp_business_account = WhatsappBusinessAccount.objects.get(pk=whatsapp_business_account_pk)
+#         if get_profile_allowed_to_edit_site_configuration(request.user.profile, whatsapp_business_account.site):            
+#             whatsapp = Whatsapp(whatsapp_business_account.company.whatsapp_access_token)
+#             whatsapp.create_phone_number(whatsapp_business_account.whatsapp_business_account_id, country_code, phone_number)
+#             return HttpResponse(status=200,headers={'HX-Refresh':True})
+#         return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
+#     return HttpResponse("Incorrect values entered, please try again.",status=500)
 
-@login_required
-@not_demo_or_superuser_check
-def add_whatsapp_business_account(request):
-    try: 
-        site_pk = request.POST.get('site_pk', None)
-        whatsapp_business_account_id = request.POST.get('whatsapp_business_account_id', None)
-        if site_pk and whatsapp_business_account_id:
-            site = Site.objects.get(pk=site_pk)
-            whatsapp = Whatsapp(site.company.whatsapp_access_token) 
-            if get_profile_allowed_to_edit_site_configuration(request.user.profile, site):      
-                if whatsapp.get_phone_numbers(whatsapp_business_account_id).get('data',[]):   
-                    whatsapp_business_account = WhatsappBusinessAccount.objects.filter(whatsapp_business_account_id=whatsapp_business_account_id).first()
-                    if whatsapp_business_account:
-                        if whatsapp_business_account.site == site:
-                            return HttpResponse(f"This Whatsapp Business Account already belongs to this Site: {site.name}.",status=500)
-                        elif whatsapp_business_account.site:
-                            return HttpResponse(f"This Whatsapp Business Account already belongs to another Site, please contact Winser Systems.",status=500)
-                        else:
-                            whatsapp_business_account.delete()
-                    WhatsappBusinessAccount.objects.create(site=site, whatsapp_business_account_id=whatsapp_business_account_id)
-                    return HttpResponse(status=200,headers={'HX-Refresh':True})
-                else:
-                    return HttpResponse("There are no phone numbers assosciated with that Whatsapp Business Account ID.",status=500)
-            return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
-        return HttpResponse("Please enter a whatsapp_business_account_id.",status=500)
-    except Exception as e:
-        return HttpResponse("Server Error, please try again later.",status=500)
 
 @login_required
 @not_demo_or_superuser_check
@@ -600,7 +573,7 @@ def save_whatsapp_template_ajax(request):
 
 @login_required
 def send_new_template_message(request):
-    whatsappnumber = WhatsappNumber.objects.get(pk=request.POST.get('whatsappnumber_pk'))
+    whatsappnumber = WhatsappNumber.objects.get(pk=request.POST.get('whatsappnumber_pk'), whatsapp_business_account__active=True)
     template_pk = request.POST.get('template_pk')
     if not template_pk:
         return HttpResponse("Please Choose a template", status=400)        

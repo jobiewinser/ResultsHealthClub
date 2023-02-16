@@ -104,7 +104,7 @@ def normalize_phone_number(number):
 @sync_to_async
 def send_whatsapp_message_to_number(message, customer_number, user, whatsappnumber_pk):  
     customer_number = normalize_phone_number(customer_number)
-    whatsappnumber = WhatsappNumber.objects.get(pk=whatsappnumber_pk)
+    whatsappnumber = WhatsappNumber.objects.get(pk=whatsappnumber_pk, whatsapp_business_account__active=True)
     logger.debug("send_whatsapp_message_to_number start") 
     lead = Campaignlead.objects.filter(whatsapp_number=customer_number).first()  
     if get_user_allowed_to_use_site_messaging(user, whatsappnumber.site):
@@ -125,7 +125,7 @@ def message_details_user(user):
     return avatar, name
 @sync_to_async
 def get_whatsappnumber(whatsappnumber_pk):   
-    return WhatsappNumber.objects.get(pk=whatsappnumber_pk)
+    return WhatsappNumber.objects.get(pk=whatsappnumber_pk, whatsapp_business_account__active=True)
 @sync_to_async
 def mark_past_messages_as_read(whatsappnumber, user, messaging_customer_number):   
     WhatsAppMessage.objects.filter(

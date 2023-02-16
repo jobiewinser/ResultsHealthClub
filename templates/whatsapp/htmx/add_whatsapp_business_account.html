@@ -10,8 +10,8 @@
         <div class="col center" >
             <button class="btn btn-primary" type="button"
                 hx-encoding="multipart/form-data" hx-vals='{"site_pk":"{{site.pk}}"}'
-                hx-post="{% url 'add-whatsapp-business-account' %}" hx-include=".whatsapp_business_account_input" hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
-                hx-swap="innerHTML">
+                hx-post="{% url 'add-whatsapp-business-account' %}" hx-include=".whatsapp_business_account_input" hx-indicator="#page_load_indicator" hx-target="#whatsapp_settings_table"
+                hx-swap="outerHTML">
                 Add Whatsapp Business Account ID
             </button>
         </div>

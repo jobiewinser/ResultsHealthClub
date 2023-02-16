@@ -41,7 +41,7 @@ def get_modal_content(request, **kwargs):
 
             whatsappnumber_pk = request.GET.get('whatsappnumber_pk')
             if whatsappnumber_pk:
-                context['whatsappnumber'] = WhatsappNumber.objects.get(pk=whatsappnumber_pk)
+                context['whatsappnumber'] = WhatsappNumber.objects.get(pk=whatsappnumber_pk, whatsapp_business_account__active=True)
 
             lead_pk = request.GET.get('lead_pk')
             if template_name == 'edit_lead':
