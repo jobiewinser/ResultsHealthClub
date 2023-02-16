@@ -173,7 +173,7 @@ function basehandlehtmxafterRequest(evt){
                 snackbarShow('Successfully sent message', 'success')
             }else if (evt.detail.pathInfo.requestPath.includes("add-whatsapp-business-account")){
                 $('#generic_modal').modal('hide');
-                snackbarShow('Successfully added phone', 'success')
+                snackbarShow('Successfully added whatsapp business account', 'success')
             }else if (evt.detail.pathInfo.requestPath.includes("create-lead-note")){
                 $('#generic_modal').modal('hide');
                 snackbarShow('Successfully added note', 'success')

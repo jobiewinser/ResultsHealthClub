@@ -133,7 +133,7 @@
                     id="template_header" 
                     name="template_header" 
                     class="template_editor_input form-control" 
-                    oninput="renderTemplate();" value="{%if template.pending_components%}{%for component in template.pending_components%}{%if component.type == 'HEADER'%}{{component.text}}{%endif%}{%endfor%}{%else%}{%for component in template.components%}{%if component.type == 'HEADER'%}{{component.text}}{%endif%}{%endfor%}{%endif%}">
+                    oninput="renderTemplate();" value="{%if template.pending_components%}{%for component in template.pending_components%}{%if component.type == 'HEADER'%}{%if component.text%}{{component.text}}{%endif%}{%endif%}{%endfor%}{%else%}{%for component in template.components%}{%if component.type == 'HEADER'%}{%if component.text%}{{component.text}}{%endif%}{%endif%}{%endfor%}{%endif%}">
                 </div>
                 <div class="col">
                 </div>
@@ -220,6 +220,11 @@
         Save Changes {%if demo and not request.user.is_superuser%}(Demo, Disabled){%endif%}
     </button>
     {%endblock submit_button%}
+    <small>
+    <ul>
+    <li id="variable2_warning" class="text-danger" hidden>This template contains The <b>[[2]]</b> campaign name as a variable, so it's only available to use for leads (and not direct sending to contacts)</li>
+    </ul>
+    </small>
     <div class="marvel-device nexus5">
         <div class="screen">
             <div class="screen-container">

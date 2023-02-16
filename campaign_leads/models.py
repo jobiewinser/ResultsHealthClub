@@ -275,7 +275,7 @@ class Campaignlead(models.Model):
                                     campaign_lead = self,
                                     archived = False,
                                 ).update(archived = True)
-                                whatsapp = Whatsapp(self.campaign.site.whatsapp_access_token)
+                                whatsapp = Whatsapp(self.campaign.company.whatsapp_access_token)
                                 template_live = whatsapp.get_template(template.whatsapp_business_account.whatsapp_business_account_id, template.message_template_id)
                                 print(template_live)
                                 template.name = template_live['name']
@@ -303,15 +303,15 @@ class Campaignlead(models.Model):
                                             )
                                             text = text.replace('[[1]]',self.first_name)
                                             counter = counter + 1
-                                        # if '[[2]]' in text:
-                                        #     params.append(              
-                                        #         {
-                                        #             "type": "text",
-                                        #             "text":  str(self.campaign)
-                                        #         }
-                                        #     )
-                                        #     text = text.replace('[[2]]',self.campaign)
-                                        #     counter = counter + 1
+                                        if '[[2]]' in text:
+                                            params.append(              
+                                                {
+                                                    "type": "text",
+                                                    "text":  str(self.campaign.name)
+                                                }
+                                            )
+                                            text = text.replace('[[2]]',self.campaign.name)
+                                            counter = counter + 1
                                     if params:
                                         components.append(
                                             {

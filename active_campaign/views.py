@@ -79,7 +79,7 @@ def set_whatsapp_template_sending_status(request, **kwargs):
         if get_profile_allowed_to_toggle_whatsapp_sending(request.user.profile, site):
             site.whatsapp_template_sending_enabled = request.POST.get('whatsapp_template_sending_enabled', 'off') == 'on'
             site.save()
-            return render(request, 'core/htmx/whatsapp_template_sending_enabled_htmx.html', {'site':site,})
+            return render(request, 'core/htmx/whatsapp_template_sending_enabled_htmx.html', {'site':site,'site_warning_section_swap':True})
         return HttpResponse(status=403)
     except Exception as e:        
         logger.error(f"set_whatsapp_template_sending_status {str(e)}")
@@ -92,7 +92,7 @@ def set_active_campaign_leads_status(request, **kwargs):
         if get_profile_allowed_to_toggle_active_campaign(request.user.profile, site):
             site.active_campaign_leads_enabled = request.POST.get('active_campaign_leads_enabled', 'off') == 'on'
             site.save()
-            return render(request, 'core/htmx/active_campaign_enabled_htmx.html', {'site':site,})
+            return render(request, 'core/htmx/active_campaign_enabled_htmx.html', {'site':site,'site_warning_section_swap':True})
         return HttpResponse(status=403)
     except Exception as e:        
         logger.error(f"set_active_campaign_leads_status {str(e)}")

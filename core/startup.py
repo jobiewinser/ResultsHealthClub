@@ -211,13 +211,13 @@ def run_debug_startup():
             )
             company.active_campaign_url = os.getenv("DEFAULT_ACTIVE_CAMPAIGN_URL")
             company.active_campaign_api_key = os.getenv("DEFAULT_ACTIVE_CAMPAIGN_API_KEY")
+            company.whatsapp_access_token = os.getenv("default_whatsapp_access_token")
             company.save()
 
             site, created = Site.objects.get_or_create(
                 name="Test Site",
                 company=company,
             )
-            site.whatsapp_access_token = os.getenv("default_whatsapp_access_token")
             site.calendly_token = os.getenv("DEFAULT_CALENDLY_TOKEN")
             site.calendly_organization = os.getenv("DEFAULT_CALENDLY_ORGANIZATION")
             site.guid = "6325bcde-feb9-4c"

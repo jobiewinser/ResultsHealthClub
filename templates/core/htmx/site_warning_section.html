@@ -1,5 +1,5 @@
-<span style="font-size:12px; line-height: 0.75em;" class="site_warning_section_span_{{site.pk}}" {%if site_warning_section_swap%}hx-swap-oob='outerHTML:.site_warning_section_span_{{site.pk}}'{%endif%}>
-    {%if not site.whatsapp_enabled%}
+<span style="line-height: 0.75em;" class="site_warning_section_span_{{site.pk}}" {%if site_warning_section_swap%}hx-swap-oob='outerHTML:.site_warning_section_span_{{site.pk}}'{%endif%}>
+    {%if not site.whatsapp_template_sending_enabled%}
     <i class="fa fa-whatsapp text-warning" 
         data-bs-html="true" 
         data-bs-toggle="popover" 

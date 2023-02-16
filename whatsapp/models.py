@@ -127,7 +127,7 @@ WHATSAPP_ORDER_CHOICES = (
 )
 template_variables = {
     '[[1]]': ["First Name", "Lead Name"],    
-    # '[[2]]': ["Campaign Alias", "Fitness Campaign"],    
+    '[[2]]': ["Campaign Alias", "Fitness Campaign"],    
 }
 class WhatsappTemplate(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -204,6 +204,8 @@ class WhatsappTemplate(models.Model):
                     text = text.replace('[[1]]',contact.first_name)
                 elif first_name:
                     text = text.replace('[[1]]',first_name)
+            if '[[2]]' in text:            
+                text = text.replace('[[2]]',lead.campaign.name)
             rendered_html = rendered_html + text
         except:
             pass
@@ -216,6 +218,8 @@ class WhatsappTemplate(models.Model):
                     text = text.replace('[[1]]',contact.first_name)
                 elif first_name:
                     text = text.replace('[[1]]',first_name)
+            if '[[2]]' in text:   
+                text = text.replace('[[2]]',lead.campaign.name)
             rendered_html = rendered_html + text
         except:
             pass
@@ -228,6 +232,8 @@ class WhatsappTemplate(models.Model):
                     text = text.replace('[[1]]',contact.first_name)
                 elif first_name:
                     text = text.replace('[[1]]',first_name)
+            if '[[2]]' in text:
+                text = text.replace('[[2]]',lead.campaign.name)
             rendered_html = rendered_html + text
         except:
             pass        

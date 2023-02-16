@@ -1,7 +1,7 @@
 {%load core_tags%}
 {%load static tz core_tags%}
 {%load user_permission_tags%}
-<table id="overview_table" class="table"> 
+<table id="whatsapp_settings_table" class="table"> 
     <thead> 
         <tr>
             <th>
@@ -31,6 +31,9 @@
             <th>
                 Verified?
             </th>
+            <th>
+                
+            </th>
         </tr>
     </thead>
     <tbody> 
@@ -58,7 +61,7 @@
                         <input maxlength="25" class="form-control form-control-sm" value="{%if number.alias%}{{number.alias}}{%endif%}" name="alias" id="alias_change_{{number.pk}}" hx-post="{% url 'whatsapp-change-number-alias' %}" hx-swap="none" {%if not request.user.profile.role == 'a'%}disabled{%endif%} 
                             hx-include="#alias_change_{{number.pk}}" hx-indicator="#htmx_indicator_alias_{{number.pk}}"  hx-trigger="input delay:0.5s"
                             hx-vals='{"whatsappnumber_pk": "{{number.pk}}"}' oninput="$('#htmx_indicator_alias_{{number.pk}}').addClass('htmx-request');"      
-                            {%if not request.user.profile|get_profile_allowed_to_edit_whatsapp_settings_tag:site%}disabled{%endif%}
+                            {%if not request.user.profile|get_profile_allowed_to_edit_whatsapp_settings_tag:site.company%}disabled{%endif%}
                             />
                     </div>
                     <div class="col-md-auto pe-0">
@@ -85,6 +88,11 @@
             </td>
             <td>
                 {{number.code_verification_status}}
+            </td>
+            <td>
+                <button class="btn btn-danger"
+                hx-post="{%url 'deactivate-whatsapp-business-account'%}" hx-vals='{"whatsapp_business_account_pk":"{{number.whatsapp_business_account.pk}}"}' hx-swap="delete" hx-target="#whatsappnumber_row_{{number.pk}}" hx-indicator="#page_load_indicator"
+                hx-confirm="This will remove this whatsapp business account (and phone number) from {{site.name}}. It will then be available for you add to another site. The Leads Management System will continue to receive your whatsapp messages until you reactivate this whatsapp business account or you delete the whatsapp business account within Whatsapp.">Deactivate</button>
             </td>
             {% comment %} <td>
                 <input type="checkbox" class="form-check-input" name="default_number" {%if site.default_number == number %}checked{%endif%} {%if site.default_number == number or not request.user.profile.role == 'a'%}disabled{%endif%}

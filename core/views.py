@@ -180,8 +180,8 @@ def get_site_configuration_context(request):
                     break
     context['site'] = site
     context['site_webhook_active'] = site_webhook_active
-    if site.whatsapp_access_token:
-        whatsapp = Whatsapp(site.whatsapp_access_token)
+    if site.company.whatsapp_access_token:
+        whatsapp = Whatsapp(site.company.whatsapp_access_token)
         context['whatsapp_business_details'] = whatsapp.get_business(site.company.whatsapp_app_business_id)
     else:
         context['whatsapp_business_details'] = {"error":True}

@@ -25,7 +25,7 @@ def message_list(request, **kwargs):
     context['chat_site'] = [site]    
     whatsappnumber_pk = request.GET.get('whatsappnumber_pk')
     if whatsappnumber_pk:
-        whatsappnumber = WhatsappNumber.objects.get(pk=whatsappnumber_pk)
+        whatsappnumber = WhatsappNumber.objects.get(pk=whatsappnumber_pk, whatsapp_business_account__active=True)
     elif customer_number and site:
         context['customer_numbers'] = [customer_number]    
         latest_message = WhatsAppMessage.objects.filter(customer_number=customer_number, whatsappnumber__whatsapp_business_account__site=site).order_by('datetime').last()
@@ -39,7 +39,7 @@ def message_list(request, **kwargs):
 
 @login_required
 def message_window(request, **kwargs):
-    whatsappnumber = WhatsappNumber.objects.get(pk=kwargs.get('whatsappnumber_pk'))
+    whatsappnumber = WhatsappNumber.objects.get(pk=kwargs.get('whatsappnumber_pk'), whatsapp_business_account__active=True)
     all_messages = WhatsAppMessage.objects.filter(customer_number=kwargs.get('customer_number'), whatsappnumber=whatsappnumber).order_by('-datetime')
     # messages = WhatsAppMessage.objects.filter(customer_number=kwargs.get('customer_number'), whatsappnumber=whatsappnumber).order_by('-datetime')[:20:-1]
     context = {}
@@ -168,7 +168,7 @@ def update_message_counts(request, **kwargs):
 def get_message_list_body(request, **kwargs):
     try:
         context = {}
-        whatsappnumber = WhatsappNumber.objects.get(pk=request.GET.get('whatsappnumber_pk')) 
+        whatsappnumber = WhatsappNumber.objects.get(pk=request.GET.get('whatsappnumber_pk'), whatsapp_business_account__active=True) 
         context['whatsappnumber'] = whatsappnumber
         context['messages'] = whatsappnumber.get_latest_messages(query={"search_string":request.GET.get('search_string'), "received":request.GET.get('received'), "hide_auto":request.GET.get('hide_auto', 'off') == 'on'})
         return render(request, "messaging/htmx/message_list_body.html", context)   
@@ -181,7 +181,7 @@ def get_message_list_body(request, **kwargs):
 def get_more_message_list_rows(request, **kwargs):
     try:
         context = {}
-        whatsappnumber = WhatsappNumber.objects.get(pk=request.GET.get('whatsappnumber_pk'))
+        whatsappnumber = WhatsappNumber.objects.get(pk=request.GET.get('whatsappnumber_pk'), whatsapp_business_account__active=True)
         earliest_datetime_timestamp = request.GET.get('earliest_datetime_timestamp')        
         context['whatsappnumber'] = whatsappnumber
         context['messages'] = whatsappnumber.get_latest_messages(after_datetime_timestamp=earliest_datetime_timestamp,query={"search_string":request.GET.get('search_string'), "received":request.GET.get('received'), "hide_auto":request.GET.get('hide_auto', 'off') == 'on'})
@@ -195,7 +195,7 @@ def get_more_message_list_rows(request, **kwargs):
 def get_more_message_chat_rows(request):
     try:
         context = {}
-        whatsappnumber = WhatsappNumber.objects.get(pk=request.GET.get('whatsappnumber_pk'))
+        whatsappnumber = WhatsappNumber.objects.get(pk=request.GET.get('whatsappnumber_pk'), whatsapp_business_account__active=True)
         earliest_datetime_timestamp = request.GET.get('earliest_datetime_timestamp')        
         context['whatsappnumber'] = whatsappnumber
         messages = WhatsAppMessage.objects.filter(customer_number=request.GET.get('customer_number'), whatsappnumber=whatsappnumber).order_by('-datetime')
