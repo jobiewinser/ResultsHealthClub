@@ -129,7 +129,7 @@ def get_whatsappnumber(whatsappnumber_pk):
 @sync_to_async
 def mark_past_messages_as_read(whatsappnumber, user, messaging_customer_number):   
     WhatsAppMessage.objects.filter(
-        site=whatsappnumber.whatsapp_business_account.site,
+        site=whatsappnumber.whatsapp_business_account.first().site,
         user=user,
         customer_number=messaging_customer_number,
         whatsappnumber=whatsappnumber,
