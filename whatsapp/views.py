@@ -208,7 +208,7 @@ def handle_received_whatsapp_text_message(message_json, metadata, webhook_object
     to_number =  metadata.get('display_phone_number')
     from_number = normalize_phone_number(message_json.get('from'))
     lead = Campaignlead.objects.filter(whatsapp_number=from_number).last()
-    whatsappnumber = WhatsappNumber.objects.filter(number=to_number)
+    whatsappnumber = WhatsappNumber.objects.get(number=to_number)
     site = whatsappnumber.whatsapp_business_account.site
     # site = Site.objects.get(phonenumber=whatsappnumber)
     datetime_from_request = datetime.fromtimestamp(int(message_json.get('timestamp')))
