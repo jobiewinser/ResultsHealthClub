@@ -12,7 +12,7 @@
         {%if message.pending%}
             This message has not sent yet.<br>
         {%endif%}
-        By <b>{%if message.lead.name%}{{message.lead.name}}{%elif message.get_site_contact.name%}{{message.get_site_contact.name}}{%else%}{{message.customer_number}}{%endif%}</b>"
+        By <b>{%if message.get_site_contact.name%}{{message.get_site_contact.name}}{%else%}{{message.customer_number}}{%endif%}</b>"
     >
         <div class="col-auto p-0 ps-1 m-1">
             <img src="{% static 'img/blank-profile-picture.png' %}" alt="" width="22" height="22" class="rounded-circle">

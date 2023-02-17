@@ -172,8 +172,13 @@ class SiteContact(models.Model):
     site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
     contact = models.ForeignKey('core.Contact', on_delete=models.SET_NULL, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    first_name_old = models.TextField(null=True, blank=True, max_length=25)
-    last_name_old = models.TextField(null=True, blank=True, max_length=25)
+    first_name = models.TextField(null=True, blank=True, max_length=25)
+    last_name = models.TextField(null=True, blank=True, max_length=25)
+    @property
+    def name(self):
+        if self.last_name:
+            return f"{self.first_name} {self.last_name}"
+        return self.first_name
     
     def send_template_whatsapp_message(self, whatsappnumber=None, template=None, communication_method = 'a'):
         print("Contact send_template_whatsapp_message", whatsappnumber, template, communication_method)
