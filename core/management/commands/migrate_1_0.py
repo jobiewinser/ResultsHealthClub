@@ -15,11 +15,16 @@ from core.views import get_or_create_contact_for_lead
 random_name = []
 class Command(BaseCommand):
     def handle(self, *args, **options):
+        for customer_number in Contact.objects.all().values_list('customer_number', flat=True).distinct(): 
+            if Contact.objects.filter(customer_number=customer_number).count() > 1:
+                Contact.objects.exclude(pk=Contact.objects.filter(customer_number=customer_number, customer_number=customer_number).first().pk).delete()
+            
         for contact in Contact.objects.all():
             if contact.site_old:
                 site_contact, created = SiteContact.objects.get_or_create(site=contact.site_old, contact=contact)
                 site_contact.first_name = contact.first_name_old
                 site_contact.last_name = contact.last_name_old
+                site_contact.save()
         for campaign_lead in Campaignlead.objects.all():
             #this will create contacts for all leads
             campaign_lead.save()
