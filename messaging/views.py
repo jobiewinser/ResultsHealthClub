@@ -52,8 +52,10 @@ def message_window(request, **kwargs):
                 context["seconds_until_send_disabled"] = seconds_until_send_disabled
     
     if get_user_allowed_to_use_site_messaging(request.user, whatsappnumber.site):
-        context["lead"] = Campaignlead.objects.filter(contact__customer_number=kwargs.get('customer_number')).last()
-        context["site_contact"] = context["lead"].site_contact
+        lead = Campaignlead.objects.filter(contact__customer_number=kwargs.get('customer_number')).last()
+        context["lead"] = lead
+        if lead:
+            context["site_contact"] = context["lead"].site_contact
         context["customer_number"] = kwargs.get('customer_number')
         context['whatsappnumber'] = whatsappnumber
         return render(request, "messaging/message_window_htmx.html", context)
