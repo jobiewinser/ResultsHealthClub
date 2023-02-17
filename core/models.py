@@ -315,7 +315,7 @@ class SiteContact(models.Model):
                     "code":template.language
                 }
                 site = self.site
-                response = whatsapp.send_template_message(self.customer_number, whatsappnumber, template, language, components)
+                response = whatsapp.send_template_message(customer_number, whatsappnumber, template, language, components)
                 reponse_messages = response.get('messages',[])
                 if reponse_messages:
                     for response_message in reponse_messages:
@@ -482,8 +482,6 @@ class WhatsappNumber(PhoneNumber):
         if after_datetime_timestamp:
             after_datetime = datetime.fromtimestamp(int(float(after_datetime_timestamp)))
             qs = qs.filter(datetime__lt=after_datetime)
-        for temp in qs.order_by('customer_number','-datetime'):
-            print()
         for dict in qs.order_by('customer_number','-datetime').distinct('customer_number').values('pk'):
             message_pk_list.append(dict.get('pk'))
         qs = WhatsAppMessage.objects.filter(pk__in=message_pk_list).order_by('-datetime')
