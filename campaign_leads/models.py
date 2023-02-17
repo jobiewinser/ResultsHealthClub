@@ -13,7 +13,7 @@ from django.db.models import Q
 from django.template import loader
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
-from core.views import get_or_create_contact_for_lead
+from core.views import get_and_create_contact_for_lead
 logger = logging.getLogger(__name__)
 
 BOOKING_CHOICES = (
@@ -141,8 +141,9 @@ class Campaignlead(models.Model):
     def ordered_bookings(self):  
         return self.booking_set.all().order_by('-datetime')
     @property
-    def whatsapp_number(self):  
-        return self.contact.customer_number
+    def whatsapp_number(self): 
+        if self.contact:
+            return self.contact.customer_number
     @property
     def active_sales_qs(self):
         return self.sale_set.exclude(archived=True)
@@ -448,9 +449,6 @@ class Campaignlead(models.Model):
             return HttpResponse("Message Error", status=400)
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-        if not self.contact and self.campaign:
-            contact = get_or_create_contact_for_lead(self, self.whatsapp_number_old)
-            self.contact = contact
         try:
             if not self.product_cost:
                 self.product_cost = self.campaign.product_cost

@@ -1003,7 +1003,7 @@ def change_theme(request):
     return HttpResponse("Successfully changed theme", status=200)
 
 from core.utils import normalize_phone_number
-def get_or_create_contact_for_lead(lead, customer_number):
+def get_and_create_contact_for_lead(lead, customer_number):
     #lead should have a campaign assigned before this is called
     # if lead.campaign.company:
     contact, created = Contact.objects.get_or_create(company=lead.campaign.company, customer_number=normalize_phone_number(customer_number))
@@ -1012,6 +1012,8 @@ def get_or_create_contact_for_lead(lead, customer_number):
         site_contact.first_name = lead.first_name
         site_contact.last_name = lead.last_name
         site_contact.save()
+    lead.contact = contact.save()
+    lead.save()
     return contact
 def get_or_create_contact_for_whatsapp_message(whatsapp_message):
     contact, created = Contact.objects.get_or_create(company=whatsapp_message.site.company, customer_number=normalize_phone_number(whatsapp_message.customer_number))

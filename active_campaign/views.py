@@ -14,6 +14,7 @@ from datetime import datetime, timedelta, time
 from core.user_permission_functions import *
 from active_campaign.api import ActiveCampaignApi
 from core.utils import normalize_phone_number
+from core.views import get_and_create_contact_for_lead
 @method_decorator(csrf_exempt, name="dispatch")
 class Webhooks(View):
     def get(self, request, *args, **kwargs):
@@ -48,6 +49,7 @@ class Webhooks(View):
                                     if not campaign.site.subscription.whatsapp_enabled:
                                         campaign_lead.disabled_automated_messaging = True
                                     campaign_lead.save()
+                                    get_and_create_contact_for_lead(campaign_lead, phone_number_whole)
                                     campaign_lead.trigger_refresh_websocket(refresh_position=True)
             return HttpResponse( "text", 200)
      
@@ -121,6 +123,7 @@ def import_active_campaign_leads(request, **kwargs):
                     if not campaign.site.subscription.whatsapp_enabled:
                         lead.disabled_automated_messaging = True
                     lead.save()
+                    get_and_create_contact_for_lead(lead, contact.get('phone'))
                     lead.trigger_refresh_websocket(refresh_position=refresh_position)
                     successful_import = True
         if successful_import:

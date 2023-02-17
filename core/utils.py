@@ -1,5 +1,5 @@
 def normalize_phone_number(number):
-    number = number.replace(" ", "")
+    number = str(number).replace(" ", "")
     if number[:3] == '440':
         return number[2:]
     elif number[:2] == '44':

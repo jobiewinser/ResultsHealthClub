@@ -618,14 +618,14 @@ def get_pipeline(request):
         context['sold_rate'] = 0
         
 # Arrived rates
-    if context['live_opportunities'] or context['lost_opportunities']:
+    if context['opportunities']:
         context['arrived_booked_rate'] = (context['arrived_opportunities'] / context['opportunities']) * 100
-    elif context['live_opportunities']:
+    elif context['arrived_opportunities']:
         context['arrived_booked_rate'] = 100
     else:
         context['arrived_booked_rate'] = 0
 
-    if context['booked_opportunities']:
+    if context['arrived_opportunities']:
         context['arrived_sold_rate'] = (context['sold_opportunities'] / (context['arrived_opportunities'])) * 100
     elif context['sold_opportunities']:
         context['arrived_sold_rate'] = 100

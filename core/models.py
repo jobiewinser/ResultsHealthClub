@@ -179,10 +179,13 @@ class SiteContact(models.Model):
         if self.last_name:
             return f"{self.first_name} {self.last_name}"
         return self.first_name
+    @property
+    def customer_number(self):
+        return self.contact.customer_number
     
     def send_template_whatsapp_message(self, whatsappnumber=None, template=None, communication_method = 'a'):
         print("Contact send_template_whatsapp_message", whatsappnumber, template, communication_method)
-        customer_number = self.contact.customer_number
+        customer_number = self.customer_number
         if settings.DEMO:
             whatsapp_message, created = WhatsAppMessage.objects.get_or_create(
                 wamid="",
@@ -875,6 +878,7 @@ class Profile(models.Model):
     @property
     def campaigns_allowed(self):
         sites = self.sites_allowed.filter(active=True)
+        from campaign_leads.models import Campaign
         return Campaign.objects.filter(site__in=sites)
     
     

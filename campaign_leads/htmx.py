@@ -17,6 +17,7 @@ from django.conf import settings
 logger = logging.getLogger(__name__) 
 from active_campaign.api import ActiveCampaignApi
 from core.core_decorators import *
+from core.views import get_and_create_contact_for_lead
 @login_required
 def get_modal_content(request, **kwargs):
     try:
@@ -153,6 +154,7 @@ def edit_lead(request, **kwargs):
         lead.disabled_automated_messaging = True
     
     lead.save()
+    get_and_create_contact_for_lead(lead, f"{country_code}{phone}")
     lead.trigger_refresh_websocket(refresh_position=refresh_position)
     return HttpResponse(str(lead.pk), status=200)
     # except Exception as e:
