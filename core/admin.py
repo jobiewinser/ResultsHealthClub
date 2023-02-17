@@ -1,7 +1,7 @@
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 from django.apps import apps
-
+from campaign_leads.models import Campaign
 from core.models import *
 models = apps.get_models()
 
@@ -19,6 +19,13 @@ class ErrorModelAdmin(admin.ModelAdmin):
     list_display = ['pk', 'created']
     search_fields = ['pk', 'created']
 admin.site.register(ErrorModel, ErrorModelAdmin)
+
+class CampaignAdmin(admin.ModelAdmin):
+    list_display = ['name','created','product_cost','guid',
+    'webhook_created','webhook_id','site','company',
+    
+    'whatsapp_business_account']
+admin.site.register(Campaign, CampaignAdmin)
 
 for model in models:
     try:

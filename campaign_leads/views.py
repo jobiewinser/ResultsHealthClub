@@ -6,10 +6,9 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
-from campaign_leads.models import Call, Campaign, Campaignlead, CampaignTemplateLink, CampaignCategory
+from campaign_leads.models import Call, Campaignlead, CampaignTemplateLink, CampaignCategory, Campaign, ManualCampaign
 from active_campaign.api import ActiveCampaignApi
 from active_campaign.models import ActiveCampaign
-from campaign_leads.models import ManualCampaign
 from core.models import Profile, Site, WhatsappBusinessAccount
 from core.user_permission_functions import get_user_allowed_to_add_call
 from core.views import get_site_pks_from_request_and_return_sites, get_campaign_category_pks_from_request, get_single_site_pk_from_request_or_default_profile_site

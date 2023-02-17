@@ -13,6 +13,7 @@ from django.db.models import Q
 from django.template import loader
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
+from core.views import get_or_create_contact_for_lead
 logger = logging.getLogger(__name__)
 
 BOOKING_CHOICES = (
@@ -23,16 +24,6 @@ booking_choices_dict = {}
 for tuple in BOOKING_CHOICES:
     booking_choices_dict[tuple[0]] = tuple[1]
 
-# class AdCampaign(models.Model):
-#     name = models.TextField(null=True, blank=True)
-class CampaignCategory(models.Model):
-    name = models.TextField(null=True, blank=True)  
-    site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
-class CampaignTemplateLink(PolymorphicModel):
-    send_order =  models.IntegerField(null=True, blank=True)
-    template = models.ForeignKey("whatsapp.WhatsappTemplate", on_delete=models.CASCADE, null=True, blank=True)
-    campaign = models.ForeignKey("campaign_leads.Campaign", on_delete=models.CASCADE, null=True, blank=True)
-    
 class Campaign(PolymorphicModel):
     name = models.TextField(null=True, blank=True)   
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -43,7 +34,7 @@ class Campaign(PolymorphicModel):
     webhook_id = models.TextField(null=True, blank=True)
     webhook_enabled = models.BooleanField(default=True)
     
-    campaign_category = models.ForeignKey("campaign_leads.CampaignCategory", on_delete=models.SET_NULL, null=True, blank=True)
+    campaign_category = models.ForeignKey("campaign_leads.campaigncategory", on_delete=models.SET_NULL, null=True, blank=True)
     site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
     company = models.ForeignKey("core.Company", on_delete=models.SET_NULL, null=True, blank=True)
     # first_send_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="first_send_template_campaign", on_delete=models.SET_NULL, null=True, blank=True)
@@ -78,6 +69,7 @@ class Campaign(PolymorphicModel):
         return campaign_template_links
     @property
     def site_templates(self):
+        from whatsapp.models import WhatsappTemplate
         return WhatsappTemplate.objects.filter(site=self.site)
     @property
     def warnings(self):
@@ -88,6 +80,15 @@ class Campaign(PolymorphicModel):
                     if not self.campaigntemplatelink_set.filter(send_order=1):
                         warnings["first_send_template_missing"] = "This campaign doesn't have a 1st Auto-Send Template, it won't automatically send a message to the customer"
         return warnings
+# class AdCampaign(models.Model):
+#     name = models.TextField(null=True, blank=True)
+class CampaignCategory(models.Model):
+    name = models.TextField(null=True, blank=True)  
+    site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
+class CampaignTemplateLink(PolymorphicModel):
+    send_order =  models.IntegerField(null=True, blank=True)
+    template = models.ForeignKey("whatsapp.WhatsappTemplate", on_delete=models.CASCADE, null=True, blank=True)
+    campaign = models.ForeignKey("campaign_leads.Campaign", on_delete=models.CASCADE, null=True, blank=True)
 @receiver(models.signals.post_save, sender=Campaign)
 def execute_after_save(sender, instance, created, *args, **kwargs):
     if created:
@@ -105,18 +106,18 @@ class ManualCampaign(Campaign):
 
 
 class Campaignlead(models.Model):
+    contact = models.ForeignKey("core.Contact", on_delete=models.SET_NULL, null=True, blank=True)
     first_name = models.TextField(null=True, blank=True, max_length=25)
     last_name = models.TextField(null=True, blank=True, max_length=25)
-    email = models.TextField(null=True, blank=True, max_length=50)
-    
-    whatsapp_number = models.TextField(null=True, blank=True)
+    email = models.TextField(null=True, blank=True, max_length=50)    
+    whatsapp_number_old = models.TextField(null=True, blank=True)
     # country_code = models.TextField(null=True, blank=True)
     campaign = models.ForeignKey("campaign_leads.Campaign", on_delete=models.SET_NULL, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     arrived = models.BooleanField(default=False)
     sold_old = models.BooleanField(default=False, null=True, blank=True)
-    marked_sold_old = models.DateTimeField(null=True, blank=True)
-    sold_by_old = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="campaignlead_sold_by", null=True, blank=True)
+    # marked_sold_old = models.DateTimeField(null=True, blank=True)
+    # sold_by_old = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="campaignlead_sold_by", null=True, blank=True)
     disabled_automated_messaging = models.BooleanField(default=False)
     archived = models.BooleanField(default=False)
     active_campaign_contact_id = models.TextField(null=True, blank=True)
@@ -130,8 +131,18 @@ class Campaignlead(models.Model):
             return str(self.name)
         return f"CampaignLead {str(self.pk)}"
     @property
+    def site_contact(self):  
+        if self.campaign.site:
+            from core.models import SiteContact
+            site_contact, created = SiteContact.objects.get_or_create(site=self.campaign.site, contact = self.contact)
+            return site_contact
+        return None
+    @property
     def ordered_bookings(self):  
         return self.booking_set.all().order_by('-datetime')
+    @property
+    def whatsapp_number(self):  
+        return self.contact.customer_number
     @property
     def active_sales_qs(self):
         return self.sale_set.exclude(archived=True)
@@ -437,31 +448,17 @@ class Campaignlead(models.Model):
             return HttpResponse("Message Error", status=400)
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-        self.whatsapp_number = normalize_phone_number(self.whatsapp_number)
+        if not self.contact and self.campaign:
+            contact = get_or_create_contact_for_lead(self, self.whatsapp_number_old)
+            self.contact = contact
         try:
             if not self.product_cost:
                 self.product_cost = self.campaign.product_cost
         except:
             pass
-        if self.sold_old:
-            Sale.objects.get_or_create(
-                lead=self,
-                user=self.sold_by_old,
-                datetime=self.marked_sold_old,
-            )
-            self.sold_old = None
-            self.sold_by_old = None
-            self.marked_sold_old = None
         super(Campaignlead, self).save(force_insert, force_update, using, update_fields)
         
-
-def normalize_phone_number(number):
-    if number:
-        if len(number) > 2:
-            if number[:2] == '44':
-                number = '0' + number[2:]
-    return number
-    
+        
 @receiver(models.signals.post_save, sender=Campaignlead)
 def execute_after_save(sender, instance, created, *args, **kwargs):
     if created and not instance.archived:
@@ -487,6 +484,8 @@ class Sale(models.Model):
     # type = models.CharField(choices=BOOKING_CHOICES, max_length=2, null=False, blank=False)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     archived = models.BooleanField(default=False)
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        super(Sale, self).save(force_insert, force_update, using, update_fields)
     # class Meta:
     #     ordering = ['-datetime']
 

@@ -1,8 +1,7 @@
 #0.9 safe
 import os
-import uuid
 from calendly.api import Calendly
-from core.models import ROLE_CHOICES, FreeTasterLink, Profile, Site, WhatsappNumber, Contact, SiteProfilePermissions, CompanyProfilePermissions, Subscription
+from core.models import ROLE_CHOICES, Profile, Site, WhatsappNumber, SiteProfilePermissions, CompanyProfilePermissions, Subscription, SiteContact
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import render
@@ -13,12 +12,10 @@ from django.views import View
 from core.user_permission_functions import get_profile_allowed_to_edit_other_profile, get_profile_allowed_to_edit_site_configuration 
 from core.views import get_site_pks_from_request_and_return_sites
 from campaign_leads.models import Campaignlead
-from django.conf import settings
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from core.core_decorators import *
 logger = logging.getLogger(__name__)
-from whatsapp.models import WhatsAppMessage
 
 @login_required
 def get_modal_content(request, **kwargs):
@@ -78,8 +75,8 @@ def get_modal_content(request, **kwargs):
                         lead = Campaignlead.objects.get(pk=lead_pk)
                     else:
                         customer_number = request.GET.get('customer_number') 
-                        site = Site.objects.filter(pk=request.GET.get('site_pk')).exclude(active=False).first()
-                        lead = Campaignlead.objects.filter(campaign__site=site, whatsapp_number=customer_number).last()
+                        site = Site.objects.filter(pk=request.GET.get('site_pk')).exclude(active=False).first()                        
+                        lead = Campaignlead.objects.filter(campaign__site=site, contact__customer_number=customer_number).last()
                         context['customer_numbers'] = [customer_number]   
                     if not lead.campaign.whatsapp_business_account:
                         return HttpResponse("You don't have a whatsapp number linked to this campaign!", status="400")
@@ -89,12 +86,12 @@ def get_modal_content(request, **kwargs):
                  
                 # context['site'] = context['whatsappnumber'].whatsapp_business_account.site
                 lead_pk = request.GET.get('lead_pk', None)
-                contact_pk = request.GET.get('contact_pk', None)
+                site_contact = request.GET.get('site_contact', None)
                 customer_number = request.GET.get('customer_number', None)                
                 if lead_pk:
                     context['lead'] = Campaignlead.objects.filter(pk=lead_pk).first()
-                if contact_pk:
-                    context['contact'] = Contact.objects.filter(pk=contact_pk).first()
+                if site_contact:
+                    context['site_contact'] = SiteContact.objects.filter(pk=site_contact).first()
                 if customer_number:
                     context['customer_number'] = customer_number
             # elif template_name == 'change_default_payment_method':

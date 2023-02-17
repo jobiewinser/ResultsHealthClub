@@ -11,7 +11,7 @@ from django.contrib.sessions.models import Session
 from django.contrib.auth.models import User
 from calendly.api import Calendly
 from core.core_decorators import check_core_profile_requirements_fulfilled
-from core.models import ROLE_CHOICES, StripeCustomer, FreeTasterLink, FreeTasterLinkClick, Profile, Site, CompanyProfilePermissions, SiteProfilePermissions, Feedback, Subscription,SiteSubscriptionChange, Company
+from core.models import ROLE_CHOICES, StripeCustomer, FreeTasterLink, FreeTasterLinkClick, Profile, Site, CompanyProfilePermissions, SiteProfilePermissions, Feedback, Subscription,SiteSubscriptionChange, Company, Contact, SiteContact
 from django.contrib.auth import authenticate
 from django.contrib.auth import login
 from django.core.exceptions import PermissionDenied
@@ -1001,4 +1001,18 @@ def change_theme(request):
     profile.theme = request.POST.get('theme', 'light')
     profile.save()
     return HttpResponse("Successfully changed theme", status=200)
-    
+
+from core.utils import normalize_phone_number
+def get_or_create_contact_for_lead(lead, customer_number):
+    #lead should have a campaign assigned before this is called
+    # if lead.campaign.company:
+    contact, created = Contact.objects.get_or_create(company=lead.campaign.company, customer_number=normalize_phone_number(customer_number))
+    site_contact, created = SiteContact.objects.get_or_create(site=lead.campaign.site, contact=contact)
+    if created:
+        site_contact.first_name = lead.first_name
+        site_contact.last_name = lead.last_name
+        site_contact.save()
+    return contact
+def get_or_create_contact_for_whatsapp_message(whatsapp_message):
+    contact, created = Contact.objects.get_or_create(company=whatsapp_message.site.company, customer_number=normalize_phone_number(whatsapp_message.customer_number))
+    return contact

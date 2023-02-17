@@ -6,9 +6,6 @@ from django.db.models.deletion import SET_NULL
 from django.contrib.auth.models import User
 from django.dispatch import receiver
 from django.http import HttpResponse
-from calendly.api import Calendly
-
-from campaign_leads.models import Campaign, Campaignlead, ManualCampaign
 # from twilio.models import TwilioMessage
 from django.db.models import Q, Count
 from whatsapp.api import Whatsapp
@@ -23,13 +20,8 @@ from channels.layers import get_channel_layer
 from django.contrib.postgres.fields import ArrayField
 from stripe_integration.api import *
 from django.core.mail import send_mail
+from core.utils import normalize_phone_number
 import sys
-
-
-def normalize_phone_number(number):
-    if number[:2] == '44':
-        number = '0' + number[2:]
-    return number
 
 class Subscription(models.Model):
     NAME_CHOICES = (
@@ -146,6 +138,8 @@ class AttachedError(models.Model):
     whatsapp_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="errors", on_delete=models.SET_NULL, null=True, blank=True)
     campaign_lead = models.ForeignKey("campaign_leads.Campaignlead", related_name="errors", on_delete=models.SET_NULL, null=True, blank=True)
     contact = models.ForeignKey("core.Contact", related_name="errors", on_delete=models.SET_NULL, null=True, blank=True)
+    site_contact = models.ForeignKey("core.SiteContact", related_name="errors", on_delete=models.SET_NULL, null=True, blank=True)
+    
     whatsapp_number = models.ForeignKey("core.WhatsappNumber", related_name="errors", on_delete=models.SET_NULL, null=True, blank=True)
     whatsapp_message = models.ForeignKey("whatsapp.WhatsappMessage", related_name="attached_errors", on_delete=models.SET_NULL, null=True, blank=True)
     whatsapp_template = models.ForeignKey("whatsapp.WhatsappTemplate", related_name="attached_errors", on_delete=models.SET_NULL, null=True, blank=True)
@@ -157,24 +151,39 @@ class AttachedError(models.Model):
     additional_info = models.TextField(blank=True, null=True)  
     
 class Contact(models.Model):
-    first_name = models.TextField(null=True, blank=True, max_length=25)
-    last_name = models.TextField(null=True, blank=True, max_length=25)
-    site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
+    first_name_old = models.TextField(null=True, blank=True, max_length=25)
+    last_name_old = models.TextField(null=True, blank=True, max_length=25)
+    site_old = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
+    company = models.ForeignKey('core.Company', on_delete=models.SET_NULL, null=True, blank=True)
     customer_number = models.CharField(max_length=50, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    @property
-    def name(self):
-        if self.last_name:
-            return f"{self.first_name} {self.last_name}"
-        return self.first_name
+    # @property
+    # def name(self):
+    #     if self.last_name:
+    #         return f"{self.first_name} {self.last_name}"
+    #     return self.first_name
+    
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        self.customer_number = normalize_phone_number(self.customer_number)
+        super(Contact, self).save(force_insert, force_update, using, update_fields)
+
+class SiteContact(models.Model):
+    site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
+    contact = models.ForeignKey('core.Contact', on_delete=models.SET_NULL, null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    first_name_old = models.TextField(null=True, blank=True, max_length=25)
+    last_name_old = models.TextField(null=True, blank=True, max_length=25)
+    
     def send_template_whatsapp_message(self, whatsappnumber=None, template=None, communication_method = 'a'):
         print("Contact send_template_whatsapp_message", whatsappnumber, template, communication_method)
-        customer_number = self.customer_number
+        customer_number = self.contact.customer_number
         if settings.DEMO:
             whatsapp_message, created = WhatsAppMessage.objects.get_or_create(
                 wamid="",
                 datetime=datetime.now(),
-                contact=self,
+                contact=self.contact,
+                site_contact=self,
                 message=f"""
                 <b>Hi {self.first_name}</b>
                 <br>
@@ -192,36 +201,35 @@ class Contact(models.Model):
             return HttpResponse(status=200)
         from core.models import AttachedError
         if communication_method == 'a' and whatsappnumber:
-            print("ContactDEBUG1")
             if template:    
-                print("ContactDEBUG2")            
                 AttachedError.objects.filter(
                     type = type,
-                    contact = self,
+                    contact = self.contact,
+                    site_contact=self,
                     archived = False,
                 ).update(archived = True)
                 if template.whatsapp_business_account.whatsapp_business_account_id: 
-                    print("ContactDEBUG3")                   
                     AttachedError.objects.filter(
                         type = '1202',
-                        contact = self,
+                        contact = self.contact,
+                        site_contact=self,
                         archived = False,
                     ).update(archived = True)
                     if template.whatsapp_business_account.site.whatsapp_template_sending_enabled:
-                        print("ContactDEBUG4")
                         AttachedError.objects.filter(
                             type = '1220',
-                            contact = self,
+                            contact = self.contact,
+                            site_contact=self,
                             archived = False,
                         ).update(archived = True)
                         if template.message_template_id:
-                            print("ContactDEBUG5")
                             AttachedError.objects.filter(
                                 type = '1201',
-                                contact = self,
+                                contact = self.contact,
+                                site_contact=self,
                                 archived = False,
                             ).update(archived = True)
-                            whatsapp = Whatsapp(self.site.company.whatsapp_access_token)
+                            whatsapp = Whatsapp(self.contact.company.whatsapp_access_token)
                             template_live = whatsapp.get_template(template.whatsapp_business_account.whatsapp_business_account_id, template.message_template_id)
                             template.name = template_live['name']
                             template.category = template_live['category']
@@ -229,7 +237,7 @@ class Contact(models.Model):
                             template.save()
                             components =   [] 
                             
-                            whole_text = template.render_whatsapp_template_to_html(contact=self)
+                            whole_text = template.render_whatsapp_template_to_html(site_contact=self)
                             counter = 1
                             for component in template.components:
                                 params = []
@@ -247,14 +255,16 @@ class Contact(models.Model):
                                         text = text.replace('[[1]]',self.first_name)
                                         counter = counter + 1
                                     if '[[2]]' in text:
-                                        params.append(              
-                                            {
-                                                "type": "text",
-                                                "text":  self.campaign.name
-                                            }
-                                        )
-                                        text = text.replace('[[2]]',self.campaign.name)
-                                        counter = counter + 1
+                                        raise Exception #investigrate this further, this can't be sent as there may be no campaign linked
+                                    # if '[[2]]' in text:
+                                    #     params.append(              
+                                    #         {
+                                    #             "type": "text",
+                                    #             "text":  self.campaign.name
+                                    #         }
+                                    #     )
+                                    #     text = text.replace('[[2]]',self.campaign.name)
+                                    #     counter = counter + 1
                                 if params:
                                     components.append(
                                         {
@@ -263,12 +273,11 @@ class Contact(models.Model):
                                         }
                                     )
                         else:
-                            print("ContactDEBUG6")
-                            print("errorhere selected template not found on Whatsapp's system")
                             attached_error, created = AttachedError.objects.get_or_create(
                                 type = '1201',
                                 attached_field = "contact",
-                                contact = self,
+                                contact = self.contact,
+                                site_contact=self,
                                 archived = False,
                             )
                             if not created:
@@ -276,12 +285,12 @@ class Contact(models.Model):
                                 attached_error.save()
                             return HttpResponse("Messaging Error: Couldn't find the specified template", status=400)
                     else:
-                        print("ContactDEBUG7")
                         print("errorhere template messaging disabled")
                         attached_error, created = AttachedError.objects.get_or_create(
                             type = '1220',
                             attached_field = "contact",
-                            contact = self,
+                            contact = self.contact,
+                            site_contact=self,
                             archived = False,
                         )
                         if not created:
@@ -289,12 +298,12 @@ class Contact(models.Model):
                             attached_error.save()
                         return HttpResponse("Messaging Error: Template Messaging disabled for this site", status=400)
                 else:
-                    print("ContactDEBUG8")
                     print("errorhere no Whatsapp Business Account Linked")
                     attached_error, created = AttachedError.objects.get_or_create(
                         type = '1202',
                         attached_field = "contact",
-                        contact = self,
+                        contact = self.contact,
+                        site_contact=self,
                         archived = False,
                     )
                     if not created:
@@ -309,12 +318,12 @@ class Contact(models.Model):
                 response = whatsapp.send_template_message(self.customer_number, whatsappnumber, template, language, components)
                 reponse_messages = response.get('messages',[])
                 if reponse_messages:
-                    print("ContactDEBUG9")
                     for response_message in reponse_messages:
                         whatsapp_message, created = WhatsAppMessage.objects.get_or_create(
                             wamid=response_message.get('id'),
                             datetime=datetime.now(),
-                            contact=self,
+                            contact = self.contact,
+                            site_contact=self,
                             message=whole_text,
                             site=site,
                             whatsappnumber=whatsappnumber,
@@ -326,12 +335,6 @@ class Contact(models.Model):
                             send_message_to_websocket(whatsappnumber, customer_number, whatsapp_message, whatsappnumber.whatsapp_business_account )
                     logger.debug("site.send_template_whatsapp_message success") 
                     return HttpResponse("Message Sent", status=200)
-
-    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-        self.customer_number = normalize_phone_number(self.customer_number)
-        super(Contact, self).save(force_insert, force_update, using, update_fields)
-
-        # return HttpResponse("No Communication method specified", status=500)
 def send_message_to_websocket(whatsappnumber, customer_number, whatsapp_message, site):
     channel_layer = get_channel_layer()          
     message_context = {
@@ -856,7 +859,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True)
     avatar = models.ImageField(default='default.png', upload_to='profile_images')
     site = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
-    campaign_category = models.ForeignKey("campaign_leads.CampaignCategory", on_delete=models.SET_NULL, null=True, blank=True)
+    campaign_category = models.ForeignKey("campaign_leads.campaigncategory", on_delete=models.SET_NULL, null=True, blank=True)
     company = models.ForeignKey("core.Company", on_delete=models.SET_NULL, null=True, blank=True)
     sites_allowed = models.ManyToManyField("core.Site", related_name="profile_sites_allowed", null=True, blank=True)
     calendly_event_page_url = models.TextField(blank=True, null=True)
@@ -1006,3 +1009,5 @@ class Feedback(models.Model):
 class StripeConfig(models.Model):
     webhook_id = models.TextField(null=True, blank=True)
     webhook_secret = models.TextField(null=True, blank=True)
+
+    

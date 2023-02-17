@@ -4,7 +4,7 @@ from django.views.generic import TemplateView
 from django.shortcuts import render
 
 from campaign_leads.models import Campaignlead
-from core.models import Site, WhatsappNumber, Contact, AttachedError
+from core.models import Site, WhatsappNumber, Contact, AttachedError, SiteContact
 from core.user_permission_functions import get_allowed_site_chats_for_user, get_user_allowed_to_use_site_messaging
 from core.views import get_site_pks_from_request_and_return_sites
 from whatsapp.models import WhatsAppMessage, WhatsappMessageImage
@@ -52,8 +52,8 @@ def message_window(request, **kwargs):
                 context["seconds_until_send_disabled"] = seconds_until_send_disabled
     
     if get_user_allowed_to_use_site_messaging(request.user, whatsappnumber.site):
-        context["lead"] = Campaignlead.objects.filter(whatsapp_number=kwargs.get('customer_number')).last()
-        context["contact"] = Contact.objects.filter(customer_number=kwargs.get('customer_number')).last()
+        context["lead"] = Campaignlead.objects.filter(contact__customer_number=kwargs.get('customer_number')).last()
+        context["site_contact"] = context["lead"].site_contact
         context["customer_number"] = kwargs.get('customer_number')
         context['whatsappnumber'] = whatsappnumber
         return render(request, "messaging/message_window_htmx.html", context)

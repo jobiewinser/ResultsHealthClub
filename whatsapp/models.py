@@ -8,14 +8,10 @@ import bleach
 from django.db.models import JSONField
 
 from messaging.models import Message, MessageImage
-from django.dispatch import receiver
 from PIL import Image
-from io import StringIO, BytesIO
-            
-from datetime import datetime, timedelta
-from django.core.files.images import ImageFile
-import os
-
+from io import BytesIO
+from core.utils import normalize_phone_number
+from datetime import datetime
 GYM_CHOICES = (
                     ('a', 'Abingdon'),
                     ('b', 'Alton'),
@@ -93,14 +89,6 @@ class WhatsAppMessage(Message):
         if self.customer_number:
             self.customer_number = normalize_phone_number(self.customer_number)
         super(WhatsAppMessage, self).save(force_insert, force_update, using, update_fields)
-        
-
-def normalize_phone_number(number):
-    if number[:2] == '44':
-        number = '0' + number[2:]
-    return number
-# class WhatsAppMessage(models.Model):
-#     pass 
     
 class WhatsAppMessageStatus(models.Model):
     whatsapp_message = models.ForeignKey(WhatsAppMessage, on_delete=models.SET_NULL, null=True, blank=True)    
@@ -193,15 +181,15 @@ class WhatsappTemplate(models.Model):
             return self.site.name
         return ''
 
-    def render_whatsapp_template_to_html(self, lead=None, contact=None, first_name=None):
+    def render_whatsapp_template_to_html(self, lead=None, self_contact=None, first_name=None):
         rendered_html = ""
         try:
             text = f"<b>{self.components[0]['text']}</b>"
             if '[[1]]' in text:
                 if lead:                
                     text = text.replace('[[1]]',lead.first_name)
-                elif contact:
-                    text = text.replace('[[1]]',contact.first_name)
+                elif self_contact:
+                    text = text.replace('[[1]]',self_contact.first_name)
                 elif first_name:
                     text = text.replace('[[1]]',first_name)
             if '[[2]]' in text:            
@@ -214,8 +202,8 @@ class WhatsappTemplate(models.Model):
             if '[[1]]' in text:
                 if lead:                
                     text = text.replace('[[1]]',lead.first_name)
-                elif contact:
-                    text = text.replace('[[1]]',contact.first_name)
+                elif self_contact:
+                    text = text.replace('[[1]]',self_contact.first_name)
                 elif first_name:
                     text = text.replace('[[1]]',first_name)
             if '[[2]]' in text:   
@@ -228,8 +216,8 @@ class WhatsappTemplate(models.Model):
             if '[[1]]' in text:
                 if lead:                
                     text = text.replace('[[1]]',lead.first_name)
-                elif contact:
-                    text = text.replace('[[1]]',contact.first_name)
+                elif self_contact:
+                    text = text.replace('[[1]]',self_contact.first_name)
                 elif first_name:
                     text = text.replace('[[1]]',first_name)
             if '[[2]]' in text:

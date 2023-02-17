@@ -5,9 +5,9 @@ from django.contrib.auth.models import User
 from django.shortcuts import render
 import logging
 from django.contrib.auth.decorators import login_required
-from campaign_leads.models import Campaign, Campaignlead, Booking, Note, ManualCampaign, CampaignCategory, Sale
+from campaign_leads.models import Campaignlead, Booking, Note, ManualCampaign, CampaignCategory, Sale, Campaign
 from active_campaign.models import ActiveCampaign
-from core.models import Site, WhatsappNumber,Subscription
+from core.models import Site, WhatsappNumber, Subscription
 from core.views import get_site_pks_from_request_and_return_sites
 from django.db.models import Count
 from asgiref.sync import async_to_sync
@@ -145,7 +145,7 @@ def edit_lead(request, **kwargs):
     lead.first_name = first_name
     lead.last_name = last_name
     lead.email = email
-    lead.whatsapp_number = f"{country_code}{phone}"
+    # lead.contact.whatsapp_number = f"{country_code}{phone}"
     if product_cost:
         lead.product_cost = product_cost
     lead.disabled_automated_messaging = disabled_automated_messaging

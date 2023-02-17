@@ -2,7 +2,6 @@ import os
 import glob
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
-from campaign_leads.models import Campaignlead, Campaign
 from core.models import Site 
 import requests
 import random as r

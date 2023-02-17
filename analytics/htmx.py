@@ -3,8 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 
-from campaign_leads.models import Call, Campaign, Campaignlead, CampaignCategory, Sale, Booking
-from core.models import Site
+from campaign_leads.models import Call, Campaignlead, CampaignCategory, Sale, Booking, Campaign
 from dateutil import relativedelta
 from django.contrib.auth.models import User
 from core.templatetags.core_tags import short_month_name

@@ -1,8 +1,8 @@
 import logging
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from campaign_leads.models import Campaign, Campaignlead
-from active_campaign.models import ActiveCampaignWebhookRequest, ActiveCampaign
+from campaign_leads.models import Campaignlead
+from active_campaign.models import ActiveCampaignWebhookRequest, ActiveCampaign, Campaign
 from core.models import Site
 logger = logging.getLogger(__name__)
 from django.views import View 
@@ -13,6 +13,7 @@ from django.conf import settings
 from datetime import datetime, timedelta, time
 from core.user_permission_functions import *
 from active_campaign.api import ActiveCampaignApi
+from core.utils import normalize_phone_number
 @method_decorator(csrf_exempt, name="dispatch")
 class Webhooks(View):
     def get(self, request, *args, **kwargs):
@@ -31,7 +32,7 @@ class Webhooks(View):
                         campaign = ActiveCampaign.objects.get(guid=guid)
                         if campaign.site:
                             if campaign.site.active_campaign_leads_enabled:
-                                phone_number_whole = str(data.get('contact[phone]', "")).replace(' ','').replace('+','')
+                                phone_number_whole = normalize_phone_number(str(data.get('contact[phone]', "")))
                                 if not Campaignlead.objects.filter(
                                         active_campaign_contact_id=data.get('contact[id]'),
                                         campaign=campaign,
@@ -41,8 +42,7 @@ class Webhooks(View):
                                             campaign=campaign,
                                         )
                                     campaign_lead.first_name=data.get('contact[first_name]', "None")
-                                    campaign_lead.whatsapp_number=phone_number_whole
-                                    campaign_lead.active_campaign_form_id=data.get('form[id]', None)
+                                    campaign_lead.active_campaign_form_id = data.get('form[id]', None)
                                     campaign_lead.email = data.get('contact[email]', "")
                                     
                                     if not campaign.site.subscription.whatsapp_enabled:
@@ -117,7 +117,6 @@ def import_active_campaign_leads(request, **kwargs):
                     lead.first_name = contact.get('firstName')
                     lead.last_name = contact.get('lastName')
                     lead.email = contact.get('email')
-                    lead.whatsapp_number = contact.get('phone')
                     lead.disabled_automated_messaging = disabled_automated_messaging
                     if not campaign.site.subscription.whatsapp_enabled:
                         lead.disabled_automated_messaging = True

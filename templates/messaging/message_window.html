@@ -17,7 +17,7 @@
                         hx-indicator="#page_load_indicator" hx-target="#generic_modal_body" 
                         hx-get="{% url 'get-modal-content' %}" 
                         hx-push-url="false"
-                        hx-vals='{"template_name": "send_new_template_message", "whatsappnumber_pk":"{{whatsappnumber.pk}}", "lead_pk":"{{lead.pk}}", "contact_pk":"{{contact.pk}}", "customer_number":"{{customer_number}}"}'
+                        hx-vals='{"template_name": "send_new_template_message", "whatsappnumber_pk":"{{whatsappnumber.pk}}", "lead_pk":"{{lead.pk}}", "site_contact_pk":"{{site_contact.pk}}", "customer_number":"{{customer_number}}"}'
                         hx-swap="innerHTML" hx-trigger="click">
                             <i class="fa fa-paper-plane-top" aria-hidden="true"></i>
                     </button>

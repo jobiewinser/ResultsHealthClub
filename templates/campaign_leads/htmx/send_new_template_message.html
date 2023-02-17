@@ -10,8 +10,8 @@
                 <option value="{{template.pk}}" 
                 {%if lead%}
                 data-rendered_template="{{template|render_whatsapp_template_with_lead_to_html_tag:lead|safe}}"
-                {%elif contact%}
-                data-rendered_template="{{template|render_whatsapp_template_with_contact_to_html_tag:contact|safe}}"
+                {%elif site_contact%}
+                data-rendered_template="{{template|render_whatsapp_template_with_site_contact_to_html_tag:site_contact|safe}}"
                 {%else%}
                 data-rendered_template="{{template|render_whatsapp_template_to_html_tag|safe}}"
                 {%endif%}
@@ -20,7 +20,7 @@
                 {%endfor%}
             </select>
             <br>
-            {% if not lead and not contact %}
+            {% if not lead and not site_contact %}
             <input name="first_name" maxlength="25" class="form-control send_new_template_message_input" placeholder="Customer Name"/>
             <br>
             <div class="row">
@@ -333,7 +333,7 @@
                 hx-post="{% url 'send-new-template-message' %}" 
                 hx-push-url="false"
                 hx-indicator="#send_new_template_message_htmx_indicator"
-                hx-vals='{"whatsappnumber_pk":"{{whatsappnumber.pk}}"{%if contact.pk%}, "contact_pk":"{{contact.pk}}"{%endif%}{%if lead.pk%}, "lead_pk":"{{lead.pk}}"{%endif%}}'
+                hx-vals='{"whatsappnumber_pk":"{{whatsappnumber.pk}}"{%if site_contact.pk%}, "site_contact_pk":"{{site_contact.pk}}"{%endif%}{%if lead.pk%}, "lead_pk":"{{lead.pk}}"{%endif%}}'
                 hx-swap="none" hx-trigger="click">
                 <i class="fa-solid fa-paper-plane-top"></i> Send
             </button>
@@ -344,5 +344,5 @@
     </div>
 </div>
 <span hx-swap-oob="true" id="generic_modal_title">
-    Send new template message {% if lead %} to <b>{{lead.name}}</b>{% elif contact %} to <b>{{contact.name}}</b>{%endif%} {% if whatsappnumber.whatsapp_business_account %} from <b>{{whatsappnumber.whatsapp_business_account.whatsappnumber}}</b>{%endif%}
+    Send new template message {% if lead %} to <b>{{lead.name}}</b>{% elif site_contact %} to <b>{{site_contact.name}}</b>{%endif%} {% if whatsappnumber.whatsapp_business_account %} from <b>{{whatsappnumber.whatsapp_business_account.whatsappnumber}}</b>{%endif%}
 </span>

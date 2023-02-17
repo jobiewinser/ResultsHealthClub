@@ -14,11 +14,12 @@ from django.template import loader
 logger = logging.getLogger(__name__)
 from django.views import View 
 from django.utils.decorators import method_decorator
-from core.models import Site, WhatsappBusinessAccount, WhatsappNumber, Contact, Company
+from core.models import Site, WhatsappBusinessAccount, WhatsappNumber, Contact, Company, SiteContact
 from core.core_decorators import check_core_profile_requirements_fulfilled
 from django.contrib.auth.decorators import login_required
 from whatsapp.models import WhatsappTemplate
 from core.core_decorators import *
+from core.utils import normalize_phone_number
 import hmac
 import hashlib
 import pickle
@@ -166,9 +167,9 @@ class Webhooks(View):
 
 def handle_received_whatsapp_image_message(message_json, metadata, webhook_object):
     wamid = message_json.get('id')
-    to_number = metadata.get('display_phone_number')
-    from_number = message_json.get('from')
-    lead = Campaignlead.objects.filter(whatsapp_number=from_number).last()
+    to_number = normalize_phone_number(f"{metadata.get('display_phone_number').split('+')[-1]}")
+    from_number = normalize_phone_number(f"{message_json.get('from').split('+')[-1]}")
+    lead = Campaignlead.objects.filter(contact__customer_number=from_number).last()
     whatsappnumber = WhatsappNumber.objects.filter(number=to_number)
     site = whatsappnumber.whatsapp_business_account.site
     # site = Site.objects.get(phonenumber=whatsappnumber)
@@ -194,20 +195,19 @@ def handle_received_whatsapp_image_message(message_json, metadata, webhook_objec
         lead=lead,
         raw_webhook=webhook_object,
         whatsappnumber=whatsappnumber,
+        contact=lead.contact,
+        site_contact=lead.site_contact,
     )    
     whatsapp_message.image.set([image_object])
     new_message_to_websocket(whatsapp_message, whatsappnumber)
 
-def normalize_phone_number(number):
-    if number[:2] == '44':
-        number = '0' + number[2:]
-    return number
+
 
 def handle_received_whatsapp_text_message(message_json, metadata, webhook_object):
     wamid = message_json.get('id')
-    to_number =  metadata.get('display_phone_number')
-    from_number = normalize_phone_number(message_json.get('from'))
-    lead = Campaignlead.objects.filter(whatsapp_number=from_number).last()
+    to_number = normalize_phone_number(f"{metadata.get('display_phone_number').split('+')[-1]}")
+    from_number = normalize_phone_number(f"{message_json.get('from').split('+')[-1]}")
+    lead = Campaignlead.objects.filter(contact__customer_number=from_number).last()
     whatsappnumber = WhatsappNumber.objects.get(number=to_number)
     site = whatsappnumber.whatsapp_business_account.site
     # site = Site.objects.get(phonenumber=whatsappnumber)
@@ -225,6 +225,8 @@ def handle_received_whatsapp_text_message(message_json, metadata, webhook_object
         lead=lead,
         raw_webhook=webhook_object,
         whatsappnumber=whatsappnumber,
+        contact=lead.contact,
+        site_contact=lead.site_contact,
     )
     new_message_to_websocket(whatsapp_message, whatsappnumber)
 
@@ -588,14 +590,15 @@ def send_new_template_message(request):
     else:
         combined_number = phone
 
-    contact = Contact.objects.filter(pk=request.POST.get('contact_pk', 0)).first()
+    site_contact = SiteContact.objects.filter(pk=request.POST.get('site_contact_pk', 0)).first()
     lead = Campaignlead.objects.filter(pk=request.POST.get('lead_pk', 0)).first()
     if not lead:
-        lead = Campaignlead.objects.filter(campaign__site=whatsappnumber.whatsapp_business_account.site, whatsapp_number=combined_number).first()
+        lead = Campaignlead.objects.filter(campaign__site=whatsappnumber.whatsapp_business_account.site, contact__customer_number=combined_number).first()
     first_name = request.POST.get('first_name', '')[:25]
+    last_name = request.POST.get('last_name', '')[:25]
     if get_user_allowed_to_send_from_whatsappnumber(request.user, whatsappnumber) and template:
-        if contact:
-            response = contact.send_template_whatsapp_message(whatsappnumber=whatsappnumber, template=template)
+        if site_contact:
+            response = site_contact.send_template_whatsapp_message(whatsappnumber=whatsappnumber, template=template)
             if response:
                 return response
         elif lead:
@@ -610,10 +613,12 @@ def send_new_template_message(request):
             if not phone:
                 return HttpResponse("Please enter a phone number", status=400)
             site = whatsappnumber.whatsapp_business_account.site
-            contact, created = Contact.objects.get_or_create(site=site, customer_number=combined_number)
-            contact.first_name = first_name
-            contact.save()
-            response = contact.send_template_whatsapp_message(whatsappnumber=whatsappnumber, template=template)
+            contact, created = Contact.objects.get_or_create(company=site.company, customer_number=combined_number)
+            site_contact, created = SiteContact.objects.get_or_create(contact=contact, site=site)
+            site_contact.first_name = first_name
+            site_contact.last_name = last_name
+            site_contact.save()
+            response = site_contact.send_template_whatsapp_message(whatsappnumber=whatsappnumber, template=template)
             if response:
                 return response
         return HttpResponse( status=500)

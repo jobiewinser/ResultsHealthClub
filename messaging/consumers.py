@@ -13,6 +13,7 @@ from whatsapp.models import WhatsAppMessage
 import logging    
 from channels.layers import get_channel_layer
 from asgiref.sync import sync_to_async
+from core.utils import normalize_phone_number
 logger = logging.getLogger(__name__)
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -91,22 +92,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send(
             text_data=event['message']
         )
-        
-        
-
-
-def normalize_phone_number(number):
-    if number[:2] == '44':
-        number = '0' + number[2:]
-    return number
-
 
 @sync_to_async
 def send_whatsapp_message_to_number(message, customer_number, user, whatsappnumber_pk):  
     customer_number = normalize_phone_number(customer_number)
     whatsappnumber = WhatsappNumber.objects.get(pk=whatsappnumber_pk, whatsapp_business_account__active=True)
     logger.debug("send_whatsapp_message_to_number start") 
-    lead = Campaignlead.objects.filter(whatsapp_number=customer_number).first()  
+    lead = Campaignlead.objects.filter(contact__customer_number=customer_number).first()  
     if get_user_allowed_to_use_site_messaging(user, whatsappnumber.site):
         if lead:     
             if whatsappnumber.site.company == user.profile.company: 
@@ -154,7 +146,7 @@ def get_rendered_html(message, message_context, messaging_customer_number, whats
 
     if message.inbound:
         rendered_html = f"""{rendered_html}
-        <span hx-swap-oob="true" id="chat_notification_{message.customer_number}">
+        <span hx-swap-oob="true" id="chat_notification_{message.self_contact.customer_number}">
             <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
                 <span class="visually-hidden">New alerts</span>
             </span>
@@ -162,7 +154,7 @@ def get_rendered_html(message, message_context, messaging_customer_number, whats
         """
     else:
         rendered_html = f"""{rendered_html}
-        <span hx-swap-oob="true" id="chat_notification_{message.customer_number}">
+        <span hx-swap-oob="true" id="chat_notification_{message.self_contact.customer_number}">
         </span>
         """
     return rendered_html
