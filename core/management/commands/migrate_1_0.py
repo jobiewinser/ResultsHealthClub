@@ -17,7 +17,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         for customer_number in Contact.objects.all().values_list('customer_number', flat=True).distinct(): 
             if Contact.objects.filter(customer_number=customer_number).count() > 1:
-                Contact.objects.exclude(pk=Contact.objects.filter(customer_number=customer_number, customer_number=customer_number).first().pk).delete()
+                Contact.objects.filter(customer_number=customer_number).exclude(pk=Contact.objects.filter(customer_number=customer_number).first().pk).delete()
             
         for contact in Contact.objects.all():
             if contact.site_old:
