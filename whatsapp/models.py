@@ -181,15 +181,15 @@ class WhatsappTemplate(models.Model):
             return self.site.name
         return ''
 
-    def render_whatsapp_template_to_html(self, lead=None, self_contact=None, first_name=None):
+    def render_whatsapp_template_to_html(self, lead=None, site_contact=None, first_name=None):
         rendered_html = ""
         try:
             text = f"<b>{self.components[0]['text']}</b>"
             if '[[1]]' in text:
                 if lead:                
                     text = text.replace('[[1]]',lead.first_name)
-                elif self_contact:
-                    text = text.replace('[[1]]',self_contact.first_name)
+                elif site_contact:
+                    text = text.replace('[[1]]',site_contact.first_name)
                 elif first_name:
                     text = text.replace('[[1]]',first_name)
             if '[[2]]' in text:            
@@ -202,8 +202,8 @@ class WhatsappTemplate(models.Model):
             if '[[1]]' in text:
                 if lead:                
                     text = text.replace('[[1]]',lead.first_name)
-                elif self_contact:
-                    text = text.replace('[[1]]',self_contact.first_name)
+                elif site_contact:
+                    text = text.replace('[[1]]',site_contact.first_name)
                 elif first_name:
                     text = text.replace('[[1]]',first_name)
             if '[[2]]' in text:   
@@ -216,8 +216,8 @@ class WhatsappTemplate(models.Model):
             if '[[1]]' in text:
                 if lead:                
                     text = text.replace('[[1]]',lead.first_name)
-                elif self_contact:
-                    text = text.replace('[[1]]',self_contact.first_name)
+                elif site_contact:
+                    text = text.replace('[[1]]',site_contact.first_name)
                 elif first_name:
                     text = text.replace('[[1]]',first_name)
             if '[[2]]' in text:

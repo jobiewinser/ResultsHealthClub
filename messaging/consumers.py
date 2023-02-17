@@ -146,7 +146,7 @@ def get_rendered_html(message, message_context, messaging_customer_number, whats
 
     if message.inbound:
         rendered_html = f"""{rendered_html}
-        <span hx-swap-oob="true" id="chat_notification_{message.self_contact.customer_number}">
+        <span hx-swap-oob="true" id="chat_notification_{message.site_contact.customer_number}">
             <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
                 <span class="visually-hidden">New alerts</span>
             </span>
@@ -154,7 +154,7 @@ def get_rendered_html(message, message_context, messaging_customer_number, whats
         """
     else:
         rendered_html = f"""{rendered_html}
-        <span hx-swap-oob="true" id="chat_notification_{message.self_contact.customer_number}">
+        <span hx-swap-oob="true" id="chat_notification_{message.site_contact.customer_number}">
         </span>
         """
     return rendered_html

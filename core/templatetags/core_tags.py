@@ -366,8 +366,8 @@ def render_whatsapp_template_with_lead_to_html_tag(whatsapp_template, lead):
 
 
 @register.filter
-def render_whatsapp_template_with_self_contact_to_html_tag(whatsapp_template, self_contact):
-    return whatsapp_template.render_whatsapp_template_to_html(self_contact=self_contact)
+def render_whatsapp_template_with_site_contact_to_html_tag(whatsapp_template, site_contact):
+    return whatsapp_template.render_whatsapp_template_to_html(site_contact=site_contact)
 
 
 @register.filter
