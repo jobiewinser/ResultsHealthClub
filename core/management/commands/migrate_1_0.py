@@ -25,6 +25,9 @@ class Command(BaseCommand):
                 site_contact.first_name = contact.first_name_old
                 site_contact.last_name = contact.last_name_old
                 site_contact.save()
+                if not contact.company:
+                    contact.company = contact.site_old.company
+                    contact.save()
         for campaign_lead in Campaignlead.objects.all():
             #this will create contacts for all leads
             campaign_lead.save()
@@ -36,7 +39,7 @@ class Command(BaseCommand):
             if not whatsapp_message.contact and whatsapp_message.lead:
                 contact = get_and_create_contact_for_lead(whatsapp_message.lead, whatsapp_message.customer_number)
                 whatsapp_message.contact = contact
-                site_contact = SiteContact.objects.get(site=contact.site_old, contact=contact)
+                site_contact, created = SiteContact.objects.get_or_create(site=whatsapp_message.whatsappnumber.site, contact=contact)
                 whatsapp_message.site_contact = site_contact
                 whatsapp_message.save()
         for campaign_lead in Campaignlead.objects.all():

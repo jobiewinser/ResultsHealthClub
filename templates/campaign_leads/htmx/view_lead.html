@@ -56,12 +56,12 @@
                 <div class="row m-0">
                     <div class="col ps-0">
                         <div class="form-floating m-1">
-                            <input value="{{lead.whatsapp_number|or_empty_string}}" class="form-control pointer" readonly onclick="copyTextToClipboard('{{lead.whatsapp_number|or_empty_string}}')"/>
+                            <input value="{{lead.contact.customer_number|or_empty_string}}" class="form-control pointer" readonly onclick="copyTextToClipboard('{{lead.contact.customer_number|or_empty_string}}')"/>
                             <label>Whatsapp Number</label>
                         </div>
                     </div>
                     <div class="col-auto align-self-center p-0">
-                        <button class="btn btn-primary" onclick="copyTextToClipboard('{{lead.whatsapp_number|or_empty_string}}')">Copy</button>
+                        <button class="btn btn-primary" onclick="copyTextToClipboard('{{lead.contact.customer_number|or_empty_string}}')">Copy</button>
                     </div>
                 </div>
                 

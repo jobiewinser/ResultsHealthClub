@@ -118,7 +118,7 @@ def send_first_template_whatsapp(request, kwargs):
     context = {}
     context["messages"] = messages
     context["lead"] = lead
-    context["customer_number"] = lead.whatsapp_number
+    context["customer_number"] = lead.contact.customer_number
     context["site_pk"] = lead.campaign.site
     context['max_call_count'] = request.POST.get('max_call_count')
     lead.trigger_refresh_websocket(refresh_position=False)
@@ -141,7 +141,7 @@ def get_modal_content(request, **kwargs):
             context['lead'] = lead
             # if request.GET.get('template_name', None) == "message_window_modal":
                 # whatsappnumber = lead.campaign.site.default_number
-                # customer_number = lead.whatsapp_number
+                # customer_number = lead.contact.customer_number
                 # context['customer_number'] = customer_number
                 # context['whatsappnumber'] = whatsappnumber
                 # context['messages'] = WhatsAppMessage.objects.filter(customer_number=customer_number, whatsappnumber=whatsappnumber).order_by('datetime')

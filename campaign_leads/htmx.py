@@ -123,9 +123,9 @@ def edit_lead(request, **kwargs):
 
     email = request.POST.get('email')[:50]
     
-    phone = request.POST.get('phone')
-    if not phone:
-        return HttpResponse("Please provide a valid Phone Number", status=500)
+    # phone = request.POST.get('phone')
+    # if not phone:
+    #     return HttpResponse("Please provide a valid Phone Number", status=500)
     
     country_code = request.POST.get('country_code', "")
     
@@ -146,7 +146,7 @@ def edit_lead(request, **kwargs):
     lead.first_name = first_name
     lead.last_name = last_name
     lead.email = email
-    # lead.contact.whatsapp_number = f"{country_code}{phone}"
+    # lead.contact.customer_number = f"{country_code}{phone}"
     if product_cost:
         lead.product_cost = product_cost
     lead.disabled_automated_messaging = disabled_automated_messaging

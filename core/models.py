@@ -477,6 +477,8 @@ class WhatsappNumber(PhoneNumber):
     def get_latest_messages(self, after_datetime_timestamp=None, query={}):
         message_pk_list = []
         qs = WhatsAppMessage.objects.filter(whatsappnumber=self)
+        if query.get('hide_auto'):
+            qs = qs.filter(template=None)
         search_string = query.get('search_string')
         if search_string:
             qs = qs.filter(
@@ -498,16 +500,13 @@ class WhatsappNumber(PhoneNumber):
         if received:
             qs = qs.filter(inbound=True, read=False)
             
-        hide_auto = query.get('hide_auto')
-        if hide_auto:
-            qs = qs.filter(template=None)
         return qs[:10]
 
     def send_whatsapp_message(self, customer_number=None, lead=None, message="", user=None):  
         try:
             logger.debug("site.send_whatsapp_message start") 
             if lead:
-                customer_number = normalize_phone_number(lead.whatsapp_number)
+                customer_number = normalize_phone_number(lead.contact.customer_number)
             if self.whatsapp_business_phone_number_id and self.company.whatsapp_access_token and message:
                 whatsapp = Whatsapp(self.company.whatsapp_access_token)
                 if '+' in self.number:
