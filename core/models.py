@@ -354,10 +354,10 @@ def send_message_to_websocket(whatsappnumber, customer_number, whatsapp_message,
     rendered_message_chat_row = loader.render_to_string('messaging/htmx/message_chat_row.html', message_context)
     rendered_html = f"""
 
-    <span id='latest_message_row_{customer_number}' hx-swap-oob='delete'></span>
+    <span id='latest_message_row_{str(whatsapp_message.site_contact.pk)}' hx-swap-oob='delete'></span>
     <span id='messageCollapse_{whatsappnumber.pk}' hx-swap-oob='afterbegin'>{rendered_message_list_row}</span>
 
-    <span id='messageWindowInnerBody_{customer_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>
+    <span id='messageWindowInnerBody_{str(whatsapp_message.site_contact.pk)}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>
     """
     
     async_to_sync(channel_layer.group_send)(
@@ -521,6 +521,7 @@ class WhatsappNumber(PhoneNumber):
                                 message=message,
                                 datetime=datetime.now(),
                                 lead=lead,
+                                site_contact=lead.site_contact,
                                 site=self.site,
                                 user=user,
                                 customer_number=customer_number,
@@ -831,9 +832,9 @@ class Company(models.Model):
         return f"{str(self.name)}"   
 
     def get_and_generate_campaign_objects(self):
-        if self.active_campaign_url:
-            from active_campaign.api import ActiveCampaignApi
-            from active_campaign.models import ActiveCampaign
+        # if self.active_campaign_url:
+            # from active_campaign.api import ActiveCampaignApi
+            # from active_campaign.models import ActiveCampaign
             
             # if not settings.DEBUG:
             # for campaign_dict in ActiveCampaignApi(self.active_campaign_api_key, self.active_campaign_url).get_lists(self.active_campaign_url).get('lists',[]):
@@ -844,6 +845,7 @@ class Company(models.Model):
             #     )
             #     campaign.json_data = campaign_dict
             #     campaign.save()
+        from campaign_leads.models import Campaign
         return Campaign.objects.all()
     @property
     def active_sites(self):

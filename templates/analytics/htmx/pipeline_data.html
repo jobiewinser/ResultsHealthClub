@@ -9,6 +9,8 @@
 </div>
 <div class="row mt-3">
     <div class="col">
+    </div>
+    <div class="col-md-auto">
         <div class="row">
             <div class="col center">
                 <h5>{{opportunities}} Leads</h5>
@@ -47,7 +49,7 @@
             </div>
         </div>
     </div>
-    <div class="col">
+    <div class="col-md-auto">
         <div class="row">
             <div class="col center">
                 <h5>£{{opportunities_value|floatformat:2}}</h5>
@@ -96,7 +98,9 @@
         <h5 class="nowrap">Sold Rate (arrived)</h5>
         <h6 class="text-success"><b>{{arrived_sold_rate|floatformat:2}}%</b> <br>of leads that arrived were sold</h6>
         <h5 class="nowrap">Booked Rate (arrived)</h5>
-        <h6 class="text-primary"><b>{{arrived_booked_rate|floatformat:2}}%</b> <br>of leads arrived</h6>
+        <h6 class="text-primary"><b>{{arrived_booked_rate|floatformat:2}}%</b> <br>of booked leads arrived</h6>
+    </div>
+    <div class="col">
     </div>
 </div>
 {%else%}

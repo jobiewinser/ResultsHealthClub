@@ -13,7 +13,7 @@ from django.db.models import Q
 from django.template import loader
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
-from core.views import get_and_create_contact_for_lead
+from core.views import get_and_create_contact_and_site_contact_for_lead
 logger = logging.getLogger(__name__)
 
 BOOKING_CHOICES = (
@@ -228,6 +228,7 @@ class Campaignlead(models.Model):
             from core.models import AttachedError, send_message_to_websocket
             customer_number = self.whatsapp_number
             if settings.DEMO:
+                contact, site_contact = get_and_create_contact_and_site_contact_for_lead(self,)
                 whatsapp_message, created = WhatsAppMessage.objects.get_or_create(
                     wamid="",
                     datetime=datetime.now(),
@@ -244,6 +245,7 @@ class Campaignlead(models.Model):
                     customer_number=customer_number,
                     template=template,
                     inbound=False,
+                    site_contact=self.site_contact,
                 )
                 send_message_to_websocket(whatsappnumber, customer_number, whatsapp_message, self.campaign.site)
                 self.trigger_refresh_websocket(refresh_position=False)
@@ -398,6 +400,7 @@ class Campaignlead(models.Model):
                                 wamid=response_message.get('id'),
                                 datetime=datetime.now(),
                                 lead=self,
+                                site_contact=self.site_contact,
                                 message=whole_text,
                                 site=site,
                                 whatsappnumber=whatsappnumber,

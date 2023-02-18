@@ -242,11 +242,11 @@ def new_message_to_websocket(whatsapp_message, whatsapp_number):
     rendered_message_chat_row = loader.render_to_string('messaging/htmx/message_chat_row.html', message_context)
     rendered_html = f"""
 
-    <span id='latest_message_row_{whatsapp_message.customer_number}' hx-swap-oob='delete'></span>
+    <span id='latest_message_row_{whatsapp_message.site_contact.pk}' hx-swap-oob='delete'></span>
     <span id='message_chat_row_{whatsapp_message.pk}' hx-swap-oob='delete'></span>
     <span id='messageCollapse_{whatsapp_message.whatsappnumber.pk}' hx-swap-oob='afterbegin'>{rendered_message_list_row}</span>
 
-    <span id='messageWindowInnerBody_{whatsapp_message.customer_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>
+    <span id='messageWindowInnerBody_{whatsapp_message.site_contact.pk}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>
     
     <span id="chat_notification_{whatsapp_number.pk}" hx-swap-oob='innerHTML'>
         <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">

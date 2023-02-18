@@ -14,6 +14,7 @@ import logging
 from channels.layers import get_channel_layer
 from asgiref.sync import sync_to_async
 from core.utils import normalize_phone_number
+from core.models import SiteContact
 logger = logging.getLogger(__name__)
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -134,19 +135,18 @@ def get_user_company_pk(user):
 # def get_lead(lead_pk):   
 #     return Campaignlead.objects.get(pk=lead_pk)
 @sync_to_async
-def get_rendered_html(message, message_context, messaging_customer_number, whatsappnumber):
+def get_rendered_html(whatsapp_message, message_context, messaging_customer_number, whatsappnumber):
     rendered_message_list_row = loader.render_to_string('messaging/htmx/message_list_row.html', message_context)
     rendered_message_chat_row = loader.render_to_string('messaging/htmx/message_chat_row.html', message_context)
     rendered_html = f"""
-    <span id='latest_message_row_{messaging_customer_number}' hx-swap-oob='delete'></span>
+    <span id='latest_message_row_{str(whatsapp_message.site_contact.pk)}' hx-swap-oob='delete'></span>
     <span id='messageCollapse_{whatsappnumber.pk}' hx-swap-oob='afterbegin'>{rendered_message_list_row}</span> #this line is clearing the whole message list?!
-    <span id='messageWindowInnerBody_{messaging_customer_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>                
+    <span id='messageWindowInnerBody_{str(whatsapp_message.site_contact.pk)}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>                
     """
-    print(f"messageWindowInnerBody_{messaging_customer_number}")
 
-    if message.inbound:
+    if whatsapp_message.inbound:
         rendered_html = f"""{rendered_html}
-        <span hx-swap-oob="true" id="chat_notification_{message.site_contact.customer_number}">
+        <span hx-swap-oob="true" id="chat_notification_{whatsapp_message.site_contact.customer_number}">
             <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
                 <span class="visually-hidden">New alerts</span>
             </span>
@@ -154,7 +154,7 @@ def get_rendered_html(message, message_context, messaging_customer_number, whats
         """
     else:
         rendered_html = f"""{rendered_html}
-        <span hx-swap-oob="true" id="chat_notification_{message.site_contact.customer_number}">
+        <span hx-swap-oob="true" id="chat_notification_{whatsapp_message.site_contact.customer_number}">
         </span>
         """
     return rendered_html
@@ -189,7 +189,7 @@ def get_rendered_html_failed(messaging_customer_number, whatsappnumber):
     }
     rendered_message_chat_row = loader.render_to_string('messaging/htmx/message_chat_row_failed.html', message_context)
     rendered_html = f"""
-    <span id='messageWindowInnerBody_{messaging_customer_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>                
+    <span id='messageWindowInnerBody_{str(SiteContact.objects.get(site=whatsappnumber.site, customer_number=normalize_phone_number(messaging_customer_number)).pk)}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>                
     """
 
     rendered_html = f"""{rendered_html}"""

@@ -11,7 +11,7 @@ from random_phone import RandomUkPhone
 import names
 from whatsapp.models import WhatsAppMessage
 from core.utils import normalize_phone_number
-from core.views import get_and_create_contact_for_lead
+from core.views import get_and_create_contact_and_site_contact_for_lead
 random_name = []
 class Command(BaseCommand):
     def handle(self, *args, **options):
@@ -37,13 +37,13 @@ class Command(BaseCommand):
                 sale.lead.save                
         for whatsapp_message in WhatsAppMessage.objects.all():
             if not whatsapp_message.contact and whatsapp_message.lead:
-                contact = get_and_create_contact_for_lead(whatsapp_message.lead, whatsapp_message.customer_number)
+                contact, site_contact = get_and_create_contact_and_site_contact_for_lead(whatsapp_message.lead, whatsapp_message.customer_number)
                 whatsapp_message.contact = contact
                 site_contact, created = SiteContact.objects.get_or_create(site=whatsapp_message.whatsappnumber.site, contact=contact)
                 whatsapp_message.site_contact = site_contact
                 whatsapp_message.save()
         for campaign_lead in Campaignlead.objects.all():
             if not campaign_lead.contact and campaign_lead.campaign and campaign_lead.whatsapp_number_old:
-                contact = get_and_create_contact_for_lead(campaign_lead, campaign_lead.whatsapp_number_old)
+                contact, site_contact = get_and_create_contact_and_site_contact_for_lead(campaign_lead, campaign_lead.whatsapp_number_old)
                 campaign_lead.contact = contact
                 campaign_lead.save()

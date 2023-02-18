@@ -38,7 +38,7 @@
                     {%if not lead.message_set.exists%}
                     <button class="btn btn-space btn-xs btn-secondary nowrap ps-1 pe-1"                     
                         {%if lead.disabled_automated_messaging%}
-                        onclick="alert(`This lead is marked as don't automatically message. Please manually send a template instead.`);"
+                        onclick="alert(`This lead is marked as don't automatically message. Please manually send a template instead or edit this lead using the yellow pencil button to reenable automatic sending.`);"
                         {%else%}
                         hx-include="#max_call_count"
                         hx-post="{%url 'send-first-template-whatsapp-lead-article' lead_pk=lead.pk%}"

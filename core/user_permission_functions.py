@@ -110,7 +110,7 @@ def get_allowed_site_chats_for_user(user):
     #TODO
     # return Site.objects.filter(pk__in=[user.profile.site.pk])
     # return Site.objects.filter(company=user.profile.site.company)
-    return user.profile.active_sites_allowed
+    return user.profile.active_sites_allowed.filter(subscription__whatsapp_enabled=True)
 
 def get_user_allowed_to_send_from_whatsappnumber(user, whatsappnumber):
     #TODO

@@ -17,7 +17,7 @@ from django.conf import settings
 logger = logging.getLogger(__name__) 
 from active_campaign.api import ActiveCampaignApi
 from core.core_decorators import *
-from core.views import get_and_create_contact_for_lead
+from core.views import get_and_create_contact_and_site_contact_for_lead
 @login_required
 def get_modal_content(request, **kwargs):
     try:
@@ -123,10 +123,6 @@ def edit_lead(request, **kwargs):
 
     email = request.POST.get('email')[:50]
     
-    # phone = request.POST.get('phone')
-    # if not phone:
-    #     return HttpResponse("Please provide a valid Phone Number", status=500)
-    
     country_code = request.POST.get('country_code', "")
     
     disabled_automated_messaging = request.POST.get('enable_automated_messaging', 'on') == 'off'
@@ -140,7 +136,10 @@ def edit_lead(request, **kwargs):
             
         refresh_position = False
     else:
-        lead = Campaignlead()
+        lead = Campaignlead()    
+        phone = request.POST.get('phone')
+        if not phone:
+            return HttpResponse("Please provide a valid Phone Number", status=500)
         refresh_position = True
     lead.campaign = campaign
     lead.first_name = first_name
@@ -154,7 +153,10 @@ def edit_lead(request, **kwargs):
         lead.disabled_automated_messaging = True
     
     lead.save()
-    get_and_create_contact_for_lead(lead, f"{country_code}{phone}")
+    if not lead_pk:
+        contact, site_contact = get_and_create_contact_and_site_contact_for_lead(lead, phone)
+        # contact.customer_number = f"{country_code}{phone}"
+        # contact.save()
     lead.trigger_refresh_websocket(refresh_position=refresh_position)
     return HttpResponse(str(lead.pk), status=200)
     # except Exception as e:
