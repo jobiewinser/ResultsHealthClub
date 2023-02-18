@@ -503,10 +503,13 @@ class WhatsappNumber(PhoneNumber):
         return qs[:10]
 
     def send_whatsapp_message(self, customer_number=None, lead=None, message="", user=None):  
-        try:
+        # try:
             logger.debug("site.send_whatsapp_message start") 
             if lead:
                 customer_number = normalize_phone_number(lead.contact.customer_number)
+                site_contact = lead.site_contact
+            else:
+                site_contact = SiteContact.objects.get(site=self.site, contact__customer_number=normalize_phone_number(customer_number))
             if self.whatsapp_business_phone_number_id and self.company.whatsapp_access_token and message:
                 whatsapp = Whatsapp(self.company.whatsapp_access_token)
                 if '+' in self.number:
@@ -521,7 +524,7 @@ class WhatsappNumber(PhoneNumber):
                                 message=message,
                                 datetime=datetime.now(),
                                 lead=lead,
-                                site_contact=lead.site_contact,
+                                site_contact=site_contact,
                                 site=self.site,
                                 user=user,
                                 customer_number=customer_number,
@@ -539,9 +542,9 @@ class WhatsappNumber(PhoneNumber):
                 (self.company.whatsapp_access_token,{str(self.company.whatsapp_access_token)}) 
                 (message,{str(message)}) 
             """) 
-        except Exception as e:
-            logger.debug("site.send_whatsapp_message error: "+str(e)) 
-            return None
+        # except Exception as e:
+        #     logger.debug("site.send_whatsapp_message error: "+str(e)) 
+        #     return None
 
 
 # class StripeSubscriptionSnapshot(models.Model):

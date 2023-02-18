@@ -8,11 +8,12 @@
             document.body.addEventListener('htmx:beforeRequest', function(evt) {  
                 if (evt.detail.target.id == 'next_chat_window'){
                     let src = $(evt.srcElement)
-                    let phone_number = src.data('customer-number');         
+                    {% comment %}let phone_number = src.data('customer-number');{% endcomment %}
+                    let site_contact_pk = src.data('site-contact-pk');         
                     let whatsappnumber_pk = src.data('whatsappnumber-pk');            
-                    if ($('#chat_card_'+phone_number).length > 0){
+                    if ($('#chat_card_'+site_contact_pk).length > 0){
                         {% comment %} evt.preventDefault() {% endcomment %}
-                        $('#chat_card_'+phone_number).remove()
+                        $('#chat_card_'+site_contact_pk).remove()
                     } else {
                     }
                 }

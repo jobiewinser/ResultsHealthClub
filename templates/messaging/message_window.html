@@ -1,11 +1,11 @@
 {%load static core_tags%}
 {%with ''|generate_uuid_tag as uuid%}
 
-<span class="chat_card_{{customer_number}}_wrapper" id="chat_card_{{customer_number}}_wrapper_{{uuid}}">
-    <div class="card chat_bottom_window customer_chat_bottom_window p-0" id="chat_card_{{customer_number}}" data-customer-number="{{customer_number}}">
+<span class="chat_card_{{site_contact.pk}}_wrapper" id="chat_card_{{site_contact.pk}}_wrapper_{{uuid}}">
+    <div class="card chat_bottom_window customer_chat_bottom_window p-0" id="chat_card_{{site_contact.pk}}" data-customer-number="{{customer_number}}" data-site-contact-pk="{{site_contact.pk}}">
         <div class="card-header chat_bottom_header" >
             <div class="row">
-                <div class="col p-0 left text-white" data-bs-toggle="collapse" data-bs-target="#messageWindowCollapse_{{customer_number}}_wrapper" aria-expanded="true" aria-controls="messageWindowCollapse_{{customer_number}}_wrapper">
+                <div class="col p-0 left text-white" data-bs-toggle="collapse" data-bs-target="#messageWindowCollapse_{{site_contact.pk}}_wrapper" aria-expanded="true" aria-controls="messageWindowCollapse_{{site_contact.pk}}_wrapper">
                     {%include 'messaging/message_window_header.html'%}
                 </div>
                 <div class="col-auto p-0 ps-1 pe-2 right">
@@ -23,7 +23,7 @@
                     </button>
                 </div>
                 <div class="col-auto p-0 right">
-                    <i class="fa-sharp fa-solid fa-circle-xmark" onclick="$('.chat_card_{{customer_number}}_wrapper').remove();"></i>
+                    <i class="fa-sharp fa-solid fa-circle-xmark" onclick="$('.chat_card_{{site_contact.pk}}_wrapper').remove();"></i>
                 </div>
             </div>
         </div>

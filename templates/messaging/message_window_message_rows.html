@@ -3,11 +3,11 @@
 {%for message in messages%}
     {% if forloop.first %}
     {%if messages|length == 10 %}
-    <div class="row chat_row" id="more_chat_messages_{{whatsappnumber.pk}}_{{customer_number}}">
+    <div class="row chat_row" id="more_chat_messages_{{whatsappnumber.pk}}_{{site_contact.pk}}">
         <div class="col center">
             <a href="#" 
             hx-trigger="click"
-            hx-target="#more_chat_messages_{{whatsappnumber.pk}}_{{customer_number}}" 
+            hx-target="#more_chat_messages_{{whatsappnumber.pk}}_{{site_contact.pk}}" 
             hx-swap="outerHTML" hx-get="{%url 'get-more-message-chat-rows'%}" 
             hx-vals='{"whatsappnumber_pk":"{{whatsappnumber.pk}}", "earliest_datetime_timestamp":"{{message.datetime|timestamp}}", "customer_number":"{{customer_number}}"}'>
                 Load More

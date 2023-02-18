@@ -189,7 +189,7 @@ def get_rendered_html_failed(messaging_customer_number, whatsappnumber):
     }
     rendered_message_chat_row = loader.render_to_string('messaging/htmx/message_chat_row_failed.html', message_context)
     rendered_html = f"""
-    <span id='messageWindowInnerBody_{str(SiteContact.objects.get(site=whatsappnumber.site, customer_number=normalize_phone_number(messaging_customer_number)).pk)}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>                
+    <span id='messageWindowInnerBody_{str(SiteContact.objects.get(site=whatsappnumber.site, contact__customer_number=normalize_phone_number(messaging_customer_number)).pk)}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>                
     """
 
     rendered_html = f"""{rendered_html}"""
