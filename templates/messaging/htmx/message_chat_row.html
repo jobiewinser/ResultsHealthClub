@@ -17,7 +17,7 @@
         <div class="col-auto p-0 ps-1 m-1">
             <img src="{% static 'img/blank-profile-picture.png' %}" alt="" width="22" height="22" class="rounded-circle">
         </div>
-        <div class="col-md-auto p-0 pe-1 ps-1 ps-1 m-1 card borderless chat_row_{{message.customer_number}} bg-secondary-trans-80 text-white" style="max-width:70%">
+        <div class="col-md-auto p-0 pe-1 ps-1 ps-1 m-1 card borderless chat_row_{{message.get_site_contact.pk}} bg-secondary-trans-80 text-white" style="max-width:70%">
             {%if message.message%}
                 {{message.message|safe}}
             {%endif%}
@@ -63,7 +63,7 @@
             <div class="col">
                 
             </div>
-            <div class="col-md-auto p-0 pe-1 ps-1 ps-1 m-1 card borderless chat_row_{{message.customer_number}} bg-success-trans-80 text-white" style="max-width:70%">
+            <div class="col-md-auto p-0 pe-1 ps-1 ps-1 m-1 card borderless chat_row_{{message.get_site_contact.pk}} bg-success-trans-80 text-white" style="max-width:70%">
                 <span>
                     {%if message.message%}
                     {%if message.failed%}<i class="fa-solid fa-triangle-exclamation text-danger"></i>{%endif%} 

@@ -15,6 +15,7 @@ urlpatterns = [
 
     path('configuration/company-configuration/', coreviews.CompanyConfigurationView.as_view(), name='company-configuration'),
     path('configuration/site-configuration/', coreviews.SiteConfigurationView.as_view(), name='site-configuration'),
+    path('contacts/', coreviews.ContactsOverviewView.as_view(), name='contacts-overview'),
 
 
     path('configuration/change-profile-role/', coreviews.change_profile_role, name='change-profile-role'),

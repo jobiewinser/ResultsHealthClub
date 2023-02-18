@@ -15,7 +15,7 @@ function leadshandlehtmxafterRequest(evt){
 }
 
 function leadshandlehtmxafterSwap(evt){
-    if (evt.detail.xhr.status == 200){
+    if (evt.detail.xhr.status == 200){   
         if (![undefined, ''].includes(evt.detail.pathInfo.requestPath)){
             if (evt.detail.pathInfo.requestPath.includes("add-manual-booking")){
                 $('#generic_modal').modal('hide');
@@ -32,7 +32,7 @@ function leadshandlehtmxafterSwap(evt){
                     iDisplayLength: 10
                 }
                 );        
-            }            
+            }
         }             
     }
 }

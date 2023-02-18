@@ -186,6 +186,16 @@ def get_site_configuration_context(request):
     else:
         context['whatsapp_business_details'] = {"error":True}
     return context
+
+def get_contacts_overview_context(request):
+    request.GET._mutable = True   
+    context = {}
+    site_pk = get_single_site_pk_from_request_or_default_profile_site(request)   
+    request.GET['site_pk'] = site_pk   
+    site = Site.objects.get(pk=site_pk)
+    context['site'] = site
+    context['site_contacts'] = SiteContact.objects.filter(site=site)
+    return context
 @method_decorator(login_required, name='dispatch')
 @method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
 @method_decorator(not_demo_or_superuser_check, name='post')
@@ -235,6 +245,19 @@ class SiteConfigurationView(TemplateView):
             request.GET['POST']['advanced_settings'] = True
             return render(request, 'core/htmx/site_configuration_htmx.html',context)
         return HttpResponse( status=200)
+    
+@method_decorator(login_required, name='dispatch')
+@method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
+class ContactsOverviewView(TemplateView):
+    template_name='core/contacts_overview.html'
+    def get(self, request, *args, **kwargs):   
+        if request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+            self.template_name = 'core/htmx/contacts_overview_htmx.html'
+        return super(ContactsOverviewView, self).get(request, args, kwargs)
+    def get_context_data(self):    
+        context = super(ContactsOverviewView, self).get_context_data()
+        context.update(get_contacts_overview_context(self.request))
+        return context
             
 
 @method_decorator(login_required, name='dispatch')

@@ -78,7 +78,7 @@
                 <div class="col">
                 </div>
                 <div class="col-md-auto p-1">
-                    <button class="btn btn-primary btn-sm" 
+                    {% comment %} <button class="btn btn-primary btn-sm" 
                         data-bs-toggle="popover" 
                         data-bs-trigger="hover focus" 
                         data-bs-placement="top"
@@ -88,6 +88,28 @@
                         hx-push-url="false"
                         hx-vals='{"template_name": "send_new_template_message", "whatsappnumber_pk":"{{whatsappnumber.pk}}"}'
                         hx-swap="innerHTML" hx-trigger="click">
+                            <i class="fa fa-paper-plane-top" aria-hidden="true"></i>
+                    </button> {% endcomment %}
+                    {% comment %} <button class="btn btn-primary btn-sm" 
+                        data-bs-toggle="popover" 
+                        data-bs-trigger="hover focus" 
+                        data-bs-placement="top"
+                        data-bs-content="Manually start a conversation using a template."
+                        hx-indicator="#htmx_indicator_messageCollapse_{{whatsappnumber.pk}}" hx-target="#generic_modal_body" 
+                        hx-get="{% url 'get-modal-content' %}" 
+                        hx-push-url="false"
+                        hx-vals='{"template_name": "choose_template_message_site_contact", "site_pk":"{{whatsappnumber.site.pk}}"}'
+                        hx-swap="innerHTML" hx-trigger="click">
+                            <i class="fa fa-paper-plane-top" aria-hidden="true"></i>
+                    </button> {% endcomment %}
+                    <button class="btn btn-primary btn-sm" 
+                        data-bs-toggle="popover" 
+                        data-bs-trigger="hover focus" 
+                        data-bs-placement="top"
+                        data-bs-content="Manually start a conversation using a template."
+                        onclick="toggle_active_top_nav('#contacts-top-nav-link')"
+                        hx-indicator="#page_load_indicator"
+                        hx-get="{%url 'contacts-overview'%}?use_defaults=True" hx-target="#content" hx-push-url="true" hx-swap="innerHTML">
                             <i class="fa fa-paper-plane-top" aria-hidden="true"></i>
                     </button>
                 </div>

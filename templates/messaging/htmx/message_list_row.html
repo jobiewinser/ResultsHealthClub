@@ -71,13 +71,13 @@
     id="latest_message_row_{{message.site_contact.pk}}"
     >
     <div class="col-auto p-0">
-        <img id="latest_message_avatar_{{message.customer_number}}" 
+        <img id="latest_message_avatar_{{message.get_site_contact.pk}}" 
         style="{%if message.user.profile.demo_account_theme_colour%}background-color:rgba({{message.user.profile.demo_account_theme_colour}}, 0.6){%endif%}"
         src="{%if message.inbound%}{% static 'img/blank-profile-picture.png' %}{%else%}{%if message.user.profile.avatar.url%}{{message.user.profile.avatar.url}}{%else%}{{message.site.company.company_logo_black.url}}{%endif%}{%endif%}" alt="" width="38" height="38" class="rounded-circle">
     </div>
     <div class="col p-0 ps-1 hidden-overflow">
         <div class="row chat_lead_name_row">
-            <div class="col p-0 elipses-overflow me-1" id="latest_message_name_{{message.customer_number}}">
+            <div class="col p-0 elipses-overflow me-1" id="latest_message_name_{{message.get_site_contact.pk}}">
                 <span>{%if message.get_site_contact.name%}{{message.get_site_contact.name}}{%else%}{{message.customer_number}}{%endif%}</span>
             </div>
             {% comment %} <div class="col ps-1 pe-1">
@@ -87,7 +87,7 @@
             </div>
         </div>
         <div class="row chat_lead_name_row">
-            <div class="col p-0 elipses-overflow" id="message_list_row_{{message.customer_number}}_{{whatsappnumber.pk}}" style="height:18px">
+            <div class="col p-0 elipses-overflow" id="message_list_row_{{message.get_site_contact.pk}}_{{whatsappnumber.pk}}" style="height:18px">
                 {%if message.failed%}<i class="fa-solid fa-triangle-exclamation text-danger"></i>{%endif%}  {%if message.inbound%}Them{%else%}You{%endif%}:
                 {%if message.message%}
                     {{message.message|safe}}
@@ -95,7 +95,7 @@
                     [Image]
                 {%endif%}
             </div>
-            <div class="col-md-auto p-0 m-0" id="latest_message_mark_read_{{message.customer_number}}">
+            <div class="col-md-auto p-0 m-0" id="latest_message_mark_read_{{message.get_site_contact.pk}}">
                 {%if message.inbound and not message.read%}
                 <span class="badge bg-secondary badge-sm"
                 
@@ -106,7 +106,7 @@
 
                     hx-post="{%url 'mark-read'%}"
                     hx-indicator="#page_load_indicator" 
-                    hx-target="#latest_message_mark_read_{{message.customer_number}}"
+                    hx-target="#latest_message_mark_read_{{message.get_site_contact.pk}}"
                     hx-push-url="false"
                     hx-vals='{"message_pk":"{{message.pk}}"}'
                     hx-swap="innerHTML" hx-trigger="click">

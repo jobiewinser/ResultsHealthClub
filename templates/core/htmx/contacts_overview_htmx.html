@@ -1,0 +1,93 @@
+{%load static core_tags user_permission_tags%}
+<span>    
+    <script>
+        document.title = "Contacts";
+        $(document).ready(function() {
+            try{$('#choose_template_message_site_contact_table').dataTable().fnDestroy()}catch{};
+                $('#choose_template_message_site_contact_table').DataTable({
+                    responsive: true,
+                });        
+        });
+    </script>
+
+
+    <div class="row mt-0">
+        {%block extra_top_left_buttons %}
+        {%with True as hide_show_all%}
+        {%include 'core/htmx/site_selection_single.html'%}
+        {%endwith%}
+        <button hidden hx-get="{%url 'contacts-overview'%}" hx-push-url="false" hx-swap="innerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
+        {%endblock extra_top_left_buttons %}
+
+        <div class="col">
+        </div>
+
+        {%block extra_top_right_buttons %}
+        <input id="current_page" hidden value="contacts"/>
+        {%endblock extra_top_right_buttons %}
+    </div>
+
+    <div class="row">
+        <div class="col alert alert-info" style=""> 
+            <p>
+                These are your contacts within Winser Systems. These can be used to send whatsapp templates. 
+                <br>
+                A contact must have a unique phone number and can be attached to multiple campaign leads.
+                <br>
+                All leads are attached to a single contacts for this site (Contacts are unique to each site, so a particular individual may have a different name for different sites within your company).  
+            </p>
+            Example:
+            <ul>
+                <li>
+                    If you have another active campaign lead come through, it will be attached to an existing contact, or automatically create a new contact if the phone number is new to Winser Systems.
+                </li>
+                <li>
+                    If you change the name of a contact, it will NOT change the name of the lead on the leads board or bookings table. This is to keep the name within the automatically sent template messages consistent (you can still change the lead name by editing the lead within the leads board to correct typos etc).
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col" style=""> 
+            <table class="table" id="choose_template_message_site_contact_table">
+                <thead>
+                    <tr>
+                        <th scope="col" width="10">Name</th>
+                        <th scope="col" width="10">Phone</th>
+                        <th scope="col" width="80"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {%with site.return_phone_numbers as whatsappnumbers%}
+                    {% for site_contact in site_contacts %}
+                    <tr>
+                        <td style="nowrap elipses-overflow">{{site_contact.name}}</td>
+                        <td style="nowrap elipses-overflow">{{site_contact.contact.customer_number}}</td>
+                        <td style="nowrap">
+                            <div class="row m-0">
+                                <div class="col-auto ps-1 pe-1">   
+                                    <button class="btn btn-warning btn-sm"><i class="fa fa-pencil" aria-hidden="true"></i> Edit</button>
+                                </div> 
+                                <div class="col-auto ps-1 pe-1">   
+                                        <button class="btn btn-primary btn-sm" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa fa-paper-plane-top"></i> Send Template</button>                                        
+                                        <ul class="dropdown-menu">
+                                            {%for whatsappnumber in whatsappnumbers%}   
+                                                <li>
+                                                    <a class="dropdown-item" href="#"
+                                                        onclick="htmx.ajax('GET', '{% url 'get-modal-content'%}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'send_new_template_message','whatsappnumber_pk':'{{whatsappnumber.pk}}','site_contact_pk':'{{site_contact.pk}}'}})">
+                                                        Send From {{whatsappnumber}}
+                                                    </a>
+                                                </li>
+                                            {%endfor%}
+                                        </ul>
+                                </div> 
+                            </div> 
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {%endwith%}
+                </tbody>
+            </table>
+        </div>
+    </div>
+<span>

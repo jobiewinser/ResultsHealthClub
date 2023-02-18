@@ -58,7 +58,12 @@ def get_modal_content(request, **kwargs):
                     context["site"] = Site.objects.get(pk=site_pk) 
             elif template_name == 'reactivate_user':
                 if site_pk:
-                    context["site"] = Site.objects.get(pk=site_pk)            
+                    context["site"] = Site.objects.get(pk=site_pk)   
+            elif template_name == 'choose_template_message_site_contact':
+                site = Site.objects.get(pk=site_pk)   
+                context["site"] = site
+                context["site_contacts"] = SiteContact.objects.filter(site=site)   
+                             
             elif template_name == 'send_new_template_message':
                 
                 whatsappnumber_pk = request.GET.get('whatsappnumber_pk', None)

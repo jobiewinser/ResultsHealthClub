@@ -1,0 +1,44 @@
+{%load core_tags%}
+<div class="generic_modal_contents">
+    <div class="card card-highlight m-1 p-3">
+        {% csrf_token %}
+        <form hx-post="{%url 'edit-contact'%}" hx-trigger="submit" hx-indicator="#page_load_indicator" hx-swap="none">
+            <input type="text" style="display:None" id="modal_contact_pk" name="contact_pk" value="{{contact.pk}}"/>
+            <div class="row">
+                <div class="col">
+                        <div class="form-floating m-1">
+                            <select name="campaign_pk" class="form-select" id="modal_campaign_pk">  
+                                {%for campaign in campaigns%}
+                                <option {%if lead.campaign.pk == campaign.pk%}selected{%endif%} value="{{campaign.pk}}">{{campaign}}</option>
+                                {%endfor%}
+                            </select>
+                            <label for="modal_campaign_pk">Campaign<span class="required">*</span></label>
+                        </div>
+
+                        <div class="form-floating m-1">
+                            <input name="first_name" maxlength="25" value="{{lead.first_name|or_empty_string}}" class="form-control" id="modal_first_name"/>
+                            <label for="modal_first_name">First Name<span class="required">*</span></label>
+                        </div>                                          
+                </div>
+            </div>
+            <div class="row m-1">
+                <div class="col center" >
+                    <button class="btn btn-primary" type="submit" {%if demo and not request.user.is_superuser%}disabled{%endif%}>
+                        {%if lead%}
+                        Save   
+                        {%else%}
+                        Create
+                        {%endif%} Lead {%if demo and not request.user.is_superuser%}(Demo, Disabled){%endif%}
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<span hx-swap-oob="true" id="generic_modal_title">
+    {%if lead%}
+    Edit Lead - {{lead.name}}    
+    {%else%}
+    Create Lead
+    {%endif%}
+</span>

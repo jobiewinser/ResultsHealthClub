@@ -96,18 +96,3 @@
     {%endif%}
     {%endwith%}
 </span>
-
-{% comment %} {%if chat_site%}
-{%for message in site.get_latest_messages%}
-{%if message.inbound%}
-<span hx-swap-oob="true" id="chat_notification_{{message.customer_number}}">
-    <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
-        <span class="visually-hidden">New alerts</span>
-    </span>
-</span>
-{%else%}
-<span hx-swap-oob="true" id="chat_notification_{{message.customer_number}}">
-</span>
-{%endif%}
-{%endfor%}
-{%endif%} {% endcomment %}

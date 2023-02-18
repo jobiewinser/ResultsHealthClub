@@ -20,7 +20,7 @@
         <div class="col">
         </div>
         {%block extra_top_right_buttons %}
-        <input id="current_page" hidden value="site_configuration"></input>
+        <input id="current_page" hidden value="site_configuration"/>
         <div class="col-md-auto p-0 m-1 pointer" hx-indicator="#page_load_indicator" data-active-selector="#configuration-top-nav-dropdown-toggle"
             hx-get="{%url 'site-configuration'%}?advanced_settings=True" hx-target="#content" hx-push-url="true" hx-swap="innerHTML">
             <h3>{%include 'core/htmx/site_warning_section.html'%}</h3>

@@ -43,6 +43,12 @@ function basehandlehtmxafterSwap(evt){
         }
     }
     if (evt.detail.xhr.status == 200){
+        // if (evt.detail.pathInfo.finalRequestPath.includes("choose_template_message_site_contact")){
+        //     try{$('#choose_template_message_site_contact_table').dataTable().fnDestroy()}catch{};
+        //     $('#choose_template_message_site_contact_table').DataTable(        
+        //     );        
+        // }
+        
     } else {
         snackbarShow(evt.detail.xhr.responseText, 'danger')
     }
