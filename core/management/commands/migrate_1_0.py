@@ -9,7 +9,7 @@ import random as r
 import json
 from random_phone import RandomUkPhone
 import names
-from whatsapp.models import WhatsAppMessage
+from whatsapp.models import WhatsAppMessage, WhatsAppNumber
 from core.utils import normalize_phone_number
 from core.views import get_and_create_contact_and_site_contact_for_lead
 random_name = []
@@ -49,3 +49,5 @@ class Command(BaseCommand):
                 contact, site_contact = get_and_create_contact_and_site_contact_for_lead(campaign_lead, campaign_lead.whatsapp_number_old)
                 campaign_lead.contact = contact
             campaign_lead.save()
+        for number in WhatsAppNumber.objects.all():
+            number.save()

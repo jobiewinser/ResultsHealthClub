@@ -462,6 +462,9 @@ class WhatsappNumber(PhoneNumber):
                     count = count + 1
         return count
 
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        self.number = normalize_phone_number(self.number)
+        super(WhatsappNumber, self).save(force_insert, force_update, using, update_fields)
     @property
     def is_whatsapp(self):
         return True
