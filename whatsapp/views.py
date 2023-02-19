@@ -66,8 +66,6 @@ class Webhooks(View):
                         if not settings.DEBUG:
                             signature = 'sha256=' + hmac.new(site.company.whatsapp_app_secret_key.encode('utf-8'), bytes(request.body), digestmod=hashlib.sha256).hexdigest()
                         if signature == request.META.get('HTTP_X_HUB_SIGNATURE_256') or settings.DEBUG:
-                            from core.views import send_email
-                            send_email("jobiewinser@gmail.com", f"TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST {str(site.pk)}", {"message": f"TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST {str(site.pk)}"})
                             if site:
                                 if field == 'messages':
                                     for message_json in value.get('messages', []):
