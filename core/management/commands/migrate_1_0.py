@@ -3,7 +3,7 @@ import glob
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from campaign_leads.models import Campaignlead, Sale
-from core.models import Site, Contact, SiteContact, WhatsAppNumber
+from core.models import Site, Contact, SiteContact, WhatsappNumber
 import requests
 import random as r
 import json
@@ -49,5 +49,5 @@ class Command(BaseCommand):
                 contact, site_contact = get_and_create_contact_and_site_contact_for_lead(campaign_lead, campaign_lead.whatsapp_number_old)
                 campaign_lead.contact = contact
             campaign_lead.save()
-        for number in WhatsAppNumber.objects.all():
+        for number in WhatsappNumber.objects.all():
             number.save()
