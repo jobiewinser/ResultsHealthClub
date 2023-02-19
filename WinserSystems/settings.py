@@ -298,4 +298,4 @@ BLEACH_VALID_ATTRS = {
     'img': ['src', 'alt', 'style'],
 }
 BLEACH_VALID_STYLES = ['color', 'cursor', 'float', 'margin']
-VERSION=0.971
+VERSION=1.0
