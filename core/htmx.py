@@ -71,25 +71,25 @@ def get_modal_content(request, **kwargs):
                 
                 whatsappnumber_pk = request.GET.get('whatsappnumber_pk', None)
                 
-                # if whatsappnumber_pk:
-                whatsappnumber = WhatsappNumber.objects.get(pk=whatsappnumber_pk, whatsapp_business_account__active=True)
-                # else:
-                #     lead_pk = request.GET.get('lead_pk') 
-                #     # latest_message = WhatsAppMessage.objects.filter(customer_number=customer_number, whatsappnumber__whatsapp_business_account__site=site).order_by('datetime').last()
-                #     # if latest_message:
-                #     #     whatsappnumber = latest_message.whatsappnumber
-                #     # else:
-                #     if lead_pk:
-                #         lead = Campaignlead.objects.get(pk=lead_pk)
-                #     else:
-                #         customer_number = request.GET.get('customer_number') 
-                #         site = Site.objects.filter(pk=request.GET.get('site_pk')).exclude(active=False).first()                        
-                #         lead = Campaignlead.objects.filter(campaign__site=site, contact__customer_number=customer_number).last()
-                #         context['customer_numbers'] = [customer_number]   
-                #     if not lead.campaign.whatsapp_business_account:
-                #         return HttpResponse("You don't have a whatsapp number linked to this campaign!", status="400")
-                #     context['lead'] = lead
-                #     whatsappnumber = lead.campaign.whatsapp_business_account.whatsappnumber
+                if whatsappnumber_pk:
+                    whatsappnumber = WhatsappNumber.objects.get(pk=whatsappnumber_pk, whatsapp_business_account__active=True)
+                else:
+                    lead_pk = request.GET.get('lead_pk') 
+                    # latest_message = WhatsAppMessage.objects.filter(customer_number=customer_number, whatsappnumber__whatsapp_business_account__site=site).order_by('datetime').last()
+                    # if latest_message:
+                    #     whatsappnumber = latest_message.whatsappnumber
+                    # else:
+                    if lead_pk:
+                        lead = Campaignlead.objects.get(pk=lead_pk)
+                    else:
+                        customer_number = request.GET.get('customer_number') 
+                        site = Site.objects.filter(pk=request.GET.get('site_pk')).exclude(active=False).first()                        
+                        lead = Campaignlead.objects.filter(campaign__site=site, contact__customer_number=customer_number).last()
+                        context['customer_numbers'] = [customer_number]   
+                    if not lead.campaign.whatsapp_business_account:
+                        return HttpResponse("You don't have a whatsapp number linked to this campaign!", status="400")
+                    context['lead'] = lead
+                    whatsappnumber = lead.campaign.whatsapp_business_account.whatsappnumber
                 context['whatsappnumber'] = whatsappnumber
                  
                 # context['site'] = context['whatsappnumber'].whatsapp_business_account.site
