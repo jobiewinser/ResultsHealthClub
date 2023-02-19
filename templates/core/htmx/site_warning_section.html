@@ -1,0 +1,20 @@
+<span style="line-height: 0.75em;" class="site_warning_section_span_{{site.pk}}" {%if site_warning_section_swap%}hx-swap-oob='outerHTML:.site_warning_section_span_{{site.pk}}'{%endif%}>
+    {%if not site.whatsapp_template_sending_enabled%}
+    <i class="fa fa-whatsapp text-warning" 
+        data-bs-html="true" 
+        data-bs-toggle="popover" 
+        data-bs-placement="bottom" 
+        data-bs-trigger="hover"
+        title="Whatsapp Disabled"
+        data-bs-content="This site has it's whatsapp automatic sending disabled. Reenable it within the site configuration advanced settings."></i>
+    {%endif%}
+    {%if not site.active_campaign_leads_enabled%}
+    <i class="fa-light fa-dumbbell text-warning" 
+        data-bs-html="true" 
+        data-bs-toggle="popover" 
+        data-bs-placement="bottom" 
+        data-bs-trigger="hover"
+        title="Active Campaign Disabled"
+        data-bs-content="This site has it's active campaign automatic leads disabled. Reenable it within the site configuration advanced settings."></i>
+    {%endif%}
+</span>

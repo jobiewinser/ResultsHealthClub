@@ -190,38 +190,6 @@
                     </div>
                 </div> 
             </div>
-            <div class="col-md-auto analytics_col">
-                {%if minimum_site_subscription_level_in_query.analytics_numerical|to_int == 2%}
-                <button hidden id="refresh_current_call_count_distribution" hx-trigger="load delay:0.3s, click delay:0.3s"
-                    class="refresh_non_date_specific_analytic"
-                    hx-get="{%url 'get-current-call-count-distribution' %}"
-                    hx-include="#start_date, #end_date, .non_site_dependant_analytics_filters, .site_dependant_analytics_filters, #graph_type_current_call_count_distribution"
-                    hx-target="#current_call_count_distribution_card_body"
-                    hx-indicator="#htmx-indicator-current-call-count-distribution"
-                    hx-swap="innerHTML"
-                    onclick="$('#htmx-indicator-current-call-count-distribution').addClass('htmx-request'); ">refresh</button>
-                {%endif%}
-                <div class="card analytics-card" style="min-width: 500px;">
-                    <div class="card-header">
-                        <div class="row m-0">
-                            <div class="col-auto p-0">
-                                <h6 class="help m-0"
-                                    data-bs-toggle="popover" 
-                                    data-bs-trigger="hover focus" 
-                                    data-bs-html="true"
-                                    data-bs-content="This shows the <b>current</b> distribution of leads in each call count column on the <b>Leads</b> page (filtered by site and campaign above)."><i class="fa-solid fa-circle-info"></i> Current Call Count Distribution <i class="fa-solid fa-rectangle-pro"></i>
-                                    <img class="htmx-indicator invert" id="htmx-indicator-current-call-count-distribution" src="{% static 'img/bars.svg' %}"/>
-                                </h6> 
-                            </div>
-                        </div>                            
-                    </div>
-                    <div class="card-body" id="{%if minimum_site_subscription_level_in_query.analytics_numerical|to_int == 2%}current_call_count_distribution_card_body{%endif%}">       
-                        {%if not minimum_site_subscription_level_in_query.analytics_numerical|to_int == 2%}             
-                        One of the sites in your query has a <b>{{minimum_site_subscription_level_in_query.get_name_display}}</b> subscription. This analytics metric requires a <b><i class="fa-solid fa-rectangle-pro"></i></b> subscription for all sites in the query.
-                        {%endif%}
-                    </div>
-                </div>
-            </div>
         </div> 
         <div class="row my-2">
             <div class="col analytics_col">
@@ -275,6 +243,38 @@
                         </div>
                     </div>
                     <div class="card-body" id="sales_today_card_body">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-auto analytics_col">
+                {%if minimum_site_subscription_level_in_query.analytics_numerical|to_int == 2%}
+                <button hidden id="refresh_current_call_count_distribution" hx-trigger="load delay:0.3s, click delay:0.3s"
+                    class="refresh_non_date_specific_analytic"
+                    hx-get="{%url 'get-current-call-count-distribution' %}"
+                    hx-include="#start_date, #end_date, .non_site_dependant_analytics_filters, .site_dependant_analytics_filters, #graph_type_current_call_count_distribution"
+                    hx-target="#current_call_count_distribution_card_body"
+                    hx-indicator="#htmx-indicator-current-call-count-distribution"
+                    hx-swap="innerHTML"
+                    onclick="$('#htmx-indicator-current-call-count-distribution').addClass('htmx-request'); ">refresh</button>
+                {%endif%}
+                <div class="card analytics-card" style="min-width: 500px;">
+                    <div class="card-header">
+                        <div class="row m-0">
+                            <div class="col-auto p-0">
+                                <h6 class="help m-0"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover focus" 
+                                    data-bs-html="true"
+                                    data-bs-content="This shows the <b>current</b> distribution of leads in each call count column on the <b>Leads</b> page (filtered by site and campaign above)."><i class="fa-solid fa-circle-info"></i> Current Call Count Distribution <i class="fa-solid fa-rectangle-pro"></i>
+                                    <img class="htmx-indicator invert" id="htmx-indicator-current-call-count-distribution" src="{% static 'img/bars.svg' %}"/>
+                                </h6> 
+                            </div>
+                        </div>                            
+                    </div>
+                    <div class="card-body" id="{%if minimum_site_subscription_level_in_query.analytics_numerical|to_int == 2%}current_call_count_distribution_card_body{%endif%}">       
+                        {%if not minimum_site_subscription_level_in_query.analytics_numerical|to_int == 2%}             
+                        One of the sites in your query has a <b>{{minimum_site_subscription_level_in_query.get_name_display}}</b> subscription. This analytics metric requires a <b><i class="fa-solid fa-rectangle-pro"></i></b> subscription for all sites in the query.
+                        {%endif%}
                     </div>
                 </div>
             </div>

@@ -1,15 +1,23 @@
 function renderTemplate(){
     console.log("renderTemplate")
     let content = ""
-    if ($('#template_header').val() != "") {
-        content = replaceVariables("<b>"+$('#template_header').val()+"</b> <br><br>  ")
+
+    let template_header = $('#template_header').val();
+    let template_body = $('#template_body').val();
+    let template_footer = $('#template_footer').val();
+
+    if (template_header != "") {
+        content = replaceVariables("<b>"+template_header+"</b> <br><br>")
     }
-    if ($('#template_body').val() != "") {
-        content = content + replaceVariables("<p>"+$('#template_body').val().replace(/\r\n|\r|\n/g,"<br />")+"</p>")
+    if (template_body != "") {
+        content = content + replaceVariables("<p>"+template_body.replace(/\r\n|\r|\n/g,"<br />")+"</p>")
     }
-    if ($('#template_footer').val() != "") {
-        content = content + "<small>"+$('#template_footer').val()+"</small>"  
+    if (template_footer != "") {
+        content = content + "<small>"+template_footer+"</small>"  
     }
+
+    $('#variable2_warning').prop('hidden', template_header.indexOf('[[2]]') == -1 && template_body.indexOf('[[2]]') == -1 && template_footer.indexOf('[[2]]') == -1);
+    
     
     $('#template_render').html(content)
 }

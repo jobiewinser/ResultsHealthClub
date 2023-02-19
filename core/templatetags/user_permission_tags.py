@@ -43,8 +43,8 @@ def get_profile_allowed_to_toggle_active_campaign_tag(profile, site):
     return get_profile_allowed_to_toggle_active_campaign(profile, site)
     
 @register.filter
-def get_profile_allowed_to_edit_whatsapp_settings_tag(profile, site):
-    return get_profile_allowed_to_edit_whatsapp_settings(profile, site)
+def get_profile_allowed_to_edit_whatsapp_settings_tag(profile, company):
+    return get_profile_allowed_to_edit_whatsapp_settings(profile, company)
 @register.filter
 def get_profile_allowed_to_toggle_whatsapp_sending_tag(profile, site):
     return get_profile_allowed_to_toggle_whatsapp_sending(profile, site)

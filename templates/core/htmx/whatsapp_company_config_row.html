@@ -1,0 +1,97 @@
+{%load core_tags%}
+{%load user_permission_tags%}
+
+<div class="row" style="margin-left:0px !important;">
+        <div class="col-md-auto p-2 card">        
+            <b>Whatsapp Business Management API configuration</b>
+            <p>
+                All sites should use the same <a target="_blank" href="https://business.facebook.com/settings/system-users/">System User</a>.
+            </p>
+            <div class="row mt-3" style="margin-left:0px !important;">
+                <div class="col center">      
+                                    
+                    {%if request.user.profile|get_profile_allowed_to_edit_whatsapp_settings_tag:company%}    
+                    <form class="" hx-post="{%url 'set-whatsapp-company-config'%}" hx-target="#whatsapp_company_config_wrapper" 
+                    hx-confirm="Are you sure you want to make this change. It may prevent you receiving and sending whatsapp messages if set up incorrectly!"
+                    hx-swap="innerHTML" hx-trigger="submit delay:0.3s" hx-indicator="#htmx_indicator_company_form" hx-vals='{"company_pk": "{{company.pk}}"}' autocomplete="off" autofill="off">  
+                        <div class="form-floating mt-1" 
+                                                        data-bs-html="true" 
+                                                        data-bs-toggle="popover" data-bs-placement="left" 
+                                                        data-bs-trigger="hover focus"
+                                                        title="Whatsapp Access Token"
+                                                        data-bs-content="(Info coming soon) This is the token found for a system user at https://business.facebook.com/settings/system-users/ (This may change)"
+                                                        >
+                            <input name="whatsapp_access_token" type="password" class="form-control" oninput="$('#whatsapp_config_submit').attr('disabled', false)" onfocus="this.value=''; this.removeAttribute('onfocus');"
+                            value="{{company.whatsapp_access_token|censor}}" />
+                            <label class="elipses-overflow">Whatsapp Access Token</label>
+                        </div>
+
+                        <div class="form-floating mt-1" 
+                            data-bs-html="true" 
+                            data-bs-toggle="popover" data-bs-placement="left" 
+                            data-bs-trigger="hover focus"
+                            title="Whatsapp Access Token"
+                            data-bs-content="(Info coming soon) This is the token found for a system user at https://business.facebook.com/settings/system-users/ (This may change)"
+                            >
+
+                            <input name="whatsapp_app_business_id" type="password" class="form-control" oninput="$('#whatsapp_config_submit').attr('disabled', false)" onfocus="this.value=''; this.removeAttribute('onfocus');"
+                            value="{{company.whatsapp_app_business_id|censor}}" />
+                            <label class="elipses-overflow">Whatsapp Business ID</label>
+                        </div>
+                        <div class="form-floating mt-1" 
+                            data-bs-html="true" 
+                            data-bs-toggle="popover" data-bs-placement="left" 
+                            data-bs-trigger="hover focus"
+                            title="Whatsapp Access Token"
+                            data-bs-content="(Info coming soon) This is the token found for a system user at https://business.facebook.com/settings/system-users/ (This may change)"
+                            >
+
+                            <input name="whatsapp_app_secret_key" type="password" class="form-control" oninput="$('#whatsapp_config_submit').attr('disabled', false)" onfocus="this.value=''; this.removeAttribute('onfocus');"
+                            value="{{company.whatsapp_app_secret_key|censor}}"/>
+                            <label class="elipses-overflow">Whatsapp Secret Key</label>
+                        </div>
+                        <br>
+                        <button class="btn btn-primary btn-sm m-3" id="whatsapp_config_submit" disabled>Submit</button>
+                    </form> 
+                    {%else%} 
+                    You do not have the permission to edit this
+                    {%endif%} 
+                </div>
+            </div>
+        </div>
+        <div class="col-md-auto center">    
+            <div class="form-floating m-1">
+                <input value='{%if whatsapp_business_details.id%}{{whatsapp_business_details.id}}{%else%}N/A{%endif%}' disabled class="form-control">
+                <label class="elipses-overflow" for="guid">Whatsapp Business ID</label>
+            </div>
+            <div class="form-floating m-1">
+                <input value='{%if whatsapp_business_details.name%}{{whatsapp_business_details.name}}{%else%}N/A{%endif%}' disabled class="form-control">
+                <label class="elipses-overflow" for="guid">Business Name</label>
+            </div> 
+            <div>
+                {%if whatsapp_business_details.id%}
+                <span class="badge bg-success help"
+                    data-bs-toggle="popover" 
+                    data-bs-trigger="hover focus" 
+                    data-bs-html="true" 
+                    data-bs-placement="top"
+                    data-bs-title="Valid Config"
+                    data-bs-content="We've detected that your whatsapp config is valid">
+                    <i class="fa-solid fa-circle-info"></i> {%if demo%}Demo Config{%else%}Valid Config <i class="fa-duotone fa-check"></i>{%endif%}
+                </span>
+                {%else%}
+                <span class="badge bg-danger help"
+                    data-bs-toggle="popover" 
+                    data-bs-trigger="hover focus" 
+                    data-bs-html="true" 
+                    data-bs-placement="top"
+                    data-bs-title="Invalid Config"
+                    data-bs-content="We've detected that your whatsapp config is invalid">
+                    <i class="fa-solid fa-circle-info"></i> {%if demo%}Demo Config{%else%}Invalid Config <i class="fa-solid fa-times"></i>{%endif%}
+                </span>
+                {%endif%}
+            </div>
+        </div>
+        <div class="col">
+        </div>
+</div>

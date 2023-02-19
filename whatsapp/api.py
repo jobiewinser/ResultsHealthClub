@@ -3,10 +3,10 @@ import os
 import requests
 from django.conf import settings
 import json
-from django.core.mail import send_mail
 
 
-from whatsapp.models import WhatsappMessageImage, WhatsappTemplate
+
+
 logger = logging.getLogger(__name__)
 # https://developers.facebook.com/docs/whatsapp/cloud-api/reference
 # https://business.facebook.com/settings/people/100085397745468?business_id=851701125750291
@@ -28,7 +28,7 @@ class Whatsapp():
     #POST
     def send_free_text_message(self, customer_number, message, whatsapp_number, preview_url = False):   
         print("send_free_text_message", customer_number, message, whatsapp_number)
-        from core.models import AttachedError
+        # from core.models import AttachedError
         if message:  
             if settings.WHATSAPP_PHONE_OVERRIDE1:
                 non_overwritten_customer_number = customer_number
@@ -165,7 +165,7 @@ class Whatsapp():
                 code = potential_error.get('code')
                 details = potential_error.get('details', "")
                 
-                campaign_lead = Campaignlead.objects.filter(whatsapp_number=non_overwritten_customer_number).last()
+                campaign_lead = Campaignlead.objects.filter(contact__customer_number=non_overwritten_customer_number).last()
                 if str(code) == '132000':
                     AttachedError.objects.create(
                         type = '0103',
@@ -212,7 +212,7 @@ class Whatsapp():
             print("send_template_message response_body", response_body)
             return response_body
         else:
-            campaign_lead = Campaignlead.objects.filter(whatsapp_number=non_overwritten_customer_number).last()
+            campaign_lead = Campaignlead.objects.filter(contact__customer_number=non_overwritten_customer_number).last()
             AttachedError.objects.create(
                 type = '0102',
                 attached_field = "whatsapp_template",
@@ -223,7 +223,9 @@ class Whatsapp():
             )
     #POST
     def create_template(self, template_object):   
+        from django.core.mail import send_mail
         from core.models import AttachedError
+        from whatsapp.models import  WhatsappTemplate
         url = f"{self.whatsapp_url}/{template_object.whatsapp_business_account.whatsapp_business_account_id}/message_templates"
         headers = self._get_headers()
         pending_components = template_object.pending_components
@@ -234,7 +236,13 @@ class Whatsapp():
                 if '[[1]]' in text:
                     text = text.replace('[[1]]','{{'+str(counter)+'}}')
                     counter = counter + 1
+                if '[[2]]' in text:
+                    template_object.lead_only #this can only be sent to leads as it requires a campaign to work
+                    text = text.replace('[[2]]','{{'+str(counter)+'}}')
+                    counter = counter + 1
                 component['text'] = text
+            
+        template_object.save()
 
         # for i in range(len(pending_components)):
         #     if not pending_components[i].get('text', ''):
@@ -293,6 +301,7 @@ class Whatsapp():
                 attached_field = "whatsapp_template",
                 archived = False,
             )
+            return
         elif message_template_id:
             AttachedError.objects.filter(
                 type__in = ['1300', '1301', '1302', '1303', '0101','0104'],
@@ -315,7 +324,13 @@ class Whatsapp():
                 if '[[1]]' in text:
                     text = text.replace('[[1]]','{{'+str(counter)+'}}')
                     counter = counter + 1
+                if '[[2]]' in text:
+                    template_object.lead_only #this can only be sent to leads as it requires a campaign to work
+                    text = text.replace('[[2]]','{{'+str(counter)+'}}')
+                    counter = counter + 1
                 component['text'] = text
+            
+            template_object.save()
             body = { 
                 "components": pending_components
             }

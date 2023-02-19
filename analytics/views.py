@@ -13,7 +13,7 @@ from core.core_decorators import check_core_profile_requirements_fulfilled
 from core.models import Site, Subscription
 logger = logging.getLogger(__name__)
 
-from campaign_leads.models import Call, Campaign, Campaignlead
+from campaign_leads.models import Call, Campaignlead, Campaign
         
 
 @method_decorator(login_required, name='dispatch')

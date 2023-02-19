@@ -1,0 +1,40 @@
+
+<tr id="site_contact_{{site_contact.pk}}" {%if swap_td%}hx-swap-oob='outerHTML:#site_contact_{{site_contact.pk}}'{%endif%}>
+    <td style="nowrap elipses-overflow">{{site_contact.name}}</td>
+    <td style="nowrap elipses-overflow">{{site_contact.contact.customer_number}}</td>
+    <td style="nowrap elipses-overflow">{{site_contact.campaignlead_set.all.count}} Leads for {{site.name}}</td>
+    <td style="nowrap">
+        {%if site.subscription.whatsapp_enabled%}
+        <div class="row m-0">
+            <div class="col-auto ps-1 pe-1">   
+                <button class="btn btn-warning btn-sm"
+                    onclick="htmx.ajax('GET', '{% url 'get-modal-content'%}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'edit_contact','site_contact_pk':'{{site_contact.pk}}'}})"><i class="fa fa-pencil" aria-hidden="true"></i> Edit</button>
+            </div> 
+            <div class="col-auto ps-1 pe-1">   
+                <button class="btn btn-primary btn-sm" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa fa-paper-plane-top"></i> Send Template</button>                                        
+                <ul class="dropdown-menu">
+                    {%for whatsappnumber in whatsappnumbers%}   
+                        <li>
+                            <a class="dropdown-item" href="#"
+                                onclick="htmx.ajax('GET', '{% url 'get-modal-content'%}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'send_new_template_message','whatsappnumber_pk':'{{whatsappnumber.pk}}','site_contact_pk':'{{site_contact.pk}}'}})">
+                                Send From {{whatsappnumber}}
+                            </a>
+                        </li>
+                    {%endfor%}
+                </ul>
+            </div> 
+        </div>
+        {%else%}
+        <div class="row m-0">
+            <div class="col-auto ps-1 pe-1">   
+                <button class="btn btn-warning btn-sm"
+                    onclick="htmx.ajax('GET', '{% url 'get-modal-content'%}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'edit_contact','site_contact_pk':'{{site_contact.pk}}'}})"><i class="fa fa-pencil" aria-hidden="true"></i> Edit</button>
+            </div> 
+            <div class="col-auto ps-1 pe-1">   
+                <button class="btn btn-primary btn-sm" disabled><i class="fa fa-paper-plane-top"></i> Send Template (<i class="fa-solid fa-rectangle-pro"></i> Only)</button>   
+                
+            </div> 
+        </div>
+        {%endif%} 
+    </td>
+</tr>

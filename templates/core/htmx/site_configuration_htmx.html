@@ -3,6 +3,10 @@
     <script>
         $(document).ready(function() {
             document.title = "Site Configuration";
+            {%if request.GET.advanced_settings or request.POST.advanced_settings%}
+            console.log(document.getElementById("content").scrollHeight - 200)
+            document.getElementById("content").scrollTo(0, document.getElementById("content").scrollHeight - 800);
+            {%endif%}
         });
     </script>
     {%if site%}
@@ -16,10 +20,13 @@
         <div class="col">
         </div>
         {%block extra_top_right_buttons %}
-        <input id="current_page" hidden value="site_configuration"></input>
-        {% comment %} <div class="col-md-auto p-0 m-1">
-            <span class="badge bg-dark text-white"><h6 class="m-1">Site Configuration</h6></span>           
-        </div> {% endcomment %}
+        <input id="current_page" hidden value="site_configuration"/>
+        <div class="col-md-auto p-0 m-1 pointer" hx-indicator="#page_load_indicator" data-active-selector="#configuration-top-nav-dropdown-toggle"
+            hx-get="{%url 'site-configuration'%}?advanced_settings=True" hx-target="#content" hx-push-url="true" hx-swap="innerHTML">
+            <h3>{%include 'core/htmx/site_warning_section.html'%}</h3>
+            {% comment %} <span class="badge bg-dark text-white"><h6 class="m-1">Site Configuration</h6></span>            {% endcomment %}
+        </div> 
+        
         {%endblock extra_top_right_buttons %}
     </div>
     <div class="row mt-2">
@@ -52,7 +59,7 @@
                 </div>
             </div>
 
-            <div class="card card-highlight p-2">
+            <div class="card card-highlight">
                 <div class="card-header">
                     <div class="row">
                         <div class="col-auto ps-0">
@@ -134,7 +141,7 @@
             </div>
 
 
-            <div class="card card-highlight p-2 mt-3">
+            <div class="card card-highlight mt-3">
                 <div class="card-header">
                     <div class="row">
                         <div class="col-auto ps-0">
@@ -228,38 +235,15 @@
             
 
             <div class="card  w-100 mt-3">
-                <div class="card-header pointer" data-bs-toggle="collapse" data-bs-target="#collapseAdvancedSettings">
+                <div class="card-header pointer {%if not request.GET.advanced_settings and not request.POST.advanced_settings%}collapsed{%endif%}" data-bs-toggle="collapse" data-bs-target="#collapseAdvancedSettings">
                     <div class="row">
                         <div class="col-md-auto p-0">   
                             <h4>Advanced Settings</h4>
                         </div>
                     </div>
                 </div>
-                <div id="collapseAdvancedSettings" class="collapse {%if advanced_settings_open%}show{%endif%}" data-bs-parent="#accordion">
+                <div id="collapseAdvancedSettings" class="collapse {%if request.GET.advanced_settings or request.POST.advanced_settings%}show{%endif%}" data-bs-parent="#accordion">
                   <div class="card-body">
-                    <div class="card card-highlight m-2">
-                        <div class="card-header">
-                            <i class="fa fa-whatsapp" aria-hidden="true"></i> <span class="name_display_{{site.pk}}">{{site.name}}</span> <b>Whatsapp Settings</b> <i class="fa-solid fa-rectangle-pro"></i>
-                        </div>
-                        <div class="card-body">
-                            {%if site.subscription.whatsapp_enabled%}
-                                <span id="whatsapp_site_config_wrapper">
-                                    {%include 'core/htmx/whatsapp_site_config_row.html'%}
-                                </span>
-                                <hr>
-                                <span id="whatsapp_template_sending_wrapper">
-                                    {%include 'core/htmx/whatsapp_template_sending_enabled_htmx.html'%}
-                                </span>
-                                <hr>
-                                <div class="m-3">
-                                    {%include 'core/htmx/site_configuration_table_htmx.html'%}
-                                </div>
-                            {%else%}
-                                <p>With a <i class="fa-solid fa-rectangle-pro"></i> subscription, you can automate further by automatically sending <i class="fa fa-whatsapp text-success" aria-hidden="true"></i> Whatsapp templates to your customers immediately after they fill in your Active Campaign Forms.</p>
-                                <p>You can also manage multiple whatsapp phone numbers from one screen, here on Winser Systems.</p>
-                            {%endif%}
-                        </div>
-                    </div>
                     <div class="card card-highlight m-2">
                         <div class="card-header">
                             <i class="fa-regular fa-calendar-days"></i> <span class="name_display_{{site.pk}}">{{site.name}}</span> <b>Calendly Settings</b>
@@ -341,6 +325,25 @@
                                 <div class="col-md-auto">
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                    <div class="card card-highlight m-2">
+                        <div class="card-header">
+                            <i class="fa fa-whatsapp" aria-hidden="true"></i> <span class="name_display_{{site.pk}}">{{site.name}}</span> <b>Whatsapp Settings</b> <i class="fa-solid fa-rectangle-pro"></i>
+                        </div>
+                        <div class="card-body">
+                            {%if site.subscription.whatsapp_enabled%}
+                                <span id="whatsapp_template_sending_wrapper">
+                                    {%include 'core/htmx/whatsapp_template_sending_enabled_htmx.html'%}
+                                </span>
+                                <hr>
+                                <div class="m-3">
+                                    {%include 'core/htmx/site_configuration_table_htmx.html'%}
+                                </div>
+                            {%else%}
+                                <p>With a <i class="fa-solid fa-rectangle-pro"></i> subscription, you can automate further by automatically sending <i class="fa fa-whatsapp text-success" aria-hidden="true"></i> Whatsapp templates to your customers immediately after they fill in your Active Campaign Forms.</p>
+                                <p>You can also manage multiple whatsapp phone numbers from one screen, here on Winser Systems.</p>
+                            {%endif%}
                         </div>
                     </div>
                   </div>

@@ -11,7 +11,7 @@ from django.contrib.sessions.models import Session
 from django.contrib.auth.models import User
 from calendly.api import Calendly
 from core.core_decorators import check_core_profile_requirements_fulfilled
-from core.models import ROLE_CHOICES, StripeCustomer, FreeTasterLink, FreeTasterLinkClick, Profile, Site, CompanyProfilePermissions, SiteProfilePermissions, Feedback, Subscription,SiteSubscriptionChange, Company
+from core.models import ROLE_CHOICES, StripeCustomer, FreeTasterLink, FreeTasterLinkClick, Profile, Site, CompanyProfilePermissions, SiteProfilePermissions, Feedback, Subscription,SiteSubscriptionChange, Company, Contact, SiteContact
 from django.contrib.auth import authenticate
 from django.contrib.auth import login
 from django.core.exceptions import PermissionDenied
@@ -180,11 +180,21 @@ def get_site_configuration_context(request):
                     break
     context['site'] = site
     context['site_webhook_active'] = site_webhook_active
-    if site.whatsapp_access_token:
-        whatsapp = Whatsapp(site.whatsapp_access_token)
+    if site.company.whatsapp_access_token:
+        whatsapp = Whatsapp(site.company.whatsapp_access_token)
         context['whatsapp_business_details'] = whatsapp.get_business(site.company.whatsapp_app_business_id)
     else:
         context['whatsapp_business_details'] = {"error":True}
+    return context
+
+def get_contacts_overview_context(request):
+    request.GET._mutable = True   
+    context = {}
+    site_pk = get_single_site_pk_from_request_or_default_profile_site(request)   
+    request.GET['site_pk'] = site_pk   
+    site = Site.objects.get(pk=site_pk)
+    context['site'] = site
+    context['site_contacts'] = SiteContact.objects.filter(site=site)
     return context
 @method_decorator(login_required, name='dispatch')
 @method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
@@ -204,6 +214,7 @@ class SiteConfigurationView(TemplateView):
         context['get_stripe_subscriptions_and_update_models'] = context['site'].get_stripe_subscriptions_and_update_models()
         return context
     def post(self, request):
+        self.request.POST._mutable = True     
         # if settings.DEMO and not request.user.is_superuser:
         #     return HttpResponse(status=500)
         self.request.POST._mutable = True 
@@ -231,9 +242,22 @@ class SiteConfigurationView(TemplateView):
                     site.calendly_token = request.POST['calendly_token']        
                     site.save()
             context = get_site_configuration_context(request)
-            context.update({'advanced_settings_open':True})
+            request.GET['POST']['advanced_settings'] = True
             return render(request, 'core/htmx/site_configuration_htmx.html',context)
         return HttpResponse( status=200)
+    
+@method_decorator(login_required, name='dispatch')
+@method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
+class ContactsOverviewView(TemplateView):
+    template_name='core/contacts_overview.html'
+    def get(self, request, *args, **kwargs):   
+        if request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+            self.template_name = 'core/htmx/contacts_overview_htmx.html'
+        return super(ContactsOverviewView, self).get(request, args, kwargs)
+    def get_context_data(self):    
+        context = super(ContactsOverviewView, self).get_context_data()
+        context.update(get_contacts_overview_context(self.request))
+        return context
             
 
 @method_decorator(login_required, name='dispatch')
@@ -992,10 +1016,57 @@ def profile_assign_color_htmx(request):
     return render(request, 'core/htmx/company_configuration_row.html', {'profile':profile})
 
 @login_required
-@not_demo_or_superuser_check
+# @not_demo_or_superuser_check
 def change_theme(request):
+    if settings.DEMO:
+        return HttpResponse("", status=200)
     profile = request.user.profile
     profile.theme = request.POST.get('theme', 'light')
     profile.save()
     return HttpResponse("Successfully changed theme", status=200)
-    
+
+from core.utils import normalize_phone_number
+def get_and_create_contact_and_site_contact_for_lead(lead, customer_number):
+    #lead should have a campaign assigned before this is called
+    # if lead.campaign.company:
+    contact, created = Contact.objects.get_or_create(company=lead.campaign.company, customer_number=normalize_phone_number(customer_number))
+    site_contact, created = SiteContact.objects.get_or_create(site=lead.campaign.site, contact=contact)
+    if created:
+        site_contact.first_name = lead.first_name
+        site_contact.last_name = lead.last_name
+        site_contact.save()
+    lead.contact = contact
+    lead.save()
+    return contact, site_contact
+def get_or_create_contact_for_whatsapp_message(whatsapp_message):
+    contact, created = Contact.objects.get_or_create(company=whatsapp_message.site.company, customer_number=normalize_phone_number(whatsapp_message.customer_number))
+    return contact
+
+@login_required
+@not_demo_or_superuser_check
+def edit_contact(request, **kwargs):
+    site_contact_pk = request.POST.get('site_contact_pk')
+    if site_contact_pk:
+        site_contact = SiteContact.objects.get(pk=request.POST.get('site_contact_pk'))
+    else:
+        customer_number = normalize_phone_number(request.POST.get('customer_number'))
+        site = request.user.profile.active_sites_allowed.filter(pk=request.POST.get('site_pk')).first()
+        if not site:
+            return HttpResponse("You're not allowed to make changes to this site", status=403)
+        if not customer_number:
+            return HttpResponse("Please enter a Phone Number", status=400)
+        if SiteContact.objects.filter(contact__customer_number=customer_number, site=site):
+            return HttpResponse(f"A contact for the site: {site.name} already exists", status=400)
+        contact, created = Contact.objects.get_or_create(company=site.company, customer_number=customer_number)
+        site_contact, created = SiteContact.objects.get_or_create(contact=contact, site=site)
+        
+    first_name = request.POST.get('first_name')
+    if not first_name:
+        return HttpResponse("Please provide a first name", status=500)
+    last_name = request.POST.get('last_name')
+    site_contact.first_name = first_name
+    site_contact.last_name = last_name
+    site_contact.save()
+    if site_contact_pk:
+        return render(request, 'core/htmx/contacts_overview_row.html', {'site_contact':site_contact, 'site':site_contact.site, 'whatsappnumbers':site_contact.site.return_phone_numbers(), 'swap_td':True})
+    return render(request, 'campaign_leads/htmx/edit_contact.html', {'site_contact':site_contact, 'site':site_contact.site})

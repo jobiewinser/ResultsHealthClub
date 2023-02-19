@@ -26,7 +26,7 @@
     </div>
 
     <div class="col-md-auto p-0 ms-2">
-        {%if not request.user.profile|get_profile_allowed_to_edit_whatsapp_settings_tag:site%}
+        {%if not request.user.profile|get_profile_allowed_to_edit_whatsapp_settings_tag:site.company%}
         <span
             data-bs-toggle="popover" 
             data-bs-trigger="hover focus" 
@@ -60,3 +60,8 @@
     <div class="col">
     </div>
 </div>
+
+
+{%if site_warning_section_swap%}
+{%include 'core/htmx/site_warning_section.html'%}
+{%endif%}

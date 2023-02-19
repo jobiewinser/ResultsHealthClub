@@ -13,7 +13,7 @@
             data-bs-title="Full Information"
             data-bs-content="
             <b>Name:</b> {{lead.name}}<br>
-            <b>Number:</b> {{lead.whatsapp_number}}<br>
+            <b>Number:</b> {{lead.contact.customer_number}}<br>
             <b>Email:</b> {{lead.email}}<br>
             <b>Campaign:</b> {{lead.campaign}}<br>
             <b>Site:</b> {{lead.campaign.site.name}}<br>
@@ -65,7 +65,8 @@
                     hx-push-url="false"
                     hx-swap="innerHTML" hx-trigger="click"  
                     {%endif%}
-                    data-customer-number="{{lead.whatsapp_number}}">
+                    data-customer-number="{{lead.contact.customer_number}}"
+                    data-site-contact-pk="{{lead.site_contact.pk}}">
                         Send <i class="fa fa-whatsapp"></i>
                 </button>
             {%else%}
@@ -74,17 +75,18 @@
                     hx-target="#chat_bottom"
                     hx-swap="outerHTML"
                     hx-indicator="#page_load_indicator"                 
-                    hx-vals='{"site_pk": "{{lead.campaign.site.pk}}", "customer_number": "{{lead.whatsapp_number}}"}'
+                    hx-vals='{"site_pk": "{{lead.campaign.site.pk}}", "customer_number": "{{lead.contact.customer_number}}"}'
                     hx-trigger="click"
                     
-                    onclick="$('#chat_card_{{lead.whatsapp_number}}').remove(); $('#chat_list_bottom_window').remove();"
-                    data-customer-number="{{lead.whatsapp_number}}">
+                    onclick="$('#chat_card_{{lead.site_contact.pk}}').remove(); $('#chat_list_bottom_window').remove();"
+                    data-customer-number="{{lead.contact.customer_number}}"
+                    data-site-contact-pk="{{lead.site_contact.pk}}">
                         Chat <i class="fa fa-whatsapp"></i>
-                        <span id="chat_notification_{{lead.whatsapp_number.pk}}">
+                        <span id="chat_notification_{{lead.site_contact.pk}}">
                         </span>
                 </button>
             {%endif%}
-            <span style="text-decoration: none;" class="nowrap text-success" target="_blank"><i class="fa fa-whatsapp" aria-hidden="true"></i> {{lead.whatsapp_number|display_phone}}</span>
+            <span style="text-decoration: none;" class="nowrap text-success" target="_blank"><i class="fa fa-whatsapp" aria-hidden="true"></i> {{lead.contact.customer_number|display_phone}}</span>
         </span>        
     </td>
     <td class="nowrap">
@@ -180,7 +182,7 @@
                     {%endfor%}
                 </ul>
                 ">
-                <button class="btn {%if lead.note_set.all%}btn-dark text-dark{%else%}btn-secondary text-secondary{%endif%} btn-sm" type="button"
+                <button class="btn {%if lead.note_set.all%}btn-dark text-white{%else%}btn-secondary text-secondary{%endif%} btn-sm" type="button"
                     onclick="htmx.ajax('GET', '{% url 'campaign-lead-get-modal-content' param1=lead.pk %}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'note_history'}})">
                     <i class="fa-solid fa-notes"></i> <span class="text-secondary">{{lead.note_set.all.count}}</span></button>
             </div>

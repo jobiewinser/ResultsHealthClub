@@ -19,11 +19,6 @@ def get_profile_allowed_to_toggle_active_campaign(profile, site):
     if permissions:
         return permissions.toggle_active_campaign
     return False
-def get_profile_allowed_to_edit_whatsapp_settings(profile, site):
-    permissions = SiteProfilePermissions.objects.filter(profile=profile, site=site).first()
-    if permissions:
-        return permissions.edit_whatsapp_settings
-    return False
 def get_profile_allowed_to_toggle_whatsapp_sending(profile, site):
     permissions = SiteProfilePermissions.objects.filter(profile=profile, site=site).first()
     if permissions:
@@ -57,6 +52,11 @@ def get_profile_allowed_to_edit_other_profile_permissions(profile, company):
     permissions = CompanyProfilePermissions.objects.filter(profile=profile, company=company).first()
     if permissions:
         return permissions.edit_user_permissions
+    return False
+def get_profile_allowed_to_edit_whatsapp_settings(profile, company):
+    permissions = CompanyProfilePermissions.objects.filter(profile=profile, company=company).first()
+    if permissions:
+        return permissions.edit_whatsapp_settings
     return False
 def get_profile_allowed_to_edit_profile_permissions(user_profile, target_profile):
     if check_if_profile_is_higher_authority_than_profile(user_profile, target_profile):
@@ -110,7 +110,7 @@ def get_allowed_site_chats_for_user(user):
     #TODO
     # return Site.objects.filter(pk__in=[user.profile.site.pk])
     # return Site.objects.filter(company=user.profile.site.company)
-    return user.profile.active_sites_allowed
+    return user.profile.active_sites_allowed.filter(subscription__whatsapp_enabled=True)
 
 def get_user_allowed_to_send_from_whatsappnumber(user, whatsappnumber):
     #TODO
@@ -118,7 +118,7 @@ def get_user_allowed_to_send_from_whatsappnumber(user, whatsappnumber):
 def get_allowed_number_chats_for_user(site, user):
     #TODO
     # return Site.objects.filter(pk__in=[user.profile.site.pk])
-    return WhatsappNumber.objects.filter(whatsapp_business_account__site=site, archived=False)
+    return WhatsappNumber.objects.filter(whatsapp_business_account__site=site, whatsapp_business_account__active=True)
 
 def get_profile_allowed_to_edit_other_profile(request_profile, other_profile):
     if request_profile == other_profile:

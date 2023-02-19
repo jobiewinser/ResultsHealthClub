@@ -6,17 +6,18 @@
         <input type="text" style="display:None" id="lead_pk_{{lead.pk}}" name="lead_pk" value="{{lead.pk}}"/>
         <div class="row" style="height:30px">
             <div class="col p-0 pe-1 elipses-overflow">
-                <span class="primary_td_layer">
+                <span class="primary_td_layer pointer" onclick="htmx.ajax('GET', '{% url 'campaign-lead-get-modal-content'%}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'view_lead','lead_pk':'{{lead.pk}}'}})">
                     <span 
-                    class="help"
+                    class=""
                     data-bs-toggle="popover" 
                     data-bs-trigger="hover focus" 
                     data-bs-html="true" 
                     data-bs-placement="top"
                     data-bs-title="Full Information"
                     data-bs-content="
+                    <b>Click to copy details</b><br>
                     <b>Name:</b> {{lead.name}}<br>
-                    <b>Number:</b> {{lead.whatsapp_number}}<br>
+                    <b>Number:</b> {{lead.contact.customer_number}}<br>
                     <b>Email:</b> {{lead.email}}<br>
                     <b>Campaign:</b> {{lead.campaign}}<br>
                     <b>Site:</b> {{lead.campaign.site.name}}<br>
@@ -29,10 +30,7 @@
                         <i class="fa-solid fa-circle-info text-info"></i>
                     </span> 
                     
-                    <span class="lead_name text-dark">{{lead.name}}</span>
-                    
-                    
-                    
+                    <span class="lead_name">{{lead.name}}</span>
                 </span>
             </div>
             <div class="col-md-auto p-0">
@@ -40,7 +38,7 @@
                     {%if not lead.message_set.exists%}
                     <button class="btn btn-space btn-xs btn-secondary nowrap ps-1 pe-1"                     
                         {%if lead.disabled_automated_messaging%}
-                        onclick="alert(`This lead is marked as don't automatically message. Please manually send a template instead.`);"
+                        onclick="alert(`This lead is marked as don't automatically message. Please manually send a template instead or edit this lead using the yellow pencil button to reenable automatic sending.`);"
                         {%else%}
                         hx-include="#max_call_count"
                         hx-post="{%url 'send-first-template-whatsapp-lead-article' lead_pk=lead.pk%}"
@@ -48,7 +46,8 @@
                         hx-push-url="false"
                         hx-swap="none" hx-trigger="click"  
                         {%endif%}
-                        data-customer-number="{{lead.whatsapp_number}}">
+                        data-customer-number="{{lead.contact.customer_number}}"
+                        data-site-contact-pk="{{lead.site_contact.pk}}">
                             Send <i class="fa fa-whatsapp"></i>
                     </button>
                     {%else%}
@@ -57,10 +56,11 @@
                             hx-target="#chat_bottom"
                             hx-swap="outerHTML"
                             hx-indicator="#page_load_indicator"                 
-                            hx-vals='{"site_pk": "{{lead.campaign.site.pk}}", "customer_number": "{{lead.whatsapp_number}}"}'
+                            hx-vals='{"site_pk": "{{lead.campaign.site.pk}}", "customer_number": "{{lead.contact.customer_number}}"}'
                             hx-trigger="click"                        
-                            onclick="$('#chat_card_{{lead.whatsapp_number}}').remove(); $('#chat_list_bottom_window').remove();"
-                            data-customer-number="{{lead.whatsapp_number}}">
+                            onclick="$('#chat_card_lead.site_contact.pk').remove(); $('#chat_list_bottom_window').remove();"
+                            data-site-contact-pk="{{lead.site_contact.pk}}"
+                            data-customer-number="{{lead.contact.customer_number}}">
                                 Chat <i class="fa fa-whatsapp"></i>
                         </button>
                     {%endif%}    
@@ -97,7 +97,7 @@
             <span class="secondary_td_layer p-0" >
                 <div class="row">
                     <div class="col p-0 pe-1 elipses-overflow">
-                        <b><i class="fa fa-whatsapp" aria-hidden="true"></i> <span class="phone_number">{{lead.whatsapp_number}}</span></b>
+                        <b><i class="fa fa-whatsapp" aria-hidden="true"></i> <span class="phone_number">{{lead.contact.customer_number}}</span></b>
                     </div>
                     <div class="col-md-auto p-0 right"> 
                         <span style="color:rgb(96, 248, 61y)" class="secondary_td_layer">£<span class="lead_cost" id="lead_cost_{{lead.pk}}" data-cost="{{lead.get_product_cost|floatformat:2}}">{{lead.get_product_cost|floatformat:2}}</span></span>

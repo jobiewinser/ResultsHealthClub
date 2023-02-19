@@ -1,0 +1,68 @@
+{%load core_tags%}
+<div class="generic_modal_contents">
+    <div class="card card-highlight m-1 p-3">
+        
+        {%if site_contact.site.subscription.whatsapp_enabled and site_contact%}
+        <div class="row m-0">
+            <div class="col">
+            </div>
+            <div class="col-auto ps-1 pe-1">   
+                <button class="btn btn-primary btn-sm" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa fa-paper-plane-top"></i> Send Template</button>                                        
+                <ul class="dropdown-menu">
+                    {%for whatsappnumber in site_contact.site.return_phone_numbers%}   
+                        <li>
+                            <a class="dropdown-item" href="#"
+                                onclick="htmx.ajax('GET', '{% url 'get-modal-content'%}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'send_new_template_message','whatsappnumber_pk':'{{whatsappnumber.pk}}','site_contact_pk':'{{site_contact.pk}}'}})">
+                                Send From {{whatsappnumber}}
+                            </a>
+                        </li>
+                    {%endfor%}
+                </ul>
+            </div> 
+            <div class="col">
+            </div>
+        </div>
+        {%endif%} 
+        <form {%if site_contact%}hx-post="{%url 'edit-contact'%}"{%else%}hx-post="{%url 'add-contact'%}"{%endif%} hx-trigger="submit" hx-indicator="#page_load_indicator" {%if site_contact%}hx-swap="none"{%else%}hx-swap="innerHTML" hx-target="#generic_modal_body"{%endif%}>
+            {% csrf_token %}
+            <input type="text" style="display:None" id="modal_site_contact_pk" name="site_contact_pk" value="{{site_contact.pk}}"/>
+            <input type="text" style="display:None" name="site_pk" value="{{site.pk}}"/>
+            <div class="row">
+                <div class="col">
+                    <div class="form-floating m-1">
+                        <input name="customer_number" value="{{site_contact.contact.customer_number|or_empty_string}}" class="form-control" id="modal_customer_number" {%if site_contact%}disabled{%endif%}/>
+                        <label for="modal_customer_number">Phone{%if not site_contact%}<span class="required">*</span>{%endif%}</label>
+                    </div> 
+
+                    <div class="form-floating m-1">
+                        <input name="first_name" maxlength="25" value="{{site_contact.first_name|or_empty_string}}" class="form-control" id="modal_first_name"/>
+                        <label for="modal_first_name">First Name<span class="required">*</span></label>
+                    </div>    
+
+                    <div class="form-floating m-1">
+                        <input name="last_name" maxlength="25" value="{{site_contact.last_name|or_empty_string}}" class="form-control" id="modal_last_name"/>
+                        <label for="modal_last_name">last Name</label>
+                    </div>                                          
+                </div>
+            </div>
+            <div class="row m-1">
+                <div class="col center" >
+                    <button class="btn btn-primary" type="submit" {%if demo and not request.user.is_superuser%}disabled{%endif%}>
+                        {%if site_contact%}
+                        Save   
+                        {%else%}
+                        Create
+                        {%endif%} Contact {%if demo and not request.user.is_superuser%}(Demo, Disabled){%endif%}
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<span hx-swap-oob="true" id="generic_modal_title">
+    {%if site_contact%}
+        Edit   
+        {%else%}
+        Create
+        {%endif%} Contact
+</span>

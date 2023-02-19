@@ -5,9 +5,9 @@ from django.contrib.auth.models import User
 from django.shortcuts import render
 import logging
 from django.contrib.auth.decorators import login_required
-from campaign_leads.models import Campaign, Campaignlead, Booking, Note, ManualCampaign, CampaignCategory, Sale
+from campaign_leads.models import Campaignlead, Booking, Note, ManualCampaign, CampaignCategory, Sale, Campaign
 from active_campaign.models import ActiveCampaign
-from core.models import Site, WhatsappNumber,Subscription
+from core.models import Site, WhatsappNumber, Subscription
 from core.views import get_site_pks_from_request_and_return_sites
 from django.db.models import Count
 from asgiref.sync import async_to_sync
@@ -17,6 +17,8 @@ from django.conf import settings
 logger = logging.getLogger(__name__) 
 from active_campaign.api import ActiveCampaignApi
 from core.core_decorators import *
+from core.views import get_and_create_contact_and_site_contact_for_lead
+from core.models import SiteContact
 @login_required
 def get_modal_content(request, **kwargs):
     try:
@@ -41,7 +43,7 @@ def get_modal_content(request, **kwargs):
 
             whatsappnumber_pk = request.GET.get('whatsappnumber_pk')
             if whatsappnumber_pk:
-                context['whatsappnumber'] = WhatsappNumber.objects.get(pk=whatsappnumber_pk)
+                context['whatsappnumber'] = WhatsappNumber.objects.get(pk=whatsappnumber_pk, whatsapp_business_account__active=True)
 
             lead_pk = request.GET.get('lead_pk')
             if template_name == 'edit_lead':
@@ -50,8 +52,15 @@ def get_modal_content(request, **kwargs):
                     context['site'] = context['lead'].campaign.site
                 if not ManualCampaign.objects.filter(site__in=context['sites']).exists():
                     for site in request.user.profile.company.active_sites:
-                        ManualCampaign.objects.get_or_create(site=site, name = "Manually Created")
-                context['campaigns'] = get_campaign_qs(request)         
+                        manual_campaign, created = ManualCampaign.objects.get_or_create(site=site, name = "Manually Created")
+                        manual_campaign.company = site.company
+                        manual_campaign.save()
+                context['campaigns'] = ManualCampaign.objects.filter(site__in=request.user.profile.active_sites_allowed)
+                # context['campaigns'] = get_campaign_qs(request)   
+            elif template_name == 'view_lead':
+                if lead_pk:
+                    context['lead'] = Campaignlead.objects.get(pk=lead_pk)
+                    context['site'] = context['lead'].campaign.site
             elif template_name == 'mark_sold':
                 lead = Campaignlead.objects.get(pk=lead_pk)
                 context['lead'] = lead
@@ -103,8 +112,6 @@ def add_campaign_category(request, **kwargs):
 @login_required
 @not_demo_or_superuser_check
 def edit_lead(request, **kwargs):
-    # logger.debug(str(request.user))
-    # try:        
     campaign_pk = request.POST.get('campaign_pk')
     if not campaign_pk:
         return HttpResponse("Please choose a campaign", status=500)
@@ -118,13 +125,9 @@ def edit_lead(request, **kwargs):
 
     email = request.POST.get('email')[:50]
     
-    phone = request.POST.get('phone')
-    if not phone:
-        return HttpResponse("Please provide a valid Phone Number", status=500)
-    
     country_code = request.POST.get('country_code', "")
     
-    disabled_automated_messaging = request.POST.get('enable_automated_messaging', 'on') == 'off'
+    disabled_automated_messaging = request.POST.get('enable_automated_messaging', 'off') == 'off'
     product_cost = request.POST.get('product_cost', 0)
     
     lead_pk = request.POST.get('lead_pk')
@@ -135,60 +138,30 @@ def edit_lead(request, **kwargs):
             
         refresh_position = False
     else:
-        lead = Campaignlead()
+        lead = Campaignlead()    
+        phone = request.POST.get('phone')
+        if not phone:
+            return HttpResponse("Please provide a valid Phone Number", status=500)
         refresh_position = True
     lead.campaign = campaign
     lead.first_name = first_name
     lead.last_name = last_name
     lead.email = email
-    lead.whatsapp_number = f"{country_code}{phone}"
+    # lead.contact.customer_number = f"{country_code}{phone}"
     if product_cost:
         lead.product_cost = product_cost
     lead.disabled_automated_messaging = disabled_automated_messaging
-    if not campaign.site.subscription.whatsapp_enabled:
-        lead.disabled_automated_messaging = True
+    # if not campaign.site.subscription.whatsapp_enabled:
+    #     lead.disabled_automated_messaging = True
     
     lead.save()
+    if not lead_pk:
+        contact, site_contact = get_and_create_contact_and_site_contact_for_lead(lead, phone)
+    # lead.save() #call again to send the message to contact
+    lead.check_if_should_send_first_message()
     lead.trigger_refresh_websocket(refresh_position=refresh_position)
     return HttpResponse(str(lead.pk), status=200)
-    # except Exception as e:
-    #     # messages.add_message(request, messages.ERROR, f'Error with creating a campaign lead')
-    #     logger.debug("create_campaign_lead Error "+str(e))
-    #     # raise Exception
-    #     return HttpResponse("Error with creating a campaign lead", status=500)
-# @login_required
-# def get_leads_column_meta_data(request, **kwargs):
-#     logger.debug(str(request.user))
-#     try:
-#         leads = Campaignlead.objects.filter(campaign__site__in=request.user.profile.active_sites_allowed)
-#         campaign_pk = request.GET.get('campaign_pk', None)
-#             # request.GET['campaign_pk'] = campaign_pk
-#         sites = get_site_pks_from_request_and_return_sites(request).filter(archived=False, booking=None)
-#         if request.GET['site_pks']:
-#             leads = leads.filter(campaign__site__pk__in=request.GET['site_pks'])
-            
-#         if campaign_pk:
-#             leads = leads.filter(campaign=request.user.profile.campaigns_allowed.get(pk=campaign_pk))
-#         leads = leads.annotate(calls=Count('call'))
-#         querysets = [
-#             ('Fresh', leads.filter(calls=0), 0)
-#         ]
-#         index = 0
-#         # if leads.filter(calls__gt=index):
-#         while leads.filter(calls__gt=index) or index < 21:
-#             index = index + 1
-#             querysets.append(
-#                 (f"Call {index}", leads.filter(calls=index), index)
-#             )
-#         # else:
-#         #     querysets.append(
-#         #         (f"Call 1", leads.none(), 1)
-#         #     )
-#         return render(request, 'campaign_leads/htmx/column_metadata_htmx.html', {'querysets':querysets})
-#     except Exception as e:
-#         logger.debug("get_leads_column_meta_data Error "+str(e))
-#         #return HttpResponse(e, status=500)
-#         raise e
+
 @login_required
 def refresh_lead_article(request, **kwargs):
     logger.debug(str(request.user))
@@ -355,6 +328,7 @@ def mark_sold(request, **kwargs):
                 datetime = datetime.now(),
                 lead = lead,
             )
+            lead.arrived = True
         lead.archived = False
         lead.save()
         return render(request, "campaign_leads/htmx/campaign_booking_row.html", {'lead':lead}) 

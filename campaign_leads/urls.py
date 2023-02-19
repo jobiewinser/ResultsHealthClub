@@ -38,6 +38,7 @@ urlpatterns = [
     
     path('create-lead-note/', campaignleadshtmx.create_lead_note, name='create-lead-note' ),
     path('edit-lead/', campaignleadshtmx.edit_lead, name='edit-lead' ),
+    
     path('add-campaign-category/', campaignleadshtmx.add_campaign_category, name='add-campaign-category' ),
     
     # path('test-whatsapp-message/', campaignleadshtmx.test_whatsapp_message, name='test-whatsapp-message' ),

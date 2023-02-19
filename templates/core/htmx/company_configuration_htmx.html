@@ -15,7 +15,7 @@
         <div class="col">
         </div>
         {%block extra_top_right_buttons %}
-        <input id="current_page" hidden value="company_configuration"></input>
+        <input id="current_page" hidden value="company_configuration"/>
         {% comment %} <div class="col-md-auto p-0 m-1">
             <span class="badge bg-dark text-white"><h6 class="m-1">Company Configuration</h6></span>           
         </div> {% endcomment %}
@@ -54,6 +54,8 @@
                                         <th>
                                             Profiles
                                         </th>
+                                        <!-- <th>
+                                        </th> -->
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -72,6 +74,11 @@
                                         <td>
                                             <b>{{site.users.count}}</b> of <b>{{site.subscription.max_profiles_string}}</b> allowed profiles
                                         </td>
+                                        <!-- <td>
+                                            <button class="btn btn-danger"
+                                                hx-post="{%url 'deactivate-whatsapp-business-account'%}" hx-vals='{"whatsapp_business_account_pk":"{{number.whatsapp_business_account.pk}}"}' hx-swap="delete" hx-target="#whatsappnumber_row_{{number.pk}}" hx-indicator="#page_load_indicator"
+                                                hx-confirm="This will remove this whatsapp business account (and phone number) from {{site.name}}. It will then be available for you add to another site. The Leads Management System will continue to receive your whatsapp messages until you reactivate this whatsapp business account or you delete the whatsapp business account within Whatsapp.">Deactivate</button>
+                                        </td> -->
                                     </tr>
                                     {%empty%}
                                     <tr>
@@ -133,6 +140,16 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+            <div class="card card-highlight m-2">
+                <div class="card-header">
+                    <i class="fa fa-whatsapp" aria-hidden="true"></i> <span class="name_display_{{site.pk}}">{{site.name}}</span> <b>Whatsapp Settings</b> <i class="fa-solid fa-rectangle-pro"></i>
+                </div>
+                <div class="card-body">
+                    <span id="whatsapp_company_config_wrapper">
+                        {%include 'core/htmx/whatsapp_company_config_row.html'%}
+                    </span>
                 </div>
             </div>
         </div>

@@ -1,18 +1,18 @@
 {%load static core_tags%}
-<div class="collapse show" id="messageWindowCollapse_{{customer_number}}_wrapper">
+<div class="collapse show" id="messageWindowCollapse_{{site_contact.pk}}_wrapper">
     <script>
         {%if seconds_until_send_disabled%}
-        chatCountdown({{seconds_until_send_disabled}}, "{{customer_number}}", "{{whatsappnumber.pk}}", ".time_left_to_send_{{customer_number}}", "#chat_card_"+{{customer_number}}+"_wrapper_{{uuid}}")
+        chatCountdown({{seconds_until_send_disabled}}, "{{customer_number}}", "{{whatsappnumber.pk}}", ".time_left_to_send_{{site_contact.pk}}", "#chat_card_"+{{site_contact.pk}}+"_wrapper_{{uuid}}")
         {%endif%}
     </script>
-    <div class="card-body p-0" id="messageWindowCollapse_{{customer_number}}">
+    <div class="card-body p-0" id="messageWindowCollapse_{{site_contact.pk}}">
         <div class="htmx-indicator disconnected_indicator messaging_disconnected_indicator">
             <b>Connecting</b> <img class="invert" src="{% static 'img/bars.svg' %}">
         </div>
-        <div class="chat_card_body  p-0" id="messageWindowInnerBody_{{customer_number}}" style="overflow-anchor: none">
+        <div class="chat_card_body  p-0" id="messageWindowInnerBody_{{site_contact.pk}}" style="overflow-anchor: none">
             {%include 'messaging/message_window_message_rows.html'%}
-            <form id="message_form_{{customer_number}}" hx-ws="send:submit" autocomplete="off" autofill="off">
-                <div style="position: absolute; right:0; bottom: 35px; width:100%;" class="row mb-2" id="message_input_div_{{customer_number}}"> 
+            <form id="message_form_{{site_contact.pk}}" hx-ws="send:submit" autocomplete="off" autofill="off">
+                <div style="position: absolute; right:0; bottom: 35px; width:100%;" class="row mb-2" id="message_input_div_{{site_contact.pk}}"> 
                     <div class="col"> 
                         {%if seconds_until_send_disabled%}
                         <div class="alert alert-success p-1 m-0"
@@ -21,7 +21,7 @@
                         data-bs-placement="top"
                         data-bs-title="What does this mean?"
                         data-bs-content="You can send messages freely to this phone number for 24 hours after they have sent you a messages; after this time, you must wait for them to reply or send another template."> 
-                            <small><i class="fa-solid fa-circle-info"></i> Able to send for <span class="time_left_to_send_{{customer_number}}">...Loading...</span></small>
+                            <small><i class="fa-solid fa-circle-info"></i> Able to send for <span class="time_left_to_send_{{site_contact.pk}}">...Loading...</span></small>
                         </div>
                         {%else%}
                         <div class="alert alert-danger p-1 m-0"
@@ -36,18 +36,18 @@
                     </div>
                 </div>
                 {%if seconds_until_send_disabled%}
-                <div style="position: absolute; right:0; bottom: 0; width:100%;" class="row mb-2" id="message_input_div_{{customer_number}}"> 
+                <div style="position: absolute; right:0; bottom: 0; width:100%;" class="row mb-2" id="message_input_div_{{site_contact.pk}}"> 
                     <div class="col"> 
-                        <input {%if not seconds_until_send_disabled%}disabled{%endif%} class="form-control form-control-sm message_input_text" id="message_input_{{customer_number}}"  name="message"  type="text"/>
+                        <input {%if not seconds_until_send_disabled%}disabled{%endif%} class="form-control form-control-sm message_input_text" id="message_input_{{site_contact.pk}}"  name="message"  type="text"/>
                         
                         <input hidden class="form-control" value="{{customer_number}}"  name="messaging_customer_number"  type="text"/>
                     </div>
                     <div class="col-auto"> 
-                        <button onclick="setTimeout(function (){$('#message_input_{{customer_number}}').val('')}, 10);" class="badge bg-primary message_submit" id="message_submit_{{customer_number}}"><i class="fa-solid fa-paper-plane-top"></i></button>                        
+                        <button onclick="setTimeout(function (){$('#message_input_{{site_contact.pk}}').val('')}, 10);" class="badge bg-primary message_submit" id="message_submit_{{site_contact.pk}}"><i class="fa-solid fa-paper-plane-top"></i></button>                        
                     </div>
                 </div>
                 {%else%}
-                <div style="position: absolute; right:0; bottom: 0px; width:100%;" class="row mb-2" id="message_input_div_{{customer_number}}"> 
+                <div style="position: absolute; right:0; bottom: 0px; width:100%;" class="row mb-2" id="message_input_div_{{site_contact.pk}}"> 
                     <div class="col"> 
                         <div class="alert alert-secondary p-1 m-0"> 
                             <small>Send a message template instead</small>
@@ -59,7 +59,7 @@
                                 hx-indicator="#page_load_indicator" hx-target="#generic_modal_body" 
                                 hx-get="{% url 'get-modal-content' %}" 
                                 hx-push-url="false"
-                                hx-vals='{"template_name": "send_new_template_message", "whatsappnumber_pk":"{{whatsappnumber.pk}}", "lead_pk":"{{lead.pk}}", "contact_pk":"{{contact.pk}}", "customer_number":"{{customer_number}}"}'
+                                hx-vals='{"template_name": "send_new_template_message", "whatsappnumber_pk":"{{whatsappnumber.pk}}", "lead_pk":"{{lead.pk}}", "site_contact_pk":"{{site_contact.pk}}", "customer_number":"{{customer_number}}"}'
                                 hx-swap="innerHTML" hx-trigger="click">
                                     <i class="fa fa-paper-plane-top" aria-hidden="true"></i>
                             </button>

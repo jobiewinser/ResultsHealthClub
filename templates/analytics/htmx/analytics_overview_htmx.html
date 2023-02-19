@@ -1,9 +1,5 @@
 {%load static core_tags%}
 <span>    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-        
-    <script src="https://cdn.jsdelivr.net/npm/moment@^2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@^1"></script>
     <script>
         document.title = "Analytics";
         $(document).ready(function() {
@@ -62,7 +58,7 @@
         </div>
 
         {%block extra_top_right_buttons %}
-        <input id="current_page" hidden value="analytics_overview"></input>
+        <input id="current_page" hidden value="analytics_overview"/>
         {% comment %} <div class="col-md-auto p-0 m-1">
             <span class="badge bg-dark text-white"><h6 class="m-1">Analytics</h6></span>      
         </div> {% endcomment %}

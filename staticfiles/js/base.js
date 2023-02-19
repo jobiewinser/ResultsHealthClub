@@ -43,6 +43,12 @@ function basehandlehtmxafterSwap(evt){
         }
     }
     if (evt.detail.xhr.status == 200){
+        // if (evt.detail.pathInfo.finalRequestPath.includes("choose_template_message_site_contact")){
+        //     try{$('#choose_template_message_site_contact_table').dataTable().fnDestroy()}catch{};
+        //     $('#choose_template_message_site_contact_table').DataTable(        
+        //     );        
+        // }
+        
     } else {
         snackbarShow(evt.detail.xhr.responseText, 'danger')
     }
@@ -173,7 +179,7 @@ function basehandlehtmxafterRequest(evt){
                 snackbarShow('Successfully sent message', 'success')
             }else if (evt.detail.pathInfo.requestPath.includes("add-whatsapp-business-account")){
                 $('#generic_modal').modal('hide');
-                snackbarShow('Successfully added phone', 'success')
+                snackbarShow('Successfully added whatsapp business account', 'success')
             }else if (evt.detail.pathInfo.requestPath.includes("create-lead-note")){
                 $('#generic_modal').modal('hide');
                 snackbarShow('Successfully added note', 'success')
@@ -256,9 +262,9 @@ function copyTextToClipboard(text) {
     return;
   }
   navigator.clipboard.writeText(text).then(function() {
-      snackbarShow('Successfully copied free taster link', 'success')
+      snackbarShow('Successfully copied to clipboard', 'success')
   }, function(err) {
-      snackbarShow('Failed to copy free taster link', 'danger')
+      snackbarShow('Failed to copy to clipboard', 'danger')
   });
 }
 
@@ -279,9 +285,9 @@ function fallbackCopyTextToClipboard(text) {
       var successful = document.execCommand('copy');
       var msg = successful ? 'successful' : 'unsuccessful';
       if (msg == 'successful') {
-        snackbarShow('Successfully copied free taster link', 'success')
+        snackbarShow('Successfully copied to clipboard', 'success')
       } else {
-        snackbarShow('Failed to copy free taster link', 'danger')
+        snackbarShow('Failed to copy to clipboard', 'danger')
       }
     } catch (err) {
     }

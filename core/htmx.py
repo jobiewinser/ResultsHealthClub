@@ -1,8 +1,7 @@
 #0.9 safe
 import os
-import uuid
 from calendly.api import Calendly
-from core.models import ROLE_CHOICES, FreeTasterLink, Profile, Site, WhatsappNumber, Contact, SiteProfilePermissions, CompanyProfilePermissions, Subscription
+from core.models import ROLE_CHOICES, Profile, Site, WhatsappNumber, SiteProfilePermissions, CompanyProfilePermissions, Subscription, SiteContact
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import render
@@ -13,12 +12,10 @@ from django.views import View
 from core.user_permission_functions import get_profile_allowed_to_edit_other_profile, get_profile_allowed_to_edit_site_configuration 
 from core.views import get_site_pks_from_request_and_return_sites
 from campaign_leads.models import Campaignlead
-from django.conf import settings
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from core.core_decorators import *
 logger = logging.getLogger(__name__)
-from whatsapp.models import WhatsAppMessage
 
 @login_required
 def get_modal_content(request, **kwargs):
@@ -38,9 +35,15 @@ def get_modal_content(request, **kwargs):
                     context["edit_user"] = User.objects.get(pk=user_pk)
             elif template_name == 'add_site':
                 if site_pk:
-                    context["site"] = Site.objects.get(pk=site_pk)     
+                    context["site"] = request.user.profile.active_sites_allowed.get(pk=site_pk)     
                 elif request.user.profile.company.part_created_site:
-                    context["site"] = request.user.profile.company.part_created_site    
+                    context["site"] = request.user.profile.company.part_created_site   
+            elif template_name == 'edit_contact':
+                site_contact_pk = request.GET.get('site_contact_pk')
+                if site_contact_pk:
+                    context["site_contact"] = SiteContact.objects.get(pk=site_contact_pk, site__in=request.user.profile.active_sites_allowed)
+                if site_pk:
+                    context["site"] = request.user.profile.active_sites_allowed.get(pk=site_pk)     
                     
             elif template_name == 'edit_permissions':
                 profile_pk = request.GET.get('profile_pk', None)
@@ -52,49 +55,51 @@ def get_modal_content(request, **kwargs):
                     for site in profile.company.active_sites:
                         site_profile_permissions, created = SiteProfilePermissions.objects.get_or_create(profile=profile, site=site)
                         site_profile_permissions.save()
-            elif template_name == 'add_phone_number':
-                if site_pk:
-                    context["site"] = Site.objects.get(pk=site_pk)
             elif template_name == 'add_user':
                 context['role_choices'] = ROLE_CHOICES    
                 if site_pk:
-                    context["site"] = Site.objects.get(pk=site_pk) 
+                    context["site"] = request.user.profile.active_sites_allowed.get(pk=site_pk) 
             elif template_name == 'reactivate_user':
                 if site_pk:
-                    context["site"] = Site.objects.get(pk=site_pk)            
+                    context["site"] = request.user.profile.active_sites_allowed.get(pk=site_pk)   
+            elif template_name == 'choose_template_message_site_contact':
+                site = request.user.profile.active_sites_allowed.get(pk=site_pk)   
+                context["site"] = site
+                context["site_contacts"] = SiteContact.objects.filter(site=site)   
+                             
             elif template_name == 'send_new_template_message':
                 
                 whatsappnumber_pk = request.GET.get('whatsappnumber_pk', None)
                 
-                if whatsappnumber_pk:
-                    whatsappnumber = WhatsappNumber.objects.get(pk=whatsappnumber_pk)
-                else:
-                    lead_pk = request.GET.get('lead_pk') 
-                    # latest_message = WhatsAppMessage.objects.filter(customer_number=customer_number, whatsappnumber__whatsapp_business_account__site=site).order_by('datetime').last()
-                    # if latest_message:
-                    #     whatsappnumber = latest_message.whatsappnumber
-                    # else:
-                    if lead_pk:
-                        lead = Campaignlead.objects.get(pk=lead_pk)
-                    else:
-                        customer_number = request.GET.get('customer_number') 
-                        site = Site.objects.filter(pk=request.GET.get('site_pk')).exclude(active=False).first()
-                        lead = Campaignlead.objects.filter(campaign__site=site, whatsapp_number=customer_number).last()
-                        context['customer_numbers'] = [customer_number]   
-                    if not lead.campaign.whatsapp_business_account:
-                        return HttpResponse("You don't have a whatsapp number linked to this campaign!", status="400")
-                    context['lead'] = lead
-                    whatsappnumber = lead.campaign.whatsapp_business_account.whatsappnumber
+                # if whatsappnumber_pk:
+                whatsappnumber = WhatsappNumber.objects.get(pk=whatsappnumber_pk, whatsapp_business_account__active=True)
+                # else:
+                #     lead_pk = request.GET.get('lead_pk') 
+                #     # latest_message = WhatsAppMessage.objects.filter(customer_number=customer_number, whatsappnumber__whatsapp_business_account__site=site).order_by('datetime').last()
+                #     # if latest_message:
+                #     #     whatsappnumber = latest_message.whatsappnumber
+                #     # else:
+                #     if lead_pk:
+                #         lead = Campaignlead.objects.get(pk=lead_pk)
+                #     else:
+                #         customer_number = request.GET.get('customer_number') 
+                #         site = Site.objects.filter(pk=request.GET.get('site_pk')).exclude(active=False).first()                        
+                #         lead = Campaignlead.objects.filter(campaign__site=site, contact__customer_number=customer_number).last()
+                #         context['customer_numbers'] = [customer_number]   
+                #     if not lead.campaign.whatsapp_business_account:
+                #         return HttpResponse("You don't have a whatsapp number linked to this campaign!", status="400")
+                #     context['lead'] = lead
+                #     whatsappnumber = lead.campaign.whatsapp_business_account.whatsappnumber
                 context['whatsappnumber'] = whatsappnumber
                  
                 # context['site'] = context['whatsappnumber'].whatsapp_business_account.site
-                lead_pk = request.GET.get('lead_pk', None)
-                contact_pk = request.GET.get('contact_pk', None)
+                # lead_pk = request.GET.get('lead_pk', None)
+                site_contact_pk = request.GET.get('site_contact_pk', None)
                 customer_number = request.GET.get('customer_number', None)                
-                if lead_pk:
-                    context['lead'] = Campaignlead.objects.filter(pk=lead_pk).first()
-                if contact_pk:
-                    context['contact'] = Contact.objects.filter(pk=contact_pk).first()
+                # if lead_pk:
+                #     context['lead'] = Campaignlead.objects.filter(pk=lead_pk).first()
+                if site_contact_pk:
+                    context['site_contact'] = SiteContact.objects.filter(pk=site_contact_pk).first()
                 if customer_number:
                     context['customer_number'] = customer_number
             # elif template_name == 'change_default_payment_method':

@@ -6,10 +6,9 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
-from campaign_leads.models import Call, Campaign, Campaignlead, CampaignTemplateLink, CampaignCategory
+from campaign_leads.models import Call, Campaignlead, CampaignTemplateLink, CampaignCategory, Campaign, ManualCampaign
 from active_campaign.api import ActiveCampaignApi
 from active_campaign.models import ActiveCampaign
-from campaign_leads.models import ManualCampaign
 from core.models import Profile, Site, WhatsappBusinessAccount
 from core.user_permission_functions import get_user_allowed_to_add_call
 from core.views import get_site_pks_from_request_and_return_sites, get_campaign_category_pks_from_request, get_single_site_pk_from_request_or_default_profile_site
@@ -240,7 +239,9 @@ class CampaignConfigurationView(TemplateView):
             self.template_name = 'campaign_leads/campaign_configuration_htmx.html'  
         company = self.request.user.profile.company
         for site in company.active_sites:
-            ManualCampaign.objects.get_or_create(site=site, name = "Manually Created")
+            manual_campaign, created = ManualCampaign.objects.get_or_create(site=site, name = "Manually Created", company=site.company)
+            manual_campaign.company = site.company
+            manual_campaign.save()
         try:
             for campaign_dict in ActiveCampaignApi(company.active_campaign_api_key, company.active_campaign_url).get_lists(company.active_campaign_url).get('lists',[]):
                 campaign, created = ActiveCampaign.objects.get_or_create(
@@ -264,16 +265,7 @@ class CampaignConfigurationView(TemplateView):
         #         self.request.GET['campaign_category_pk'] = campaign_category_pk
         #     except Exception as e:
         #         pass
-        campaign_category_pk = self.request.GET.get('campaign_category_pk', None)
-        if campaign_category_pk and not campaign_category_pk == 'all':
-            try:
-                context['campaign_category'] = CampaignCategory.objects.get(pk=campaign_category_pk)
-                campaigns = campaigns.filter(campaign_category=context['campaign_category'])
-                self.request.GET['site_pk'] = context['campaign_category'].site.pk
-                self.request.GET['campaign_category_pk'] = campaign_category_pk
-            except Exception as e:
-                pass
-        site_pk = get_site_pk_from_request(self.request)
+        site_pk = get_single_site_pk_from_request_or_default_profile_site(self.request)
         if site_pk and not site_pk == 'all':
             try:
                 campaigns = campaigns.filter(Q(site=None)|Q(site__pk=site_pk))

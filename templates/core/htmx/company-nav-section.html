@@ -2,17 +2,27 @@
 <ul class="navbar-nav mb-lg-0 pe-2 border-end" style="height:54px" >
     {%if request.user.is_authenticated%} 
     <li class="nav-item dropstart p-1">
-        <a class="nav-link text-white p-0 pointer top-nav-link"
-            hx-indicator="#page_load_indicator" data-active-selector="#configuration-top-nav-dropdown-toggle" 
-            hx-get="{%url 'company-configuration'%}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML">
+        <a class="nav-link text-white p-0">
             <div class="row m-0" style="overflow:hidden">
                 <div class="col-auto p-0 m-1">
                     <img src="{%if user.profile.company.company_logo_white%}/media/{{user.profile.company.company_logo_white}}{%else%}{% static 'img/blank-profile-picture.png' %}{%endif%}" alt="" 
-                        style="width:32px; height:32px;" class="rounded-circle">
+                        style="width:32px; height:32px;" class="rounded-circle pointer top-nav-link"
+                        hx-indicator="#page_load_indicator" data-active-selector="#configuration-top-nav-dropdown-toggle" 
+                        hx-get="{%url 'company-configuration'%}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML">
                 </div>
-                <div class="col-sm p-0 ms-1 nowrap elipses-overflow" style="">
-                    <strong style="font-size:14px; margin:0px; margin-top:-3px">{{user.profile.company}}</strong>
+                <div class="col-sm p-0 ms-1 nowrap elipses-overflow pe-1" style="">
+                    <strong style="font-size:14px; margin:0px; margin-top:-3px" class="pointer top-nav-link"
+                        hx-indicator="#page_load_indicator" data-active-selector="#configuration-top-nav-dropdown-toggle" 
+                        hx-get="{%url 'company-configuration'%}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML">{{user.profile.company}}</strong>
                     <hr style="margin:0px; margin-bottom:-3px">
+                    <span class="pointer" hx-indicator="#page_load_indicator" data-active-selector="#configuration-top-nav-dropdown-toggle"
+                        hx-get="{%url 'site-configuration'%}?advanced_settings=True" hx-target="#content" hx-push-url="true" hx-swap="innerHTML">
+                        <span style="font-size:12px; line-height: 0.75em; ">{%if user.profile.site.name%}{{user.profile.site.name}} ({{user.profile.site.subscription.get_name_display}}){%endif%}
+                        {%with request.user.profile.site as site%}
+                        {%include 'core/htmx/site_warning_section.html'%}
+                        {%endwith%}
+                    </span>
+                    </span>
                 </div>
                 <input hidden id="user_id" value="{{user.pk}}"/>
             </div>

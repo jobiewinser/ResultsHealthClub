@@ -8,14 +8,10 @@ import bleach
 from django.db.models import JSONField
 
 from messaging.models import Message, MessageImage
-from django.dispatch import receiver
 from PIL import Image
-from io import StringIO, BytesIO
-            
-from datetime import datetime, timedelta
-from django.core.files.images import ImageFile
-import os
-
+from io import BytesIO
+from core.utils import normalize_phone_number
+from datetime import datetime
 GYM_CHOICES = (
                     ('a', 'Abingdon'),
                     ('b', 'Alton'),
@@ -32,7 +28,8 @@ class WhatsAppWebhookRequest(models.Model):
     meta_data = models.JSONField(default=dict)
     errors = models.ManyToManyField("core.ErrorModel", null=True, blank=True)
     request_type = models.CharField(choices=REQUEST_TYPE_CHOICES, default='a', max_length=1)
-
+    
+from django.http import Http404
 
 class WhatsappMessageImage(MessageImage): 
     media_id = models.TextField(blank=True, null=True)
@@ -42,8 +39,11 @@ class WhatsappMessageImage(MessageImage):
         if self.image:
             base = str(settings.BASE_DIR)
             path = base+self.image.url
-            with open(path, "rb") as image_file:
-                image_data = base64.b64encode(image_file.read()).decode('utf-8')
+            try:
+                with open(path, "rb") as image_file:
+                    image_data = base64.b64encode(image_file.read()).decode('utf-8')
+            except:
+                raise Http404('No image found.')
             return image_data
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
@@ -93,14 +93,6 @@ class WhatsAppMessage(Message):
         if self.customer_number:
             self.customer_number = normalize_phone_number(self.customer_number)
         super(WhatsAppMessage, self).save(force_insert, force_update, using, update_fields)
-        
-
-def normalize_phone_number(number):
-    if number[:2] == '44':
-        number = '0' + number[2:]
-    return number
-# class WhatsAppMessage(models.Model):
-#     pass 
     
 class WhatsAppMessageStatus(models.Model):
     whatsapp_message = models.ForeignKey(WhatsAppMessage, on_delete=models.SET_NULL, null=True, blank=True)    
@@ -127,7 +119,7 @@ WHATSAPP_ORDER_CHOICES = (
 )
 template_variables = {
     '[[1]]': ["First Name", "Lead Name"],    
-    # '[[2]]': ["Campaign Alias", "Fitness Campaign"],    
+    '[[2]]': ["Campaign Alias", "Fitness Campaign"],    
 }
 class WhatsappTemplate(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -193,17 +185,19 @@ class WhatsappTemplate(models.Model):
             return self.site.name
         return ''
 
-    def render_whatsapp_template_to_html(self, lead=None, contact=None, first_name=None):
+    def render_whatsapp_template_to_html(self, lead=None, site_contact=None, first_name=None):
         rendered_html = ""
         try:
             text = f"<b>{self.components[0]['text']}</b>"
             if '[[1]]' in text:
                 if lead:                
                     text = text.replace('[[1]]',lead.first_name)
-                elif contact:
-                    text = text.replace('[[1]]',contact.first_name)
+                elif site_contact:
+                    text = text.replace('[[1]]',site_contact.first_name)
                 elif first_name:
                     text = text.replace('[[1]]',first_name)
+            if '[[2]]' in text:            
+                text = text.replace('[[2]]',lead.campaign.name)
             rendered_html = rendered_html + text
         except:
             pass
@@ -212,10 +206,12 @@ class WhatsappTemplate(models.Model):
             if '[[1]]' in text:
                 if lead:                
                     text = text.replace('[[1]]',lead.first_name)
-                elif contact:
-                    text = text.replace('[[1]]',contact.first_name)
+                elif site_contact:
+                    text = text.replace('[[1]]',site_contact.first_name)
                 elif first_name:
                     text = text.replace('[[1]]',first_name)
+            if '[[2]]' in text:   
+                text = text.replace('[[2]]',lead.campaign.name)
             rendered_html = rendered_html + text
         except:
             pass
@@ -224,10 +220,12 @@ class WhatsappTemplate(models.Model):
             if '[[1]]' in text:
                 if lead:                
                     text = text.replace('[[1]]',lead.first_name)
-                elif contact:
-                    text = text.replace('[[1]]',contact.first_name)
+                elif site_contact:
+                    text = text.replace('[[1]]',site_contact.first_name)
                 elif first_name:
                     text = text.replace('[[1]]',first_name)
+            if '[[2]]' in text:
+                text = text.replace('[[2]]',lead.campaign.name)
             rendered_html = rendered_html + text
         except:
             pass        

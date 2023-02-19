@@ -13,6 +13,8 @@ from whatsapp.models import WhatsAppMessage
 import logging    
 from channels.layers import get_channel_layer
 from asgiref.sync import sync_to_async
+from core.utils import normalize_phone_number
+from core.models import SiteContact
 logger = logging.getLogger(__name__)
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -91,22 +93,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send(
             text_data=event['message']
         )
-        
-        
-
-
-def normalize_phone_number(number):
-    if number[:2] == '44':
-        number = '0' + number[2:]
-    return number
-
 
 @sync_to_async
 def send_whatsapp_message_to_number(message, customer_number, user, whatsappnumber_pk):  
     customer_number = normalize_phone_number(customer_number)
-    whatsappnumber = WhatsappNumber.objects.get(pk=whatsappnumber_pk)
+    whatsappnumber = WhatsappNumber.objects.get(pk=whatsappnumber_pk, whatsapp_business_account__active=True)
     logger.debug("send_whatsapp_message_to_number start") 
-    lead = Campaignlead.objects.filter(whatsapp_number=customer_number).first()  
+    lead = Campaignlead.objects.filter(contact__customer_number=customer_number).first()  
     if get_user_allowed_to_use_site_messaging(user, whatsappnumber.site):
         if lead:     
             if whatsappnumber.site.company == user.profile.company: 
@@ -125,7 +118,7 @@ def message_details_user(user):
     return avatar, name
 @sync_to_async
 def get_whatsappnumber(whatsappnumber_pk):   
-    return WhatsappNumber.objects.get(pk=whatsappnumber_pk)
+    return WhatsappNumber.objects.get(pk=whatsappnumber_pk, whatsapp_business_account__active=True)
 @sync_to_async
 def mark_past_messages_as_read(whatsappnumber, user, messaging_customer_number):   
     WhatsAppMessage.objects.filter(
@@ -142,19 +135,18 @@ def get_user_company_pk(user):
 # def get_lead(lead_pk):   
 #     return Campaignlead.objects.get(pk=lead_pk)
 @sync_to_async
-def get_rendered_html(message, message_context, messaging_customer_number, whatsappnumber):
+def get_rendered_html(whatsapp_message, message_context, messaging_customer_number, whatsappnumber):
     rendered_message_list_row = loader.render_to_string('messaging/htmx/message_list_row.html', message_context)
     rendered_message_chat_row = loader.render_to_string('messaging/htmx/message_chat_row.html', message_context)
     rendered_html = f"""
-    <span id='latest_message_row_{messaging_customer_number}' hx-swap-oob='delete'></span>
+    <span id='latest_message_row_{str(whatsapp_message.site_contact.pk)}' hx-swap-oob='delete'></span>
     <span id='messageCollapse_{whatsappnumber.pk}' hx-swap-oob='afterbegin'>{rendered_message_list_row}</span> #this line is clearing the whole message list?!
-    <span id='messageWindowInnerBody_{messaging_customer_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>                
+    <span id='messageWindowInnerBody_{str(whatsapp_message.site_contact.pk)}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>                
     """
-    print(f"messageWindowInnerBody_{messaging_customer_number}")
 
-    if message.inbound:
+    if whatsapp_message.inbound:
         rendered_html = f"""{rendered_html}
-        <span hx-swap-oob="true" id="chat_notification_{message.customer_number}">
+        <span hx-swap-oob="true" id="chat_notification_{whatsapp_message.site_contact.pk}">
             <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
                 <span class="visually-hidden">New alerts</span>
             </span>
@@ -162,32 +154,11 @@ def get_rendered_html(message, message_context, messaging_customer_number, whats
         """
     else:
         rendered_html = f"""{rendered_html}
-        <span hx-swap-oob="true" id="chat_notification_{message.customer_number}">
+        <span hx-swap-oob="true" id="chat_notification_{whatsapp_message.site_contact.pk}">
         </span>
         """
     return rendered_html
-# @sync_to_async
-# def get_sending_rendered_html(message, message_context, messaging_customer_number, whatsappnumber):
-#     # rendered_message_list_row = loader.render_to_string('messaging/htmx/message_list_row.html', message_context)
-#     rendered_message_chat_row = loader.render_to_string('messaging/htmx/message_chat_row.html', message_context)
-#     rendered_html = f"""
-#     <span id='messageWindowInnerBody_{messaging_customer_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>                
-#     """
 
-#     if message.inbound:
-#         rendered_html = f"""{rendered_html}
-#         <span hx-swap-oob="true" id="chat_notification_{message.customer_number}">
-#             <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
-#                 <span class="visually-hidden">New alerts</span>
-#             </span>
-#         </span>
-#         """
-#     else:
-#         rendered_html = f"""{rendered_html}
-#         <span hx-swap-oob="true" id="chat_notification_{message.customer_number}">
-#         </span>
-#         """
-#     return rendered_html
 
 @sync_to_async
 def get_rendered_html_failed(messaging_customer_number, whatsappnumber):
@@ -197,7 +168,7 @@ def get_rendered_html_failed(messaging_customer_number, whatsappnumber):
     }
     rendered_message_chat_row = loader.render_to_string('messaging/htmx/message_chat_row_failed.html', message_context)
     rendered_html = f"""
-    <span id='messageWindowInnerBody_{messaging_customer_number}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>                
+    <span id='messageWindowInnerBody_{str(SiteContact.objects.get(site=whatsappnumber.site, contact__customer_number=normalize_phone_number(messaging_customer_number)).pk)}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>                
     """
 
     rendered_html = f"""{rendered_html}"""

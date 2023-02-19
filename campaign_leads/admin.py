@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from campaign_leads.models import Campaignlead, Campaign, Booking, Call
+from campaign_leads.models import Campaignlead, Booking, Call
 
 # Register your models here.
 
@@ -14,13 +14,6 @@ class CampaignleadAdmin(admin.ModelAdmin):
     'active_campaign_contact_id','active_campaign_form_id',
     'possible_duplicate','last_dragged']
 admin.site.register(Campaignlead, CampaignleadAdmin)
-
-class CampaignAdmin(admin.ModelAdmin):
-    list_display = ['name','created','product_cost','guid',
-    'webhook_created','webhook_id','site','company',
-    
-    'whatsapp_business_account']
-admin.site.register(Campaign, CampaignAdmin)
 
 class BookingAdmin(admin.ModelAdmin):
     list_display = ['datetime', 'lead', 'user', 'calendly_event_uri', 'archived', 'created']

@@ -3,8 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 
-from campaign_leads.models import Call, Campaign, Campaignlead, CampaignCategory, Sale, Booking
-from core.models import Site
+from campaign_leads.models import Call, Campaignlead, CampaignCategory, Sale, Booking, Campaign
 from dateutil import relativedelta
 from django.contrib.auth.models import User
 from core.templatetags.core_tags import short_month_name
@@ -564,12 +563,14 @@ def get_pipeline(request):
     live_opportunities = opportunities.exclude(archived=True).exclude(sale__archived=False)
     sold_opportunities = opportunities.filter(sale__archived=False, booking__archived=False)
     booked_opportunities = opportunities.filter(booking__archived=False)
+    arrived_opportunities = opportunities.filter(arrived=True)
     lost_opportunities = opportunities.filter(archived=True).exclude(sale__archived=False)
 
     context['opportunities'] = opportunities.count()
     context['live_opportunities'] = live_opportunities.count()
     context['sold_opportunities'] = sold_opportunities.count()
     context['booked_opportunities'] = booked_opportunities.count()
+    context['arrived_opportunities'] = arrived_opportunities.count()
     context['lost_opportunities'] = lost_opportunities.count()
     
     if live_opportunities:
@@ -586,6 +587,11 @@ def get_pipeline(request):
         context['booked_value'] = float(booked_opportunities.aggregate(Sum('campaign__product_cost')).get('campaign__product_cost__sum', 0))
     else:
         context['booked_value'] = 0
+
+    if arrived_opportunities:
+        context['arrived_value'] = float(arrived_opportunities.aggregate(Sum('campaign__product_cost')).get('campaign__product_cost__sum', 0))
+    else:
+        context['arrived_value'] = 0
 
     if lost_opportunities:
         context['lost_value'] = float(lost_opportunities.aggregate(Sum('campaign__product_cost')).get('campaign__product_cost__sum', 0))
@@ -610,6 +616,22 @@ def get_pipeline(request):
         context['sold_rate'] = 100
     else:
         context['sold_rate'] = 0
+        
+# Arrived rates
+    if context['opportunities']:
+        context['arrived_booked_rate'] = (context['arrived_opportunities'] / context['opportunities']) * 100
+    elif context['arrived_opportunities']:
+        context['arrived_booked_rate'] = 100
+    else:
+        context['arrived_booked_rate'] = 0
+
+    if context['arrived_opportunities']:
+        context['arrived_sold_rate'] = (context['sold_opportunities'] / (context['arrived_opportunities'])) * 100
+    elif context['sold_opportunities']:
+        context['arrived_sold_rate'] = 100
+    else:
+        context['arrived_sold_rate'] = 0
+
     context['start_date'] = start_date
     context['end_date'] = end_date
     context['minimum_site_subscription_level_in_query'] = get_minimum_site_subscription_level_from_site_qs(sites)

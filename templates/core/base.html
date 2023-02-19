@@ -42,13 +42,18 @@
         <script src="{% static 'js/modules/leads.js' %}?{{version}}"></script>
         <script src="{% static 'js/modules/booking.js' %}?{{version}}"></script>
         <script src="{% static 'js/modules/graphs.js' %}?{{version}}"></script>
-        <script src="{% static 'js/modules/free_tasters.js' %}?{{version}}"></script>
+        {% comment %} <script src="{% static 'js/modules/free_tasters.js' %}?{{version}}"></script> {% endcomment %}
+        <script src="{% static 'js/modules/contacts.js' %}?{{version}}"></script>
         <script src="{% static 'js/modules/campaign_configuration.js' %}?{{version}}"></script>
         <script src="{% static 'js/modules/company_configuration.js' %}?{{version}}"></script>
         <script src="{% static 'js/modules/whatsapp_templates.js' %}?{{version}}"></script>
         <script src="{% static 'js/modules/whatsapp_template_edit.js' %}?{{version}}"></script>
         <audio id="notification1" src="{% static 'audio/notification1.wav' %}?{{version}}" preload="auto"></audio>
         <audio id="notification2" src="{% static 'audio/notification2.mp3' %}?{{version}}" preload="auto"></audio>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>        
+        <script src="https://cdn.jsdelivr.net/npm/moment@^2"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@^1"></script>
         
         {%block styles%}
         <style>
@@ -73,6 +78,12 @@
     }
     </style>
     <script>  
+
+        function toggle_active_top_nav(active_selector){
+            $('#generic_modal').modal('hide');
+            $( ".top-nav-link.active, .nav-link.active" ).removeClass('active');
+            $(active_selector).addClass('active');
+        }
         let boolean = false;
         $(document).ready(function() {
             
@@ -103,13 +114,9 @@
             window.addEventListener('mouseup', function(event){
             })
             
-            $( ".top-nav-link" ).click(function() {
-                $('#generic_modal').modal('hide');
-                $( ".top-nav-link.active, .nav-link.active" ).removeClass('active');
-                $($( this ).data('active-selector')).addClass('active');
+            $(".top-nav-link" ).click(function() {
+                toggle_active_top_nav($( this ).data('active-selector'))
             });
-
-            
             
             document.body.onkeydown = function(e) {
                 var current_module = $('#current_page').val()
@@ -162,6 +169,8 @@
                     freetastershandlehtmxafterSwap(evt);                    
                 } else if (current_module == 'whatsapp_templates'){
                     whatsapptemplateshandlehtmxafterSwap(evt);                    
+                }  else if (current_module == 'contacts'){
+                    contactshandlehtmxafterSwap(evt);                    
                 }                
                 basehandlehtmxafterSwap(evt);
             }
