@@ -3,13 +3,13 @@ import glob
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from campaign_leads.models import Campaignlead, Sale
-from core.models import Site, Contact, SiteContact
+from core.models import Site, Contact, SiteContact, WhatsAppNumber
 import requests
 import random as r
 import json
 from random_phone import RandomUkPhone
 import names
-from whatsapp.models import WhatsAppMessage, WhatsAppNumber
+from whatsapp.models import WhatsAppMessage
 from core.utils import normalize_phone_number
 from core.views import get_and_create_contact_and_site_contact_for_lead
 random_name = []
