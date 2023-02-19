@@ -175,7 +175,7 @@ def handle_received_whatsapp_image_message(message_json, metadata, webhook_objec
     whatsappnumber = WhatsappNumber.objects.filter(number=to_number)
     site = whatsappnumber.whatsapp_business_account.site
     contact, created = Contact.objects.get_or_create(customer_number=from_number, company=site.company)
-    site_contact = SiteContact.objects.get_or_create(site=site, contact=contact)
+    site_contact, created = SiteContact.objects.get_or_create(site=site, contact=contact)
     datetime_from_request = datetime.fromtimestamp(int(message_json.get('timestamp')))
     if settings.DEBUG:
         datetime_from_request = datetime.now()
@@ -215,7 +215,7 @@ def handle_received_whatsapp_text_message(message_json, metadata, webhook_object
     whatsappnumber = WhatsappNumber.objects.get(number=to_number)
     site = whatsappnumber.whatsapp_business_account.site
     contact, created = Contact.objects.get_or_create(customer_number=from_number, company=site.company)
-    site_contact = SiteContact.objects.get_or_create(site=site, contact=contact)
+    site_contact, created = SiteContact.objects.get_or_create(site=site, contact=contact)
     datetime_from_request = datetime.fromtimestamp(int(message_json.get('timestamp')))
     if settings.DEBUG:
         datetime_from_request = datetime.now()
