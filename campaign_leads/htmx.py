@@ -52,7 +52,9 @@ def get_modal_content(request, **kwargs):
                     context['site'] = context['lead'].campaign.site
                 if not ManualCampaign.objects.filter(site__in=context['sites']).exists():
                     for site in request.user.profile.company.active_sites:
-                        ManualCampaign.objects.get_or_create(site=site, name = "Manually Created", company=site.company)
+                        manual_campaign, created = ManualCampaign.objects.get_or_create(site=site, name = "Manually Created")
+                        manual_campaign.company = site.company
+                        manual_campaign.save()
                 context['campaigns'] = ManualCampaign.objects.filter(site__in=request.user.profile.active_sites_allowed)
                 # context['campaigns'] = get_campaign_qs(request)   
             elif template_name == 'view_lead':
@@ -125,7 +127,7 @@ def edit_lead(request, **kwargs):
     
     country_code = request.POST.get('country_code', "")
     
-    disabled_automated_messaging = request.POST.get('enable_automated_messaging', 'on') == 'off'
+    disabled_automated_messaging = request.POST.get('enable_automated_messaging', 'off') == 'off'
     product_cost = request.POST.get('product_cost', 0)
     
     lead_pk = request.POST.get('lead_pk')
@@ -155,7 +157,8 @@ def edit_lead(request, **kwargs):
     lead.save()
     if not lead_pk:
         contact, site_contact = get_and_create_contact_and_site_contact_for_lead(lead, phone)
-    lead.save() #call again to send the message to contact
+    # lead.save() #call again to send the message to contact
+    lead.check_if_should_send_first_message()
     lead.trigger_refresh_websocket(refresh_position=refresh_position)
     return HttpResponse(str(lead.pk), status=200)
 

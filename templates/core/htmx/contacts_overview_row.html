@@ -2,7 +2,7 @@
 <tr id="site_contact_{{site_contact.pk}}" {%if swap_td%}hx-swap-oob='outerHTML:#site_contact_{{site_contact.pk}}'{%endif%}>
     <td style="nowrap elipses-overflow">{{site_contact.name}}</td>
     <td style="nowrap elipses-overflow">{{site_contact.contact.customer_number}}</td>
-    <td style="nowrap elipses-overflow">{{site_contact.campaignlead_set.all}}</td>
+    <td style="nowrap elipses-overflow">{{site_contact.campaignlead_set.all.count}} Leads for {{site.name}}</td>
     <td style="nowrap">
         {%if site.subscription.whatsapp_enabled%}
         <div class="row m-0">

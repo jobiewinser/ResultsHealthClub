@@ -155,7 +155,7 @@ class Contact(models.Model):
     last_name_old = models.TextField(null=True, blank=True, max_length=25)
     site_old = models.ForeignKey('core.Site', on_delete=models.SET_NULL, null=True, blank=True)
     company = models.ForeignKey('core.Company', on_delete=models.SET_NULL, null=True, blank=True)
-    customer_number = models.CharField(max_length=50, null=True, blank=True)
+    customer_number = models.CharField(max_length=50)
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     # @property
     # def name(self):

@@ -44,15 +44,15 @@
                             <label for="modal_phone">Whatsapp Number<span class="required">*</span></label>
                         </div>
                         {%endif%}
-                        <div class="m-1">
+                        <div class="m-1"
+                            data-bs-toggle="popover" 
+                            data-bs-trigger="hover focus" 
+                            data-bs-placement="top"
+                            data-bs-html="true"
+                            data-bs-title="What does this do?"
+                            data-bs-content="If this is checked, this lead will start/continue to receive scheduled whatsapp templates that you have configured in the campaign configuration page. This is only applicable if you have a Pro subscription.">
                             Automatically send Whatsapp templates? <i class="fa-solid fa-circle-info help"></i>
-                            <div class="form-check form-switch" style="margin-left: 2em;" 
-                                data-bs-toggle="popover" 
-                                data-bs-trigger="hover focus" 
-                                data-bs-placement="top"
-                                data-bs-html="true"
-                                data-bs-title="What does this do?"
-                                data-bs-content="If this is checked, this lead will start/continue to receive scheduled whatsapp templates that you have configured in the campaign configuration page. This is only applicable if you have a Pro subscription.">
+                            <div class="form-check form-switch" style="margin-left: 2em;" >
                                 <label style="width: 2em; margin-left: -4.3em;"> Off </label>
                                 <input class="form-check-input" name="enable_automated_messaging" {% comment %}putting disabled_automated_messaging here to find it easily later{% endcomment %} 
                                 {%if not lead.disabled_automated_messaging%}checked{%endif%} type="checkbox">

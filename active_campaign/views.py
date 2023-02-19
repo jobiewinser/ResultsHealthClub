@@ -50,6 +50,7 @@ class Webhooks(View):
                                         campaign_lead.disabled_automated_messaging = True
                                     campaign_lead.save()
                                     get_and_create_contact_and_site_contact_for_lead(campaign_lead, phone_number_whole)
+                                    campaign_lead.check_if_should_send_first_message()
                                     campaign_lead.trigger_refresh_websocket(refresh_position=True)
             return HttpResponse( "text", 200)
      
@@ -124,6 +125,7 @@ def import_active_campaign_leads(request, **kwargs):
                         lead.disabled_automated_messaging = True
                     lead.save()
                     get_and_create_contact_and_site_contact_for_lead(lead, contact.get('phone'))
+                    lead.check_if_should_send_first_message()
                     lead.trigger_refresh_websocket(refresh_position=refresh_position)
                     successful_import = True
         if successful_import:

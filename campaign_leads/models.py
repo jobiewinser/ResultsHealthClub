@@ -218,15 +218,31 @@ class Campaignlead(models.Model):
                 rendered_html = f"<span hx-swap-oob='beforeend:.campaign_column_{campaign.pk}_calls_{new_position},.campaign_category_column_{campaign_category_pk}_calls_{new_position},.site_column_{site.pk}_calls_{new_position},.company_column_{company.pk}_calls_{new_position}'><a hx-get='/refresh-lead-article/{self.pk}/' hx-swap='outerHTML' hx-vals=' U+007B U+0022 flash U+0022 : true U+007D' hx-indicator='#top-htmx-indicator' hx-trigger='load' href='#'></a> </span>"
                 from django.utils.safestring import mark_safe
                 return mark_safe(f"{rendered_html} {delete_htmx}")
-
+    def check_if_should_send_first_message(self):        
+        # from whatsapp.models import WhatsAppMessage
+        if not self.archived and self.site_contact and self.contact and not WhatsAppMessage.objects.filter(lead=self).filter(send_order=1):
+            self.send_template_whatsapp_message(send_order=1)
     def send_template_whatsapp_message(self, whatsappnumber=None, send_order=None, template=None, communication_method = 'a'):
         if self.disabled_automated_messaging and send_order:
             pass #not sure if anything needs to happen here yet. will probably indicate on the leads card that messaging is disabled
         else:
             print("Campaignlead send_template_whatsapp_message", whatsappnumber, send_order, template, communication_method)
-            if not whatsappnumber:
-                whatsappnumber = self.campaign.whatsapp_business_account.whatsappnumber
             from core.models import AttachedError, send_message_to_websocket
+            if not whatsappnumber and self.campaign.whatsapp_business_account:
+                whatsappnumber = self.campaign.whatsapp_business_account.whatsappnumber
+            elif not self.campaign.whatsapp_business_account:                
+                print("CampaignleadDEBUG8")
+                print("errorhere no Whatsapp Business Account Linked")
+                attached_error, created = AttachedError.objects.get_or_create(
+                    type = '1202',
+                    attached_field = "campaign_lead",
+                    campaign_lead = self,
+                    archived = False,
+                )
+                if not created:
+                    attached_error.created = datetime.now()
+                    attached_error.save()
+                return HttpResponse("Messaging Error: No Whatsapp Business Account linked to campaign", status=400)
             customer_number = self.whatsapp_number
             if settings.DEMO:
                 contact, site_contact = get_and_create_contact_and_site_contact_for_lead(self,)
@@ -458,21 +474,21 @@ class Campaignlead(models.Model):
                 self.product_cost = self.campaign.product_cost
         except:
             pass
-        if self.campaign.site:
+        if self.campaign.site and not self.site_contact and self.contact:
             from core.models import SiteContact
             site_contact, created = SiteContact.objects.get_or_create(site=self.campaign.site, contact = self.contact)
             self.site_contact = site_contact
         super(Campaignlead, self).save(force_insert, force_update, using, update_fields)
         
         
-@receiver(models.signals.post_save, sender=Campaignlead)
-def execute_after_save(sender, instance, created, *args, **kwargs):
-    if created:
-        if not instance.archived and instance.site_contact and instance.contact:
-            try:
-                instance.send_template_whatsapp_message(send_order=1)
-            except:
-                pass
+# @receiver(models.signals.post_save, sender=Campaignlead)
+# def execute_after_save(sender, instance, created, *args, **kwargs):
+#     if created:
+#         if not instance.archived and instance.site_contact and instance.contact:
+#             try:
+#                 instance.send_template_whatsapp_message(send_order=1)
+#             except Exception as e:
+#                 pass
         
 class Call(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
