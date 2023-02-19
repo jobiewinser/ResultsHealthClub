@@ -208,6 +208,10 @@ def handle_received_whatsapp_text_message(message_json, metadata, webhook_object
     to_number = normalize_phone_number(f"{metadata.get('display_phone_number')}")
     from_number = normalize_phone_number(f"{message_json.get('from')}")
     lead = Campaignlead.objects.filter(contact__customer_number=from_number).last()
+    logger.debug("TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST")
+    logger.debug(str(to_number))
+    logger.debug(str(from_number))
+    logger.debug(str(lead))
     whatsappnumber = WhatsappNumber.objects.get(number=to_number)
     site = whatsappnumber.whatsapp_business_account.site
     # site = Site.objects.get(phonenumber=whatsappnumber)
