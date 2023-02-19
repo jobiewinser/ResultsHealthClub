@@ -171,10 +171,11 @@ def handle_received_whatsapp_image_message(message_json, metadata, webhook_objec
     wamid = message_json.get('id')
     to_number = normalize_phone_number(f"{metadata.get('display_phone_number')}")
     from_number = normalize_phone_number(f"{message_json.get('from')}")
-    lead = Campaignlead.objects.filter(contact__customer_number=from_number).last()
+    # lead = Campaignlead.objects.filter(contact__customer_number=from_number).last()
     whatsappnumber = WhatsappNumber.objects.filter(number=to_number)
     site = whatsappnumber.whatsapp_business_account.site
-    # site = Site.objects.get(phonenumber=whatsappnumber)
+    contact, created = Contact.objects.get_or_create(customer_number=from_number, company=site.company)
+    site_contact = SiteContact.objects.get_or_create(site=site, contact=contact)
     datetime_from_request = datetime.fromtimestamp(int(message_json.get('timestamp')))
     if settings.DEBUG:
         datetime_from_request = datetime.now()
@@ -194,11 +195,11 @@ def handle_received_whatsapp_image_message(message_json, metadata, webhook_objec
         customer_number = from_number,
         inbound=True,
         site=site,
-        lead=lead,
+        # lead=lead,
         raw_webhook=webhook_object,
         whatsappnumber=whatsappnumber,
-        contact=lead.contact,
-        site_contact=lead.site_contact,
+        contact=contact,
+        site_contact=site_contact,
     )    
     whatsapp_message.image.set([image_object])
     new_message_to_websocket(whatsapp_message, whatsappnumber)
@@ -209,12 +210,13 @@ def handle_received_whatsapp_text_message(message_json, metadata, webhook_object
     wamid = message_json.get('id')
     to_number = normalize_phone_number(f"{metadata.get('display_phone_number')}")
     from_number = normalize_phone_number(f"{message_json.get('from')}")
-    lead = Campaignlead.objects.filter(contact__customer_number=from_number).last()
+    # lead = Campaignlead.objects.filter(contact__customer_number=from_number).last()
     from core.views import send_email
     send_email("jobiewinser@gmail.com", f"TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST {str(to_number)} {str(from_number)} {str(lead)}", {"message": f"TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST {str(to_number)} {str(from_number)} {str(lead)}"})
     whatsappnumber = WhatsappNumber.objects.get(number=to_number)
     site = whatsappnumber.whatsapp_business_account.site
-    # site = Site.objects.get(phonenumber=whatsappnumber)
+    contact, created = Contact.objects.get_or_create(customer_number=from_number, company=site.company)
+    site_contact = SiteContact.objects.get_or_create(site=site, contact=contact)
     datetime_from_request = datetime.fromtimestamp(int(message_json.get('timestamp')))
     if settings.DEBUG:
         datetime_from_request = datetime.now()
@@ -226,11 +228,11 @@ def handle_received_whatsapp_text_message(message_json, metadata, webhook_object
         customer_number = from_number,
         inbound=True,
         site=site,
-        lead=lead,
+        # lead=lead,
         raw_webhook=webhook_object,
         whatsappnumber=whatsappnumber,
-        contact=lead.contact,
-        site_contact=lead.site_contact,
+        contact=contact,
+        site_contact=site_contact,
     )
     new_message_to_websocket(whatsapp_message, whatsappnumber)
 
