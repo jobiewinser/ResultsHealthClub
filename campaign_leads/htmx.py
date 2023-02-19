@@ -55,7 +55,7 @@ def get_modal_content(request, **kwargs):
                         manual_campaign, created = ManualCampaign.objects.get_or_create(site=site, name = "Manually Created")
                         manual_campaign.company = site.company
                         manual_campaign.save()
-                context['campaigns'] = ManualCampaign.objects.filter(site__in=request.user.profile.active_sites_allowed)
+                context['campaigns'] = Campaign.objects.filter(site__in=request.user.profile.active_sites_allowed)
                 # context['campaigns'] = get_campaign_qs(request)   
             elif template_name == 'view_lead':
                 if lead_pk:
