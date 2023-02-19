@@ -167,8 +167,8 @@ class Webhooks(View):
 
 def handle_received_whatsapp_image_message(message_json, metadata, webhook_object):
     wamid = message_json.get('id')
-    to_number = normalize_phone_number(f"{metadata.get('display_phone_number').split('+')[-1]}")
-    from_number = normalize_phone_number(f"{message_json.get('from').split('+')[-1]}")
+    to_number = normalize_phone_number(f"{metadata.get('display_phone_number')}")
+    from_number = normalize_phone_number(f"{message_json.get('from')}")
     lead = Campaignlead.objects.filter(contact__customer_number=from_number).last()
     whatsappnumber = WhatsappNumber.objects.filter(number=to_number)
     site = whatsappnumber.whatsapp_business_account.site
@@ -205,8 +205,8 @@ def handle_received_whatsapp_image_message(message_json, metadata, webhook_objec
 
 def handle_received_whatsapp_text_message(message_json, metadata, webhook_object):
     wamid = message_json.get('id')
-    to_number = normalize_phone_number(f"{metadata.get('display_phone_number').split('+')[-1]}")
-    from_number = normalize_phone_number(f"{message_json.get('from').split('+')[-1]}")
+    to_number = normalize_phone_number(f"{metadata.get('display_phone_number')}")
+    from_number = normalize_phone_number(f"{message_json.get('from')}")
     lead = Campaignlead.objects.filter(contact__customer_number=from_number).last()
     whatsappnumber = WhatsappNumber.objects.get(number=to_number)
     site = whatsappnumber.whatsapp_business_account.site

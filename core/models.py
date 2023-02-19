@@ -516,7 +516,7 @@ class WhatsappNumber(PhoneNumber):
             if self.whatsapp_business_phone_number_id and self.company.whatsapp_access_token and message:
                 whatsapp = Whatsapp(self.company.whatsapp_access_token)
                 if '+' in self.number:
-                    customer_number = normalize_phone_number(f"{self.number.split('+')[-1]}")
+                    customer_number = normalize_phone_number(f"{self.number}")
                 response_body, attached_errors = whatsapp.send_free_text_message(customer_number, message, self)
                 if not attached_errors:
                     reponse_messages = response_body.get('messages',[])
