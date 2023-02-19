@@ -172,7 +172,7 @@ def handle_received_whatsapp_image_message(message_json, metadata, webhook_objec
     to_number = normalize_phone_number(f"{metadata.get('display_phone_number')}")
     from_number = normalize_phone_number(f"{message_json.get('from')}")
     # lead = Campaignlead.objects.filter(contact__customer_number=from_number).last()
-    whatsappnumber = WhatsappNumber.objects.filter(number=to_number)
+    whatsappnumber = WhatsappNumber.objects.get(number=to_number)
     site = whatsappnumber.whatsapp_business_account.site
     contact, created = Contact.objects.get_or_create(customer_number=from_number, company=site.company)
     site_contact, created = SiteContact.objects.get_or_create(site=site, contact=contact)
@@ -211,7 +211,6 @@ def handle_received_whatsapp_text_message(message_json, metadata, webhook_object
     to_number = normalize_phone_number(f"{metadata.get('display_phone_number')}")
     from_number = normalize_phone_number(f"{message_json.get('from')}")
     # lead = Campaignlead.objects.filter(contact__customer_number=from_number).last()
-    from core.views import send_email
     whatsappnumber = WhatsappNumber.objects.get(number=to_number)
     site = whatsappnumber.whatsapp_business_account.site
     contact, created = Contact.objects.get_or_create(customer_number=from_number, company=site.company)
