@@ -589,7 +589,7 @@ def send_new_template_message(request):
         combined_number = f"{country_code}{phone}"
     else:
         combined_number = phone
-
+    combined_number = normalize_phone_number(combined_number)
     site_contact = SiteContact.objects.filter(pk=request.POST.get('site_contact_pk', 0)).first()
     lead = Campaignlead.objects.filter(pk=request.POST.get('lead_pk', 0)).first()
     if not lead:

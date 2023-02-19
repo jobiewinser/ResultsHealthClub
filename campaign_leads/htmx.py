@@ -52,7 +52,7 @@ def get_modal_content(request, **kwargs):
                     context['site'] = context['lead'].campaign.site
                 if not ManualCampaign.objects.filter(site__in=context['sites']).exists():
                     for site in request.user.profile.company.active_sites:
-                        ManualCampaign.objects.get_or_create(site=site, name = "Manually Created")
+                        ManualCampaign.objects.get_or_create(site=site, name = "Manually Created", company=site.company)
                 context['campaigns'] = ManualCampaign.objects.filter(site__in=request.user.profile.active_sites_allowed)
                 # context['campaigns'] = get_campaign_qs(request)   
             elif template_name == 'view_lead':
@@ -149,12 +149,13 @@ def edit_lead(request, **kwargs):
     if product_cost:
         lead.product_cost = product_cost
     lead.disabled_automated_messaging = disabled_automated_messaging
-    if not campaign.site.subscription.whatsapp_enabled:
-        lead.disabled_automated_messaging = True
+    # if not campaign.site.subscription.whatsapp_enabled:
+    #     lead.disabled_automated_messaging = True
     
     lead.save()
     if not lead_pk:
         contact, site_contact = get_and_create_contact_and_site_contact_for_lead(lead, phone)
+    lead.save() #call again to send the message to contact
     lead.trigger_refresh_websocket(refresh_position=refresh_position)
     return HttpResponse(str(lead.pk), status=200)
 

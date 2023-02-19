@@ -239,7 +239,7 @@ class CampaignConfigurationView(TemplateView):
             self.template_name = 'campaign_leads/campaign_configuration_htmx.html'  
         company = self.request.user.profile.company
         for site in company.active_sites:
-            ManualCampaign.objects.get_or_create(site=site, name = "Manually Created")
+            ManualCampaign.objects.get_or_create(site=site, name = "Manually Created", company=site.company)
         try:
             for campaign_dict in ActiveCampaignApi(company.active_campaign_api_key, company.active_campaign_url).get_lists(company.active_campaign_url).get('lists',[]):
                 campaign, created = ActiveCampaign.objects.get_or_create(

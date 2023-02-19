@@ -1049,7 +1049,7 @@ def edit_contact(request, **kwargs):
     if site_contact_pk:
         site_contact = SiteContact.objects.get(pk=request.POST.get('site_contact_pk'))
     else:
-        customer_number = request.POST.get('customer_number')
+        customer_number = normalize_phone_number(request.POST.get('customer_number'))
         site = request.user.profile.active_sites_allowed.filter(pk=request.POST.get('site_pk')).first()
         if not site:
             return HttpResponse("You're not allowed to make changes to this site", status=403)

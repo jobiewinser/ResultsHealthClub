@@ -15,6 +15,8 @@ from core.views import get_and_create_contact_and_site_contact_for_lead
 random_name = []
 class Command(BaseCommand):
     def handle(self, *args, **options):
+        for contact in Contact.objects.all():
+            contact.save()
         for customer_number in Contact.objects.all().values_list('customer_number', flat=True).distinct(): 
             if Contact.objects.filter(customer_number=customer_number).count() > 1:
                 Contact.objects.filter(customer_number=customer_number).exclude(pk=Contact.objects.filter(customer_number=customer_number).first().pk).delete()
@@ -46,4 +48,4 @@ class Command(BaseCommand):
             if not campaign_lead.contact and campaign_lead.campaign and campaign_lead.whatsapp_number_old:
                 contact, site_contact = get_and_create_contact_and_site_contact_for_lead(campaign_lead, campaign_lead.whatsapp_number_old)
                 campaign_lead.contact = contact
-                campaign_lead.save()
+            campaign_lead.save()

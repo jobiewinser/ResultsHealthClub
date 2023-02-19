@@ -107,6 +107,7 @@ class ManualCampaign(Campaign):
 
 class Campaignlead(models.Model):
     contact = models.ForeignKey("core.Contact", on_delete=models.SET_NULL, null=True, blank=True)
+    site_contact = models.ForeignKey("core.SiteContact", on_delete=models.SET_NULL, null=True, blank=True)
     first_name = models.TextField(null=True, blank=True, max_length=25)
     last_name = models.TextField(null=True, blank=True, max_length=25)
     email = models.TextField(null=True, blank=True, max_length=50)    
@@ -130,13 +131,13 @@ class Campaignlead(models.Model):
         if self.name:
             return str(self.name)
         return f"CampaignLead {str(self.pk)}"
-    @property
-    def site_contact(self):  
-        if self.campaign.site:
-            from core.models import SiteContact
-            site_contact, created = SiteContact.objects.get_or_create(site=self.campaign.site, contact = self.contact)
-            return site_contact
-        return None
+    # @property
+    # def site_contact(self):  
+    #     if self.campaign.site:
+    #         from core.models import SiteContact
+    #         site_contact, created = SiteContact.objects.get_or_create(site=self.campaign.site, contact = self.contact)
+    #         return site_contact
+    #     return None
     @property
     def ordered_bookings(self):  
         return self.booking_set.all().order_by('-datetime')
@@ -457,16 +458,21 @@ class Campaignlead(models.Model):
                 self.product_cost = self.campaign.product_cost
         except:
             pass
+        if self.campaign.site:
+            from core.models import SiteContact
+            site_contact, created = SiteContact.objects.get_or_create(site=self.campaign.site, contact = self.contact)
+            self.site_contact = site_contact
         super(Campaignlead, self).save(force_insert, force_update, using, update_fields)
         
         
 @receiver(models.signals.post_save, sender=Campaignlead)
 def execute_after_save(sender, instance, created, *args, **kwargs):
-    if created and not instance.archived:
-        try:
-            instance.send_template_whatsapp_message(send_order=1)
-        except:
-            pass
+    if created:
+        if not instance.archived and instance.site_contact and instance.contact:
+            try:
+                instance.send_template_whatsapp_message(send_order=1)
+            except:
+                pass
         
 class Call(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
