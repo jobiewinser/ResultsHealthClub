@@ -1041,3 +1041,32 @@ def get_and_create_contact_and_site_contact_for_lead(lead, customer_number):
 def get_or_create_contact_for_whatsapp_message(whatsapp_message):
     contact, created = Contact.objects.get_or_create(company=whatsapp_message.site.company, customer_number=normalize_phone_number(whatsapp_message.customer_number))
     return contact
+
+@login_required
+@not_demo_or_superuser_check
+def edit_contact(request, **kwargs):
+    site_contact_pk = request.POST.get('site_contact_pk')
+    if site_contact_pk:
+        site_contact = SiteContact.objects.get(pk=request.POST.get('site_contact_pk'))
+    else:
+        customer_number = request.POST.get('customer_number')
+        site = request.user.profile.active_sites_allowed.filter(pk=request.POST.get('site_pk')).first()
+        if not site:
+            return HttpResponse("You're not allowed to make changes to this site", status=403)
+        if not customer_number:
+            return HttpResponse("Please enter a Phone Number", status=400)
+        if SiteContact.objects.filter(contact__customer_number=customer_number, site=site):
+            return HttpResponse(f"A contact for the site: {site.name} already exists", status=400)
+        contact, created = Contact.objects.get_or_create(company=site.company, customer_number=customer_number)
+        site_contact, created = SiteContact.objects.get_or_create(contact=contact, site=site)
+        
+    first_name = request.POST.get('first_name')
+    if not first_name:
+        return HttpResponse("Please provide a first name", status=500)
+    last_name = request.POST.get('last_name')
+    site_contact.first_name = first_name
+    site_contact.last_name = last_name
+    site_contact.save()
+    if site_contact_pk:
+        return render(request, 'core/htmx/contacts_overview_row.html', {'site_contact':site_contact, 'site':site_contact.site, 'whatsappnumbers':site_contact.site.return_phone_numbers(), 'swap_td':True})
+    return render(request, 'campaign_leads/htmx/edit_contact.html', {'site_contact':site_contact, 'site':site_contact.site})

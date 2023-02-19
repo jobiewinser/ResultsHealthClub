@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 from active_campaign.api import ActiveCampaignApi
 from core.core_decorators import *
 from core.views import get_and_create_contact_and_site_contact_for_lead
+from core.models import SiteContact
 @login_required
 def get_modal_content(request, **kwargs):
     try:
@@ -52,7 +53,8 @@ def get_modal_content(request, **kwargs):
                 if not ManualCampaign.objects.filter(site__in=context['sites']).exists():
                     for site in request.user.profile.company.active_sites:
                         ManualCampaign.objects.get_or_create(site=site, name = "Manually Created")
-                context['campaigns'] = get_campaign_qs(request)   
+                context['campaigns'] = ManualCampaign.objects.filter(site__in=request.user.profile.active_sites_allowed)
+                # context['campaigns'] = get_campaign_qs(request)   
             elif template_name == 'view_lead':
                 if lead_pk:
                     context['lead'] = Campaignlead.objects.get(pk=lead_pk)
@@ -108,8 +110,6 @@ def add_campaign_category(request, **kwargs):
 @login_required
 @not_demo_or_superuser_check
 def edit_lead(request, **kwargs):
-    # logger.debug(str(request.user))
-    # try:        
     campaign_pk = request.POST.get('campaign_pk')
     if not campaign_pk:
         return HttpResponse("Please choose a campaign", status=500)
@@ -155,48 +155,9 @@ def edit_lead(request, **kwargs):
     lead.save()
     if not lead_pk:
         contact, site_contact = get_and_create_contact_and_site_contact_for_lead(lead, phone)
-        # contact.customer_number = f"{country_code}{phone}"
-        # contact.save()
     lead.trigger_refresh_websocket(refresh_position=refresh_position)
     return HttpResponse(str(lead.pk), status=200)
-    # except Exception as e:
-    #     # messages.add_message(request, messages.ERROR, f'Error with creating a campaign lead')
-    #     logger.debug("create_campaign_lead Error "+str(e))
-    #     # raise Exception
-    #     return HttpResponse("Error with creating a campaign lead", status=500)
-# @login_required
-# def get_leads_column_meta_data(request, **kwargs):
-#     logger.debug(str(request.user))
-#     try:
-#         leads = Campaignlead.objects.filter(campaign__site__in=request.user.profile.active_sites_allowed)
-#         campaign_pk = request.GET.get('campaign_pk', None)
-#             # request.GET['campaign_pk'] = campaign_pk
-#         sites = get_site_pks_from_request_and_return_sites(request).filter(archived=False, booking=None)
-#         if request.GET['site_pks']:
-#             leads = leads.filter(campaign__site__pk__in=request.GET['site_pks'])
-            
-#         if campaign_pk:
-#             leads = leads.filter(campaign=request.user.profile.campaigns_allowed.get(pk=campaign_pk))
-#         leads = leads.annotate(calls=Count('call'))
-#         querysets = [
-#             ('Fresh', leads.filter(calls=0), 0)
-#         ]
-#         index = 0
-#         # if leads.filter(calls__gt=index):
-#         while leads.filter(calls__gt=index) or index < 21:
-#             index = index + 1
-#             querysets.append(
-#                 (f"Call {index}", leads.filter(calls=index), index)
-#             )
-#         # else:
-#         #     querysets.append(
-#         #         (f"Call 1", leads.none(), 1)
-#         #     )
-#         return render(request, 'campaign_leads/htmx/column_metadata_htmx.html', {'querysets':querysets})
-#     except Exception as e:
-#         logger.debug("get_leads_column_meta_data Error "+str(e))
-#         #return HttpResponse(e, status=500)
-#         raise e
+
 @login_required
 def refresh_lead_article(request, **kwargs):
     logger.debug(str(request.user))

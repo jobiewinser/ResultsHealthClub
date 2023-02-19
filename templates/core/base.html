@@ -42,7 +42,8 @@
         <script src="{% static 'js/modules/leads.js' %}?{{version}}"></script>
         <script src="{% static 'js/modules/booking.js' %}?{{version}}"></script>
         <script src="{% static 'js/modules/graphs.js' %}?{{version}}"></script>
-        <script src="{% static 'js/modules/free_tasters.js' %}?{{version}}"></script>
+        {% comment %} <script src="{% static 'js/modules/free_tasters.js' %}?{{version}}"></script> {% endcomment %}
+        <script src="{% static 'js/modules/contacts.js' %}?{{version}}"></script>
         <script src="{% static 'js/modules/campaign_configuration.js' %}?{{version}}"></script>
         <script src="{% static 'js/modules/company_configuration.js' %}?{{version}}"></script>
         <script src="{% static 'js/modules/whatsapp_templates.js' %}?{{version}}"></script>
@@ -168,6 +169,8 @@
                     freetastershandlehtmxafterSwap(evt);                    
                 } else if (current_module == 'whatsapp_templates'){
                     whatsapptemplateshandlehtmxafterSwap(evt);                    
+                }  else if (current_module == 'contacts'){
+                    contactshandlehtmxafterSwap(evt);                    
                 }                
                 basehandlehtmxafterSwap(evt);
             }

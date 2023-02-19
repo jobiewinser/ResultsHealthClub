@@ -35,9 +35,15 @@ def get_modal_content(request, **kwargs):
                     context["edit_user"] = User.objects.get(pk=user_pk)
             elif template_name == 'add_site':
                 if site_pk:
-                    context["site"] = Site.objects.get(pk=site_pk)     
+                    context["site"] = request.user.profile.active_sites_allowed.get(pk=site_pk)     
                 elif request.user.profile.company.part_created_site:
-                    context["site"] = request.user.profile.company.part_created_site    
+                    context["site"] = request.user.profile.company.part_created_site   
+            elif template_name == 'edit_contact':
+                site_contact_pk = request.GET.get('site_contact_pk')
+                if site_contact_pk:
+                    context["site_contact"] = SiteContact.objects.get(pk=site_contact_pk, site__in=request.user.profile.active_sites_allowed)
+                if site_pk:
+                    context["site"] = request.user.profile.active_sites_allowed.get(pk=site_pk)     
                     
             elif template_name == 'edit_permissions':
                 profile_pk = request.GET.get('profile_pk', None)
@@ -49,18 +55,15 @@ def get_modal_content(request, **kwargs):
                     for site in profile.company.active_sites:
                         site_profile_permissions, created = SiteProfilePermissions.objects.get_or_create(profile=profile, site=site)
                         site_profile_permissions.save()
-            # elif template_name == 'add_phone_number':
-            #     if site_pk:
-            #         context["site"] = Site.objects.get(pk=site_pk)
             elif template_name == 'add_user':
                 context['role_choices'] = ROLE_CHOICES    
                 if site_pk:
-                    context["site"] = Site.objects.get(pk=site_pk) 
+                    context["site"] = request.user.profile.active_sites_allowed.get(pk=site_pk) 
             elif template_name == 'reactivate_user':
                 if site_pk:
-                    context["site"] = Site.objects.get(pk=site_pk)   
+                    context["site"] = request.user.profile.active_sites_allowed.get(pk=site_pk)   
             elif template_name == 'choose_template_message_site_contact':
-                site = Site.objects.get(pk=site_pk)   
+                site = request.user.profile.active_sites_allowed.get(pk=site_pk)   
                 context["site"] = site
                 context["site_contacts"] = SiteContact.objects.filter(site=site)   
                              

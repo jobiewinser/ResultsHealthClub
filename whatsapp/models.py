@@ -28,7 +28,8 @@ class WhatsAppWebhookRequest(models.Model):
     meta_data = models.JSONField(default=dict)
     errors = models.ManyToManyField("core.ErrorModel", null=True, blank=True)
     request_type = models.CharField(choices=REQUEST_TYPE_CHOICES, default='a', max_length=1)
-
+    
+from django.http import Http404
 
 class WhatsappMessageImage(MessageImage): 
     media_id = models.TextField(blank=True, null=True)
@@ -38,8 +39,11 @@ class WhatsappMessageImage(MessageImage):
         if self.image:
             base = str(settings.BASE_DIR)
             path = base+self.image.url
-            with open(path, "rb") as image_file:
-                image_data = base64.b64encode(image_file.read()).decode('utf-8')
+            try:
+                with open(path, "rb") as image_file:
+                    image_data = base64.b64encode(image_file.read()).decode('utf-8')
+            except:
+                raise Http404('No image found.')
             return image_data
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
