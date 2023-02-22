@@ -21,18 +21,14 @@ class Command(BaseCommand):
                     #     campaign_lead.send_template_whatsapp_message(send_order=1)
                     #     campaign_lead.trigger_refresh_websocket(refresh_position=False)
                     elif not whatsapp_messages.filter(send_order=2).exists():
-                        print(2)
-                        # campaign_lead.send_template_whatsapp_message(send_order=2)
-                        # campaign_lead.trigger_refresh_websocket(refresh_position=False)
+                        campaign_lead.send_template_whatsapp_message(send_order=2)
+                        campaign_lead.trigger_refresh_websocket(refresh_position=False)
                     elif not whatsapp_messages.filter(send_order=3).exists():
-                        print(3)
-                        # campaign_lead.send_template_whatsapp_message(send_order=3)#
-                        # campaign_lead.trigger_refresh_websocket(refresh_position=False)
+                        campaign_lead.send_template_whatsapp_message(send_order=3)#
+                        campaign_lead.trigger_refresh_websocket(refresh_position=False)
                     elif not whatsapp_messages.filter(send_order=4).exists():
-                        print(4)
-                        # campaign_lead.send_template_whatsapp_message(send_order=4)#
-                        # campaign_lead.trigger_refresh_websocket(refresh_position=False)
+                        campaign_lead.send_template_whatsapp_message(send_order=4)#
+                        campaign_lead.trigger_refresh_websocket(refresh_position=False)
                     elif not whatsapp_messages.filter(send_order=5).exists():
-                        print(5)
-                        # campaign_lead.send_template_whatsapp_message(send_order=5)#
-                        # campaign_lead.trigger_refresh_websocket(refresh_position=False)
+                        campaign_lead.send_template_whatsapp_message(send_order=5)#
+                        campaign_lead.trigger_refresh_websocket(refresh_position=False)
