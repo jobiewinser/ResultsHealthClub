@@ -295,13 +295,13 @@ class WhatsappTemplatesView(TemplateView):
         site_pk = self.request.GET.get('site_pk')
         site = None
         if site_pk:
-            site = Site.objects.get(pk=site_pk)
+            site = self.request.user.profile.active_sites_allowed.get(pk=site_pk)
         if not site:
             if self.request.user.profile.site:
                 self.request.GET['site_pk'] = self.request.user.profile.site.pk
                 site = self.request.user.profile.site
             else:
-                site = Site.objects.filter(company=self.request.user.profile.company.first()).exclude(active=False).first()
+                site = self.request.user.profile.active_sites_allowed.exclude(active=False).first()
 
                 
         whatsapp_business_account_pk = self.request.GET.get('whatsapp_business_account_pk')

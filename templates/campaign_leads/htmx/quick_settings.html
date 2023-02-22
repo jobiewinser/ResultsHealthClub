@@ -11,13 +11,13 @@
                   <div class="col-sm-12">
                     <div class="checkbox">
                       <label>
-                        <input class="form-check" type="checkbox" id="slide-toggle" onclick="$('#calendly_quick_settings').slideToggle('fast');"/> <i class="fa-regular fa-calendar-days"></i> Calendly
+                        <input type="checkbox" id="slide-toggle" onclick="$('#calendly_quick_settings').slideToggle('fast');"/> <i class="fa-regular fa-calendar-days"></i> Calendly
                       </label>
                     </div>
                   </div>
                 </div>
                 <div class="row">
-                  <div class="col-sm-12" style="min-width:1000px">
+                  <div class="col-sm-12" style="min-width:1050px">
                     <div class="panel panel-default" style="display:none;" id="calendly_quick_settings">
                       <div class="panel-body">
                         {%include 'core/htmx/calendly_site_settings.html'%}

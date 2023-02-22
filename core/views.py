@@ -27,6 +27,7 @@ from stripe_integration.api import *
 from django.core.mail import send_mail
 from django.shortcuts import redirect, render
 from core.core_decorators import *
+
 logger = logging.getLogger(__name__)
 
 class LoginDemoView(View):
@@ -159,7 +160,7 @@ def get_site_configuration_context(request):
     context = {}
     site_pk = get_single_site_pk_from_request_or_default_profile_site(request)   
     request.GET['site_pk'] = site_pk   
-    site = Site.objects.get(pk=site_pk)     
+    site = request.user.profile.active_sites_allowed.get(pk=site_pk)     
 
     # permissions
     context['permitted'] = False
@@ -192,7 +193,7 @@ def get_contacts_overview_context(request):
     context = {}
     site_pk = get_single_site_pk_from_request_or_default_profile_site(request)   
     request.GET['site_pk'] = site_pk   
-    site = Site.objects.get(pk=site_pk)
+    site = request.user.profile.active_sites_allowed.get(pk=site_pk)
     context['site'] = site
     context['site_contacts'] = SiteContact.objects.filter(site=site)
     return context
@@ -215,10 +216,7 @@ class SiteConfigurationView(TemplateView):
         return context
     def post(self, request):
         self.request.POST._mutable = True     
-        # if settings.DEMO and not request.user.is_superuser:
-        #     return HttpResponse(status=500)
-        self.request.POST._mutable = True 
-        site = Site.objects.get(pk=request.POST.get('site_pk'))   
+        site = request.user.profile.active_sites_allowed.get(pk=request.POST.get('site_pk'))   
         if not get_profile_allowed_to_view_site_configuration(request.user.profile, site):
             if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
                 return HttpResponse("You don't have the edit Calendly configuration permission", status=403)
@@ -230,22 +228,7 @@ class SiteConfigurationView(TemplateView):
             response_text = f"{response_text} <span hx-swap-oob='innerHTML:.name_display_{site.pk}'>{site.name}</span>"            
             site.save()
             return HttpResponse(response_text, status=200)
-            
-        if 'calendly_organization' in request.POST or 'calendly_token' in request.POST:
-            if 'calendly_organization' in request.POST:
-                if request.POST['calendly_organization'] == '' or request.POST['calendly_organization'].replace('*', ''): #stops the **** input submitting!
-                    site.calendly_organization = request.POST['calendly_organization']        
-                    site.save()            
-                
-            if 'calendly_token' in request.POST:
-                if request.POST['calendly_token'] == '' or request.POST['calendly_token'].replace('*', ''): #stops the **** input submitting!
-                    site.calendly_token = request.POST['calendly_token']        
-                    site.save()
-            context = get_site_configuration_context(request)
-            request.GET['POST']['advanced_settings'] = True
-            return render(request, 'core/htmx/site_configuration_htmx.html',context)
         return HttpResponse( status=200)
-    
 @method_decorator(login_required, name='dispatch')
 @method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
 class ContactsOverviewView(TemplateView):
@@ -372,7 +355,7 @@ def deactivate_profile(request):
 @login_required
 @not_demo_or_superuser_check
 def reactivate_profile(request):
-    site = Site.objects.get(pk=request.POST.get('site_pk'))
+    site = request.user.profile.active_sites_allowed.get(pk=request.POST.get('site_pk'))
     user = User.objects.get(pk=request.POST.get('user_pk'))
     if get_profile_allowed_to_edit_other_profile(request.user.profile, user.profile):
         if site.subscription.max_profiles:
@@ -726,7 +709,7 @@ def complete_stripe_subscription_new_site_handler(request):
 @check_core_profile_requirements_fulfilled
 def renew_stripe_subscription(request):
     site_pk = request.POST['site_pk']   
-    site = Site.objects.get(pk=site_pk)    
+    site = request.user.profile.active_sites_allowed.get(pk=site_pk)    
     if get_profile_allowed_to_change_subscription(request.user.profile, site): 
         payment_method_id = request.POST.get('payment_method_id')
         if site.stripecustomer.subscription_id and payment_method_id:

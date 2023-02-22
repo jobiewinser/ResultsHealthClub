@@ -48,8 +48,6 @@ class Calendly():
                 body.update({'organization':f"{os.getenv('CALENDLY_URL')}/users/{organization}", 'scope':'organization'})
             response = requests.post(url=url, json=body, headers=headers)
             response_body = response.json()
-            print("create_webhook_subscription response_body", response_body)
-            print("create_webhook_subscription body", body)
             return response_body
         print("create_webhook_subscription no organization or user")
     #GET
@@ -67,7 +65,6 @@ class Calendly():
         
         response = requests.get(url=url, headers=headers)
         response_body = response.json()
-        print("response_body", response_body)
         return response_body
     #DELETE
     def delete_webhook_subscriptions(self, webhook_guuid):   

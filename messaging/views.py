@@ -64,7 +64,7 @@ def message_window(request, **kwargs):
 def get_messaging_list_row(request, **kwargs):
     try:
     #     request.GET._mutable = True
-        site = Site.objects.get(pk=request.GET.get('site_pk'))
+        site = request.user.profile.active_sites_allowed.get(pk=request.GET.get('site_pk'))
         message = WhatsAppMessage.objects.filter(site=site, customer_number=request.GET.get('whatsapp_number')).last()
         return render(request, "messaging/htmx/message_list_row.html", {'site':site, 'message':message})   
     except Exception as e:

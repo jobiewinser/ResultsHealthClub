@@ -51,7 +51,7 @@ def add_whatsapp_business_account(request):
         site_pk = request.POST.get('site_pk', None)
         whatsapp_business_account_id = request.POST.get('whatsapp_business_account_id', None)
         if site_pk and whatsapp_business_account_id:
-            site = Site.objects.get(pk=site_pk)
+            site = request.user.profile.active_sites_allowed.get(pk=site_pk)
             whatsapp = Whatsapp(site.company.whatsapp_access_token) 
             if get_profile_allowed_to_edit_site_configuration(request.user.profile, site):      
                 if whatsapp.get_phone_numbers(whatsapp_business_account_id).get('data',[]):   

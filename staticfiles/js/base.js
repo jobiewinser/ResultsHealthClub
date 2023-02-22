@@ -25,6 +25,7 @@ function basehandlehtmxafterSwap(evt){
     }
     if (evt.detail.target.id == 'content'){
         $('#generic_modal').modal('hide');
+        console.log("TEST1")
     }
     
     if (![undefined, ''].includes(evt.detail.pathInfo.requestPath)){

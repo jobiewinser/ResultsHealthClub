@@ -32,7 +32,9 @@ urlpatterns = [
     # path('free-tasters/overview/', coreviews.FreeTasterOverviewView.as_view(), name='free-taster-overview' ),
     path('free-tasters/redirect/<str:guid>/', coreviews.free_taster_redirect, name='free-taster' ),
     # path('generate-free-taster-link/', corehtmx.generate_free_taster_link, name='generate-free-taster-link' ),
-    path('create-calendly-webhook-subscription/', corehtmx.create_calendly_webhook_subscription, name='create-calendly-webhook-subscription' ),
+    
+    path('edit-calendly-configuration/', corehtmx.edit_calendly_configuration, name='edit-calendly-configuration'),
+    path('recreate-calendly-webhook-subscription/', corehtmx.recreate_calendly_webhook_subscription, name='recreate-calendly-webhook-subscription' ),
     path('delete-calendly-webhook-subscription/', corehtmx.delete_calendly_webhook_subscription, name='delete-calendly-webhook-subscription' ),
 
     path('add-site/', corehtmx.add_site, name='add-site' ),

@@ -1,9 +1,9 @@
 {%load static tz core_tags user_permission_tags%}
-<div class="row">
+<div class="row calendly_site_settings" {% if hx_swap_oob %}hx-swap-oob='outerHTML:.calendly_site_settings'{%endif%}>
     <div class="col-md-auto p-2 card card-light">      
-        <form class="" hx-post="{%url 'site-configuration'%}" hx-swap="innerHTML" hx-indicator="#page_load_indicator " 
+        <form class="" hx-post="{%url 'edit-calendly-configuration'%}" hx-swap="none" hx-indicator="#page_load_indicator " 
         hx-vals='{"site_pk": "{{site.pk}}"}' 
-        hx-trigger='submit delay:0.3s' autocomplete="off" autofill="off" hx-target="#content">
+        hx-trigger='submit delay:0.3s' autocomplete="off" autofill="off">
             <div class="row mt-1">
                 <div class="col-md-auto">   
                     <div class="form-floating m-1"
@@ -18,7 +18,7 @@
                         "
                     {%endif%}>
                         <input style="min-width:400px" id="calendly_organization" type="password" type="text" class="form-control" name="calendly_organization"
-                            oninput="$('#calendly_config_submit').attr('disabled', false)" onfocus="this.value=''; this.removeAttribute('onfocus');"
+                            oninput="$('.calendly_config_submit').attr('disabled', false)" onfocus="this.value=''; this.removeAttribute('onfocus');"
                             value="{%if site.calendly_organization%}{{site.calendly_organization|censor}}{%endif%}" {%if not request.user.profile|get_profile_allowed_to_edit_site_calendly_configuration_tag:site%}disabled{%endif%}/>
                         <label for="calendly_organization">Site Calendly Organisation</label>
                     </div>
@@ -36,7 +36,7 @@
                         "
                     {%endif%}>
                         <input name="calendly_token" type="password" class="form-control"
-                            oninput="$('#calendly_config_submit').attr('disabled', false)" onfocus="this.value=''; this.removeAttribute('onfocus');"
+                            oninput="$('.calendly_config_submit').attr('disabled', false)" onfocus="this.value=''; this.removeAttribute('onfocus');"
                             value="{{site.calendly_token|censor}}" {%if not request.user.profile|get_profile_allowed_to_edit_site_calendly_configuration_tag:site%}disabled{%endif%}/>
                         <label class="elipses-overflow">Site Calendly Token</label>
                     </div>
@@ -44,15 +44,12 @@
             </div>
             <div class="row">
                 <div class="col center">  
-                    {%if request.user.profile|get_profile_allowed_to_edit_site_configuration_tag:site%}<button type='submit' class="btn btn-primary btn-sm m-3" id="calendly_config_submit" disabled>Submit</button>{%endif%}  
+                    {%if request.user.profile|get_profile_allowed_to_edit_site_configuration_tag:site%}<button type='submit' class="btn btn-primary btn-sm m-3 calendly_config_submit" disabled>Submit {{hx_swap_oob}}</button>{%endif%}  
                 </div>
             </div>
         </form>
     </div>
-    <div class="col-md-auto p-2 card card-light ms-2" style="">                          
-        <div>   
-            Calendly Webhook for <span class="name_display_{{site.pk}}">{{site.name}}</span>: 
+    <div class="col-md-auto p-2 card card-light ms-2" style="">           
             {%include 'core/htmx/calendly_webhook_status_wrapper.html'%}  
-        </div>
     </div>
 </div>

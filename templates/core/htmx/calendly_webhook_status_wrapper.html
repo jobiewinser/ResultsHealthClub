@@ -1,9 +1,10 @@
 {%load user_permission_tags%}
-<span id="calendly_webhook_status_wrapper">
+<div id="calendly_webhook_status_wrapper" class="center">
+    Calendly Webhook for <span class="name_display_{{site.pk}}">{{site.name}}</span>: 
     {%if site_webhook_active%}
         <b class="text-success">Active</b>
         <br>
-        <span 
+        <div 
             {%if not request.user.profile|get_profile_allowed_to_edit_site_configuration_tag:site%}
             data-bs-toggle="popover" 
             data-bs-trigger="hover focus" 
@@ -22,11 +23,11 @@
                 hx-swap="outerHTML" hx-trigger="click">
                     <i class="fa-solid fa-trash" aria-hidden="true"></i> Delete Calendly Webhook
             </button>
-        </span>
+        </div>
     {%else%}
         <b class="text-danger">Inactive</b> 
         <br>
-        <span 
+        <div 
             {%if not request.user.profile|get_profile_allowed_to_edit_site_configuration_tag:site%}disabled
             data-bs-toggle="popover" 
             data-bs-trigger="hover focus" 
@@ -40,11 +41,13 @@
                 {%if not request.user.profile|get_profile_allowed_to_edit_site_configuration_tag:site%}disabled{%endif%}
                 hx-indicator=".top-htmx-indicator" hx-target="#calendly_webhook_status_wrapper" 
                 hx-vals='{"site_pk": "{{site.pk}}"}'
-                hx-post="{% url 'create-calendly-webhook-subscription' %}" 
+                hx-post="{% url 'recreate-calendly-webhook-subscription' %}" 
                 hx-push-url="false"
                 hx-swap="outerHTML" hx-trigger="click">
                     <i class="fa-solid fa-link" aria-hidden="true"></i> Recreate Calendly Webhook
             </button>
-        </span>
+        </div>
+        <br>
+        <div class="text-danger">{{status_reason}}</div>
     {%endif%}
-</span>
+</div>

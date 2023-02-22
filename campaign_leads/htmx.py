@@ -100,7 +100,7 @@ def add_campaign_category(request, **kwargs):
         campaign.campaign_category = campaign_category
         campaign.save()
     else:
-        site = Site.objects.get(pk=site_pk)
+        site = request.user.profile.active_sites_allowed.get(pk=site_pk)
         campaign_category, created = CampaignCategory.objects.get_or_create(site=site, name=name)
     return HttpResponse( status=200)
     # except Exception as e:

@@ -7,7 +7,7 @@ from django.shortcuts import redirect
 
 def create_customer_portal_session(request):
     site_pk = request.GET.get('site_pk')
-    site = Site.objects.get(pk=site_pk)
+    site = request.user.profile.active_sites_allowed.get(pk=site_pk)
     
     if get_profile_allowed_to_change_subscription(request.user.profile, site):
         # Authenticate your user.

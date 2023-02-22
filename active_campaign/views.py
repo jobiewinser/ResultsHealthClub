@@ -65,7 +65,7 @@ def set_campaign_site(request, **kwargs):
         campaign.campaigntemplatelink_set.all().delete()
 
         if site_pk:
-            site = Site.objects.get(pk=site_pk)
+            site = request.user.profile.active_sites_allowed.get(pk=site_pk)
             campaign.site = site
         else:
             campaign.site = None
@@ -78,7 +78,7 @@ def set_campaign_site(request, **kwargs):
 @login_required
 def set_whatsapp_template_sending_status(request, **kwargs):
     try:
-        site = Site.objects.get(pk=request.POST.get('site_pk',None))
+        site = request.user.profile.active_sites_alloweds.get(pk=request.POST.get('site_pk',None))
         if get_profile_allowed_to_toggle_whatsapp_sending(request.user.profile, site):
             site.whatsapp_template_sending_enabled = request.POST.get('whatsapp_template_sending_enabled', 'off') == 'on'
             site.save()
@@ -91,7 +91,7 @@ def set_whatsapp_template_sending_status(request, **kwargs):
 @login_required
 def set_active_campaign_leads_status(request, **kwargs):
     try:
-        site = Site.objects.get(pk=request.POST.get('site_pk',None))
+        site = request.user.profile.active_sites_allowed.get(pk=request.POST.get('site_pk',None))
         if get_profile_allowed_to_toggle_active_campaign(request.user.profile, site):
             site.active_campaign_leads_enabled = request.POST.get('active_campaign_leads_enabled', 'off') == 'on'
             site.save()
