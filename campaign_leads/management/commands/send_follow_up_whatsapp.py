@@ -12,21 +12,27 @@ class Command(BaseCommand):
             whatsapp_messages = WhatsAppMessage.objects.filter(site_contact=campaign_lead.site_contact)
             day_ago =  datetime.now() - timedelta(days = 1)
             week_ago =  datetime.now() - timedelta(days = 7)
-            if not whatsapp_messages.filter(inbound=True, datetime__gte=week_ago).exists():
-                if not whatsapp_messages.filter(datetime__gte=day_ago).exists():
+            if not whatsapp_messages.filter(inbound=True, datetime__gte=campaign_lead.created).exists(): #never send a message if they have sent us a message since the lead was created. 
+                #Basically they could have sent a message saying i'm not interested that we haven'y seen and archived yet
+                
+                if not whatsapp_messages.filter(datetime__gte=day_ago).exists(): #never send an auto message if they have sent a message within 24 hours, will ruin the conversation
                     if not whatsapp_messages.filter(send_order=1).exists():
                         pass
                     #     campaign_lead.send_template_whatsapp_message(send_order=1)
                     #     campaign_lead.trigger_refresh_websocket(refresh_position=False)
                     elif not whatsapp_messages.filter(send_order=2).exists():
-                        campaign_lead.send_template_whatsapp_message(send_order=2)
-                        campaign_lead.trigger_refresh_websocket(refresh_position=False)
+                        print(2)
+                        # campaign_lead.send_template_whatsapp_message(send_order=2)
+                        # campaign_lead.trigger_refresh_websocket(refresh_position=False)
                     elif not whatsapp_messages.filter(send_order=3).exists():
-                        campaign_lead.send_template_whatsapp_message(send_order=3)#
-                        campaign_lead.trigger_refresh_websocket(refresh_position=False)
+                        print(3)
+                        # campaign_lead.send_template_whatsapp_message(send_order=3)#
+                        # campaign_lead.trigger_refresh_websocket(refresh_position=False)
                     elif not whatsapp_messages.filter(send_order=4).exists():
-                        campaign_lead.send_template_whatsapp_message(send_order=4)#
-                        campaign_lead.trigger_refresh_websocket(refresh_position=False)
+                        print(4)
+                        # campaign_lead.send_template_whatsapp_message(send_order=4)#
+                        # campaign_lead.trigger_refresh_websocket(refresh_position=False)
                     elif not whatsapp_messages.filter(send_order=5).exists():
-                        campaign_lead.send_template_whatsapp_message(send_order=5)#
-                        campaign_lead.trigger_refresh_websocket(refresh_position=False)
+                        print(5)
+                        # campaign_lead.send_template_whatsapp_message(send_order=5)#
+                        # campaign_lead.trigger_refresh_websocket(refresh_position=False)
