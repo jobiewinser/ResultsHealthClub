@@ -37,7 +37,9 @@ def get_modal_content(request, **kwargs):
                 if site_pk:
                     context["site"] = request.user.profile.active_sites_allowed.get(pk=site_pk)     
                 elif request.user.profile.company.part_created_site:
-                    context["site"] = request.user.profile.company.part_created_site   
+                    context["site"] = request.user.profile.company.part_created_site  
+            elif template_name == 'quick_settings':
+                context["site"] = request.user.profile.company.part_created_site   
             elif template_name == 'edit_contact':
                 site_contact_pk = request.GET.get('site_contact_pk')
                 if site_contact_pk:
@@ -276,7 +278,7 @@ def add_site(request, **kwargs):
             profile.save()
             response = HttpResponse( status=200)
             response["HX-Redirect"] = f"/configuration/site-configuration/?site_pk={site.pk}"
-            return response
+            return render(request, "campaign_leads/htmx/quick_settings.html", {'site':site})
             
     return HttpResponse("This feature requires a Pro subscription", status=403)
 

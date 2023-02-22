@@ -49,3 +49,17 @@ def public_check(function):
         else:
             raise Exception("PUBLIC not enabled!")
     return wrapper
+
+
+def login_not_allowed(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login_url="/"):
+    """
+    Decorator for views that checks that the user has a profile, a company and at least 1 site allowed
+    """
+    actual_decorator = user_passes_test(
+        lambda u: not u.is_authenticated,
+        login_url=login_url,
+        redirect_field_name=redirect_field_name
+    )
+    if function:
+        return actual_decorator(function)
+    return False

@@ -1,8 +1,5 @@
 {%load static tz core_tags user_permission_tags%}
 <div class="card card-highlight">
-    <div class="card-header">
-        Payment Methods on Stripe for {{site.name}}
-    </div>
     <div class="card-body">
         <div class="alert alert-warning">
             <ul>
@@ -160,3 +157,6 @@
         </table>
     </div>                
 </div>
+<span hx-swap-oob="true" id="generic_modal_title">
+    Payment Methods on Stripe for {{site.name}}
+</span>

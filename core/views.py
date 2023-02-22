@@ -10,7 +10,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.sessions.models import Session
 from django.contrib.auth.models import User
 from calendly.api import Calendly
-from core.core_decorators import check_core_profile_requirements_fulfilled
+from core.core_decorators import check_core_profile_requirements_fulfilled, login_not_allowed
 from core.models import ROLE_CHOICES, StripeCustomer, FreeTasterLink, FreeTasterLinkClick, Profile, Site, CompanyProfilePermissions, SiteProfilePermissions, Feedback, Subscription,SiteSubscriptionChange, Company, Contact, SiteContact
 from django.contrib.auth import authenticate
 from django.contrib.auth import login
@@ -874,6 +874,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.mail import EmailMessage
 from django.template import loader
 import uuid
+
+@method_decorator(login_not_allowed, name='dispatch')
 class RegisterNewCompanyView(TemplateView):
     template_name='registration/register_new_company.html'
     def get(self, request, *args, **kwargs):

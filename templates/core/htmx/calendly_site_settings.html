@@ -1,0 +1,58 @@
+{%load static tz core_tags user_permission_tags%}
+<div class="row">
+    <div class="col-md-auto p-2 card card-light">      
+        <form class="" hx-post="{%url 'site-configuration'%}" hx-swap="innerHTML" hx-indicator="#page_load_indicator " 
+        hx-vals='{"site_pk": "{{site.pk}}"}' 
+        hx-trigger='submit delay:0.3s' autocomplete="off" autofill="off" hx-target="#content">
+            <div class="row mt-1">
+                <div class="col-md-auto">   
+                    <div class="form-floating m-1"
+                    {%if not request.user.profile|get_profile_allowed_to_edit_site_calendly_configuration_tag:site%}
+                        data-bs-toggle="popover" 
+                        data-bs-trigger="hover focus" 
+                        data-bs-html="true" 
+                        data-bs-placement="top"
+                        data-bs-title="Site Calendly Organisation"
+                        data-bs-content="
+                            You do not have permission to edit this field: Edit Calendly Configuration
+                        "
+                    {%endif%}>
+                        <input style="min-width:400px" id="calendly_organization" type="password" type="text" class="form-control" name="calendly_organization"
+                            oninput="$('#calendly_config_submit').attr('disabled', false)" onfocus="this.value=''; this.removeAttribute('onfocus');"
+                            value="{%if site.calendly_organization%}{{site.calendly_organization|censor}}{%endif%}" {%if not request.user.profile|get_profile_allowed_to_edit_site_calendly_configuration_tag:site%}disabled{%endif%}/>
+                        <label for="calendly_organization">Site Calendly Organisation</label>
+                    </div>
+                </div>
+                <div class="col">   
+                    <div class="form-floating m-1"
+                    {%if not request.user.profile|get_profile_allowed_to_edit_site_calendly_configuration_tag:site%}
+                        data-bs-toggle="popover" 
+                        data-bs-trigger="hover focus" 
+                        data-bs-html="true" 
+                        data-bs-placement="top"
+                        data-bs-title="Site Calendly Token"
+                        data-bs-content="
+                            You do not have permission to edit this field: Edit Calendly Configuration
+                        "
+                    {%endif%}>
+                        <input name="calendly_token" type="password" class="form-control"
+                            oninput="$('#calendly_config_submit').attr('disabled', false)" onfocus="this.value=''; this.removeAttribute('onfocus');"
+                            value="{{site.calendly_token|censor}}" {%if not request.user.profile|get_profile_allowed_to_edit_site_calendly_configuration_tag:site%}disabled{%endif%}/>
+                        <label class="elipses-overflow">Site Calendly Token</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col center">  
+                    {%if request.user.profile|get_profile_allowed_to_edit_site_configuration_tag:site%}<button type='submit' class="btn btn-primary btn-sm m-3" id="calendly_config_submit" disabled>Submit</button>{%endif%}  
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-auto p-2 card card-light ms-2" style="">                          
+        <div>   
+            Calendly Webhook for <span class="name_display_{{site.pk}}">{{site.name}}</span>: 
+            {%include 'core/htmx/calendly_webhook_status_wrapper.html'%}  
+        </div>
+    </div>
+</div>

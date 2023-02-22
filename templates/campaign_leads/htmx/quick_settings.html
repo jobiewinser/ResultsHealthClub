@@ -1,0 +1,76 @@
+{%load static tz core_tags user_permission_tags%}
+
+<span id="payment_methods_wrapper">
+    <div class="card card-highlight">
+        <div class="card-body">
+            <div class="alert alert-warning p-2">
+                Below are some quick integrations you can add. <br>You can also change them from the Site Configuration page.              
+            </div>
+            <div class="container">
+                <div class="row">
+                  <div class="col-sm-12">
+                    <div class="checkbox">
+                      <label>
+                        <input class="form-check" type="checkbox" id="slide-toggle" onclick="$('#calendly_quick_settings').slideToggle('fast');"/> <i class="fa-regular fa-calendar-days"></i> Calendly
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-sm-12" style="min-width:1000px">
+                    <div class="panel panel-default" style="display:none;" id="calendly_quick_settings">
+                      <div class="panel-body">
+                        {%include 'core/htmx/calendly_site_settings.html'%}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+            <hr>
+            <div class="container">
+                <div class="row">
+                  <div class="col-sm-12">
+                    <div class="checkbox">
+                      <label>
+                        <input type="checkbox" id="slide-toggle" onclick="$('#active_campaign_quick_settings').slideToggle('fast');"/> <i class="fa-light fa-dumbbell"></i> Active Campaign
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-sm-12">
+                    <div class="panel panel-default" style="display:none;" id="active_campaign_quick_settings">
+                      <div class="panel-body">
+                        Active Campaign Settings
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+            <hr>
+            <div class="container">
+                <div class="row">
+                  <div class="col-sm-12">
+                    <div class="checkbox">
+                      <label>
+                        <input type="checkbox" id="slide-toggle" onclick="$('#whatsapp_quick_settings').slideToggle('fast');"/> <i class="fa fa-whatsapp"></i> Whatsapp <i class="fa-solid fa-rectangle-pro"></i>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-sm-12">
+                    <div class="panel panel-default" style="display:none;" id="whatsapp_quick_settings">
+                      <div class="panel-body">
+                        Whatsapp Settings
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            </div>            
+        </div>                
+    </div>
+</span>
+<span hx-swap-oob="true" id="generic_modal_title">
+    Quick Settings for {{site.name}}
+</span>
