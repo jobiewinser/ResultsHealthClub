@@ -1,6 +1,6 @@
 {%load static core_tags%}
 
-<span {%if request.META.HTTP_HX_REQUEST%}hx-swap-oob='innerHTML:#under_nav_section'{%endif%}>
+<span id="under_nav_section" {%if request.META.HTTP_HX_REQUEST%}hx-swap-oob='outerHTML:#under_nav_section'{%endif%}>
     <div class="row p-1 border-bottom">
         <div class="htmx-indicator whole_page_disconnected_indicator leads_disconnected_indicator" id="leads_disconnected_indicator">
             <div class="whole_page_disconnected_indicator_content">

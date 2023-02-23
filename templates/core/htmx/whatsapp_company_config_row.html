@@ -2,6 +2,8 @@
 {%load user_permission_tags%}
 
 <div class="row" style="margin-left:0px !important;">
+    {%with company|get_allowed_site_chats_for_company_tag as pro_sites%}
+    {%if pro_sites%}
         <div class="col-md-auto p-2 card">        
             <b>Whatsapp Business Management API configuration</b>
             <p>
@@ -13,7 +15,7 @@
                     {%if request.user.profile|get_profile_allowed_to_edit_whatsapp_settings_tag:company%}    
                     <form class="" hx-post="{%url 'set-whatsapp-company-config'%}" hx-target="#whatsapp_company_config_wrapper" 
                     hx-confirm="Are you sure you want to make this change. It may prevent you receiving and sending whatsapp messages if set up incorrectly!"
-                    hx-swap="innerHTML" hx-trigger="submit delay:0.3s" hx-indicator="#htmx_indicator_company_form" hx-vals='{"company_pk": "{{company.pk}}"}' autocomplete="off" autofill="off">  
+                    hx-swap="innerHTML" hx-trigger="submit delay:0.3s" hx-indicator="#page_load_indicator" hx-vals='{"company_pk": "{{company.pk}}"}' autocomplete="off" autofill="off">  
                         <div class="form-floating mt-1" 
                                                         data-bs-html="true" 
                                                         data-bs-toggle="popover" data-bs-placement="left" 
@@ -94,4 +96,11 @@
         </div>
         <div class="col">
         </div>
+    {%else%}
+        <small>
+            <p>With a <i class="fa-solid fa-rectangle-pro"></i> subscription, you can automate further by automatically sending <i class="fa fa-whatsapp text-success" aria-hidden="true"></i> Whatsapp templates to your customers immediately after they fill in your Active Campaign Forms.</p>
+            <p>You can also manage multiple whatsapp phone numbers from one screen, here on Winser Systems.</p>
+        </small>
+    {%endif%}
+    {%endwith%}
 </div>

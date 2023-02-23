@@ -1,4 +1,8 @@
 {% extends 'core/base.html' %}
+{%block nav%}
+{{block.super}}
+{%include 'whatsapp/whatsapp_templates_under_nav.html'%}
+{%endblock%}
 {%block content%}  
 {%include 'whatsapp/htmx/whatsapp_templates_htmx.html'%}
 {%endblock content%}

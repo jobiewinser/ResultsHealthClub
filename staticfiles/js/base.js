@@ -221,7 +221,12 @@ function basehandlehtmxafterRequest(evt){
     }else if (status == 500){
         snackbarShow('Error: '+evt.detail.xhr.response, 'danger', display_ms=5000)           
     }else if (status == 400){
-        snackbarShow('Error: '+evt.detail.xhr.response, 'danger', display_ms=5000)           
+        snackbarShow('Error: '+evt.detail.xhr.response, 'danger', display_ms=5000)  
+        if (evt.detail.pathInfo.requestPath.includes("add-stripe-payment-method-handler")){ 
+            $('#add_card_error').html(evt.detail.xhr.response)
+            $('#add_card_error').prop('hidden', false)
+            console.log(evt)
+        }         
     }else if (status == 403){
         snackbarShow('You are not permitted to perform this action: '+evt.detail.xhr.response, 'danger', display_ms=5000)           
     }

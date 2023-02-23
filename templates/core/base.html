@@ -339,7 +339,7 @@
         {%endif%}
 
         {%endblock snackbar%}
-        <button class="btn btn-primary" style="border-radius:10px; opacity: 0.8; position: fixed; bottom: 25px; left: 20px;" hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
+        <button class="btn btn-primary" style="border-radius:10px; opacity: 0.5; position: fixed; bottom: 25px; left: 20px;" hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
             hx-vals='{"template_name": "tutorial"}'
             hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
             hx-swap="innerHTML" hx-trigger="click" style="z-index:99"><i class="fa-regular fa-square-question"></i></button>

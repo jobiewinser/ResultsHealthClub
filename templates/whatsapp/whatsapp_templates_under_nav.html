@@ -1,0 +1,40 @@
+{%load static core_tags%}
+
+<span id="under_nav_section" {%if request.META.HTTP_HX_REQUEST%}hx-swap-oob='outerHTML:#under_nav_section'{%endif%}>
+    <div class="row p-1 border-bottom">
+        {%block extra_top_left_buttons %}
+        {% comment %} <div class="col-md-auto">
+            <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
+        </div> {% endcomment %}
+        {%with True as hide_show_all%}
+        {%include 'core/htmx/site_selection_single.html'%}
+        <div class="col-md-auto ps-1 pe-1 border-start">
+            <div id="phone_list_wrapper">  
+                <label for="site_pk" style="width:300px">
+                  Select your <b>Whatsapp Phone</b><br>
+                  <select class="form-select select2 select2-styling overview_table_filters" name="whatsapp_business_account_pk" id="whatsapp_business_account_pk" onchange="$('#change_site').click();">
+                      {%for whatsapp_business_account in whatsapp_business_accounts%}
+                      <option {%if whatsapp_business_account.pk|to_str == request|get_key_in_get_or_post:'whatsapp_business_account_pk' %}selected{%endif%} value="{{whatsapp_business_account.pk}}">{{whatsapp_business_account.whatsappnumber}}</option>
+                      {%endfor%}
+                  </select>
+                </label>
+            </div>
+        </div>
+
+
+
+        <button hidden hx-get="{%url 'whatsapp-templates'%}" hx-push-url="false" hx-swap="innerHTML" hx-include=".overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
+        {%endwith%}    
+        {%endblock extra_top_left_buttons %}
+        
+        {%block extra_top_right_buttons %}
+        <div class="col m-1 ps-0">
+        </div>
+        <input id="current_page" hidden value="whatsapp_templates"/>
+        {% comment %} <div class="col-md-auto p-0 m-1">
+            <span class="badge bg-dark text-white"><h6 class="m-1">Whatsapp Templates</h6></span>          
+        </div>  {% endcomment %}
+        {%endblock extra_top_right_buttons %}     
+    </div>   
+</span>
+

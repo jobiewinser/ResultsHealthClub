@@ -240,7 +240,7 @@ body * {
 #content {
     padding: 10px;
     padding-bottom: 100px;
-    height: calc(100vh) !important;
+    height: calc(100vh - 140px) !important;
     overflow-y: scroll;
     margin: 0;
     height: 100vh;
@@ -888,9 +888,9 @@ td, th{
 }
 
 
-#site_list_wrapper, #phone_list_wrapper{
+/* #site_list_wrapper, #phone_list_wrapper{
     min-width:350px
-}
+} */
 
 #campaign_category_pk{
     min-width:350px

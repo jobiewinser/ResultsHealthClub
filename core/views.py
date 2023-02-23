@@ -181,11 +181,6 @@ def get_site_configuration_context(request):
                     break
     context['site_webhook_active'] = site_webhook_active
     context['site'] = site
-    if site.company.whatsapp_access_token:
-        whatsapp = Whatsapp(site.company.whatsapp_access_token)
-        context['whatsapp_business_details'] = whatsapp.get_business(site.company.whatsapp_app_business_id)
-    else:
-        context['whatsapp_business_details'] = {"error":True}
     return context
 
 def get_contacts_overview_context(request):
@@ -262,10 +257,16 @@ class CompanyConfigurationView(TemplateView):
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'core/company_configuration/company_configuration_htmx.html'
         # context['site_list'] = get_available_sites_for_user(self.request.user)
-        context['company'] = self.request.user.profile.company
+        company = self.request.user.profile.company
+        context['company'] = company
         for profile in context['company'].profile_set.all():
             CompanyProfilePermissions.objects.get_or_create(profile=profile, company=profile.company)  
         
+        if company.whatsapp_access_token:
+            whatsapp = Whatsapp(company.whatsapp_access_token)
+            context['whatsapp_business_details'] = whatsapp.get_business(company.whatsapp_app_business_id)
+        else:
+            context['whatsapp_business_details'] = {"error":True}
         context['role_choices'] = ROLE_CHOICES
         # context['site_list'] = get_available_sites_for_user(self.request.user)
         return context
@@ -763,7 +764,7 @@ def add_stripe_payment_method_handler(request):
     site_pk = request.POST.get('site_pk')
     site = request.user.profile.active_sites_allowed.get(pk=site_pk)
     if get_profile_allowed_to_change_subscription(request.user.profile, site):
-        add_stripe_payment_method(site, 
+        response = add_stripe_payment_method(site, 
             request.POST['cardNumber'], 
             request.POST['expiryMonth'],
             request.POST['expiryYear'],
@@ -772,7 +773,9 @@ def add_stripe_payment_method_handler(request):
         site_subscription_change_pk = request.POST.get('site_subscription_change_pk')        
         if site_subscription_change_pk:
             context['site_subscription_change'] = SiteSubscriptionChange.objects.filter(pk=site_subscription_change_pk).last()
-        return render(request, 'core/htmx/payment_methods.html', context)
+        if response.status_code == 200:
+            return render(request, 'core/htmx/payment_methods.html', context)
+        return HttpResponse(response.content.decode('utf-8'), status=400)
     return HttpResponse(status=403)
 
 @login_required
@@ -814,6 +817,7 @@ def add_stripe_payment_method(site, card_number, expiry_month, expiry_year, cvc)
         site.stripecustomer.customer_id, 
         payment_method['id']
     )
+    return HttpResponse("", status=200)
 @login_required
 @check_core_profile_requirements_fulfilled
 def detach_stripe_payment_method_handler(request): 

@@ -142,14 +142,16 @@
                     </div>
                 </div>
             </div>
-            <div class="card card-highlight m-2">
-                <div class="card-header">
-                    <i class="fa fa-whatsapp" aria-hidden="true"></i> <span class="name_display_{{site.pk}}">{{site.name}}</span> <b>Whatsapp Settings</b> <i class="fa-solid fa-rectangle-pro"></i>
-                </div>
-                <div class="card-body">
-                    <span id="whatsapp_company_config_wrapper">
-                        {%include 'core/htmx/whatsapp_company_config_row.html'%}
-                    </span>
+            <div class="row mt-2">
+                <div class="col card card-highlight m-0 p-0">
+                    <div class="card-header">
+                        <i class="fa fa-whatsapp" aria-hidden="true"></i> <span class="name_display_{{site.pk}}">{{site.name}}</span> <b>Whatsapp Settings</b> <i class="fa-solid fa-rectangle-pro"></i>
+                    </div>
+                    <div class="card-body">
+                        <span id="whatsapp_company_config_wrapper">
+                            {%include 'core/htmx/whatsapp_company_config_row.html'%}
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>

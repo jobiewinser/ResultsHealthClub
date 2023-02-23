@@ -9,38 +9,6 @@
         var SearchTerm = ""
     </script>
     
-    <div class="row mt-0">
-        {%block extra_top_left_buttons %}
-        {% comment %} <div class="col-md-auto">
-            <a class="btn btn-secondary" href="{%url 'customer-home'%}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
-        </div> {% endcomment %}
-        {%with True as hide_show_all%}
-        {%include 'core/htmx/site_selection_single.html'%}
-        <div class="col-md-auto m-1 ps-0">
-            <div id="phone_list_wrapper">  
-                <select class="form-select select2 select2-styling overview_table_filters"name="whatsapp_business_account_pk" id="whatsapp_business_account_pk" onchange="$('#change_site').click();">
-                    {%for whatsapp_business_account in whatsapp_business_accounts%}
-                    <option {%if whatsapp_business_account.pk|to_str == request|get_key_in_get_or_post:'whatsapp_business_account_pk' %}selected{%endif%} value="{{whatsapp_business_account.pk}}">Whatsapp Phone: {{whatsapp_business_account.whatsappnumber}}</option>
-                    {%endfor%}
-                </select>
-            </div>
-        </div>
-
-
-
-        <button hidden hx-get="{%url 'whatsapp-templates'%}" hx-push-url="false" hx-swap="innerHTML" hx-include=".overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
-        {%endwith%}    
-        {%endblock extra_top_left_buttons %}
-        
-        {%block extra_top_right_buttons %}
-        <div class="col m-1 ps-0">
-        </div>
-        <input id="current_page" hidden value="whatsapp_templates"/>
-        {% comment %} <div class="col-md-auto p-0 m-1">
-            <span class="badge bg-dark text-white"><h6 class="m-1">Whatsapp Templates</h6></span>          
-        </div>  {% endcomment %}
-        {%endblock extra_top_right_buttons %}    
-    </div>   
     <div class="row mt-2">
         <div class="col m-3 alert alert-warning">
             <p>Message templates in an Aproved state can be edited up to 10 times in a 30 day window, or 1 time in a 24 hour window.</p>
@@ -104,3 +72,4 @@
     Please select a phone number in the top left. 
     {%endif%}
 </span>
+{%if request.META.HTTP_HX_REQUEST%}{%include 'whatsapp/whatsapp_templates_under_nav.html'%}{%endif%}

@@ -72,6 +72,10 @@ def get_profile_allowed_to_view_site_configuration_tag(profile, site):
 @register.filter
 def get_allowed_site_chats_for_user_tag(user):
     return get_allowed_site_chats_for_user(user)
+
+@register.filter
+def get_allowed_site_chats_for_company_tag(company):
+    return get_allowed_site_chats_for_company(company)
     
 @register.filter
 def get_user_allowed_to_send_from_whatsappnumber_tag(user, whatsappnumber):
