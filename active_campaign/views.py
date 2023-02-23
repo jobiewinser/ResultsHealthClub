@@ -78,7 +78,7 @@ def set_campaign_site(request, **kwargs):
 @login_required
 def set_whatsapp_template_sending_status(request, **kwargs):
     try:
-        site = request.user.profile.active_sites_alloweds.get(pk=request.POST.get('site_pk',None))
+        site = request.user.profile.active_sites_allowed.get(pk=request.POST.get('site_pk',None))
         if get_profile_allowed_to_toggle_whatsapp_sending(request.user.profile, site):
             site.whatsapp_template_sending_enabled = request.POST.get('whatsapp_template_sending_enabled', 'off') == 'on'
             site.save()

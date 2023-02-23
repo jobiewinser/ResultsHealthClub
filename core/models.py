@@ -411,7 +411,7 @@ class WhatsappBusinessAccount(models.Model):
     def active_live_templates(self):
         return self.whatsapptemplate_set.filter(status="APPROVED").exclude(archived=True).exclude(name__icontains="sample")
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-        if self.site and self.active:
+        if self.site and self.active and self.whatsappnumber:
             # for whatsapp_number in self.whatsappnumber.all():
             #     whatsapp_number.company = self.site.company
             #     whatsapp_number.save()
@@ -714,7 +714,7 @@ class Site(models.Model):
         for whatsapp_business_account in self.whatsappbusinessaccount_set.all():
             try:
                 phone_numbers = whatsapp.get_phone_numbers(whatsapp_business_account.whatsapp_business_account_id).get('data',[])  
-                print("get_live_whatsapp_phone_numbers phone_numbers", str(phone_numbers))
+                
                 whatsapp_number_ids = []
                 if phone_numbers:
                     for number in phone_numbers:

@@ -47,15 +47,17 @@ def deactivate_whatsapp_business_account(request):
 @login_required
 @not_demo_or_superuser_check
 def add_whatsapp_business_account(request):
-    try: 
+    # try: 
         site_pk = request.POST.get('site_pk', None)
         whatsapp_business_account_id = request.POST.get('whatsapp_business_account_id', None)
         if site_pk and whatsapp_business_account_id:
             site = request.user.profile.active_sites_allowed.get(pk=site_pk)
             whatsapp = Whatsapp(site.company.whatsapp_access_token) 
             if get_profile_allowed_to_edit_site_configuration(request.user.profile, site):      
-                if whatsapp.get_phone_numbers(whatsapp_business_account_id).get('data',[]):   
+                phone_numbers = whatsapp.get_phone_numbers(whatsapp_business_account_id).get('data',[])
+                if phone_numbers:   
                     whatsapp_business_account, created = WhatsappBusinessAccount.objects.get_or_create(whatsapp_business_account_id=whatsapp_business_account_id)
+                    phone_number_instances = site.get_live_whatsapp_phone_numbers()
                     if not created:
                         if whatsapp_business_account.active:
                             if whatsapp_business_account.site == site:
@@ -69,6 +71,7 @@ def add_whatsapp_business_account(request):
                             return render(request, 'core/site_configuration/site_configuration_table_htmx.html', {'whatsapp_numbers':site.get_live_whatsapp_phone_numbers(), 'site': site, })
                         # else:
                         #     whatsapp_business_account.delete()
+                    whatsapp_business_account.save()
                     whatsapp_business_account.site = site
                     whatsapp_business_account.save()
                     return render(request, 'core/site_configuration/site_configuration_table_htmx.html', {'whatsapp_numbers':site.get_live_whatsapp_phone_numbers(), 'site': site, })
@@ -76,5 +79,5 @@ def add_whatsapp_business_account(request):
                     return HttpResponse("There are no phone numbers assosciated with that Whatsapp Business Account ID (for your whatsapp credentials).",status=500)
             return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
         return HttpResponse("Please enter a whatsapp_business_account_id.",status=500)
-    except Exception as e:
-        return HttpResponse("Server Error, please try again later.",status=500)
+    # except Exception as e:
+    #     return HttpResponse("Server Error, please try again later.",status=500)
