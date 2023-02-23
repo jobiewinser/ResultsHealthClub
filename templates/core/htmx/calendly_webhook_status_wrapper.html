@@ -39,11 +39,11 @@
             "{%endif%}>
             <button class="btn btn-secondary mt-2" {%if not request.user.profile.role == 'a'%}disabled{%endif%}
                 {%if not request.user.profile|get_profile_allowed_to_edit_site_configuration_tag:site%}disabled{%endif%}
-                hx-indicator=".top-htmx-indicator" hx-target="#calendly_webhook_status_wrapper" 
+                hx-indicator="#page_load_indicator" 
                 hx-vals='{"site_pk": "{{site.pk}}"}'
                 hx-post="{% url 'recreate-calendly-webhook-subscription' %}" 
                 hx-push-url="false"
-                hx-swap="outerHTML" hx-trigger="click">
+                hx-swap="none" hx-trigger="click">
                     <i class="fa-solid fa-link" aria-hidden="true"></i> Recreate Calendly Webhook
             </button>
         </div>

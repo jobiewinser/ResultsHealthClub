@@ -10,7 +10,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views import View
 from core.user_permission_functions import get_profile_allowed_to_edit_other_profile, get_profile_allowed_to_edit_site_configuration 
-from core.views import get_site_pks_from_request_and_return_sites
+from core.views import get_site_pks_from_request_and_return_sites,get_site_configuration_context
 from campaign_leads.models import Campaignlead
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
@@ -40,6 +40,7 @@ def get_modal_content(request, **kwargs):
                     context["site"] = request.user.profile.company.part_created_site  
             elif template_name == 'quick_settings':
                 context["site"] = request.user.profile.active_sites_allowed.get(pk=site_pk)   
+                context.update(get_site_configuration_context(request))
             elif template_name == 'edit_contact':
                 site_contact_pk = request.GET.get('site_contact_pk')
                 if site_contact_pk:
@@ -285,7 +286,7 @@ def recreate_calendly_webhook_subscription(request, **kwargs):
         if not site.calendly_organization or not site.calendly_token:
             return HttpResponse("Your Calendly settings are not submitted yet", status=400)        
         response = create_calendly_webhook_subscription(site)
-        return render(request, "core/htmx/calendly_webhook_status_wrapper.html", {'site':site, 'site_webhook_active':(response.get('resource',{}).get('state')=='active'), 'status_reason':response.content.decode("utf-8"), 'hx_swap_oob':True})
+        return render(request, 'core/htmx/calendly_site_settings.html',{'site':site, 'site_webhook_active':(response.get('resource',{}).get('state')=='active'), 'status_reason':response.content.decode("utf-8"), 'hx_swap_oob':True })
     return HttpResponse("", status="403")
 @login_required
 @not_demo_or_superuser_check
@@ -317,7 +318,11 @@ def edit_calendly_configuration(request):
             site.calendly_token = request.POST['calendly_token']        
             site.save()
     response = create_calendly_webhook_subscription(site)
-    return render(request, 'core/htmx/calendly_site_settings.html',{'site':site, 'site_webhook_active':(response.get('resource',{}).get('state')=='active'), 'status_reason':response.content.decode("utf-8"), 'hx_swap_oob':True })
+    try:
+        status_reason = response.content.decode("utf-8")
+    except:
+        status_reason = None
+    return render(request, 'core/htmx/calendly_site_settings.html',{'site':site, 'site_webhook_active':(response.get('resource',{}).get('state')=='active'), 'status_reason':status_reason, 'hx_swap_oob':True })
     
 def create_calendly_webhook_subscription(site):
     calendly = Calendly(site.calendly_token)

@@ -1,7 +1,7 @@
 {%load static tz core_tags user_permission_tags%}
 <div class="row calendly_site_settings" {% if hx_swap_oob %}hx-swap-oob='outerHTML:.calendly_site_settings'{%endif%}>
     <div class="col-md-auto p-2 card card-light">      
-        <form class="" hx-post="{%url 'edit-calendly-configuration'%}" hx-swap="none" hx-indicator="#page_load_indicator " 
+        <form class="" hx-post="{%url 'edit-calendly-configuration'%}" hx-swap="none" hx-indicator="#page_load_indicator" 
         hx-vals='{"site_pk": "{{site.pk}}"}' 
         hx-trigger='submit delay:0.3s' autocomplete="off" autofill="off">
             <div class="row mt-1">
@@ -44,7 +44,7 @@
             </div>
             <div class="row">
                 <div class="col center">  
-                    {%if request.user.profile|get_profile_allowed_to_edit_site_configuration_tag:site%}<button type='submit' class="btn btn-primary btn-sm m-3 calendly_config_submit" disabled>Submit {{hx_swap_oob}}</button>{%endif%}  
+                    {%if request.user.profile|get_profile_allowed_to_edit_site_configuration_tag:site%}<button type='submit' class="btn btn-primary btn-sm m-3 calendly_config_submit" disabled>Submit</button>{%endif%}  
                 </div>
             </div>
         </form>

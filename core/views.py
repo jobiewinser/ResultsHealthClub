@@ -179,8 +179,8 @@ def get_site_configuration_context(request):
                 and webhook.get('organization') == f"{os.getenv('CALENDLY_URL')}/organizations/{site.calendly_organization}":
                     site_webhook_active = True
                     break
-    context['site'] = site
     context['site_webhook_active'] = site_webhook_active
+    context['site'] = site
     if site.company.whatsapp_access_token:
         whatsapp = Whatsapp(site.company.whatsapp_access_token)
         context['whatsapp_business_details'] = whatsapp.get_business(site.company.whatsapp_app_business_id)
