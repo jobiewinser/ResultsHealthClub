@@ -239,11 +239,8 @@ body * {
 
 #content {
     padding: 10px;
-    padding-bottom: 50px;
-    /* top: 7vh; */
-    height: calc(100vh - 60px) !important;
-    
-    /* position: fixed; */
+    padding-bottom: 100px;
+    height: calc(100vh) !important;
     overflow-y: scroll;
     margin: 0;
     height: 100vh;

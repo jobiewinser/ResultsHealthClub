@@ -1,4 +1,6 @@
 {%load static core_tags%}
+{%if request.META.HTTP_HX_REQUEST%}{%include 'campaign_leads/leads_overview/campaign_leads_overview_under_nav.html'%}{%endif%}
+
 <div>
     <style>
         #content {
@@ -9,46 +11,14 @@
         body {
             height:100vh;
         }
-    </style>
-    <div class="row mt-0" style="padding:10px">
-        <div class="htmx-indicator whole_page_disconnected_indicator leads_disconnected_indicator" id="leads_disconnected_indicator">
-            <div class="whole_page_disconnected_indicator_content">
-                <b>Connecting</b> <img class="invert" src="{% static 'img/bars.svg' %}">
-            </div>
-        </div>
-        <script>
-            document.title = "Campaign Leads"; 
-        </script>
-    
-        {%block extra_top_left_buttons %}
-        {%include 'core/htmx/site_selection.html'%}
-        {%include 'campaign_leads/htmx/campaign_category_selection.html'%}
-        {%include 'campaign_leads/htmx/campaign_select.html'%}
-        <button hidden hx-get="{%url 'campaign-leads-overview'%}" hx-push-url="false" hx-swap="innerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_site" hx-trigger="click delay:0.3s" class="btn btn-primary btn-sm"></button>
-        <button hidden hx-get="{%url 'campaign-leads-overview'%}" onclick="$('#campaign_pk').val('').trigger('change')"
-        hx-push-url="false" hx-swap="innerHTML" hx-include=".overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_campaign_category" class="btn btn-primary btn-sm"></button>
-        
-        <button hidden
-            hx-get="{%url 'refresh-leads-board'%}" onclick="$('#campaign_category_pk').val('').trigger('change')"
-            hx-swap="outerHTML" hx-push-url="false" hx-include=".overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#leads_board_span_wrapper" id="filter_campaign"></button>
-        {%endblock extra_top_left_buttons %}
-
-        <div class="col">
-        </div>
-
-        {%block extra_top_right_buttons %}
-        <input id="current_page" hidden value="campaign_leads_overview"/>
-        {% comment %} <div class="col-md-auto p-0 m-1">
-            <span class="badge bg-dark text-white"><h6 class="m-1">Campaign Leads</h6></span>               
-        </div>  {% endcomment %}
-        {%endblock extra_top_right_buttons %}
-    </div>
+    </style>      
     <div class="row p-0 m-0" style="padding:10px">
         <div class="col p-0 m-0" style=""> 
         {%include 'campaign_leads/htmx/leads_board.html' %}
         </div>
     </div>
-</div>
+
+
     <script>
       $(document).ready(function() {
             new Sortable(document.getElementById('archive_area_body'), {
@@ -116,3 +86,4 @@
             </div>
         </div>
     </div>
+</div>

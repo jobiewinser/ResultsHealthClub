@@ -64,7 +64,7 @@ def get_campaign_category_qs(request):
 @method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
 class CampaignleadsOverviewView(TemplateView):
     # this class is used to render the campaign leads overview
-    template_name='campaign_leads/campaign_leads_overview.html'
+    template_name='campaign_leads/leads_overview/campaign_leads_overview.html'
     def get(self, request, *args, **kwargs):
         try:
             return super().get(request, *args, **kwargs)
@@ -77,7 +77,7 @@ class CampaignleadsOverviewView(TemplateView):
     def get_context_data(self, **kwargs):    
         context = super(CampaignleadsOverviewView, self).get_context_data(**kwargs)  
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
-            self.template_name = 'campaign_leads/htmx/campaign_leads_overview_htmx.html'   
+            self.template_name = 'campaign_leads/leads_overview/campaign_leads_overview_htmx.html'   
         context.update(get_leads_board_context(self.request))
         return context
 #this doesn't needs a method decorator because it is not directly used by urls.py
