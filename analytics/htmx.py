@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from django.http import HttpResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 
@@ -524,9 +524,17 @@ def get_current_call_count_distribution(request):
     return render(request, 'analytics/htmx/current_call_count_distribution_data.html', context)
 @login_required
 def get_pipeline(request):
+    context = get_pipeline_context(request)
+    return render(request, 'analytics/htmx/pipeline_data.html', context)
+
+@login_required
+def get_pipeline_data(request):
+    return JsonResponse(get_pipeline_context(request, json_response=True))
+
+def get_pipeline_context(request, json_response=False):    
     context = {}
-    campaign_pks = request.GET.getlist('campaign_pks', [])
-    campaign_category_pks = request.GET.getlist('campaign_category_pks', [])
+    campaign_pks = request.GET.getlist('campaign_pks', request.GET.getlist('campaign_pks[]', []))
+    campaign_category_pks = request.GET.getlist('campaign_category_pks', request.GET.getlist('campaign_category_pks[]', []))
     campaigns = None
     campaign_categorys = None
     sites = []
@@ -537,7 +545,7 @@ def get_pipeline(request):
         campaign_categorys = CampaignCategory.objects.filter(pk__in=campaign_category_pks)
     #     sites = Site.objects.filter(campaigncategory__in=campaign_categorys).exclude(active=False)
     # else:
-    site_pks = request.GET.getlist('site_pks', request.user.profile.active_sites_allowed)
+    site_pks = request.GET.getlist('site_pks', request.GET.getlist('site_pks[]', request.user.profile.active_sites_allowed))
     sites = request.user.profile.active_sites_allowed.filter(pk__in=site_pks)
 
     start_date = datetime.strptime(request.GET.get('start_date'), '%Y-%m-%d')
@@ -634,6 +642,6 @@ def get_pipeline(request):
 
     context['start_date'] = start_date
     context['end_date'] = end_date
-    context['minimum_site_subscription_level_in_query'] = get_minimum_site_subscription_level_from_site_qs(sites)
-    return render(request, 'analytics/htmx/pipeline_data.html', context)
-        
+    if not json_response:
+        context['minimum_site_subscription_level_in_query'] = get_minimum_site_subscription_level_from_site_qs(sites)
+    return context

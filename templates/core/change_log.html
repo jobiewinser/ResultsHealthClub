@@ -1,4 +1,10 @@
 {% extends 'core/base.html' %}
+
+{%block nav%}
+{{block.super}}
+<span id="under_nav_section">
+</span>
+{%endblock%}
 {%block content%}
     {%include 'core/change_log_htmx.html'%}
 {%endblock content%}   

@@ -15,9 +15,9 @@
             hx-swap="outerHTML" hx-push-url="false" hx-include=".non_site_dependant_analytics_filters" hx-indicator="#page_load_indicator" hx-target="#analytics_span_wrapper" id="filter_campaign"></button>        
         
         {%endblock extra_top_left_buttons %}
-        <div class="col">
+        <div class="col p-0">
         </div>
-        <div class="col-auto">
+        <div class="col-auto p-0 ps-1">
             <div class="card">
                 <div class="card-header p-1">
                     <div class="row m-0">
@@ -27,7 +27,7 @@
                                 data-bs-trigger="hover focus" 
                                 data-bs-placement="left"
                                 data-bs-html="true"
-                                data-bs-content="These inputs filter the graphs below by time. The earliest data available for the chosen site(s): {{sites.first.created|short_date_tag}}. This is either due to your subsciprion level or when the site(s) was created"><i class="fa-solid fa-circle-info"></i> Filters
+                                data-bs-content="These inputs filter the graphs below by time. The earliest data available for the chosen site(s) is {{sites.first.created|short_date_tag}}. This is either due to your subscription level or when the site(s) was created"><i class="fa-solid fa-circle-info"></i> Time Filters
                         </small> 
                         </div>
                     </div>
@@ -80,12 +80,12 @@
                 </div>
             </div> 
         </div>
-        <div class="col-auto">
+        <div class="col-auto p-0 ps-1">
             <div class="card">
                 <div class="card-header p-1">
                     <div class="row m-0">
                         <div class="col-auto p-0 ps-2">
-                            <small class="help m-0" style="min-height:30px">Quick Filters</small> 
+                            <small class="help m-0" style="min-height:30px">Quick Time Filters</small> 
                         </div>
                     </div>
                 </div>

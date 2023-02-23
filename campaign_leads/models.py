@@ -214,10 +214,12 @@ class Campaignlead(models.Model):
                 else:
                     campaign_category_pk = 0
                 site = self.campaign.site
-                company = site.company
-                rendered_html = f"<span hx-swap-oob='beforeend:.campaign_column_{campaign.pk}_calls_{new_position},.campaign_category_column_{campaign_category_pk}_calls_{new_position},.site_column_{site.pk}_calls_{new_position},.company_column_{company.pk}_calls_{new_position}'><a hx-get='/refresh-lead-article/{self.pk}/' hx-swap='outerHTML' hx-vals=' U+007B U+0022 flash U+0022 : true U+007D' hx-indicator='#top-htmx-indicator' hx-trigger='load' href='#'></a> </span>"
-                from django.utils.safestring import mark_safe
-                return mark_safe(f"{rendered_html} {delete_htmx}")
+                if site:
+                    company = site.company
+                    rendered_html = f"<span hx-swap-oob='beforeend:.campaign_column_{campaign.pk}_calls_{new_position},.campaign_category_column_{campaign_category_pk}_calls_{new_position},.site_column_{site.pk}_calls_{new_position},.company_column_{company.pk}_calls_{new_position}'><a hx-get='/refresh-lead-article/{self.pk}/' hx-swap='outerHTML' hx-vals=' U+007B U+0022 flash U+0022 : true U+007D' hx-indicator='#top-htmx-indicator' hx-trigger='load' href='#'></a> </span>"
+                    from django.utils.safestring import mark_safe
+                    return mark_safe(f"{rendered_html} {delete_htmx}")
+                return ""
     def check_if_should_send_first_message(self):        
         # from whatsapp.models import WhatsAppMessage
         if not self.archived and self.site_contact and self.contact and not WhatsAppMessage.objects.filter(lead=self).filter(send_order=1):

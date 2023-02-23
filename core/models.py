@@ -410,14 +410,14 @@ class WhatsappBusinessAccount(models.Model):
     @property
     def active_live_templates(self):
         return self.whatsapptemplate_set.filter(status="APPROVED").exclude(archived=True).exclude(name__icontains="sample")
-    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-        if self.site and self.active and self.whatsappnumber:
+    # def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        # if self.site and self.active and self.whatsappnumber:
             # for whatsapp_number in self.whatsappnumber.all():
             #     whatsapp_number.company = self.site.company
             #     whatsapp_number.save()
-            self.whatsappnumber.company = self.site.company
-            self.whatsappnumber.save()
-        super(WhatsappBusinessAccount, self).save(force_insert, force_update, using, update_fields)
+            # self.whatsappnumber.company = self.site.company
+            # self.whatsappnumber.save()
+        # super(WhatsappBusinessAccount, self).save(force_insert, force_update, using, update_fields)
 
 class PhoneNumber(PolymorphicModel):
     number = models.CharField(max_length=30, null=True, blank=True)

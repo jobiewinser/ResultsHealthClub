@@ -18,6 +18,7 @@ urlpatterns = [
     path('get-calls-made-per-day/', analyticshtmx.get_calls_made_per_day, name='get-calls-made-per-day' ),
     
     path('get-pipeline/', analyticshtmx.get_pipeline, name='get-pipeline' ),
+    path('get-pipeline-data/', analyticshtmx.get_pipeline_data, name='get-pipeline-data' ),
     
     
     # path('get-base-analytics/', analyticshtmx.get_base_analytics, name='get-base-analytics' ),

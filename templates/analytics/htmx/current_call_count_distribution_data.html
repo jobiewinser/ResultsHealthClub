@@ -1,8 +1,6 @@
 {%load core_tags%}
 <div class="row">
-    <div class="col">
-    </div>
-    <div class="col-md-auto center text-primary" style="text-align:left">
+    <div class="col center text-primary" style="text-align:left">
         {%if call_counts_tuples%}
         {%for call_count_tuple in call_counts_tuples%}
         {% with call_count_tuple.3|percentage_to_colour as percentage_to_colour %}
@@ -32,7 +30,5 @@
         {%else%}
         No Data Yet
         {%endif%}
-    </div>
-    <div class="col">
     </div>
 </div>

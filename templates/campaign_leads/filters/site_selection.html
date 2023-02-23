@@ -2,7 +2,10 @@
 {%load core_tags%}
 <div class="col-md-auto ps-1 pe-1">
     <div id="site_list_wrapper_multiple">  
-        <label for="site_pks" style="width:300px">
+      <small>  
+        <label for="site_pks" 
+        {% comment %} style="width:300px" {% endcomment %}
+        >
           Filter <b>Sites</b><br>
           <select multiple="multiple" style="width:100%" class="form-control select2tag select2-styling overview_table_filters non_site_dependant_overview_table_filters non_site_dependant_analytics_filters" name="site_pks" id="site_pks" onchange="$('#change_site').click();">
               {% comment %} {%if not hide_show_all%}<option value="" {%if not request|get_key_in_get_or_post:'site_pks'%}selected{%endif%}>Show All Sites {{request|get_key_in_get_or_post:'site_pks'}}</option>{%endif%} {% endcomment %}
@@ -17,5 +20,6 @@
               {%endfor%}
           </select>
         </label>
+      </small>
     </div>
-</div>
+</div> 

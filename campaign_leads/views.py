@@ -239,7 +239,7 @@ class CampaignConfigurationView(TemplateView):
             self.template_name = 'campaign_leads/campaign_configuration/campaign_configuration_htmx.html'  
         company = self.request.user.profile.company
         for site in company.active_sites:
-            manual_campaign, created = ManualCampaign.objects.get_or_create(site=site, name = "Manually Created", company=site.company)
+            manual_campaign, created = ManualCampaign.objects.get_or_create(site=site, company=site.company, name = "Manually Created")
             manual_campaign.company = site.company
             manual_campaign.save()
         try:

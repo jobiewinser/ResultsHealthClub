@@ -52,7 +52,7 @@ def get_modal_content(request, **kwargs):
                     context['site'] = context['lead'].campaign.site
                 if not ManualCampaign.objects.filter(site__in=context['sites']).exists():
                     for site in request.user.profile.company.active_sites:
-                        manual_campaign, created = ManualCampaign.objects.get_or_create(site=site, name = "Manually Created")
+                        manual_campaign, created = ManualCampaign.objects.get_or_create(site=site, company=site.company, name = "Manually Created")
                         manual_campaign.company = site.company
                         manual_campaign.save()
                 context['campaigns'] = Campaign.objects.filter(site__in=request.user.profile.active_sites_allowed)
@@ -177,7 +177,7 @@ def refresh_booking_row(request, **kwargs):
     logger.debug(str(request.user))
     try:
         lead = Campaignlead.objects.get(pk=kwargs.get('lead_pk'), campaign__site__in=request.user.profile.active_sites_allowed)       
-        return render(request, 'campaign_leads/bookings_overview/campaign_booking_row_htmx.html', {'lead':lead})
+        return render(request, 'campaign_leads/bookings_overview/booking_row_htmx.html', {'lead':lead})
     except Exception as e:
         logger.debug("get_leads_column_meta_data Error "+str(e))
         #return HttpResponse(e, status=500)
@@ -257,7 +257,7 @@ def mark_archived(request, **kwargs):
             # lead.sold = False
         lead.save()
         lead.trigger_refresh_websocket(refresh_position=False)
-        return render(request, "campaign_leads/bookings_overview/campaign_booking_row.html", {'lead':lead}) 
+        return render(request, "campaign_leads/bookings_overview/booking_row.html", {'lead':lead}) 
     except Exception as e:
         logger.debug("mark_archived Error "+str(e))
         #return HttpResponse(e, status=500)
@@ -300,7 +300,7 @@ def mark_arrived(request, **kwargs):
         lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'), campaign__site__in=request.user.profile.active_sites_allowed)
         lead.arrived = not lead.arrived
         lead.save()
-        return render(request, "campaign_leads/bookings_overview/campaign_booking_row.html", {'lead':lead}) 
+        return render(request, "campaign_leads/bookings_overview/booking_row.html", {'lead':lead}) 
     except Exception as e:
         logger.debug("mark_archived Error "+str(e))
         #return HttpResponse(e, status=500)
@@ -331,7 +331,7 @@ def mark_sold(request, **kwargs):
             lead.arrived = True
         lead.archived = False
         lead.save()
-        return render(request, "campaign_leads/bookings_overview/campaign_booking_row.html", {'lead':lead}) 
+        return render(request, "campaign_leads/bookings_overview/booking_row.html", {'lead':lead}) 
     except Exception as e:
         logger.debug("mark_archived Error "+str(e))
         #return HttpResponse(e, status=500)
@@ -346,7 +346,7 @@ def mark_sold(request, **kwargs):
 #             lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'))
 #             active_sales = lead.active_sales_qs
 #             active_sales.update(archived=True)
-#             return render(request, "campaign_leads/bookings_overview/campaign_booking_row.html", {'lead':lead}) 
+#             return render(request, "campaign_leads/bookings_overview/booking_row.html", {'lead':lead}) 
 #     except Exception as e:
 #         logger.debug("mark_archived Error "+str(e))
 #         #return HttpResponse(e, status=500)
