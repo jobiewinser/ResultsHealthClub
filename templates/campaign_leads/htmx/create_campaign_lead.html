@@ -4,7 +4,7 @@
         <div class="col center">     
             
             <div class="form-floating m-1">     
-                <select class="form-select campaign_bookings_inputs" name="site_pk" id="campaign_site">
+                <select class="form-select bookings_inputs" name="site_pk" id="campaign_site">
                     {%for site in request.user.profile.active_sites_allowed%}
                     <option {%if site.pk|to_str == request|get_key_in_get_or_post:'site_pk' %}selected{%endif%} value="{{site.pk}}">{{site.name}}</option>
                     {%endfor%}
@@ -13,13 +13,13 @@
             </div>
             
             <div class="form-floating m-1">
-                <input name="first_name" maxlength="25" id="campaign_first_name" class="form-control campaign_bookings_inputs"/>
+                <input name="first_name" maxlength="25" id="campaign_first_name" class="form-control bookings_inputs"/>
                 <label for="campaign_first_name">Customer Name<span class="required">*</span></label>
             </div>
             
             
             <div class="form-floating m-1">
-                <input name="email" id="campaign_email" class="form-control campaign_bookings_inputs"/>     
+                <input name="email" id="campaign_email" class="form-control bookings_inputs"/>     
                 <label for="campaign_email">Customer Email</label>
             </div>    
             
@@ -27,7 +27,7 @@
             <div class="row m-0 p-0">
                 <div class="col-md-auto p-0">
                     <div class="form-floating m-1">
-                        <select name="country_code" class="form-select campaign_bookings_inputs" id="campaign_phone_extension">
+                        <select name="country_code" class="form-select bookings_inputs" id="campaign_phone_extension">
                             <option data-country_code="GB" value="44" Selected>UK (+44)</option>
                             <option data-country_code="US" value="1">USA (+1)</option>
                             <optgroup label="Other countries">
@@ -252,7 +252,7 @@
                 </div>    
                 <div class="col m-1 p-0">
                     <div class="form-floating">
-                        <input name="phone" id="campaign_phone" class="form-control campaign_bookings_inputs"/>
+                        <input name="phone" id="campaign_phone" class="form-control bookings_inputs"/>
                         <label for="campaign_phone" class="nowrap">Customer Phone Number<span class="required">*</span></label>
                     </div>
                 </div>
@@ -263,7 +263,7 @@
     <div class="row">
         <div class="col center">
             <button class="btn btn-success"
-                hx-include=".campaign_bookings_inputs"
+                hx-include=".bookings_inputs"
                 onclick="htmx.ajax('GET', '{% url 'campaign-lead-get-modal-content'%}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'edit_lead'}})"
                 hx-push-url="false"
                 

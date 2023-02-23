@@ -133,7 +133,7 @@
                                 {%for temp_user in company.users%}
                                 {%with temp_user.profile as profile%}
                                 <tr id="user_configuration_row_{{profile.pk}}">
-                                    {%include 'core/htmx/company_configuration_row.html'%}
+                                    {%include 'core/company_configuration/company_configuration_row.html'%}
                                 </tr>
                                 {%endwith%}
                                 {%endfor%}
@@ -156,5 +156,7 @@
         <div class="col">
         </div>
     </div>
-<span>
-    
+<span>    
+
+<span id="under_nav_section" {%if request.META.HTTP_HX_REQUEST%}hx-swap-oob='outerHTML:#under_nav_section'{%endif%}>
+</span>

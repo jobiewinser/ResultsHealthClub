@@ -32,11 +32,11 @@
         </thead>
         <tbody> 
             {%for lead in leads%}
-            {%include 'campaign_leads/htmx/campaign_booking_row.html'%}
+            {%include 'campaign_leads/bookings_overview/campaign_booking_row.html'%}
             {%endfor%}
         </tbody>
     </table>
 </div>
 {%if request.META.HTTP_HX_REQUEST%}
-{%include 'campaign_leads/htmx/campaign_bookings_table_filters_toggle_div_oob.html'%}
+{%include 'campaign_leads/bookings_overview/bookings_table_filters_toggle_div_oob.html'%}
 {%endif%}

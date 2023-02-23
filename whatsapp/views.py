@@ -483,7 +483,7 @@ def whatsapp_number_change_alias(request):
 #         site = whatsappnumber.site
 #         site.default_number = whatsappnumber
 #         site.save()
-#         return render(request, 'core/htmx/site_configuration_table_htmx.html', {'whatsapp_numbers':site.get_live_whatsapp_phone_numbers(), 'site': site, })
+#         return render(request, 'core/site_configuration/site_configuration_table_htmx.html', {'whatsapp_numbers':site.get_live_whatsapp_phone_numbers(), 'site': site, })
 #         # 'site_list': get_available_sites_for_user(request.user)})
 #     return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
     

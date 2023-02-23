@@ -41,7 +41,7 @@ data-bs-content="
 </p>
 {%endif%}
 "> 
-    {%include 'campaign_leads/htmx/campaign_configuration_select.html'%}
+    {%include 'campaign_leads/campaign_configuration/campaign_configuration_select.html'%}
 <button hidden 
 hx-post="{% url 'set-campaign-site' campaign_pk=campaign.pk %}" 
 hx-swap="outerHTML" hx-include="#site_pk_{{campaign.pk}}" 

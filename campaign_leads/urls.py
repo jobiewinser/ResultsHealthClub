@@ -6,7 +6,7 @@ urlpatterns = [
 
 
     path('refresh-booking-table/', campaignleadsviews.refresh_booking_table_htmx, name='refresh-booking-table'),
-    path('booking-overview/', campaignleadsviews.CampaignBookingsOverviewView.as_view(), name='campaign-booking-overview'),
+    path('booking-overview/', campaignleadsviews.BookingsOverviewView.as_view(), name='campaign-booking-overview'),
     path('refresh-leads-board/', campaignleadsviews.refresh_leads_board, name='refresh-leads-board'),
     path('leads-and-calls/', campaignleadsviews.CampaignleadsOverviewView.as_view(), name='campaign-leads-overview'),    
 

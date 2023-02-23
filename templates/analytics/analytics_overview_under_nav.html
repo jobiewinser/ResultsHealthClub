@@ -1,0 +1,185 @@
+{%load static core_tags%}
+
+<span id="under_nav_section" {%if request.META.HTTP_HX_REQUEST%}hx-swap-oob='outerHTML:#under_nav_section'{%endif%}>
+    <div class="row p-1 border-bottom">
+        {%block extra_top_left_buttons %}
+        {%include 'campaign_leads/filters/site_selection.html'%}
+        {%include 'campaign_leads/filters/campaign_category_selection.html'%}
+        {%include 'campaign_leads/filters/campaign_select.html'%}
+
+        <button hidden hx-get="{% url 'analytics-overview' %}" hx-push-url="false" hx-swap="innerHTML" hx-include=".non_site_dependant_analytics_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
+        <button hidden hx-get="{%url 'analytics-overview'%}" onclick="$('#campaign_pk').val('').trigger('change')"
+        hx-push-url="false" hx-swap="innerHTML" hx-include=".overview_table_filters, .non_site_dependant_analytics_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_campaign_category" class="btn btn-primary btn-sm"></button>
+        <button hidden
+            hx-get="{%url 'refresh-analytics'%}"
+            hx-swap="outerHTML" hx-push-url="false" hx-include=".non_site_dependant_analytics_filters" hx-indicator="#page_load_indicator" hx-target="#analytics_span_wrapper" id="filter_campaign"></button>        
+        
+        {%endblock extra_top_left_buttons %}
+        <div class="col">
+        </div>
+        <div class="col-auto">
+            <div class="card">
+                <div class="card-header p-1">
+                    <div class="row m-0">
+                        <div class="col-auto p-0 ps-2">
+                            <small class="help m-0" style="min-height:30px"
+                                data-bs-toggle="popover" 
+                                data-bs-trigger="hover focus" 
+                                data-bs-placement="left"
+                                data-bs-html="true"
+                                data-bs-content="These inputs filter the graphs below by time. The earliest data available for the chosen site(s): {{sites.first.created|short_date_tag}}. This is either due to your subsciprion level or when the site(s) was created"><i class="fa-solid fa-circle-info"></i> Filters
+                        </small> 
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body center p-1" id="filters_card_body">
+                    <div class="row m-0">
+                        <div class="col-auto p-0">
+                            <div class="row m-0">
+                                <div class="col p-0">
+                                </div>
+                                <div class="col m-1 right p-0">
+                                    <input id="start_date" value="{%if start_date%}{{start_date}}{%elif not end_date and not start_date and minimum_site_subscription_level_in_query.numerical|to_int == 0%}{{''|today_date_tag|add_days:-7|date_to_date_input_prefill}}{%elif not end_date and not start_date and not minimum_site_subscription_level_in_query.numerical|to_int == 0%}{{''|today_date_tag|add_months:-1|date_to_date_input_prefill}}{%endif%}" 
+                                        min="{%if minimum_site_subscription_level_in_query.analytics_seconds and not request.user.profile.active_sites_allowed.first.created > ''|today_date_tag|subtract_seconds_to_days_rounded_up:minimum_site_subscription_level_in_query.analytics_seconds%}{{''|today_date_tag|subtract_seconds_to_days_rounded_up:minimum_site_subscription_level_in_query.analytics_seconds|date_to_date_input_prefill}}{%else%}{{request.user.profile.active_sites_allowed.first.created|date_to_date_input_prefill}}{%endif%}" 
+                                        max="{{''|today_date_input_tag}}" class="form-control form-control-xs non_site_dependant_analytics_filters" type="date" name="start_date"
+                                        onchange="$('#refresh_analytics').click();"/>
+                                </div>
+                                <div class="col-md-auto m-1 mt-0 p-0">
+                                    <small>To</small>
+                                </div>
+                                <div class="col m-1 left p-0">
+                                    <input id="end_date" value="{%if end_date%}{{end_date}}{%else%}{{''|today_date_input_tag}}{%endif%}" 
+                                        min="{{''|today_date_tag|add_years:-3|date_to_date_input_prefill}}" 
+                                        max="{{''|today_date_input_tag}}" class="form-control form-control-xs non_site_dependant_analytics_filters" type="date" name="end_date"
+                                        onchange="$('#refresh_analytics').click();"/>
+                                </div>
+                                <div class="col p-0">
+                                </div>
+                            </div>
+                            <div class="row m-0">
+                                <div class="col p-0">
+                                </div>
+                                <div class="col-md-auto p-0 m-1 ">
+                                    <button
+                                        hx-include=".non_site_dependant_analytics_filters, .site_dependant_analytics_filters" hx-indicator="#page_load_indicator" id="refresh_analytics"
+                                        onclick="$('.refresh_date_specific_analytic').click(); $('.refresh_non_date_specific_analytic').click();"
+                                        {% comment %} hx-get="{%url 'refresh-analytics'%}" hx-target="#analytics_span_wrapper" hx-push-url="false" hx-swap="innerHTML"  {% endcomment %}
+                                        class="btn btn-success btn-xs"><i class="fa-solid fa-arrows-rotate"></i> Refresh</button>
+                                </div>
+                                <div class="col-md-auto p-0 m-1 right">
+                                    <button             
+                                        hx-include="" hx-indicator="#page_load_indicator"
+                                        hx-get="{%url 'refresh-analytics'%}" hx-target="#analytics_span_wrapper" hx-push-url="false" hx-swap="innerHTML" 
+                                        class="btn btn-warning  btn-xs"><i class="fa-solid fa-ban"></i> Reset</button>
+                                </div>
+                                <div class="col p-0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>                    
+                </div>
+            </div> 
+        </div>
+        <div class="col-auto">
+            <div class="card">
+                <div class="card-header p-1">
+                    <div class="row m-0">
+                        <div class="col-auto p-0 ps-2">
+                            <small class="help m-0" style="min-height:30px">Quick Filters</small> 
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body center p-1" id="filters_card_body">
+                    <div class="row m-0">
+                        <div class="col p-0">
+                            <div class="row m-0">
+                                <div class="col-md-auto m-1 p-0">
+                                    <button 
+                                        class="btn btn-secondary btn-xs quick_filter_date_button {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_input_tag%}active{%endif%}" 
+                                        onclick="$('#start_date').val('{{''|today_date_tag|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change'); $('.quick_filter_date_button').removeClass('active'); $(this).addClass('active');">
+                                        <small>{{''|today_date_tag|nice_date_tag}} (day)</small>
+                                    </button>
+                                </div>
+                                <div class="col-md-auto m-1 p-0">
+                                    <div
+                                        {% comment %} {%if request.user.profile.active_sites_allowed.first.created > ''|today_date_tag|add_days:-7 %}                                
+                                        data-bs-toggle="popover" 
+                                        data-bs-trigger="hover focus" 
+                                        data-bs-placement="top"
+                                        data-bs-title="Why is this disabled?"
+                                        data-bs-content="None of the sites in this query were created before a week ago"                                                           
+                                        {%endif%} {% endcomment %}
+                                        >
+                                        <button 
+                                            {% comment %} {%if request.user.profile.active_sites_allowed.first.created > ''|today_date_tag|add_days:-7 %}disabled{%endif%} {% endcomment %}
+                                            class="btn btn-secondary btn-xs quick_filter_date_button {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_tag|add_days:-7|date_to_date_input_prefill%}active{%elif not end_date and not start_date and minimum_site_subscription_level_in_query.numerical|to_int == 0%}active{%endif%}" 
+                                            onclick="$('#start_date').val('{{''|today_date_tag|add_days:-7|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change'); $('.quick_filter_date_button').removeClass('active'); $(this).addClass('active');">
+                                            <small>{{''|today_date_tag|add_days:-7|nice_date_tag}} (week)</small>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row m-0">                                
+                                <div class="col-md-auto m-1 p-0">
+                                    <div 
+                                        {%if minimum_site_subscription_level_in_query.numerical|to_int == 0 and not demo %}
+                                        data-bs-toggle="popover" 
+                                        data-bs-trigger="hover focus" 
+                                        data-bs-placement="top"
+                                        data-bs-title="Why is this disabled?"
+                                        data-bs-content="One of the sites in your query is not permitted to look this far back"   
+                                        {% comment %} {%elif request.user.profile.active_sites_allowed.first.created > ''|today_date_tag|add_months:-1 %}
+                                        data-bs-toggle="popover" 
+                                        data-bs-trigger="hover focus" 
+                                        data-bs-placement="top"
+                                        data-bs-title="Why is this disabled?"
+                                        data-bs-content="None of the sites in this query were created before a month ago"    {% endcomment %}
+                                        {%endif%}>
+                                        <button 
+                                            {%if minimum_site_subscription_level_in_query.numerical|to_int == 0 and not demo%}disabled{%endif%}
+                                            {% comment %} {%if request.user.profile.active_sites_allowed.first.created > ''|today_date_tag|add_months:-1 %}disabled{%endif%} {% endcomment %}
+                                            class="btn btn-secondary btn-xs quick_filter_date_button {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_tag|add_months:-1|date_to_date_input_prefill%}active{%elif not end_date and not start_date and not minimum_site_subscription_level_in_query.numerical|to_int == 0%}active{%endif%}" 
+                                            onclick="$('#start_date').val('{{''|today_date_tag|add_months:-1|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change'); $('.quick_filter_date_button').removeClass('active'); $(this).addClass('active');">
+                                            <small>{{''|today_date_tag|add_months:-1|nice_date_tag}} (month) {%if minimum_site_subscription_level_in_query.numerical|to_int == 0%}<b>Basic</b>{%endif%}</small>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-auto m-1 p-0">
+                                    <div
+                                        {%if not minimum_site_subscription_level_in_query.numerical|to_int == 2 and not demo %}
+                                        data-bs-toggle="popover" 
+                                        data-bs-trigger="hover focus" 
+                                        data-bs-placement="top"
+                                        data-bs-title="Why is this disabled?"
+                                        data-bs-content="One of the sites in your query is not permitted to look this far back" 
+                                        {% comment %} {%elif request.user.profile.active_sites_allowed.first.created > ''|today_date_tag|add_years:-1 %}
+                                        data-bs-toggle="popover" 
+                                        data-bs-trigger="hover focus" 
+                                        data-bs-placement="top"
+                                        data-bs-title="Why is this disabled?"
+                                        data-bs-content="None of the sites in this query were created before a year ago"  {% endcomment %}
+                                        {%endif%}>
+                                        <button 
+                                            {%if not minimum_site_subscription_level_in_query.numerical|to_int == 2 and not demo%}disabled{%endif%}
+                                            {% comment %} {%if request.user.profile.active_sites_allowed.first.created > ''|today_date_tag|add_years:-1 %}disabled{%endif%} {% endcomment %}
+                                            class="btn btn-secondary btn-xs quick_filter_date_button {%if end_date == ''|today_date_input_tag and start_date == ''|today_date_tag|add_years:-1|date_to_date_input_prefill%}active{%endif%}" 
+                                            onclick="$('#start_date').val('{{''|today_date_tag|add_years:-1|date_to_date_input_prefill}}'); $('#end_date').val('{{''|today_date_input_tag}}').trigger('change'); $('.quick_filter_date_button').removeClass('active'); $(this).addClass('active');">
+                                            <small>{{''|today_date_tag|add_years:-1|nice_date_tag}} (year) {%if not minimum_site_subscription_level_in_query.numerical|to_int == 2%}<i class="fa-solid fa-rectangle-pro"></i>{%endif%}</small>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div> 
+        </div>
+
+        {%block extra_top_right_buttons %}
+        <input id="current_page" hidden value="analytics_overview"/>
+        {%endblock extra_top_right_buttons %}
+    </div>
+    
+</span>
+

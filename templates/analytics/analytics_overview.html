@@ -1,4 +1,8 @@
 {% extends 'core/base.html' %}
+{%block nav%}
+{{block.super}}
+{%include 'analytics/analytics_overview_under_nav.html'%}
+{%endblock%}
 {%block content%}       
     {%include 'analytics/htmx/analytics_overview_htmx.html'%}
 {%endblock content%}   

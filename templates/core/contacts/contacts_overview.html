@@ -1,0 +1,8 @@
+{% extends 'core/base.html' %}
+{%block nav%}
+{{block.super}}
+{%include 'core/contacts/contacts_overview_under_nav.html'%}
+{%endblock%}
+{%block content%}   
+    {%include 'core/contacts/contacts_overview_htmx.html'%}
+{%endblock content%}

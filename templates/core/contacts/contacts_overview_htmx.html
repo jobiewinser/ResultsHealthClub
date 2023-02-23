@@ -3,30 +3,13 @@
     <script>
         document.title = "Contacts";
         $(document).ready(function() {
+            select2stuff()
             try{$('#choose_template_message_site_contact_table').dataTable().fnDestroy()}catch{};
                 $('#choose_template_message_site_contact_table').DataTable({
                     responsive: true,
                 });        
         });
     </script>
-
-
-    <div class="row mt-0">
-        {%block extra_top_left_buttons %}
-        {%with True as hide_show_all%}
-        {%include 'core/htmx/site_selection_single.html'%}
-        {%endwith%}
-        <button hidden hx-get="{%url 'contacts-overview'%}" hx-push-url="false" hx-swap="innerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
-        {%endblock extra_top_left_buttons %}
-
-        <div class="col">
-        </div>
-
-        {%block extra_top_right_buttons %}
-        <input id="current_page" hidden value="contacts"/>
-        {%endblock extra_top_right_buttons %}
-    </div>
-
     <div class="row">
         <div class="col alert alert-info" style=""> 
             <p>
@@ -67,7 +50,7 @@
                 <tbody>
                     {%with site.return_phone_numbers as whatsappnumbers%}
                     {% for site_contact in site_contacts %}
-                        {%include 'core/htmx/contacts_overview_row.html'%}
+                        {%include 'core/contacts/contacts_overview_row.html'%}
                     {% endfor %}
                     {%endwith%}
                 </tbody>
@@ -75,3 +58,4 @@
         </div>
     </div>
 <span>
+{%if request.META.HTTP_HX_REQUEST%}{%include 'core/contacts/contacts_overview_under_nav.html'%}{%endif%}

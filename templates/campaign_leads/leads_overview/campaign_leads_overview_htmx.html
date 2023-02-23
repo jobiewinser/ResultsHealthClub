@@ -1,6 +1,4 @@
 {%load static core_tags%}
-{%if request.META.HTTP_HX_REQUEST%}{%include 'campaign_leads/leads_overview/campaign_leads_overview_under_nav.html'%}{%endif%}
-
 <div>
     <style>
         #content {
@@ -87,3 +85,4 @@
         </div>
     </div>
 </div>
+{%if request.META.HTTP_HX_REQUEST%}{%include 'campaign_leads/leads_overview/campaign_leads_overview_under_nav.html'%}{%endif%}

@@ -1,14 +1,14 @@
 {%load core_tags%}
-{%include 'campaign_leads/htmx/campaign_bookings_table.html'%}
+{%include 'campaign_leads/bookings_overview/bookings_table.html'%}
 
-{%include 'campaign_leads/htmx/campaign_bookings_table_sold_toggle_div.html'%}
-{%include 'campaign_leads/htmx/campaign_bookings_table_archived_toggle_div.html'%}
+{%include 'campaign_leads/bookings_overview/bookings_table_sold_toggle_div.html'%}
+{%include 'campaign_leads/bookings_overview/bookings_table_archived_toggle_div.html'%}
 
 {% comment %} <span hx-swap-oob="true" id="site_pk_span">   
     <input type="text" style="display:None" id="site_pk" name="site_pk" value="{{request|get_key_in_get_or_post:'site_pk'}}"/>
 </span> {% endcomment %}
 <div hx-swap-oob="true" id="campaign_list_wrapper">    
-    {%include 'campaign_leads/htmx/campaign_select.html'%}
+    {%include 'campaign_leads/filters/campaign_select.html'%}
 </div>
 <span hx-swap-oob="true" id="progress-span">  
     <div class="progress">  

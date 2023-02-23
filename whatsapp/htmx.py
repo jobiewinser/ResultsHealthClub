@@ -66,12 +66,12 @@ def add_whatsapp_business_account(request):
                             whatsapp_business_account.site = site
                             whatsapp_business_account.active = True
                             whatsapp_business_account.save()
-                            return render(request, 'core/htmx/site_configuration_table_htmx.html', {'whatsapp_numbers':site.get_live_whatsapp_phone_numbers(), 'site': site, })
+                            return render(request, 'core/site_configuration/site_configuration_table_htmx.html', {'whatsapp_numbers':site.get_live_whatsapp_phone_numbers(), 'site': site, })
                         # else:
                         #     whatsapp_business_account.delete()
                     whatsapp_business_account.site = site
                     whatsapp_business_account.save()
-                    return render(request, 'core/htmx/site_configuration_table_htmx.html', {'whatsapp_numbers':site.get_live_whatsapp_phone_numbers(), 'site': site, })
+                    return render(request, 'core/site_configuration/site_configuration_table_htmx.html', {'whatsapp_numbers':site.get_live_whatsapp_phone_numbers(), 'site': site, })
                 else:
                     return HttpResponse("There are no phone numbers assosciated with that Whatsapp Business Account ID (for your whatsapp credentials).",status=500)
             return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)

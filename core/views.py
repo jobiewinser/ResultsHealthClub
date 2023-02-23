@@ -201,12 +201,12 @@ def get_contacts_overview_context(request):
 @method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
 @method_decorator(not_demo_or_superuser_check, name='post')
 class SiteConfigurationView(TemplateView):
-    template_name='core/site_configuration.html'
+    template_name='core/site_configuration/site_configuration.html'
 
     def get(self, request, *args, **kwargs):   
         # site = Site.objects.get(pk=site_pk) 
         if request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
-            self.template_name = 'core/htmx/site_configuration_htmx.html'
+            self.template_name = 'core/site_configuration/site_configuration_htmx.html'
         return super(SiteConfigurationView, self).get(request, args, kwargs)
 
     def get_context_data(self):    
@@ -232,10 +232,10 @@ class SiteConfigurationView(TemplateView):
 @method_decorator(login_required, name='dispatch')
 @method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
 class ContactsOverviewView(TemplateView):
-    template_name='core/contacts_overview.html'
+    template_name='core/contacts/contacts_overview.html'
     def get(self, request, *args, **kwargs):   
         if request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
-            self.template_name = 'core/htmx/contacts_overview_htmx.html'
+            self.template_name = 'core/contacts/contacts_overview_htmx.html'
         return super(ContactsOverviewView, self).get(request, args, kwargs)
     def get_context_data(self):    
         context = super(ContactsOverviewView, self).get_context_data()
@@ -246,7 +246,7 @@ class ContactsOverviewView(TemplateView):
 @method_decorator(login_required, name='dispatch')
 # @method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
 class CompanyConfigurationView(TemplateView):
-    template_name='core/company_configuration.html'
+    template_name='core/company_configuration/company_configuration.html'
 
     def get(self, request, *args, **kwargs):
         if not request.user.profile.role == 'a':
@@ -260,7 +260,7 @@ class CompanyConfigurationView(TemplateView):
         self.request.GET._mutable = True       
         context = super(CompanyConfigurationView, self).get_context_data(**kwargs)
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
-            self.template_name = 'core/htmx/company_configuration_htmx.html'
+            self.template_name = 'core/company_configuration/company_configuration_htmx.html'
         # context['site_list'] = get_available_sites_for_user(self.request.user)
         context['company'] = self.request.user.profile.company
         for profile in context['company'].profile_set.all():
@@ -282,7 +282,7 @@ def change_profile_role(request):
             context['profile'] = profile
             context['role_choices'] = ROLE_CHOICES
             # context['site_list'] = get_available_sites_for_user(request.user)
-            return render(request, 'core/htmx/company_configuration_row.html', context)
+            return render(request, 'core/company_configuration/company_configuration_row.html', context)
     return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
 @login_required
 @not_demo_or_superuser_check
@@ -297,7 +297,7 @@ def change_profile_site(request):
             context['profile'] = profile
             context['role_choices'] = ROLE_CHOICES
             # context['site_list'] = get_available_sites_for_user(request.user)
-            return render(request, 'core/htmx/company_configuration_row.html', context)
+            return render(request, 'core/company_configuration/company_configuration_row.html', context)
     return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
 @login_required
 @not_demo_or_superuser_check
@@ -323,7 +323,7 @@ def change_site_allowed(request):
         context['error'] = "You do not have permission to do this"
     if request.POST.get('add_user', False):
         context['site'] = Site.objects.get(pk=site_pk)
-        return render(request, 'core/htmx/site_configuration_htmx.html', context)
+        return render(request, 'core/site_configuration/site_configuration_htmx.html', context)
     return render(request, 'campaign_leads/htmx/edit_permissions.html', context)
 @login_required
 def submit_feedback_form(request):
@@ -998,7 +998,7 @@ def profile_assign_color_htmx(request):
     profile = Profile.objects.get(pk=request.POST.get('profile_pk'), site__in=request.user.profile.active_sites_allowed)
     profile.color = hex_to_rgb_tuple(request.POST.get('color', "60F83D"))
     profile.save()
-    return render(request, 'core/htmx/company_configuration_row.html', {'profile':profile})
+    return render(request, 'core/company_configuration/company_configuration_row.html', {'profile':profile})
 
 @login_required
 # @not_demo_or_superuser_check
@@ -1053,5 +1053,5 @@ def edit_contact(request, **kwargs):
     site_contact.last_name = last_name
     site_contact.save()
     if site_contact_pk:
-        return render(request, 'core/htmx/contacts_overview_row.html', {'site_contact':site_contact, 'site':site_contact.site, 'whatsappnumbers':site_contact.site.return_phone_numbers(), 'swap_td':True})
+        return render(request, 'core/contacts/contacts_overview_row.html', {'site_contact':site_contact, 'site':site_contact.site, 'whatsappnumbers':site_contact.site.return_phone_numbers(), 'swap_td':True})
     return render(request, 'campaign_leads/htmx/edit_contact.html', {'site_contact':site_contact, 'site':site_contact.site})

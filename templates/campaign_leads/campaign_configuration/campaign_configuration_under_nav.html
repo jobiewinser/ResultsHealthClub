@@ -1,0 +1,24 @@
+{%load static core_tags%}
+
+<span id="under_nav_section" {%if request.META.HTTP_HX_REQUEST%}hx-swap-oob='outerHTML:#under_nav_section'{%endif%}>
+    <div class="row p-1 border-bottom">
+        {%block extra_top_left_buttons %}
+        
+        {%include 'core/htmx/site_selection_single.html'%}
+        
+        <button hidden hx-get="{%url 'campaign-configuration'%}" hx-push-url="false" hx-swap="innerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
+        
+        <button hidden
+            hx-get="{%url 'campaign-configuration'%}" onclick="$('#campaign_pk').val('').trigger('change')"
+            hx-swap="innerHTML" hx-push-url="false" hx-include=".overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_campaign_category"></button>
+        {%endblock extra_top_left_buttons %}
+
+        <div class="col">
+        </div>
+
+        {%block extra_top_right_buttons %} 
+        <input id="current_page" hidden value="campaign_configuration"/>
+        {%endblock extra_top_right_buttons %}
+    </div>
+</span>
+

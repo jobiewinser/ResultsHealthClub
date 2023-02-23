@@ -156,13 +156,13 @@ def refresh_leads_board(request):
 
 @method_decorator(login_required, name='dispatch')
 @method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
-class CampaignBookingsOverviewView(TemplateView):
+class BookingsOverviewView(TemplateView):
     # this class is used to display the campaign bookings overview
-    template_name='campaign_leads/campaign_bookings_overview.html'
+    template_name='campaign_leads/bookings_overview/bookings_overview.html'
     def get_context_data(self, **kwargs):
-        context = super(CampaignBookingsOverviewView, self).get_context_data(**kwargs)    
+        context = super(BookingsOverviewView, self).get_context_data(**kwargs)    
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
-            self.template_name = 'campaign_leads/htmx/campaign_bookings_overview_htmx.html'   
+            self.template_name = 'campaign_leads/bookings_overview/bookings_overview_htmx.html'   
             context['campaigns'] = get_campaign_qs(self.request)
             context['campaign_categorys'] = get_campaign_category_qs(self.request)
         context.update(get_booking_table_context(self.request))
@@ -223,20 +223,20 @@ def get_booking_table_context(request):
     return context
 @login_required
 def refresh_booking_table_htmx(request):
-    return render(request, 'campaign_leads/htmx/campaign_bookings_table.html', get_booking_table_context(request))
+    return render(request, 'campaign_leads/bookings_overview/bookings_table.html', get_booking_table_context(request))
 
 
 @method_decorator(login_required, name='dispatch')
 @method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
 class CampaignConfigurationView(TemplateView):
     #this view is used to configure the campaigns
-    template_name='campaign_leads/campaign_configuration.html'
+    template_name='campaign_leads/campaign_configuration/campaign_configuration.html'
 
     def get_context_data(self, **kwargs):
         self.request.GET._mutable = True
         context = super(CampaignConfigurationView, self).get_context_data(**kwargs)
         if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
-            self.template_name = 'campaign_leads/campaign_configuration_htmx.html'  
+            self.template_name = 'campaign_leads/campaign_configuration/campaign_configuration_htmx.html'  
         company = self.request.user.profile.company
         for site in company.active_sites:
             manual_campaign, created = ManualCampaign.objects.get_or_create(site=site, name = "Manually Created", company=site.company)
@@ -285,7 +285,7 @@ def get_campaigns(request, **kwargs):
     # try:
     if request.user.profile.company:
         request.user.profile.company.get_and_generate_campaign_objects()
-    return render(request, f"campaign_leads/htmx/campaign_select.html", 
+    return render(request, f"campaign_leads/filters/campaign_select.html", 
     {'campaigns':get_campaign_qs(request)})
     # except Exception as e:        
     #     logger.error(f"get_campaigns {str(e)}")
@@ -359,7 +359,7 @@ def campaign_assign_whatsapp_business_account_htmx(request):
     campaign.whatsapp_business_account = WhatsappBusinessAccount.objects.filter(pk=whatsapp_business_account_pk).first()
     campaign.campaigntemplatelink_set.all().delete()
     campaign.save()
-    return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign})
+    return render(request, 'campaign_leads/campaign_configuration/campaign_configuration_row.html', {'campaign':campaign})
 @login_required
 @not_demo_or_superuser_check
 def campaign_assign_campaign_category_htmx(request):
@@ -368,7 +368,7 @@ def campaign_assign_campaign_category_htmx(request):
     campaign_category_pk = request.POST.get('campaign_category_pk') or 0    
     campaign.campaign_category = CampaignCategory.objects.filter(pk=campaign_category_pk).first()
     campaign.save()
-    return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign})
+    return render(request, 'campaign_leads/campaign_configuration/campaign_configuration_row.html', {'campaign':campaign})
 @login_required
 @not_demo_or_superuser_check
 def profile_assign_campaign_category_htmx(request):
@@ -380,14 +380,14 @@ def profile_assign_campaign_category_htmx(request):
         profile.campaign_category = CampaignCategory.objects.filter(pk=campaign_category_pk).first()
         profile.save()
         context['profile'] = profile
-        return render(request, 'core/htmx/company_configuration_row.html', context)
+        return render(request, 'core/company_configuration/company_configuration_row.html', context)
     return HttpResponse(status=403)
 @login_required
 def refresh_campaign_configuration_row(request):
     #this function is used to refresh the campaign config row
     campaign = Campaign.objects.get(pk=request.POST.get('campaign_pk'), site__in=request.user.profile.active_sites_allowed)
     campaign.save()
-    return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign})
+    return render(request, 'campaign_leads/campaign_configuration/campaign_configuration_row.html', {'campaign':campaign})
     
 @login_required
 def campaign_assign_color_htmx(request):
@@ -395,7 +395,7 @@ def campaign_assign_color_htmx(request):
     campaign = Campaign.objects.get(pk=request.POST.get('campaign_pk'), site__in=request.user.profile.active_sites_allowed)
     campaign.color = hex_to_rgb_tuple(request.POST.get('color', "60F83D"))
     campaign.save()
-    return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign})
+    return render(request, 'campaign_leads/campaign_configuration/campaign_configuration_row.html', {'campaign':campaign})
     
 
 @login_required
@@ -407,7 +407,7 @@ def campaign_assign_product_cost_htmx(request):
     if product_cost:
         campaign.product_cost = product_cost
         campaign.save()
-    return render(request, 'campaign_leads/campaign_configuration_row.html', {'campaign':campaign,})
+    return render(request, 'campaign_leads/campaign_configuration/campaign_configuration_row.html', {'campaign':campaign,})
 
 @login_required
 def toggle_claim_lead(request, **kwargs):

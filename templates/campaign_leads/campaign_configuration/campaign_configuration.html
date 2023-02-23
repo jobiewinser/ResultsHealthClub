@@ -1,0 +1,8 @@
+{% extends 'core/base.html' %}
+{%block nav%}
+{{block.super}}
+{%include 'campaign_leads/campaign_configuration/campaign_configuration_under_nav.html'%}
+{%endblock%}
+{%block content%}   
+    {%include 'campaign_leads/campaign_configuration/campaign_configuration_htmx.html'%}
+{%endblock content%}

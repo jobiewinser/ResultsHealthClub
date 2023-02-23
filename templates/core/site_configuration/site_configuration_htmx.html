@@ -10,33 +10,6 @@
         });
     </script>
     {%if site%}
-    <div class="row mt-0">
-        {%block extra_top_left_buttons %}
-        {%with True as hide_show_all%}
-        {%include 'core/htmx/site_selection_single.html'%}
-        
-        <div class="col-auto">
-            <a class="nowrap btn btn-success mt-1" type="button" 
-                hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
-                hx-vals='{"template_name": "quick_settings", "site_pk": "{{site.pk}}"}'
-                hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
-                hx-swap="innerHTML" hx-trigger="click"><i class="fa-light fa-gear"></i> Quick Settings</a>
-        </div>
-        {%endwith%}
-        <button hidden hx-get="{%url 'site-configuration'%}" hx-push-url="false" hx-swap="innerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
-        {%endblock extra_top_left_buttons %}
-        <div class="col">
-        </div>
-        {%block extra_top_right_buttons %}
-        <input id="current_page" hidden value="site_configuration"/>
-        <div class="col-md-auto p-0 m-1 pointer" hx-indicator="#page_load_indicator" data-active-selector="#configuration-top-nav-dropdown-toggle"
-            hx-get="{%url 'site-configuration'%}?advanced_settings=True" hx-target="#content" hx-push-url="true" hx-swap="innerHTML">
-            <h3>{%include 'core/htmx/site_warning_section.html'%}</h3>
-            {% comment %} <span class="badge bg-dark text-white"><h6 class="m-1">Site Configuration</h6></span>            {% endcomment %}
-        </div> 
-        
-        {%endblock extra_top_right_buttons %}
-    </div>
     <div class="row mt-2">
         <div class="col p-2"> 
             <div class="row m-2">
@@ -232,7 +205,7 @@
                             {%for temp_user in site.users%}
                             {%with temp_user.profile as profile%}
                             <tr id="user_configuration_row_{{profile.pk}}">
-                                {%include 'core/htmx/company_configuration_row.html'%}
+                                {%include 'core/company_configuration/company_configuration_row.html'%}
                             </tr>
                             {%endwith%}
                             {%endfor%}
@@ -287,7 +260,7 @@
                                 </span>
                                 <hr>
                                 <div class="m-3">
-                                    {%include 'core/htmx/site_configuration_table_htmx.html'%}
+                                    {%include 'core/site_configuration/site_configuration_table_htmx.html'%}
                                 </div>
                             {%else%}
                                 <p>With a <i class="fa-solid fa-rectangle-pro"></i> subscription, you can automate further by automatically sending <i class="fa fa-whatsapp text-success" aria-hidden="true"></i> Whatsapp templates to your customers immediately after they fill in your Active Campaign Forms.</p>
@@ -304,3 +277,4 @@
     Something went wrong, please let us know if this problem persists: <a href="mailto:jobie@winser.uk">jobie@winser.uk</a>
     {%endif%}
 </span>
+{%if request.META.HTTP_HX_REQUEST%}{%include 'core/site_configuration/site_configuration_under_nav.html'%}{%endif%}
