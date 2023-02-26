@@ -160,6 +160,7 @@ def edit_lead(request, **kwargs):
     # lead.save() #call again to send the message to contact
     lead.check_if_should_send_first_message()
     lead.trigger_refresh_websocket(refresh_position=refresh_position)
+    request.user.profile.company.get_company_cache().clear()
     return HttpResponse(str(lead.pk), status=200)
 
 @login_required
@@ -233,6 +234,7 @@ def add_manual_booking(request, **kwargs):
                 }
             }
         )
+        request.user.profile.company.get_company_cache().clear()
         return HttpResponse( status=200)
     except Exception as e:
         logger.debug("add_manual_booking Error "+str(e))
@@ -257,6 +259,7 @@ def mark_archived(request, **kwargs):
             # lead.sold = False
         lead.save()
         lead.trigger_refresh_websocket(refresh_position=False)
+        request.user.profile.company.get_company_cache().clear()
         return render(request, "campaign_leads/bookings_overview/booking_row.html", {'lead':lead}) 
     except Exception as e:
         logger.debug("mark_archived Error "+str(e))
@@ -286,7 +289,7 @@ def delete_lead(request, **kwargs):
     try:
         lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'), campaign__site__in=request.user.profile.active_sites_allowed)
         lead.delete()
-
+        request.user.profile.company.get_company_cache().clear()
         return HttpResponse("", 200)
     except Exception as e:
         logger.debug("mark_archived Error "+str(e))
@@ -300,6 +303,7 @@ def mark_arrived(request, **kwargs):
         lead = Campaignlead.objects.get(pk=request.POST.get('lead_pk'), campaign__site__in=request.user.profile.active_sites_allowed)
         lead.arrived = not lead.arrived
         lead.save()
+        request.user.profile.company.get_company_cache().clear()
         return render(request, "campaign_leads/bookings_overview/booking_row.html", {'lead':lead}) 
     except Exception as e:
         logger.debug("mark_archived Error "+str(e))
@@ -331,6 +335,8 @@ def mark_sold(request, **kwargs):
             lead.arrived = True
         lead.archived = False
         lead.save()
+        request.user.profile.company.get_company_cache().clear()
+        request.user.profile.company.get_company_cache().clear()
         return render(request, "campaign_leads/bookings_overview/booking_row.html", {'lead':lead}) 
     except Exception as e:
         logger.debug("mark_archived Error "+str(e))

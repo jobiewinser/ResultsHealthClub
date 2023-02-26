@@ -783,7 +783,7 @@ def execute_after_save(sender, instance, created, *args, **kwargs):
     #     instance.calendly_webhook_created = True 
     #     instance.save()
 # Extending User Model Using a One-To-One Link
-
+from django.core.cache import caches
 class Company(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     name = models.TextField(null=True, blank=True)
@@ -803,6 +803,25 @@ class Company(models.Model):
     active_campaign_api_key = models.TextField(null=True, blank=True)
     contact_email = models.TextField(blank=True, null=True, max_length=50)
     is_active = models.BooleanField(default=True)
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        self.get_company_cache()
+        super(Company, self).save(force_insert, force_update, using, update_fields)
+    def get_company_cache(self):
+        # construct a unique name for the per-company cache
+        company_cache_name = f"company_analytics_{str(self.pk)}"
+        # check if the cache exists in django's settings
+        if company_cache_name not in settings.CACHES.keys():
+            # if not, create a new entry in settings and register it in django's cache registry
+            settings.CACHES[company_cache_name] = {
+                'BACKEND': 'django_redis.cache.RedisCache',
+                'LOCATION': 'redis://127.0.0.1:6379/1',
+                'OPTIONS': {
+                    'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+                }
+            }
+            # caches.register(company_cache_name, settings.CACHES[company_cache_name])
+        # return the per-user cache
+        return caches[company_cache_name]
     def get_subscription_sites(self, numerical):
         return self.site_set.filter(subscription__numerical=numerical)
     def outstanding_whatsapp_messages(self, user):

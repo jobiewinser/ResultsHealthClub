@@ -34,3 +34,4 @@ Werkzeug==2.0.0
 django-extensions==3.2.1
 stripe==5.0.0
 names==0.3.0
+django-redis==5.0.0

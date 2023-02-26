@@ -10,6 +10,7 @@ from core.templatetags.core_tags import short_month_name
 from django.db.models import Sum
 from django.db.models import Q, Count
 from analytics.views import get_minimum_site_subscription_level_from_site_qs
+from django.core.cache import caches
 
 def check_if_start_date_allowed_and_replace(start_date, site_qs, lead_qs=None, sale_qs=None, booking_qs=None):
     # if not site_qs and lead_qs:
@@ -493,16 +494,16 @@ def get_current_call_count_distribution(request):
     site_pks = request.GET.getlist('site_pks', request.user.profile.active_sites_allowed)
     sites = request.user.profile.active_sites_allowed.filter(pk__in=site_pks)
     
-    non_time_filtered_live_opportunities = Campaignlead.objects.filter(booking = None, archived = False).exclude(sale__archived=False).annotate(calls=Count('call'))
+    non_time_filtered_not_booked_opportunities = Campaignlead.objects.filter(booking = None, archived = False).exclude(sale__archived=False).annotate(calls=Count('call'))
     
     if campaigns:
-        non_time_filtered_opportunities = non_time_filtered_live_opportunities.filter(campaign__site__company=request.user.profile.company, campaign__in=campaigns, campaign__site__in=request.user.profile.active_sites_allowed)
+        non_time_filtered_opportunities = non_time_filtered_not_booked_opportunities.filter(campaign__site__company=request.user.profile.company, campaign__in=campaigns, campaign__site__in=request.user.profile.active_sites_allowed)
     if campaign_categorys:
-        non_time_filtered_opportunities = non_time_filtered_live_opportunities.filter(campaign__campaign_category__site__company=request.user.profile.company, campaign__campaign_category__in=campaign_categorys, campaign__campaign_category__site__in=request.user.profile.active_sites_allowed)
+        non_time_filtered_opportunities = non_time_filtered_not_booked_opportunities.filter(campaign__campaign_category__site__company=request.user.profile.company, campaign__campaign_category__in=campaign_categorys, campaign__campaign_category__site__in=request.user.profile.active_sites_allowed)
     elif sites:
-        non_time_filtered_opportunities = non_time_filtered_live_opportunities.filter(campaign__site__company=request.user.profile.company, campaign__site__in=sites).filter(campaign__site__in=request.user.profile.active_sites_allowed)
+        non_time_filtered_opportunities = non_time_filtered_not_booked_opportunities.filter(campaign__site__company=request.user.profile.company, campaign__site__in=sites).filter(campaign__site__in=request.user.profile.active_sites_allowed)
     else:
-        non_time_filtered_opportunities = non_time_filtered_live_opportunities.filter(campaign__site__company=request.user.profile.company, campaign__site__in=request.user.profile.active_sites_allowed)
+        non_time_filtered_opportunities = non_time_filtered_not_booked_opportunities.filter(campaign__site__company=request.user.profile.company, campaign__site__in=request.user.profile.active_sites_allowed)
 
 
     call_counts_tuples = []
@@ -515,7 +516,7 @@ def get_current_call_count_distribution(request):
                 queryset_percentage_portion = 100
             else:
                 queryset_percentage_portion = 0
-            call_counts_tuples.append((index, non_time_filtered_opportunities.filter(calls=index).count(), non_time_filtered_live_opportunities.filter(calls=index).aggregate(Sum('campaign__product_cost')), queryset_percentage_portion))
+            call_counts_tuples.append((index, non_time_filtered_opportunities.filter(calls=index).count(), non_time_filtered_not_booked_opportunities.filter(calls=index).aggregate(Sum('campaign__product_cost')), queryset_percentage_portion))
             index = index + 1
     else:
         pass
@@ -533,32 +534,56 @@ def get_pipeline_data(request):
 
 def get_pipeline_context(request, json_response=False):    
     context = {}
+    cache = request.user.profile.company.get_company_cache()
     campaign_pks = request.GET.getlist('campaign_pks', request.GET.getlist('campaign_pks[]', []))
     campaign_category_pks = request.GET.getlist('campaign_category_pks', request.GET.getlist('campaign_category_pks[]', []))
     campaigns = None
     campaign_categorys = None
     sites = []
+    site_pks = request.GET.getlist('site_pks', request.GET.getlist('site_pks[]', request.user.profile.active_sites_allowed))
+    sites = request.user.profile.active_sites_allowed.filter(pk__in=site_pks)
+    request_start_date_string = request.GET.get('start_date')
+    if request_start_date_string:
+        start_date = datetime.strptime(request_start_date_string, '%Y-%m-%d')
+        end_date = datetime.strptime(request.GET.get('end_date'), '%Y-%m-%d') + relativedelta.relativedelta(days=1)
+    else:
+        quick_analytics_timeframe = request.GET.get('quick_analytics_timeframe', 'week')
+        today_date = datetime.today()
+        if quick_analytics_timeframe == 'week':
+            #saturday midnight (sunday "morning")
+            start_date = today_date - timedelta(days=today_date.weekday()+1)
+        else: #== 'month'
+            start_date = today_date.replace(day=1, hour=1, minute=0, second=0, microsecond=0)
+        end_date = today_date
+    start_date = check_if_start_date_allowed_and_replace(start_date, site_qs=sites)
     if campaign_pks:
         campaigns = Campaign.objects.filter(pk__in=campaign_pks)
+        if json_response:
+            cache_campaign_pks = str(set(campaigns.order_by('pk').values_list('pk', flat=True)))
+            cache_key = f"campaigns_{cache_campaign_pks}_start_date_{start_date.strftime('%Y-%m-%d')}_end_date_{end_date.strftime('%Y-%m-%d')}"
         # sites = Site.objects.filter(campaign__in=campaigns).exclude(active=False)
     elif campaign_category_pks:
         campaign_categorys = CampaignCategory.objects.filter(pk__in=campaign_category_pks)
+        if json_response:
+            cache_campaign_categorys_pks = str(set(campaign_categorys.order_by('pk').values_list('pk', flat=True)))
+            cache_key = f"campaign_categorys_{cache_campaign_categorys_pks}_start_date_{start_date.strftime('%Y-%m-%d')}_end_date_{end_date.strftime('%Y-%m-%d')}"
+    else:
+        if json_response:
+            cache_sites_pks = str(set(sites.order_by('pk').values_list('pk', flat=True)))
+            cache_key = f"sites_{cache_sites_pks}_start_date_{start_date.strftime('%Y-%m-%d')}_end_date_{end_date.strftime('%Y-%m-%d')}"
     #     sites = Site.objects.filter(campaigncategory__in=campaign_categorys).exclude(active=False)
     # else:
-    site_pks = request.GET.getlist('site_pks', request.GET.getlist('site_pks[]', request.user.profile.active_sites_allowed))
-    sites = request.user.profile.active_sites_allowed.filter(pk__in=site_pks)
-
-    start_date = datetime.strptime(request.GET.get('start_date'), '%Y-%m-%d')
-
-    start_date = check_if_start_date_allowed_and_replace(start_date, site_qs=sites)
-
-    end_date = datetime.strptime(request.GET.get('end_date'), '%Y-%m-%d') + relativedelta.relativedelta(days=1)
-            
-    context['start_date'] = start_date
-    context['end_date'] = end_date
+    
+    
+    
+    if json_response:
+        if (not cache.get(cache_key) is None):
+            return cache.get(cache_key)
+    
+    
+    
     # if not request.user.profile.company.check_if_allowed_to_get_analytics(start_date):
     #     start_date = datetime.now() - timedelta(days=7)
-    end_date = datetime.strptime(request.GET.get('end_date'), '%Y-%m-%d') + relativedelta.relativedelta(days=1)   
     if campaigns:
         opportunities = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, campaign__in=campaigns, created__gte=start_date, created__lt=end_date, campaign__site__in=request.user.profile.active_sites_allowed).annotate(calls=Count('call'))
     if campaign_categorys:
@@ -568,23 +593,25 @@ def get_pipeline_context(request, json_response=False):
     else:
         opportunities = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, created__gte=start_date, created__lt=end_date, campaign__site__in=request.user.profile.active_sites_allowed).annotate(calls=Count('call'))
 
-    live_opportunities = opportunities.exclude(archived=True).exclude(sale__archived=False)
+    not_booked_opportunities = opportunities.exclude(archived=True).exclude(sale__archived=False).exclude(booking__archived=False)
     sold_opportunities = opportunities.filter(sale__archived=False, booking__archived=False)
     booked_opportunities = opportunities.filter(booking__archived=False)
+    booked_not_sold_opportunities = booked_opportunities.exclude(sale__archived=False)
     arrived_opportunities = opportunities.filter(arrived=True)
     lost_opportunities = opportunities.filter(archived=True).exclude(sale__archived=False)
 
     context['opportunities'] = opportunities.count()
-    context['live_opportunities'] = live_opportunities.count()
+    context['not_booked_opportunities'] = not_booked_opportunities.count()
     context['sold_opportunities'] = sold_opportunities.count()
     context['booked_opportunities'] = booked_opportunities.count()
+    context['booked_not_sold_opportunities'] = booked_not_sold_opportunities.count()
     context['arrived_opportunities'] = arrived_opportunities.count()
     context['lost_opportunities'] = lost_opportunities.count()
     
-    if live_opportunities:
-        context['live_value'] = float(live_opportunities.aggregate(Sum('campaign__product_cost')).get('campaign__product_cost__sum', 0))
+    if not_booked_opportunities:
+        context['not_booked_value'] = float(not_booked_opportunities.aggregate(Sum('campaign__product_cost')).get('campaign__product_cost__sum', 0))
     else:
-        context['live_value'] = 0
+        context['not_booked_value'] = 0
 
     if sold_opportunities:
         context['sold_value'] = float(sold_opportunities.aggregate(Sum('campaign__product_cost')).get('campaign__product_cost__sum', 0))
@@ -595,6 +622,11 @@ def get_pipeline_context(request, json_response=False):
         context['booked_value'] = float(booked_opportunities.aggregate(Sum('campaign__product_cost')).get('campaign__product_cost__sum', 0))
     else:
         context['booked_value'] = 0
+
+    if booked_not_sold_opportunities:
+        context['booked_not_sold_value'] = float(booked_not_sold_opportunities.aggregate(Sum('campaign__product_cost')).get('campaign__product_cost__sum', 0))
+    else:
+        context['booked_not_sold_value'] = 0
 
     if arrived_opportunities:
         context['arrived_value'] = float(arrived_opportunities.aggregate(Sum('campaign__product_cost')).get('campaign__product_cost__sum', 0))
@@ -611,12 +643,19 @@ def get_pipeline_context(request, json_response=False):
     else:
         context['opportunities_value'] = 0
 
-    if context['live_opportunities'] or context['lost_opportunities']:
+    if opportunities.exclude(archived=True).exclude(sale__archived=False) or context['lost_opportunities']:
         context['booked_rate'] = (context['booked_opportunities'] / context['opportunities']) * 100
-    elif context['live_opportunities']:
+    elif opportunities.exclude(archived=True).exclude(sale__archived=False):
         context['booked_rate'] = 100
     else:
         context['booked_rate'] = 0
+
+    if opportunities.exclude(archived=True).exclude(sale__archived=False) or context['lost_opportunities']:
+        context['booked_not_sold_rate'] = (context['booked_not_sold_opportunities'] / context['opportunities']) * 100
+    elif opportunities.exclude(archived=True).exclude(sale__archived=False):
+        context['booked_not_sold_rate'] = 100
+    else:
+        context['booked_not_sold_rate'] = 0
 
     if context['booked_opportunities']:
         context['sold_rate'] = (context['sold_opportunities'] / (context['booked_opportunities'])) * 100
@@ -643,5 +682,7 @@ def get_pipeline_context(request, json_response=False):
     context['start_date'] = start_date
     context['end_date'] = end_date
     if not json_response:
-        context['minimum_site_subscription_level_in_query'] = get_minimum_site_subscription_level_from_site_qs(sites)
+        context['minimum_site_subscription_level_in_query'] = get_minimum_site_subscription_level_from_site_qs(sites)        
+    else:
+        cache.set(cache_key, context, 2000) # Last 1 month
     return context

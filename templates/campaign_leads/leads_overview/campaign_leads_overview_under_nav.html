@@ -26,48 +26,82 @@
 
         <div class="col">
         </div>
-        <div class="col-auto card center" style="width:300px">
+        <div class="col-auto card center me-1">
             <small>
-                <div class="row border-bottom pb-1" role="tablist">
-                    <div class="col">
-                        Fast Analytics
-                    </div>
-                    <div class="col-auto" role="presentation">
-                        <button class="btn btn-secondary btn-xs active" id="pills-one-tab" data-bs-toggle="pill" data-bs-target="#pills-one" type="button" role="tab" aria-controls="pills-one" aria-selected="true"> <i class="fa-solid fa-bolt"></i> </button>
-                    </div>
-                    <div class="col-auto" role="presentation">
-                        <button class="btn btn-success btn-xs" id="pills-two-tab" data-bs-toggle="pill" data-bs-target="#pills-two" type="button" role="tab" aria-controls="pills-two" aria-selected="false"> <i class="fa-solid fa-bolt"></i> </button>
-                    </div>
-                    <div class="col-auto" role="presentation">
-                        <button class="btn btn-primary btn-xs" id="pills-three-tab" data-bs-toggle="pill" data-bs-target="#pills-three" type="button" role="tab" aria-controls="pills-three" aria-selected="false"> <i class="fa-solid fa-bolt"></i> </button>
-                    </div>
-                    <div class="col-auto" role="presentation">
-                        <button class="btn btn-info btn-xs" id="pills-four-tab" data-bs-toggle="pill" data-bs-target="#pills-four" type="button" role="tab" aria-controls="pills-four" aria-selected="false"> <i class="fa-solid fa-bolt"></i> </button>
-                    </div>
-                </div>
-                <div class="tab-content" id="pills-tabContent">
-                    <div class="tab-pane fade show active" id="pills-one" role="tabpanel" aria-labelledby="pills-one-tab" tabindex="0">
-                        <div class="col-md-auto center">
-                            <span class="nowrap">Booked Rate</span>
-                            <div class=""><b><span class="booked_rate_quick_analytic">?</span>%</b> of leads were booked</div>
+                <div class="row">
+                    <div class="col-auto">
+                        <div class="row border-bottom pb-1" style="height:38px">
+                            <div class="col ps-1 pe-1">
+                                <select class="form-select form-select-sm mt-1" onchange="get_pipeline_data();"
+                                    id="quick_analytics_timeframe" name="quick_analytics_timeframe">
+                                    <option value="week">This Week</option>
+                                    <option value="month">This Month</option>
+                                </select>
+                            </div>
+                            <div class="col ps-1 pe-1 nowrap">
+                                <h5 class="mt-1"><span class="lead_count_quick_analytic">?</span> Leads</h5>
+                            </div>
+                            <div class="col-auto ps-1 pe-1 nowrap">
+                            </div>
+                        </div>
+                        <div>
+                            <div class="row">
+                                <div class="col-6 center nowrap text-success">
+                                    <b class="sold_count_quick_analytic">?</b> Sold
+                                </div>                       
+                                <div class="col-6 center nowrap text-primary">
+                                    <b class="booked_not_sold_count_quick_analytic">?</b> Booked (Not Sold)
+                                </div>
+                                <div class="col-6 center nowrap">
+                                    <b class="not_booked_count_quick_analytic">?</b> Not Booked
+                                </div>
+                                <div class="col-6 center nowrap text-danger">
+                                    <b class="lost_count_quick_analytic">?</b> Lost
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="tab-pane fade" id="pills-two" role="tabpanel" aria-labelledby="pills-two-tab" tabindex="0">                        
-                        <div class="col-md-auto center">
-                            <span class="nowrap">Sold Rate</span>
-                            <div class="text-success"><b><span class="sold_rate_quick_analytic">?</span>%</b> of booked leads were sold</div>
+                    <div class="col-auto">
+                        
+                        <div class="row border-bottom pb-1" style="height:38px" role="tablist">
+                            <div class="col-auto ps-1 pe-1" role="presentation">
+                                <button class="btn btn-primary btn-xs mt-1 inactive_no_background active" id="pills-one-tab" data-bs-toggle="pill" data-bs-target="#pills-one" type="button" role="tab" aria-controls="pills-one" aria-selected="true"> <i class="fa-solid fa-bolt"></i> Booked </button>
+                            </div>
+                            <div class="col-auto ps-1 pe-1" role="presentation">
+                                <button class="btn btn-success btn-xs mt-1 inactive_no_background" id="pills-two-tab" data-bs-toggle="pill" data-bs-target="#pills-two" type="button" role="tab" aria-controls="pills-two" aria-selected="false"> <i class="fa-solid fa-bolt"></i> Sold</button>
+                            </div>
+                            <div class="col-auto ps-1 pe-1" role="presentation">
+                                <button class="btn btn-primary btn-xs mt-1 inactive_no_background" id="pills-three-tab" data-bs-toggle="pill" data-bs-target="#pills-three" type="button" role="tab" aria-controls="pills-three" aria-selected="false"> <i class="fa-solid fa-bolt"></i> Booked (arrived)</button>
+                            </div>
+                            <div class="col-auto ps-1 pe-1" role="presentation">
+                                <button class="btn btn-success btn-xs mt-1 inactive_no_background" id="pills-four-tab" data-bs-toggle="pill" data-bs-target="#pills-four" type="button" role="tab" aria-controls="pills-four" aria-selected="false"> <i class="fa-solid fa-bolt"></i> Sold (arrived)</button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="tab-pane fade" id="pills-three" role="tabpanel" aria-labelledby="pills-four-tab" tabindex="0">
-                        <div class="col-md-auto center">
-                            <span class="nowrap">Booked Rate (arrived)</span>
-                            <div class=" text-primary"><b><span class="arrived_booked_rate_quick_analytic">?</span>%</b> of booked leads arrived</div>
-                        </div>
-                    </div>
-                    <div class="tab-pane fade" id="pills-four" role="tabpanel" aria-labelledby="pills-four-tab" tabindex="0">
-                        <div class="col-md-auto center">
-                            <span class="nowrap">Sold Rate (arrived)</span>
-                            <div class="text-info"><b><span class="arrived_sold_rate_quick_analytic">?</span>%</b> of leads that arrived were sold</div>
+                        <div class="tab-content" id="pills-tabContent">
+                            <div class="tab-pane fade show active" id="pills-one" role="tabpanel" aria-labelledby="pills-one-tab" tabindex="0">
+                                <div class="col-md-auto center">
+                                    <span class="nowrap">Booked (Not Sold) Rate</span>
+                                    <div class="text-primary"><b><span class="booked_not_sold_rate_quick_analytic">?</span>%</b> of leads were booked</div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="pills-two" role="tabpanel" aria-labelledby="pills-two-tab" tabindex="0">                        
+                                <div class="col-md-auto center">
+                                    <span class="nowrap">Sold Rate</span>
+                                    <div class="text-success"><b><span class="sold_rate_quick_analytic">?</span>%</b> of booked leads were sold</div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="pills-three" role="tabpanel" aria-labelledby="pills-four-tab" tabindex="0">
+                                <div class="col-md-auto center">
+                                    <span class="nowrap">Booked Rate (arrived)</span>
+                                    <div class="text-primary"><b><span class="arrived_booked_rate_quick_analytic">?</span>%</b> of booked leads arrived</div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="pills-four" role="tabpanel" aria-labelledby="pills-four-tab" tabindex="0">
+                                <div class="col-md-auto center">
+                                    <span class="nowrap">Sold Rate (arrived)</span>
+                                    <div class="text-success"><b><span class="arrived_sold_rate_quick_analytic">?</span>%</b> of leads that arrived were sold</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

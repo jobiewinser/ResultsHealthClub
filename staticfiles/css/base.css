@@ -17,6 +17,11 @@ body * {
     font-family: 'Roboto', sans-serif;
 }
 
+.inactive_no_background:not(.active) {
+    background-color:unset;
+    color:var(--bs-body-color);
+}
+
 .htmx-indicator {
     visibility: hidden;
     opacity: 0;
