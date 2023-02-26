@@ -31,23 +31,38 @@
             <script src="https://cdnjs.cloudflare.com/ajax/libs/cleave.js/1.5.3/cleave.min.js"></script>
             
             {%endblock cdn%}
-        
-        
-        <link href="{% static 'css/phone.css' %}?{{version}}" rel="stylesheet" />
-        <link href="{% static 'css/drag_drop.css' %}?{{version}}" rel="stylesheet" />
-        <link rel="stylesheet" type="text/css"  href="{% static 'css/base.css' %}?{%if debug%}{{''|random_guid}}{%else%}{{version}}{%endif%}">
-        <script src="{% static 'js/drag_drop.js' %}?{{version}}"></script> 
-        <script src="{% static 'js/base.js' %}?{{version}}"></script>
-        <script src="{% static 'js/chat.js' %}?{{version}}"></script>        
-        <script src="{% static 'js/modules/leads.js' %}?{{version}}"></script>
-        <script src="{% static 'js/modules/booking.js' %}?{{version}}"></script>
-        <script src="{% static 'js/modules/graphs.js' %}?{{version}}"></script>
-        {% comment %} <script src="{% static 'js/modules/free_tasters.js' %}?{{version}}"></script> {% endcomment %}
-        <script src="{% static 'js/modules/contacts.js' %}?{{version}}"></script>
-        <script src="{% static 'js/modules/campaign_configuration.js' %}?{{version}}"></script>
-        <script src="{% static 'js/modules/company_configuration.js' %}?{{version}}"></script>
-        <script src="{% static 'js/modules/whatsapp_templates.js' %}?{{version}}"></script>
-        <script src="{% static 'js/modules/whatsapp_template_edit.js' %}?{{version}}"></script>
+            <meta name="htmx-config" content='{"refreshOnHistoryMiss":"true"}' />
+            <link href="{% static 'css/phone.css' %}?{%if debug%}{{''|random_guid}}{%else%}{{version}}{%endif%}" rel="stylesheet" />
+            <link href="{% static 'css/drag_drop.css' %}?{%if debug%}{{''|random_guid}}{%else%}{{version}}{%endif%}" rel="stylesheet" />
+            <link rel="stylesheet" type="text/css"  href="{% static 'css/base.css' %}?{%if debug%}{{''|random_guid}}{%else%}{{version}}{%endif%}">
+            <script src="{% static 'js/drag_drop.js' %}?{%if debug%}{{''|random_guid}}{%else%}{{version}}{%endif%}"></script> 
+            <script src="{% static 'js/base.js' %}?{%if debug%}{{''|random_guid}}{%else%}{{version}}{%endif%}"></script>
+            <script src="{% static 'js/chat.js' %}?{%if debug%}{{''|random_guid}}{%else%}{{version}}{%endif%}"></script>        
+            <script src="{% static 'js/modules/leads.js' %}?{%if debug%}{{''|random_guid}}{%else%}{{version}}{%endif%}"></script>
+            <script src="{% static 'js/modules/booking.js' %}?{%if debug%}{{''|random_guid}}{%else%}{{version}}{%endif%}"></script>
+            <script src="{% static 'js/modules/graphs.js' %}?{%if debug%}{{''|random_guid}}{%else%}{{version}}{%endif%}"></script>
+            <script src="{% static 'js/modules/contacts.js' %}?{%if debug%}{{''|random_guid}}{%else%}{{version}}{%endif%}"></script>
+            <script src="{% static 'js/modules/campaign_configuration.js' %}?{%if debug%}{{''|random_guid}}{%else%}{{version}}{%endif%}"></script>
+            <script src="{% static 'js/modules/company_configuration.js' %}?{%if debug%}{{''|random_guid}}{%else%}{{version}}{%endif%}"></script>
+            <script src="{% static 'js/modules/whatsapp_templates.js' %}?{%if debug%}{{''|random_guid}}{%else%}{{version}}{%endif%}"></script>
+            <script src="{% static 'js/modules/whatsapp_template_edit.js' %}?{%if debug%}{{''|random_guid}}{%else%}{{version}}{%endif%}"></script>
+
+
+            
+            {% comment %} <link href="{% static 'css/phone.css' %}?{{version}}" rel="stylesheet" />
+            <link href="{% static 'css/drag_drop.css' %}?{{version}}" rel="stylesheet" />
+            <link rel="stylesheet" type="text/css"  href="{% static 'css/base.css' %}?{%if debug%}{{''|random_guid}}{%else%}{{version}}{%endif%}">
+            <script src="{% static 'js/drag_drop.js' %}?{{version}}"></script> 
+            <script src="{% static 'js/base.js' %}?{{version}}"></script>
+            <script src="{% static 'js/chat.js' %}?{{version}}"></script>        
+            <script src="{% static 'js/modules/leads.js' %}?{{version}}"></script>
+            <script src="{% static 'js/modules/booking.js' %}?{{version}}"></script>
+            <script src="{% static 'js/modules/graphs.js' %}?{{version}}"></script>
+            <script src="{% static 'js/modules/contacts.js' %}?{{version}}"></script>
+            <script src="{% static 'js/modules/campaign_configuration.js' %}?{{version}}"></script>
+            <script src="{% static 'js/modules/company_configuration.js' %}?{{version}}"></script>
+            <script src="{% static 'js/modules/whatsapp_templates.js' %}?{{version}}"></script>
+            <script src="{% static 'js/modules/whatsapp_template_edit.js' %}?{{version}}"></script> {% endcomment %}
         <audio id="notification1" src="{% static 'audio/notification1.wav' %}?{{version}}" preload="auto"></audio>
         <audio id="notification2" src="{% static 'audio/notification2.mp3' %}?{{version}}" preload="auto"></audio>
         
@@ -281,6 +296,10 @@
             }
             document.body.addEventListener('htmx:configRequest', handlehtmxconfigRequest);
             
+            document.body.addEventListener('htmx:pushedIntoHistory', (evt) => {
+                localStorage.removeItem('htmx-history-cache')
+              })
+              
             function wsReconnectDelay(retryCount){ 
                 $('#chat_load_indicator').addClass('htmx-request');
                 var r=Math.min(retryCount,6);var n=1e3*Math.pow(2,r);
@@ -288,7 +307,7 @@
             }
 
             htmx.config.wsReconnectDelay = wsReconnectDelay;
-            htmx.config.refreshOnHistoryMiss = true;
+            {% comment %} htmx.config.refreshOnHistoryMiss = true; {% endcomment %}
             
 
             $('#generic_modal').on('hidden.bs.modal', function () {

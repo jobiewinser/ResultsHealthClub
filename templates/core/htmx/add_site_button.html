@@ -10,7 +10,7 @@
     {% if request.user.profile.company.part_created_site%}    
         <button class="btn btn-sm btn-success"
             hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
-            hx-vals='{"template_name": "add_site", "site_pk": "{{request.user.profile.company.part_created_site.pk}}"}'
+            hx-vals='{"template_name": "add_site"}'
             hx-get="{% url 'get-modal-content'%}" 
             hx-push-url="false"
             hx-swap="innerHTML" hx-trigger="click"><i class="fa-solid fa-plus help"></i> Continue Adding Site</button> 

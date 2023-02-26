@@ -701,9 +701,10 @@ def complete_stripe_subscription_new_site_handler(request):
             site.save()
             profile.sites_allowed.add(site)
             profile.save()
-            response = HttpResponse( status=200)
-            response["HX-Redirect"] = f"/configuration/site-configuration/?site_pk={site.pk}"
-            return response
+            return render(request, "campaign_leads/htmx/quick_settings.html", {'site':site})
+            # response = HttpResponse( status=200)
+            # response["HX-Redirect"] = f"/configuration/site-configuration/?site_pk={site.pk}"
+            # return response
         return HttpResponse("Not allowed to change that site subscription", status=403)
 
 @login_required
@@ -785,7 +786,7 @@ def add_stripe_payment_method_new_site_handler(request):
     site_pk = request.POST.get('site_pk')
     site = request.user.profile.sites_allowed.get(pk=site_pk)
     if get_profile_allowed_to_change_subscription(request.user.profile, site):
-        add_stripe_payment_method(site, 
+        response = add_stripe_payment_method(site, 
             request.POST['cardNumber'], 
             request.POST['expiryMonth'],
             request.POST['expiryYear'],
@@ -794,7 +795,9 @@ def add_stripe_payment_method_new_site_handler(request):
         site_subscription_change_pk = request.POST.get('site_subscription_change_pk')        
         if site_subscription_change_pk:
             context['site_subscription_change'] = SiteSubscriptionChange.objects.filter(pk=site_subscription_change_pk).last()
-        return render(request, 'campaign_leads/htmx/new_site_payment_methods.html', context)
+        if response.status_code == 200:
+            return render(request, 'campaign_leads/htmx/new_site_payment_methods.html', context)
+        return HttpResponse(response.content.decode('utf-8'), status=400)
     return HttpResponse(status=403)
 
 def add_stripe_payment_method(site, card_number, expiry_month, expiry_year, cvc):    
@@ -943,7 +946,8 @@ class RegisterNewCompanyView(TemplateView):
             'profile': profile,
             'title': "Activate your account",
         })
-        
+        if settings.DEBUG:
+            context['activation_url'] = f"/activate/{profile.register_uuid}/{profile.user.email}/"
         send_email(user.email, 'Activate your account.', {"message": message})
         return HttpResponse(render(request, "registration/register_new_company_success.html", context), status=200)
 

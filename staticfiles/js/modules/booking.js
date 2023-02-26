@@ -68,7 +68,6 @@ function bookinghandlehtmxbeforeRequest(evt){
 }
 
 function  bookinghandlehtmxafterRequest(evt){
-    console.log(evt)
     if (evt.detail.xhr.status == 200){
         if (evt.detail.pathInfo.requestPath.includes("create-lead-note")){
             snackbarShow('Successfully added note', 'success')

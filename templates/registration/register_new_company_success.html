@@ -3,6 +3,9 @@
   Success! 
   <br>
   Please check your email to activate your account.
+  {%if activation_url%}
+  <a href="{{activation_url}}">activation_url</a>
+  {%endif%}
   {% comment %} <br>
   If you do not activate your account within 24 hours, the company name you have chosen will become available for other users and your account will be automatically deleted. {% endcomment %}
 </span>
