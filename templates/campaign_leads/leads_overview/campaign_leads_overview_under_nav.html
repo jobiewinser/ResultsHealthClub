@@ -34,8 +34,8 @@
                             <div class="col ps-1 pe-1">
                                 <select class="form-select form-select-sm mt-1" onchange="get_pipeline_data();"
                                     id="quick_analytics_timeframe" name="quick_analytics_timeframe">
-                                    <option value="week">This Week</option>
                                     <option value="month">This Month</option>
+                                    <option value="week">This Week</option>
                                 </select>
                             </div>
                             <div class="col ps-1 pe-1 nowrap">
@@ -46,16 +46,16 @@
                         </div>
                         <div>
                             <div class="row">
-                                <div class="col-6 center nowrap text-success">
+                                <div class="col-6 center nowrap text-success ps-1 pe-1">
                                     <b class="sold_count_quick_analytic">?</b> Sold
                                 </div>                       
-                                <div class="col-6 center nowrap text-primary">
+                                <div class="col-6 center nowrap text-primary ps-1 pe-1">
                                     <b class="booked_not_sold_count_quick_analytic">?</b> Booked (Not Sold)
                                 </div>
-                                <div class="col-6 center nowrap">
+                                <div class="col-6 center nowrap ps-1 pe-1">
                                     <b class="not_booked_count_quick_analytic">?</b> Not Booked
                                 </div>
-                                <div class="col-6 center nowrap text-danger">
+                                <div class="col-6 center nowrap text-danger ps-1 pe-1">
                                     <b class="lost_count_quick_analytic">?</b> Lost
                                 </div>
                             </div>
@@ -80,8 +80,8 @@
                         <div class="tab-content" id="pills-tabContent">
                             <div class="tab-pane fade show active" id="pills-one" role="tabpanel" aria-labelledby="pills-one-tab" tabindex="0">
                                 <div class="col-md-auto center">
-                                    <span class="nowrap">Booked (Not Sold) Rate</span>
-                                    <div class="text-primary"><b><span class="booked_not_sold_rate_quick_analytic">?</span>%</b> of leads were booked</div>
+                                    <span class="nowrap">Booked (Inc Sold) Rate</span>
+                                    <div class="text-primary"><b><span class="booked_rate_quick_analytic">?</span>%</b> of leads were booked</div>
                                 </div>
                             </div>
                             <div class="tab-pane fade" id="pills-two" role="tabpanel" aria-labelledby="pills-two-tab" tabindex="0">                        

@@ -92,7 +92,7 @@
                 },
                 success: function (responseData, textStatus, jqXHR) {
                   $('.sold_rate_quick_analytic').html(Math.round(responseData.sold_rate * 10) / 10)
-                  $('.booked_not_sold_rate_quick_analytic').html(Math.round(responseData.booked_not_sold_rate * 10) / 10)
+                  $('.booked_rate_quick_analytic').html(Math.round(responseData.booked_rate * 10) / 10)
                   $('.arrived_sold_rate_quick_analytic').html(Math.round(responseData.arrived_sold_rate * 10) / 10)
                   $('.arrived_booked_rate_quick_analytic').html(Math.round(responseData.arrived_booked_rate * 10) / 10)
 
