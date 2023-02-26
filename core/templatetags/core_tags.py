@@ -390,7 +390,7 @@ def get_subscription_by_stripe_price_id(price_id):
 def random_guid(anything):
     return str(uuid.uuid4())
 
-@register.filter(name='display_phone')
+@register.filter
 def display_phone(number_string, country=None):
     """Convert a 11 character string into xxxxx xxxxxx."""
     if not len(number_string) == 11:
@@ -398,3 +398,7 @@ def display_phone(number_string, country=None):
     first = number_string[0:5]
     second = number_string[5:11]
     return f"{first} {second}"
+
+@register.filter
+def current_month(anything):
+    return datetime.now().strftime("%B")
