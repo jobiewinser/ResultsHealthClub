@@ -121,8 +121,8 @@ class Webhooks(View):
                                             )[0]                
 
                 elif field == 'message_template_status_update':                    
-                    templates = WhatsappTemplate.objects.filter(message_template_id=value.get('message_template_id')).last()
-                    if templates:
+                    templates = WhatsappTemplate.objects.filter(message_template_id=value.get('message_template_id'))
+                    if templates.exists():
                         for template in templates:
                             site = template.whatsapp_business_account.site
                             if site:
