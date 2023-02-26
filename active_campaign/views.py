@@ -52,6 +52,7 @@ class Webhooks(View):
                                     get_and_create_contact_and_site_contact_for_lead(campaign_lead, phone_number_whole)
                                     campaign_lead.check_if_should_send_first_message()
                                     campaign_lead.trigger_refresh_websocket(refresh_position=True)
+                                    campaign_lead.contact.company.get_company_cache().clear()
             return HttpResponse( "text", 200)
      
 logger = logging.getLogger(__name__)
@@ -128,6 +129,7 @@ def import_active_campaign_leads(request, **kwargs):
                     lead.check_if_should_send_first_message()
                     lead.trigger_refresh_websocket(refresh_position=refresh_position)
                     successful_import = True
+                    request.user.profile.company.get_company_cache().clear()
         if successful_import:
             return HttpResponse("Successfully import contacts", status=200)
         return HttpResponse("No valid contacts selected", status=400)

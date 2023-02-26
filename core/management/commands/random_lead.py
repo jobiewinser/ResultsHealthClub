@@ -30,4 +30,5 @@ class Command(BaseCommand):
                     lead.save()
                     get_and_create_contact_and_site_contact_for_lead(lead, rukp.random_mobile())
                     lead.trigger_refresh_websocket(refresh_position=refresh_position)
+                    lead.contact.company.get_company_cache().clear()
 

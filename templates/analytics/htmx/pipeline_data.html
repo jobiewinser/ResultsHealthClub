@@ -1,108 +1,129 @@
 {%load core_tags%}
-{%if minimum_site_subscription_level_in_query.analytics_numerical|to_int == 2%}
-<div class="row">
-    <div class="col p-0">
-    </div>
-    <div class="col-md-auto">
-        <span class="secondary_td_layer">{{start_date}} - {{end_date}}</span>
-    </div>
-</div>
-<div class="row mt-3">
-    <div class="col">
-    </div>
-    <div class="col-md-auto">
-        <div class="row">
-            <div class="col center">
-                <h5>{{opportunities}} Leads</h5>
-            </div>
+<span hx-swap-oob='innerHTML:#pipeline_body'>
+    {%if minimum_site_subscription_level_in_query.analytics_numerical|to_int == 2%}
+    <div class="row">
+        <div class="col p-0">
         </div>
-        <div class="row text-success">
-            <div class="col center">
-                Sold
-            </div>
-            <div class="col center">
-                {{sold_opportunities}}
-            </div>
-        </div>
-        <div class="row text-primary">
-            <div class="col center nowrap">
-                Booked (Not Sold)
-            </div>
-            <div class="col center">
-                {{booked_not_sold_opportunities}}
-            </div>
-        </div>
-        <div class="row text-secondary">
-            <div class="col center">
-                Live
-            </div>
-            <div class="col center">
-                {{not_booked_opportunities }}
-            </div>
-        </div>
-        <div class="row text-danger">
-            <div class="col center">
-                Lost
-            </div>
-            <div class="col center">
-                {{lost_opportunities}}
-            </div>
+        <div class="col-md-auto">
+            <span class="secondary_td_layer">{{start_date}} - {{end_date}}</span>
         </div>
     </div>
-    <div class="col-md-auto">
-        <div class="row">
-            <div class="col center">
-                <h5>£{{opportunities_value|floatformat:2}}</h5>
+    <div class="row me-0 ms-0 mt-3">
+        <div class="col p-0">
+        </div>
+        <div class="col-md-auto ps-1 pe-1">
+            <div class="row">
+                <div class="col center">
+                    <h5>{{opportunities}} Leads</h5>
+                </div>
+            </div>
+            <div class="row text-success">
+                <div class="col center pe-1">
+                    Sold
+                </div>
+                <div class="col center ps-1">
+                    {{sold_opportunities}}
+                </div>
+            </div>
+            <div class="row text-primary" style="min-width:250px">
+                <div class="col-6 center pe-1 nowrap">
+                    Booked (Not Sold)
+                </div>
+                <div class="col center ps-1">
+                    {{booked_not_sold_opportunities}}
+                </div>
+            </div>
+            <div class="row text-secondary">
+                <div class="col center pe-1">
+                    Live
+                </div>
+                <div class="col center ps-1">
+                    {{not_booked_opportunities }}
+                </div>
+            </div>
+            <div class="row text-danger">
+                <div class="col center pe-1">
+                    Lost
+                </div>
+                <div class="col center ps-1">
+                    {{lost_opportunities}}
+                </div>
             </div>
         </div>
-        <div class="row text-success">
-            <div class="col center">
-                Sold
+        <div class="col-md-auto ps-1 pe-1">
+            <div class="row">
+                <div class="col center">
+                    <h5>£{{opportunities_value|floatformat:2}}</h5>
+                </div>
             </div>
-            <div class="col center">
-                £{{sold_value|floatformat:2}}
+            <div class="row text-success">
+                <div class="col center pe-1">
+                    Sold
+                </div>
+                <div class="col center ps-1">
+                    £{{sold_value|floatformat:2}}
+                </div>
+            </div>
+            <div class="row text-primary" style="min-width:250px">
+                <div class="col-6 center pe-1 nowrap">
+                    Booked (Not Sold)
+                </div>
+                <div class="col center ps-1">
+                    £{{booked_not_sold_value|floatformat:2}}
+                </div>
+            </div>
+            <div class="row text-secondary">
+                <div class="col center pe-1">
+                    Live
+                </div>
+                <div class="col center ps-1">
+                    £{{not_booked_value|floatformat:2}}
+                </div>
+            </div>
+            <div class="row text-danger">
+                <div class="col center pe-1">
+                    Lost
+                </div>
+                <div class="col center ps-1">
+                    £{{lost_value|floatformat:2}}
+                </div>
             </div>
         </div>
-        <div class="row text-primary">
-            <div class="col center nowrap">
-                Booked (Not Sold)
-            </div>
-            <div class="col center">
-                £{{booked_not_sold_value|floatformat:2}}
-            </div>
-        </div>
-        <div class="row text-secondary">
-            <div class="col center">
-                Live
-            </div>
-            <div class="col center">
-                £{{not_booked_value|floatformat:2}}
-            </div>
-        </div>
-        <div class="row text-danger">
-            <div class="col center">
-                Lost
-            </div>
-            <div class="col center">
-                £{{lost_value|floatformat:2}}
-            </div>
+        <div class="col p-0">
         </div>
     </div>
-    <div class="col-md-auto center">
-        <h5 class="nowrap">Sold Rate</h5>
-        <h6 class="text-success"><b>{{sold_rate|floatformat:1}}%</b> <br>of booked leads were sold</h6>
-        <h5 class="nowrap">Booked (Incl Sold) Rate</h5>
-        <h6 class="text-primary"><b>{{booked_rate|floatformat:1}}%</b> <br>of leads were booked</h6>
+    {%else%}
+    One of the sites in your query has a <b>{{minimum_site_subscription_level_in_query.get_name_display}}</b> subscription. <br>This analytics metric requires a <b><i class="fa-solid fa-rectangle-pro"></i></b> subscription for all sites in the query.
+    {%endif%}
+</span>
+<span hx-swap-oob='innerHTML:#conversion_body'>
+    {%if minimum_site_subscription_level_in_query.analytics_numerical|to_int == 2%}
+    <div class="row">
+        <div class="col p-0">
+        </div>
+        <div class="col-md-auto">
+            <span class="secondary_td_layer">{{start_date}} - {{end_date}}</span>
+        </div>
     </div>
-    <div class="col-md-auto center">
-        <h5 class="nowrap">Sold Rate (arrived)</h5>
-        <h6 class="text-success"><b>{{arrived_sold_rate|floatformat:1}}%</b> <br>of leads that arrived were sold</h6>
-        <h5 class="nowrap">Booked Rate (arrived)</h5>
-        <h6 class="text-primary"><b>{{arrived_booked_rate|floatformat:1}}%</b> <br>of booked leads arrived</h6>
+    <div class="row mt-3">
+        <div class="col">
+        </div>
+        <div class="col-md-auto center">
+            <h5 class="nowrap">Sold Rate</h5>
+            <h6 class="text-success"><b>{{sold_rate|floatformat:1}}%</b> <br>of booked leads were sold</h6>
+            <h5 class="nowrap">Booked (Incl Sold) Rate</h5>
+            <h6 class="text-primary"><b>{{booked_rate|floatformat:1}}%</b> <br>of leads were booked</h6>
+        </div>
+        <div class="col-md-auto center">
+            <h5 class="nowrap">Sold Rate (arrived)</h5>
+            <h6 class="text-success"><b>{{arrived_sold_rate|floatformat:1}}%</b> <br>of leads that arrived were sold</h6>
+            <h5 class="nowrap">Booked Rate (arrived)</h5>
+            <h6 class="text-primary"><b>{{arrived_booked_rate|floatformat:1}}%</b> <br>of booked leads arrived</h6>
+        </div>
+        <div class="col">
+        </div>
     </div>
-    <div class="col">
-    </div>
-</div>
-{%else%}
-One of the sites in your query has a <b>{{minimum_site_subscription_level_in_query.get_name_display}}</b> subscription. <br>This analytics metric requires a <b><i class="fa-solid fa-rectangle-pro"></i></b> subscription for all sites in the query.
-{%endif%}
+    {%else%}
+    One of the sites in your query has a <b>{{minimum_site_subscription_level_in_query.get_name_display}}</b> subscription. <br>This analytics metric requires a <b><i class="fa-solid fa-rectangle-pro"></i></b> subscription for all sites in the query.
+    {%endif%}
+</span>

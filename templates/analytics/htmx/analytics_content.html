@@ -4,13 +4,13 @@
 <div class="row my-2">  
     <div class="col">
         <div class="row my-2">    
-            <div class="col-auto analytics_col" style="min-width:975px">
+            <div class="col-auto analytics_col" style="min-width:500px">
                 <button hidden id="refresh_pipeline" class="refresh_date_specific_analytic" hx-trigger="load delay:0.3s, click delay:0.3s"
                         hx-get="{%url 'get-pipeline' %}"
                         hx-include="#start_date, #end_date, .non_site_dependant_analytics_filters, .site_dependant_analytics_filters"
-                        hx-target="#pipeline_body"
+                        {% comment %} hx-target="#pipeline_body" {% endcomment %}
                         hx-indicator="#htmx-indicator-pipeline"
-                        hx-swap="innerHTML"
+                        hx-swap="none"
                         onclick="$('#htmx-indicator-pipeline').addClass('htmx-request')">refresh</button>
                 <div class="card analytics-card">
                     <div class="card-header">
@@ -20,13 +20,34 @@
                                     data-bs-toggle="popover" 
                                     data-bs-trigger="hover focus" 
                                     data-bs-html="true"
-                                    data-bs-content="This shows the potential monetary value of leads <b>created</b> between the shown dates that were successfully marked as sold, still live or closed without being sold (filtered by site and campaign above)."><i class="fa-solid fa-circle-info"></i> Pipeline & Conversion Rate <i class="fa-solid fa-rectangle-pro"></i>
+                                    data-bs-content="This shows the potential monetary value of leads <b>created</b> between the shown dates that were successfully marked as sold, still live or closed without being sold (filtered by site and campaign above)."><i class="fa-solid fa-circle-info"></i> Pipeline <i class="fa-solid fa-rectangle-pro"></i>
                                     <img  class="htmx-indicator invert" id="htmx-indicator-pipeline" src="{% static 'img/bars.svg' %}"/>
                                 </h6> 
                             </div>
                         </div>
                     </div>
                     <div class="card-body" id="pipeline_body">
+                        
+                    </div>
+                </div> 
+            </div>
+            
+            <div class="col-auto analytics_col" style="min-width:500px">
+                <div class="card analytics-card">
+                    <div class="card-header">
+                        <div class="row m-0">
+                            <div class="col-auto p-0">
+                                <h6 class="help m-0"
+                                    data-bs-toggle="popover" 
+                                    data-bs-trigger="hover focus" 
+                                    data-bs-html="true"
+                                    data-bs-content="Description coming soon."><i class="fa-solid fa-circle-info"></i> Conversion Rate <i class="fa-solid fa-rectangle-pro"></i>
+                                    <img  class="htmx-indicator invert" id="htmx-indicator-pipeline" src="{% static 'img/bars.svg' %}"/>
+                                </h6> 
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body" id="conversion_body">
                         
                     </div>
                 </div> 
