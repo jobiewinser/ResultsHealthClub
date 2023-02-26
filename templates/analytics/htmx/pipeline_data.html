@@ -26,10 +26,10 @@
         </div>
         <div class="row text-primary">
             <div class="col center">
-                Booked
+                Booked (Not Sold)
             </div>
             <div class="col center">
-                {{booked_opportunities}}
+                {{booked_not_sold_opportunities}}
             </div>
         </div>
         <div class="row text-secondary">
@@ -91,8 +91,8 @@
     <div class="col-md-auto center">
         <h5 class="nowrap">Sold Rate</h5>
         <h6 class="text-success"><b>{{sold_rate|floatformat:1}}%</b> <br>of booked leads were sold</h6>
-        <h5 class="nowrap">Booked (Not Sold) Rate</h5>
-        <h6 class="text-primary"><b>{{booked_not_sold_rate|floatformat:1}}%</b> <br>of leads were booked</h6>
+        <h5 class="nowrap">Booked (Incl Sold) Rate</h5>
+        <h6 class="text-primary"><b>{{booked_rate|floatformat:1}}%</b> <br>of leads were booked</h6>
     </div>
     <div class="col-md-auto center">
         <h5 class="nowrap">Sold Rate (arrived)</h5>
