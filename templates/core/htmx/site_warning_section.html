@@ -1,3 +1,4 @@
+{%if site%}
 <span style="line-height: 0.75em;" class="site_warning_section_span_{{site.pk}}" {%if site_warning_section_swap%}hx-swap-oob='outerHTML:.site_warning_section_span_{{site.pk}}'{%endif%}>
     {%if not site.whatsapp_template_sending_enabled%}
     <i class="fa fa-whatsapp text-warning" 
@@ -18,3 +19,4 @@
         data-bs-content="This site has it's active campaign automatic leads disabled. Reenable it within the site configuration advanced settings."></i>
     {%endif%}
 </span>
+{%endif%}

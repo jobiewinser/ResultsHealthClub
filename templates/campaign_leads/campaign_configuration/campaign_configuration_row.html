@@ -54,7 +54,7 @@ id="submit_site_pk_{{campaign.pk}}"></button>
         class="form-control"
         hx-post="{% url 'campaign-assign-product_cost' %}" hx-swap="innerHTML" 
         hx-trigger="change delay:0.5s"
-        hx-indicator=".top-htmx-indicator" 
+        hx-indicator="#page_load_indicator" 
         hx-vals='{"campaign_pk": "{{campaign.pk}}"}'
         hx-target="#row_{{campaign.pk}}"/>
 </td>
@@ -63,7 +63,7 @@ id="submit_site_pk_{{campaign.pk}}"></button>
     <input type="color" id="color_{{campaign.pk}}"  name="color" class="form-control" style="height: 38.5px; width: 52.5px;"
         hx-post="{% url 'campaign-assign-color' %}" hx-swap="innerHTML" 
         hx-trigger="change"
-        hx-indicator=".top-htmx-indicator" 
+        hx-indicator="#page_load_indicator" 
         hx-vals='{"campaign_pk": "{{campaign.pk}}"}'
         hx-target="#row_{{campaign.pk}}"
             value="#{{campaign.color|rgb_to_hex_tuple_tag}}">

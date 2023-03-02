@@ -18,6 +18,7 @@ from whatsapp.models import WhatsappTemplate
 from core.core_decorators import check_core_profile_requirements_fulfilled
 from core.user_permission_functions import get_profile_allowed_to_edit_other_profile
 from core.core_decorators import *
+from core.utils import get_object_or_403
 logger = logging.getLogger(__name__)
 def hex_to_rgb_tuple(hex):
     # this function takes a hex string and returns a string of rgb values
@@ -391,8 +392,8 @@ def refresh_campaign_configuration_row(request):
     
 @login_required
 def campaign_assign_color_htmx(request):
-    #this function is used to assign a color to a campaign and refresh the campaign config row
-    campaign = Campaign.objects.get(pk=request.POST.get('campaign_pk'), site__in=request.user.profile.active_sites_allowed)
+    #this function is used to assign a color to a campaign and refresh the campaign config row    
+    campaign = get_object_or_403(Campaign.objects.filter(Q(site=None)|Q(site__in=request.user.profile.active_sites_allowed)), pk=request.POST.get('campaign_pk'))
     campaign.color = hex_to_rgb_tuple(request.POST.get('color', "60F83D"))
     campaign.save()
     return render(request, 'campaign_leads/campaign_configuration/campaign_configuration_row.html', {'campaign':campaign})

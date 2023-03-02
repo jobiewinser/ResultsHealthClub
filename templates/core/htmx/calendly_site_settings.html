@@ -1,11 +1,11 @@
 {%load static tz core_tags user_permission_tags%}
 <div class="row calendly_site_settings" {% if hx_swap_oob %}hx-swap-oob='outerHTML:.calendly_site_settings'{%endif%}>
-    <div class="col-md-auto p-2 card card-light">      
+    <div class="col-auto p-2 card card-light">      
         <form class="" hx-post="{%url 'edit-calendly-configuration'%}" hx-swap="none" hx-indicator="#page_load_indicator" 
         hx-vals='{"site_pk": "{{site.pk}}"}' 
         hx-trigger='submit delay:0.3s' autocomplete="off" autofill="off">
             <div class="row mt-1">
-                <div class="col-md-auto">   
+                <div class="col">   
                     <div class="form-floating m-1"
                     {%if not request.user.profile|get_profile_allowed_to_edit_site_calendly_configuration_tag:site%}
                         data-bs-toggle="popover" 
@@ -49,7 +49,7 @@
             </div>
         </form>
     </div>
-    <div class="col-md-auto p-2 card card-light ms-2" style="">           
+    <div class="col-auto p-2 card card-light ms-2" style="">           
             {%include 'core/htmx/calendly_webhook_status_wrapper.html'%}  
     </div>
 </div>

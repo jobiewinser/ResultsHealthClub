@@ -8,7 +8,7 @@
         {%include 'core/htmx/site_selection_single.html'%}
         
         <div class="col-auto">
-            <a class="nowrap btn btn-success mt-1" type="button" 
+            <a class="nowrap btn btn-success btn-sm mt-3" type="button" 
                 hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
                 hx-vals='{"template_name": "quick_settings", "site_pk": "{{site.pk}}"}'
                 hx-get="{% url 'get-modal-content' %}" hx-push-url="false"

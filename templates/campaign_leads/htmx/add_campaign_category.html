@@ -1,20 +1,20 @@
 {%load static%}
 <span>
-    <div class="card p-3" style="overflow-y:scroll; max-height:250px">
-        Existing categories for <b>{{site.name}}</b>
+    <div class="card p-3" style="overflow-y:scroll; max-height:250px; min-width:350px">
+        <span>Existing categories for <b>{{campaign.site.name}}</b></span>
         <br>
         <ul>
             {%for campaign_category in site.campaigncategory_set.all%}
                 <li>{{campaign_category.name}}</li>
             {%empty%}
-                <li>No Categories</li>
+                <li>None yet</li>
             {%endfor%}
         </ul>
     </div>
     <form hx-post="{%url 'add-campaign-category'%}" hx-trigger="submit" hx-indicator="#page_load_indicator" hx-swap="none">
         {% csrf_token %}
         <input hidden name="campaign_pk" value="{{campaign.pk}}"/>
-        <input hidden name="site_pk" value="{{site.pk}}"/>
+        <input hidden name="site_pk" value="{{campaign.site.pk}}"/>
         <div class="row">
             <div class="col center p-0">
                 <div class="form-floating m-1">

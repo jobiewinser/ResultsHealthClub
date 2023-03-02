@@ -640,8 +640,8 @@ def change_default_payment_method(request):
 @login_required
 @check_core_profile_requirements_fulfilled
 def complete_stripe_subscription_handler(request):
-    complete_stripe_subscription(request.POST.get('site_subscription_change_pk'), request.POST.get('payment_method_id'), request.user)
-    return render(request, 'core/htmx/subscription_changed.html', {})
+    site = complete_stripe_subscription(request.POST.get('site_subscription_change_pk'), request.POST.get('payment_method_id'), request.user)
+    return render(request, 'campaign_leads/htmx/quick_settings.html', {"site": site})
 
 def complete_stripe_subscription(site_subscription_change_pk, payment_method_id, user):
     site_subscription_change_pk = site_subscription_change_pk
@@ -684,7 +684,9 @@ def complete_stripe_subscription(site_subscription_change_pk, payment_method_id,
         site.get_stripe_subscriptions_and_update_models()
         site_subscription_change.completed_by = user
         site_subscription_change.complete()
-    return HttpResponse("Not allowed to change that site subscription", status=403)
+        return site
+    raise PermissionDenied()
+    # return HttpResponse("Not allowed to change that site subscription", status=403)
 
 
 @login_required
