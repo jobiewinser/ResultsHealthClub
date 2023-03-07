@@ -7,5 +7,6 @@ urlpatterns = [
     
     path('set-active-campaign-lead-status/', activecampaignviews.set_active_campaign_leads_status, name='set-active-campaign-lead-status'),
     path('import-active-campaign-leads/', activecampaignviews.import_active_campaign_leads, name='import-active-campaign-leads'),
+    path('set-active-campaign-company-config/', activecampaignviews.set_active_campaign_company_config, name='set-active-campaign-company-config'),
     
 ]

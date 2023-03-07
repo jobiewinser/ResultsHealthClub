@@ -34,6 +34,7 @@ def get_modal_content(request, **kwargs):
         raise e
 
 
+from core.views import get_site_configuration_context
 @login_required
 @not_demo_or_superuser_check
 def deactivate_whatsapp_business_account(request):
@@ -41,7 +42,10 @@ def deactivate_whatsapp_business_account(request):
     if get_profile_allowed_to_edit_site_configuration(request.user.profile, whatsapp_business_account.site):  
         whatsapp_business_account.active = False
         whatsapp_business_account.save()
-        return HttpResponse(status=200)
+        context = {}
+        context.update(get_site_configuration_context(request))
+        context['hx_swap_oob'] = True
+        return render(request, 'core/site_configuration/site_configuration_table_htmx.html', context)
     return HttpResponse(status=403)
 
 @login_required
@@ -56,6 +60,7 @@ def add_whatsapp_business_account(request):
             if get_profile_allowed_to_edit_site_configuration(request.user.profile, site):      
                 phone_numbers = whatsapp.get_phone_numbers(whatsapp_business_account_id).get('data',[])
                 if phone_numbers:   
+                    context = {}
                     whatsapp_business_account, created = WhatsappBusinessAccount.objects.get_or_create(whatsapp_business_account_id=whatsapp_business_account_id)
                     phone_number_instances = site.get_live_whatsapp_phone_numbers()
                     if not created:
@@ -74,7 +79,9 @@ def add_whatsapp_business_account(request):
                     whatsapp_business_account.save()
                     whatsapp_business_account.site = site
                     whatsapp_business_account.save()
-                    return render(request, 'core/site_configuration/site_configuration_table_htmx.html', {'whatsapp_numbers':site.get_live_whatsapp_phone_numbers(), 'site': site, })
+                    context.update(get_site_configuration_context(request))
+                    context['hx_swap_oob'] = True
+                    return render(request, 'core/site_configuration/site_configuration_table_htmx.html', context)
                 else:
                     return HttpResponse("There are no phone numbers assosciated with that Whatsapp Business Account ID (for your whatsapp credentials).",status=500)
             return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)

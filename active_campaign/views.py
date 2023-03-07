@@ -8,13 +8,15 @@ logger = logging.getLogger(__name__)
 from django.views import View 
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
+from core.core_decorators import *
 from django.shortcuts import render
 from django.conf import settings
 from datetime import datetime, timedelta, time
+from core.models import Company
 from core.user_permission_functions import *
 from active_campaign.api import ActiveCampaignApi
 from core.utils import normalize_phone_number
-from core.views import get_and_create_contact_and_site_contact_for_lead
+from core.views import get_and_create_contact_and_site_contact_for_lead, get_company_configuration_context
 @method_decorator(csrf_exempt, name="dispatch")
 class Webhooks(View):
     def get(self, request, *args, **kwargs):
@@ -136,3 +138,32 @@ def import_active_campaign_leads(request, **kwargs):
     except Exception as e:        
         logger.error(f"import_active_campaign_leads {str(e)}")
         return HttpResponse("Couldn't import_active_campaign_leads", status=500)
+    
+    
+@login_required
+@not_demo_or_superuser_check
+def set_active_campaign_company_config(request, **kwargs):
+    try:
+        context = {}
+        company = Company.objects.get(pk=request.POST.get('company_pk',None))
+        if not get_profile_allowed_to_edit_active_campaign_settings(request.user.profile, company):
+            return HttpResponse("You need the edit Active Campaign permission", status=403)
+        active_campaign_url = request.POST.get('active_campaign_url', '*')
+        active_campaign_api_key = request.POST.get('active_campaign_api_key', '*')
+        if active_campaign_url.replace('*', ''):
+            company.active_campaign_url = active_campaign_url
+        if active_campaign_api_key.replace('*', ''):
+            company.active_campaign_api_key = active_campaign_api_key        
+        company.save()
+        active_campaign = ActiveCampaignApi(company.active_campaign_api_key, company.active_campaign_url)
+        
+        context.update(get_company_configuration_context(request))
+        context['company'] = company
+        context['hx_swap_oob'] = True
+        active_campaign = ActiveCampaignApi(request.user.profile.company.active_campaign_api_key, request.user.profile.company.active_campaign_url)
+        context['webhooks'] = active_campaign.get_webhooks(request.user.profile.company.active_campaign_url)
+        
+        return render(request, 'core/htmx/active_campaign_company_config_row.html', context)
+    except Exception as e:        
+        logger.error(f"set_active_campaign_template_sending_status {str(e)}")
+        return HttpResponse("Couldn't set Active Campaign configuration", status=500)

@@ -19,6 +19,7 @@ from core.core_decorators import check_core_profile_requirements_fulfilled
 from django.contrib.auth.decorators import login_required
 from whatsapp.models import WhatsappTemplate
 from core.core_decorators import *
+from core.views import get_company_configuration_context
 from core.utils import normalize_phone_number
 import hmac
 import hashlib
@@ -638,6 +639,7 @@ def send_new_template_message(request):
 @not_demo_or_superuser_check
 def set_whatsapp_company_config(request, **kwargs):
     try:
+        context = {}
         company = Company.objects.get(pk=request.POST.get('company_pk',None))
         if not get_profile_allowed_to_edit_whatsapp_settings(request.user.profile, company):
             return HttpResponse("You need the edit Whatsapp Settings permission", status=403)
@@ -652,9 +654,18 @@ def set_whatsapp_company_config(request, **kwargs):
             company.whatsapp_app_secret_key = whatsapp_app_secret_key
         
         company.save()
-        whatsapp = Whatsapp(company.whatsapp_access_token)
-        whatsapp_business_details = whatsapp.get_business(company.whatsapp_app_business_id)
-        return render(request, 'core/htmx/whatsapp_company_config_row.html', {'company':company, 'whatsapp_business_details':whatsapp_business_details})
+        context.update(get_company_configuration_context(request))
+        
+        context['company'] = company      
+        
+        if company.whatsapp_access_token:
+            whatsapp = Whatsapp(company.whatsapp_access_token)
+            whatsapp_business_details = whatsapp.get_business(company.whatsapp_app_business_id)
+        else:
+            whatsapp_business_details = {"error":True}
+        context['whatsapp_business_details'] = whatsapp_business_details
+        context['hx_swap_oob'] = True
+        return render(request, 'core/htmx/whatsapp_company_config_row.html', context)
     except Exception as e:        
         logger.error(f"set_whatsapp_template_sending_status {str(e)}")
         return HttpResponse("Couldn't set Whatsapp configuration", status=500)

@@ -17,6 +17,7 @@ from django.contrib.auth import login
 from django.core.exceptions import PermissionDenied
 from core.user_permission_functions import *
 from whatsapp.api import Whatsapp
+from active_campaign.api import ActiveCampaignApi
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from datetime import datetime, timedelta
@@ -69,6 +70,8 @@ PROFILE_ERROR_OPTIONS = {
 class ProfileConfigurationNeededView(TemplateView):
     template_name='core/profile_configuration_needed.html'
     def get(self, request, *args, **kwargs):
+        if request.user.profile and request.user.profile.company and request.user.profile.active_sites_allowed and request.user.profile.site:
+            return redirect('/')
         if request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
             self.template_name = 'core/profile_configuration_needed_htmx.html'
         return super().get(request, *args, **kwargs)
@@ -144,6 +147,7 @@ class SitePermissionsView(TemplateView):
                             'edit_site_configuration',
                             'edit_site_calendly_configuration',                            
                             'edit_whatsapp_settings',
+                            'edit_active_campaign_settings',
                             'toggle_active_campaign',                            
                             'toggle_whatsapp_sending',                            
                             'change_subscription',                            
@@ -181,6 +185,12 @@ def get_site_configuration_context(request):
                     break
     context['site_webhook_active'] = site_webhook_active
     context['site'] = site
+    if request.user.profile.company.whatsapp_access_token:
+        whatsapp = Whatsapp(request.user.profile.company.whatsapp_access_token)
+        whatsapp_business_details = whatsapp.get_business(request.user.profile.company.whatsapp_app_business_id)
+    else:
+        whatsapp_business_details = {"error":True}
+    context['whatsapp_business_details'] = whatsapp_business_details
     return context
 
 def get_contacts_overview_context(request):
@@ -248,28 +258,34 @@ class CompanyConfigurationView(TemplateView):
             if request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
                 return HttpResponse("Only an owner can edit the company configuration", status=403)
             raise PermissionDenied()
+        if request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
+            self.template_name = 'core/company_configuration/company_configuration_htmx.html'
         return super().get(request, *args, **kwargs)
         
     def get_context_data(self, **kwargs):
             
         self.request.GET._mutable = True       
         context = super(CompanyConfigurationView, self).get_context_data(**kwargs)
-        if self.request.META.get("HTTP_HX_REQUEST", 'false') == 'true':
-            self.template_name = 'core/company_configuration/company_configuration_htmx.html'
-        # context['site_list'] = get_available_sites_for_user(self.request.user)
+        context.update(get_company_configuration_context(self.request))  
+    
         company = self.request.user.profile.company
-        context['company'] = company
-        for profile in context['company'].profile_set.all():
-            CompanyProfilePermissions.objects.get_or_create(profile=profile, company=profile.company)  
-        
         if company.whatsapp_access_token:
             whatsapp = Whatsapp(company.whatsapp_access_token)
             context['whatsapp_business_details'] = whatsapp.get_business(company.whatsapp_app_business_id)
         else:
             context['whatsapp_business_details'] = {"error":True}
-        context['role_choices'] = ROLE_CHOICES
-        # context['site_list'] = get_available_sites_for_user(self.request.user)
+        active_campaign = ActiveCampaignApi(company.active_campaign_api_key, company.active_campaign_url)
+        context['webhooks'] = active_campaign.get_webhooks(company.active_campaign_url)
+        
         return context
+def get_company_configuration_context(request):    
+    context = {}
+    company = request.user.profile.company
+    context['company'] = company
+    for profile in context['company'].profile_set.all():
+        CompanyProfilePermissions.objects.get_or_create(profile=profile, company=profile.company)
+    context['role_choices'] = ROLE_CHOICES
+    return context
 @login_required
 @not_demo_or_superuser_check
 def change_profile_role(request):
@@ -641,7 +657,7 @@ def change_default_payment_method(request):
 @check_core_profile_requirements_fulfilled
 def complete_stripe_subscription_handler(request):
     site = complete_stripe_subscription(request.POST.get('site_subscription_change_pk'), request.POST.get('payment_method_id'), request.user)
-    return render(request, 'campaign_leads/htmx/quick_settings.html', {"site": site})
+    return render(request, 'campaign_leads/htmx/site_quick_settings.html', {"site": site})
 
 def complete_stripe_subscription(site_subscription_change_pk, payment_method_id, user):
     site_subscription_change_pk = site_subscription_change_pk
@@ -703,7 +719,22 @@ def complete_stripe_subscription_new_site_handler(request):
             site.save()
             profile.sites_allowed.add(site)
             profile.save()
-            return render(request, "campaign_leads/htmx/quick_settings.html", {'site':site})
+            
+            context = {}
+            context["company"] = request.user.profile.company
+            context.update(get_company_configuration_context(request))
+            if request.user.profile.company.whatsapp_access_token:
+                whatsapp = Whatsapp(request.user.profile.company.whatsapp_access_token)
+                whatsapp_business_details = whatsapp.get_business(request.user.profile.company.whatsapp_app_business_id)
+            else:
+                whatsapp_business_details = {"error":True}
+            context['whatsapp_business_details'] = whatsapp_business_details
+            active_campaign = ActiveCampaignApi(request.user.profile.company.active_campaign_api_key, request.user.profile.company.active_campaign_url)
+            context['webhooks'] = active_campaign.get_webhooks(request.user.profile.company.active_campaign_url)
+            context['quick_settings_site'] = site
+            context['refresh_on_close'] = True
+            
+            return render(request, "campaign_leads/htmx/company_quick_settings.html", context)
             # response = HttpResponse( status=200)
             # response["HX-Redirect"] = f"/configuration/site-configuration/?site_pk={site.pk}"
             # return response

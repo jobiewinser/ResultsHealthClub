@@ -58,6 +58,11 @@ def get_profile_allowed_to_edit_whatsapp_settings(profile, company):
     if permissions:
         return permissions.edit_whatsapp_settings
     return False
+def get_profile_allowed_to_edit_active_campaign_settings(profile, company):
+    permissions = CompanyProfilePermissions.objects.filter(profile=profile, company=company).first()
+    if permissions:
+        return permissions.edit_active_campaign_settings
+    return False
 def get_profile_allowed_to_edit_profile_permissions(user_profile, target_profile):
     if check_if_profile_is_higher_authority_than_profile(user_profile, target_profile):
         permissions = CompanyProfilePermissions.objects.filter(profile=user_profile, company=user_profile.company).first()

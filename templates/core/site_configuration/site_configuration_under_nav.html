@@ -6,14 +6,6 @@
         {%block extra_top_left_buttons %}
         {%with True as hide_show_all%}
         {%include 'core/htmx/site_selection_single.html'%}
-        
-        <div class="col-auto">
-            <a class="nowrap btn btn-success btn-sm mt-3" type="button" 
-                hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
-                hx-vals='{"template_name": "quick_settings", "site_pk": "{{site.pk}}"}'
-                hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
-                hx-swap="innerHTML" hx-trigger="click"><i class="fa-light fa-gear"></i> Quick Settings</a>
-        </div>
         {%endwith%}
         <button hidden hx-get="{%url 'site-configuration'%}" hx-push-url="false" hx-swap="innerHTML" hx-include=".non_site_dependant_overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#content" id="change_site" class="btn btn-primary btn-sm"></button>
         {%endblock extra_top_left_buttons %}
@@ -21,11 +13,20 @@
         </div>
         {%block extra_top_right_buttons %}
         <input id="current_page" hidden value="site_configuration"/>
+        
         <div class="col-md-auto p-0 m-1 pointer" hx-indicator="#page_load_indicator" data-active-selector="#configuration-top-nav-dropdown-toggle"
-            hx-get="{%url 'site-configuration'%}?advanced_settings=True" hx-target="#content" hx-push-url="true" hx-swap="innerHTML">
+            hx-get="{%url 'site-configuration'%}?integration_settings=True" hx-target="#content" hx-push-url="true" hx-swap="innerHTML">
             <h3>{%include 'core/htmx/site_warning_section.html'%}</h3>
             {% comment %} <span class="badge bg-dark text-white"><h6 class="m-1">Site Configuration</h6></span>            {% endcomment %}
         </div> 
+        
+        <div class="col-auto">
+            <a class="nowrap btn btn-success btn-sm" type="button" 
+                hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
+                hx-vals='{"template_name": "site_quick_settings", "site_pk": "{{site.pk}}"}'
+                hx-get="{% url 'get-modal-content' %}" hx-push-url="false"
+                hx-swap="innerHTML" hx-trigger="click"><i class="fa-light fa-gear"></i> Site Quick Settings</a>
+        </div>
         
         {%endblock extra_top_right_buttons %}
     </div>   

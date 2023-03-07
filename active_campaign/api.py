@@ -54,6 +54,14 @@ class ActiveCampaignApi:
             }
             response = requests.post(url=url, json=body, headers=headers)
             return response
+    def get_webhooks(self, activate_campaign_url):       
+        if activate_campaign_url: 
+            url = f"{activate_campaign_url}api/3/webhooks?limit=100"
+            headers = self._get_headers()
+            response = requests.get(url=url, headers=headers)
+            if response:
+                return response.json() or {}
+        return None
     # Get
     # def get_campaigns(self):        
     #     url = f"{self.active_campaign_url}api/3/campaigns"

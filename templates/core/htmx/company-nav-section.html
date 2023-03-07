@@ -16,7 +16,7 @@
                         hx-get="{%url 'company-configuration'%}" hx-target="#content" hx-push-url="true" hx-swap="innerHTML">{{user.profile.company}}</strong>
                     <hr style="margin:0px; margin-bottom:-3px">
                     <span class="pointer" hx-indicator="#page_load_indicator" data-active-selector="#configuration-top-nav-dropdown-toggle"
-                        hx-get="{%url 'site-configuration'%}?advanced_settings=True" hx-target="#content" hx-push-url="true" hx-swap="innerHTML">
+                        hx-get="{%url 'site-configuration'%}?integration_settings=True" hx-target="#content" hx-push-url="true" hx-swap="innerHTML">
                         <span style="font-size:12px; line-height: 0.75em; ">{%if user.profile.site.name%}{{user.profile.site.name}} ({{user.profile.site.subscription.get_name_display}}){%endif%}
                         {%with request.user.profile.site as site%}
                         {%include 'core/htmx/site_warning_section.html'%}

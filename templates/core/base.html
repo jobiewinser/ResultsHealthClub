@@ -127,7 +127,7 @@
             $( ".top-nav-link.active, .nav-link.active" ).removeClass('active');
             $(active_selector).addClass('active');
         }
-        let boolean = false;
+        var boolean = false;
         $(document).ready(function() {
             
 
@@ -144,7 +144,7 @@
                 element.classList.remove("flash");
             }
             });
-            let boolean = true;
+            var boolean = true;
 
 
 
@@ -364,7 +364,7 @@
                             <span aria-hidden="true"></span>
                         </button>
                     </div> 
-                    <div class="modal-body" id="generic_modal_body">
+                    <div class="modal-body" id="generic_modal_body" style="max-height:80vh; overflow-y: scroll;">
                     </div>
                 </div>
             </div>

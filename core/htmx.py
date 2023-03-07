@@ -10,11 +10,13 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views import View
 from core.user_permission_functions import get_profile_allowed_to_edit_other_profile, get_profile_allowed_to_edit_site_configuration 
-from core.views import get_site_pks_from_request_and_return_sites,get_site_configuration_context
+from core.views import get_site_pks_from_request_and_return_sites, get_site_configuration_context, get_company_configuration_context
 from campaign_leads.models import Campaignlead
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from core.core_decorators import *
+from whatsapp.api import Whatsapp
+from active_campaign.api import ActiveCampaignApi
 logger = logging.getLogger(__name__)
 
 @login_required
@@ -36,9 +38,23 @@ def get_modal_content(request, **kwargs):
             elif template_name == 'add_site':
                 if request.user.profile.company.part_created_site:
                     context["site"] = request.user.profile.company.part_created_site  
-            elif template_name == 'quick_settings':
+            elif template_name == 'site_quick_settings':
                 context["site"] = request.user.profile.active_sites_allowed.get(pk=site_pk)   
                 context.update(get_site_configuration_context(request))
+            elif template_name == 'company_quick_settings':
+                context["company"] = request.user.profile.company
+                context.update(get_company_configuration_context(request))
+                if request.user.profile.company.whatsapp_access_token:
+                    whatsapp = Whatsapp(request.user.profile.company.whatsapp_access_token)
+                    whatsapp_business_details = whatsapp.get_business(request.user.profile.company.whatsapp_app_business_id)
+                else:
+                    whatsapp_business_details = {"error":True}
+                context['whatsapp_business_details'] = whatsapp_business_details
+                active_campaign = ActiveCampaignApi(request.user.profile.company.active_campaign_api_key, request.user.profile.company.active_campaign_url)
+                context['webhooks'] = active_campaign.get_webhooks(request.user.profile.company.active_campaign_url)
+                quick_settings_site_pk = request.GET.get('quick_settings_site')
+                if quick_settings_site_pk:
+                    context['quick_settings_site'] = request.user.profile.active_sites_allowed.get(pk=quick_settings_site_pk)
             elif template_name == 'edit_contact':
                 site_contact_pk = request.GET.get('site_contact_pk')
                 if site_contact_pk:
@@ -233,9 +249,22 @@ def add_site(request, **kwargs):
             site.save()
             profile.sites_allowed.add(site)
             profile.save()
-            # response = HttpResponse( status=200)
-            # response["HX-Redirect"] = f"/configuration/site-configuration/?site_pk={site.pk}"
-            return render(request, "campaign_leads/htmx/quick_settings.html", {'site':site})
+            
+            
+            context = {}
+            context["company"] = request.user.profile.company
+            context.update(get_company_configuration_context(request))
+            if request.user.profile.company.whatsapp_access_token:
+                whatsapp = Whatsapp(request.user.profile.company.whatsapp_access_token)
+                whatsapp_business_details = whatsapp.get_business(request.user.profile.company.whatsapp_app_business_id)
+            else:
+                whatsapp_business_details = {"error":True}
+            context['whatsapp_business_details'] = whatsapp_business_details
+            active_campaign = ActiveCampaignApi(request.user.profile.company.active_campaign_api_key, request.user.profile.company.active_campaign_url)
+            context['webhooks'] = active_campaign.get_webhooks(request.user.profile.company.active_campaign_url)
+            context['quick_settings_site'] = site
+            
+            return render(request, "campaign_leads/htmx/company_quick_settings.html", context)
             
     return HttpResponse("This feature requires a Pro subscription", status=403)
 

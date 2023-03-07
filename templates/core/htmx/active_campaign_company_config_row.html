@@ -1,0 +1,79 @@
+{%load core_tags%}
+{%load user_permission_tags%}
+
+<span class="active_campaign_company_config_wrapper" {% if hx_swap_oob %}hx-swap-oob='outerHTML:.active_campaign_company_config_wrapper'{%endif%}>
+    <div class="row" style="margin-left:0px !important;">
+        <div class="col-md-auto p-2 card center"  style="max-width:400px">        
+            <b>Active Campaign API configuration</b>
+            <p>
+                All sites should use the same Active Campaign Account.
+            </p>
+            <div class="row mt-3" style="margin-left:0px !important;">
+                <div class="col center">     
+                                    
+                    {%if request.user.profile|get_profile_allowed_to_edit_active_campaign_settings_tag:company%}    
+                    <form class="" hx-post="{%url 'set-active-campaign-company-config'%}" hx-target=".active_campaign_company_config_wrapper" 
+                    hx-confirm="Are you sure you want to make this change. It may prevent you receiving and sending active campaign messages if set up incorrectly!"
+                    hx-swap="none" hx-trigger="submit delay:0.3s" hx-indicator="#page_load_indicator" hx-vals='{"company_pk": "{{company.pk}}"}' autocomplete="off" autofill="off">  
+                        <div class="form-floating mt-1" 
+                                                        data-bs-html="true" 
+                                                        data-bs-toggle="popover" data-bs-placement="top" 
+                                                        data-bs-trigger="hover focus"
+                                                        title="Active Campaign API URL"
+                                                        data-bs-content="Please watch the video linked above to get this value"
+                                                        >
+                            <input name="active_campaign_url" type="password" class="form-control" oninput="$('.active_campaign_config_submit').attr('disabled', false)" onfocus="this.value=''; this.removeAttribute('onfocus');"
+                            value="{{company.active_campaign_url|censor}}" />
+                            <label class="elipses-overflow">Active Campaign API URL</label>
+                        </div>
+
+                        <div class="form-floating mt-1" 
+                            data-bs-html="true" 
+                            data-bs-toggle="popover" data-bs-placement="top" 
+                            data-bs-trigger="hover focus"
+                            title="Active Campaign API Key"
+                            data-bs-content="Please watch the video linked above to get this value"
+                            >
+
+                            <input name="active_campaign_api_key" type="password" class="form-control" oninput="$('.active_campaign_config_submit').attr('disabled', false)" onfocus="this.value=''; this.removeAttribute('onfocus');"
+                            value="{{company.active_campaign_api_key|censor}}" />
+                            <label class="elipses-overflow">Active Campaign API Key</label>
+                        </div>
+                        <br>
+                        <button class="btn btn-primary btn-sm m-3 active_campaign_config_submit" disabled>Submit</button>
+                    </form> 
+                    {%else%} 
+                    You do not have the permission to edit this
+                    {%endif%} 
+                </div>
+            </div>
+        </div>
+        <div class="col-md-auto p-2 center"  style="width:250px">    
+            <div>
+                {%if not webhooks == None%}
+                <span class="badge bg-success help"
+                    data-bs-toggle="popover" 
+                    data-bs-trigger="hover focus" 
+                    data-bs-html="true" 
+                    data-bs-placement="top"
+                    data-bs-title="Valid Config"
+                    data-bs-content="We've detected that your active campaign config is valid">
+                    <i class="fa-solid fa-circle-info"></i> {%if demo%}Demo Config{%else%}Valid Config <i class="fa-duotone fa-check"></i>{%endif%}
+                </span>
+                {%else%}
+                <span class="badge bg-danger help"
+                    data-bs-toggle="popover" 
+                    data-bs-trigger="hover focus" 
+                    data-bs-html="true" 
+                    data-bs-placement="top"
+                    data-bs-title="Invalid Config"
+                    data-bs-content="We've detected that your active campaign config is invalid">
+                    <i class="fa-solid fa-circle-info"></i> {%if demo%}Demo Config{%else%}Invalid Config <i class="fa-solid fa-times"></i>{%endif%}
+                </span>
+                {%endif%}
+            </div>
+        </div>
+        <div class="col">
+        </div>
+    </div>
+</span>

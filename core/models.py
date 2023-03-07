@@ -799,6 +799,7 @@ class Company(models.Model):
     whatsapp_access_token = models.TextField(blank=True, null=True)
     whatsapp_app_secret_key = models.TextField(blank=True, null=True)
     whatsapp_app_business_id = models.TextField(blank=True, null=True)
+    # last_successful_active_campaign_url = models.TextField(null=True, blank=True)
     active_campaign_url = models.TextField(null=True, blank=True)
     active_campaign_api_key = models.TextField(null=True, blank=True)
     contact_email = models.TextField(blank=True, null=True, max_length=50)
@@ -990,6 +991,7 @@ class CompanyProfilePermissions(models.Model):
     company = models.ForeignKey("core.Company", on_delete=models.CASCADE, null=True, blank=True)
     edit_user_permissions = models.BooleanField(default=False)
     edit_whatsapp_settings = models.BooleanField(default=False)
+    edit_active_campaign_settings = models.BooleanField(default=False)
     permissions_count = models.IntegerField(default = 0)
     class Meta:
         ordering = ['-pk']   
