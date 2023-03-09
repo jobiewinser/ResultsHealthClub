@@ -1,5 +1,4 @@
-{%load user_permission_tags%}
-
+{%load user_permission_tags core_tags%}
 <div class="row" style="margin-left:0px !important;">
     <div class="col-md-auto mt-0" 
         data-bs-toggle="popover" 
@@ -42,9 +41,8 @@
         </span>
         {%else%}
             <a class="nowrap btn btn-success btn-sm" type="button" 
-                hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body"
-                hx-vals='{"template_name": "add_whatsapp_business_account", "site_pk": "{{site.pk}}"}'
-                hx-get="{% url 'whatsapp-get-modal-content' %}" hx-push-url="false"
+            
+                data-bs-toggle="collapse" data-bs-target="#collapseWhatsappAccountAdd" aria-expanded="false" aria-controls="collapseWhatsappAccountAdd"
                 data-bs-content="
                     You may need to contact Winser Systems about this function if you are not tech savvy!
                 "                
@@ -52,8 +50,7 @@
                 data-bs-trigger="hover focus" 
                 data-bs-html="true" 
                 data-bs-placement="top"
-                data-bs-title="Add Phone Number"
-                hx-swap="innerHTML" hx-trigger="click"><i class="fa-light fa-plus"></i> Add Phone Number to {{site.name}}</a>
+                data-bs-title="Add Phone Number"><i class="fa-light fa-plus"></i> Add Phone Number to {{site.name}}</a>
         {%endif%}
     </div>
 
@@ -61,6 +58,24 @@
     </div>
 </div>
 
+<div class="collapse mt-2" id="collapseWhatsappAccountAdd">
+    <div class="card card-body">  
+        <div class="row">
+            <div class="col-auto" style="min-width:350px">
+                <input name="whatsapp_business_account_id" id="whatsapp_business_account_id" class="form-control whatsapp_business_account_input" placeholder="Whatapp Business Account ID"/>
+            </div>
+            
+            <div class="col-auto" >
+                <button class="btn btn-primary" type="button"
+                    hx-encoding="multipart/form-data" hx-vals='{"site_pk":"{{site.pk}}"}'
+                    hx-post="{% url 'add-whatsapp-business-account' %}" hx-include=".whatsapp_business_account_input" hx-indicator="#page_load_indicator"
+                    hx-swap="none">
+                    Add Whatsapp Business Account ID
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 {%if site_warning_section_swap%}
 {%include 'core/htmx/site_warning_section.html'%}

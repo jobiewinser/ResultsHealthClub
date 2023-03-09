@@ -243,10 +243,6 @@
                 </div>
                 <div class="card-body">
                     {%if site.subscription.whatsapp_enabled%}
-                        <span id="whatsapp_template_sending_wrapper">
-                            {%include 'core/htmx/whatsapp_template_sending_enabled_htmx.html'%}
-                        </span>
-                        <hr>
                         <div class="m-3">
                             {%include 'core/site_configuration/site_configuration_table_htmx.html'%}
                         </div>

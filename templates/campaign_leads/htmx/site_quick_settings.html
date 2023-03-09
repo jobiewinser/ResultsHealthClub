@@ -10,13 +10,11 @@
     </script>
     {%endif%}
     <div class="card card-highlight">
-        <div class="card-body">
+        <div class="card-body" style="min-width:1100px">
             <div class="alert alert-warning p-2">
-                Below are some quick integrations you can add to your site. You can also change them from the 
-                <a class="pointer top-nav-link" href="{%url 'site-configuration'%}?site_pk={{site.pk}}"><i class="fa-light fa-gear"></i> Site Configuration</a>
-                 page.
+                Below are some quick integrations you can add to your site. You can also change them from the Site Configuration page.
             </div>
-            <div class="accordion" style="min-width:1100px">
+            <div class="accordion">
               <div class="accordion-item">
                 <h2 class="accordion-header" id="headingCalendly">
                   <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCalendly" aria-expanded="true" aria-controls="collapseCalendly">
@@ -42,7 +40,9 @@
                     {%if site.subscription.whatsapp_enabled %} 
                     
                       {%if whatsapp_business_details.id%}
-                      You have a valid config for your company, coming soon
+                      <div class="m-3">
+                          {%include 'core/site_configuration/site_configuration_table_htmx.html'%}
+                      </div>
                       {%else%}
                       To add a whatsapp number for this site, you need to add a valid Whatsapp configuration here: <a class="nowrap" type="button" 
                         hx-indicator="#page_load_indicator" hx-target="#generic_modal_body"
