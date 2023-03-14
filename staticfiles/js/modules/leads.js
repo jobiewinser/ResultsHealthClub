@@ -33,8 +33,9 @@ function leadshandlehtmxafterSwap(evt){
                 try{$('#import_contact_table').dataTable().fnDestroy()}catch{};
                 $('#import_contact_table').DataTable(            
                 {  
-                    order: [[ 2, 'desc' ]],
-                    iDisplayLength: 10
+                    "order": [[ 2, 'desc' ]],
+                    "pageLength": 25,
+                    "iDisplayLength": 10
                 }
                 );        
             }

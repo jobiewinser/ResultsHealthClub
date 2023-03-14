@@ -188,10 +188,11 @@ def cancel_all_subscriptions(customer_id):
     return
     
 def cancel_subscription(subscription_id):
-    return stripe.Subscription.modify(
+    temp = stripe.Subscription.modify(
         sid=subscription_id,
         cancel_at_period_end=True,
     )
+    return temp
 
     
 def preview_add_or_update_subscription(subscription_id, new_price):

@@ -359,6 +359,17 @@ def submit_feedback_form(request):
 
 @login_required
 @not_demo_or_superuser_check
+def deactivate_site(request):
+    site = request.user.profile.active_sites_allowed.get(pk=request.POST.get('site_pk'))
+    if get_profile_allowed_to_view_site_configuration(request.user.profile, site):
+        for stripe_subscription_id in site.stripe_subscription_id:
+            cancel_subscription(stripe_subscription_id)
+        site.active = False
+        site.save()
+        return HttpResponse(status=200)
+    return HttpResponse(status=403)
+@login_required
+@not_demo_or_superuser_check
 def deactivate_profile(request):
     user = User.objects.get(pk=request.POST.get('user_pk'))
     if not user.profile.role == 'a':
@@ -487,7 +498,12 @@ def get_single_site_pk_from_request_or_default_profile_site(request):
     profile = Profile.objects.filter(user=request.user).first()
     if profile and not request_dict.get('campaign_category_pk', None) and not request_dict.get('campaign_pk', None):
         if profile.site:
-            return request.user.profile.site.pk
+            if profile.site.active:
+                return request.user.profile.site.pk
+    site = request.user.profile.active_sites_allowed.first()
+    if site:
+        return site.pk
+    return None
 
 #this doesn't needs a method decorator because it is not directly used by urls.py
 def get_campaign_category_pks_from_request(request):  

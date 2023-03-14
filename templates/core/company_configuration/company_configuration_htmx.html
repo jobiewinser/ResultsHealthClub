@@ -57,9 +57,10 @@
                                 <thead>
                                     <tr>
                                         <th>
-                                            <a>
-                                                Name
-                                            </a>
+                                            Name
+                                        </th>
+                                        <th>
+                                            Created
                                         </th>
                                         <th>
                                             Subscription
@@ -67,13 +68,13 @@
                                         <th>
                                             Profiles
                                         </th>
-                                        <!-- <th>
-                                        </th> -->
+                                        <th>
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {%for site in company.active_sites%}
-                                    <tr>
+                                    <tr id="site_row_{{site.pk}}">
                                         <td>
                                             <a href="#"
                                                 hx-indicator="#page_load_indicator" data-active-selector="#configuration-top-nav-dropdown-toggle"
@@ -82,16 +83,19 @@
                                             </a>
                                         </td>
                                         <td>
+                                            {{site.created|nice_date_tag}}
+                                        </td>
+                                        <td>
                                             {{site.subscription.get_name_display}}
                                         </td>
                                         <td>
                                             <b>{{site.users.count}}</b> of <b>{{site.subscription.max_profiles_string}}</b> allowed profiles
                                         </td>
-                                        <!-- <td>
+                                        <td>
                                             <button class="btn btn-danger"
-                                                hx-post="{%url 'deactivate-whatsapp-business-account'%}" hx-vals='{"whatsapp_business_account_pk":"{{number.whatsapp_business_account.pk}}"}' hx-swap="delete" hx-target="#whatsappnumber_row_{{number.pk}}" hx-indicator="#page_load_indicator"
-                                                hx-confirm="This will remove this whatsapp business account (and phone number) from {{site.name}}. It will then be available for you add to another site. The Leads Management System will continue to receive your whatsapp messages until you reactivate this whatsapp business account or you delete the whatsapp business account within Whatsapp.">Deactivate</button>
-                                        </td> -->
+                                                hx-post="{%url 'deactivate-site'%}" hx-vals='{"site_pk":"{{site.pk}}"}' hx-swap="delete" hx-target="#site_row_{{site.pk}}" hx-indicator="#page_load_indicator"
+                                                hx-confirm="This will remove this site. We do not yet support reactivating sites (this is coming soon, even for sites deactivated now).">Deactivate</button>
+                                        </td>
                                     </tr>
                                     {%empty%}
                                     <tr>

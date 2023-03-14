@@ -42,10 +42,17 @@ data-bs-content="
 {%endif%}
 "> 
     {%include 'campaign_leads/campaign_configuration/campaign_configuration_select.html'%}
+    {%if not campaign.site and site%}
+    <button class="btn btn-xs btn-primary" 
+        hx-post="{% url 'set-campaign-site' campaign_pk=campaign.pk %}" 
+        hx-swap="innerHTML" hx-indicator=".top-htmx-indicator" 
+        hx-target="#row_{{campaign.pk}}"
+        hx-vals='{"site_pk":"{{site.pk}}"}'>Assign to <span style="max-width=100px" class="elipses-overflow">{{site.name}}</span></button>
+    {%endif%}
 <button hidden 
-hx-post="{% url 'set-campaign-site' campaign_pk=campaign.pk %}" 
-hx-swap="outerHTML" hx-include="#site_pk_{{campaign.pk}}" 
-id="submit_site_pk_{{campaign.pk}}"></button>
+    hx-post="{% url 'set-campaign-site' campaign_pk=campaign.pk %}" 
+    hx-swap="outerHTML" hx-include="#site_pk_{{campaign.pk}}" 
+    id="submit_site_pk_{{campaign.pk}}"></button>
 </td>
 <td>
     <span hidden>{{campaign.product_cost|floatformat:2}}</span>   

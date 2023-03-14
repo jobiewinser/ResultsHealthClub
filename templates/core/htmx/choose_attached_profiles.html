@@ -61,8 +61,8 @@
           $(document).ready(function() {
             $('#profile_choice_table').DataTable().destroy();
             var table = $('#profile_choice_table').DataTable(
-              { "order": [[0, "desc"]] },
-              {
+              { "order": [[0, "desc"]]
+                "pageLength": 25,
                 "targets": [1,2,3],
                 "orderable": false
               },
@@ -96,8 +96,9 @@
             // Move selected rows to top
             $('#profile_choice_table').DataTable().destroy();
             var table = $('#profile_choice_table').DataTable(
-              { "order": [[0, "desc"]] },
-              {
+              { "order": [[0, "desc"]]
+              
+                "pageLength": 25,
                 "targets": [1,2,3],
                 "orderable": false
               },

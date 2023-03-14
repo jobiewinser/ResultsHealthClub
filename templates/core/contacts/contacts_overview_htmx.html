@@ -6,7 +6,8 @@
             select2stuff()
             try{$('#choose_template_message_site_contact_table').dataTable().fnDestroy()}catch{};
                 $('#choose_template_message_site_contact_table').DataTable({
-                    responsive: true,
+                    "pageLength": 25,
+                    "responsive": true,
                 });        
         });
     </script>
