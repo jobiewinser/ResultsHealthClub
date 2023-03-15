@@ -55,13 +55,9 @@
         </div>
         <div class="col p-0" id="permissions_wrapper">
             {%if site_permissions%}
-            <div class="card" id="permissions_wrapper">
                 {%include 'campaign_leads/htmx/site_permissions.html'%}
-            </div>
             {%elif company_permissions%}
-            <div class="card" id="permissions_wrapper">
                 {%include 'campaign_leads/htmx/company_permissions.html'%}
-            </div>
             {%endif%}
         </div>
     </div>

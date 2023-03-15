@@ -1,5 +1,26 @@
 {%load static core_tags user_permission_tags%}
 <span id="chat_bottom" class="" {%if whatsappnumber%}hx-ws="connect:/ws/messaging/{{whatsappnumber.pk}}/" hx-indicator="#page_load_indicator"{%endif%}>
+    {%if whatsappnumber%}
+    <script>         
+        var ws = new WebSocket("wss://{% get_env_var 'DOMAIN' %}/ws/chat/{{whatsappnumber.pk}}/");
+        
+        ws.onopen = function (evt) {
+          console.log("Connection established");
+        };
+      
+        ws.onmessage = function (evt) {
+          console.log("Message received: " + evt.data);
+        };
+      
+        ws.onclose = function (evt) {
+          console.log("Connection closed");
+        };
+      
+        function sendMessage(message) {
+          ws.send(message);
+        }
+    </script>
+    {%endif%}
     <script>
         $(document).ready(function() {   
             {% if site%}      

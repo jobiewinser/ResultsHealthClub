@@ -203,9 +203,7 @@
                         <tbody>
                             {%for temp_user in site.users%}
                             {%with temp_user.profile as profile%}
-                            <tr id="user_configuration_row_{{profile.pk}}">
                                 {%include 'core/company_configuration/company_configuration_row.html'%}
-                            </tr>
                             {%endwith%}
                             {%endfor%}
                         </tbody>

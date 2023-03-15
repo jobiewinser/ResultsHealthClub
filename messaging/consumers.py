@@ -10,13 +10,14 @@ from core.user_permission_functions import get_user_allowed_to_use_site_messagin
 
 from whatsapp.api import Whatsapp
 from whatsapp.models import WhatsAppMessage
+from django.core.cache import cache
 import logging    
 from channels.layers import get_channel_layer
 from asgiref.sync import sync_to_async
 from core.utils import normalize_phone_number
 from core.models import SiteContact
 logger = logging.getLogger(__name__)
-class ChatConsumer(AsyncWebsocketConsumer):
+class MessagingConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.whatsappnumber_pk = self.scope["url_route"]["kwargs"]["whatsappnumber_pk"]
         self.group_name = f"messaging_{self.whatsappnumber_pk}"
@@ -92,6 +93,30 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def chatbox_message(self, event):
         await self.send(
             text_data=event['message']
+        )
+class ChatConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        logger.debug("TEST start") 
+        self.whatsappnumber_pk = self.scope["url_route"]["kwargs"]["whatsappnumber_pk"]
+        self.group_name = f"chat_{self.whatsappnumber_pk}"
+        self.user = self.scope["user"]
+        if self.user.is_anonymous:
+            self.close()
+        
+        await self.channel_layer.group_add(self.group_name, self.channel_name)
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard(self.group_name, self.channel_name)
+
+    # This function receive messages from WebSocket.
+    async def receive(self, text_data):        
+        logger.info(text_data) 
+        cache.set_notify_expiry() 
+    # Receive message from room group.    
+    async def someone_is_typing(self, event):
+        await self.send(
+            text_data=event['user']
         )
 
 @sync_to_async

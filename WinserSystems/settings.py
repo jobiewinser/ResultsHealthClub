@@ -46,6 +46,12 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'formatter': 'file',
             'filename': "debug.log",
+        },
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'formatter': 'file',
+            'filename': "info.log",
         }
         # 'active_campaign_webhook': {
         #     'level': 'DEBUG',

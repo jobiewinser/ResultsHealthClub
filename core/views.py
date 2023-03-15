@@ -313,8 +313,11 @@ def change_profile_site(request):
             profile.save()
             context['profile'] = profile
             context['role_choices'] = ROLE_CHOICES
+            context['swap_nav_company'] = True
             # context['site_list'] = get_available_sites_for_user(request.user)
             return render(request, 'core/company_configuration/company_configuration_row.html', context)
+    if profile.role == 'a':
+        return HttpResponse("You can't change the site of the company owner.",status=500)        
     return HttpResponse("You are not allowed to edit this, please contact your manager.",status=500)
 @login_required
 @not_demo_or_superuser_check

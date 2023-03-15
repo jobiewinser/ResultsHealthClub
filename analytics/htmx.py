@@ -665,7 +665,7 @@ def get_pipeline_context(request, json_response=False):
         context['sold_rate'] = 0
         
 # Arrived rates
-    if context['opportunities']:
+    if context['arrived_opportunities']:
         context['arrived_booked_rate'] = (context['booked_opportunities'] / context['arrived_opportunities']) * 100
     elif context['arrived_opportunities']:
         context['arrived_booked_rate'] = 100
