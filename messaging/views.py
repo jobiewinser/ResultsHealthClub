@@ -13,8 +13,8 @@ from core.templatetags.core_tags import seconds_until_hours_passed
 from django.utils.decorators import method_decorator
 from core.core_decorators import check_core_profile_requirements_fulfilled
 import logging
+from django.conf import settings
 logger = logging.getLogger(__name__)
-
 
 @login_required
 def message_list(request, **kwargs):
@@ -47,9 +47,12 @@ def message_window(request, **kwargs):
     last_customer_message = all_messages.filter(inbound=True).first()
     if last_customer_message:
         seconds_until_send_disabled = seconds_until_hours_passed(last_customer_message.datetime, 24)
+            
         if seconds_until_send_disabled:
             if seconds_until_send_disabled > 3:
                 context["seconds_until_send_disabled"] = seconds_until_send_disabled
+    if settings.DEBUG:
+        context["seconds_until_send_disabled"] = 100
     # temp = SiteContact.objects.filter(site=whatsappnumber.site, contact__customer_number=kwargs.get('customer_number'))
     context["site_contact"] = SiteContact.objects.get(site=whatsappnumber.site, contact__customer_number=kwargs.get('customer_number'))
     if get_user_allowed_to_use_site_messaging(request.user, whatsappnumber.site):

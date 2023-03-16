@@ -11,7 +11,7 @@ websocket_urlpatterns=[
                     # ),
                     path('ws/messaging/<str:whatsappnumber_pk>/', consumers.MessagingConsumer.as_asgi()),
                     path('ws/lead/<str:company_pk>/', consumers.LeadsConsumer.as_asgi()),
-                    path('ws/chat/<str:whatsappnumber_pk>/', consumers.ChatConsumer.as_asgi()),
+                    path('ws/chat/<str:whatsappnumber_pk>/<str:site_contact_pk>/', consumers.ChatConsumer.as_asgi()),
                     path('ws/message_count/<str:company_pk>/', consumers.CompanyMessageCountConsumer.as_asgi()),
                     
                     # re_path(

@@ -5,6 +5,51 @@
         chatCountdown({{seconds_until_send_disabled}}, "{{customer_number}}", "{{whatsappnumber.pk}}", ".time_left_to_send_{{site_contact.pk}}", "#chat_card_"+{{site_contact.pk}}+"_wrapper_{{uuid}}")
         {%endif%}
     </script>
+    {%if whatsappnumber%}
+    <script>         
+        var ws = new WebSocket("wss://{% get_env_var 'DOMAIN' %}/ws/chat/{{whatsappnumber.pk}}/{{site_contact.pk}}/");
+        var firstAmountUpdated = false;
+        ws.onopen = function (evt) {
+          console.log("Connection established");
+        };
+        
+        var timer_id_{{site_contact.pk}} = "";
+
+        ws.onmessage = function (evt) {
+            console.log(evt)
+            if (evt.data != "{{request.user.pk}}") {
+                console.log("TEST123")
+                clearTimeout(timer_id_{{site_contact.pk}});
+                $('#message_input_{{site_contact.pk}}_someone_typing_div').attr('hidden', false)
+                $('#message_input_div_{{site_contact.pk}}').attr('hidden', true)
+                timer_id_{{site_contact.pk}} = setTimeout(function() {
+                    $('#message_input_{{site_contact.pk}}_someone_typing_div').attr('hidden', true)
+                    $('#message_input_div_{{site_contact.pk}}').attr('hidden', false)
+                }, 8000).toString();
+            }
+            
+        };
+      
+        ws.onclose = function (evt) {
+          console.log("Connection closed");
+        };
+      
+        function typingStarted() {
+            ws.send("test");
+        }
+        function delayedInputListener_{{site_contact.pk}}() {
+            typingStarted()
+            input = document.getElementById("message_input_{{site_contact.pk}}")
+            input.removeEventListener('input', delayedInputListener_{{site_contact.pk}});
+            setTimeout(function() {
+                input.addEventListener('input', delayedInputListener_{{site_contact.pk}});
+            }, 3000);
+        }
+        $(document).ready(function() {            
+            document.getElementById("message_input_{{site_contact.pk}}").addEventListener('input', delayedInputListener_{{site_contact.pk}});
+        })
+    </script>
+    {%endif%}
     <div class="card-body p-0" id="messageWindowCollapse_{{site_contact.pk}}">
         <div class="htmx-indicator disconnected_indicator messaging_disconnected_indicator">
             <b>Connecting</b> <img class="invert" src="{% static 'img/bars.svg' %}">
@@ -12,7 +57,7 @@
         <div class="chat_card_body  p-0" id="messageWindowInnerBody_{{site_contact.pk}}" style="overflow-anchor: none">
             {%include 'messaging/message_window_message_rows.html'%}
             <form id="message_form_{{site_contact.pk}}" hx-ws="send:submit" autocomplete="off" autofill="off">
-                <div style="position: absolute; right:0; bottom: 35px; width:100%;" class="row mb-2" id="message_input_div_{{site_contact.pk}}"> 
+                <div style="position: absolute; right:0; bottom: 35px; width:100%;" class="row mb-2"> 
                     <div class="col"> 
                         {%if seconds_until_send_disabled%}
                         <div class="alert alert-success p-1 m-0"
@@ -38,12 +83,16 @@
                 {%if seconds_until_send_disabled%}
                 <div style="position: absolute; right:0; bottom: 0; width:100%;" class="row mb-2" id="message_input_div_{{site_contact.pk}}"> 
                     <div class="col"> 
-                        <input {%if not seconds_until_send_disabled%}disabled{%endif%} class="form-control form-control-sm message_input_text" id="message_input_{{site_contact.pk}}"  name="message"  type="text"/>
-                        
+                        <input {%if not seconds_until_send_disabled%}disabled{%endif%} class="form-control form-control-sm message_input_text" id="message_input_{{site_contact.pk}}"  name="message"  type="text"/>                        
                         <input hidden class="form-control" value="{{customer_number}}"  name="messaging_customer_number"  type="text"/>
                     </div>
                     <div class="col-auto"> 
                         <button onclick="setTimeout(function (){$('#message_input_{{site_contact.pk}}').val('')}, 10);" class="badge bg-primary message_submit" id="message_submit_{{site_contact.pk}}"><i class="fa-solid fa-paper-plane-top"></i></button>                        
+                    </div>
+                </div>
+                <div style="position: absolute; right:0; bottom: 0; width:100%;" class="row mb-2" id="message_input_{{site_contact.pk}}_someone_typing_div"> 
+                    <div class="col"> 
+                        <input hidden disabled class="form-control form-control-sm message_input_text" id="message_input_{{site_contact.pk}}_someone_typing" value="Someone in your company is typing..." type="text"/>                    
                     </div>
                 </div>
                 {%else%}

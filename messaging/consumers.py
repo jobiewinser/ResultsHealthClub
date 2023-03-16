@@ -98,7 +98,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         logger.debug("TEST start") 
         self.whatsappnumber_pk = self.scope["url_route"]["kwargs"]["whatsappnumber_pk"]
-        self.group_name = f"chat_{self.whatsappnumber_pk}"
+        self.site_contact_pk = self.scope["url_route"]["kwargs"]["site_contact_pk"]
+        self.group_name = f"chat_{self.whatsappnumber_pk}_{self.site_contact_pk}"
         self.user = self.scope["user"]
         if self.user.is_anonymous:
             self.close()
@@ -111,12 +112,23 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     # This function receive messages from WebSocket.
     async def receive(self, text_data):        
-        logger.info(text_data) 
-        cache.set_notify_expiry() 
+        user = self.scope["user"]
+        logger.info(str(user)) 
+        await self.channel_layer.group_send(
+            self.group_name,
+            {
+                'type': 'someone_is_typing',
+                'data':{
+                    'user_pk':str(user.pk),
+                }                     
+            }
+        )
+
     # Receive message from room group.    
     async def someone_is_typing(self, event):
+        logger.info(str(event)) 
         await self.send(
-            text_data=event['user']
+            text_data=event['data']['user_pk']
         )
 
 @sync_to_async
