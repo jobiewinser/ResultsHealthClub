@@ -10,9 +10,35 @@
     {% comment %} <span hx-swap-oob="true" id="site_pk_span">   
         <input type="text" style="display:None" id="site_pk" name="site_pk" value="{{request|get_key_in_get_or_post:'site_pk'}}"/>
     </span> {% endcomment %}
-    
-    <span hx-ws="connect:/ws/lead/{{company.pk}}/">
-    {% include 'campaign_leads/bookings_overview/bookings_table.html' %}
-    </span>
+    <div class="m-3 card card-highlight p-2">
+        {% comment %} <div class="row">
+            <div class="col-auto pe-1">
+                <label>Show</label>
+            </div>
+            <div class="col-auto p-0">
+                <select name="overview_table_length" aria-controls="overview_table" class="form-select form-select-sm">
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
+            <div class="col-auto ps-1">
+                <label>entries</label>
+            </div>
+            <div class="col">
+                
+            </div>
+            <div class="col-auto pe-1">
+                <label>Search:</label>
+            </div>
+            <div class="col-auto ps-1">
+                <input type="search" class="form-control form-control-sm" placeholder="" aria-controls="overview_table">
+            </div>
+        </div> {% endcomment %}
+        {% comment %} <span hx-ws="connect:/ws/lead/{{company.pk}}/"> {% endcomment %}
+        {% include 'campaign_leads/bookings_overview/bookings_table.html' %}
+    {% comment %} </span> {% endcomment %}
+    </div>
 <span>
 {%if request.META.HTTP_HX_REQUEST%}{%include 'campaign_leads/bookings_overview/bookings_overview_under_nav.html'%}{%endif%}

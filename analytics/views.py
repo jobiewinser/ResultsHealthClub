@@ -60,7 +60,6 @@ def get_minimum_site_subscription_level_from_site_qs(site_qs):
     if site_qs:
         lowest_subscription_site = site_qs.order_by('subscription__numerical').first()
         if lowest_subscription_site:
-            print(lowest_subscription_site)
             return lowest_subscription_site.subscription
     return Subscription.objects.get(numerical=2)
 # def get_minimum_site_subscription_level_from_campaign_qs(campaign_qs):

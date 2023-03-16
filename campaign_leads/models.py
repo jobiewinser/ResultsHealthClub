@@ -132,7 +132,7 @@ class Campaignlead(models.Model):
             return str(self.name)
         return f"CampaignLead {str(self.pk)}"
     # @property
-    # def site_contact(self):  
+    # def site_contact(self):  resh-booking-tab
     #     if self.campaign.site:
     #         from core.models import SiteContact
     #         site_contact, created = SiteContact.objects.get_or_create(site=self.campaign.site, contact = self.contact)
@@ -310,7 +310,6 @@ class Campaignlead(models.Model):
                                 ).update(archived = True)
                                 whatsapp = Whatsapp(self.campaign.company.whatsapp_access_token)
                                 template_live = whatsapp.get_template(template.whatsapp_business_account.whatsapp_business_account_id, template.message_template_id)
-                                print(template_live)
                                 template.name = template_live['name']
 
                                 template.category = template_live['category']

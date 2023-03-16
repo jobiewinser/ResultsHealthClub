@@ -198,8 +198,6 @@ def get_booking_table_context(request):
         except Exception as e:
             pass
     elif context['sites']:
-        for item in leads:
-            print(item.campaign.site)
         leads = leads.filter(campaign__site__in=context['sites'])
 
     # context['archived_count'] = leads.filter(archived=True).count()

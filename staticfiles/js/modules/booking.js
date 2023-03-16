@@ -1,13 +1,27 @@
 function initBookingDataTable() {
     console.log("initBookingDataTable")
     try{$('#overview_table').dataTable().fnDestroy()}catch{};
+
+    let typingTimer;                //timer identifier
+    let doneTypingInterval = 5000;  //time in ms (5 seconds)
+    let myInput = document.getElementById('myInput');
     
     var dt = $('#overview_table').DataTable(            
-    {  
-        order: [[ 4, 'desc' ],[ 2, 'desc' ]],
-        iDisplayLength: 10
-    }
+        {  
+            order: [[ 4, 'desc' ],[ 2, 'desc' ]],
+            iDisplayLength: 10
+        }
     );
+    var old_element = document.querySelector(".dataTables_filter input[type='search']");
+    var new_element = old_element.cloneNode(true);
+    old_element.parentNode.replaceChild(new_element, old_element);
+    $(new_element).on('keypress', function(e) {
+        console.log(e);
+    });
+}
+//user is "finished typing," do something
+function doneTyping () {
+    alert("YAY")
 }
 
 function bookinghandlehtmxafterSwap(evt){
