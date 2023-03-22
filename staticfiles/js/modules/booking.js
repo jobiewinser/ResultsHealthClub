@@ -1,27 +1,25 @@
 function initBookingDataTable() {
     console.log("initBookingDataTable")
     try{$('#overview_table').dataTable().fnDestroy()}catch{};
-
-    let typingTimer;                //timer identifier
-    let doneTypingInterval = 5000;  //time in ms (5 seconds)
-    let myInput = document.getElementById('myInput');
     
+    let booking_search = null;
+    let booking_search_val = "";
     var dt = $('#overview_table').DataTable(            
         {  
             order: [[ 4, 'desc' ],[ 2, 'desc' ]],
-            iDisplayLength: 10
+            iDisplayLength: 10,
+            "initComplete": function () {
+                // Overwrite the default search event
+                $('.dataTables_filter input').unbind().keyup(function () {
+                    clearTimeout(booking_search);
+                    booking_search_val = $(this).val();
+                    booking_search = setTimeout(function() {
+                        console.log(booking_search_val)
+                    }, 1000)
+                });
+            }
         }
     );
-    var old_element = document.querySelector(".dataTables_filter input[type='search']");
-    var new_element = old_element.cloneNode(true);
-    old_element.parentNode.replaceChild(new_element, old_element);
-    $(new_element).on('keypress', function(e) {
-        console.log(e);
-    });
-}
-//user is "finished typing," do something
-function doneTyping () {
-    alert("YAY")
 }
 
 function bookinghandlehtmxafterSwap(evt){
