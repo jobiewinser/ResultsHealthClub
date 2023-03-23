@@ -35,3 +35,5 @@ django-extensions==3.2.1
 stripe==5.0.0
 names==0.3.0
 django-redis==5.0.0
+djangorestframework==3.13.1
+djangorestframework-datatables==0.7.0

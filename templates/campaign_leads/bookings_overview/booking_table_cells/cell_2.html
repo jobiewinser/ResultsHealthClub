@@ -1,0 +1,10 @@
+{%load static core_tags tz%}
+<div class="nowrap">
+    {% if lead.active_sales_qs.exists %}
+        <span class="legend-indicator bg-success text-success"></span> Sold
+    {% elif lead.archived and not lead.active_sales_qs%}
+        <span class="legend-indicator bg-danger text-danger"></span> Archived
+    {% else%}
+        <span class="legend-indicator bg-primary"></span>Active
+    {%endif%}
+</div>

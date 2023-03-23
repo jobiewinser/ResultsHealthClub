@@ -1,39 +1,39 @@
 
 {%load static%}
-<div id="overview_table_span_wrapper" class="">
-    <table id="overview_table" class="table"> 
+<div id="overview_table_span_wrapper">
+    <table id="overview_table" class="table" data-server-side="true" data-ajax="/booking-overview-data/?format=datatables"> 
         <thead> 
             <tr>
-                <th>
+                <th data-data="data1">
                     Name
                 </th>
-                <th>
+                <th data-data="data2">
                     Status
                 </th>
                 {% comment %} <th>
                     Lead Date
                 </th> {% endcomment %}
-                <th>
+                <th data-data="data3">
                     Ad Campaign
                 </th>
-                <th>
+                <th data-data="data4">
                     Value
                 </th>
-                <th>
+                <th data-data="data5">
                     Booked
                 </th>
                 {% comment %} <th>
                     Next Auto Whatsapp
                 </th> {% endcomment %}
-                <th>
+                <th data-data="data6">
                     Actions
                 </th>
             </tr>
         </thead>
         <tbody> 
-            {%for lead in leads%}
+            {% comment %} {%for lead in leads%}
             {%include 'campaign_leads/bookings_overview/booking_row.html'%}
-            {%endfor%}
+            {%endfor%} {% endcomment %}
         </tbody>
     </table>
 </div>

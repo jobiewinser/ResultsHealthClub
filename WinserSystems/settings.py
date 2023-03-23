@@ -143,6 +143,7 @@ INSTALLED_APPS = [
     'hijack',
     'hijack.contrib.admin',
     "django_extensions",
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -315,3 +316,24 @@ VERSION=1.01
 #             }
 #         }
 #     }
+auth_classes = [
+        "rest_framework.authentication.SessionAuthentication",        
+    ]
+    
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": auth_classes,
+    
+    "DEFAULT_PERMISSION_CLASSES": [
+        # "rest_framework.permissions.IsAuthenticatedOrReadOnly"
+    ],
+    "DEFAULT_PAGINATION_CLASS": "rest_framework_datatables.pagination.DatatablesLimitOffsetPagination",
+    "PAGE_SIZE": 50,
+    'DEFAULT_FILTER_BACKENDS': (
+        'rest_framework_datatables.filters.DatatablesFilterBackend',
+    ),
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer', #DO NOT REMOVE, VIEWFLOW NEEDS THIS???
+        'rest_framework.renderers.TemplateHTMLRenderer', #DO NOT REMOVE, VIEWFLOW NEEDS THIS???
+        'rest_framework_datatables.renderers.DatatablesRenderer',
+    )
+}

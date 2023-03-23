@@ -10,13 +10,13 @@ function initBookingDataTable() {
             iDisplayLength: 10,
             "initComplete": function () {
                 // Overwrite the default search event
-                $('.dataTables_filter input').unbind().keyup(function () {
-                    clearTimeout(booking_search);
-                    booking_search_val = $(this).val();
-                    booking_search = setTimeout(function() {
-                        console.log(booking_search_val)
-                    }, 1000)
-                });
+                // $('.dataTables_filter input').unbind().keyup(function () {
+                //     clearTimeout(booking_search);
+                //     booking_search_val = $(this).val();
+                //     booking_search = setTimeout(function() {
+                //         console.log(booking_search_val)
+                //     }, 1000)
+                // });
             }
         }
     );

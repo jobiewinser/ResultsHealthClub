@@ -3,12 +3,14 @@ import logging
 from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import render
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, View
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from campaign_leads.models import Call, Campaignlead, CampaignTemplateLink, CampaignCategory, Campaign, ManualCampaign
 from active_campaign.api import ActiveCampaignApi
 from active_campaign.models import ActiveCampaign
+from django.utils.decorators import classonlymethod
+from functools import update_wrapper
 from core.models import Profile, Site, WhatsappBusinessAccount
 from core.user_permission_functions import get_user_allowed_to_add_call
 from core.views import get_site_pks_from_request_and_return_sites, get_campaign_category_pks_from_request, get_single_site_pk_from_request_or_default_profile_site
@@ -19,6 +21,9 @@ from core.core_decorators import check_core_profile_requirements_fulfilled
 from core.user_permission_functions import get_profile_allowed_to_edit_other_profile
 from core.core_decorators import *
 from core.utils import get_object_or_403
+from rest_framework import mixins, viewsets
+from django.template import loader
+from rest_framework.response import Response
 logger = logging.getLogger(__name__)
 def hex_to_rgb_tuple(hex):
     # this function takes a hex string and returns a string of rgb values
@@ -168,6 +173,62 @@ class BookingsOverviewView(TemplateView):
             context['campaign_categorys'] = get_campaign_category_qs(self.request)
         context.update(get_booking_table_context(self.request))
         return context
+    
+from rest_framework import serializers
+    
+class CampaignLeadSerializer(serializers.ModelSerializer):
+    data1 = serializers.SerializerMethodField()
+    data2 = serializers.SerializerMethodField()
+    data3 = serializers.SerializerMethodField()
+    data4 = serializers.SerializerMethodField()
+    data5 = serializers.SerializerMethodField()
+    data6 = serializers.SerializerMethodField()
+    class Meta:
+        model = Campaignlead
+        fields = [
+            'data1',
+            'data2',
+            'data3',
+            'data4',
+            'data5',
+            'data6',
+        ]
+            
+
+    def get_data1(self, obj):
+        return loader.render_to_string('campaign_leads/bookings_overview/booking_table_cells/cell_1.html', {"lead":obj})
+    def get_data2(self, obj):
+        return loader.render_to_string('campaign_leads/bookings_overview/booking_table_cells/cell_2.html', {"lead":obj})
+    def get_data3(self, obj):
+        return loader.render_to_string('campaign_leads/bookings_overview/booking_table_cells/cell_3.html', {"lead":obj})
+    def get_data4(self, obj):
+        return loader.render_to_string('campaign_leads/bookings_overview/booking_table_cells/cell_4.html', {"lead":obj})
+    def get_data5(self, obj):
+        return loader.render_to_string('campaign_leads/bookings_overview/booking_table_cells/cell_5.html', {"lead":obj})
+    def get_data6(self, obj):
+        return loader.render_to_string('campaign_leads/bookings_overview/booking_table_cells/cell_6.html', {"lead":obj})
+    # def get_refund__refund(self, obj):
+    #     refund = getattr(obj, 'refund', None)
+    #     if refund:
+    #         return True
+    
+# @method_decorator(login_required, name='dispatch')
+# @method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
+class BookingsOverviewDataViewSet(viewsets.ModelViewSet):
+    queryset = Campaignlead.objects.all().order_by('id')
+    serializer_class = CampaignLeadSerializer
+    # permission_classes = [BasicPermissions]
+    def list(self, request, *args, **kwargs):
+        queryset = get_booking_table_context(request)['leads']
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+    
 def get_booking_table_context(request):
     #this function is used to get the context for the booking table and refresh_booking_table_htmx
     request.GET._mutable = True     

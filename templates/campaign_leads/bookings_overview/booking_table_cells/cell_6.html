@@ -1,0 +1,108 @@
+{%load static core_tags tz%}
+<div class="double_layer_td">
+    <span class="primary_td_layer">  
+        <div class="btn-group btn-space btn-space-with-history mb-1">
+            <button class="btn btn-secondary btn-sm" type="button"
+                data-bs-toggle="popover" 
+                data-bs-trigger="hover focus" 
+                data-bs-placement="top"
+                data-bs-content="Add new booking for this lead."
+                onclick="htmx.ajax('GET', '{% url 'campaign-lead-get-modal-content' param1=lead.pk %}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'add_booking'}})"
+                ><i class="fa-regular fa-plus" ></i> New Booking</button>
+            <button class="btn btn-secondary btn-sm" type="button"
+                data-bs-toggle="popover" 
+                data-bs-trigger="hover focus" 
+                data-bs-placement="top"
+                data-bs-content="See booking history for this lead."
+                onclick="htmx.ajax('GET', '{% url 'campaign-lead-get-modal-content' param1=lead.pk %}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'booking_history'}})"
+                
+                {% comment %} hx-indicator=".top-htmx-indicator" hx-target="#generic_modal_body" 
+                hx-vals='{"template_name": "booking_history"}'
+                hx-get="{% url 'campaign-lead-get-modal-content' param1=lead.pk %}" 
+                hx-push-url="false"
+                hx-swap="innerHTML" hx-trigger="click" {% endcomment %}
+                
+                ><i class="fa-regular fa-clock-rotate-left" ></i> {{lead.ordered_bookings.count}}</button>
+        </div>
+        <div class="btn-group btn-space btn-space-with-history mb-1 btn-secondary"
+            data-bs-toggle="popover" 
+            data-bs-trigger="hover focus" 
+            data-bs-html="true" 
+            data-bs-placement="top"
+            data-bs-title="Create and View Notes."
+            data-bs-content="
+            <ul>
+                {%for note in lead.note_set.all|queryset_last_x:10%}
+                <li>
+                    <div class='double_layer_td'>                         
+                        <div class='row'>   
+                            <div class='col p-0 elipses-overflow' style='max-width: 200px;'>   
+                                <span class='primary_td_layer'>{{note.text}}</span>
+                                <br>
+                                <span class='secondary_td_layer'>{{note.user.first_name}} {{note.user.last_name}} - {{note.datetime}}</span>   
+                            </div>
+                            <div class='col-md-auto p-0'>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                {%endfor%}
+            </ul>
+            ">
+            <button class="btn {%if lead.note_set.all%}btn-dark text-white{%else%}btn-secondary text-secondary{%endif%} btn-sm" type="button"
+                onclick="htmx.ajax('GET', '{% url 'campaign-lead-get-modal-content' param1=lead.pk %}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'note_history'}})">
+                <i class="fa-solid fa-notes"></i> <span class="text-secondary">{{lead.note_set.all.count}}</span></button>
+        </div>
+        
+        <div class="btn-group btn-space  mb-1">    
+            <button class="btn btn-secondary btn-sm" type="button"
+                onclick="htmx.ajax('GET', '{% url 'campaign-lead-get-modal-content'%}', {swap:'innerHTML', target:'#generic_modal_body', values:{'template_name':'edit_lead','lead_pk':'{{lead.pk}}'}})">
+                <i class="fa-solid fa-pencil"></i></button>
+        </div>
+    </span>
+    <br>
+    <span class="secondary_td_layer">     
+        <div class="btn-group btn-space mt-1">     
+            {%include 'campaign_leads/htmx/arrived_button.html'%}
+        </div>
+        <div class="btn-group btn-space mt-1 dropdown">     
+            {%include 'campaign_leads/htmx/sold_button.html'%}
+        </div>
+
+        <div class="btn-group btn-space mt-1">     
+            {%if not lead.active_sales_qs%}
+                {%if lead.archived%}
+                    <button class="btn btn-danger btn-sm nowrap"
+                    {%if demo and not request.user.is_superuser%}disabled{%endif%}
+                        data-bs-toggle="popover" 
+                        data-bs-trigger="hover focus" 
+                        data-bs-placement="top"
+                        data-bs-content="Unarchive this lead"
+                        onclick="htmx.ajax('POST', '{% url 'mark-archived' %}', {target:'#row_{{lead.pk}}', swap:'outerHTML', values:htmx.values(htmx.find('#lead_pk_{{lead.pk}}'))})"
+                        ><i class="fa-regular fa-box-archive"></i> Unarchive {%if demo and not request.user.is_superuser%}(Demo, Disabled){%endif%}</button>
+                    <button class="btn btn-dark btn-sm nowrap" 
+                        data-bs-toggle="popover" 
+                        data-bs-trigger="hover focus" 
+                        data-bs-placement="top"
+                        data-bs-content="Delete this lead"
+                        onclick="if (confirm('Are you sure you want to PERMANENTLY DELETE this archived lead')){htmx.ajax('POST', '{% url 'delete-lead' %}', {target:'#row_{{lead.pk}}', values:htmx.values(htmx.find('#lead_pk_{{lead.pk}}'))})}"
+                            {% comment %} hx-confirm=""
+                            hx-trigger="click"
+                            hx-post="{% url 'delete-lead' %}" hx-indicator=".top-htmx-indicator" hx-target="#row_{{lead.pk}}" {% endcomment %}
+                        ><i class="fa-regular fa-trash"></i> Delete</button>
+                {%else%}
+                    <button class="btn btn-secondary btn-sm nowrap" 
+                    {%if demo and not request.user.is_superuser%}disabled{%endif%}
+                    data-bs-toggle="popover" 
+                    data-bs-trigger="hover focus" 
+                    data-bs-placement="top"
+                    data-bs-content="Archive this lead"
+                    onclick="htmx.ajax('POST', '{% url 'mark-archived' %}', {target:'#row_{{lead.pk}}', swap:'outerHTML', values:htmx.values(htmx.find('#lead_pk_{{lead.pk}}'))})"
+                        {% comment %} hx-trigger="click" hx-include="#lead_pk_{{lead.pk}}"
+                        hx-post="{% url 'mark-archived' %}" hx-indicator=".top-htmx-indicator" hx-target="#row_{{lead.pk}}" {% endcomment %}
+                        ><i class="fa-regular fa-box-archive"></i> Archive {%if demo and not request.user.is_superuser%}(Demo, Disabled){%endif%}</button>
+                {%endif%} 
+            {%endif%} 
+        </div>
+    </span>
+</div>

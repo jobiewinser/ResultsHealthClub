@@ -1,0 +1,91 @@
+{%load static core_tags tz%}
+<div class="double_layer_td">
+    <span hidden class="booking-lead-{{lead.pk}}"></span>
+    <input type="text" style="display:None" id="lead_pk_{{lead.pk}}" name="lead_pk" value="{{lead.pk}}"/>
+    <span class="primary_td_layer">
+        
+        <span 
+        class="help"
+        data-bs-toggle="popover" 
+        data-bs-trigger="hover focus" 
+        data-bs-html="true" 
+        data-bs-placement="top"
+        data-bs-title="Full Information"
+        data-bs-content="
+        <b>Name:</b> {{lead.name}}<br>
+        <b>Number:</b> {{lead.contact.customer_number}}<br>
+        <b>Email:</b> {{lead.email}}<br>
+        <b>Campaign:</b> {{lead.campaign}}<br>
+        <b>Site:</b> {{lead.campaign.site.name}}<br>
+        <b>Created:</b> {{lead.created}}<br>
+        <b>Last Dragged:</b> {{lead.last_dragged}}<br>
+
+        <br>
+        <b>Cost:</b> {{lead.get_product_cost|floatformat:2}}<br>
+        ">
+            <i class="fa-solid fa-circle-info text-info"></i>
+        </span>
+        {%if lead.active_errors%}
+            <span 
+            data-bs-toggle="popover" 
+            data-bs-trigger="hover focus" 
+            data-bs-html="true" 
+            data-bs-placement="top"
+            data-bs-title="Errors"
+            data-bs-content="
+            <b>Errors:</b>
+            <ul>
+                {%for error in lead.active_errors%}
+                <li>{{error.created}} - {{error.get_type_display}}</li>
+                {%endfor%}
+            </ul>
+            ">
+                <i class="fa-solid fa-triangle-exclamation help flashme text-danger"></i>
+            </span>
+        {%endif%} 
+        {{lead.name}} 
+    
+        {%if lead.possible_duplicate%}<i class="fa-solid fa-triangle-exclamation"
+        data-bs-toggle="popover" 
+        data-bs-trigger="hover focus" 
+        data-bs-placement="top"
+        data-bs-content="This is a possible duplicate"></i>{%endif%}
+        
+    </span>
+    <br>
+    <span class="secondary_td_layer">
+        {%if not lead.message_set.all%}
+            <button class="btn btn-sm btn-secondary position-relative" 
+                {%if lead.disabled_automated_messaging%}
+                onclick="alert(`This lead is marked as don't automatically message. Please manually send a template from the message window at the bottom of your screen.`)"
+                {%else%}
+                hx-post="{%url 'send-first-template-whatsapp-booking-row' lead_pk=lead.pk%}"
+                hx-indicator="#page_load_indicator" 
+                hx-target="#row_{{lead.pk}}"
+                hx-push-url="false"
+                hx-swap="innerHTML" hx-trigger="click"  
+                {%endif%}
+                data-customer-number="{{lead.contact.customer_number}}"
+                data-site-contact-pk="{{lead.site_contact.pk}}">
+                    Send <i class="fa fa-whatsapp"></i>
+            </button>
+        {%else%}
+            <button class="btn btn-sm btn-success position-relative"                     
+                hx-get="{%url 'message-list'%}"
+                hx-target="#chat_bottom"
+                hx-swap="outerHTML"
+                hx-indicator="#page_load_indicator"                 
+                hx-vals='{"site_pk": "{{lead.campaign.site.pk}}", "customer_number": "{{lead.contact.customer_number}}"}'
+                hx-trigger="click"
+                
+                onclick="$('#chat_card_{{lead.site_contact.pk}}').remove(); $('#chat_list_bottom_window').remove();"
+                data-customer-number="{{lead.contact.customer_number}}"
+                data-site-contact-pk="{{lead.site_contact.pk}}">
+                    Chat <i class="fa fa-whatsapp"></i>
+                    <span id="chat_notification_{{lead.site_contact.pk}}">
+                    </span>
+            </button>
+        {%endif%}
+        <span style="text-decoration: none;" class="nowrap text-success" target="_blank"><i class="fa fa-whatsapp" aria-hidden="true"></i> {{lead.contact.customer_number|display_phone}}</span>
+    </span>   
+</div>

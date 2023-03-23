@@ -1,0 +1,14 @@
+{%load static core_tags tz%}
+{%with lead.active_bookings.0 as booking%}
+<span hidden>{%if booking.datetime%}{{booking.datetime|timestamp}}{%else%}9999999999{%endif%}</span>
+{%if booking and not booking.datetime and not demo%}
+    <button hidden
+        hx-trigger="load"
+        hx-get="{%url 'get-latest-calendly-booking-info'%}"
+        hx-target="#booking_datetime_{{booking.pk}}" 
+        hx-swap="innerHTML" 
+        hx-vals='{"booking_pk":"{{booking.pk}}"}' 
+        hx-indicator="#booking_datetime_indicator_{{booking.pk}}"></button>
+{%endif%}
+{%include 'campaign_leads/htmx/calendly_booking_datetime_snippet.html'%}   
+{%endwith%}  
