@@ -24,6 +24,7 @@ from core.utils import get_object_or_403
 from rest_framework import mixins, viewsets
 from django.template import loader
 from rest_framework.response import Response
+from campaign_leads.filter_backends import DefineSearchFieldsDatatablesBaseFilterBackend
 logger = logging.getLogger(__name__)
 def hex_to_rgb_tuple(hex):
     # this function takes a hex string and returns a string of rgb values
@@ -93,7 +94,7 @@ def get_leads_board_context(request):
     context = {}   
     context['sites'] = get_site_pks_from_request_and_return_sites(request)
     campaigns = get_campaign_qs(request)
-    leads = Campaignlead.objects.filter(archived=False, campaign__site__company=request.user.profile.company, campaign__site__in=request.user.profile.active_sites_allowed).exclude(booking__archived=False)
+    leads = Campaignlead.objects.filter(archived=False, campaign__site__company=request.user.profile.company, campaign__site__in=request.user.profile.active_sites_allowed, booking__isnull=True)
     campaign_pks = request.GET.getlist('campaign_pks', None)
     filtered = False
     
@@ -177,35 +178,35 @@ class BookingsOverviewView(TemplateView):
 from rest_framework import serializers
     
 class CampaignLeadSerializer(serializers.ModelSerializer):
-    data1 = serializers.SerializerMethodField()
-    data2 = serializers.SerializerMethodField()
-    data3 = serializers.SerializerMethodField()
-    data4 = serializers.SerializerMethodField()
-    data5 = serializers.SerializerMethodField()
-    data6 = serializers.SerializerMethodField()
+    site_contact__first_name = serializers.SerializerMethodField()
+    active_sale = serializers.SerializerMethodField()
+    campaign__name = serializers.SerializerMethodField()
+    product_cost = serializers.SerializerMethodField()
+    booking__datetime = serializers.SerializerMethodField()
+    pk = serializers.SerializerMethodField()
     class Meta:
         model = Campaignlead
         fields = [
-            'data1',
-            'data2',
-            'data3',
-            'data4',
-            'data5',
-            'data6',
+            'site_contact__first_name',
+            'active_sale',
+            'campaign__name',
+            'product_cost',
+            'booking__datetime',
+            'pk',
         ]
             
 
-    def get_data1(self, obj):
+    def get_site_contact__first_name(self, obj):
         return loader.render_to_string('campaign_leads/bookings_overview/booking_table_cells/cell_1.html', {"lead":obj})
-    def get_data2(self, obj):
+    def get_active_sale(self, obj):
         return loader.render_to_string('campaign_leads/bookings_overview/booking_table_cells/cell_2.html', {"lead":obj})
-    def get_data3(self, obj):
+    def get_campaign__name(self, obj):
         return loader.render_to_string('campaign_leads/bookings_overview/booking_table_cells/cell_3.html', {"lead":obj})
-    def get_data4(self, obj):
+    def get_product_cost(self, obj):
         return loader.render_to_string('campaign_leads/bookings_overview/booking_table_cells/cell_4.html', {"lead":obj})
-    def get_data5(self, obj):
+    def get_booking__datetime(self, obj):
         return loader.render_to_string('campaign_leads/bookings_overview/booking_table_cells/cell_5.html', {"lead":obj})
-    def get_data6(self, obj):
+    def get_pk(self, obj):
         return loader.render_to_string('campaign_leads/bookings_overview/booking_table_cells/cell_6.html', {"lead":obj})
     # def get_refund__refund(self, obj):
     #     refund = getattr(obj, 'refund', None)
@@ -216,25 +217,30 @@ class CampaignLeadSerializer(serializers.ModelSerializer):
 # @method_decorator(check_core_profile_requirements_fulfilled, name='dispatch')
 class BookingsOverviewDataViewSet(viewsets.ModelViewSet):
     queryset = Campaignlead.objects.all().order_by('id')
+    # filterset_fields = ('site_contact__first_name','site_contact__last_name',)
     serializer_class = CampaignLeadSerializer
+    filter_backends = [DefineSearchFieldsDatatablesBaseFilterBackend]
+    # search_fields = ('site_contact__first_name','site_contact__last_name',)
     # permission_classes = [BasicPermissions]
     def list(self, request, *args, **kwargs):
-        queryset = get_booking_table_context(request)['leads']
+        self.queryset = get_booking_table_context(request)['leads']
+        return super(BookingsOverviewDataViewSet, self).list(request)
+    def filter_queryset(self, request, *args, **kwargs):
+        return super(BookingsOverviewDataViewSet, self).filter_queryset(request)
+        # page = self.paginate_queryset(queryset)
+        # if page is not None:
+        #     serializer = self.get_serializer(page, many=True)
+        #     return self.get_paginated_response(serializer.data)
 
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        # serializer = self.get_serializer(queryset, many=True)
+        # return Response(serializer.data)
     
 def get_booking_table_context(request):
     #this function is used to get the context for the booking table and refresh_booking_table_htmx
     request.GET._mutable = True     
     context = {}
     # This need further testing. You can archive then sell and it won't show anywhere in the whole ui
-    leads = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, campaign__site__in=request.user.profile.active_sites_allowed).exclude(booking__archived=True)
+    leads = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, campaign__site__in=request.user.profile.active_sites_allowed, booking__isnull=False)
     campaign_pks = request.GET.getlist('campaign_pks', None)
 
     campaign_category_pks = request.GET.getlist('campaign_category_pks', None)

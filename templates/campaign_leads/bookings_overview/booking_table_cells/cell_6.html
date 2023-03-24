@@ -78,14 +78,14 @@
                         data-bs-trigger="hover focus" 
                         data-bs-placement="top"
                         data-bs-content="Unarchive this lead"
-                        onclick="htmx.ajax('POST', '{% url 'mark-archived' %}', {target:'#row_{{lead.pk}}', swap:'outerHTML', values:htmx.values(htmx.find('#lead_pk_{{lead.pk}}'))})"
+                        onclick="htmx.ajax('POST', '{% url 'mark-archived' %}', {target:'#'+$('#booking-lead-{{lead.pk}}').parents('tr:first').attr('id'), swap:'outerHTML', values:htmx.values(htmx.find('#lead_pk_{{lead.pk}}'))})"
                         ><i class="fa-regular fa-box-archive"></i> Unarchive {%if demo and not request.user.is_superuser%}(Demo, Disabled){%endif%}</button>
                     <button class="btn btn-dark btn-sm nowrap" 
                         data-bs-toggle="popover" 
                         data-bs-trigger="hover focus" 
                         data-bs-placement="top"
                         data-bs-content="Delete this lead"
-                        onclick="if (confirm('Are you sure you want to PERMANENTLY DELETE this archived lead')){htmx.ajax('POST', '{% url 'delete-lead' %}', {target:'#row_{{lead.pk}}', values:htmx.values(htmx.find('#lead_pk_{{lead.pk}}'))})}"
+                        onclick="if (confirm('Are you sure you want to PERMANENTLY DELETE this archived lead')){htmx.ajax('POST', '{% url 'delete-lead' %}', {target:'#'+$('#booking-lead-{{lead.pk}}').parents('tr:first').attr('id'), values:htmx.values(htmx.find('#lead_pk_{{lead.pk}}'))})}"
                             {% comment %} hx-confirm=""
                             hx-trigger="click"
                             hx-post="{% url 'delete-lead' %}" hx-indicator=".top-htmx-indicator" hx-target="#row_{{lead.pk}}" {% endcomment %}
@@ -97,7 +97,7 @@
                     data-bs-trigger="hover focus" 
                     data-bs-placement="top"
                     data-bs-content="Archive this lead"
-                    onclick="htmx.ajax('POST', '{% url 'mark-archived' %}', {target:'#row_{{lead.pk}}', swap:'outerHTML', values:htmx.values(htmx.find('#lead_pk_{{lead.pk}}'))})"
+                    onclick="htmx.ajax('POST', '{% url 'mark-archived' %}', {target:'#'+$('#booking-lead-{{lead.pk}}').parents('tr:first').attr('id'), swap:'outerHTML', values:htmx.values(htmx.find('#lead_pk_{{lead.pk}}'))})"
                         {% comment %} hx-trigger="click" hx-include="#lead_pk_{{lead.pk}}"
                         hx-post="{% url 'mark-archived' %}" hx-indicator=".top-htmx-indicator" hx-target="#row_{{lead.pk}}" {% endcomment %}
                         ><i class="fa-regular fa-box-archive"></i> Archive {%if demo and not request.user.is_superuser%}(Demo, Disabled){%endif%}</button>

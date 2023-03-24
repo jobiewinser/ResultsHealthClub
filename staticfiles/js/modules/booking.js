@@ -6,20 +6,21 @@ function initBookingDataTable() {
     let booking_search_val = "";
     var dt = $('#overview_table').DataTable(            
         {  
-            order: [[ 4, 'desc' ],[ 2, 'desc' ]],
-            iDisplayLength: 10,
-            "initComplete": function () {
-                // Overwrite the default search event
-                // $('.dataTables_filter input').unbind().keyup(function () {
-                //     clearTimeout(booking_search);
-                //     booking_search_val = $(this).val();
-                //     booking_search = setTimeout(function() {
-                //         console.log(booking_search_val)
-                //     }, 1000)
-                // });
-            }
+            "order": [[ 4, 'desc' ]],
+            "iDisplayLength": 10,
+            "columnDefs":[
+                {
+                    "targets": [1],
+                    "orderable": false
+                },
+                {
+                    "targets": [-1],
+                    "orderable": false
+                }
+            ],
         }
     );
+
 }
 
 function bookinghandlehtmxafterSwap(evt){

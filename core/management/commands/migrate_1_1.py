@@ -2,7 +2,7 @@ import os
 import glob
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
-from campaign_leads.models import Campaignlead, Sale
+from campaign_leads.models import Campaignlead, Sale, Booking
 from core.models import Site, Contact, SiteContact, WhatsappNumber
 import requests
 import random as r
@@ -15,6 +15,10 @@ from core.views import get_and_create_contact_and_site_contact_for_lead
 random_name = []
 class Command(BaseCommand):
     def handle(self, *args, **options):
+        for sale in Sale.objects.all():
+            sale.save()
+        for booking in Booking.objects.all():
+            booking.save()
         pass
         # for contact in Contact.objects.all():
         #     contact.save()

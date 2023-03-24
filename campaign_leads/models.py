@@ -127,6 +127,7 @@ class Campaignlead(models.Model):
     last_dragged = models.DateTimeField(null=True, blank=True)
     assigned_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     product_cost = models.FloatField(null=True, blank=True)
+    active_sale = models.BooleanField(default=False)
     def __str__(self):
         if self.name:
             return str(self.name)
@@ -140,7 +141,7 @@ class Campaignlead(models.Model):
     #     return None
     @property
     def ordered_bookings(self):  
-        return self.booking_set.all().order_by('-datetime')
+        return self.booking.all().order_by('-datetime')
     @property
     def whatsapp_number(self): 
         if self.contact:
@@ -169,10 +170,12 @@ class Campaignlead(models.Model):
         return AttachedError.objects.filter(Q(campaign_lead=self)|Q(customer_number=self.whatsapp_number, whatsapp_number__whatsapp_business_account__site=self.campaign.site)).filter(archived=False)
     @property
     def active_bookings(self):        
-        return self.booking_set.exclude(archived=True)
+        return self.booking.exclude(archived=True)
 
     @property
     def name(self):
+        if self.site_contact:
+            return self.site_contact.name
         if self.last_name:
             return f"{self.first_name} {self.last_name}"
         return self.first_name
@@ -475,10 +478,11 @@ class Campaignlead(models.Model):
                 self.product_cost = self.campaign.product_cost
         except:
             pass
-        if self.campaign.site and not self.site_contact and self.contact:
-            from core.models import SiteContact
-            site_contact, created = SiteContact.objects.get_or_create(site=self.campaign.site, contact = self.contact)
-            self.site_contact = site_contact
+        if self.campaign and not self.site_contact and self.contact:
+            if self.campaign.site:
+                from core.models import SiteContact
+                site_contact, created = SiteContact.objects.get_or_create(site=self.campaign.site, contact = self.contact)
+                self.site_contact = site_contact
         super(Campaignlead, self).save(force_insert, force_update, using, update_fields)
         
         
@@ -509,6 +513,9 @@ class Sale(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     archived = models.BooleanField(default=False)
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        if self.lead:
+            self.lead.active_sale = self.lead.active_sales_qs.exists()
+            self.lead.save()
         super(Sale, self).save(force_insert, force_update, using, update_fields)
     # class Meta:
     #     ordering = ['-datetime']
@@ -516,11 +523,20 @@ class Sale(models.Model):
 class Booking(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     datetime = models.DateTimeField(null=True, blank=True)
-    lead = models.ForeignKey(Campaignlead, on_delete=models.SET_NULL, null=True, blank=True)
+    # lead = models.ForeignKey(Campaignlead, on_delete=models.SET_NULL, null=True, blank=True)
+    lead = models.ForeignKey(Campaignlead, on_delete=models.SET_NULL, null=True, blank=True, related_name="booking")
+    lead_archived = models.ForeignKey(Campaignlead, on_delete=models.SET_NULL, null=True, blank=True, related_name="booking_archived")
     # type = models.CharField(choices=BOOKING_CHOICES, max_length=2, null=False, blank=False)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     calendly_event_uri = models.TextField(null=True, blank=True)
     archived = models.BooleanField(default=False)
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        if self.archived and self.lead:
+            self.lead_archived = self.lead
+            self.lead = None
+        super(Booking, self).save(force_insert, force_update, using, update_fields)
+    
     # class Meta:
     #     ordering = ['-datetime']
 

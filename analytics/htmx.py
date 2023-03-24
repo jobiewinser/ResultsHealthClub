@@ -592,10 +592,9 @@ def get_pipeline_context(request, json_response=False):
         opportunities = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, campaign__site__in=sites, created__gte=start_date, created__lt=end_date).filter(campaign__site__in=request.user.profile.active_sites_allowed).annotate(calls=Count('call'))
     else:
         opportunities = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, created__gte=start_date, created__lt=end_date, campaign__site__in=request.user.profile.active_sites_allowed).annotate(calls=Count('call'))
-
-    not_booked_opportunities = opportunities.exclude(archived=True).exclude(sale__archived=False).exclude(booking__archived=False)
-    sold_opportunities = opportunities.filter(sale__archived=False, booking__archived=False)
-    booked_opportunities = opportunities.filter(booking__archived=False)
+    not_booked_opportunities = opportunities.filter(booking__isnull=True).exclude(archived=True).exclude(sale__archived=False)
+    sold_opportunities = opportunities.filter(sale__archived=False, booking__isnull=False)
+    booked_opportunities = opportunities.filter(booking__isnull=False)
     booked_not_sold_opportunities = booked_opportunities.exclude(sale__archived=False)
     arrived_opportunities = opportunities.filter(arrived=True)
     lost_opportunities = opportunities.filter(archived=True).exclude(sale__archived=False)

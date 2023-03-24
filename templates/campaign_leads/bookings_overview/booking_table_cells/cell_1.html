@@ -1,6 +1,7 @@
 {%load static core_tags tz%}
 <div class="double_layer_td">
-    <span hidden class="booking-lead-{{lead.pk}}"></span>
+    <script>$('#booking-lead-{{lead.pk}}').parents('tr:first').attr('id', 'row_{{lead.pk}}'); </script>
+    <span hidden class="booking-lead-{{lead.pk}}" id="booking-lead-{{lead.pk}}"></span>
     <input type="text" style="display:None" id="lead_pk_{{lead.pk}}" name="lead_pk" value="{{lead.pk}}"/>
     <span class="primary_td_layer">
         

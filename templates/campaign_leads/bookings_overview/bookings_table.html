@@ -1,36 +1,42 @@
 
 {%load static%}
 <div id="overview_table_span_wrapper">
-    <table id="overview_table" class="table" data-server-side="true" data-ajax="/booking-overview-data/?format=datatables"> 
+    
+    <table id="overview_table" class="table" data-server-side="true" data-ajax="/booking-overview-data/?format=datatables&sold={{sold}}&archived={{archived}}&order[0][dir]=desc&order[0][column]=4&length=10"> 
         <thead> 
             <tr>
-                <th data-data="data1">
+                <th data-data="site_contact__first_name">
                     Name
                 </th>
-                <th data-data="data2">
+                <th data-data="active_sale">
                     Status
                 </th>
                 {% comment %} <th>
                     Lead Date
                 </th> {% endcomment %}
-                <th data-data="data3">
+                <th data-data="campaign__name">
                     Ad Campaign
                 </th>
-                <th data-data="data4">
+                <th data-data="product_cost">
                     Value
                 </th>
-                <th data-data="data5">
+                <th data-data="booking__datetime">
                     Booked
                 </th>
                 {% comment %} <th>
                     Next Auto Whatsapp
                 </th> {% endcomment %}
-                <th data-data="data6">
+                <th data-data="pk">
                     Actions
                 </th>
             </tr>
         </thead>
         <tbody> 
+            <tr>
+                <td class="center" colspan="6">
+                    <img style="height:100px" src="{% static 'img/bars.svg' %}"/>
+                </td>
+            </tr>
             {% comment %} {%for lead in leads%}
             {%include 'campaign_leads/bookings_overview/booking_row.html'%}
             {%endfor%} {% endcomment %}

@@ -20,6 +20,11 @@ class ErrorModelAdmin(admin.ModelAdmin):
     search_fields = ['pk', 'created']
 admin.site.register(ErrorModel, ErrorModelAdmin)
 
+class SiteContactAdmin(admin.ModelAdmin):
+    list_display = ['first_name','last_name','created','contact','site']
+    search_fields = ['first_name','last_name','created'
+                     ]
+admin.site.register(SiteContact, SiteContactAdmin)
 class CampaignAdmin(admin.ModelAdmin):
     list_display = ['name','created','product_cost','guid',
     'webhook_created','webhook_id','site','company',
