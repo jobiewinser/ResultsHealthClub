@@ -1,5 +1,5 @@
 {%load static core_tags user_permission_tags%}
-<span id="chat_bottom" class="" {%if whatsappnumber%}hx-ws="connect:/ws/messaging/{{whatsappnumber.pk}}/" hx-indicator="#page_load_indicator"{%endif%}>
+<span id="chat_bottom" class="" {%if whatsappnumber%}hx-ws="connect:/ws/messaging/{{whatsappnumber.pk}}/"{%endif%}>
     <script>
         $(document).ready(function() {   
             {% if site%}      
