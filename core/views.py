@@ -117,6 +117,8 @@ class CompanyPermissionsView(TemplateView):
                 if request.user.profile.role == 'a' or (request.user.profile.role == 'b' and company_permissions.profile.role == 'c'):      
                     for key in [
                                 'edit_user_permissions',
+                                'edit_whatsapp_settings',
+                                'edit_active_campaign_settings',
                                 ] :
                         if key in request.POST:
                             setattr(company_permissions, key, (request.POST.get(key, 'off') == 'on'))

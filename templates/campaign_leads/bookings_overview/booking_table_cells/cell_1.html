@@ -79,7 +79,7 @@
                 hx-vals='{"site_pk": "{{lead.campaign.site.pk}}", "customer_number": "{{lead.contact.customer_number}}"}'
                 hx-trigger="click"
                 
-                onclick="$('#chat_card_{{lead.site_contact.pk}}').remove(); $('#chat_list_bottom_window').remove();"
+                onclick="$('#chat_card_{{lead.site_contact.contact.customer_number}}').remove(); $('#chat_list_bottom_window').remove();"
                 data-customer-number="{{lead.contact.customer_number}}"
                 data-site-contact-pk="{{lead.site_contact.pk}}">
                     Chat <i class="fa fa-whatsapp"></i>

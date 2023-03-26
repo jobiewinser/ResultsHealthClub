@@ -245,7 +245,7 @@ def new_message_to_websocket(whatsapp_message, whatsapp_number):
     rendered_message_chat_row = loader.render_to_string('messaging/htmx/message_chat_row.html', message_context)
     rendered_html = f"""
 
-    <span id='latest_message_row_{whatsapp_message.site_contact.pk}' hx-swap-oob='delete'></span>
+    <span id='latest_message_row_{whatsapp_message.customer_number}' hx-swap-oob='delete'></span>
     <span id='message_chat_row_{whatsapp_message.pk}' hx-swap-oob='delete'></span>
     <span id='messageCollapse_{whatsapp_message.whatsappnumber.pk}' hx-swap-oob='afterbegin'>{rendered_message_list_row}</span>
 

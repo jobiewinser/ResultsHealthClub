@@ -181,8 +181,10 @@ class SiteContact(models.Model):
         return self.first_name
     @property
     def customer_number(self):
-        return self.contact.customer_number
-    
+        try:
+            return self.contact.customer_number
+        except:
+            return "No number"
     def send_template_whatsapp_message(self, whatsappnumber=None, template=None, communication_method = 'a'):
         print("Contact send_template_whatsapp_message", whatsappnumber, template, communication_method)
         customer_number = self.customer_number
@@ -354,7 +356,7 @@ def send_message_to_websocket(whatsappnumber, customer_number, whatsapp_message,
     rendered_message_chat_row = loader.render_to_string('messaging/htmx/message_chat_row.html', message_context)
     rendered_html = f"""
 
-    <span id='latest_message_row_{str(whatsapp_message.site_contact.pk)}' hx-swap-oob='delete'></span>
+    <span id='latest_message_row_{str(customer_number)}' hx-swap-oob='delete'></span>
     <span id='messageCollapse_{whatsappnumber.pk}' hx-swap-oob='afterbegin'>{rendered_message_list_row}</span>
 
     <span id='messageWindowInnerBody_{str(whatsapp_message.site_contact.pk)}' hx-swap-oob='beforeend'>{rendered_message_chat_row}</span>

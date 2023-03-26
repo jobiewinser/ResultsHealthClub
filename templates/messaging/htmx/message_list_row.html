@@ -6,7 +6,7 @@
         hx-target="#next_chat_window"
         hx-push-url="false"
         hx-swap="outerHTML" hx-trigger="click"
-        onclick="$('.chat_card_{{message.get_site_contact.pk}}_wrapper').remove()"
+        onclick="$('.chat_card_{{message.get_site_contact.contact.customer_number}}_wrapper').remove()"
     {%endif%}
 
     {%if message.active_errors%}
@@ -68,7 +68,7 @@
     data-site-contact-pk="{{message.get_site_contact.pk}}"
     data-customer-number="{{message.customer_number}}"
     data-whatsappnumber-pk="{{message.whatsappnumber.pk}}"
-    id="latest_message_row_{{message.site_contact.pk}}"
+    id="latest_message_row_{{message.customer_number}}"
     >
     <div class="col-auto p-0">
         <img id="latest_message_avatar_{{message.get_site_contact.pk}}" 
