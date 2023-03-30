@@ -586,12 +586,13 @@ def get_pipeline_context(request, json_response=False):
     #     start_date = datetime.now() - timedelta(days=7)
     if campaigns:
         opportunities = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, campaign__in=campaigns, created__gte=start_date, created__lt=end_date, campaign__site__in=request.user.profile.active_sites_allowed).annotate(calls=Count('call'))
-    if campaign_categorys:
+    elif campaign_categorys:
         opportunities = Campaignlead.objects.filter(campaign__campaign_category__site__company=request.user.profile.company, campaign__campaign_category__in=campaign_categorys, created__gte=start_date, created__lt=end_date, campaign__campaign_category__site__in=request.user.profile.active_sites_allowed).annotate(calls=Count('call'))
     elif sites:
         opportunities = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, campaign__site__in=sites, created__gte=start_date, created__lt=end_date).filter(campaign__site__in=request.user.profile.active_sites_allowed).annotate(calls=Count('call'))
     else:
         opportunities = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, created__gte=start_date, created__lt=end_date, campaign__site__in=request.user.profile.active_sites_allowed).annotate(calls=Count('call'))
+    print(opportunities.count())
     not_booked_opportunities = opportunities.filter(booking__isnull=True).exclude(archived=True).exclude(sale__archived=False)
     sold_opportunities = opportunities.filter(sale__archived=False, booking__isnull=False)
     booked_opportunities = opportunities.filter(booking__isnull=False)
