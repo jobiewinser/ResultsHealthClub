@@ -256,6 +256,8 @@ class SiteContact(models.Model):
                                 text = component.get('text', '')
                                 if component_type in ['header', 'body']:
                                     if '[[1]]' in text:
+                                        if not self.first_name:
+                                            return HttpResponse("Please set a first name for this contact on the contacts page.", status=400)
                                         params.append(              
                                             {
                                                 "type": "text",

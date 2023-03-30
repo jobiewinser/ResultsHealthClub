@@ -2,7 +2,7 @@
 <div class="collapse show" id="messageWindowCollapse_{{site_contact.pk}}_wrapper">
     <script>
         {%if seconds_until_send_disabled%}
-        chatCountdown({{seconds_until_send_disabled}}, "{{customer_number}}", "{{whatsappnumber.pk}}", ".time_left_to_send_{{site_contact.pk}}", "#chat_card_"+{{site_contact.contact.customer_number}}+"_wrapper_{{uuid}}")
+        chatCountdown({{seconds_until_send_disabled}}, "{{customer_number}}", "{{whatsappnumber.pk}}", ".time_left_to_send_{{site_contact.pk}}", "#chat_card_{{customer_number}}_wrapper_{{uuid}}")
         {%endif%}
     </script>
     {%if whatsappnumber%}

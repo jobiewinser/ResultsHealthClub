@@ -51,8 +51,11 @@ def message_window(request, **kwargs):
         if seconds_until_send_disabled:
             if seconds_until_send_disabled > 3:
                 context["seconds_until_send_disabled"] = seconds_until_send_disabled
-    # if settings.DEBUG:
-    #     context["seconds_until_send_disabled"] = 100
+    if settings.DEBUG:
+        if not kwargs.get('refresh') == 'refresh':
+            context["seconds_until_send_disabled"] = 5
+        else:
+            del context["seconds_until_send_disabled"]
     # temp = SiteContact.objects.filter(site=whatsappnumber.site, contact__customer_number=kwargs.get('customer_number'))
     contact, created = Contact.objects.get_or_create(company=request.user.profile.company, customer_number=kwargs.get('customer_number'))
     context["site_contact"], created = SiteContact.objects.get_or_create(site=whatsappnumber.site, contact=contact)

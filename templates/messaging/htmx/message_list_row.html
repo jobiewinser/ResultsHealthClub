@@ -96,7 +96,7 @@
                 {%endif%}
             </div>
             <div class="col-md-auto p-0 m-0" id="latest_message_mark_read_{{message.get_site_contact.pk}}">
-                {%if message.inbound and not message.read%}
+                {% comment %} {%if message.inbound and not message.read%}
                 <span class="badge bg-secondary badge-sm"
                 
                     data-bs-toggle="popover" 
@@ -112,7 +112,7 @@
                     hx-swap="innerHTML" hx-trigger="click">
                     <i class="fa-brands fa-readme"></i>
                 </span>
-                    {%endif%}
+                {%endif%} {% endcomment %}
             </div>
         </div>
     </div>

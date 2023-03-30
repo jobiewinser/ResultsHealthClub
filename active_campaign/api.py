@@ -31,36 +31,40 @@ class ActiveCampaignApi:
                    }
         return headers
     def get(self, endpoint, result_key, params={}, limit=100):       
-        if self.active_campaign_url: 
-        #     url = f"{self.active_campaign_url}/{endpoint}?limit={str(limit)}"
-        #     headers = self._get_headers()
-        #     response = requests.get(url=url, headers=headers)
-        #     if response:
-        #         return response.json() or {}
-        # return {}
-            param_string = ""
-            for k,v in params.items():
-                if type(v) == list:
-                    value_string = ','.join(v)
-                else:
-                    value_string = v
-                param_string = f"{param_string}&{k}={value_string}"
-        
-            url = f"{self.active_campaign_url}/{endpoint}?limit={str(limit)}{param_string}"
-            headers = self._get_headers()
-            i = 0
-            count = 0
-            results = []
-            response = requests.get(url=url, headers=headers)
-            if not response.status_code == 200:
-                return []
-            response_json = response.json()
-            while count < int(response_json.get('meta', {}).get('total', 0)):
-                count += len(response_json.get(result_key,[]))
-                results += response_json.get(result_key,[])
-                i+=1
-                response_json = requests.get(url=f"{url}&offset={i}", headers=headers).json()
-            return results
+        try:
+            if self.active_campaign_url: 
+            #     url = f"{self.active_campaign_url}/{endpoint}?limit={str(limit)}"
+            #     headers = self._get_headers()
+            #     response = requests.get(url=url, headers=headers)
+            #     if response:
+            #         return response.json() or {}
+            # return {}
+                param_string = ""
+                for k,v in params.items():
+                    if type(v) == list:
+                        value_string = ','.join(v)
+                    else:
+                        value_string = v
+                    param_string = f"{param_string}&{k}={value_string}"
+            
+                url = f"{self.active_campaign_url}/{endpoint}?limit={str(limit)}{param_string}"
+                headers = self._get_headers()
+                i = 0
+                count = 0
+                results = []
+                response = requests.get(url=url, headers=headers)
+                if not response.status_code == 200:
+                    return []
+                response_json = response.json()
+                while count < int(response_json.get('meta', {}).get('total', 0)):
+                    count += len(response_json.get(result_key,[]))
+                    results += response_json.get(result_key,[])
+                    i+=1
+                    response_json = requests.get(url=f"{url}&offset={i}", headers=headers).json()
+                return results
+        except Exception as e:
+            if not "Invalid URL" in e.args[0]:
+                raise e
         return None
 
     # Get\
