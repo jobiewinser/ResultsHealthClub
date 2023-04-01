@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 class Whatsapp():    
     # whatsapp_access_token = os.getenv("WHATSAPP_ACCESS_TOKEN")
     whatsapp_url = os.getenv("WHATSAPP_URL")
-    whatsapp_app_id = os.getenv("WHATSAPP_APP_ID")
+    # whatsapp_app_id = os.getenv("WHATSAPP_APP_ID")
     
 
     def __init__(self, whatsapp_access_token):

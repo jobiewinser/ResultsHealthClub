@@ -1,6 +1,9 @@
 {%load static tz core_tags user_permission_tags%}
 <div class="row calendly_site_settings" {% if hx_swap_oob %}hx-swap-oob='outerHTML:.calendly_site_settings'{%endif%}>
-    <div class="col-auto p-2 card card-light">      
+    <div class="col-auto p-2 card card-light">    
+        <p>
+            Here is a short <a target="_blank" href="https://www.youtube.com/watch?v=IGpJNMhXlqI">Video Tutorial</a>
+        </p>
         <form class="" hx-post="{%url 'edit-calendly-configuration'%}" hx-swap="none" hx-indicator="#page_load_indicator" 
         hx-vals='{"site_pk": "{{site.pk}}"}' 
         hx-trigger='submit delay:0.3s' autocomplete="off" autofill="off">
