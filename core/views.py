@@ -359,6 +359,8 @@ def submit_feedback_form(request):
             user=request.user,
             comment=comment,
         )
+        send_email("jobiewinser@gmail.com", 'Activate your account.', {"message": f"From:{request.user.profile.name} <br>Comment:{comment}"})
+        
 
     return HttpResponse(status=200)
 
