@@ -23,7 +23,7 @@
             hx-get="{%url 'refresh-leads-board'%}" onclick="$('#campaign_category_pk').val('').trigger('change')"
             hx-swap="outerHTML" hx-push-url="false" hx-include=".overview_table_filters" hx-indicator="#page_load_indicator" hx-target="#leads_board_span_wrapper" id="filter_campaign"></button>
         {%endblock extra_top_left_buttons %}
-        {%if 'domain'|get_env_var_filter == "results.winser.uk" or debug%}
+        {%if 'DOMAIN'|get_env_var_filter == "results.winser.uk" or debug%}
         <div class="col-auto ">
             <div class="card center pe-1 ps-1 mt-3">
                 <h5 class="mt-1 nowrap text-primary"><span class="booked_rate_quick_analytic">?</span>% Appointed</h5>
