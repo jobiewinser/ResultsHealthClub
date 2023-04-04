@@ -55,6 +55,9 @@ def last_x_chars(var,x):
     return str(var)[x:]
 @register.simple_tag
 def get_env_var(key):
+    return os.environ.get(key)  
+@register.filter
+def get_env_var_filter(key):
     return os.environ.get(key)    
 @register.filter
 def settings_value(name):

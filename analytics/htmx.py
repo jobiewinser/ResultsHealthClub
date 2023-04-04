@@ -578,7 +578,8 @@ def get_pipeline_context(request, json_response=False):
     
     if json_response:
         if (not cache.get(cache_key) is None):
-            return cache.get(cache_key)
+            cache_result = cache.get(cache_key)
+            return cache_result
     
     
     
