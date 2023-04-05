@@ -11,6 +11,18 @@
                     <label for="company">Company</label>
                 </div>
                 {%endif%}
+                            
+                <div class="form-floating m-1">
+                    <input name="username" maxlength="25" {%if demo and not request.user.is_superuser%}disabled{%endif%}
+                    value="{{edit_user.username}}"  class="form-control modify_user_input" id="username"/>
+                    <label for="username">Username<span class="required">*</span></label>
+                </div>
+                
+                <div class="form-floating m-1">
+                    <input name="email" maxlength="100" type="email" {%if demo and not request.user.is_superuser%}disabled{%endif%}
+                    value="{{edit_user.email}}"  class="form-control modify_user_input" id="email"/>
+                    <label for="email">Email</label>
+                </div>
                 
                 <div class="form-floating m-1">
                     <input name="first_name" maxlength="25" {%if demo and not request.user.is_superuser%}disabled{%endif%}

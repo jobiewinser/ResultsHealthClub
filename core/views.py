@@ -941,12 +941,24 @@ class RegisterNewCompanyView(TemplateView):
             User.objects.filter(email__iexact = 'jobiewinser@live.co.uk').delete()
             Site.objects.filter(billing_email__iexact = 'jobiewinser@live.co.uk').update(billing_email='')
             
-        owner_email = request.POST.get('owner_email').lower()
-        company_name = request.POST.get('company_name')
-        password = request.POST.get('password')
-        
+        owner_email = request.POST.get('owner_email', '').lower()  
+        if not owner_email:
+            context['errors']['owner_email'].append("Please enter an email.")
+            error_found = True
         context['owner_email'] = owner_email
+        
+        
+        company_name = request.POST.get('company_name', '')
+        if not company_name:
+            context['errors']['company_name'].append("Please enter a company name.")
+            error_found = True
         context['company_name'] = company_name
+        
+        
+        password = request.POST.get('password', '')
+        if not password:
+            context['errors']['password'].append("Please enter a password.")
+            error_found = True        
         context['password'] = password
         
         
@@ -1006,6 +1018,32 @@ class RegisterNewCompanyView(TemplateView):
             context['activation_url'] = f"/activate/{profile.register_uuid}/{profile.user.email}/"
         send_email(user.email, 'Activate your account.', {"message": message})
         return HttpResponse(render(request, "registration/register_new_company_success.html", context), status=200)
+    
+# @method_decorator(login_not_allowed, name='dispatch')
+# class PasswordResetView(TemplateView):
+#     template_name='registration/password_reset.html'
+#     def get(self, request, *args, **kwargs):
+#         return super().get(request, *args, **kwargs)
+    # def post(self, request):       
+    #     context = {}
+    #     email = request.POST.get('email')
+    #     if not email:
+    #         return HttpResponse("Please enter an email", status=400)
+    #     user = User.objects.filter(email=email).first()
+    #     if user:
+    #         user.password_reset_guid = str(uuid.uuid4())[:16]
+    #         user.save()
+    #     # message = loader.render_to_string('registration/registration_email.html', {
+    #     #     'user': user,
+    #     #     'domain': os.getenv("SITE_URL"),
+    #     #     'profile': profile,
+    #     #     'title': "Activate your account",
+    #     # })
+    #     # if settings.DEBUG:
+    #     #     context['activation_url'] = f"/activate/{profile.register_uuid}/{profile.user.email}/"
+    #     # send_email(user.email, 'Activate your account.', {"message": message})
+        
+    #     return HttpResponse(render(request, "registration/password_reset_sent.html", context), status=200)
 
 def send_email(recipients, subject, messages):
     

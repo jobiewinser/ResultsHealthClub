@@ -1,6 +1,7 @@
 from django.urls import path
 import core.views as coreviews
 import core.htmx as corehtmx
+import django.contrib.auth.views as auth_views
 urlpatterns = [
     # Public Facing
     # path('products/campaign-leads-product-page', coreviews.CampaignLeadsProductPageView.as_view(), name='campaign-leads-product-page' ),
@@ -67,8 +68,11 @@ urlpatterns = [
     path('renew-stripe-subscription/', coreviews.renew_stripe_subscription, name='renew-stripe-subscription'),  
     path('change-default-payment-method/', coreviews.change_default_payment_method, name='change-default-payment-method'),  
     path('accounts/register/', coreviews.RegisterNewCompanyView.as_view(), name='register'), 
+    # path('accounts/password-reset/', coreviews.PasswordResetView.as_view(), name='password-reset'), 
 
     path('activate/<str:register_uuid>/<str:email>/', coreviews.activate, name='activate'),
     path('change-theme/', coreviews.change_theme, name='change-theme'),
+    
+    path('accounts/password_reset/', auth_views.PasswordResetView.as_view(html_email_template_name='registration/password_reset_email.html'), name = 'password_reset'),
 
 ]

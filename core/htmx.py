@@ -137,17 +137,19 @@ class ModifyUser(View):
     def post(self, request, **kwargs):
         try:
             action = request.POST.get('action', '')
+            username = request.POST.get('username', '')[:25]
+            email = request.POST.get('email', '')[:100]
+            first_name = request.POST.get('first_name', '')[:25]
+            last_name = request.POST.get('last_name', '')[:25]
+            password = request.POST.get('password', '')
+            role = request.POST.get('role', '')
+            calendly_event_page_url = request.POST.get('calendly_event_page_url', '')
+            site_pk = request.POST.get('site_pk', '')
             if action == 'add':
-                site = request.user.profile.active_sites_allowed.get(pk=request.POST.get('site_pk', ''))
+                site = request.user.profile.active_sites_allowed.get(pk=site_pk)
                 if site.subscription.max_profiles:
                     if site.users.count() >= site.subscription.max_profiles:
                         return HttpResponse("You already have the maximum number of users", status=400)
-                username = request.POST.get('username', '')[:25]
-                first_name = request.POST.get('first_name', '')[:25]
-                last_name = request.POST.get('last_name', '')[:25]
-                password = request.POST.get('password', '')
-                role = request.POST.get('role', '')
-                calendly_event_page_url = request.POST.get('calendly_event_page_url', '')
                 if not first_name:
                     return HttpResponse("Please enter a First Name", status=400)
                 if not password:
@@ -170,29 +172,46 @@ class ModifyUser(View):
                         username = f"{first_name}{last_name}_{index}"
                 if User.objects.filter(username=username):
                     return HttpResponse("Username already taken", status=400)
+                if email:
+                    if User.objects.filter(email=email):
+                        return HttpResponse("Email already taken", status=400)
                 user = User.objects.create(username=username, 
+                                            email=email,
                                             first_name=first_name,
                                             last_name=last_name)
                 user.set_password(password)
                 user.save()
-                Profile.objects.create(user = user, 
-                                        avatar = profile_picture, 
-                                        company = request.user.profile.company, 
-                                        role = role,
-                                        calendly_event_page_url = calendly_event_page_url, 
-                                        site = site)
+                profile, created = Profile.objects.get_or_create(user = user)                 
+                profile.avatar = profile_picture
+                profile.company = request.user.profile.company
+                profile.role = role
+                profile.calendly_event_page_url = calendly_event_page_url
+                profile.site = site
+                profile.save()
             elif action == 'edit':       
                 user = User.objects.get(pk=request.POST['user_pk'])   
                 profile = Profile.objects.get_or_create(user = user)[0] 
                 user.profile = profile     
                 if get_profile_allowed_to_edit_other_profile(request.user.profile, user.profile):
-                    first_name = request.POST.get('first_name', '')[:25]
-                    last_name = request.POST.get('last_name', '')[:25]
-                    site_pk = request.POST.get('site_pk', '')
-                    calendly_event_page_url = request.POST.get('calendly_event_page_url', '')
                     # user.username=f"{first_name}{last_name}" 
                     user.first_name=first_name
                     user.last_name=last_name
+                    
+                    if not username:
+                        username = f"{first_name}{last_name}"
+                        index = 0
+                        while User.objects.filter(username=username):
+                            index = index + 1
+                            username = f"{first_name}{last_name}_{index}"
+                    if User.objects.filter(username=username).exclude(pk=user.pk).exists():
+                        return HttpResponse("Username already taken", status=400)
+                    if email:
+                        if User.objects.filter(email=email).exclude(pk=user.pk).exists():
+                            return HttpResponse("Email already taken", status=400)
+                    user = User.objects.create(username=username, 
+                                                email=email,
+                                                first_name=first_name,
+                                                last_name=last_name)
                     user.save()
 
                     profile_picture = request.FILES.get('profile_picture', None)

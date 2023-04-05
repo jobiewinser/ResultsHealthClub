@@ -156,6 +156,12 @@ def nice_date_tag(date):
         return str(date.strftime("%-d %B %Y"))
     except Exception as e:
         return str(date)
+@register.filter
+def add_hour_tag(date, hours):
+    try:
+        return date + timedelta(hours=hours)
+    except Exception as e:        
+        return date
 
 @register.filter
 def short_date_tag(date):
@@ -403,5 +409,13 @@ def display_phone(number_string, country=None):
     return f"{first} {second}"
 
 @register.filter
-def current_month(anything):
+def current_month_tag(anything):
     return datetime.now().strftime("%B")
+@register.filter
+def start_of_month_date_tag(anything):
+    today_date = datetime.today()
+    return today_date.replace(day=1, hour=1, minute=0, second=0, microsecond=0)
+@register.filter
+def start_of_week_date_tag(anything):
+    today_date = datetime.today()
+    return today_date - timedelta(days=today_date.weekday()+1)
