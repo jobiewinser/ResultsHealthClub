@@ -14,8 +14,7 @@ from functools import update_wrapper
 from core.models import Profile, Site, WhatsappBusinessAccount
 from core.user_permission_functions import get_user_allowed_to_add_call
 from core.views import get_site_pks_from_request_and_return_sites, get_campaign_category_pks_from_request, get_single_site_pk_from_request_or_default_profile_site
-from django.db.models import Q, Count
-from django.db.models import OuterRef, Subquery, Count
+from django.db.models import Q, Count, OuterRef, Subquery
 from whatsapp.models import WhatsappTemplate
 from core.core_decorators import check_core_profile_requirements_fulfilled
 from core.user_permission_functions import get_profile_allowed_to_edit_other_profile
@@ -391,29 +390,69 @@ def new_call(request, **kwargs):
         raise e
 
 
-
 @login_required
 @not_demo_or_superuser_check
 def campaign_assign_auto_send_template_htmx(request):
     #this function is used to assign a template to a campaign to be auto sent
     campaign = Campaign.objects.get(pk=request.POST.get('campaign_pk'), site__in=request.user.profile.active_sites_allowed)
-    send_order = send_order = request.POST['send_order']
+    send_order = send_order = request.POST.get('send_order',None)
     template_pk = request.POST.get('template_pk')
-    if not template_pk:
-        if not CampaignTemplateLink.objects.filter(send_order__gt=send_order).exclude(template=None):
-            CampaignTemplateLink.objects.filter(send_order__gte=send_order).delete()
+    method = request.POST.get('method')
+    interval_only = request.POST.get('interval_only', False)
+    if not interval_only:
+        if not template_pk and not send_order == None:
+            CampaignTemplateLink.objects.filter(campaign=campaign, send_order=send_order).update(template=None)
+            CampaignTemplateLink.objects.filter(campaign=campaign, template=None).delete()
+            campaign.reorder_campaign_template_links()
+            return render(request, 'campaign_leads/htmx/choose_auto_templates_both_pills.html', {'campaign':campaign})
         else:
-            CampaignTemplateLink.objects.filter(send_order=send_order).delete()
-
+            if method == 'call':
+                CampaignTemplateLink.objects.filter(campaign=campaign, method='time').delete()
+            else:
+                CampaignTemplateLink.objects.filter(campaign=campaign, method='call').delete()
+            if not send_order:
+                try:
+                    send_order = CampaignTemplateLink.objects.filter(campaign=campaign).order_by('-send_order').first().send_order + 1
+                except:
+                    send_order = 1
+            template = WhatsappTemplate.objects.filter(pk=template_pk).first()
+            campaign_template_link, created = CampaignTemplateLink.objects.get_or_create(
+                campaign = campaign,
+                send_order = send_order,
+            )
+            campaign_template_link.template = template
+            campaign_template_link.method = method
+            campaign_template_link.save()
     else:
-        template = WhatsappTemplate.objects.filter(pk=template_pk).first()
-        campaign_template_link, created = CampaignTemplateLink.objects.get_or_create(
-            campaign = campaign,
-            send_order = send_order,
+        campaign_template_link = CampaignTemplateLink.objects.get(
+                campaign = campaign,
+                send_order = send_order,
         )
-        campaign_template_link.template = template
+    #remove links that have no template and reorder
+    if method == 'call':
+        submitted_call_interval = int(request.POST.get('call_interval', 0))
+        highest_call_interval_before_send_order = campaign.get_highest_call_interval_before_send_order(campaign_template_link.send_order)
+        lowest_call_interval_after_send_order = campaign.get_lowest_call_interval_after_send_order(campaign_template_link.send_order)
+        if not highest_call_interval_before_send_order == None:            
+            lowest_allowed_call_interval = highest_call_interval_before_send_order + 1
+            if submitted_call_interval < lowest_allowed_call_interval:
+                submitted_call_interval = lowest_allowed_call_interval
+                
+        if not lowest_call_interval_after_send_order == None:            
+            highest_allowed_call_interval = lowest_call_interval_after_send_order - 1
+            if submitted_call_interval > highest_allowed_call_interval:
+                submitted_call_interval = highest_allowed_call_interval
+            
+        campaign_template_link.call_interval = submitted_call_interval
         campaign_template_link.save()
-    return render(request, 'campaign_leads/htmx/choose_auto_templates.html', {'campaign':campaign})
+        if interval_only:
+            return render(request, 'campaign_leads/htmx/choose_auto_call_templates_row.html', {'campaign':campaign, 'campaign_template_link':campaign_template_link, 'counter':campaign_template_link.send_order})
+    else:
+        campaign_template_link.time_interval = int(request.POST.get('time_interval', None) or 1)
+        campaign_template_link.save()
+        if interval_only:
+            return render(request, 'campaign_leads/htmx/choose_auto_time_templates_row.html', {'campaign':campaign, 'campaign_template_link':campaign_template_link, 'counter':campaign_template_link.send_order})
+    return render(request, 'campaign_leads/htmx/choose_auto_templates_both_pills.html', {'campaign':campaign})
     
 @login_required
 @not_demo_or_superuser_check

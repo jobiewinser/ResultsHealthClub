@@ -1,0 +1,81 @@
+{%load static core_tags%}
+<tr id="choose_auto_call_tr_{{counter}}">
+    <td>
+        {% if counter == 0%}
+        Initial
+        {% elif campaign_template_link.send_order %}
+        {{campaign_template_link.send_order}}
+        {%else%}
+        Add
+        {%endif%}
+    </td>
+    <td>    
+        <button id="choose_auto_call_template_{{counter}}" hx-swap="None" hidden
+            hx-indicator="#htmx_indicator_call_template_{{counter}}" hx-trigger="click"
+            hx-vals='{"campaign_pk": "{{campaign.pk}}", "send_order":"{{ counter }}", "method":"call"}'
+            hx-include='.template_call_inputs_{{counter}}'
+            hx-post="{% url 'campaign-assign-auto-send-template' %}"></button>
+        <button id="interval_only_choose_auto_call_template_{{counter}}" hx-swap="outerHTML" hx-target="#choose_auto_call_tr_{{counter}}" hidden
+            hx-indicator="#htmx_indicator_call_template_{{counter}}" hx-trigger="click delay:0.5s"
+            hx-vals='{"campaign_pk": "{{campaign.pk}}", "send_order":"{{ counter }}", "method":"call", "interval_only":true}'
+            hx-include='.template_call_inputs_{{counter}}'
+            hx-post="{% url 'campaign-assign-auto-send-template' %}"></button>
+        <select class="form-select template_call_inputs_{{counter}}" name="template_pk"
+        {%if demo and not request.user.is_superuser%}disabled{%endif%}
+            onchange="$('#choose_auto_call_template_{{counter}}').click();"
+            data-bs-toggle="popover" 
+            data-bs-trigger="hover focus" 
+            data-bs-html="true" 
+            data-bs-placement="top"
+            data-bs-title="What does this do?"
+            data-bs-content='
+                <p>
+                    You can assign your campaign a template to send through your chosen messaging service automatically (Whatsapp by default).
+                </p>
+                '>
+            <option value=""></option>
+            {%for template in campaign.whatsapp_business_account.whatsapptemplate_set.all%}
+                {%if template.name and not 'sample_' in template.name%}
+                <option {%if campaign_template_link.template.pk == template.pk %}selected{%endif%} value="{{template.pk}}">{{template.name}}</option>
+                {%endif%}
+            {%endfor%}
+        </select> 
+    </td>
+    <td>
+        {% if counter%}
+            {% if campaign_template_link%}
+            {%with campaign|get_lowest_allowed_call_interval_tag:counter as lowest_allowed_call_interval%}
+            {%with campaign|get_highest_allowed_call_interval_tag:counter as highest_allowed_call_interval%}
+            <div class="row m-0">
+                <div class="col-auto p-0 pt-1 pe-1">
+                    After 
+                </div>
+                <div class="col-auto p-0">
+                    <input oninput="$('#interval_only_choose_auto_call_template_{{counter}}').click();" name="call_interval" class="form-control form-control-sm template_call_inputs_{{counter}}" type="number"
+                        {% comment %} min="{%if lowest_allowed_call_interval%}{{lowest_allowed_call_interval}}{%endif%}" 
+                        max="{%if highest_allowed_call_interval%}{{highest_allowed_call_interval}}{%endif%}"  {% endcomment %}
+                        value="{%if campaign_template_link.call_interval%}{{campaign_template_link.call_interval}}{%else%}1{%endif%}"
+                        style="width:50px">
+                </div>
+                <div class="col-auto p-0 pt-1 ps-1">
+                    Total Calls
+                </div>
+                <div class="col">
+                    
+                </div>
+                {% comment %} <div class="col-auto p-0 pt-1 ps-1 pe-1 right">
+                    <small>{%if lowest_allowed_call_interval%}Min: {{lowest_allowed_call_interval}} {%if highest_allowed_call_interval%}-{%endif%}{%endif%} {%if highest_allowed_call_interval%}Max: {{highest_allowed_call_interval}}{%endif%}</small>
+                    
+                </div> {% endcomment %}
+                <div class="col-auto p-0">
+                    <img  class="top-htmx-indicator htmx-indicator invert" id="htmx_indicator_call_template_{{counter}}" src="{% static 'img/bars.svg' %}"/>
+                </div>
+            </div>
+            {%endwith%}
+            {%endwith%}
+            {%endif%} 
+        {%elif counter == 0%}
+            If you choose a template for this row, it will be sent on lead creation.
+        {%endif%}       
+    </td>
+</tr>

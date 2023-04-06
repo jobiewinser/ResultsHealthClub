@@ -3,21 +3,38 @@
     {%if demo and not request.user.is_superuser%}
     <div class="alert alert-info"><b>Demo Mode</b>, not editable</div>
     {%endif%}
-    <div class="row">
-        <div class="col">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Order</th>
-                        <th>Template</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {%for campaign_template_link in campaign.campaign_template_links_with_send_orders%}
-                        {%include 'campaign_leads/htmx/choose_auto_templates_row.html'%}
-                    {%endfor%}
-                </tbody>
-            </table>
+    <div class="alert alert-info">
+        There are 2 ways to automatically send templates.  
+        <ul>
+            <li>Time intervals. Messages are scheduled based on time.</li>
+            <li>Call intervals. Messages are scheduled to send after a certain number of call attempts are made <br>(if there has been no call attempt within the last 10 minutes).</li>
+        </ul>
+        With both settings above, there are some additional rules that dictate when automatic messages can be sent.<br>Messages are <b>not</b> automically sent if:
+        <ul>
+            <li>The lead has been booked, archived or sold.</li>
+            <li>The lead has messaged any of your site's whatsapp numbers within the last 7 days.</li>
+            <li>The lead has been messaged within the last 24 hours from any of your site's whatsapp numbers.</li>
+            <li>The lead has had a call attempt logged within the last 10 minutes <br>(to prevent accidental drags from sending unintentional messages for call interval campaigns).</li>
+        </ul>
+    </div>
+    <div class="row center">
+        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link {%if not campaign.call_campaign_template_links_with_send_orders%}active{%endif%}" id="pills-time-tab" data-bs-toggle="pill" data-bs-target="#pills-time" type="button" role="tab" aria-controls="pills-time" aria-selected="true">Time Intervals</button>
+            </li>
+
+            <li class="nav-item" role="presentation">
+                <button class="nav-link {%if campaign.call_campaign_template_links_with_send_orders%}active{%endif%}" id="pills-call-tab" data-bs-toggle="pill" data-bs-target="#pills-call" type="button" role="tab" aria-controls="pills-call" aria-selected="false">Call Intervals</button>
+            </li>
+        </ul>
+        <div class="tab-content" id="pills-tabContent">
+            <div class="tab-pane fade {%if not campaign.call_campaign_template_links_with_send_orders%}show active{%endif%}" id="pills-time" role="tabpanel" aria-labelledby="pills-time-tab">
+                {%include 'campaign_leads/htmx/choose_auto_time_templates_pill.html'%}
+            </div>
+
+            <div class="tab-pane fade {%if campaign.call_campaign_template_links_with_send_orders%}show active{%endif%}" id="pills-call" role="tabpanel" aria-labelledby="pills-call-tab">
+                {%include 'campaign_leads/htmx/choose_auto_call_templates_pill.html'%}
+            </div>
         </div>     
     </div>
     

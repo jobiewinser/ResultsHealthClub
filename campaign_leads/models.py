@@ -52,21 +52,59 @@ class Campaign(PolymorphicModel):
         return self.campaignlead_set.exclude(archived=True).exclude(sale__archived=False)
     def is_manual(self):
         return False
+    def reorder_campaign_template_links(self):
+        for i, campaigntemplatelink in enumerate(self.campaigntemplatelink_set.all().order_by('send_order')):
+            campaigntemplatelink.send_order = i+1
+            campaigntemplatelink.save()
+        
+    
+    def get_highest_call_interval_before_send_order(self, send_order):
+        if send_order:
+            campaigntemplatelinks = self.campaigntemplatelink_set.filter(send_order__lt=send_order)
+        else:
+            campaigntemplatelinks = self.campaigntemplatelink_set.all()
+        campaigntemplatelink_with_highest_call_interval = campaigntemplatelinks.order_by('-call_interval').first()
+        if campaigntemplatelink_with_highest_call_interval:
+            return campaigntemplatelink_with_highest_call_interval.call_interval
+        return None
+    
+    def get_lowest_call_interval_after_send_order(self, send_order):
+        if send_order:
+            campaigntemplatelinks = self.campaigntemplatelink_set.filter(send_order__gt=send_order)
+        else:
+            campaigntemplatelinks = self.campaigntemplatelink_set.all()
+        campaigntemplatelink_with_lowest_call_interval = campaigntemplatelinks.order_by('call_interval').first()
+        if campaigntemplatelink_with_lowest_call_interval:
+            return campaigntemplatelink_with_lowest_call_interval.call_interval
+        return None
         
     @property
     def campaigntemplatelinks_with_templates(self):
         return self.campaigntemplatelink_set.exclude(template=None)
     @property
-    def campaign_template_links_with_send_orders(self):
+    def time_campaign_template_links_with_send_orders(self):
+        return self.get_campaign_template_links_with_send_orders("time")
+    @property
+    def call_campaign_template_links_with_send_orders(self):
+        return self.get_campaign_template_links_with_send_orders("call")
+    
+    def get_campaign_template_links_with_send_orders(self, method):
+        campaigntemplatelink_qs = self.campaigntemplatelink_set.filter(method=method)
         campaign_template_links = []
         try:
-            max_send_order = self.campaigntemplatelink_set.all().order_by('-send_order').first().send_order or 1
+            max_send_order = campaigntemplatelink_qs.order_by('-send_order').first().send_order or 1
         except:
             max_send_order = 0
-
-        for i in range(1, max_send_order+2):
-            campaign_template_links.append(self.campaigntemplatelink_set.filter(send_order = i).first())
+        campaigntemplatelink_send_order_0 = campaigntemplatelink_qs.filter(send_order=0)
+        if campaigntemplatelink_send_order_0.exists():
+            campaign_template_links.append(campaigntemplatelink_send_order_0.first())
+            
+        for i in range(1, max_send_order+1):
+            campaigntemplatelink_send_order_i = campaigntemplatelink_qs.filter(send_order=i)
+            if campaigntemplatelink_send_order_i.exists():
+                campaign_template_links.append(campaigntemplatelink_send_order_i.first())
         return campaign_template_links
+    
     @property
     def site_templates(self):
         from whatsapp.models import WhatsappTemplate
@@ -78,7 +116,8 @@ class Campaign(PolymorphicModel):
             if self.site.subscription:
                 if self.site.subscription.whatsapp_enabled:
                     if not self.campaigntemplatelink_set.filter(send_order=1):
-                        warnings["first_send_template_missing"] = "This campaign doesn't have a 1st Auto-Send Template, it won't automatically send a message to the customer"
+                        # warnings["first_send_template_missing"] = "This campaign doesn't have a 1st Auto-Send Template, it won't automatically send a message to the customer on lead creation"
+                        pass
         return warnings
 # class AdCampaign(models.Model):
 #     name = models.TextField(null=True, blank=True)
@@ -89,6 +128,9 @@ class CampaignTemplateLink(PolymorphicModel):
     send_order =  models.IntegerField(null=True, blank=True)
     template = models.ForeignKey("whatsapp.WhatsappTemplate", on_delete=models.CASCADE, null=True, blank=True)
     campaign = models.ForeignKey("campaign_leads.Campaign", on_delete=models.CASCADE, null=True, blank=True)
+    method = models.TextField(null=True, blank=True, max_length=25)
+    time_interval =  models.IntegerField(null=True, blank=True)
+    call_interval =  models.IntegerField(null=True, blank=True)
 @receiver(models.signals.post_save, sender=Campaign)
 def execute_after_save(sender, instance, created, *args, **kwargs):
     if created:
