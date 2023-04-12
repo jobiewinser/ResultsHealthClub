@@ -43,11 +43,11 @@ class Command(BaseCommand):
                                                 previous_auto_message_send_time = previous_auto_message.datetime #the time that the previous template was sent
                                                 if previous_auto_message_send_time < (now - timedelta(days=campaigntemplatelink.time_interval)): # If the previous template was x amount of days ago
                                                     campaign_lead.send_template_whatsapp_message(send_order=campaigntemplatelink.send_order) #send adn refresh
-                                                    campaign_lead.trigger_refresh_websocket(refresh_position=False)
+                                                    # campaign_lead.trigger_refresh_websocket(refresh_position=False)
                                             elif method == 'call':
                                                 if campaign_lead.calls >= campaigntemplatelink.call_interval:  #if enough calls have been made for this template link to be satisfied, 
                                                     campaign_lead.send_template_whatsapp_message(send_order=campaigntemplatelink.send_order) #send adn refresh
-                                                    campaign_lead.trigger_refresh_websocket(refresh_position=False)
+                                                    # campaign_lead.trigger_refresh_websocket(refresh_position=False)
                                         break #break if this the next template to send, regardless of whether we send in the logic above or not
                                     previous_auto_message = campaigntemplatelink
                                     

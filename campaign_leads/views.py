@@ -395,7 +395,9 @@ def new_call(request, **kwargs):
 def campaign_assign_auto_send_template_htmx(request):
     #this function is used to assign a template to a campaign to be auto sent
     campaign = Campaign.objects.get(pk=request.POST.get('campaign_pk'), site__in=request.user.profile.active_sites_allowed)
-    send_order = send_order = request.POST.get('send_order',None)
+    send_order = request.POST.get('send_order',None)
+    if not send_order == None and not send_order == "":
+        send_order = int(send_order)
     template_pk = request.POST.get('template_pk')
     method = request.POST.get('method')
     interval_only = request.POST.get('interval_only', False)
@@ -410,7 +412,7 @@ def campaign_assign_auto_send_template_htmx(request):
                 CampaignTemplateLink.objects.filter(campaign=campaign, method='time').delete()
             else:
                 CampaignTemplateLink.objects.filter(campaign=campaign, method='call').delete()
-            if not send_order:
+            if send_order == None or send_order == "":
                 try:
                     send_order = CampaignTemplateLink.objects.filter(campaign=campaign).order_by('-send_order').first().send_order + 1
                 except:
@@ -442,13 +444,20 @@ def campaign_assign_auto_send_template_htmx(request):
             highest_allowed_call_interval = lowest_call_interval_after_send_order - 1
             if submitted_call_interval > highest_allowed_call_interval:
                 submitted_call_interval = highest_allowed_call_interval
-            
+                
+        if campaign_template_link.send_order == 0:
+            submitted_call_interval = 0          
+        elif submitted_call_interval < 1:
+            submitted_call_interval = 1
         campaign_template_link.call_interval = submitted_call_interval
         campaign_template_link.save()
         if interval_only:
             return render(request, 'campaign_leads/htmx/choose_auto_call_templates_row.html', {'campaign':campaign, 'campaign_template_link':campaign_template_link, 'counter':campaign_template_link.send_order})
     else:
-        campaign_template_link.time_interval = int(request.POST.get('time_interval', None) or 1)
+        if campaign_template_link.send_order == 0:
+            campaign_template_link.time_interval = 0
+        else:
+            campaign_template_link.time_interval = int(request.POST.get('time_interval', None) or 1)
         campaign_template_link.save()
         if interval_only:
             return render(request, 'campaign_leads/htmx/choose_auto_time_templates_row.html', {'campaign':campaign, 'campaign_template_link':campaign_template_link, 'counter':campaign_template_link.send_order})

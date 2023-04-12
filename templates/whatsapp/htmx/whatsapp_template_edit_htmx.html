@@ -58,49 +58,66 @@
     <div class="row mt-2 whatsapp_write_div">
         <div class="col text-center">
             {%block template_name%}
-            <h5>Template Name</h5>
             <div class="row">
-                <div class="col"
-                    data-bs-toggle="popover" 
-                    data-bs-trigger="hover focus" 
-                    data-bs-placement="top"
-                    data-bs-html="true"
-                    data-bs-title="{%if readonly or template.message_template_id%}Why is this input disabled?{%else%}Template Name Rules{%endif%}"
-                    data-bs-content="{%if readonly or template.message_template_id%}This input can't be changed for template edits. Please only make small changes, otherwise create a new template.{%else%}This it the name of the template sent to whatsapp. It must only use lowercase letters and underscores! <br><br><small>e.g <b>my_first_message_template</b></small>{%endif%}">
-                    <input {%if readonly or template.message_template_id%}disabled{%endif%} oninput="validateWhatsappText(this);" class="form-control" id="template_name" value="{%if template.name%}{{template.name}}{%elif not template.name and template.pending_name%}{{template.pending_name}}{%endif%}" name="template_name">
+                <div class="col">
+                </div>
+                <div class="col-auto center" style="min-width:400px">
+                    <h5>Template Name</h5>
+                    <div class="row">
+                        <div class="col"
+                            data-bs-toggle="popover" 
+                            data-bs-trigger="hover focus" 
+                            data-bs-placement="top"
+                            data-bs-html="true"
+                            data-bs-title="{%if readonly or template.message_template_id%}Why is this input disabled?{%else%}Template Name Rules{%endif%}"
+                            data-bs-content="{%if readonly or template.message_template_id%}This input can't be changed for template edits. Please only make small changes, otherwise create a new template.{%else%}This it the name of the template sent to whatsapp. It must only use lowercase letters and underscores! <br><br><small>e.g <b>my_first_message_template</b></small>{%endif%}">
+                            <input {%if readonly or template.message_template_id%}disabled{%endif%} oninput="validateWhatsappText(this);" class="form-control" id="template_name" value="{%if template.name%}{{template.name}}{%elif not template.name and template.pending_name%}{{template.pending_name}}{%endif%}" name="template_name">
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
                 </div>
             </div>
             {%endblock template_name%}
             
             {%block template_category%}
             <hr>
-            <h5>Category</h5>
             <div class="row">
-                <div class="col"
-                data-bs-toggle="popover" 
-                data-bs-trigger="hover focus" 
-                data-bs-html="true"
-                data-bs-placement="top"
-                data-bs-title="{%if readonly or template.message_template_id%}Why is this input disabled?{%else%}What do these categories mean?{%endif%}"
-                data-bs-content="{%if readonly or template.message_template_id%}
-                                This input can't be changed for template edits. Please only make small changes, otherwise create a new template.
-                                {%else%}
-                                <b>Transactional</b>
-                                <p>
-                                    Send account updates, order updates, alerts and more to share important information.
-                                </p>
-                                <br>
-                                <b>Marketing</b>
-                                <p>
-                                    Send promotional offers, product announcements and more to increase awareness.
-                                </p>{%endif%}" >
-                    <select {%if readonly or template.message_template_id%}disabled{%endif%} id="template_category" name="template_category" class="form-select form-select-sm align-self-center m-1">
-                        {%for k,v in categories.items%}
-                        <option {%if template.category == k%}selected {%elif not template.category and template.pending_category == k%}selected {%endif%}value="{{k}}">{{k}}</option>
-                        {%endfor%}        
-                    </select>
+                <div class="col">
+                </div>
+                <div class="col-auto center" style="min-width:400px">
+                    <h5>Category</h5>
+                    <div class="row">
+                        <div class="col"
+                        data-bs-toggle="popover" 
+                        data-bs-trigger="hover focus" 
+                        data-bs-html="true"
+                        data-bs-placement="top"
+                        data-bs-title="{%if readonly or template.message_template_id%}Why is this input disabled?{%else%}What do these categories mean?{%endif%}"
+                        data-bs-content="{%if readonly or template.message_template_id%}
+                                        This input can't be changed for template edits. Please only make small changes, otherwise create a new template.
+                                        {%else%}
+                                        <b>Transactional</b>
+                                        <p>
+                                            Send account updates, order updates, alerts and more to share important information.
+                                        </p>
+                                        <br>
+                                        <b>Marketing</b>
+                                        <p>
+                                            Send promotional offers, product announcements and more to increase awareness.
+                                        </p>{%endif%}" >
+                            <select {%if readonly or template.message_template_id%}disabled{%endif%} id="template_category" name="template_category" class="form-select form-select-sm align-self-center m-1">
+                                {%for k,v in categories.items%}
+                                <option {%if template.category == k%}selected {%elif not template.category and template.pending_category == k%}selected {%endif%}value="{{k}}">{{k}}</option>
+                                {%endfor%}        
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
                 </div>
             </div>
+            
             {%endblock template_category%}
             <hr>
             <h5>Header </h5>

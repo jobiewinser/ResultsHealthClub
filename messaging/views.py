@@ -123,7 +123,7 @@ def send_first_template_whatsapp(request, kwargs):
                     campaign_lead = lead,
                     archived = False,
                 ).update(archived = True) 
-            lead.send_template_whatsapp_message(whatsappnumber=lead.campaign.whatsapp_business_account.whatsappnumber, send_order=1)
+            lead.send_template_whatsapp_message(whatsappnumber=lead.campaign.whatsapp_business_account.whatsappnumber, send_order=0)
     messages = WhatsAppMessage.objects.filter(customer_number=kwargs.get('customer_number'), whatsappnumber__number=kwargs.get('messaging_phone_number')).order_by('-datetime')
     context = {}
     context["messages"] = messages

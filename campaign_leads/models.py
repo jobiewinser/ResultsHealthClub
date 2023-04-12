@@ -53,11 +53,18 @@ class Campaign(PolymorphicModel):
     def is_manual(self):
         return False
     def reorder_campaign_template_links(self):
-        for i, campaigntemplatelink in enumerate(self.campaigntemplatelink_set.all().order_by('send_order')):
+        for i, campaigntemplatelink in enumerate(self.campaigntemplatelink_set.filter(send_order__gt=0).order_by('send_order')):
             campaigntemplatelink.send_order = i+1
             campaigntemplatelink.save()
         
     
+    @property
+    def next_send_order(self):
+        campaigntemplatelinks = self.campaigntemplatelink_set.all()
+        campaigntemplatelink_with_highest_send_order = campaigntemplatelinks.order_by('-send_order').first()
+        if campaigntemplatelink_with_highest_send_order:
+            return campaigntemplatelink_with_highest_send_order.send_order + 1
+        return 1
     def get_highest_call_interval_before_send_order(self, send_order):
         if send_order:
             campaigntemplatelinks = self.campaigntemplatelink_set.filter(send_order__lt=send_order)
@@ -115,7 +122,7 @@ class Campaign(PolymorphicModel):
         if self.site:
             if self.site.subscription:
                 if self.site.subscription.whatsapp_enabled:
-                    if not self.campaigntemplatelink_set.filter(send_order=1):
+                    if not self.campaigntemplatelink_set.filter(send_order=0):
                         # warnings["first_send_template_missing"] = "This campaign doesn't have a 1st Auto-Send Template, it won't automatically send a message to the customer on lead creation"
                         pass
         return warnings
@@ -267,8 +274,8 @@ class Campaignlead(models.Model):
                 return ""
     def check_if_should_send_first_message(self):        
         # from whatsapp.models import WhatsAppMessage
-        if not self.archived and self.site_contact and self.contact and not WhatsAppMessage.objects.filter(lead=self).filter(send_order=1):
-            self.send_template_whatsapp_message(send_order=1)
+        if not self.archived and self.site_contact and self.contact and not WhatsAppMessage.objects.filter(lead=self).filter(send_order=0):
+            self.send_template_whatsapp_message(send_order=0)
     def send_template_whatsapp_message(self, whatsappnumber=None, send_order=None, template=None, communication_method = 'a'):
         if self.disabled_automated_messaging and send_order:
             pass #not sure if anything needs to happen here yet. will probably indicate on the leads card that messaging is disabled
@@ -512,6 +519,7 @@ class Campaignlead(models.Model):
                             print("CampaignleadDEBUG11")
                             attached_error.created = datetime.now()
                             attached_error.save()
+            self.trigger_refresh_websocket(refresh_position=False)
             return HttpResponse("Message Error", status=400)
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):

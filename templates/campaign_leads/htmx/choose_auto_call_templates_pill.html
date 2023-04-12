@@ -19,7 +19,7 @@
                 {%include 'campaign_leads/htmx/choose_auto_call_templates_row.html'%}
             {%endwith%}
         {%endfor%}
-        {%with campaign|get_lowest_allowed_call_interval_tag:None as counter%}
+        {%with campaign.next_send_order as counter%}
         {%include 'campaign_leads/htmx/choose_auto_call_templates_row.html'%}
         {%endwith%}
     </tbody>

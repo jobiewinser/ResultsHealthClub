@@ -20,3 +20,8 @@ class Command(BaseCommand):
             campaigntemplatelink.time_interval = 1
             campaigntemplatelink.send_order = campaigntemplatelink.send_order - 1
             campaigntemplatelink.save()
+        for whatsappmessage in WhatsAppMessage.objects.all():
+            if whatsappmessage.send_order:
+                whatsappmessage.send_order = whatsappmessage.send_order - 1
+            whatsappmessage.save()
+            

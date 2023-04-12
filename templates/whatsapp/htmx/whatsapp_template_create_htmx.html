@@ -3,46 +3,62 @@
 
 
 {%block template_name%}
-<h5>Template Name</h5>
-<div class="row"
-    data-bs-toggle="popover" 
-    data-bs-trigger="hover focus" 
-    data-bs-html="true" 
-    data-bs-placement="top"
-    data-bs-title="What does this do?"
-    data-bs-content="This it the name of the template sent to whatsapp. It must only use lowercase letters and underscores! <br><br><small>e.g <b>my_first_message_template</b></small>">
+<div class="row">
     <div class="col">
-        <input class="form-control" id="template_name" oninput="validateWhatsappText(this);" value="{{template.name}}" name="template_name">
+    </div>
+    <div class="col-auto center" style="min-width:400px">
+        <h5>Template Name</h5>
+        <div class="row"
+            data-bs-toggle="popover" 
+            data-bs-trigger="hover focus" 
+            data-bs-html="true" 
+            data-bs-placement="top"
+            data-bs-title="What does this do?"
+            data-bs-content="This it the name of the template sent to whatsapp. It must only use lowercase letters and underscores! <br><br><small>e.g <b>my_first_message_template</b></small>">
+            <div class="col">
+                <input class="form-control" id="template_name" oninput="validateWhatsappText(this);" value="{{template.name}}" name="template_name">
+            </div>
+        </div>
+    </div>
+    <div class="col">
     </div>
 </div>
 {%endblock template_name%}
 
 {%block template_category%}
-<h5>Category</h5>
-<div class="row"
-data-bs-toggle="popover" 
-data-bs-trigger="hover focus" 
-data-bs-html="true" 
-data-bs-placement="top"
-data-bs-title="What do these categories mean?"
-data-bs-content="
-<b>Transactional</b>
-<p>
-    Send account updates, order updates, alerts and more to share important information.
-</p>
-<br>
-<b>Marketing</b>
-<p>
-    Send promotional offers, product announcements and more to increase awareness.
-</p>
-<br>
-">
+<div class="row">
     <div class="col">
-        <select id="template_category" name="template_category" class="form-select form-select-sm align-self-center m-1">
-            {%for k,v in categories.items%}
-            <option {%if template.category == k%}selected {%endif%}value="{{k}}">{{k}}</option>
-            {%endfor%}        
-        </select>
+    </div>
+    <div class="col-auto center" style="min-width:400px">
+        <h5>Category</h5>
+        <div class="row"
+            data-bs-toggle="popover" 
+            data-bs-trigger="hover focus" 
+            data-bs-html="true" 
+            data-bs-placement="top"
+            data-bs-title="What do these categories mean?"
+            data-bs-content="
+            <b>Transactional</b>
+            <p>
+                Send account updates, order updates, alerts and more to share important information.
+            </p>
+            <br>
+            <b>Marketing</b>
+            <p>
+                Send promotional offers, product announcements and more to increase awareness.
+            </p>
+            <br>
+        ">
+            <div class="col">
+                <select id="template_category" name="template_category" class="form-select form-select-sm align-self-center m-1">
+                    {%for k,v in categories.items%}
+                    <option {%if template.category == k%}selected {%endif%}value="{{k}}">{{k}}</option>
+                    {%endfor%}        
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="col">
     </div>
 </div>
 {%endblock template_category%}
