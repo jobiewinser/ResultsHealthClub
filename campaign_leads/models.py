@@ -149,7 +149,7 @@ class ManualCampaign(Campaign):
     @property
     def is_manual(self):
         return True
-    
+
     def __str__(self):
         return f"Manually Created ({self.site.name})"
 

@@ -305,7 +305,7 @@ BLEACH_VALID_ATTRS = {
     'img': ['src', 'alt', 'style'],
 }
 BLEACH_VALID_STYLES = ['color', 'cursor', 'float', 'margin']
-VERSION=1.2
+VERSION=1.21
 
 # CACHES = {
 #         'default': {
