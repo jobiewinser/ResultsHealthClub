@@ -332,7 +332,8 @@ def recreate_calendly_webhook_subscription(request, **kwargs):
         if not site.calendly_organization or not site.calendly_token:
             return HttpResponse("Your Calendly settings are not submitted yet", status=400)        
         response = create_calendly_webhook_subscription(site)
-        return render(request, 'core/htmx/calendly_site_settings.html',{'site':site, 'site_webhook_active':(response.get('resource',{}).get('state')=='active'), 'status_reason':response.content.decode("utf-8"), 'hx_swap_oob':True })
+        return render(request, 'core/htmx/calendly_site_settings.html',{'site':site, 'site_webhook_active':(response.get('resource',{}).get('state')=='active'), 'status_reason':response.get('message', ""), 'hx_swap_oob':True })
+        # return render(request, 'core/htmx/calendly_site_settings.html',{'site':site, 'site_webhook_active':(response.get('resource',{}).get('state')=='active'), 'status_reason':response.content.decode("utf-8"), 'hx_swap_oob':True })
     return HttpResponse("", status="403")
 @login_required
 @not_demo_or_superuser_check
@@ -354,10 +355,10 @@ def delete_calendly_webhook_subscription(request, **kwargs):
 @login_required
 def edit_calendly_configuration(request):
     site = request.user.profile.active_sites_allowed.get(pk=request.POST.get('site_pk')) 
-    if 'calendly_organization' in request.POST:
-        if request.POST['calendly_organization'] == '' or request.POST['calendly_organization'].replace('*', ''): #stops the **** input submitting!
-            site.calendly_organization = request.POST['calendly_organization']        
-            site.save()            
+    # if 'calendly_organization' in request.POST:
+    #     if request.POST['calendly_organization'] == '' or request.POST['calendly_organization'].replace('*', ''): #stops the **** input submitting!
+    #         site.calendly_organization = request.POST['calendly_organization']        
+    #         site.save()            
         
     if 'calendly_token' in request.POST:
         if request.POST['calendly_token'] == '' or request.POST['calendly_token'].replace('*', ''): #stops the **** input submitting!
@@ -372,6 +373,9 @@ def edit_calendly_configuration(request):
     
 def create_calendly_webhook_subscription(site):
     calendly = Calendly(site.calendly_token)
+    calendly_user = calendly.get_user()
+    site.calendly_organization = calendly_user.get('resource', {}).get('current_organization', "").replace("https://api.calendly.com/organizations/", "")
+    site.save()
     calendly_webhooks = calendly.list_webhook_subscriptions(organization = site.calendly_organization).get('collection')
     if calendly_webhooks == None:
         return HttpResponse("Invalid Calendly details", status=400)
