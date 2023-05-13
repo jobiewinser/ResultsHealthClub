@@ -223,14 +223,9 @@ class BookingsOverviewDataViewSet(viewsets.ModelViewSet):
     # permission_classes = [BasicPermissions]
     def list(self, request, *args, **kwargs):
         self.queryset = get_booking_table_context(request)['leads']
-        temp = super(BookingsOverviewDataViewSet, self).list(request)
-        return temp
-    def get_queryset(self):
-        queryset = Campaignlead.objects.all().order_by('id')
-        return queryset
+        return super(BookingsOverviewDataViewSet, self).list(request)
     def filter_queryset(self, request, *args, **kwargs):
-        temp = super(BookingsOverviewDataViewSet, self).filter_queryset(request)
-        return temp
+        return super(BookingsOverviewDataViewSet, self).filter_queryset(request)
         # page = self.paginate_queryset(queryset)
         # if page is not None:
         #     serializer = self.get_serializer(page, many=True)
@@ -244,7 +239,7 @@ def get_booking_table_context(request):
     request.GET._mutable = True     
     context = {}
     # This need further testing. You can archive then sell and it won't show anywhere in the whole ui
-    leads = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, campaign__site__in=request.user.profile.active_sites_allowed, booking__isnull=False)
+    leads = Campaignlead.objects.filter(campaign__site__company=request.user.profile.company, campaign__site__in=request.user.profile.active_sites_allowed, booking__isnull=False).distinct()
     campaign_pks = request.GET.getlist('campaign_pks', None)
 
     campaign_category_pks = request.GET.getlist('campaign_category_pks', None)
@@ -270,11 +265,13 @@ def get_booking_table_context(request):
             pass
     elif context['sites']:
         leads = leads.filter(campaign__site__in=context['sites'])
+        print()
 
     # context['archived_count'] = leads.filter(archived=True).count()
     archived_filter = (request.GET.get('archived', '').lower() =='true')
     if not archived_filter:
         leads = leads.exclude(booking__created=None)
+        print()
     leads = leads.filter(archived=archived_filter)   
     context['archived'] = archived_filter
     

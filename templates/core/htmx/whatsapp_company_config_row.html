@@ -73,7 +73,7 @@
             </div>
             <div class="col-md-auto p-2 center"  style="width:250px"> 
                 <div>
-                    {%if whatsapp_business_details.id%}
+                    {%if whatsapp_business_details.id or demo%}
                     <span class="badge bg-success help"
                         data-bs-toggle="popover" 
                         data-bs-trigger="hover focus" 
@@ -91,7 +91,7 @@
                         data-bs-placement="top"
                         data-bs-title="Invalid Config"
                         data-bs-content="We've detected that your whatsapp config is invalid">
-                        <i class="fa-solid fa-circle-info"></i> {%if demo%}Demo Config{%else%}Invalid Config <i class="fa-solid fa-times"></i>{%endif%}
+                        <i class="fa-solid fa-circle-info"></i> Invalid Config <i class="fa-solid fa-times"></i>{%endif%}
                     </span>
                     {%endif%}
                 </div>   
