@@ -1,13 +1,10 @@
 function initBookingDataTable() {
     console.log("initBookingDataTable")
     try{$('#overview_table').dataTable().fnDestroy()}catch{};
-    
-    let booking_search = null;
-    let booking_search_val = "";
     var dt = $('#overview_table').DataTable(            
         {  
-            "order": [[ 4, 'desc' ]],
-            "iDisplayLength": 10,
+            // "order": [[ 4, 'desc' ]],
+            // "iDisplayLength": 10,
             "columnDefs":[
                 {
                     "targets": [1],

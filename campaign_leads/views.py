@@ -223,9 +223,14 @@ class BookingsOverviewDataViewSet(viewsets.ModelViewSet):
     # permission_classes = [BasicPermissions]
     def list(self, request, *args, **kwargs):
         self.queryset = get_booking_table_context(request)['leads']
-        return super(BookingsOverviewDataViewSet, self).list(request)
+        temp = super(BookingsOverviewDataViewSet, self).list(request)
+        return temp
+    def get_queryset(self):
+        queryset = Campaignlead.objects.all().order_by('id')
+        return queryset
     def filter_queryset(self, request, *args, **kwargs):
-        return super(BookingsOverviewDataViewSet, self).filter_queryset(request)
+        temp = super(BookingsOverviewDataViewSet, self).filter_queryset(request)
+        return temp
         # page = self.paginate_queryset(queryset)
         # if page is not None:
         #     serializer = self.get_serializer(page, many=True)
