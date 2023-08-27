@@ -299,7 +299,7 @@ class Campaignlead(models.Model):
                 return HttpResponse("Messaging Error: No Whatsapp Business Account linked to campaign", status=400)
             customer_number = self.whatsapp_number
             if settings.DEMO:
-                contact, site_contact = get_and_create_contact_and_site_contact_for_lead(self,)
+                contact, site_contact = get_and_create_contact_and_site_contact_for_lead(self, customer_number)
                 whatsapp_message, created = WhatsAppMessage.objects.get_or_create(
                     wamid="",
                     datetime=datetime.now(),
