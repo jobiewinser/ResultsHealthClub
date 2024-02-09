@@ -104,6 +104,8 @@ data-bs-content="
                 >Add</button> 
         </div>  
     </div>  
+    {%else%}
+    Please choose a Site
     {%endif%}
 </td>
 <td >   
@@ -135,6 +137,8 @@ data-bs-content="
     </span> 
     {%elif campaign.site and not campaign.site.subscription.whatsapp_enabled%}
     <i class="fa-solid fa-rectangle-pro"></i> subscription feature
+    {%else%}
+    Please choose a Site
     {%endif%}
 </td>
 <td>
@@ -147,5 +151,7 @@ data-bs-content="
         {% comment %} <button type="button" class="btn btn-primary">
             Notifications <span class="badge text-bg-secondary">4</span>
           </button> {% endcomment %}
+    {%else%}
+    Please choose a Whatsapp number
     {%endif%}
 </td>

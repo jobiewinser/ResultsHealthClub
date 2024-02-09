@@ -1,0 +1,26 @@
+{%load core_tags%}
+<table class="table">
+    <thead>
+        <tr>
+            <th>Order</th>
+            <th>Template</th>
+            <th>After how many total calls</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {%if not campaign.call_campaign_template_links_with_send_orders.0.send_order == 0%}
+        {%with 0 as counter%}
+            {%include 'campaign_leads/htmx/choose_auto_call_templates_row.html'%}
+        {%endwith%}
+        {%endif%}
+        {%for campaign_template_link in campaign.call_campaign_template_links_with_send_orders%}
+            {%with campaign_template_link.send_order as counter%}
+                {%include 'campaign_leads/htmx/choose_auto_call_templates_row.html'%}
+            {%endwith%}
+        {%endfor%}
+        {%with campaign.next_send_order as counter%}
+        {%include 'campaign_leads/htmx/choose_auto_call_templates_row.html'%}
+        {%endwith%}
+    </tbody>
+</table>

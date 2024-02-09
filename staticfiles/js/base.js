@@ -359,3 +359,9 @@ function outputSubscriptionProfileChoice(site_subscription_change_pk) {
     submission_dict['site_subscription_change_pk'] = site_subscription_change_pk
     htmx.ajax('POST', '/choose-attached-profiles/', {target:'#generic_modal_body', swap:'innerHTML', values:submission_dict})
 }
+
+$(document).ajaxComplete(function(event, xhr, settings) { 
+    if(settings.url.includes('booking-overview-data')) { 
+        popoverstuff()
+    } 
+});

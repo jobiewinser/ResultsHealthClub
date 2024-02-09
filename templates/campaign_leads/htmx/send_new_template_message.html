@@ -7,6 +7,8 @@
                 <option value="">Choose a template</option>
                 {%for template in whatsappnumber.whatsapp_business_account.active_live_templates%} 
                 {%if template.name%}
+                {%if not template.lead_only or lead%} 
+                {% comment %} Above checks if we should be showing lead only templates {% endcomment %}
                 <option value="{{template.pk}}" 
                 {%if lead%}
                 data-rendered_template="{{template|render_whatsapp_template_with_lead_to_html_tag:lead|safe}}"
@@ -16,6 +18,7 @@
                 data-rendered_template="{{template|render_whatsapp_template_to_html_tag|safe}}"
                 {%endif%}
                 >{{template.name}}</option>
+                {%endif%}
                 {%endif%}
                 {%endfor%}
             </select>

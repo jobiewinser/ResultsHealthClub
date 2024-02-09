@@ -43,9 +43,9 @@ class Calendly():
         }
         if user or organization:
             if user:
-                body.update({'user':f"{os.getenv('CALENDLY_URL')}/organizations/{user}", 'scope':'user'})
+                body.update({'user':f"{os.getenv('CALENDLY_URL')}/users/{user}", 'scope':'user'})
             else:
-                body.update({'organization':f"{os.getenv('CALENDLY_URL')}/users/{organization}", 'scope':'organization'})
+                body.update({'organization':f"{os.getenv('CALENDLY_URL')}/organizations/{organization}", 'scope':'organization'})
             response = requests.post(url=url, json=body, headers=headers)
             response_body = response.json()
             return response_body
@@ -57,6 +57,14 @@ class Calendly():
         response = requests.get(url=uri, headers=headers)
         response_body = response.json()
         print("response_body", response_body)
+        return response_body
+    #GET
+    def get_user(self):   
+        url = f"{self.calendly_url}/users/me"
+        headers = self._get_headers()
+        
+        response = requests.get(url=url, headers=headers)
+        response_body = response.json()
         return response_body
     #GET
     def list_webhook_subscriptions(self, organization = None, user = None):   

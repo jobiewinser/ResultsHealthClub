@@ -235,7 +235,7 @@ def add_manual_booking(request, **kwargs):
             }
         )
         request.user.profile.company.get_company_cache().clear()
-        return HttpResponse( status=200)
+        return HttpResponse(str(lead.pk), status=200)
     except Exception as e:
         logger.debug("add_manual_booking Error "+str(e))
         #return HttpResponse(e, status=500)

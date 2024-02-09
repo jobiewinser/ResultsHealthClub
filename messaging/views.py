@@ -55,7 +55,10 @@ def message_window(request, **kwargs):
         if not kwargs.get('refresh') == 'refresh':
             context["seconds_until_send_disabled"] = 5
         else:
-            del context["seconds_until_send_disabled"]
+            try:
+                del context["seconds_until_send_disabled"]
+            except:
+                pass
     # temp = SiteContact.objects.filter(site=whatsappnumber.site, contact__customer_number=kwargs.get('customer_number'))
     contact, created = Contact.objects.get_or_create(company=request.user.profile.company, customer_number=kwargs.get('customer_number'))
     context["site_contact"], created = SiteContact.objects.get_or_create(site=whatsappnumber.site, contact=contact)
@@ -120,7 +123,7 @@ def send_first_template_whatsapp(request, kwargs):
                     campaign_lead = lead,
                     archived = False,
                 ).update(archived = True) 
-            lead.send_template_whatsapp_message(whatsappnumber=lead.campaign.whatsapp_business_account.whatsappnumber, send_order=1)
+            lead.send_template_whatsapp_message(whatsappnumber=lead.campaign.whatsapp_business_account.whatsappnumber, send_order=0)
     messages = WhatsAppMessage.objects.filter(customer_number=kwargs.get('customer_number'), whatsappnumber__number=kwargs.get('messaging_phone_number')).order_by('-datetime')
     context = {}
     context["messages"] = messages

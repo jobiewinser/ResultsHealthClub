@@ -1,13 +1,10 @@
 function initBookingDataTable() {
     console.log("initBookingDataTable")
     try{$('#overview_table').dataTable().fnDestroy()}catch{};
-    
-    let booking_search = null;
-    let booking_search_val = "";
     var dt = $('#overview_table').DataTable(            
         {  
-            "order": [[ 4, 'desc' ]],
-            "iDisplayLength": 10,
+            // "order": [[ 4, 'desc' ]],
+            // "iDisplayLength": 10,
             "columnDefs":[
                 {
                     "targets": [1],
@@ -34,6 +31,7 @@ function bookinghandlehtmxafterSwap(evt){
             } else if (evt.detail.pathInfo.requestPath.includes("add-manual-booking")){
                 $('#generic_modal').modal('hide');
                 snackbarShow('Successfully added a booking', 'success')
+                htmx.ajax('GET', "/refresh-booking-row/"+evt.detail.xhr.response+"/", {swap:'innerHTML', target: '#row_'+evt.detail.xhr.response})
             } else if (evt.detail.pathInfo.requestPath.includes("create-campaign-lead")){
                 $('#refresh_overview_table').click(); 
                 $('#generic_modal').modal('hide');

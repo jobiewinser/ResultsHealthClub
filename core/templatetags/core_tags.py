@@ -419,3 +419,16 @@ def start_of_month_date_tag(anything):
 def start_of_week_date_tag(anything):
     today_date = datetime.today()
     return today_date - timedelta(days=today_date.weekday()+1)
+
+@register.filter
+def get_lowest_allowed_call_interval_tag(campaign, send_order):
+    highest_call_interval_before_send_order = campaign.get_highest_call_interval_before_send_order(send_order)
+    if highest_call_interval_before_send_order:
+        return highest_call_interval_before_send_order + 1
+    return 1
+@register.filter
+def get_highest_allowed_call_interval_tag(campaign, send_order):
+    lowest_call_interval_after_send_order = campaign.get_lowest_call_interval_after_send_order(send_order)
+    if lowest_call_interval_after_send_order:
+        return lowest_call_interval_after_send_order - 1
+    return None

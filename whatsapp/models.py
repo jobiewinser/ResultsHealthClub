@@ -143,7 +143,7 @@ class WhatsappTemplate(models.Model):
     pending_language = models.TextField(null=True, blank=True)
     
     last_approval = models.DateTimeField(null=True, blank=True)
-
+    lead_only = models.BooleanField(default=False)
     components = ArrayField(
         JSONField(default=dict),
         null=True,

@@ -38,7 +38,7 @@ def subscription_options(request):
     context_extras = {}
     subscription_options = cache.get("subscription_options")
     if subscription_options is None:
-        cache.set("subscription_options", Subscription.objects.filter(visible_to_all=True, active=True), 2000)
+        cache.set("subscription_options", Subscription.objects.filter(visible_to_all=True, active=True).order_by('numerical'), 2000)
         subscription_options = cache.get("subscription_options")
     context_extras['subscription_options'] = subscription_options
     from django.db import connections
