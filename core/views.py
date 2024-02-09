@@ -992,7 +992,7 @@ def profile_assign_color_htmx(request):
     return render(request, 'core/htmx/company_configuration_row.html', {'profile':profile})
 
 @login_required
-@not_demo_or_superuser_check
+# @not_demo_or_superuser_check
 def change_theme(request):
     profile = request.user.profile
     profile.theme = request.POST.get('theme', 'light')

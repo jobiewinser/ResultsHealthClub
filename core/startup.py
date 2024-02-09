@@ -11,22 +11,23 @@ import sys
         
 def run_startup():
     # try:
-        webhooks = list_webhooks()
-        webhook_found = False
-        for webhook in webhooks:
-            if webhook['url'] == f'{os.getenv("SITE_URL")}/stripe-webhooks/':
-                if 'customer.subscription.created' in webhook['enabled_events'] \
-                    and 'customer.subscription.deleted' in webhook['enabled_events']  \
-                    and 'customer.subscription.updated' in webhook['enabled_events']  \
-                    and 'invoice.payment_succeeded' in webhook['enabled_events']  \
-                    and 'invoice.payment_failed' in webhook['enabled_events'] \
-                    and StripeConfig.objects.filter(webhook_id=webhook['id']).exists():
-                    webhook_found = True
-                    break
-                else:
-                    delete_webhook(webhook['id'])
-        if not webhook_found:
-            create_webhook()
+        if not settings.DEMO:
+            webhooks = list_webhooks()
+            webhook_found = False
+            for webhook in webhooks:
+                if webhook['url'] == f'{os.getenv("SITE_URL")}/stripe-webhooks/':
+                    if 'customer.subscription.created' in webhook['enabled_events'] \
+                        and 'customer.subscription.deleted' in webhook['enabled_events']  \
+                        and 'customer.subscription.updated' in webhook['enabled_events']  \
+                        and 'invoice.payment_succeeded' in webhook['enabled_events']  \
+                        and 'invoice.payment_failed' in webhook['enabled_events'] \
+                        and StripeConfig.objects.filter(webhook_id=webhook['id']).exists():
+                        webhook_found = True
+                        break
+                    else:
+                        delete_webhook(webhook['id'])
+            if not webhook_found:
+                create_webhook()
         subscription, created = Subscription.objects.get_or_create(name="free")
         subscription.max_profiles = 5
         subscription.analytics_seconds = 604800
